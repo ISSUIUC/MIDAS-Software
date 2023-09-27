@@ -6,9 +6,10 @@
  */
 
 #include "sensor_data.h"
-
+#include "errors.h"
 
 struct LowGSensor {
+    ErrorCode init();
     LowGData read();
 };
 
