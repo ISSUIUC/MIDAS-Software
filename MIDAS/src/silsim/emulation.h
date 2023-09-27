@@ -1,13 +1,5 @@
 #pragma once
 
-#ifndef SILSIM
-
-#include <FreeRTOS.h>
-#include <semphr.h>
-
-#define MUTEX_TIMEOUT ((TickType_t) 100000)
-#define QUEUE_LENGTH 100
-
 template<typename T>
 struct Mutex {
 private:
@@ -71,9 +63,3 @@ public:
 #define START_THREAD(name, core, arg) StaticTask_t name##_task;                \
                                       unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + 1, name##_stack, &name##_task, core)
-
-#else
-
-#include "silsim/emulation.h"
-
-#endif

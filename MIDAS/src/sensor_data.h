@@ -79,8 +79,6 @@ struct KalmanData {
     AccelerationData acceleration;
 
     float altitude;
-
-    clock_t timeStamp_state = 0;
 };
 
 struct Pyro {
