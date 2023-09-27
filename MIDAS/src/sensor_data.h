@@ -1,5 +1,11 @@
 #pragma once
 
+/**
+ * This header provides all the implementation for the data that comes from all of the sensors/
+ * These structs will be individual packets of data passed between the sensor and the 
+ * rocket_state struct, and each will be tagged with a timestamp.
+*/
+
 struct PositionData {
     float px = 0;
     float py = 0;

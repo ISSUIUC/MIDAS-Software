@@ -17,6 +17,11 @@ static unsigned char CONTINUITY_STACK[STACK_SIZE];
 constexpr std::size_t SENSOR_CORE = 0;
 constexpr std::size_t DATA_CORE = 1;
 
+
+/**
+ * Reference to documentation of a type of function that could be a task
+ * See below for actual, implemented functions
+*/
 int i = 0;
 /* Task to be created. */
 void vTaskCode( void * pvParameters )
@@ -32,6 +37,11 @@ void vTaskCode( void * pvParameters )
     }
 }
 
+/**
+ *  Reference from documentation that creates non-core-pinned tasks
+ *  Not currently in use as we are pinning all threads to cores
+*/
+
 void init_thread(TaskFunction_t function, const char* name, UBaseType_t priority, TaskHandle_t* handle) {
     BaseType_t xReturned;
     xReturned = xTaskCreate(function, name, STACK_SIZE, NULL, priority, handle);
@@ -39,6 +49,10 @@ void init_thread(TaskFunction_t function, const char* name, UBaseType_t priority
         Serial.println("Failed to create task");
     }
 }
+
+/**
+ * Thread functions, these are the code snippets that actually run upon initializing each respective thread
+*/
 
 void data_logger_thread(void* pvParameters) {
     while (true) {
@@ -100,6 +114,9 @@ void continuity_thread(void* pvParameters) {
     }
 }
 
+/**
+ * Creates all threads for each sensor, FSM, Kalman algorithim, and data logging member
+*/
 void setup() {
     StaticTask_t data_logger_task;
     xTaskCreateStaticPinnedToCore(data_logger_thread, "data_logger", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, DATA_LOG_STACK, &data_logger_task, SENSOR_CORE);
@@ -120,7 +137,7 @@ void setup() {
     xTaskCreateStaticPinnedToCore(magnometer_thread, "magnometer", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, MAGNOMETER_STACK, &magnometer_task, SENSOR_CORE);
 
     StaticTask_t gps_task;
-    xTaskCreateStaticPinnedToCore(gps_thread, "gps", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, GPS_STACK, &gps_task, SENSOR_CORE);
+    xTaskCreateStaticPinnedToCore(gps_thread, "gps", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, GPS_STACK, &gps_task, DATA_CORE);
 
     StaticTask_t gas_task;
     xTaskCreateStaticPinnedToCore(gas_thread, "gas", STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, GAS_STACK, &gas_task, SENSOR_CORE);
