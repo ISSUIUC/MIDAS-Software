@@ -1,5 +1,4 @@
-#pragma oncegit
-
+#pragma once
 
 struct LowGData {
     float gx = 0;
