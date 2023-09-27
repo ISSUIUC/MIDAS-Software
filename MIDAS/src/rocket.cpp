@@ -94,7 +94,7 @@ void start_threads(RocketConfig config) {
     START_THREAD(high_g, SENSOR_CORE, &config);
     START_THREAD(orientation, SENSOR_CORE, &config);
     START_THREAD(magnetometer, SENSOR_CORE, &config);
-    START_THREAD(gps, SENSOR_CORE, &config);
+    START_THREAD(gps, DATA_CORE, &config);
     START_THREAD(gas, SENSOR_CORE, &config);
     START_THREAD(voltage, SENSOR_CORE, &config);
     START_THREAD(continuity, SENSOR_CORE, &config);

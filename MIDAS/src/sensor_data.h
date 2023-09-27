@@ -23,6 +23,10 @@ struct Velocity {
     float vx = 0;
     float vy = 0;
     float vz = 0;
+
+    float get_Speed() {
+        return sqrt(vx * vx + vy * vy + vz * vz);
+    }
 };
 
 struct Acceleration {

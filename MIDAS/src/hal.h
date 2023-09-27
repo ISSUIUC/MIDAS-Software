@@ -108,6 +108,11 @@ public:
  */
 #define STACK_SIZE 1024
 
+/**
+ * The two cores we have: 
+ * SENSOR_CORE will hold all of the sensor tasks writing to the struct
+ * DATA_CORE will have all of the tasks reading from the struct for data logging, along with GPS
+*/
 #define SENSOR_CORE ((BaseType_t) 0)
 #define DATA_CORE ((BaseType_t) 1)
 
