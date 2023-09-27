@@ -136,9 +136,6 @@ public:
 #define START_THREAD(name, core, arg) StaticTask_t name##_task;                \
                                       unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + 1, name##_stack, &name##_task, core)
-
-#define THREAD_SLEEP(millis) (vTaskDelay((millis) / portTICK_PERIOD_MS))
-
 /**
  * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
  * Function to be run by the thread, this contains a `while(true)` loop
@@ -150,6 +147,12 @@ public:
  * A handle to reference the task with
  * The core to pin the task to
  */
+
+/**
+ * delays a task for a certain amount of time in milliseconds
+ * @param millis the time to delay in milliseconds
+*/
+#define THREAD_SLEEP(millis) (vTaskDelay((millis) / portTICK_PERIOD_MS))
 
 #else
 
