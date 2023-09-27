@@ -1,6 +1,7 @@
 #include "rocket.h"
 
 #include "hal.h"
+#include "sensors.h"
 
 /**
  * These are all the functions that will run in each task
@@ -23,7 +24,10 @@ DECLARE_THREAD(barometer, RocketConfig* arg) {
 
 DECLARE_THREAD(low_g, RocketConfig* arg) {
     while (true) {
+        LowGData reading = arg->sensors.low_g.read();
+        arg->rocket_state.low_g.update(reading);
 
+        THREAD_SLEEP(16);
     }
 }
 
@@ -79,8 +83,6 @@ DECLARE_THREAD(kalman, RocketConfig* arg) {
     while (true) {
 
     }
-    // Kill thread
-    vTaskDelete(NULL);
 }
 
 /**
