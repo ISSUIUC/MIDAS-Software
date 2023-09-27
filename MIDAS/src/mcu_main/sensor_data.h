@@ -1,5 +1,23 @@
 #pragma once
 
+struct PositionData {
+    float px = 0;
+    float py = 0;
+    float pz = 0;
+};
+
+struct VelocityData {
+    float vx = 0;
+    float vy = 0;
+    float vz = 0;
+};
+
+struct AccelerationData {
+    float ax =0 ;
+    float ay = 0;
+    float az = 0;
+};
+
 struct LowGData {
     float gx = 0;
     float gy = 0;
@@ -53,24 +71,6 @@ struct Orientation {
     Magnetometer magnetometer;
 
     float temperature;
-};
-
-struct PositionData {
-    float px = 0; 
-    float py = 0; 
-    float pz = 0;
-};
-
-struct VelocityData {
-    float vx = 0; 
-    float vy = 0; 
-    float vz = 0;
-};
-
-struct AccelerationData {
-    float ax =0 ; 
-    float ay = 0; 
-    float az = 0;
 };
 
 struct KalmanData {
