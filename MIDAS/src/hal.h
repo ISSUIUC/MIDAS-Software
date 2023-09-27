@@ -67,7 +67,21 @@ public:
 #define SENSOR_CORE ((BaseType_t) 0)
 #define DATA_CORE ((BaseType_t) 1)
 
+/**
+ * Macro for declaring the functionality of a thread
+ * @param name the name of the task
+ * @param param parameters to input into the thread
+*/
 #define DECLARE_THREAD(name, param) [[noreturn]] void name##_thread(param)
+
+/**
+ * Macro for creating the thread itself
+ * @param name name of the thread
+ * @param core core for the task to be pinned to
+ * @param arg confiug arguments for the task to take in
+ * 
+ * @return a value determining the success of thread creation, pdPASS if successful, errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY if not
+*/
 #define START_THREAD(name, core, arg) StaticTask_t name##_task;                \
                                       unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + 1, name##_stack, &name##_task, core)

@@ -2,7 +2,13 @@
 
 #include "hal.h"
 
-
+/**
+ * These are all the functions that will run in each task
+ * Each function has a while true loop within that should not be returned out of or yielded in any way
+ * 
+ * @param {name} the name of the thread, replace with the actual name
+ * @param arg the config file for the rocket
+*/
 DECLARE_THREAD(data_logger, RocketConfig* arg) {
     while (true) {
 
@@ -63,8 +69,21 @@ DECLARE_THREAD(continuity, RocketConfig* arg) {
     }
 }
 
+DECLARE_THREAD(fsm, RocketConfig* arg) {
+    while (true) {
+
+    }
+}
+
+DECLARE_THREAD(kalman, RocketConfig* arg) {
+    while (true) {
+
+    }
+}
+
 /**
  * Creates all threads for each sensor, FSM, Kalman algorithim, and data logging member
+ * Starts thread scheduler to actually start doing jobs
 */
 void start_threads(RocketConfig config) {
     START_THREAD(data_logger, DATA_CORE, &config);
@@ -77,6 +96,8 @@ void start_threads(RocketConfig config) {
     START_THREAD(gas, SENSOR_CORE, &config);
     START_THREAD(voltage, SENSOR_CORE, &config);
     START_THREAD(continuity, SENSOR_CORE, &config);
+    START_THREAD(fsm, SENSOR_CORE, &config);
+    START_THREAD(kalman, SENSOR_CORE, &config);
 
     vTaskStartScheduler();
 }
