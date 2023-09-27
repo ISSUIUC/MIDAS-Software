@@ -132,6 +132,18 @@ public:
  * @param core core for the task to be pinned to
  * @param arg config arguments for the task to take in
  */
+
+/**
+ * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
+ * Function to be run by the thread, this contains a `while(true)` loop
+ * Name of thread 
+ * Size of the stack for each thread in words (1 word = 4 bytes)
+ * Arguments to be passed into the function, this will generally eb the config file
+ * Priority of the task, in allmost all cases, this will be the idle priority plus one
+ * The actual stack memory to use
+ * A handle to reference the task with
+ * The core to pin the task to
+*/
 #define START_THREAD(name, core, arg) StaticTask_t name##_task;                \
                                       unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + 1, name##_stack, &name##_task, core)
