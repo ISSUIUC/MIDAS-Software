@@ -1,10 +1,17 @@
 #pragma once
 
+#include <cmath>
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
  * rocket_state struct, and each will be tagged with a timestamp.
 */
+
+struct Vec3 {
+    float x = 0;
+    float y = 0;
+    float z = 0;
+};
 
 struct Position {
     float px = 0;
@@ -22,6 +29,11 @@ struct Acceleration {
     float ax = 0 ;
     float ay = 0;
     float az = 0;
+
+    // Get G-Force applied on the rocket
+    float get_Gees() {
+        return sqrt(ax * ax + ay * ay + az * az);
+    }
 };
 
 struct LowGData {

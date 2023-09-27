@@ -1,5 +1,7 @@
 #pragma once
 
+#include "hal.h"
+
 template<typename T>
 struct Mutex {
 private:

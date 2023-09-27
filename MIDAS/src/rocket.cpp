@@ -79,6 +79,8 @@ DECLARE_THREAD(kalman, RocketConfig* arg) {
     while (true) {
 
     }
+    // Kill thread
+    vTaskDelete(NULL);
 }
 
 /**
