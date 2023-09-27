@@ -1,6 +1,6 @@
 #pragma once
 
-#include "mcu_main/sensor_data.h"
+#include "sensor_data.h"
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *

@@ -5,7 +5,7 @@
  * we can switch whether we're using hardware sensors or emulated sensors
  */
 
-#include "mcu_main/sensor_data.h"
+#include "sensor_data.h"
 
 
 struct LowGSensor {
