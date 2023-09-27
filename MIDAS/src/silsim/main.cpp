@@ -3,6 +3,6 @@
 
 int main() {
 //    RocketConfig config { };
-//    start_rocket(config);
+//    start_threads(config);
     return 0;
 }

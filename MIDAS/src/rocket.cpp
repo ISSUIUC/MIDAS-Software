@@ -66,7 +66,7 @@ DECLARE_THREAD(continuity, RocketConfig* arg) {
 /**
  * Creates all threads for each sensor, FSM, Kalman algorithim, and data logging member
 */
-void start_rocket(RocketConfig config) {
+void start_threads(RocketConfig config) {
     START_THREAD(data_logger, DATA_CORE, &config);
     START_THREAD(barometer, SENSOR_CORE, &config);
     START_THREAD(low_g, SENSOR_CORE, &config);

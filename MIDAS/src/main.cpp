@@ -4,7 +4,7 @@
 void setup() {
     RocketConfig config { .sensors = Sensors(), .rocket_state = RocketState() };
 
-    start_rocket(config);
+    start_threads(config);
 }
 
 void loop() {

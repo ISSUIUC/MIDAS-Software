@@ -6,20 +6,20 @@
  * rocket_state struct, and each will be tagged with a timestamp.
 */
 
-struct PositionData {
+struct Position {
     float px = 0;
     float py = 0;
     float pz = 0;
 };
 
-struct VelocityData {
+struct Velocity {
     float vx = 0;
     float vy = 0;
     float vz = 0;
 };
 
-struct AccelerationData {
-    float ax =0 ;
+struct Acceleration {
+    float ax = 0 ;
     float ay = 0;
     float az = 0;
 };
@@ -67,10 +67,10 @@ struct Orientation {
     float pitch = 0;
     float roll = 0;
 
-    VelocityData orientation_velocity;
-    AccelerationData orientation_acceleration;
+    Velocity orientation_velocity;
+    Acceleration orientation_acceleration;
 
-    AccelerationData linear_acceleration;
+    Acceleration linear_acceleration;
 
     float gx = 0, gy = 0, gz = 0;
 
@@ -80,9 +80,9 @@ struct Orientation {
 };
 
 struct KalmanData {
-    PositionData position;
-    VelocityData velocity;
-    AccelerationData acceleration;
+    Position position;
+    Velocity velocity;
+    Acceleration acceleration;
 
     float altitude;
 };
