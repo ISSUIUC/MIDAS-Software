@@ -24,9 +24,11 @@ void init_thread(TaskFunction_t function, const char* name, UBaseType_t priority
     xReturned = xTaskCreate(function, name, STACK_SIZE, NULL, priority, handle);
     if (xReturned != pdPASS) {
         Serial.println("Failed to create task");
-static const int STACK_SIZE = 1024;
-constexpr std::size_t SENSOR_CORE = 0;
-constexpr std::size_t DATA_CORE = 1;
+        static const int STACK_SIZE = 1024;
+        constexpr std::size_t SENSOR_CORE = 0;
+        constexpr std::size_t DATA_CORE = 1;
+    }
+}
 
 void data_logger_thread(void* pvParameters) {
     configASSERT(((uint32_t) pvParameters ) == 1);
@@ -36,10 +38,12 @@ void data_logger_thread(void* pvParameters) {
 }
 
 void setup() {
-    TaskHandle_t data_logger_task = NULL;
-    xTaskCreateStaticPinnedToCore(data_logger_thread, "data_logger", STACK_SIZE, NULL, tskIDLE_PRIORITY, &data_logger_task);
+    StaticTask_t data_logger_task;
+    unsigned char stack_data[STACK_SIZE];
+    xTaskCreateStaticPinnedToCore(data_logger_thread, "data_logger", STACK_SIZE, NULL, tskIDLE_PRIORITY, stack_data, &data_logger_task, 0);
     vTaskStartScheduler();
 }
 
 void loop() {
+
 }
