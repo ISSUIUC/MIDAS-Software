@@ -8,15 +8,21 @@
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
 
-class RocketState {
-    bool pyro_should_be_firing;
-
-    Mutex<LowGData> low_g;
-    Queue<LowGData> low_g_queue;
+template<typename SensorData>
+struct SensorState {
+private:
+    Mutex<SensorData> current;
+    Queue<Datatype> queue;
 
 public:
-    void updateLowG(LowGData data);
-    LowGData getRecentLowG();
-    bool getQueuedLowG(LowGData* out);
+    void update(SensorData data);
+    SensorData getRecent();
+    bool getQueued(SensorData* out);
+};
+
+struct RocketState {
+    bool pyro_should_be_firing;
+
+    SensorState<LowGData> low_g;
 };
 
