@@ -42,7 +42,7 @@ struct Barometer {
 };
 
 struct Continuity {
-    bool is_continious = false;
+    bool is_continuous = false;
 };
 
 struct Voltage {
@@ -53,7 +53,7 @@ struct GPS {
     float latitude = 0;
     float longitudinal = 0;
     float altitude = 0;
-    float satalite_count = 0;
+    float satellite_count = 0;
 };
 
 struct Magnetometer {
@@ -70,7 +70,7 @@ struct Orientation {
     VelocityData orientation_velocity;
     AccelerationData orientation_acceleration;
 
-    AccelerationData lienar_acceleration;
+    AccelerationData linear_acceleration;
 
     float gx = 0, gy = 0, gz = 0;
 
