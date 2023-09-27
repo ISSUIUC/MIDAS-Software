@@ -16,11 +16,4 @@ struct LowGSensor {
 
 struct Sensors {
     LowGSensor low_g;
-    HighGData high_g;
-    Barometer barometer;
-    Continuity continuity;
-    Voltage voltage;
-    GPS gps;
-    Magnetometer magnometer;
-    Orientation orientation;
 };
