@@ -7,6 +7,9 @@
  * rocket_state struct, and each will be tagged with a timestamp.
 */
 
+/**
+ * First 4 structs are base vector, pos, vel, and accel data to be used elsewhere
+*/
 struct Vec3 {
     float x = 0;
     float y = 0;
@@ -40,6 +43,9 @@ struct Acceleration {
     }
 };
 
+/**
+ * Structs starting here represent specific sensors and the respective data
+*/
 struct LowGData {
     float gx = 0;
     float gy = 0;

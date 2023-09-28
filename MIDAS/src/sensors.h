@@ -13,7 +13,36 @@ struct LowGSensor {
     LowGData read();
 };
 
+struct HighGSensor {
+    ErrorCode init();
+    HighGData read();
+};
+
+struct BarometerSensor {
+    ErrorCode init();
+    Barometer read();
+};
+
+struct ContinuitySensor {
+    ErrorCode init();
+    Continuity read();
+};
+
+struct VoltageSensor {
+    ErrorCode init();
+    Voltage read();
+};
+
+struct OrientationSensor {
+    ErrorCode init();
+    Orientation read();
+};
 
 struct Sensors {
     LowGSensor low_g;
+    HighGSensor high_g;
+    BarometerSensor barometer;
+    ContinuitySensor continuity;
+    VoltageSensor voltage;
+    OrientationSensor orientation;
 };
