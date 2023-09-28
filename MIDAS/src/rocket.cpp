@@ -14,12 +14,14 @@ DECLARE_THREAD(data_logger, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(barometer, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(low_g, RocketConfig* arg) {
@@ -29,60 +31,70 @@ DECLARE_THREAD(low_g, RocketConfig* arg) {
 
         THREAD_SLEEP(16);
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(high_g, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(orientation, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(magnetometer, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(gps, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(gas, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(voltage, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(continuity, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(fsm, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(kalman, RocketConfig* arg) {
     while (true) {
 
     }
+    vTaskDelete(NULL);
 }
 
 /**
