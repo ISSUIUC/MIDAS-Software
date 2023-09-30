@@ -20,6 +20,9 @@ private:
 
 public:
     Mutex() = delete;
+    Mutex(const Mutex&) = delete;
+    Mutex(Mutex&&) = delete;
+
 
     /**
      * Initializes the mutex with an initial contained value.
@@ -28,7 +31,7 @@ public:
      */
     explicit Mutex(T data) : mutex_buffer() {
         mutex_handle = xSemaphoreCreateMutexStatic(&mutex_buffer);
-        configASSERT(mutex_handle);
+        // configASSERT(mutex_handle);
     }
 
     /**

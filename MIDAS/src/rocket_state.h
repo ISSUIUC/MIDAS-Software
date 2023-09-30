@@ -31,7 +31,7 @@ public:
         return queue.receive(out);
     };
 
-    SensorState() : current(Mutex<SensorData>(SensorData())) { }
+    SensorState() : current(SensorData()) { }
 };
 
 struct RocketState {

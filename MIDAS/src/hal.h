@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Arduino.h>
+
 /**
  *  The size of a stack, in bytes.
  */

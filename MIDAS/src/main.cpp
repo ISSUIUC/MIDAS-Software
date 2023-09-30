@@ -8,12 +8,12 @@
 /**
  * Sets the config file and then starts all the threads using the config.
  */
-void setup() {
-    RocketConfig config { .sensors = Sensors(), .rocket_state = RocketState() };
+RocketConfig config;
 
+void setup() {
+    Serial.begin(9600);
     start_rocket(config);
 }
 
 void loop() {
-
 }

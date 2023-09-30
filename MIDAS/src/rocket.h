@@ -5,11 +5,8 @@
 
 
 struct RocketConfig {
-public:
-    Sensors sensors;
-    RocketState rocket_state;
-
-    RocketConfig() = delete;
+    Sensors sensors{};
+    RocketState rocket_state{};
 };
 
-void start_rocket(RocketConfig config);
+void start_rocket(RocketConfig& config);

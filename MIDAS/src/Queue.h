@@ -15,7 +15,8 @@
  */
 template<typename T, uint64_t length = QUEUE_LENGTH>
 class Queue {
-private:
+// private:
+public:
     // todo probably have the Queue Store the timestamps too
     StaticQueue_t queue_area{};
     uint8_t buffer[sizeof(T) * length]{};
@@ -24,8 +25,10 @@ private:
 public:
     Queue() {
         queue = xQueueCreateStatic(length, sizeof(T), buffer, &queue_area);
-        configASSERT(mutex_handle);
+        // configASSERT(mutex_handle);
     }
+    Queue(const Queue&) = delete;
+    Queue(Queue&&) = delete;
 
     /**
      * Put a value in the queue. If the queue is full or timed out, do nothing.
