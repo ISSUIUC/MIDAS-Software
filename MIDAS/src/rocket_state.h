@@ -2,6 +2,8 @@
 
 #include "sensor_data.h"
 #include "hal.h"
+#include "Mutex.h"
+#include "Queue.h"
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
