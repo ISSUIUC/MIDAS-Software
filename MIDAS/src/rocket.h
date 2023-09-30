@@ -12,4 +12,4 @@ public:
     RocketConfig() = delete;
 };
 
-void start_threads(RocketConfig config);
+void start_rocket(RocketConfig config);

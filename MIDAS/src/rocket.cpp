@@ -97,11 +97,30 @@ DECLARE_THREAD(kalman, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
+#define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
+bool init_sensors(Sensors& sensors) {
+    // todo message on failure
+    INIT_SENSOR(sensors.low_g);
+    INIT_SENSOR(sensors.high_g);
+    INIT_SENSOR(sensors.barometer);
+    INIT_SENSOR(sensors.continuity);
+    INIT_SENSOR(sensors.orientation);
+    INIT_SENSOR(sensors.voltage);
+    return true;
+}
+#undef INIT_SENSOR
+
 /**
  * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
  * Starts thread scheduler to actually start doing jobs
 */
-void start_threads(RocketConfig config) {
+void start_rocket(RocketConfig config) {
+    bool success = init_sensors(config.sensors);
+    if (!success) {
+        // todo some message probably
+        return;
+    }
+
     START_THREAD(data_logger, DATA_CORE, &config);
     START_THREAD(barometer, SENSOR_CORE, &config);
     START_THREAD(low_g, SENSOR_CORE, &config);
