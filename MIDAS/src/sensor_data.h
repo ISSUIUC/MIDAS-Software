@@ -27,18 +27,18 @@ struct Velocity {
     float vy = 0;
     float vz = 0;
 
-    float get_Speed() {
+    float get_speed() {
         return sqrt(vx * vx + vy * vy + vz * vz);
     }
 };
 
 struct Acceleration {
-    float ax = 0 ;
+    float ax = 0;
     float ay = 0;
     float az = 0;
 
     // Get G-Force applied on the rocket
-    float get_Gees() {
+    float get_magnitude() {
         return sqrt(ax * ax + ay * ay + az * az);
     }
 };
