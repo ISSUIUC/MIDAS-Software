@@ -88,7 +88,7 @@ public:
      * @param value The value to put in the queue.
      */
     void send(T value) {
-        xQueueSendToBack(queue, &value, MUTEX_TIMEOUT);
+        xQueueSendToBack(queue, &value, 0);
     }
 
     /**
@@ -98,7 +98,7 @@ public:
      * @return True if there was a value in the queue that was read into `out`, false otherwise.
      */
     bool receive(T* out) {
-        return xQueueReceive(queue, out, MUTEX_TIMEOUT);
+        return xQueueReceive(queue, out, 0);
     }
 };
 
@@ -134,7 +134,7 @@ public:
  * @param arg config arguments for the task to take in
  */
 #define START_THREAD(name, core, arg) StaticTask_t name##_task;                \
-                                      unsigned char name##_stack[STACK_SIZE];            \
+                                      static unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + 1, name##_stack, &name##_task, core)
 /**
  * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
@@ -152,7 +152,7 @@ public:
  * delays a task for a certain amount of time in milliseconds
  * @param millis the time to delay in milliseconds
 */
-#define THREAD_SLEEP(millis) (vTaskDelay((millis) / portTICK_PERIOD_MS))
+#define THREAD_SLEEP(millis) vTaskDelay(pdMS_TO_TICKS(millis))
 
 #else
 
