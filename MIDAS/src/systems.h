@@ -4,9 +4,9 @@
 #include "rocket_state.h"
 
 
-struct RocketConfig {
+struct RocketSystems {
     Sensors sensors{};
     RocketState rocket_state{};
 };
 
-void start_rocket(RocketConfig& config);
+void begin_systems(RocketSystems& config);

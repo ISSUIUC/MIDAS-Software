@@ -1,8 +1,8 @@
 #include "silsim/emulation.h"
-#include "rocket.h"
+#include "systems.h"
 
 int main() {
-//    RocketConfig config { };
-//    start_threads(config);
+    RocketSystems systems;
+    begin_systems(systems);
     return 0;
 }

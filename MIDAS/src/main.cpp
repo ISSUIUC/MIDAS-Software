@@ -1,19 +1,15 @@
-#include "rocket.h"
-#include "sensors.h"
-
-#ifdef HILSIM
-// HILSIM code
-#endif
+#include "systems.h"
 
 /**
  * Sets the config file and then starts all the threads using the config.
  */
-RocketConfig config;
+RocketSystems systems;
 
 void setup() {
     Serial.begin(9600);
-    start_rocket(config);
+    begin_systems(systems);
 }
 
 void loop() {
+
 }

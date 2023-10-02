@@ -1,6 +1,16 @@
 #pragma once
 
+#ifdef SILSIM
+
+#include "silsim/emulation.h"
+
+#else
 #include <Arduino.h>
+#include "FreeRTOSConfig.h"
+
+#include "hardware/Mutex.h"
+#include "hardware/Queue.h"
+#endif
 
 /**
  *  The size of a stack, in bytes.

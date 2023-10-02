@@ -1,4 +1,4 @@
-#include "rocket.h"
+#include "systems.h"
 
 #include "hal.h"
 #include "sensors.h"
@@ -10,7 +10,7 @@
  * @param name the name of the thread, replace with the actual name
  * @param arg the config file for the rocket
  */
-DECLARE_THREAD(data_logger, RocketConfig* arg) {
+DECLARE_THREAD(data_logger, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("DATA");
@@ -18,7 +18,7 @@ DECLARE_THREAD(data_logger, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(barometer, RocketConfig* arg) {
+DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("BARO");
@@ -26,7 +26,7 @@ DECLARE_THREAD(barometer, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(low_g, RocketConfig* arg) {
+DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("LOWG");
@@ -34,7 +34,7 @@ DECLARE_THREAD(low_g, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(high_g, RocketConfig* arg) {
+DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("HIGHG");
@@ -42,7 +42,7 @@ DECLARE_THREAD(high_g, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(orientation, RocketConfig* arg) {
+DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("ORI");
@@ -50,7 +50,7 @@ DECLARE_THREAD(orientation, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(magnetometer, RocketConfig* arg) {
+DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("MAG");
@@ -58,7 +58,7 @@ DECLARE_THREAD(magnetometer, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(gps, RocketConfig* arg) {
+DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("GPS");
@@ -66,7 +66,7 @@ DECLARE_THREAD(gps, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(gas, RocketConfig* arg) {
+DECLARE_THREAD(gas, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("GAS");
@@ -74,7 +74,7 @@ DECLARE_THREAD(gas, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(voltage, RocketConfig* arg) {
+DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("VOLT");
@@ -82,7 +82,7 @@ DECLARE_THREAD(voltage, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(continuity, RocketConfig* arg) {
+DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("conct");
@@ -90,7 +90,7 @@ DECLARE_THREAD(continuity, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(fsm, RocketConfig* arg) {
+DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("FSM");
@@ -98,7 +98,7 @@ DECLARE_THREAD(fsm, RocketConfig* arg) {
     vTaskDelete(NULL);
 }
 
-DECLARE_THREAD(kalman, RocketConfig* arg) {
+DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) {        
         THREAD_SLEEP(16);
         //Serial.println("KALMAN");
@@ -123,7 +123,7 @@ bool init_sensors(Sensors& sensors) {
  * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
  * Starts thread scheduler to actually start doing jobs
 */
-void start_rocket(RocketConfig& config) {
+void begin_systems(RocketSystems& config) {
     bool success = init_sensors(config.sensors);
     if (!success) {
         // todo some message probably
