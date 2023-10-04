@@ -4,7 +4,10 @@
 #include <Adafruit_BME680.h>
 
 // global static instance of the sensor
-Adafruit_BME680 bme;
+/**
+ * TODO: Replace BME688_CS with the actual pin number
+*/
+Adafruit_BME680 bme(BME688_CS);
 
 /**
  * Initializes the gas sensor, always returns NoError
