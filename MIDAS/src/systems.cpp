@@ -106,6 +106,17 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
+*/
+DECLARE_THREAD(pyro, RocketSystems* arg) {
+    while (true) {        
+        THREAD_SLEEP(16);
+        //Serial.println("PYRO");
+    }
+    vTaskDelete(NULL);
+}
+
 #define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
 bool init_sensors(Sensors& sensors) {
     // todo message on failure
@@ -141,6 +152,7 @@ void begin_systems(RocketSystems& config) {
     START_THREAD(continuity, SENSOR_CORE, &config);
     START_THREAD(fsm, SENSOR_CORE, &config);
     START_THREAD(kalman, SENSOR_CORE, &config);
+    START_THREAD(pyro, SENSOR_CORE, &config);
 
     while(true){
         THREAD_SLEEP(1000);
