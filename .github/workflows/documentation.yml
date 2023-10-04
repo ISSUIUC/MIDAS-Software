@@ -1,24 +1,13 @@
 name: Deploy documentation
-
+# If I graduate or die in a horrific accident, and you need to setup a new SSH key, follow these instructions:
+# https://cpina.github.io/push-to-another-repository-docs/setup-using-ssh-deploy-keys.html#setup-ssh-deploy-keys
+# You probably need write access to MIDAS-flight-docs and need to write the SSH key to the MIDAS repo.
 on:
   push:
     branches:
     - main
 
 jobs:
-  skip-duplicates:
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    # Map a step output to a job output
-    outputs:
-      should_skip: ${{ steps.skip_check.outputs.should_skip }}
-    steps:
-      - id: skip_check
-        uses: fkirc/skip-duplicate-actions@master
-        with:
-          cancel_others: 'true'
-          paths: '["src/**"]'
-
   deploy-book:
     runs-on: ubuntu-latest
     steps:
@@ -30,12 +19,11 @@ jobs:
       uses: mattnotmitt/doxygen-action@v1.9.2
       with:
         working-directory: './MIDAS/docs'
-        doxyfile-path: 'MIDAS/Doxyfile'
 
     - name: Pushes to another repository
       uses: cpina/github-action-push-to-another-repository@main
       env:
-        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        SSH_DEPLOY_KEY : ${{ secrets.SSH_DEPLOY_KEY  }}
       with:
         source-directory: 'docs/html'
         destination-github-username: ISSUIUC
