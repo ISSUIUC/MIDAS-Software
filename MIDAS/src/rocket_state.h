@@ -10,57 +10,43 @@
  */
 
 enum ReadingDiscriminant {
-    READING_LowGData,
-    READING_HighGData,
-    READING_Barometer,
-    READING_Continuity,
-    READING_Voltage,
-    READING_GPS,
-    READING_Magnetometer,
-    READING_Orientation
+    READING_low_g,
+    READING_high_g,
+    READING_barometer,
+    READING_continuity,
+    READING_voltage,
+    READING_gps,
+    READING_magnetometer,
+    READING_orientation
 };
 
 struct Reading {
     ReadingDiscriminant discriminant;
     uint64_t timestamp_ms;
     union {
-        LowGData variant_LowGData;
-        HighGData variant_HighGData;
-        Barometer variant_Barometer;
-        Continuity variant_Continuity;
-        Voltage variant_Voltage;
-        GPS variant_GPS;
-        Magnetometer variant_Magnetometer;
-        Orientation variant_Orientation;
+        LowGData variant_low_g;
+        HighGData variant_high_g;
+        Barometer variant_barometer;
+        Continuity variant_continuity;
+        Voltage variant_voltage;
+        GPS variant_gps;
+        Magnetometer variant_magnetometer;
+        Orientation variant_orientation;
     };
 
     Reading() = delete;
 };
 
-template<typename SensorData>
-struct SensorDataToReading { };
+#define UPDATE_READING(rocket_state, sensor, value) do { \
+                                                        auto _macro_value = value; \
+                                                        (rocket_state).sensor._update((_macro_value)); \
+                                                        (rocket_state).readings.queue.send(Reading {   \
+                                                            .discriminant = ReadingDiscriminant::READING_##sensor, \
+                                                            .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()),     \
+                                                            .variant_##sensor = _macro_value           \
+                                                        });                        \
+                                                    } while (0)
 
-#define ASSOCIATE(ty) template<>                                                        \
-                      struct SensorDataToReading<ty> {                                  \
-                          static Reading to_reading(ty data, uint64_t timestamp_ms) {   \
-                              return Reading {                                          \
-                                  .discriminant = ReadingDiscriminant::READING_##ty,    \
-                                  .timestamp_ms = timestamp_ms,                         \
-                                  .variant_##ty = data                                  \
-                              };                                                        \
-                          }                                                             \
-                      }                                                                 \
-
-ASSOCIATE(LowGData);
-ASSOCIATE(HighGData);
-ASSOCIATE(Barometer);
-ASSOCIATE(Continuity);
-ASSOCIATE(Voltage);
-ASSOCIATE(GPS);
-ASSOCIATE(Magnetometer);
-ASSOCIATE(Orientation);
-
-#undef ASSOCIATE
 
 struct Readings {
     Queue<Reading, 512> queue;
@@ -71,23 +57,17 @@ template<typename SensorData>
 struct SensorState {
 private:
     Mutex<SensorData> current;
-    Readings& readings;
 
 public:
-    void update(SensorData data) {
+    void _update(SensorData data) {
         current.write(data);
-        readings.queue.send(SensorDataToReading<SensorData>::to_reading(data, 0));
     };
 
     SensorData getRecent() {
         return current.read();
     };
 
-//    bool getQueued(SensorData* out) {
-//        return queue.receive(out);
-//    };
-
-    explicit SensorState(Readings& readings_) : current(SensorData()), readings(readings_) { }
+    SensorState() : current(SensorData()) { }
 };
 
 struct RocketState {
@@ -104,8 +84,5 @@ public:
     SensorState<GPS> gps;
     SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
-
-    RocketState() : low_g(readings), high_g(readings), barometer(readings), continuity(readings), voltage(readings), gps(readings),
-                    magnetometer(readings), orientation(readings) { }
 };
 

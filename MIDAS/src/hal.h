@@ -1,9 +1,7 @@
 #pragma once
 
 #ifdef SILSIM
-
 #include "silsim/emulation.h"
-
 #else
 #include <Arduino.h>
 #include "FreeRTOSConfig.h"

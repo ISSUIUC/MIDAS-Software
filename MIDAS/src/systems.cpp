@@ -26,7 +26,7 @@ DECLARE_THREAD(data_logger, RocketSystems* arg) {
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
-        arg->rocket_state.barometer.update(reading);
+        UPDATE_READING(arg->rocket_state, barometer, reading);
 
         THREAD_SLEEP(16);
         //Serial.println("BARO");
