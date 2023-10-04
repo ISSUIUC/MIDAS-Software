@@ -116,6 +116,6 @@ struct Pyro {
 struct Gas {
     float temperature = 0.0;
     float humidity = 0.0;
-    float pressure = 0;
-    float resistance = 0;
+    float pressure = 0.0;
+    float resistance = 0.0;
 };
