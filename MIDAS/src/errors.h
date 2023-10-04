@@ -3,5 +3,6 @@
 
 enum ErrorCode {
     NoError,
-    LowGCouldNotBeInitialized
+    LowGCouldNotBeInitialized,
+    CANNOT_INIT_KX134_CS,
 };
