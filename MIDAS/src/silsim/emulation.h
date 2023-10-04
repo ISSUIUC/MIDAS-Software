@@ -3,6 +3,7 @@
 #include <cstdio>
 #include <cstdint>
 #include <queue>
+#include <cstring>
 
 #include "fiber.h"
 
@@ -42,9 +43,63 @@ typedef size_t TickType_t;
 
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t* buffer);
 bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout);
+bool xSemaphoreGive(SemaphoreHandle_t semaphore);
 
-typedef int StaticQueue_t;
 
+class StaticQueue_t {
+public:
+    StaticQueue_t() : item_size(0), max_count(0), buffer(nullptr) { };
+
+    StaticQueue_t* initialize(size_t item_size_, size_t max_count_, uint8_t* buffer_) {
+        item_size = item_size_;
+        max_count = max_count_;
+        buffer = buffer_;
+        return this;
+    }
+
+    void push(void* item) {
+        std::memcmp(&buffer[tail_idx * item_size], item, item_size);
+        tail_idx++;
+        if (tail_idx == max_count) {
+            tail_idx = 0;
+        }
+        if (count == max_count) {
+            head_idx++;
+            if (head_idx == max_count) {
+                head_idx = 0;
+            }
+        } else {
+            count++;
+        }
+    }
+
+    bool pop(void* item) {
+        if (count == 0) {
+            return false;
+        }
+        std::memcpy(item, &buffer[head_idx * item_size], item_size);
+        head_idx++;
+        if (head_idx == max_count) {
+            head_idx = 0;
+        }
+        count--;
+        return true;
+    }
+
+private:
+    size_t count = 0;     // The number of items currently in the Queue.
+    size_t head_idx = 0;  // The index to for the next pop to read from.
+    size_t tail_idx = 0;  // The index to for the next push to write to.
+
+    size_t item_size;
+    size_t max_count;
+    uint8_t* buffer;
+};
+typedef StaticQueue_t* QueueHandle_t;
+
+#define xQueueCreateStatic(length, item_size, buffer, queue) ((queue)->initialize(length, item_size, buffer))
+#define xQueueSendToBack(queue, value_ptr, timeout) ((queue)->push(value_ptr))
+#define xQueueReceive(queue, store_ptr, timeout) ((queue)->pop(store_ptr))
 
 void vTaskDelay(int32_t time);
 void vTaskDelete(void* something_probably);

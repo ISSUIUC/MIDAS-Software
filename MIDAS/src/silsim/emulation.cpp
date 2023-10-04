@@ -74,6 +74,10 @@ bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout) {
     return true;
 }
 
+bool xSemaphoreGive(SemaphoreHandle_t semaphore) {
+    semaphore->unlock();
+    return true;
+}
 
 [[noreturn]] void time_is_real(void* arg) {
     time_since_start = 0.0;
