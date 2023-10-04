@@ -2,7 +2,10 @@
 #include <MS5611.h>
 
 // global instance of the barometer sensor, using the same files as TARS
-MS5611 MS; 
+/**
+ * TODO: replace MS5611_CS with actual pin
+*/
+MS5611 MS(4); 
 
 /**
  * Initializes barometer, returns NoError
@@ -24,5 +27,10 @@ Barometer BarometerSensor::read() {
     float pressure = static_cast<float>(MS.getPressure() * 0.01 + 26.03);
     float temperature = static_cast<float>(MS.getTemperature() * 0.01);
 
-    return Barometer{pressure, temperature};
+    Barometer b;
+
+    b.pressure = pressure;
+    b.temperature = temperature;
+
+    return b;
 }
