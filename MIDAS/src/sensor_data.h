@@ -78,10 +78,10 @@ struct GPS {
     float satellite_count = 0;
 };
 
-struct Magnetometer {
-    float mx = 0;
-    float my = 0;
-    float mz = 0;
+struct MagnetometerReading {
+    float mx;
+    float my;
+    float mz;
 };
 
 struct Orientation {
@@ -96,7 +96,7 @@ struct Orientation {
 
     float gx = 0, gy = 0, gz = 0;
 
-    Magnetometer magnetometer;
+    MagnetometerReading magnetometer;
 
     float temperature;
 };

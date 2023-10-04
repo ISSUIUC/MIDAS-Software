@@ -61,3 +61,4 @@
  * @param millis the time to delay in milliseconds
 */
 #define THREAD_SLEEP(millis) vTaskDelay(pdMS_TO_TICKS(millis))
+#define LIS3MDL_CS 0

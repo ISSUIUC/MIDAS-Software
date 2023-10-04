@@ -52,8 +52,10 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
-        //Serial.println("MAG");
+        MagnetometerReading reading = arg->sensors.magnetometer.read();
+        arg->rocket_state.magnometer.update(reading);
+
+        THREAD_SLEEP(7);
     }
     vTaskDelete(NULL);
 }
@@ -115,6 +117,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
+    INIT_SENSOR(sensors.magnetometer);
     return true;
 }
 #undef INIT_SENSOR

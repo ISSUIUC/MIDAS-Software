@@ -3,5 +3,6 @@
 
 enum ErrorCode {
     NoError,
-    LowGCouldNotBeInitialized
+    LowGCouldNotBeInitialized,
+    CannotConnectMagnetometer,
 };
