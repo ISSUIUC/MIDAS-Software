@@ -36,7 +36,7 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
 
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
-        arg->rocket_state.high_g.update(arg->sensors.high_g.read())
+        arg->rocket_state.high_g.update(arg->sensors.high_g.read());
         THREAD_SLEEP(16);
         //Serial.println("HIGHG");
     }
