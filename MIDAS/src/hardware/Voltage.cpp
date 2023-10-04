@@ -13,6 +13,7 @@ ErrorCode VoltageSensor::init() {
  * \return The scaled voltage given by the voltage sensor
 */
 Voltage VoltageSensor::read() {
-    Voltage v_battery = {analogRead(69) / 1024.f * 3.3f * 3.f};
+    Voltage v_battery;
+    v_battery.voltage = analogRead(69) / 1024.f * 3.3f * 3.f;
     return v_battery;
 }
