@@ -21,6 +21,7 @@ struct HighGSensor {
 struct BarometerSensor {
     ErrorCode init();
     Barometer read() const;
+    
 };
 
 struct ContinuitySensor {
