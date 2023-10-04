@@ -7,14 +7,12 @@
 Adafruit_LIS3MDL MagnetometerSensor;
 
 ErrorCode Magnetometer::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
-    if (!MagnetometerSensor.begin_SPI(LIS3MDL_CS)) {
+    if (!MagnetometerSensor.begin_SPI(LIS3MDL_CS)) { //Checks if sensor is connected
         return ErrorCode::CannotConnectMagnetometer;
     }
-    MagnetometerSensor.setOperationMode(LIS3MDL_CONTINUOUSMODE);
-    MagnetometerSensor.setDataRate(LIS3MDL_DATARATE_155_HZ);
-    MagnetometerSensor.setRange(LIS3MDL_RANGE_4_GAUSS);
+    MagnetometerSensor.setOperationMode(LIS3MDL_CONTINUOUSMODE);//reading continously
+    MagnetometerSensor.setDataRate(LIS3MDL_DATARATE_155_HZ);//sets datarate to 155hz
+    MagnetometerSensor.setRange(LIS3MDL_RANGE_4_GAUSS);//earth is 1/2 gauss, can detect high current
     return ErrorCode::NoError;
 }
 

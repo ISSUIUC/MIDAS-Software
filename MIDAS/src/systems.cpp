@@ -55,7 +55,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         MagnetometerReading reading = arg->sensors.magnetometer.read();
         arg->rocket_state.magnometer.update(reading);
 
-        THREAD_SLEEP(7);
+        THREAD_SLEEP(7);//data rate is 155hz so 7 is closest
     }
     vTaskDelete(NULL);
 }
