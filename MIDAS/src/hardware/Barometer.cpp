@@ -14,6 +14,7 @@ ErrorCode BarometerSensor::init() {
 }
 
 /**
+ * TODO: change the 12 in MS.read(12) to the actual pin of the barometer
  * Reads the pressure and temperature from the MS5611
  * @return a barometer data packet for the thread to send to the data logger
 */
