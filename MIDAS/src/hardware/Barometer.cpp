@@ -5,7 +5,7 @@
 /**
  * TODO: replace MS5611_CS with actual pin
 */
-MS5611 MS(4); 
+MS5611 MS(MS5611_CS); 
 
 /**
  * Initializes barometer, returns NoError
