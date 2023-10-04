@@ -17,7 +17,7 @@ ErrorCode BarometerSensor::init() {
  * Reads the pressure and temperature from the MS5611
  * @return a barometer data packet for the thread to send to the data logger
 */
-Barometer BarometerSensor::read() const {
+Barometer BarometerSensor::read() {
     MS.read(12);
 
     float pressure = static_cast<float>(MS.getPressure() * 0.01 + 26.03);
