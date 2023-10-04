@@ -38,6 +38,11 @@ struct OrientationSensor {
     Orientation read();
 };
 
+struct GasSensor {
+    ErrorCode init();
+    Gas read();
+};
+
 struct Sensors {
     LowGSensor low_g;
     HighGSensor high_g;
@@ -45,4 +50,5 @@ struct Sensors {
     ContinuitySensor continuity;
     VoltageSensor voltage;
     OrientationSensor orientation;
+    GasSensor gas;
 };

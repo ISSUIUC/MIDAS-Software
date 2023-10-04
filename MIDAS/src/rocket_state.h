@@ -44,5 +44,6 @@ public:
     SensorState<GPS> gps;
     SensorState<Magnetometer> magnometer;
     SensorState<Orientation> orientation;
+    SensorState<Gas> gas;
 };
 
