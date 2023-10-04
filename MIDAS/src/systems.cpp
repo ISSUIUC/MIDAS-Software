@@ -20,8 +20,9 @@ DECLARE_THREAD(data_logger, RocketSystems* arg) {
 
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
+        arg->rocket_state.barometer.update(arg->sensors.barometer.read());
+
         THREAD_SLEEP(16);
-        //Serial.println("BARO");
     }
     vTaskDelete(NULL);
 }
