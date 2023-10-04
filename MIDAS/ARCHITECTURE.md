@@ -27,11 +27,11 @@ All of the source code for the rocket
 
 `sensor_data.h` The type of data each sensor contains
 
-`/hardware` Implementation for each of the sensors on MIDAS
+`/hardware` Implementation for each of the pyhsical sensors on MIDAS
 
-`/silsim` Implementation for SILSIM emulation
+`/silsim` Implementation for SILSIM
 
-`/hilsim` Implementation for HILSIM emulation
+`/hilsim` Implementation for HILSIM
 
 ***
 
