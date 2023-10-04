@@ -22,6 +22,7 @@ ErrorCode HighGSensor::init() {
 
 /**
  * Reads and returns the data from the sensor
+ * @return a HighGData packet with current acceleration in all three axies
 */
 HighGData HighGSensor::read() {
     auto data = KX.getAccelData();
