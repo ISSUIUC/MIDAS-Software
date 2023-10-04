@@ -1,0 +1,45 @@
+name: Deploy documentation
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  skip-duplicates:
+    continue-on-error: true
+    runs-on: ubuntu-latest
+    # Map a step output to a job output
+    outputs:
+      should_skip: ${{ steps.skip_check.outputs.should_skip }}
+    steps:
+      - id: skip_check
+        uses: fkirc/skip-duplicate-actions@master
+        with:
+          cancel_others: 'true'
+          paths: '["src/**"]'
+
+  deploy-book:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        fetch-depth: 1
+  
+    - name: Create Doxygen
+      uses: mattnotmitt/doxygen-action@v1.9.2
+      with:
+        working-directory: './MIDAS/docs'
+        doxyfile-path: 'MIDAS/Doxyfile'
+
+    - name: Pushes to another repository
+      uses: cpina/github-action-push-to-another-repository@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+      with:
+        source-directory: 'docs/html'
+        destination-github-username: ISSUIUC
+        destination-repository-name: MIDAS-flight-docs
+        user-email: action@github.com
+        target-branch: main
+        target-directory: docs
