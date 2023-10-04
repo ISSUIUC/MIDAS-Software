@@ -197,9 +197,15 @@ void MS5611::convert(const uint8_t addr, uint8_t bits) {
     SPI.endTransaction();        // end SPI transaction
 }
 
+/**
+ * TODO:
+ * I changed reg = min(reg,7) to reg = min(reg, reg)
+ * This was to make sure the file could compile, this will likely have to change back to what 
+ * it was based on board stuff
+*/
 uint16_t MS5611::readProm(uint8_t reg) {
     // read two bytes from SPI and return accumulated value
-    reg = min(reg, 7);
+    reg = min(reg, reg);
     uint8_t offset = reg * 2;
     uint16_t val = 0;
     digitalWrite(_cspin, LOW);       // pull CS line low
