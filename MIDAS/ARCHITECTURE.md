@@ -2,7 +2,7 @@
 This document describes the architecture of the MIDAS software flight code and surrounding ecosystem.
 
 ## Flight Code Structure
-![Diagram of Flight Code](../MIDAS/docs/architecture-diagram.png)
+![Diagram of Flight Code](docs/architecture-diagram.png)
 
 ## Code Map
 This section talks briefly about the code structure of the flight code for MIDAS, held under `/MIDAS`
