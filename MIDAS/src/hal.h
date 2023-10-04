@@ -1,16 +1,16 @@
 #pragma once
 
+// the only thing #ifdef we need, theoretically
 #ifdef SILSIM
-
 #include "silsim/emulation.h"
-
 #else
 #include <Arduino.h>
+#endif
+
 #include "FreeRTOSConfig.h"
 
-#include "hardware/Mutex.h"
-#include "hardware/Queue.h"
-#endif
+#include "Mutex.h"
+#include "Queue.h"
 
 /**
  *  The size of a stack, in bytes.
