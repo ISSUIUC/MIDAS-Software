@@ -12,20 +12,31 @@
  */
 DECLARE_THREAD(data_logger, RocketSystems* arg) {
     while (true) {
+
+
         THREAD_SLEEP(16);
         //Serial.println("DATA");
     }
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
+        Barometer reading = arg->sensors.barometer.read();
+        arg->rocket_state.barometer.update(reading);
+
         THREAD_SLEEP(16);
         //Serial.println("BARO");
     }
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -34,6 +45,9 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -42,6 +56,9 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -50,6 +67,9 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -58,6 +78,9 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -66,6 +89,9 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(gas, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -74,6 +100,9 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -82,6 +111,9 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -90,6 +122,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -98,6 +133,9 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) {        
         THREAD_SLEEP(16);
