@@ -3,5 +3,7 @@
 
 enum ErrorCode {
     NoError,
-    LowGCouldNotBeInitialized
+    LowGCouldNotBeInitialized,
+    LowGRangeCouldNotBeSet,
+    LowGODRLPFCouldNotBeSet,
 };

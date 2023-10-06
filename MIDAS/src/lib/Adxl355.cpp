@@ -2,24 +2,30 @@
 
 Adxl355::Adxl355(int chipSelectPin) : _csPin(chipSelectPin){};
 
-Adxl355::~Adxl355() {
-    if (isRunning()) {
+Adxl355::~Adxl355()
+{
+    if (isRunning())
+    {
         stop();
     }
 }
 
-void Adxl355::initSPI(SPIClass &spi) {
+void Adxl355::initSPI(SPIClass &spi)
+{
     spi_obj = &spi;
-    if (spi_obj) {
+    if (spi_obj)
+    {
         spi_obj->begin();
     }
 }
 
 // Puts Sensor in Standby Mode
-int Adxl355::stop() {
+int Adxl355::stop()
+{
     int power = read8(POWER_CTL);
 
-    if (!(power & POWER_CTL_VALUES::POWER_CTL_OFF)) {
+    if (!(power & POWER_CTL_VALUES::POWER_CTL_OFF))
+    {
         power = power | (int)POWER_CTL_VALUES::POWER_CTL_OFF;
         write8(POWER_CTL, power);
     }
@@ -27,13 +33,16 @@ int Adxl355::stop() {
     return power;
 }
 
-int Adxl355::start() {
+int Adxl355::start()
+{
     int result = 0;
 
-    if (!isDeviceRecognized()) {
+    if (!isDeviceRecognized())
+    {
         result = -1;
     }
-    else {
+    else
+    {
         uint8_t power = read8(POWER_CTL);
 
         if (power & POWER_CTL_VALUES::POWER_CTL_OFF)
@@ -46,12 +55,14 @@ int Adxl355::start() {
     return result;
 }
 
-bool Adxl355::isDeviceRecognized() {
+bool Adxl355::isDeviceRecognized()
+{
     uint16_t check = read16(0x01);
     return (check == 0x1ded);
 }
 
-bool Adxl355::isRunning() {
+bool Adxl355::isRunning()
+{
     bool check = false;
     int data = read8(POWER_CTL);
 
@@ -62,7 +73,8 @@ bool Adxl355::isRunning() {
 
 void Adxl355::update() { uint8_t data[8]; }
 
-uint8_t Adxl355::read8(uint8_t reg) {
+uint8_t Adxl355::read8(uint8_t reg)
+{
     uint8_t value = 0;
 
     uint8_t registerToSend = (reg << 1) | READ_BYTE;
@@ -74,7 +86,8 @@ uint8_t Adxl355::read8(uint8_t reg) {
     return value;
 }
 
-uint16_t Adxl355::read16(uint8_t reg) {
+uint16_t Adxl355::read16(uint8_t reg)
+{
     uint16_t value = 0;
     uint8_t byte = 0;
 
@@ -82,7 +95,8 @@ uint16_t Adxl355::read16(uint8_t reg) {
     digitalWrite(_csPin, LOW);
 
     spi_obj->transfer(registerToSend);
-    for (int i = 2; i >= 0; i--) {
+    for (int i = 2; i >= 0; i--)
+    {
         byte = spi_obj->transfer(0x00);
         value = value |= (byte << (i * 8));
     }
@@ -92,7 +106,8 @@ uint16_t Adxl355::read16(uint8_t reg) {
     return value;
 }
 
-uint8_t Adxl355::readBlock(uint8_t reg, uint8_t length, uint8_t *output) {
+uint8_t Adxl355::readBlock(uint8_t reg, uint8_t length, uint8_t *output)
+{
     uint8_t registerToSend = (reg << 1) | READ_BYTE;
 
     digitalWrite(_csPin, LOW);
@@ -100,7 +115,8 @@ uint8_t Adxl355::readBlock(uint8_t reg, uint8_t length, uint8_t *output) {
 
     int i = length;
 
-    while (i) {
+    while (i)
+    {
         *output++ = spi_obj->transfer(0x00);
         i--;
     }
@@ -110,7 +126,8 @@ uint8_t Adxl355::readBlock(uint8_t reg, uint8_t length, uint8_t *output) {
     return length - i;
 }
 
-void Adxl355::write8(uint8_t reg, uint8_t value) {
+void Adxl355::write8(uint8_t reg, uint8_t value)
+{
     uint8_t registerToSend = (reg << 1) | WRITE_BYTE;
 
     digitalWrite(_csPin, LOW);
@@ -121,37 +138,43 @@ void Adxl355::write8(uint8_t reg, uint8_t value) {
 
 void Adxl355::setIntMap(uint8_t value) { write8(INT_MAP, value); }
 
-int Adxl355::getFIFOCount() {
+int Adxl355::getFIFOCount()
+{
     uint8_t data = read8(FIFO_ENTRIES);
 
     return data;
 }
 
-Adxl355::STATUS_VALUES Adxl355::getStatus() {
+Adxl355::STATUS_VALUES Adxl355::getStatus()
+{
     uint8_t data = read8(STATUS);
 
     return (STATUS_VALUES)data;
 }
 
-bool Adxl355::isDataReady() {
+bool Adxl355::isDataReady()
+{
     STATUS_VALUES data = getStatus();
 
     return (data & STATUS_VALUES::DATA_READY) ? true : false;
 }
 
-bool Adxl355::isFIFOFull() {
+bool Adxl355::isFIFOFull()
+{
     STATUS_VALUES data = getStatus();
 
     return (data & STATUS_VALUES::FIFO_FULL) ? true : false;
 }
 
-bool Adxl355::isFIFOOverrun() {
+bool Adxl355::isFIFOOverrun()
+{
     STATUS_VALUES data = getStatus();
 
     return (data & STATUS_VALUES::FIFO_OVERRUN) ? true : false;
 }
 
-bool Adxl355::isTempSensorOn() {
+bool Adxl355::isTempSensorOn()
+{
     bool result = false;
 
     uint8_t work = read8(POWER_CTL);
@@ -161,46 +184,55 @@ bool Adxl355::isTempSensorOn() {
     return result;
 }
 
-void Adxl355::startTempSensor() {
+void Adxl355::startTempSensor()
+{
     uint8_t data = read8(POWER_CTL);
 
-    if (data & POWER_CTL_VALUES::POWER_CTL_TEMP_OFF) {
+    if (data & POWER_CTL_VALUES::POWER_CTL_TEMP_OFF)
+    {
         data = data & (int)POWER_CTL_VALUES::POWER_CTL_TEMP_ON;
         write8(POWER_CTL, data);
     }
 }
 
-void Adxl355::stopTempSensor() {
+void Adxl355::stopTempSensor()
+{
     uint8_t data = read8(POWER_CTL);
 
-    if (!(data & POWER_CTL_VALUES::POWER_CTL_TEMP_OFF)) {
+    if (!(data & POWER_CTL_VALUES::POWER_CTL_TEMP_OFF))
+    {
         data = data | (int)POWER_CTL_VALUES::POWER_CTL_TEMP_OFF;
         write8(POWER_CTL, data);
     }
 }
 
-double Adxl355::getTempC() {
+double Adxl355::getTempC()
+{
     uint16_t value = read16(TEMP2);
     double temp = ((double)(1852 - value)) / 9.05 + 19.21;
 
     return temp;
 }
 
-double Adxl355::getTempF() {
+double Adxl355::getTempF()
+{
     double result = getTempC();
 
     return result * 9 / 5 + 32;
 }
 
-Adxl355::RANGE_VALUES Adxl355::getRange() {
+Adxl355::RANGE_VALUES Adxl355::getRange()
+{
     int range = read8(I2CSPEED_INTPOLARITY_RANGE);
 
     return (RANGE_VALUES)(range & RANGE_VALUES::RANGE_MASK);
 }
 
-void Adxl355::setRange(RANGE_VALUES value) {
+void Adxl355::setRange(RANGE_VALUES value)
+{
     // Cannot setRange while running the sensor
-    if (isRunning()) {
+    if (isRunning())
+    {
         return;
     }
 
@@ -222,7 +254,8 @@ Adxl355::ODR_LPF Adxl355::getOdrLpf()
 void Adxl355::setOdrLpf(ODR_LPF value)
 {
     // Cannot setOdrLpf while running the sensor
-    if (isRunning()) {
+    if (isRunning())
+    {
         return;
     }
 
@@ -233,11 +266,9 @@ void Adxl355::setOdrLpf(ODR_LPF value)
     write8(FILTER, work);
 }
 
-// Defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
-void Adxl355::initializeSensor(RANGE_VALUES range = RANGE_VALUES::RANGE_2G, ODR_LPF odr_lpf = ODR_LPF::ODR_4000_AND_1000) {
+void Adxl355::initializeSensor(RANGE_VALUES range, ODR_LPF odr_lpf)
+{
     setRange(range);
-
-    Adxl355::RANGE_VALUES rangeValue = getRange();
 
     // Set the ODR and LPF
     setOdrLpf(odr_lpf);
@@ -246,7 +277,8 @@ void Adxl355::initializeSensor(RANGE_VALUES range = RANGE_VALUES::RANGE_2G, ODR_
     setIntMap(0x01);
 }
 
-long Adxl355::twosComplement(unsigned long value) {
+long Adxl355::twosComplement(unsigned long value)
+{
     // If the most significant bit is set we negate the value
     value = -(value & (1 << (20 - 1))) + (value & ~(1 << (20 - 1)));
 
@@ -254,7 +286,8 @@ long Adxl355::twosComplement(unsigned long value) {
 }
 
 // Convert raw data to signed integer value
-int Adxl355::getRawAxis(long *x, long *y, long *z) {
+int Adxl355::getRawAxis(long *x, long *y, long *z)
+{
     uint8_t output[9];
     // Fills memory with 0's
     memset(output, 0, 9);
@@ -267,7 +300,8 @@ int Adxl355::getRawAxis(long *x, long *y, long *z) {
     unsigned long value_z = 0;
 
     // Check if all bytes were successfully read into
-    if (result == 9) {
+    if (result == 9)
+    {
         // Converts into 20 bit value for each axis
         value_x = (output[0] << 12) | (output[1] << 4) | (output[2] >> 4);
         value_y = (output[3] << 12) | (output[4] << 4) | (output[5] >> 4);
@@ -286,7 +320,8 @@ int Adxl355::getRawAxis(long *x, long *y, long *z) {
 void Adxl355::setTrim(int32_t x, int32_t y, int32_t z)
 {
     // Cannot setTrim while running the sensor
-    if (isRunning()) {
+    if (isRunning())
+    {
         return;
     }
 
@@ -386,4 +421,25 @@ void Adxl355::calibrateSensor(int fifoReadCount)
     // Set new trim and start
     setTrim(avg_x, avg_y, avg_z);
     start();
+}
+
+Adxl355::getAxisG(long rawValue, int decimals)
+{
+
+    double slider = (decimals > 1) ? pow(10.0, (double)decimals) : 1.0;
+
+    // Convert the raw value to g's
+    double result = ((double)rawValue / 260000.0);
+
+    // Round the result to the specified number of decimal places (if decimals > 1)
+    result = round(result * slider) / slider;
+
+    return result;
+    long raw_x, raw_y, raw_z;
+
+    getRawAxis(&raw_x, &raw_y, &raw_z);
+
+    *x = raw_x * 0.000244;
+    *y = raw_y * 0.000244;
+    *z = raw_z * 0.000244;
 }

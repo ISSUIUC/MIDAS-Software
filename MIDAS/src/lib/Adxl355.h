@@ -88,22 +88,6 @@ private:
         HPF_CORNER_MASK = 0b01110000
     };
 
-    enum ODR_LPF
-    {
-        ODR_4000_AND_1000 = 0b0000,
-        ODR_2000_AND_500 = 0b0001,
-        ODR_1000_AND_250 = 0b0010,
-        ODR_500_AND_125 = 0b0011,
-        ODR_250_AND_62_5 = 0b0100,
-        ODR_125_AND_31_25 = 0b0101,
-        ODR_62_5_AND_15_625 = 0b0110,
-        ODR_31_25_AND_7_813 = 0b0111,
-        ODR_15_625_AND_3_906 = 0b1000,
-        ODR_7_813_AND_1_953 = 0b1001,
-        ODR_3_906_AND_0_977 = 0b1010,
-        ODR_LPF_MASK = 0b1111
-    };
-
     enum POWER_CTL_VALUES
     {
         POWER_CTL_OFF = 0x01,
@@ -137,6 +121,22 @@ public:
         RANGE_MASK = 0x03
     };
 
+    enum ODR_LPF
+    {
+        ODR_4000_AND_1000 = 0b0000,
+        ODR_2000_AND_500 = 0b0001,
+        ODR_1000_AND_250 = 0b0010,
+        ODR_500_AND_125 = 0b0011,
+        ODR_250_AND_62_5 = 0b0100,
+        ODR_125_AND_31_25 = 0b0101,
+        ODR_62_5_AND_15_625 = 0b0110,
+        ODR_31_25_AND_7_813 = 0b0111,
+        ODR_15_625_AND_3_906 = 0b1000,
+        ODR_7_813_AND_1_953 = 0b1001,
+        ODR_3_906_AND_0_977 = 0b1010,
+        ODR_LPF_MASK = 0b1111
+    };
+
     void initSPI(SPIClass &spi);
     int start();
     int stop();
@@ -145,7 +145,8 @@ public:
 
     bool isDeviceRecognized();
     bool isRunning();
-    void initializeSensor(RANGE_VALUES range, ODR_LPF odr_lpf);
+    // Defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
+    void initializeSensor(RANGE_VALUES range = RANGE_VALUES::RANGE_2G, ODR_LPF odr_lpf = ODR_LPF::ODR_4000_AND_1000);
     void setRange(RANGE_VALUES value);
     void setIntMap(uint8_t value);
     int getFIFOCount();
@@ -163,6 +164,7 @@ public:
     RANGE_VALUES getRange();
     long twosComplement(unsigned long value);
     int getRawAxis(long *x, long *y, long *z);
+    double getAccelG(long rawValue, int decimals);
     void calibrateSensor(int fifoReadCount);
     void setTrim(int32_t x, int32_t y, int32_t z);
     int readFIFOEntries(long *output);
