@@ -286,7 +286,7 @@ long Adxl355::twosComplement(unsigned long value)
 }
 
 // Convert raw data to signed integer value
-int Adxl355::getRawAxis(long *x, long *y, long *z)
+int Adxl355::getRawAccel(long *x, long *y, long *z)
 {
     uint8_t output[9];
     // Fills memory with 0's
@@ -423,23 +423,17 @@ void Adxl355::calibrateSensor(int fifoReadCount)
     start();
 }
 
-Adxl355::getAxisG(long rawValue, int decimals)
+double Adxl355::convertAccel(long rawValue)
 {
+    return (double)rawValue / 260000.0;
+}
 
-    double slider = (decimals > 1) ? pow(10.0, (double)decimals) : 1.0;
+Adxl355::outputData Adxl355::getAccel()
+{
+    long *x;
+    long *y;
+    long *z;
+    int error_code = getRawAccel(x, y, z);
 
-    // Convert the raw value to g's
-    double result = ((double)rawValue / 260000.0);
-
-    // Round the result to the specified number of decimal places (if decimals > 1)
-    result = round(result * slider) / slider;
-
-    return result;
-    long raw_x, raw_y, raw_z;
-
-    getRawAxis(&raw_x, &raw_y, &raw_z);
-
-    *x = raw_x * 0.000244;
-    *y = raw_y * 0.000244;
-    *z = raw_z * 0.000244;
+    return {convertAccel(*x), convertAccel(*y), convertAccel(*z)};
 }

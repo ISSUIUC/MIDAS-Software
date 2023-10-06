@@ -104,10 +104,6 @@ private:
     void write8(uint8_t reg, uint8_t value);
 
     int _csPin;
-    int16_t _x_accel;
-    int16_t _y_accel;
-    int16_t _z_accel;
-    int16_t _temp;
 
 public:
     Adxl355(int chipSelectPin);
@@ -137,6 +133,13 @@ public:
         ODR_LPF_MASK = 0b1111
     };
 
+    struct outputData
+    {
+        float x;
+        float y;
+        float z;
+    };
+
     void initSPI(SPIClass &spi);
     int start();
     int stop();
@@ -163,8 +166,8 @@ public:
     void setOdrLpf(ODR_LPF odr_lpf);
     RANGE_VALUES getRange();
     long twosComplement(unsigned long value);
-    int getRawAxis(long *x, long *y, long *z);
-    double getAccelG(long rawValue, int decimals);
+    double convertAccel(long rawValue);
+    outputData getAccel();
     void calibrateSensor(int fifoReadCount);
     void setTrim(int32_t x, int32_t y, int32_t z);
     int readFIFOEntries(long *output);

@@ -13,8 +13,6 @@ void LowGSensor::calibrate()
     sensor.calibrateSensor(ADXL355_CS);
 }
 
-
-
 ErrorCode LowGSensor::init()
 {
     ErrorCode error = ErrorCode::NoError;
@@ -22,21 +20,24 @@ ErrorCode LowGSensor::init()
     sensor.start();
     delay(1000);
 
-    if (sensor.isDeviceRecognized()) {
+    if (sensor.isDeviceRecognized())
+    {
         // Defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
         sensor.initializeSensor();
-        if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange()) {
+        if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange())
+        {
             error = ErrorCode::LowGRangeCouldNotBeSet;
         }
 
-        if (Adxl355::ODR_LPF::ODR_4000_AND_1000 != sensor.getOdrLpf()) {
+        if (Adxl355::ODR_LPF::ODR_4000_AND_1000 != sensor.getOdrLpf())
+        {
             error = ErrorCode::LowGODRLPFCouldNotBeSet;
         }
-
-    } else {
+    }
+    else
+    {
         error = ErrorCode::LowGCouldNotBeInitialized;
     }
-
 
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code
@@ -46,7 +47,11 @@ ErrorCode LowGSensor::init()
 LowGData LowGSensor::read()
 {
     // read from aforementioned global instance of sensor
+    auto data = sensor.getAccel();
+    LowGData result;
+    result.gx = data.x;
+    result.gy = data.y;
+    result.gz = data.z;
 
-    sensor.getRawAxis()
-    return LowGData();
+    return result;
 }
