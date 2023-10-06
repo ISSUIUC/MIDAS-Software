@@ -1,4 +1,5 @@
 #include <gtest/gtest.h>
+#include "sensors.h"
 
 #if defined(ARDUINO)
 #include <Arduino.h>

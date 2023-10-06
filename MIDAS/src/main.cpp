@@ -5,6 +5,10 @@
  */
 RocketSystems systems;
 
+// According to this, don't ever do this
+// https://docs.platformio.org/en/stable/advanced/unit-testing/structure/shared-code.html
+// We shall then do this.
+#ifndef PIO_UNIT_TESTING
 void setup() {
     Serial.begin(9600);
     begin_systems(systems);
@@ -13,3 +17,4 @@ void setup() {
 void loop() {
 
 }
+#endif // PIO_UNIT_TESTING
