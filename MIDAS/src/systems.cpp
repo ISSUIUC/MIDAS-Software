@@ -3,6 +3,8 @@
 #include "hal.h"
 #include "sensors.h"
 
+#include "gnc/example_kf.h"
+
 /**
  * These are all the functions that will run in each task
  * Each function has a `while(true)` loop within that should not be returned out of or yielded in any way
@@ -99,9 +101,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
+    example_kf.initialize();
     while (true) {        
         THREAD_SLEEP(16);
         //Serial.println("KALMAN");
+        example_kf.priori();
+        example_kf.update();
     }
     vTaskDelete(NULL);
 }
