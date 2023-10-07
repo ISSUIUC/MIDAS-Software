@@ -13,9 +13,9 @@ struct LowGSensor {
     LowGData read();
 };
 
-struct BackupLowGSensor {
+struct Gyroscope {
     ErrorCode init();
-    LowGData read();
+    GyroscopeData read();
 };
 
 struct HighGSensor {
@@ -45,7 +45,7 @@ struct OrientationSensor {
 
 struct Sensors {
     LowGSensor low_g;
-    BackupLowGSensor backup_low_g;
+    Gyroscope gyroscope;
     HighGSensor high_g;
     BarometerSensor barometer;
     ContinuitySensor continuity;

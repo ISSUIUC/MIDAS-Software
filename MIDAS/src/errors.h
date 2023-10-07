@@ -4,5 +4,5 @@
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
-    BackupLowGCouldNotBeInitialized
+    GyroCouldNotBeInitialized
 };
