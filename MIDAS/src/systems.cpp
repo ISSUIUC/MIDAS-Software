@@ -36,7 +36,7 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
 
 DECLARE_THREAD(gyroscope, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(10);
         // Serial.println("LOWG");
         arg->rocket_state.gyroscope.update(arg->sensors.gyroscope.read());
     }
