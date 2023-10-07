@@ -2,22 +2,20 @@
 
 #include "hal.h"
 #include "sensors.h"
+#include "data_logging.h"
 
 /**
  * These are all the functions that will run in each task
- * Each function has a `while(true)` loop within that should not be returned out of or yielded in any way
+ * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
  * 
  * @param name the name of the thread, replace with the actual name
  * @param arg the config file for the rocket
  */
 DECLARE_THREAD(data_logger, RocketSystems* arg) {
     while (true) {
-
-
+        log_data(arg->log_sink, arg->rocket_data);
         THREAD_SLEEP(16);
-        //Serial.println("DATA");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -26,12 +24,10 @@ DECLARE_THREAD(data_logger, RocketSystems* arg) {
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
-        UPDATE_READING(arg->rocket_state, barometer, reading);
+        arg->rocket_data.barometer.update(reading);
 
         THREAD_SLEEP(16);
-        //Serial.println("BARO");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -42,7 +38,6 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("LOWG");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -53,7 +48,6 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("HIGHG");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -64,7 +58,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("ORI");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -75,7 +68,6 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("MAG");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -86,7 +78,6 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("GPS");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -97,7 +88,6 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("GAS");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -108,7 +98,6 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("VOLT");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -119,7 +108,6 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("conct");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -130,7 +118,6 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("FSM");
     }
-    vTaskDelete(NULL);
 }
 
 /**
@@ -141,7 +128,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         THREAD_SLEEP(16);
         //Serial.println("KALMAN");
     }
-    vTaskDelete(NULL);
 }
 
 #define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
@@ -180,7 +166,7 @@ void begin_systems(RocketSystems& config) {
     START_THREAD(fsm, SENSOR_CORE, &config);
     START_THREAD(kalman, SENSOR_CORE, &config);
 
-    while(true){
+    while (true) {
         THREAD_SLEEP(1000);
     }
 }

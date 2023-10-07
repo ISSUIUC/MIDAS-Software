@@ -3,51 +3,53 @@
 #include "sensor_data.h"
 #include "hal.h"
 
+
 template<typename SensorData>
-struct SensorState {
-private:
-    struct Reading {
-        uint32_t timestamp_ms;
-        SensorData data;
-    };
+struct Reading {
+    uint32_t timestamp_ms;
+    SensorData data;
+};
 
-    Mutex<SensorData> current;
-    Queue<Reading> queue;
-
+template<typename S>
+struct SensorData {
 public:
-    SensorState() : current(SensorData()) { }
+    SensorData() : current(S()) { }
 
-    void update(SensorData data) {
+    void update(S data) {
         current.write(data);
-        queue.send((Reading) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
+        queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
     };
 
-    SensorData getRecent() {
+    S getRecent() {
         return current.read();
     };
 
-    bool getQueued(SensorData* out) {
+    bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     }
+
+private:
+    Mutex<S> current;
+    Queue<Reading<S>> queue;
 };
 
 /**
- * The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
+ * The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
  *
  *  Normally, this would be considered a poor decision. However, the fact that all this data is here
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
-struct RocketState {
+struct RocketData {
 public:
     bool pyro_should_be_firing = false;
 
-    SensorState<LowGData> low_g;
-    SensorState<HighGData> high_g;
-    SensorState<Barometer> barometer;
-    SensorState<Continuity> continuity;
-    SensorState<Voltage> voltage;
-    SensorState<GPS> gps;
-    SensorState<Magnetometer> magnetometer;
-    SensorState<Orientation> orientation;
+    SensorData<LowGData> low_g;
+    SensorData<HighGData> high_g;
+    SensorData<Barometer> barometer;
+    SensorData<Continuity> continuity;
+    SensorData<Voltage> voltage;
+    SensorData<GPS> gps;
+    SensorData<Magnetometer> magnetometer;
+    SensorData<Orientation> orientation;
 };
 
