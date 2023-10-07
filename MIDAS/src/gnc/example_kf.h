@@ -1,5 +1,4 @@
-#ifndef GNC_EXAMPLE_KF_H_
-#define GNC_EXAMPLE_KF_H_
+#pragma once
 
 #include "kalman_filter.h"
 
@@ -25,5 +24,3 @@ private:
 };
 
 extern ExampleKalmanFilter example_kf;
-
-#endif  // GNC_EXAMPLE_KF_H_

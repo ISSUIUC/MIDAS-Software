@@ -1,5 +1,4 @@
-#ifndef GNC_KALMAN_FILTER_H_
-#define GNC_KALMAN_FILTER_H_
+#pragma once
 
 #undef abs
 #undef F
@@ -53,5 +52,3 @@ public:
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanData state) = 0;
 };
-
-#endif  // GNC_KALMAN_FILTER_H_
