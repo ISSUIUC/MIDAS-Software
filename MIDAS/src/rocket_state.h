@@ -37,6 +37,7 @@ public:
     bool pyro_should_be_firing;
 
     SensorState<LowGData> low_g;
+    SensorState<LowGData> backup_low_g;
     SensorState<HighGData> high_g;
     SensorState<Barometer> barometer;
     SensorState<Continuity> continuity;

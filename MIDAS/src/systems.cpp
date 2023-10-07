@@ -34,6 +34,15 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+DECLARE_THREAD(backup_low_g, RocketSystems* arg) {
+    while (true) {
+        THREAD_SLEEP(16);
+        // Serial.println("LOWG");
+        arg->rocket_state.backup_low_g.update(arg->sensors.backup_low_g.read());
+    }
+    vTaskDelete(NULL);
+}
+
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
@@ -110,6 +119,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 bool init_sensors(Sensors& sensors) {
     // todo message on failure
     INIT_SENSOR(sensors.low_g);
+    INIT_SENSOR(sensors.backup_low_g);
     INIT_SENSOR(sensors.high_g);
     INIT_SENSOR(sensors.barometer);
     INIT_SENSOR(sensors.continuity);
@@ -132,6 +142,7 @@ void begin_systems(RocketSystems& config) {
     START_THREAD(data_logger, DATA_CORE, &config);
     START_THREAD(barometer, SENSOR_CORE, &config);
     START_THREAD(low_g, SENSOR_CORE, &config);
+    START_THREAD(backup_low_g, SENSOR_CORE, &config);
     START_THREAD(high_g, SENSOR_CORE, &config);
     START_THREAD(orientation, SENSOR_CORE, &config);
     START_THREAD(magnetometer, SENSOR_CORE, &config);
