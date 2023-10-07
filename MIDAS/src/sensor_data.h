@@ -58,6 +58,12 @@ struct HighGData {
     float gz = 0;
 };
 
+struct GyroscopeData {
+    float gx = 0;
+    float gy = 0;
+    float gz = 0;
+};
+
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
