@@ -14,7 +14,7 @@
 DECLARE_THREAD(data_logger, RocketSystems* arg) {
     while (true) {
         log_data(arg->log_sink, arg->rocket_data);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -131,7 +131,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 }
 
 #define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
-bool init_sensors(Sensors& sensors) {
+bool init_sensors(Sensors& sensors, LogSink& log_sink) {
     // todo message on failure
     INIT_SENSOR(sensors.low_g);
     INIT_SENSOR(sensors.high_g);
@@ -139,6 +139,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
+    INIT_SENSOR(log_sink);
     return true;
 }
 #undef INIT_SENSOR
@@ -148,7 +149,7 @@ bool init_sensors(Sensors& sensors) {
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems& config) {
-    bool success = init_sensors(config.sensors);
+    bool success = init_sensors(config.sensors, config.log_sink);
     if (!success) {
         // todo some message probably
         return;

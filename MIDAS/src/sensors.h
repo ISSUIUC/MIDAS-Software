@@ -5,38 +5,13 @@
  * we can switch whether we're using hardware sensors or emulated sensors.
  */
 
-#include "sensor_data.h"
-#include "errors.h"
 
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
-};
+#if defined(SILSIM)
+#elif defined(HILSIM)
+#else
+#include "hardware/sensors.h"
+#endif
 
-struct HighGSensor {
-    ErrorCode init();
-    HighGData read();
-};
-
-struct BarometerSensor {
-    ErrorCode init();
-    Barometer read();
-};
-
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
-};
-
-struct VoltageSensor {
-    ErrorCode init();
-    Voltage read();
-};
-
-struct OrientationSensor {
-    ErrorCode init();
-    Orientation read();
-};
 
 struct Sensors {
     LowGSensor low_g;
