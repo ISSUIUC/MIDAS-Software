@@ -26,12 +26,5 @@ ErrorCode HighGSensor::init() {
 */
 HighGData HighGSensor::read() {
     auto data = KX.getAccelData();
-
-    HighGData h;
-    
-    h.gx = data.xData;
-    h.gy = data.yData;
-    h.gz = data.zData;
-
-    return h;
+    return {.gx = data.xData, .gy = data.yData, .gz = data.zData};
 }
