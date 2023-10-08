@@ -27,10 +27,5 @@ Barometer BarometerSensor::read() {
     float pressure = static_cast<float>(MS.getPressure() * 0.01 + 26.03);
     float temperature = static_cast<float>(MS.getTemperature() * 0.01);
 
-    Barometer b;
-
-    b.pressure = pressure;
-    b.temperature = temperature;
-
-    return b;
+    return { .pressure = pressure, .temperature = temperature };
 }
