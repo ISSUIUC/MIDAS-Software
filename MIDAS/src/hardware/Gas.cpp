@@ -38,12 +38,6 @@ Gas GasSensor::read() {
         pressure = bme.pressure;
         resistance = bme.gas_resistance;
     }
-
-    Gas g;
-    g.humidity = humidity;
-    g.temperature = temperature;
-    g.pressure = pressure;
-    g.resistance = resistance;
-
-    return g;
+    
+    return {.humidity = humidity, .temperature = temperature, .pressure = pressure, .resistance = resistance};
 }
