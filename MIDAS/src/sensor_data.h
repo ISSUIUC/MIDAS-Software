@@ -61,6 +61,9 @@ struct HighGData {
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
+
+    Barometer() = default;
+    Barometer(float t, float p) : temperature(t), pressure(p) {}
 };
 
 struct Continuity {
