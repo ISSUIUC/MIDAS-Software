@@ -7,7 +7,7 @@
 /**
  * TODO: Replace BME688_CS with the actual pin number
 */
-Adafruit_BME680 bme(BME688_CS);
+Adafruit_BME680 bme(2);
 
 /**
  * Initializes the gas sensor, always returns NoError
@@ -39,5 +39,5 @@ Gas GasSensor::read() {
         resistance = bme.gas_resistance;
     }
     
-    return {.humidity = humidity, .temperature = temperature, .pressure = pressure, .resistance = resistance};
+    return Gas(temperature, humidity, pressure, resistance);
 }

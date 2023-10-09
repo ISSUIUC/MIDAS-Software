@@ -116,6 +116,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
+    INIT_SENSOR(sensors.gas);
     return true;
 }
 #undef INIT_SENSOR
