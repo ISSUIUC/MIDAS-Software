@@ -1,5 +1,6 @@
 #include "sensors.h"
 #include <Arduino.h>
+#define VOLTAGE_PIN 69
 
 /**
  * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
@@ -14,6 +15,6 @@ ErrorCode VoltageSensor::init() {
 */
 Voltage VoltageSensor::read() {
     Voltage v_battery;
-    v_battery.voltage = analogRead(69) / 1024.f * 3.3f * 3.f;
+    v_battery.voltage = analogRead(VOLTAGE_PIN) / 1024.f * 3.3f * 3.f;
     return v_battery;
 }
