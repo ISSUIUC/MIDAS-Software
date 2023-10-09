@@ -76,7 +76,7 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        arg->rocket_state.voltage.update(arg->sensors.voltage.read())
+        arg->rocket_state.voltage.update(arg->sensors.voltage.read());
         THREAD_SLEEP(20); // 50hz
     }
     vTaskDelete(NULL);
