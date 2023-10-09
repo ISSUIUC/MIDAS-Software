@@ -38,6 +38,7 @@ public:
 
     SensorState<LowGData> low_g;
     SensorState<HighGData> high_g;
+    SensorState<GyroscopeData> gyroscope;
     SensorState<Barometer> barometer;
     SensorState<Continuity> continuity;
     SensorState<Voltage> voltage;

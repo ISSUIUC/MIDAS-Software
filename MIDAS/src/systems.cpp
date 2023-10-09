@@ -3,6 +3,8 @@
 #include "hal.h"
 #include "sensors.h"
 
+#include "gnc/example_kf.h"
+
 /**
  * These are all the functions that will run in each task
  * Each function has a `while(true)` loop within that should not be returned out of or yielded in any way
@@ -30,6 +32,15 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("LOWG");
+    }
+    vTaskDelete(NULL);
+}
+
+DECLARE_THREAD(gyroscope, RocketSystems* arg) {
+    while (true) {
+        THREAD_SLEEP(10);
+        // Serial.println("LOWG");
+        arg->rocket_state.gyroscope.update(arg->sensors.gyroscope.read());
     }
     vTaskDelete(NULL);
 }
@@ -100,9 +111,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
+    example_kf.initialize();
     while (true) {        
         THREAD_SLEEP(16);
         //Serial.println("KALMAN");
+        example_kf.priori();
+        example_kf.update();
     }
     vTaskDelete(NULL);
 }
@@ -112,6 +126,7 @@ bool init_sensors(Sensors& sensors) {
     // todo message on failure
     INIT_SENSOR(sensors.low_g);
     INIT_SENSOR(sensors.high_g);
+    INIT_SENSOR(sensors.gyroscope);
     INIT_SENSOR(sensors.barometer);
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
@@ -133,6 +148,7 @@ void begin_systems(RocketSystems& config) {
     START_THREAD(data_logger, DATA_CORE, &config);
     START_THREAD(barometer, SENSOR_CORE, &config);
     START_THREAD(low_g, SENSOR_CORE, &config);
+    START_THREAD(gyroscope, SENSOR_CORE, &config);
     START_THREAD(high_g, SENSOR_CORE, &config);
     START_THREAD(orientation, SENSOR_CORE, &config);
     START_THREAD(magnetometer, SENSOR_CORE, &config);
