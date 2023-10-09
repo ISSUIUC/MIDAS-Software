@@ -13,7 +13,7 @@ QwiicKX134 KX;
 ErrorCode HighGSensor::init() {
     KX.beginSPI(KX134_CS);
     if (!KX.initialize(DEFAULT_SETTINGS)) {
-        return ErrorCode::CANNOT_INIT_KX134_CS;
+        return ErrorCode::HighGCouldNotBeInitialized;
     }
 
     KX.setRange(3);
