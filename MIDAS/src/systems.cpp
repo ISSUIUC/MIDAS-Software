@@ -69,7 +69,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 DECLARE_THREAD(gas, RocketSystems* arg) {
     while (true) {
         arg->rocket_state.gas.update(arg->sensors.gas.read());
-        THREAD_SLEEP(5.5);
+        THREAD_SLEEP(6);
         //Serial.println("GAS");
     }
     vTaskDelete(NULL);
