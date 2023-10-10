@@ -38,9 +38,9 @@ struct OrientationSensor {
     Orientation read();
 };
 
-struct Magnetometer {
+struct MagnetometerSensor {
     ErrorCode init();
-    MagnetometerReading read();
+    Magnetometer read();
 };
 
 struct Sensors {
@@ -50,7 +50,7 @@ struct Sensors {
     ContinuitySensor continuity;
     VoltageSensor voltage;
     OrientationSensor orientation;
-    Magnetometer magnetometer;
+    MagnetometerSensor magnetometer;
 };
 
 

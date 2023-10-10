@@ -42,7 +42,7 @@ public:
     SensorState<Continuity> continuity;
     SensorState<Voltage> voltage;
     SensorState<GPS> gps;
-    SensorState<MagnetometerReading> magnetometer;
+    SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
 };
 

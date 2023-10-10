@@ -1,28 +1,29 @@
 #include "sensors.h"
 #include <Adafruit_LIS3MDL.h>
 #include "hal.h"
+#define LIS3MDL_CS 0
 // #include sensor library
 
 // global static instance of the sensor
-Adafruit_LIS3MDL MagnetometerSensor;
+Adafruit_LIS3MDL LIS3MDL;
 
-ErrorCode Magnetometer::init() {
-    if (!MagnetometerSensor.begin_SPI(LIS3MDL_CS)) { //Checks if sensor is connected
+ErrorCode MagnetometerSensor::init() {
+    if (!LIS3MDL.begin_SPI(LIS3MDL_CS)) { //Checks if sensor is connected
         return ErrorCode::CannotConnectMagnetometer;
     }
-    MagnetometerSensor.setOperationMode(LIS3MDL_CONTINUOUSMODE);//reading continously
-    MagnetometerSensor.setDataRate(LIS3MDL_DATARATE_155_HZ);//sets datarate to 155hz
-    MagnetometerSensor.setRange(LIS3MDL_RANGE_4_GAUSS);//earth is 1/2 gauss, can detect high current
+    LIS3MDL.setOperationMode(LIS3MDL_CONTINUOUSMODE);//reading continously
+    LIS3MDL.setDataRate(LIS3MDL_DATARATE_155_HZ);//sets datarate to 155hz
+    LIS3MDL.setRange(LIS3MDL_RANGE_4_GAUSS);//earth is 1/2 gauss, can detect high current
     return ErrorCode::NoError;
 }
 
-MagnetometerReading Magnetometer::read() {
+Magnetometer MagnetometerSensor::read() {
     // read from aforementioned global instance of sensor
-    MagnetometerSensor.read();
+    LIS3MDL.read();
 
-    float mx = MagnetometerSensor.x_gauss;
-    float my = MagnetometerSensor.y_gauss;
-    float mz = MagnetometerSensor.z_gauss;
-    MagnetometerReading reading {mx, my, mz};
+    float mx = LIS3MDL.x_gauss;
+    float my = LIS3MDL.y_gauss;
+    float mz = LIS3MDL.z_gauss;
+    Magnetometer reading {mx, my, mz};
     return reading;
 }
