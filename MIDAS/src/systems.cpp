@@ -83,7 +83,7 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
         if(reading.has_value()){
             arg->rocket_state.gas.update(*reading);
         }
-        THREAD_SLEEP(500);
+        THREAD_SLEEP(500); //gas sensor reads very slowly
     }
     vTaskDelete(NULL);
 }
