@@ -85,9 +85,9 @@ struct GPS {
 };
 
 struct Magnetometer {
-    float mx = 0;
-    float my = 0;
-    float mz = 0;
+    float mx;
+    float my;
+    float mz;
 };
 
 struct Orientation {
