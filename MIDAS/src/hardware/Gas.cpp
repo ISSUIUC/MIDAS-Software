@@ -11,16 +11,18 @@ Adafruit_BME680 bme(BME688_CS);
 
 /**
  * Initializes the gas sensor, always returns NoError
-*/
+ */
 ErrorCode GasSensor::init() {
-    bme.begin();
+    if (!bme.begin()) {
+        return ErrorCode::GasCouldNotBeInitialized;
+    }
     return ErrorCode::NoError;
 }
 
 /**
  * Checks if the gas sensor is still reading, and returns data
  * @return Gas data packet, all of the data will be -1 if cannot read
-*/
+ */
 std::optional<Gas> GasSensor::read() {
     int remaining = bme.remainingReadingMillis();
 
