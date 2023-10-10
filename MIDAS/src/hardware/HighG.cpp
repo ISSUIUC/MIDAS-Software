@@ -16,6 +16,10 @@ ErrorCode HighGSensor::init() {
         return ErrorCode::HighGCouldNotBeInitialized;
     }
 
+    if(!KX.setOutputDataRate(0xb)) {
+        return ErrorCode::HighGCoulNotUpdateDataRate;
+    }
+
     KX.setRange(3);
     return ErrorCode::NoError;
 }
