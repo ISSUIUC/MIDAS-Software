@@ -24,6 +24,8 @@ ErrorCode LowGSensor::init()
     {
         // Defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
         sensor.initializeSensor();
+
+        // Swap check if the sensor is changed from different values
         if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange())
         {
             error = ErrorCode::LowGRangeCouldNotBeSet;
@@ -48,10 +50,6 @@ LowGData LowGSensor::read()
 {
     // read from aforementioned global instance of sensor
     auto data = sensor.getAccel();
-    LowGData result;
-    result.gx = data.x;
-    result.gy = data.y;
-    result.gz = data.z;
 
-    return result;
+    return LowGData{data.x, data.y, data.z};
 }

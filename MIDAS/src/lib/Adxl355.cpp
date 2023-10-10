@@ -2,6 +2,7 @@
 
 Adxl355::Adxl355(int chipSelectPin) : _csPin(chipSelectPin){};
 
+// Deconstructor stops the sensor
 Adxl355::~Adxl355()
 {
     if (isRunning())
@@ -10,6 +11,7 @@ Adxl355::~Adxl355()
     }
 }
 
+// Initialize SPI
 void Adxl355::initSPI(SPIClass &spi)
 {
     spi_obj = &spi;
@@ -30,9 +32,12 @@ int Adxl355::stop()
         write8(POWER_CTL, power);
     }
 
+    stopTempSensor();
+
     return power;
 }
 
+// Puts Sensor in Measurement Mode
 int Adxl355::start()
 {
     int result = 0;
@@ -51,16 +56,20 @@ int Adxl355::start()
             write8(POWER_CTL, power);
         }
     }
+    
+    startTempSensor();
 
     return result;
 }
 
+// Checks if the device is recognized
 bool Adxl355::isDeviceRecognized()
 {
     uint16_t check = read16(0x01);
     return (check == 0x1ded);
 }
 
+// Checks if the sensor is running
 bool Adxl355::isRunning()
 {
     bool check = false;
@@ -73,6 +82,7 @@ bool Adxl355::isRunning()
 
 void Adxl355::update() { uint8_t data[8]; }
 
+// Reads 8 bit register
 uint8_t Adxl355::read8(uint8_t reg)
 {
     uint8_t value = 0;
@@ -86,6 +96,7 @@ uint8_t Adxl355::read8(uint8_t reg)
     return value;
 }
 
+// Reads 16 bit register
 uint16_t Adxl355::read16(uint8_t reg)
 {
     uint16_t value = 0;
@@ -106,6 +117,7 @@ uint16_t Adxl355::read16(uint8_t reg)
     return value;
 }
 
+// Reads a block of data
 uint8_t Adxl355::readBlock(uint8_t reg, uint8_t length, uint8_t *output)
 {
     uint8_t registerToSend = (reg << 1) | READ_BYTE;
@@ -126,6 +138,7 @@ uint8_t Adxl355::readBlock(uint8_t reg, uint8_t length, uint8_t *output)
     return length - i;
 }
 
+// Writes 8 bit register
 void Adxl355::write8(uint8_t reg, uint8_t value)
 {
     uint8_t registerToSend = (reg << 1) | WRITE_BYTE;
@@ -251,6 +264,7 @@ Adxl355::ODR_LPF Adxl355::getOdrLpf()
     return (ODR_LPF)(work & ODR_LPF::ODR_LPF_MASK);
 }
 
+// Sets the Output Data Rate and Low Pass Filter
 void Adxl355::setOdrLpf(ODR_LPF value)
 {
     // Cannot setOdrLpf while running the sensor
@@ -308,7 +322,7 @@ int Adxl355::getRawAccel(long *x, long *y, long *z)
         value_z = (output[6] << 12) | (output[7] << 4) | (output[8] >> 4);
     }
 
-    // Binary to
+    // Binary to decimal conversion
 
     *x = twosComplement(value_x);
     *y = twosComplement(value_y);
@@ -344,6 +358,7 @@ void Adxl355::setTrim(int32_t x, int32_t y, int32_t z)
     write8(OFFSET_Z_L, low_z);
 }
 
+// Reads First In First Out data entries
 int Adxl355::readFIFOEntries(long *output)
 {
     int fifoCount = getFIFOCount();
@@ -373,6 +388,7 @@ int Adxl355::readFIFOEntries(long *output)
     return fifoCount / 3;
 }
 
+// Calibrates the sensor and sets trim values
 void Adxl355::calibrateSensor(int fifoReadCount)
 {
     long FIFOOut[32][3];
@@ -423,11 +439,13 @@ void Adxl355::calibrateSensor(int fifoReadCount)
     start();
 }
 
+// Converts raw data to G's
 double Adxl355::convertAccel(long rawValue)
 {
     return (double)rawValue / 260000.0;
 }
 
+// Returns the acceleration data
 Adxl355::outputData Adxl355::getAccel()
 {
     long *x;
