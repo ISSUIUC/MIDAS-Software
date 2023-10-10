@@ -5,4 +5,5 @@ enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
     CannotConnectMagnetometer,
+    GyroCouldNotBeInitialized
 };
