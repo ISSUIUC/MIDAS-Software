@@ -3,10 +3,9 @@
 // #include sensor library
 #include <Adafruit_BME680.h>
 
+#define BME688_CS (int8_t) 0
+
 // global static instance of the sensor
-/**
- * TODO: Replace BME688_CS with the actual pin number
-*/
 Adafruit_BME680 bme(BME688_CS);
 
 /**
