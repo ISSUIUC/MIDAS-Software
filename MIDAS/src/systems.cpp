@@ -53,7 +53,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         MagnetometerReading reading = arg->sensors.magnetometer.read();
-        arg->rocket_state.magnometer.update(reading);
+        arg->rocket_state.magnetometer.update(reading);
 
         THREAD_SLEEP(7);//data rate is 155hz so 7 is closest
     }
