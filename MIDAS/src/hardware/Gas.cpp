@@ -21,7 +21,7 @@ ErrorCode GasSensor::init() {
 
 /**
  * Checks if the gas sensor is still reading, and returns data
- * @return Gas data packet, all of the data will be -1 if cannot read
+ * @return Gas data packet, returns std::nullopt if cannot read
  */
 std::optional<Gas> GasSensor::read() {
     int remaining = bme.remainingReadingMillis();
