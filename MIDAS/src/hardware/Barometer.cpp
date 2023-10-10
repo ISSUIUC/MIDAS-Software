@@ -2,9 +2,8 @@
 #include <MS5611.h>
 
 // global instance of the barometer sensor, using the same files as TARS
-/**
- * TODO: replace MS5611_CS with actual pin
-*/
+#define MS5611_CS 0
+
 MS5611 MS(MS5611_CS); 
 
 /**
