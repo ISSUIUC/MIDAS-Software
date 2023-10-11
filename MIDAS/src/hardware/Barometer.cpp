@@ -11,7 +11,6 @@ MS5611 MS(MS5611_CS);
 */
 ErrorCode BarometerSensor::init() {
     MS.init();
-    MS.setOversampling(OSR_ULTRA_LOW);
 
     return ErrorCode::NoError;
 }
