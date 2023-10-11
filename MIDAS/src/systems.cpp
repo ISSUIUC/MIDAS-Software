@@ -22,7 +22,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         arg->rocket_state.barometer.update(arg->sensors.barometer.read());
 
-        THREAD_SLEEP(10);
+        THREAD_SLEEP(1);
     }
     vTaskDelete(NULL);
 }
