@@ -7,6 +7,7 @@
 
 #include "sensor_data.h"
 #include "errors.h"
+#include<optional>
 
 struct LowGSensor {
     ErrorCode init();
@@ -43,6 +44,11 @@ struct OrientationSensor {
     Orientation read();
 };
 
+struct GasSensor {
+    ErrorCode init();
+    std::optional<Gas> read();
+};
+
 struct MagnetometerSensor {
     ErrorCode init();
     Magnetometer read();
@@ -56,6 +62,7 @@ struct Sensors {
     ContinuitySensor continuity;
     VoltageSensor voltage;
     OrientationSensor orientation;
+    GasSensor gas;
     MagnetometerSensor magnetometer;
 };
 

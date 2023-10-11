@@ -82,8 +82,11 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 
 DECLARE_THREAD(gas, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
-        //Serial.println("GAS");
+        std::optional<Gas> reading = arg->sensors.gas.read();
+        if(reading.has_value()){
+            arg->rocket_state.gas.update(*reading);
+        }
+        THREAD_SLEEP(500); //gas sensor reads very slowly
     }
     vTaskDelete(NULL);
 }
@@ -133,6 +136,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
+    INIT_SENSOR(sensors.gas);
     INIT_SENSOR(sensors.magnetometer);
     return true;
 }

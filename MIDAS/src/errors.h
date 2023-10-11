@@ -7,5 +7,6 @@ enum ErrorCode {
     HighGCouldNotBeInitialized,
     HighGCoulNotUpdateDataRate,
     CannotConnectMagnetometer,
-    GyroCouldNotBeInitialized
+    GyroCouldNotBeInitialized,
+    GasCouldNotBeInitialized
 };
