@@ -47,7 +47,8 @@ DECLARE_THREAD(gyroscope, RocketSystems* arg) {
 
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
+        arg->rocket_state.high_g.update(arg->sensors.high_g.read());
+        THREAD_SLEEP(1);
         //Serial.println("HIGHG");
     }
     vTaskDelete(NULL);
@@ -63,8 +64,10 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
-        //Serial.println("MAG");
+        Magnetometer reading = arg->sensors.magnetometer.read();
+        arg->rocket_state.magnetometer.update(reading);
+
+        THREAD_SLEEP(7);//data rate is 155hz so 7 is closest
     }
     vTaskDelete(NULL);
 }
@@ -90,8 +93,8 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
-        //Serial.println("VOLT");
+        arg->rocket_state.voltage.update(arg->sensors.voltage.read());
+        THREAD_SLEEP(20); // 50hz
     }
     vTaskDelete(NULL);
 }
@@ -134,6 +137,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
     INIT_SENSOR(sensors.gas);
+    INIT_SENSOR(sensors.magnetometer);
     return true;
 }
 #undef INIT_SENSOR

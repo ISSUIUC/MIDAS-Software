@@ -56,6 +56,9 @@ struct HighGData {
     float gx = 0;
     float gy = 0;
     float gz = 0;
+
+    HighGData() = default;
+    HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
 };
 
 struct GyroscopeData {
@@ -85,9 +88,9 @@ struct GPS {
 };
 
 struct Magnetometer {
-    float mx = 0;
-    float my = 0;
-    float mz = 0;
+    float mx;
+    float my;
+    float mz;
 };
 
 struct Orientation {

@@ -49,6 +49,11 @@ struct GasSensor {
     std::optional<Gas> read();
 };
 
+struct MagnetometerSensor {
+    ErrorCode init();
+    Magnetometer read();
+};
+
 struct Sensors {
     LowGSensor low_g;
     Gyroscope gyroscope;
@@ -58,4 +63,7 @@ struct Sensors {
     VoltageSensor voltage;
     OrientationSensor orientation;
     GasSensor gas;
+    MagnetometerSensor magnetometer;
 };
+
+
