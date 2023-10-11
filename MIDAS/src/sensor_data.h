@@ -78,7 +78,10 @@ struct Barometer {
     Barometer(float t, float p) : temperature(t), pressure(p) {}
 };
 
+// Detects if a charge or 
 struct Continuity {
+    Continuity() = default;
+    explicit Continuity(bool is_continuous) : is_continuous(is_continuous) { }
     bool is_continuous = false;
 };
 

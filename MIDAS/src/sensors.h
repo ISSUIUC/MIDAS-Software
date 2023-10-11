@@ -35,6 +35,9 @@ struct BarometerSensor {
 struct ContinuitySensor {
     ErrorCode init();
     Continuity read();
+
+    static const int input_pin = 4;
+    static const int output_pin = 5;
 };
 
 struct VoltageSensor {
