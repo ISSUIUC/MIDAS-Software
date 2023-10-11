@@ -6,7 +6,7 @@
 
 // global static instance of the sensor
 
-Adxl355 sensor;
+Adxl355 sensor(ADXL355_CS);
 
 void LowGSensor::calibrate()
 {
@@ -52,5 +52,5 @@ LowGData LowGSensor::read()
     // read from aforementioned global instance of sensor
     auto data = sensor.getAccel();
 
-    return LowGData{data.x, data.y, data.z};
+    return LowGData(data.x, data.y, data.z);
 }
