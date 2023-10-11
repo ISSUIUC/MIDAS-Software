@@ -21,6 +21,7 @@ template<typename T>
 void log_reading(LogSink& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
     sink.write((uint8_t*) &discriminant, sizeof(ReadingDiscriminant));
+    sink.write((uint8_t*) &reading.timestamp_ms, sizeof(uint32_t));
     sink.write((uint8_t*) &reading.data, sizeof(T));
 }
 
