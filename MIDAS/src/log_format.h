@@ -35,6 +35,4 @@ struct LoggedReading {
         Magnetometer magnetometer;
         Orientation orientation;
     } data;
-
-    LoggedReading() = delete;
 };
