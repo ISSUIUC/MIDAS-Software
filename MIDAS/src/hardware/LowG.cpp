@@ -22,8 +22,9 @@ ErrorCode LowGSensor::init()
 
     if (sensor.isDeviceRecognized())
     {
-        // Defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
-        sensor.initializeSensor();
+        // On boot, defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
+        // Change to 2G range and Output Data Rate: 1000Hz and Low Pass Filter: 250Hz
+        sensor.initializeSensor(Adxl355::RANGE_VALUES::RANGE_2G, Adxl355::ODR_LPF::ODR_1000_AND_250);
 
         // Swap check if the sensor is changed from different values
         if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange())
