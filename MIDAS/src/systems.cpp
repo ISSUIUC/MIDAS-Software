@@ -47,7 +47,8 @@ DECLARE_THREAD(gyroscope, RocketSystems* arg) {
 
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
+        arg->rocket_state.high_g.update(arg->sensors.high_g.read());
+        THREAD_SLEEP(1);
         //Serial.println("HIGHG");
     }
     vTaskDelete(NULL);
