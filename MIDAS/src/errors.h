@@ -6,5 +6,6 @@ enum ErrorCode {
     LowGCouldNotBeInitialized,
     HighGCouldNotBeInitialized,
     HighGCoulNotUpdateDataRate,
+    CannotConnectMagnetometer,
     GyroCouldNotBeInitialized
 };
