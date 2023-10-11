@@ -3,5 +3,7 @@
 
 enum ErrorCode {
     NoError,
-    LowGCouldNotBeInitialized
+    LowGCouldNotBeInitialized,
+    CANNOT_CONNECT_BNO,
+    CANNOT_INIT_BNO
 };
