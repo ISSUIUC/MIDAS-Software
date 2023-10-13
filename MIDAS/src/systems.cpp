@@ -12,6 +12,7 @@
  * @param arg the config file for the rocket
  */
 DECLARE_THREAD(data_logger, RocketSystems* arg) {
+    log_begin(arg->log_sink);
     while (true) {
         log_data(arg->log_sink, arg->rocket_data);
         THREAD_SLEEP(50);

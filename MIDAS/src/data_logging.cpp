@@ -1,5 +1,6 @@
 #include "data_logging.h"
 #include "log_format.h"
+#include "log_checksum.h"
 
 
 template<typename T>
@@ -31,6 +32,11 @@ void log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     while (sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);
     }
+}
+
+void log_begin(LogSink& sink) {
+    uint32_t checksum = LOG_CHECKSUM;
+    sink.write((uint8_t*) &checksum, 4);
 }
 
 void log_data(LogSink& sink, RocketData& data) {

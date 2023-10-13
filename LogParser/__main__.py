@@ -1,5 +1,6 @@
 import json
 import pathlib
+import zlib
 from argparse import ArgumentParser
 from LogParser.cpp_parser import Context, parse_file, Type, Struct, Enum, Integer, Union
 
@@ -48,6 +49,13 @@ def construct_values_mapping(ctxt: Context) -> dict[int, tuple[str, Type]]:
     return variants
 
 
+def calculate_checksum() -> int:
+    src = pathlib.Path(__file__).parent.parent / "MIDAS" / "src"
+    text = (src / "log_format.h").read_text() + (src / "sensor_data.h").read_text()
+    expected_checksum = zlib.crc32(text.encode("utf-8"))
+    return expected_checksum
+
+
 def main():
     parser = ArgumentParser()
     parser.add_argument("raw", type=pathlib.Path)
@@ -56,12 +64,18 @@ def main():
 
     format_file = pathlib.Path(__file__).parent.parent / "MIDAS" / "src" / "log_format.h"
 
+    expected_checksum = calculate_checksum()
+
     ctxt: Context = parse_file(format_file)
 
     mapping = construct_values_mapping(ctxt)
 
     json_out = []
     with open(args.raw, "rb") as data_file:
+        found_checksum = int.from_bytes(data_file.read(4), byteorder="little")
+        if found_checksum != expected_checksum:
+            raise Exception(f"Trying to parse file with checksum {expected_checksum}, found file with checksum {found_checksum}")
+        
         while True:
             disc_bytes = data_file.read(4)
             if len(disc_bytes) == 0:

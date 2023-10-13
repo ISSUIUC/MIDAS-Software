@@ -17,4 +17,5 @@
 //     void write(const uint8_t* data, size_t size);
 // };
 
+void log_begin(LogSink& sink);
 void log_data(LogSink& sink, RocketData& data);
