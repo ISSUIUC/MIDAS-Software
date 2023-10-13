@@ -1,11 +1,13 @@
 #pragma once
 
+#include "sensor_data.h"
+
 /**
  * 0 is not used to make it easier to spot bugs
  */
 enum ReadingDiscriminant {
-    ID_LOWGDATA         = 1,
-    ID_HIGHGDATA        = 2,
+    ID_LOWG             = 1,
+    ID_HIGHG            = 2,
     ID_BAROMETER        = 3,
     ID_CONTINUITY       = 4,
     ID_VOLTAGE          = 5,
@@ -35,6 +37,4 @@ struct LoggedReading {
         Magnetometer magnetometer;
         Orientation orientation;
     } data;
-
-    LoggedReading() = delete;
 };
