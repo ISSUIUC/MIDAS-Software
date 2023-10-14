@@ -20,10 +20,12 @@
 // magnetometer chip select
 #define LIS3MDL_CS 0
 
-// orientation chip select, reset, interrupt
+// orientation chip select, interrupt
 #define BNO086_CS 0
-#define BNO086_RESET 0
 #define BNO086_INT 0
 
 // voltage adc pin
 #define VOLTAGE_PIN 0
+
+#define I2C_SDA 0
+#define I2C_SCL 0

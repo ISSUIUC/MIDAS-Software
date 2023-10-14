@@ -13,7 +13,12 @@ void setup() {
     Serial.begin(9600);
 
     //begin sensor SPI bus
+    Serial.println("Starting SPI...");
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
+
+    //begin I2C bus
+    Serial.println("Starting I2C...");
+    Wire.begin(I2C_SDA, I2C_SCL);
 
     begin_systems(systems);
 }
