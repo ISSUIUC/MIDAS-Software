@@ -50,6 +50,9 @@ struct LowGData {
     float gx = 0;
     float gy = 0;
     float gz = 0;
+
+    LowGData() = default;
+    LowGData(float x, float y, float z) : gx(x), gy(y), gz(z) {};
 };
 
 struct HighGData {

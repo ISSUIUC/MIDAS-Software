@@ -31,7 +31,8 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 
 DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
+        arg->rocket_state.low_g.update(arg->sensors.low_g.read());
+        THREAD_SLEEP(1);
         //Serial.println("LOWG");
     }
     vTaskDelete(NULL);

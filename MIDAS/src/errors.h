@@ -4,6 +4,8 @@
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
+    LowGRangeCouldNotBeSet,
+    LowGODRLPFCouldNotBeSet,
     HighGCouldNotBeInitialized,
     HighGCoulNotUpdateDataRate,
     CannotConnectMagnetometer,

@@ -12,6 +12,7 @@
 struct LowGSensor {
     ErrorCode init();
     LowGData read();
+    void calibrate();
 };
 
 struct Gyroscope {
