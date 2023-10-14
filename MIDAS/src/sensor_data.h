@@ -59,6 +59,9 @@ struct HighGData {
     float gx = 0;
     float gy = 0;
     float gz = 0;
+
+    HighGData() = default;
+    HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
 };
 
 struct GyroscopeData {
@@ -70,6 +73,9 @@ struct GyroscopeData {
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
+
+    Barometer() = default;
+    Barometer(float t, float p) : temperature(t), pressure(p) {}
 };
 
 struct Continuity {
@@ -88,9 +94,9 @@ struct GPS {
 };
 
 struct Magnetometer {
-    float mx = 0;
-    float my = 0;
-    float mz = 0;
+    float mx;
+    float my;
+    float mz;
 };
 
 struct Orientation {
@@ -122,3 +128,12 @@ struct Pyro {
     bool is_active = false;
 };
 
+struct Gas {
+    float temperature = 0.0;
+    float humidity = 0.0;
+    float pressure = 0.0;
+    float resistance = 0.0;
+
+    Gas() = default;
+    Gas(float t, float h, float p, float r) : temperature(t), humidity(h), pressure(p), resistance(r) {}
+};
