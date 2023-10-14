@@ -23,8 +23,8 @@ DECLARE_THREAD(data_logger, RocketSystems* arg) {
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         arg->rocket_state.barometer.update(arg->sensors.barometer.read());
-
         THREAD_SLEEP(1);
+        //Serial.println("BARO");
     }
     vTaskDelete(NULL);
 }
@@ -40,9 +40,9 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
 
 DECLARE_THREAD(gyroscope, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(10);
-        // Serial.println("LOWG");
         arg->rocket_state.gyroscope.update(arg->sensors.gyroscope.read());
+        THREAD_SLEEP(10);
+        // Serial.println("GYRO");
     }
     vTaskDelete(NULL);
 }
@@ -66,10 +66,9 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        Magnetometer reading = arg->sensors.magnetometer.read();
-        arg->rocket_state.magnetometer.update(reading);
-
+        arg->rocket_state.magnetometer.update(arg->sensors.magnetometer.read());
         THREAD_SLEEP(7);//data rate is 155hz so 7 is closest
+        //Serial.println("MAG");
     }
     vTaskDelete(NULL);
 }
@@ -86,6 +85,7 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         arg->rocket_state.voltage.update(arg->sensors.voltage.read());
         THREAD_SLEEP(20); // 50hz
+        //Serial.println("VOLT");
     }
     vTaskDelete(NULL);
 }
@@ -93,7 +93,7 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
 DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("conct");
+        //Serial.println("CONT");
     }
     vTaskDelete(NULL);
 }
@@ -109,10 +109,10 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     example_kf.initialize();
     while (true) {        
-        THREAD_SLEEP(16);
-        //Serial.println("KALMAN");
         example_kf.priori();
         example_kf.update();
+        THREAD_SLEEP(16);
+        //Serial.println("KALMAN");
     }
     vTaskDelete(NULL);
 }
