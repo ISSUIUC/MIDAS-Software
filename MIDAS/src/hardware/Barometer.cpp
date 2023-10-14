@@ -1,9 +1,6 @@
 #include "sensors.h"
 #include <MS5611.h>
 
-// global instance of the barometer sensor, using the same files as TARS
-#define MS5611_CS 0
-
 MS5611 MS(MS5611_CS); 
 
 /**
@@ -16,7 +13,6 @@ ErrorCode BarometerSensor::init() {
 }
 
 /**
- * TODO: change the 12 in MS.read(12) to the actual pin of the barometer
  * Reads the pressure and temperature from the MS5611
  * @return a barometer data packet for the thread to send to the data logger
 */

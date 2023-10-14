@@ -1,6 +1,5 @@
 #include "sensors.h"
 #include <Arduino.h>
-#define VOLTAGE_PIN 69
 
 /**
  * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.

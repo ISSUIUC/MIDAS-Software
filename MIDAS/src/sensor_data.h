@@ -127,13 +127,3 @@ struct KalmanData {
 struct Pyro {
     bool is_active = false;
 };
-
-struct Gas {
-    float temperature = 0.0;
-    float humidity = 0.0;
-    float pressure = 0.0;
-    float resistance = 0.0;
-
-    Gas() = default;
-    Gas(float t, float h, float p, float r) : temperature(t), humidity(h), pressure(p), resistance(r) {}
-};

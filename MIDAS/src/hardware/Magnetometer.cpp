@@ -1,8 +1,6 @@
 #include "sensors.h"
 #include <Adafruit_LIS3MDL.h>
 #include "hal.h"
-#define LIS3MDL_CS 0
-// #include sensor library
 
 // global static instance of the sensor
 Adafruit_LIS3MDL LIS3MDL;

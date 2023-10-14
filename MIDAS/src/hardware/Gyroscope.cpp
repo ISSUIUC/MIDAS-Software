@@ -3,7 +3,7 @@
 // #include sensor library
 #include <SparkFunLSM6DS3.h>
 // global static instance of the sensor
-LSM6DS3 LSM;
+LSM6DS3 LSM(SPI_MODE, LSM6DS3_CS);
 
 ErrorCode Gyroscope::init() {
     // do whatever steps to initialize the sensor

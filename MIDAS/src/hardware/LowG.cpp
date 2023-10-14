@@ -1,5 +1,5 @@
 #include "sensors.h"
-#include "lib/Adxl355.h"
+#include "Adxl355.h"
 #include "pins.h"
 
 // #include sensor library

@@ -6,10 +6,7 @@
 // global static instance of the sensor
 QwiicKX134 KX;
 
-#define KX134_CS 0
-
 /**
- * TODO: REPLACE KX134_CS WITH THE ACTUAL PIN NUMBER
  * Initializes the high G data sensor, returns ErrorCode::CANNOT_INIT_KX134_CS if cannot initialize
 */
 ErrorCode HighGSensor::init() {
