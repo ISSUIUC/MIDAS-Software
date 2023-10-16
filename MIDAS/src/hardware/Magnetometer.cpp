@@ -7,7 +7,7 @@ Adafruit_LIS3MDL LIS3MDL;
 
 ErrorCode MagnetometerSensor::init() {
     if (!LIS3MDL.begin_SPI(LIS3MDL_CS)) { //Checks if sensor is connected
-        return ErrorCode::CannotConnectMagnetometer;
+        return ErrorCode::MagnetometerCoultNotBeInitialized;
     }
     LIS3MDL.setOperationMode(LIS3MDL_CONTINUOUSMODE);//reading continously
     LIS3MDL.setDataRate(LIS3MDL_DATARATE_155_HZ);//sets datarate to 155hz
