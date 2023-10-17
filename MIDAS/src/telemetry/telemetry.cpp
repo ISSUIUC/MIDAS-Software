@@ -11,20 +11,20 @@
  * Nicholas Phillips
  * Patrick Marschoun
  * Peter Giannetos
- * Rishi Gommuktmala
+ * Rishi Gokkumutkkala
  * Aaditya Voruganti
  */
 #include <limits>
 
-#include "mcu_main/telemetry.h"
-#include "mcu_main/debug.h"
-#include "mcu_main/dataLog.h"
-#include "mcu_main/Rt.h"
+#include "MIDAS/src/telemetry/telemetry.h"
+//#include "mcu_main/debug.h"
+//#include "mcu_main/dataLog.h"
+#include "MIDAS/src/telemetry/Rt.h"
 #include <cstring>
 #include <cmath>
 
 #ifndef ENABLE_SILSIM_MODE
-#include "RHHardwareSPI1.h"
+#include "MIDAS/lib/RH/RHHardwareSPI.h"
 #endif
 
 Telemetry tlm;
@@ -47,7 +47,7 @@ T inv_convert_range(float val, float range) {
 }
 
 ErrorCode Telemetry::init() {
-#if defined(ENABLE_TELEMETRY) && !defined(ENABLE_SILSIM_MODE)
+#if defined(ENABLE_TELEMETRY) && !defined(ENABLE_SILSIM_MODE) 
     pinMode(RFM96_RST, OUTPUT);
     digitalWrite(RFM96_RST, HIGH);
     delay(10);
@@ -395,7 +395,7 @@ TelemetryPacket Telemetry::makePacket(const sensorDataStruct_t &data_struct) {
 
 void Telemetry::bufferData() {
 #ifdef ENABLE_TELEMETRY
-#ifndef TLM_DEBUG
+//#ifndef TLM_DEBUG
     sensorDataStruct_t sensor_data = dataLogger.read();
     TelemetryDataLite data{};
     data.timestamp = TIME_I2MS(chVTGetSystemTime());
@@ -415,6 +415,6 @@ void Telemetry::bufferData() {
 #ifdef SERIAL_PLOTTING
     serialPrint(sensor_data);
 #endif
-#endif
+//#endif
 #endif
 }
