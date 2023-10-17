@@ -13,7 +13,7 @@
 #include "Queue.h"
 
 /**
- *  The size of a stack, in bytes.
+ *  The size of a thread stack, in bytes.
  */
 #define STACK_SIZE 1024
 

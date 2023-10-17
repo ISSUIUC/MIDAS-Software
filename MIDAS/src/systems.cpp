@@ -2,112 +2,138 @@
 
 #include "hal.h"
 #include "sensors.h"
+#include "data_logging.h"
 
 /**
  * These are all the functions that will run in each task
- * Each function has a `while(true)` loop within that should not be returned out of or yielded in any way
+ * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
  * 
  * @param name the name of the thread, replace with the actual name
  * @param arg the config file for the rocket
  */
 DECLARE_THREAD(data_logger, RocketSystems* arg) {
+    log_begin(arg->log_sink);
     while (true) {
-        THREAD_SLEEP(16);
-        Serial.println("DATA");
+        log_data(arg->log_sink, arg->rocket_data);
+        THREAD_SLEEP(50);
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
+        Barometer reading = arg->sensors.barometer.read();
+        arg->rocket_data.barometer.update(reading);
+
         THREAD_SLEEP(16);
         Serial.println("BARO");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("LOWG");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("HIGHG");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("ORI");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("MAG");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("GPS");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(gas, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("GAS");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("VOLT");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("conct");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         Serial.println("FSM");
     }
-    vTaskDelete(NULL);
 }
 
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) {        
         THREAD_SLEEP(16);
         Serial.println("KALMAN");
     }
-    vTaskDelete(NULL);
 }
 
 #define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
-bool init_sensors(Sensors& sensors) {
+bool init_sensors(Sensors& sensors, LogSink& log_sink) {
     // todo message on failure
     INIT_SENSOR(sensors.low_g);
     INIT_SENSOR(sensors.high_g);
@@ -115,6 +141,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
+    INIT_SENSOR(log_sink);
     return true;
 }
 #undef INIT_SENSOR
@@ -124,7 +151,7 @@ bool init_sensors(Sensors& sensors) {
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems& config) {
-    bool success = init_sensors(config.sensors);
+    bool success = init_sensors(config.sensors, config.log_sink);
     if (!success) {
         // todo some message probably
         return;
@@ -142,7 +169,7 @@ void begin_systems(RocketSystems& config) {
     START_THREAD(fsm, SENSOR_CORE, &config);
     START_THREAD(kalman, SENSOR_CORE, &config);
 
-    while(true){
+    while (true) {
         THREAD_SLEEP(1000);
     }
 }
