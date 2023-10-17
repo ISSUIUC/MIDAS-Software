@@ -4,6 +4,7 @@
 #include <cstdint>
 #include <queue>
 #include <cstring>
+#include <iostream>
 
 #include "fiber.h"
 
@@ -105,3 +106,23 @@ void vTaskDelay(int32_t time);
 void vTaskDelete(void* something_probably);
 
 void begin_silsim();
+
+struct SerialPatch {
+    void println(const char* s);
+
+    template <typename T>
+    void print(T t) {
+        std::cout << t;
+    }
+
+    template <typename T, typename... Args>
+    void print(T t, Args... args) {
+        std::cout << t;
+
+        print(args...);
+    }
+
+    void begin(int baudrate);
+};
+
+extern SerialPatch Serial;

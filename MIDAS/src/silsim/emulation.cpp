@@ -103,3 +103,10 @@ void vTaskDelete(void* something_probably) {
 void vTaskDelay(int32_t time) {
     threadSleep(time);
 }
+
+
+void SerialPatch::println(const char* s) { std::cout << s << '\n'; }
+
+void SerialPatch::begin(int baudrate) {}
+
+SerialPatch Serial;

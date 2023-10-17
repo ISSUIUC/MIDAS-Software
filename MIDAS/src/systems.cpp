@@ -13,7 +13,7 @@
 DECLARE_THREAD(data_logger, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("DATA");
+        Serial.println("DATA");
     }
     vTaskDelete(NULL);
 }
@@ -21,7 +21,7 @@ DECLARE_THREAD(data_logger, RocketSystems* arg) {
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("BARO");
+        Serial.println("BARO");
     }
     vTaskDelete(NULL);
 }
@@ -29,7 +29,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("LOWG");
+        Serial.println("LOWG");
     }
     vTaskDelete(NULL);
 }
@@ -37,7 +37,7 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("HIGHG");
+        Serial.println("HIGHG");
     }
     vTaskDelete(NULL);
 }
@@ -45,7 +45,7 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("ORI");
+        Serial.println("ORI");
     }
     vTaskDelete(NULL);
 }
@@ -61,7 +61,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("GPS");
+        Serial.println("GPS");
     }
     vTaskDelete(NULL);
 }
@@ -69,7 +69,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 DECLARE_THREAD(gas, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("GAS");
+        Serial.println("GAS");
     }
     vTaskDelete(NULL);
 }
@@ -77,7 +77,7 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("VOLT");
+        Serial.println("VOLT");
     }
     vTaskDelete(NULL);
 }
@@ -85,7 +85,7 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
 DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("conct");
+        Serial.println("conct");
     }
     vTaskDelete(NULL);
 }
@@ -93,7 +93,7 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("FSM");
+        Serial.println("FSM");
     }
     vTaskDelete(NULL);
 }
@@ -101,7 +101,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) {        
         THREAD_SLEEP(16);
-        //Serial.println("KALMAN");
+        Serial.println("KALMAN");
     }
     vTaskDelete(NULL);
 }
