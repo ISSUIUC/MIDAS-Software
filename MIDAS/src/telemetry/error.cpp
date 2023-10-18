@@ -16,9 +16,10 @@
  * RED, 2 Hz => Initialization Error
  */
 
-#include "mcu_main/error.h"
-#include "mcu_main/Rt.h"
-#include "mcu_main/pins.h"
+#include "error.h"
+//#include "Rt.h"
+#include "Arduino.h"
+#include "pins.h"
 
 void handleError(ErrorCode code) {
     switch (code) {

@@ -6,7 +6,7 @@
  * computer and the ground station.
  *
  * Spaceshot Avionics 2023-24
- * Illinois Space Society - Telemetry Team
+ * Illinois Space Society - Software Team
  * Gautam Dayal
  * Nicholas Phillips
  * Patrick Marschoun
@@ -16,15 +16,15 @@
  */
 #include <limits>
 
-#include "MIDAS/src/telemetry/telemetry.h"
+#include "telemetry.h"
 //#include "mcu_main/debug.h"
 //#include "mcu_main/dataLog.h"
-#include "MIDAS/src/telemetry/Rt.h"
+//#include "Rt.h"
 #include <cstring>
 #include <cmath>
 
 #ifndef ENABLE_SILSIM_MODE
-#include "MIDAS/lib/RH/RHHardwareSPI.h"
+#include <RHHardwareSPI.h>
 #endif
 
 Telemetry tlm;
@@ -160,7 +160,7 @@ void Telemetry::transmit() {
     digitalWrite(LED_BLUE, blue_state);
     blue_state = !blue_state;
 
-    TelemetryPacket packet = makePacket(dataLogger.read());
+    TelemetryPacket packet = makePacket(dataLogger.read()); //change to new data struct
 #ifndef ENABLE_SILSIM_MODE
     rf95.send((uint8_t *)&packet, sizeof(packet));
 

@@ -1,17 +1,15 @@
 #pragma once
 
-#include "src/telemetry/Rt.h"
+
 
 #include <array>
 
-#include "src/telemetry/MessageQueue.h"
-#include "src/telemetry/packet.h"
-#include "src/telemetry/pins.h"
-#include "src/telemetry/error.h"
-
-#ifndef ENABLE_SILSIM_MODE
+#include "MessageQueue.h"
+#include "packet.h"
+#include "pins.h"
+#include "error.h"
 #include <RH_RF95.h>
-#endif
+
 
 // Make sure to change these pinout depending on wiring
 // Don't forget to change the ini file to build the correct main file
