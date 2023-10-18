@@ -4,16 +4,17 @@
 #include <cstdint>
 #include <queue>
 #include <cstring>
-#include <iostream>
 
 #include "fiber.h"
+#include "arduino_emulation.h"
 
-#define tskIDLE_PRIORITY (0)
+#define tskIDLE_PRIORITY (128)
 
 #define pdMS_TO_TICKS(ms) (ms)
 
 void threadYield();
 void threadSleep(int32_t time_ms);
+void silsimStepTime();
 
 typedef int StaticTask_t;
 typedef int BaseType_t;
@@ -45,7 +46,6 @@ typedef size_t TickType_t;
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t* buffer);
 bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout);
 bool xSemaphoreGive(SemaphoreHandle_t semaphore);
-
 
 class StaticQueue_t {
 public:
@@ -106,23 +106,3 @@ void vTaskDelay(int32_t time);
 void vTaskDelete(void* something_probably);
 
 void begin_silsim();
-
-struct SerialPatch {
-    void println(const char* s);
-
-    template <typename T>
-    void print(T t) {
-        std::cout << t;
-    }
-
-    template <typename T, typename... Args>
-    void print(T t, Args... args) {
-        std::cout << t;
-
-        print(args...);
-    }
-
-    void begin(int baudrate);
-};
-
-extern SerialPatch Serial;
