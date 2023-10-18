@@ -45,5 +45,6 @@ public:
     SensorState<GPS> gps;
     SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
+    SensorState<FSMState> fsm_state;
 };
 

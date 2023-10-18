@@ -1,5 +1,7 @@
 #pragma once
 
+#include "finite-state-machines/fsm_states.h"
+
 #include <cmath>
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
@@ -126,4 +128,8 @@ struct KalmanData {
 
 struct Pyro {
     bool is_active = false;
+};
+
+struct FSMState {
+    FSM_state curr_state = STATE_IDLE;
 };
