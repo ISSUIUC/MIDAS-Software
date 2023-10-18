@@ -5,12 +5,14 @@
 #include <queue>
 #include <cstring>
 
-#include "fiber.h"
-#include "arduino_emulation.h"
+#include "silsim/fiber.h"
+#include "silsim/arduino_emulation.h"
 
 #define tskIDLE_PRIORITY (128)
 
 #define pdMS_TO_TICKS(ms) (ms)
+#define pdTICKS_TO_MS(ticks) (ticks)
+#define xTaskGetTickCount() (millis())
 
 void threadYield();
 void threadSleep(int32_t time_ms);
@@ -53,7 +55,7 @@ class StaticQueue_t {
 public:
     StaticQueue_t() : item_size(0), max_count(0), buffer(nullptr) { };
 
-    StaticQueue_t* initialize(size_t item_size_, size_t max_count_, uint8_t* buffer_) {
+    StaticQueue_t* initialize(size_t max_count_, size_t item_size_, uint8_t* buffer_) {
         item_size = item_size_;
         max_count = max_count_;
         buffer = buffer_;
@@ -61,7 +63,7 @@ public:
     }
 
     void push(void* item) {
-        std::memcmp(&buffer[tail_idx * item_size], item, item_size);
+        std::memcpy(&buffer[tail_idx * item_size], item, item_size);
         tail_idx++;
         if (tail_idx == max_count) {
             tail_idx = 0;

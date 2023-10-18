@@ -1,67 +1,63 @@
-#include "sensors.h"
+#include "silsim/emulated_sensors.h"
+#include <cmath>
+
 
 ErrorCode BarometerSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
 Barometer BarometerSensor::read() {
-    // read from aforementioned global instance of sensor
-    return Barometer();
+    return { .temperature = 273.15, .pressure = (float) log(rocket->height) } ;
 }
 
 ErrorCode ContinuitySensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
 Continuity ContinuitySensor::read() {
-    // read from aforementioned global instance of sensor
-    return Continuity();
+    return { .is_continuous = false };
 }
 
 ErrorCode HighGSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
 HighGData HighGSensor::read() {
-    // read from aforementioned global instance of sensor
-    return HighGData();
+    return { .gx = 0, .gy = 0, .gz = (float) rocket->acceleration };
 }
 
 ErrorCode LowGSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
 LowGData LowGSensor::read() {
-    // read from aforementioned global instance of sensor
-    return LowGData();
+    return { .gx = 0, .gy = 0, .gz = (float) rocket->acceleration };
 }
 
 ErrorCode OrientationSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
 Orientation OrientationSensor::read() {
-    // read from aforementioned global instance of sensor
-    return Orientation();
+    return {
+            .yaw = 0,
+            .pitch = 0,
+            .roll = 0,
+            .orientation_velocity = { .vx = 0, .vy = 0, .vz = (float) rocket->velocity },
+            .orientation_acceleration = { .ax = 0, .ay = 0, .az = 0 },
+            .linear_acceleration = { .ax = 0, .ay = 0, .az = (float) rocket->acceleration },
+            .gx = 0,
+            .gy = 0,
+            .gz = 0,  // todo I don't know what the g's are
+            .magnetometer = { .mx = 0, .my = 0, .mz = 0},
+            .temperature = 273.15,
+    };
 }
 
 ErrorCode VoltageSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
 Voltage VoltageSensor::read() {
-    // read from aforementioned global instance of sensor
-    return Voltage();
+    return { .voltage = 9 };
 }

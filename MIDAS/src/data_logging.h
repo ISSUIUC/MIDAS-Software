@@ -3,6 +3,7 @@
 #include "rocket_state.h"
 
 #if defined(SILSIM)
+#include "silsim/FileSink.h"
 #elif defined(HILSIM)
 #else
 #include "hardware/SDLog.h"

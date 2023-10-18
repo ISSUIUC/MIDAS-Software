@@ -6,9 +6,9 @@
 
 
 struct RocketSystems {
-    Sensors sensors{};
-    RocketData rocket_data{};
-    LogSink log_sink{};
+    Sensors sensors;
+    RocketData rocket_data;
+    LogSink log_sink;
 };
 
-void begin_systems(RocketSystems& config);
+void begin_systems(RocketSystems* config);

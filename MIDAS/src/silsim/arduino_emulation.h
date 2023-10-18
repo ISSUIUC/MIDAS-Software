@@ -4,7 +4,7 @@
 unsigned long millis();
 
 struct SerialPatch {
-    void println(const char* s);
+//    void println(const char* s);
 
     template <typename T>
     void print(T t) {

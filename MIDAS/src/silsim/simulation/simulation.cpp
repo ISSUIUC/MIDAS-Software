@@ -11,10 +11,12 @@ double SimulatedMotor::get_thrust(bool was_ignited, double time_since_ignition) 
     }
 }
 
+SimulatedMotor::SimulatedMotor(double max_thrust, double burn_time) : max_thrust(max_thrust), burn_time(burn_time) { }
+
 
 void Simulation::step(double dt) {
-    for (SimulatedRocket& rocket : rockets) {
-        rocket.step(current_time, dt);
+    for (SimulatedRocket* rocket : rockets) {
+        rocket->step(current_time, dt);
     }
     current_time += dt;
 }
@@ -27,6 +29,12 @@ void SimulatedRocket::step(double current_time, double dt) {
     double thrust = parameters.motor.get_thrust(was_ignited, current_time - ignition_time);
     double drag = 0.5 * parameters.drag_coefficient * parameters.cross_sectional_area * velocity * velocity;
 
-    velocity += (thrust - drag) / parameters.mass * dt;
+    acceleration = (thrust - drag) / parameters.mass;
+    velocity += acceleration * dt;
     height += velocity * dt;
 }
+
+SimulatedRocket::SimulatedRocket(bool is_active, RocketParameters parameters) : is_active(is_active), parameters(parameters) { }
+
+RocketParameters::RocketParameters(double mass, double area, double drag, SimulatedMotor motor) : mass(mass), cross_sectional_area(area), drag_coefficient(drag),
+                                                                                                  motor(motor) { }
