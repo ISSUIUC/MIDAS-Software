@@ -52,6 +52,11 @@ struct MagnetometerSensor {
     Magnetometer read();
 };
 
+struct GPSSensor {
+    ErrorCode init();
+    GPS read();
+};
+
 struct Sensors {
     LowGSensor low_g;
     Gyroscope gyroscope;
@@ -61,6 +66,7 @@ struct Sensors {
     VoltageSensor voltage;
     OrientationSensor orientation;
     MagnetometerSensor magnetometer;
+    GPSSensor gps;
 };
 
 
