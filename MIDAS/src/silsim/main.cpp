@@ -14,6 +14,8 @@ int main() {
     xTaskCreateStaticPinnedToCore(rocket_main, "rocket main", 4096, nullptr, tskIDLE_PRIORITY, stack, nullptr, 0);
 
     for(int i = 0; i < 1000 * 100; i++){
+        // phsyics
+        
         silsimStepTime();
     }
 

@@ -14,6 +14,8 @@
 
 void threadYield();
 void threadSleep(int32_t time_ms);
+void delay(unsigned long ms);
+void emu_busy_wait(size_t ms);
 void silsimStepTime();
 
 typedef int StaticTask_t;

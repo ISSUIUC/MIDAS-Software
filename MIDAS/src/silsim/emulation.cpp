@@ -3,6 +3,7 @@
 #include <vector>
 #include <chrono>
 #include <array>
+#include <map>
 
 size_t global_ms = 0;
 
@@ -15,34 +16,51 @@ public:
     BaseType_t core;
 };
 
+struct Core {
+    std::vector<ThreadInfo> threads;
+    size_t next_idx;
+    size_t current_quantum;
+    size_t core_idx;
+};
+
 struct ThreadManager {
 public:
-    ThreadManager() : threads(), next_thread(1), core_quantums() {}
+    ThreadManager(): core_idx(0), cores(3) {}
 
-    std::vector<ThreadInfo> threads;
-    size_t next_thread;
-    std::array<size_t, 2> core_quantums;
+    size_t core_idx;
+    std::vector<Core> cores;
 
     bool debug = false;
 
-    void yield() {
-        if (threads.empty()) {
-            return;
-        }
-        if (next_thread >= threads.size()) {
-            next_thread = 0;
-        }
-        ThreadInfo* switch_to = &threads[next_thread];
-        next_thread++;
+    void add_thread(ThreadInfo t){
+        cores.at(t.core).threads.push_back(t);
+    }
 
-        if(switch_to->core == -1){ //silsim manager thread
-            if (debug) std::cout << "Switching to " << switch_to->name << std::endl;
-            EmuSwitchToFiber(switch_to->fiber_handle);
-        } else if(core_quantums.at(switch_to->core) <= global_ms){
-            core_quantums[switch_to->core] = global_ms;
-            if (debug) std::cout << "Switching to " << switch_to->name << std::endl;
-            EmuSwitchToFiber(switch_to->fiber_handle);
+    void yield() {
+        while(true){
+            Core& core = cores[core_idx];
+            if(core.next_idx == core.threads.size()){
+                core.next_idx = 0;
+                core_idx = (core_idx + 1) % cores.size();
+                continue;
+            }
+            if(core.current_quantum <= global_ms){
+                core.current_quantum = global_ms;
+            } else {
+                core_idx = (core_idx + 1) % cores.size();
+                continue;
+            }
+
+            ThreadInfo& thread = core.threads[core.next_idx];
+            core.next_idx++;
+            if (debug) std::cout << "Switching to " << thread.name << std::endl;
+            EmuSwitchToFiber(thread.fiber_handle);
+            break;
         }
+    }
+
+    void busy_wait_current_core(size_t ms){
+        cores[core_idx].current_quantum += ms;
     }
 };
 
@@ -62,6 +80,15 @@ void threadSleep(int32_t time_ms) {
     }
 }
 
+void delay(unsigned long ms){
+    threadSleep(ms);
+}
+
+void emu_busy_wait(size_t ms){
+    thread_manager.busy_wait_current_core(ms);
+}
+
+
 void silsimStepTime() {
     global_ms++;
     threadYield();
@@ -69,7 +96,7 @@ void silsimStepTime() {
 
 void createThread(const char* name, void fn(void*), size_t stack, void* arg, BaseType_t core) {
     FiberHandle handle = EmuCreateFiber(stack, fn, arg);
-    thread_manager.threads.push_back(ThreadInfo(name, handle, core));
+    thread_manager.add_thread(ThreadInfo(name, handle, core));
 }
 
 
@@ -93,7 +120,7 @@ bool xSemaphoreGive(SemaphoreHandle_t semaphore) {
 }
 
 void begin_silsim() {
-    thread_manager.threads.emplace_back("main", EmuConvertThreadToFiber(), -1);
+    thread_manager.add_thread(ThreadInfo{"main", EmuConvertThreadToFiber(), 2});
 }
 
 void vTaskDelete(void* something_probably) {
