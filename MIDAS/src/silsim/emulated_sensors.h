@@ -31,7 +31,7 @@ struct ContinuitySensor {
     ErrorCode init();
     Continuity read();
 
-    SimulatedRocket* rocket;
+    bool should_be_continous;
 };
 
 struct VoltageSensor {

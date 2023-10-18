@@ -10,12 +10,12 @@ void start_rocket_thread(const char* name, RocketSystems* systems) {
     xTaskCreateStaticPinnedToCore((TaskFunction_t) rocket_main_thread, name, 4096, systems, tskIDLE_PRIORITY, stack, nullptr, 0);
 }
 
-Sensors create_sensors_attached_to(SimulatedRocket* sim) {
+Sensors create_sensors_attached_to(SimulatedRocket* sim, bool should_be_continuous) {
     return Sensors {
             LowGSensor { sim },
             HighGSensor { sim },
             BarometerSensor { sim },
-            ContinuitySensor { sim },
+            ContinuitySensor { should_be_continuous },
             VoltageSensor { sim },
             OrientationSensor { sim }
     };
@@ -34,13 +34,13 @@ int main() {
     };
 
     RocketSystems* stage1_systems = new RocketSystems {
-            create_sensors_attached_to(together_sim)
+            create_sensors_attached_to(together_sim, true)
     };
     stage1_systems->log_sink.output_file.open("stage1_sink.launch", std::ios::out | std::ios::binary | std::ios::trunc);
     start_rocket_thread("stage1 thread", stage1_systems);
 
     RocketSystems* stage2_systems = new RocketSystems {
-        create_sensors_attached_to(together_sim)
+        create_sensors_attached_to(together_sim, true)
     };
     stage2_systems->log_sink.output_file.open("stage2_sink.launch", std::ios::out | std::ios::binary | std::ios::trunc);
     start_rocket_thread("stage2 thread", stage2_systems);
@@ -59,8 +59,8 @@ int main() {
     sim.activate_rocket(stage2_sim);
     sim.deactivate_rocket(together_sim);
     sim.ignite_rocket(stage1_sim);
-    stage1_systems->sensors = create_sensors_attached_to(stage1_sim);
-    stage2_systems->sensors = create_sensors_attached_to(stage2_sim);
+    stage1_systems->sensors = create_sensors_attached_to(stage1_sim, false);
+    stage2_systems->sensors = create_sensors_attached_to(stage2_sim, false);
 
     while (stage2_sim->height != 0) {
         sim.step(0.001);

@@ -28,7 +28,6 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         arg->rocket_data.barometer.update(reading);
 
         THREAD_SLEEP(16);
-        Serial.println("BARO");
     }
 }
 
@@ -37,8 +36,9 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
  */
 DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
+        LowGData reading = arg->sensors.low_g.read();
+        arg->rocket_data.low_g.update(reading);
         THREAD_SLEEP(16);
-        Serial.println("LOWG");
     }
 }
 
@@ -47,8 +47,9 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
  */
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
+        HighGData reading = arg->sensors.high_g.read();
+        arg->rocket_data.high_g.update(reading);
         THREAD_SLEEP(16);
-        Serial.println("HIGHG");
     }
 }
 
@@ -61,7 +62,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         arg->rocket_data.orientation.update(reading);
 
         THREAD_SLEEP(16);
-        Serial.println("ORI");
     }
 }
 
@@ -71,7 +71,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        //Serial.println("MAG");
     }
 }
 
@@ -81,17 +80,6 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        Serial.println("GPS");
-    }
-}
-
-/**
- * See \ref data_logger_thread
- */
-DECLARE_THREAD(gas, RocketSystems* arg) {
-    while (true) {
-        THREAD_SLEEP(16);
-        Serial.println("GAS");
     }
 }
 
@@ -100,8 +88,9 @@ DECLARE_THREAD(gas, RocketSystems* arg) {
  */
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
+        Voltage reading = arg->sensors.voltage.read();
+        arg->rocket_data.voltage.update(reading);
         THREAD_SLEEP(16);
-        Serial.println("VOLT");
     }
 }
 
@@ -110,8 +99,9 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
  */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
+        Continuity reading = arg->sensors.continuity.read();
+        arg->rocket_data.continuity.update(reading);
         THREAD_SLEEP(16);
-        Serial.println("conct");
     }
 }
 
@@ -121,7 +111,6 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
-        Serial.println("FSM");
     }
 }
 
@@ -131,7 +120,6 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) {        
         THREAD_SLEEP(16);
-        Serial.println("KALMAN");
     }
 }
 
@@ -166,7 +154,6 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(orientation, SENSOR_CORE, config);
     START_THREAD(magnetometer, SENSOR_CORE, config);
     START_THREAD(gps, DATA_CORE, config);
-    START_THREAD(gas, SENSOR_CORE, config);
     START_THREAD(voltage, SENSOR_CORE, config);
     START_THREAD(continuity, SENSOR_CORE, config);
     START_THREAD(fsm, SENSOR_CORE, config);

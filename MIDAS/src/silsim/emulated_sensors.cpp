@@ -15,7 +15,7 @@ ErrorCode ContinuitySensor::init() {
 }
 
 Continuity ContinuitySensor::read() {
-    return { .is_continuous = false };
+    return { .is_continuous = should_be_continous };
 }
 
 ErrorCode HighGSensor::init() {
