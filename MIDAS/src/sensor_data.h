@@ -81,8 +81,16 @@ struct Barometer {
 // Detects if a charge or 
 struct Continuity {
     Continuity() = default;
-    explicit Continuity(bool is_continuous) : is_continuous(is_continuous) { }
-    bool is_continuous = false;
+    bool pins[6];
+    // fancy operator overloading, you CS 128 kids won't get it until like week 6, and even then I don't think y'all
+    // mess with overloading []
+    bool& operator[](const int i) {
+        return pins[i];
+    }
+
+    bool operator[](const int i) const {
+        return pins[i];
+    }
 };
 
 struct Voltage {

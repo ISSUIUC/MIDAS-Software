@@ -8,6 +8,15 @@
  */
 RocketSystems systems;
 
+#ifdef HILSIM
+#include "hilsim/hilsim.pb.h"
+
+int hilsim() {
+    char[HILSIMPacket_size]
+    // Read from serial
+    return 0;
+}
+#endif
 void setup() {
     //begin serial port
     Serial.begin(9600);
