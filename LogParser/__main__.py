@@ -61,6 +61,8 @@ def main():
     parser.add_argument("raw", type=pathlib.Path)
     parser.add_argument("-o", "--out", type=pathlib.Path)
     args = parser.parse_args()
+    if args.out is None:
+        args.out = args.raw.with_suffix(".json")
 
     format_file = pathlib.Path(__file__).parent.parent / "MIDAS" / "src" / "log_format.h"
 

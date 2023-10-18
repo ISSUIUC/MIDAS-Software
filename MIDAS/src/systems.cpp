@@ -57,6 +57,9 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
  */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
+        Orientation reading = arg->sensors.orientation.read();
+        arg->rocket_data.orientation.update(reading);
+
         THREAD_SLEEP(16);
         Serial.println("ORI");
     }

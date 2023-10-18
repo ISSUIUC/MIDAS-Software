@@ -34,6 +34,7 @@ struct SimulatedRocket {
     double ignition_time = 0.0;
 
     void step(double current_time, double dt);
+    void copy_state_from(SimulatedRocket* other);
 };
 
 struct Simulation {
@@ -41,4 +42,8 @@ struct Simulation {
     std::vector<SimulatedRocket*> rockets;
 
     void step(double dt);
+
+    void activate_rocket(SimulatedRocket* rocket);
+    void deactivate_rocket(SimulatedRocket* rocket);
+    void ignite_rocket(SimulatedRocket* rocket);
 };

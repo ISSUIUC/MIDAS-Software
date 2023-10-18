@@ -27,11 +27,14 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
 }
 
 template<typename T>
-void log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
+int log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
+    int read = 0;
     while (sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);
+        read++;
     }
+    return read;
 }
 
 void log_begin(LogSink& sink) {

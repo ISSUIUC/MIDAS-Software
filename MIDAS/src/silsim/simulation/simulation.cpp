@@ -17,8 +17,24 @@ SimulatedMotor::SimulatedMotor(double max_thrust, double burn_time) : max_thrust
 void Simulation::step(double dt) {
     for (SimulatedRocket* rocket : rockets) {
         rocket->step(current_time, dt);
+        if (rocket->height < 0) {
+            rocket->height = 0;
+        }
     }
     current_time += dt;
+}
+
+void Simulation::ignite_rocket(SimulatedRocket* rocket) {
+    rocket->was_ignited = true;
+    rocket->ignition_time = current_time;
+}
+
+void Simulation::activate_rocket(SimulatedRocket* rocket) {
+    rocket->is_active = true;
+}
+
+void Simulation::deactivate_rocket(SimulatedRocket* rocket) {
+    rocket->is_active = false;
 }
 
 void SimulatedRocket::step(double current_time, double dt) {
@@ -35,6 +51,12 @@ void SimulatedRocket::step(double current_time, double dt) {
 }
 
 SimulatedRocket::SimulatedRocket(bool is_active, RocketParameters parameters) : is_active(is_active), parameters(parameters) { }
+
+void SimulatedRocket::copy_state_from(SimulatedRocket* other) {
+    acceleration = other->velocity;
+    velocity = other->velocity;
+    height = other->height;
+}
 
 RocketParameters::RocketParameters(double mass, double area, double drag, SimulatedMotor motor) : mass(mass), cross_sectional_area(area), drag_coefficient(drag),
                                                                                                   motor(motor) { }

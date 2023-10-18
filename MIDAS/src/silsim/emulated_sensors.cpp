@@ -7,7 +7,7 @@ ErrorCode BarometerSensor::init() {
 }
 
 Barometer BarometerSensor::read() {
-    return { .temperature = 273.15, .pressure = (float) log(rocket->height) } ;
+    return { .temperature = 273.15, .pressure = (float) rocket->height } ;
 }
 
 ErrorCode ContinuitySensor::init() {
