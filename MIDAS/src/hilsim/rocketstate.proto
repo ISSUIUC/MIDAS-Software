@@ -1,0 +1,4 @@
+
+message RocketState {
+    // Get the state of the rocket
+}
