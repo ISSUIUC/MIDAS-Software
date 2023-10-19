@@ -4,5 +4,6 @@
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
-    GyroCouldNotBeInitialized
+    GyroCouldNotBeInitialized,
+    SDBeginFailed
 };

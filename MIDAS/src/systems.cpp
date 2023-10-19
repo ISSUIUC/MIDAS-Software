@@ -109,6 +109,14 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+DECLARE_THREAD(telem, RocketSystems* arg) {
+    while (true) {
+        THREAD_SLEEP(16);
+        //Serial.println("TELEM");
+    }
+    vTaskDelete(NULL);
+}
+
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     example_kf.initialize();
     while (true) {        
@@ -157,6 +165,7 @@ void begin_systems(RocketSystems& config) {
     START_THREAD(continuity, SENSOR_CORE, &config);
     START_THREAD(fsm, SENSOR_CORE, &config);
     START_THREAD(kalman, SENSOR_CORE, &config);
+    START_THREAD(telem, DATA_CORE, &config);
 
     while(true){
         THREAD_SLEEP(1000);

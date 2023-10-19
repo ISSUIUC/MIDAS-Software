@@ -159,8 +159,9 @@ void Telemetry::transmit() {
     static bool blue_state = false;
     digitalWrite(LED_BLUE, blue_state);
     blue_state = !blue_state;
+    
 
-    TelemetryPacket packet = makePacket(dataLogger.read()); //change to new data struct
+    TelemetryPacket packet = makePacket(); //change to new data struct
 #ifndef ENABLE_SILSIM_MODE
     rf95.send((uint8_t *)&packet, sizeof(packet));
 
@@ -187,6 +188,7 @@ void Telemetry::transmit() {
 #endif
 #endif
 }
+
 
 void printFloat(float f, int precision = 5) {
     if (std::isinf(f) || std::isnan(f)) {
@@ -351,28 +353,29 @@ void Telemetry::serialPrint(const sensorDataStruct_t &sensor_data) {
 
 TelemetryPacket Telemetry::makePacket(const sensorDataStruct_t &data_struct) {
     TelemetryPacket packet{};
-    packet.gps_lat = data_struct.gps_data.latitude;
-    packet.gps_long = data_struct.gps_data.longitude;
-    packet.gps_alt = data_struct.gps_data.altitude;
+    packet.gps_lat = Sensorstate->gps->latitude;
+    packet.gps_long = Sensorstate->gps->longitude;
+    packet.gps_alt = Sensorstate->gps->altitude;
 
-    packet.gnc_state_ax = data_struct.kalman_data.kalman_acc_x;
-    packet.gnc_state_vx = data_struct.kalman_data.kalman_vel_x;
-    packet.gnc_state_x = data_struct.kalman_data.kalman_pos_x;
-    packet.gnc_state_ay = data_struct.kalman_data.kalman_acc_y;
-    packet.gnc_state_vy = data_struct.kalman_data.kalman_vel_y;
-    packet.gnc_state_y = data_struct.kalman_data.kalman_pos_y;
-    packet.gnc_state_az = data_struct.kalman_data.kalman_acc_z;
-    packet.gnc_state_vz = data_struct.kalman_data.kalman_vel_z;
-    packet.gnc_state_z = data_struct.kalman_data.kalman_pos_z;
-    packet.gns_state_apo = data_struct.kalman_data.kalman_apo;
+    // packet.gnc_state_ax = data_struct.kalman_data.kalman_acc_x;
+    // packet.gnc_state_vx = data_struct.kalman_data.kalman_vel_x;
+    // packet.gnc_state_x = data_struct.kalman_data.kalman_pos_x;
+    // packet.gnc_state_ay = data_struct.kalman_data.kalman_acc_y;
+    // packet.gnc_state_vy = data_struct.kalman_data.kalman_vel_y;
+    // packet.gnc_state_y = data_struct.kalman_data.kalman_pos_y;
+    // packet.gnc_state_az = data_struct.kalman_data.kalman_acc_z;
+    // packet.gnc_state_vz = data_struct.kalman_data.kalman_vel_z;
+    // packet.gnc_state_z = data_struct.kalman_data.kalman_pos_z;
+    // packet.gnc_state_apo = data_struct.kalman_data.kalman_apo;
 
-    packet.mag_x = inv_convert_range<int16_t>(data_struct.magnetometer_data.magnetometer.mx, 8);
-    packet.mag_y = inv_convert_range<int16_t>(data_struct.magnetometer_data.magnetometer.my, 8);
-    packet.mag_z = inv_convert_range<int16_t>(data_struct.magnetometer_data.magnetometer.mz, 8);
+    //fix the gnc stuff later
 
-    packet.gyro_x = inv_convert_range<int16_t>(data_struct.lowG_data.gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(data_struct.lowG_data.gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(data_struct.lowG_data.gz, 8192);
+    packet.mag_x = inv_convert_range<int16_t>(Sensorstate->magnetometer->mx, 8);
+    packet.mag_y = inv_convert_range<int16_t>(Sensorstate->magnetometer->my, 8);
+    packet.mag_z = inv_convert_range<int16_t>(Sensorstate->magnetometer->mz, 8);
+    packet.gyro_x = inv_convert_range<int16_t>(Sensorstate->gyroscope->gx, 8192);
+    packet.gyro_y = inv_convert_range<int16_t>(Sensorstate->gyroscope->gy, 8192);
+    packet.gyro_z = inv_convert_range<int16_t>(Sensorstate->gyroscope->gz, 8192);
 
     packet.response_ID = last_command_id;
 #ifdef ENABLE_SILSIM_MODE
@@ -401,15 +404,14 @@ void Telemetry::bufferData() {
     data.timestamp = TIME_I2MS(chVTGetSystemTime());
     data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(sensor_data.highG_data.hg_ax, 256);
-    data.highG_ay = inv_convert_range<int16_t>(sensor_data.highG_data.hg_ay, 256);
-    data.highG_az = inv_convert_range<int16_t>(sensor_data.highG_data.hg_az, 256);
+    data.highG_ax = inv_convert_range<int16_t>(Sensorstate->high_g->gx, 256);
+    data.highG_ay = inv_convert_range<int16_t>(Sensorstate->high_g->gy, 256);
+    data.highG_az = inv_convert_range<int16_t>(Sensorstate->high_g->gz, 256);
 
-    data.bno_pitch = inv_convert_range<int16_t>(sensor_data.orientation_data.angle.pitch, 8);
-    data.bno_yaw = inv_convert_range<int16_t>(sensor_data.orientation_data.angle.yaw, 8);
-    data.bno_roll = inv_convert_range<int16_t>(sensor_data.orientation_data.angle.roll, 8);
+    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate->orientation->pitch, 8);
+    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate->orientation->yaw, 8);
+    data.bno_roll = inv_convert_range<int16_t>(Sensorstate->orientation->roll, 8);
 
-    data.flap_extension = sensor_data.flap_data.extension;
     buffered_data.push(data);
 
 #ifdef SERIAL_PLOTTING
