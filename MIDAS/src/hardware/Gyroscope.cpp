@@ -5,7 +5,7 @@
 // global static instance of the sensor
 LSM6DS3 LSM(SPI_MODE, LSM6DS3_CS);
 
-ErrorCode Gyroscope::init() {
+ErrorCode GyroscopeSensor::init() {
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code
     if (!LSM.begin()) {
@@ -14,9 +14,9 @@ ErrorCode Gyroscope::init() {
     return ErrorCode::NoError;
 }
 
-GyroscopeData Gyroscope::read() {
+Gyroscope GyroscopeSensor::read() {
     // read from aforementioned global instance of sensor
-    GyroscopeData result;
+    Gyroscope result;
     result.gx = LSM.readFloatGyroX();
     result.gy = LSM.readFloatGyroY(),
     result.gz = LSM.readFloatGyroZ();

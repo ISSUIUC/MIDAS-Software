@@ -146,8 +146,8 @@ bool init_sensors(Sensors& sensors, LogSink& log_sink) {
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
-    INIT_SENSOR(log_sink);
     INIT_SENSOR(sensors.magnetometer);
+    INIT_SENSOR(log_sink);
     return true;
 }
 #undef INIT_SENSOR
@@ -166,7 +166,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
     START_THREAD(high_g, SENSOR_CORE, config);
-    START_THREAD(gyroscope, SENSOR_CORE, &config);
+    START_THREAD(gyroscope, SENSOR_CORE, config);
     START_THREAD(orientation, SENSOR_CORE, config);
     START_THREAD(magnetometer, SENSOR_CORE, config);
     START_THREAD(gps, DATA_CORE, config);

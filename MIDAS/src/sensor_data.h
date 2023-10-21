@@ -64,7 +64,7 @@ struct HighGData {
     HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
 };
 
-struct GyroscopeData {
+struct Gyroscope {
     float gx = 0;
     float gy = 0;
     float gz = 0;

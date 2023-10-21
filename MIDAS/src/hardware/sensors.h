@@ -2,6 +2,7 @@
 
 #include "errors.h"
 #include "sensor_data.h"
+#include "hardware/pins.h"
 
 struct LowGSensor {
     ErrorCode init();
@@ -13,9 +14,19 @@ struct HighGSensor {
     HighGData read();
 };
 
+struct MagnetometerSensor {
+    ErrorCode init();
+    Magnetometer read();
+};
+
 struct BarometerSensor {
     ErrorCode init();
     Barometer read();
+};
+
+struct GyroscopeSensor {
+    ErrorCode init();
+    Gyroscope read();
 };
 
 struct ContinuitySensor {

@@ -13,6 +13,13 @@ struct LowGSensor {
     SimulatedRocket* rocket;
 };
 
+struct GyroscopeSensor {
+    ErrorCode init();
+    Gyroscope read();
+
+    SimulatedRocket* rocket;
+};
+
 struct HighGSensor {
     ErrorCode init();
     HighGData read();
@@ -37,6 +44,13 @@ struct ContinuitySensor {
 struct VoltageSensor {
     ErrorCode init();
     Voltage read();
+
+    SimulatedRocket* rocket;
+};
+
+struct MagnetometerSensor {
+    ErrorCode init();
+    Magnetometer read();
 
     SimulatedRocket* rocket;
 };

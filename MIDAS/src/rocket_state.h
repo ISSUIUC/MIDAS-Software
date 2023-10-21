@@ -19,7 +19,7 @@ template<typename S>
 struct SensorData {
 private:
     Mutex<S> current;
-    Queue<S> queue;
+    Queue<Reading<S>> queue;
 
 public:
     void update(S data) {
@@ -50,7 +50,7 @@ public:
 
     SensorData<LowGData> low_g;
     SensorData<HighGData> high_g;
-    SensorData<GyroscopeData> gyroscope;
+    SensorData<Gyroscope> gyroscope;
     SensorData<Barometer> barometer;
     SensorData<Continuity> continuity;
     SensorData<Voltage> voltage;
