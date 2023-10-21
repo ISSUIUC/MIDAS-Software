@@ -1,5 +1,7 @@
 #include "simulation.h"
 
+#include <utility>
+
 double SimulatedMotor::get_thrust(bool was_ignited, double time_since_ignition) const {
     if (!was_ignited) {
         return 0.0;
@@ -16,7 +18,7 @@ SimulatedMotor::SimulatedMotor(double max_thrust, double burn_time) : max_thrust
 
 void Simulation::step(double dt) {
     for (SimulatedRocket* rocket : rockets) {
-        rocket->step(current_time, dt);
+        rocket->step(simulation_parameters, current_time, dt);
         if (rocket->height < 0) {
             rocket->height = 0;
         }
@@ -37,15 +39,23 @@ void Simulation::deactivate_rocket(SimulatedRocket* rocket) {
     rocket->is_active = false;
 }
 
-void SimulatedRocket::step(double current_time, double dt) {
+Simulation::Simulation(SimulationParameters params, std::vector<SimulatedRocket*> rockets)
+    : simulation_parameters(params), rockets(std::move(rockets)), current_time(0.0) {
+
+}
+
+void SimulatedRocket::step(SimulationParameters& sim_parameters, double current_time, double dt) {
     if (!is_active) {
         return;
     }
 
     double thrust = parameters.motor.get_thrust(was_ignited, current_time - ignition_time);
-    double drag = 0.5 * parameters.drag_coefficient * parameters.cross_sectional_area * velocity * velocity;
+    double drag = 0.5 * sim_parameters.density_of_air * parameters.drag_coefficient * parameters.cross_sectional_area * velocity * velocity;
+    if (velocity < 0) {
+        drag = -drag;
+    }
 
-    acceleration = (thrust - drag) / parameters.mass;
+    acceleration = (thrust - drag) / parameters.mass - sim_parameters.gravity;
     velocity += acceleration * dt;
     height += velocity * dt;
 }
