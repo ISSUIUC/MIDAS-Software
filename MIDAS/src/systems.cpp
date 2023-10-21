@@ -100,9 +100,10 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
-        arg->rocket_state.fsm_state.update(arg->fsm.tick_fsm(arg->rocket_state.fsm_state.getRecent()));
+        FSMState current_state = arg->rocket_state.fsm_state.getRecent();
+        FSMState next_state = tick_fsm(current_state);
+        arg->rocket_state.fsm_state.update(next_state);
         THREAD_SLEEP(16);
-        //Serial.println("FSM");
     }
     vTaskDelete(NULL);
 }

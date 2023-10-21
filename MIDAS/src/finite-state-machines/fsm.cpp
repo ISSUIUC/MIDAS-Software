@@ -2,7 +2,7 @@
 
 // code for the fsm update function
 
-FSMState FSM::tick_fsm(FSMState state){
+FSMState tick_fsm(FSMState state){
     //pass current state
     return state;
 }

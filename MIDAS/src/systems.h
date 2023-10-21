@@ -7,7 +7,6 @@
 
 struct RocketSystems {
     Sensors sensors{};
-    FSM fsm{};
     RocketState rocket_state{};
 };
 

@@ -6,6 +6,4 @@
 #include "thresholds.h"
 #include "sensor_data.h"
 
-struct FSM{
-    FSMState tick_fsm(FSMState curr_state);
-};
+FSMState tick_fsm(FSMState curr_state);
