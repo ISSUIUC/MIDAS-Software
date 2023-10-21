@@ -3,6 +3,11 @@
 #include "sensor_data.h"
 #include "hal.h"
 
+/** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
+ *
+ *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  makes it easier to debug since all this data can be logged (and thus used when debugging).
+ */
 
 template<typename SensorData>
 struct Reading {
@@ -12,9 +17,11 @@ struct Reading {
 
 template<typename S>
 struct SensorData {
-public:
-    SensorData() : current(S()) { }
+private:
+    Mutex<S> current;
+    Queue<S> queue;
 
+public:
     void update(S data) {
         current.write(data);
         queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
@@ -26,11 +33,9 @@ public:
 
     bool getQueued(Reading<S>* out) {
         return queue.receive(out);
-    }
+    };
 
-private:
-    Mutex<S> current;
-    Queue<Reading<S>> queue;
+    SensorData() : current(S()) { }
 };
 
 /**
@@ -45,6 +50,7 @@ public:
 
     SensorData<LowGData> low_g;
     SensorData<HighGData> high_g;
+    SensorData<GyroscopeData> gyroscope;
     SensorData<Barometer> barometer;
     SensorData<Continuity> continuity;
     SensorData<Voltage> voltage;
