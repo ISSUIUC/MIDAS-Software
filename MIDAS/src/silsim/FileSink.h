@@ -2,6 +2,7 @@
 
 #include "errors.h"
 #include <fstream>
+#include <cstdint>
 
 struct LogSink {
     ErrorCode init();

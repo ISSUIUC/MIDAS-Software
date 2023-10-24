@@ -7,7 +7,7 @@ RocketSystems systems;
 
 void setup() {
     Serial.begin(9600);
-    begin_systems(systems);
+    begin_systems(&systems);
 }
 
 void loop() {
