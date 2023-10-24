@@ -114,5 +114,6 @@ class Telemetry {
     char callsign[8] = "NO SIGN";
     command_handler_struct freq_status = {};
 
-    TelemetryPacket makePacket(const sensorDataStruct_t& data_struct);
+    TelemetryPacket makePacket(const SensorState &Sensorstate);
+
 };

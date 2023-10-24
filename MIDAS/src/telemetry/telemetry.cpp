@@ -17,6 +17,7 @@
 #include <limits>
 
 #include "telemetry.h"
+#include "rocket_state.h"
 //#include "mcu_main/debug.h"
 //#include "mcu_main/dataLog.h"
 //#include "Rt.h"
@@ -351,31 +352,32 @@ void Telemetry::serialPrint(const sensorDataStruct_t &sensor_data) {
     // Serial.println("}}\n");
 }
 
-TelemetryPacket Telemetry::makePacket(const sensorDataStruct_t &data_struct) {
+TelemetryPacket Telemetry::makePacket(const SensorState &Sensorstate) {
     TelemetryPacket packet{};
-    packet.gps_lat = Sensorstate->gps->latitude;
-    packet.gps_long = Sensorstate->gps->longitude;
-    packet.gps_alt = Sensorstate->gps->altitude;
+    SensorState Sensorstate = SensorState.getRecent();
+    packet.gps_lat = Sensorstate.gps.latitude;
+    packet.gps_long = Sensorstate.gps.longitude;
+    packet.gps_alt = Sensorstate.gps.altitude;
 
-    // packet.gnc_state_ax = data_struct.kalman_data.kalman_acc_x;
-    // packet.gnc_state_vx = data_struct.kalman_data.kalman_vel_x;
-    // packet.gnc_state_x = data_struct.kalman_data.kalman_pos_x;
-    // packet.gnc_state_ay = data_struct.kalman_data.kalman_acc_y;
-    // packet.gnc_state_vy = data_struct.kalman_data.kalman_vel_y;
-    // packet.gnc_state_y = data_struct.kalman_data.kalman_pos_y;
-    // packet.gnc_state_az = data_struct.kalman_data.kalman_acc_z;
-    // packet.gnc_state_vz = data_struct.kalman_data.kalman_vel_z;
-    // packet.gnc_state_z = data_struct.kalman_data.kalman_pos_z;
-    // packet.gnc_state_apo = data_struct.kalman_data.kalman_apo;
+    // packet.gnc_state_ax = Sensorstate.kalman_data.kalman_acc_x;
+    // packet.gnc_state_vx = Sensorstate.kalman_data.kalman_vel_x;
+    // packet.gnc_state_x = Sensorstate.kalman_data.kalman_pos_x;
+    // packet.gnc_state_ay = Sensorstate.kalman_data.kalman_acc_y;
+    // packet.gnc_state_vy = Sensorstate.kalman_data.kalman_vel_y;
+    // packet.gnc_state_y = Sensorstate.kalman_data.kalman_pos_y;
+    // packet.gnc_state_az = Sensorstate.kalman_data.kalman_acc_z;
+    // packet.gnc_state_vz = Sensorstate.kalman_data.kalman_vel_z;
+    // packet.gnc_state_z = Sensorstate.kalman_data.kalman_pos_z;
+    // packet.gnc_state_apo = Sensorstate.kalman_data.kalman_apo;
 
     //fix the gnc stuff later
 
-    packet.mag_x = inv_convert_range<int16_t>(Sensorstate->magnetometer->mx, 8);
-    packet.mag_y = inv_convert_range<int16_t>(Sensorstate->magnetometer->my, 8);
-    packet.mag_z = inv_convert_range<int16_t>(Sensorstate->magnetometer->mz, 8);
-    packet.gyro_x = inv_convert_range<int16_t>(Sensorstate->gyroscope->gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(Sensorstate->gyroscope->gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(Sensorstate->gyroscope->gz, 8192);
+    packet.mag_x = inv_convert_range<int16_t>(Sensorstate.magnetometer.mx, 8);
+    packet.mag_y = inv_convert_range<int16_t>(Sensorstate.magnetometer.my, 8);
+    packet.mag_z = inv_convert_range<int16_t>(Sensorstate.magnetometer.mz, 8);
+    packet.gyro_x = inv_convert_range<int16_t>(Sensorstate.gyroscope.gx, 8192);
+    packet.gyro_y = inv_convert_range<int16_t>(Sensorstate.gyroscope.gy, 8192);
+    packet.gyro_z = inv_convert_range<int16_t>(Sensorstate.gyroscope.gz, 8192);
 
     packet.response_ID = last_command_id;
 #ifdef ENABLE_SILSIM_MODE
@@ -383,9 +385,9 @@ TelemetryPacket Telemetry::makePacket(const sensorDataStruct_t &data_struct) {
 #else
     packet.rssi = rf95.lastRssi();
 #endif
-    packet.voltage_battery = inv_convert_range<uint8_t>(data_struct.voltage_data.v_battery, 16);
-    packet.FSM_State = (uint8_t)data_struct.rocketState_data.rocketStates[0];
-    packet.barometer_temp = inv_convert_range<int16_t>(data_struct.barometer_data.temperature, 256);
+    packet.voltage_battery = inv_convert_range<uint8_t>(Sensorstate.voltage_data.v_battery, 16);
+    packet.FSM_State = (uint8_t)Sensorstate.rocketState_data.rocketStates[0];
+    packet.barometer_temp = inv_convert_range<int16_t>(Sensorstate.barometer_data.temperature, 256);
 
     TelemetryDataLite data{};
     packet.datapoint_count = 0;
@@ -396,21 +398,21 @@ TelemetryPacket Telemetry::makePacket(const sensorDataStruct_t &data_struct) {
     return packet;
 }
 
-void Telemetry::bufferData() {
+void Telemetry::bufferData(SensorState &Sensorstate) {
 #ifdef ENABLE_TELEMETRY
 //#ifndef TLM_DEBUG
-    sensorDataStruct_t sensor_data = dataLogger.read();
+    SensorState Sensorstate = SensorState.getRecent();
     TelemetryDataLite data{};
     data.timestamp = TIME_I2MS(chVTGetSystemTime());
     data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(Sensorstate->high_g->gx, 256);
-    data.highG_ay = inv_convert_range<int16_t>(Sensorstate->high_g->gy, 256);
-    data.highG_az = inv_convert_range<int16_t>(Sensorstate->high_g->gz, 256);
+    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.gx, 256);
+    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.gy, 256);
+    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.gz, 256);
 
-    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate->orientation->pitch, 8);
-    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate->orientation->yaw, 8);
-    data.bno_roll = inv_convert_range<int16_t>(Sensorstate->orientation->roll, 8);
+    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.pitch, 8);
+    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.yaw, 8);
+    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.roll, 8);
 
     buffered_data.push(data);
 
