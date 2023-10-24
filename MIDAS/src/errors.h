@@ -3,5 +3,12 @@
 
 enum ErrorCode {
     NoError,
-    LowGCouldNotBeInitialized
+    LowGCouldNotBeInitialized,
+    LowGRangeCouldNotBeSet,
+    LowGODRLPFCouldNotBeSet,
+    HighGCouldNotBeInitialized,
+    HighGCoulNotUpdateDataRate,
+    MagnetometerCoultNotBeInitialized,
+    GyroCouldNotBeInitialized,
+    GasCouldNotBeInitialized
 };

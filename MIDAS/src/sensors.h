@@ -7,10 +7,18 @@
 
 #include "sensor_data.h"
 #include "errors.h"
+#include "hardware/pins.h"
+#include<optional>
 
 struct LowGSensor {
     ErrorCode init();
     LowGData read();
+    void calibrate();
+};
+
+struct Gyroscope {
+    ErrorCode init();
+    GyroscopeData read();
 };
 
 struct HighGSensor {
@@ -21,6 +29,7 @@ struct HighGSensor {
 struct BarometerSensor {
     ErrorCode init();
     Barometer read();
+    
 };
 
 struct ContinuitySensor {
@@ -38,11 +47,20 @@ struct OrientationSensor {
     Orientation read();
 };
 
+struct MagnetometerSensor {
+    ErrorCode init();
+    Magnetometer read();
+};
+
 struct Sensors {
     LowGSensor low_g;
+    Gyroscope gyroscope;
     HighGSensor high_g;
     BarometerSensor barometer;
     ContinuitySensor continuity;
     VoltageSensor voltage;
     OrientationSensor orientation;
+    MagnetometerSensor magnetometer;
 };
+
+

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "finite-state-machines/fsm_states.h"
+
 #include <cmath>
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
@@ -50,9 +52,21 @@ struct LowGData {
     float gx = 0;
     float gy = 0;
     float gz = 0;
+
+    LowGData() = default;
+    LowGData(float x, float y, float z) : gx(x), gy(y), gz(z) {};
 };
 
 struct HighGData {
+    float gx = 0;
+    float gy = 0;
+    float gz = 0;
+
+    HighGData() = default;
+    HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
+};
+
+struct GyroscopeData {
     float gx = 0;
     float gy = 0;
     float gz = 0;
@@ -61,6 +75,9 @@ struct HighGData {
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
+
+    Barometer() = default;
+    Barometer(float t, float p) : temperature(t), pressure(p) {}
 };
 
 struct Continuity {
@@ -79,9 +96,9 @@ struct GPS {
 };
 
 struct Magnetometer {
-    float mx = 0;
-    float my = 0;
-    float mz = 0;
+    float mx;
+    float my;
+    float mz;
 };
 
 struct Orientation {
@@ -137,3 +154,6 @@ struct Pyro {
     PyroChannel channels[4];
 };
 
+struct FSMState {
+    FSM_state curr_state = STATE_IDLE;
+};

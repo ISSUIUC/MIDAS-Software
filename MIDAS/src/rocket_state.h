@@ -38,11 +38,13 @@ public:
 
     SensorState<LowGData> low_g;
     SensorState<HighGData> high_g;
+    SensorState<GyroscopeData> gyroscope;
     SensorState<Barometer> barometer;
     SensorState<Continuity> continuity;
     SensorState<Voltage> voltage;
     SensorState<GPS> gps;
-    SensorState<Magnetometer> magnometer;
+    SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
+    SensorState<FSMState> fsm_state;
 };
 
