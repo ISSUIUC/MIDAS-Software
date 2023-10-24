@@ -2,6 +2,7 @@
 
 #include "sensor_data.h"
 #include "hal.h"
+#include "Buffer.h"
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -9,37 +10,63 @@
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
 
-template<typename SensorData>
+template<typename S>
 struct SensorState {
 private:
-    Mutex<SensorData> current;
-    Queue<SensorData> queue;
+    Mutex<S> current;
+    Queue<S> queue;
 
 public:
-    void update(SensorData data) {
+    void update(S data) {
         current.write(data);
         queue.send(data);
     };
 
-    SensorData getRecent() {
+    S getRecent() {
         return current.read();
     };
 
-    bool getQueued(SensorData* out) {
+    bool getQueued(S* out) {
         return queue.receive(out);
     };
 
-    SensorState() : current(SensorData()) { }
+    SensorState() : current(S()) { }
 };
+
+template<typename S, size_t count>
+struct BufferedSensorState {
+private:
+    Mutex<S> current;
+    Queue<S> queue;
+    Buffer<S, count> buffer;
+
+public:
+    void update(S data) {
+        current.write(data);
+        queue.send(data);
+        buffer.push(data);
+    };
+
+    S getRecent() {
+        return current.read();
+    };
+
+    bool getQueued(S* out) {
+        return queue.receive(out);
+    };
+
+    BufferedSensorState() : current(S()) { }
+};
+
 
 struct RocketState {
 public:
     bool pyro_should_be_firing;
 
     SensorState<LowGData> low_g;
-    SensorState<HighGData> high_g;
+    BufferedSensorState<HighGData, 8> high_g;
     SensorState<GyroscopeData> gyroscope;
-    SensorState<Barometer> barometer;
+    BufferedSensorState<Barometer, 8> barometer;
     SensorState<Continuity> continuity;
     SensorState<Voltage> voltage;
     SensorState<GPS> gps;
