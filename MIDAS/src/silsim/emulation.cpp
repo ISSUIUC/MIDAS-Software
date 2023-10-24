@@ -5,7 +5,7 @@
 #include <array>
 #include <map>
 
-size_t global_ms = 0;
+uint32_t global_ms = 0;
 
 struct ThreadInfo {
 public:
@@ -70,7 +70,7 @@ ThreadManager thread_manager;
 void threadYield() { thread_manager.yield(); }
 
 void threadSleep(int32_t time_ms) {
-    size_t start = global_ms;
+    uint32_t start = global_ms;
     while (true) {
         if (global_ms >= start + time_ms) {
             return;

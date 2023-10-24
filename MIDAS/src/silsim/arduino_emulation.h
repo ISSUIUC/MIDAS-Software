@@ -1,7 +1,7 @@
 #pragma once
 #include <iostream>
 
-unsigned long millis();
+uint32_t millis();
 
 struct SerialPatch {
 //    void println(const char* s);

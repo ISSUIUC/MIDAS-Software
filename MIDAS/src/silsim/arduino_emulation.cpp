@@ -2,9 +2,9 @@
 #include <cstdint>
 #include <iostream>
 
-extern size_t global_ms;
+extern uint32_t global_ms;
 
-unsigned long millis(){
+uint32_t millis(){
     return global_ms;
 }
 
