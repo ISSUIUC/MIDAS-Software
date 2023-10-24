@@ -4,6 +4,8 @@
 #include "sensors.h"
 #include "data_logging.h"
 
+#include "gnc/example_kf.h"
+
 /**
  * These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
@@ -38,7 +40,14 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
         LowGData reading = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(reading);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(1);
+    }
+}
+
+DECLARE_THREAD(gyroscope, RocketSystems* arg) {
+    while (true) {
+        arg->rocket_data.gyroscope.update(arg->sensors.gyroscope.read());
+        THREAD_SLEEP(10);
     }
 }
 
@@ -49,7 +58,7 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
         HighGData reading = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(reading);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(1);
     }
 }
 
@@ -70,7 +79,8 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
  */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        THREAD_SLEEP(16);
+        arg->rocket_data.magnetometer.update(arg->sensors.magnetometer.read());
+        THREAD_SLEEP(7);  //data rate is 155hz so 7 is closest
     }
 }
 
@@ -90,7 +100,7 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         Voltage reading = arg->sensors.voltage.read();
         arg->rocket_data.voltage.update(reading);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(20);
     }
 }
 
@@ -118,7 +128,10 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    while (true) {        
+    example_kf.initialize();
+    while (true) {
+        example_kf.priori();
+        example_kf.update();
         THREAD_SLEEP(16);
     }
 }
@@ -128,10 +141,12 @@ bool init_sensors(Sensors& sensors, LogSink& log_sink) {
     // todo message on failure
     INIT_SENSOR(sensors.low_g);
     INIT_SENSOR(sensors.high_g);
+    INIT_SENSOR(sensors.gyroscope);
     INIT_SENSOR(sensors.barometer);
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
+    INIT_SENSOR(sensors.magnetometer);
     INIT_SENSOR(log_sink);
     return true;
 }
@@ -151,6 +166,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
     START_THREAD(high_g, SENSOR_CORE, config);
+    START_THREAD(gyroscope, SENSOR_CORE, config);
     START_THREAD(orientation, SENSOR_CORE, config);
     START_THREAD(magnetometer, SENSOR_CORE, config);
     START_THREAD(gps, DATA_CORE, config);

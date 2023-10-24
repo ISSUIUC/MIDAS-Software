@@ -1,17 +1,33 @@
 #include "sensors.h"
 
 // #include sensor library
+#include "SparkFun_Qwiic_KX13X.h"
 
 // global static instance of the sensor
+QwiicKX134 KX;
 
-
+/**
+ * Initializes the high G data sensor, returns ErrorCode::CANNOT_INIT_KX134_CS if cannot initialize
+*/
 ErrorCode HighGSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
+    KX.beginSPI(KX134_CS);
+    if (!KX.initialize(DEFAULT_SETTINGS)) {
+        return ErrorCode::HighGCouldNotBeInitialized;
+    }
+
+    if(!KX.setOutputDataRate(0xb)) {
+        return ErrorCode::HighGCoulNotUpdateDataRate;
+    }
+
+    KX.setRange(3);
     return ErrorCode::NoError;
 }
 
+/**
+ * Reads and returns the data from the sensor
+ * @return a HighGData packet with current acceleration in all three axies
+*/
 HighGData HighGSensor::read() {
-    // read from aforementioned global instance of sensor
-    return HighGData();
+    auto data = KX.getAccelData();
+    return HighGData(data.xData, data.yData, data.zData);
 }

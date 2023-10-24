@@ -21,6 +21,11 @@ struct RocketParameters {
     SimulatedMotor motor;
 };
 
+struct SimulationParameters {
+    double density_of_air;
+    double gravity;
+};
+
 struct SimulatedRocket {
     SimulatedRocket(bool is_active, RocketParameters parameters);
 
@@ -33,13 +38,16 @@ struct SimulatedRocket {
     bool was_ignited = false;
     double ignition_time = 0.0;
 
-    void step(double current_time, double dt);
+    void step(SimulationParameters& sim_parameters, double current_time, double dt);
     void copy_state_from(SimulatedRocket* other);
 };
 
 struct Simulation {
     double current_time;
+    SimulationParameters simulation_parameters;
     std::vector<SimulatedRocket*> rockets;
+
+    Simulation(SimulationParameters params, std::vector<SimulatedRocket*> rockets);
 
     void step(double dt);
 
