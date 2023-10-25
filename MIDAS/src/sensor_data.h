@@ -1,6 +1,8 @@
 #pragma once
 
 #include <cmath>
+
+#define CONTINUITY_PIN_COUNT 4
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
@@ -80,17 +82,7 @@ struct Barometer {
 
 // Detects if a charge or 
 struct Continuity {
-    Continuity() = default;
-    bool pins[6];
-    // fancy operator overloading, you CS 128 kids won't get it until like week 6, and even then I don't think y'all
-    // mess with overloading []
-    bool& operator[](const int i) {
-        return pins[i];
-    }
-
-    bool operator[](const int i) const {
-        return pins[i];
-    }
+    bool pins[CONTINUITY_PIN_COUNT];
 };
 
 struct Voltage {

@@ -35,10 +35,6 @@ struct BarometerSensor {
 struct ContinuitySensor {
     ErrorCode init();
     Continuity read();
-
-    // IIRC we have 6 continuity pins
-    static int const PIN_COUNT = 6;
-    uint16_t pins[PIN_COUNT];
 };
 
 struct VoltageSensor {
