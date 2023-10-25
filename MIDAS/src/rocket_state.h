@@ -50,7 +50,7 @@ public:
 
     SensorData<LowGData> low_g;
     SensorData<HighGData> high_g;
-    SensorData<Gyroscope> gyroscope;
+    SensorData<LowGLSM> low_g_lsm;
     SensorData<Barometer> barometer;
     SensorData<Continuity> continuity;
     SensorData<Voltage> voltage;

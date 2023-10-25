@@ -10,12 +10,12 @@ Barometer BarometerSensor::read() {
     return { 273.15, (float) rocket->height };
 }
 
-ErrorCode GyroscopeSensor::init() {
+ErrorCode LowGLSMSensor::init() {
     return ErrorCode::NoError;
 }
 
-Gyroscope GyroscopeSensor::read() {
-    return { .gx = 0, .gy = 0, .gz = 0 };
+LowGLSM LowGLSMSensor::read() {
+    return { .gx = 0, .gy = 0, .gz = 0, .ax = 0, .ay = 0, .az =0 };
 }
 
 ErrorCode ContinuitySensor::init() {

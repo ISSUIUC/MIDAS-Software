@@ -13,9 +13,9 @@ struct LowGSensor {
     SimulatedRocket* rocket;
 };
 
-struct GyroscopeSensor {
+struct LowGLSMSensor {
     ErrorCode init();
-    Gyroscope read();
+    LowGLSM read();
 
     SimulatedRocket* rocket;
 };

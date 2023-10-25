@@ -8,7 +8,7 @@ void rocket_main_thread(RocketSystems* systems) {
 Sensors create_sensors_attached_to(SimulatedRocket* sim, bool should_be_continuous) {
     return Sensors {
             LowGSensor { sim },
-            GyroscopeSensor { sim },
+            LowGLSMSensor { sim },
             HighGSensor { sim },
             BarometerSensor { sim },
             ContinuitySensor { should_be_continuous },

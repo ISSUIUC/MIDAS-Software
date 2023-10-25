@@ -15,7 +15,7 @@
 
 struct Sensors {
     LowGSensor low_g;
-    GyroscopeSensor gyroscope;
+    LowGLSMSensor low_g_lsm;
     HighGSensor high_g;
     BarometerSensor barometer;
     ContinuitySensor continuity;

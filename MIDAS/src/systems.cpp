@@ -44,9 +44,9 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
     }
 }
 
-DECLARE_THREAD(gyroscope, RocketSystems* arg) {
+DECLARE_THREAD(low_g_lsm, RocketSystems* arg) {
     while (true) {
-        arg->rocket_data.gyroscope.update(arg->sensors.gyroscope.read());
+        arg->rocket_data.low_g_lsm.update(arg->sensors.low_g_lsm.read());
         THREAD_SLEEP(10);
     }
 }
@@ -141,7 +141,7 @@ bool init_sensors(Sensors& sensors, LogSink& log_sink) {
     // todo message on failure
     INIT_SENSOR(sensors.low_g);
     INIT_SENSOR(sensors.high_g);
-    INIT_SENSOR(sensors.gyroscope);
+    INIT_SENSOR(sensors.low_g_lsm);
     INIT_SENSOR(sensors.barometer);
     INIT_SENSOR(sensors.continuity);
     INIT_SENSOR(sensors.orientation);
@@ -166,7 +166,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
     START_THREAD(high_g, SENSOR_CORE, config);
-    START_THREAD(gyroscope, SENSOR_CORE, config);
+    START_THREAD(low_g_lsm, SENSOR_CORE, config);
     START_THREAD(orientation, SENSOR_CORE, config);
     START_THREAD(magnetometer, SENSOR_CORE, config);
     START_THREAD(gps, DATA_CORE, config);

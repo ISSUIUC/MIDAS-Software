@@ -24,9 +24,9 @@ struct BarometerSensor {
     Barometer read();
 };
 
-struct GyroscopeSensor {
+struct LowGLSMSensor {
     ErrorCode init();
-    Gyroscope read();
+    LowGLSM read();
 };
 
 struct ContinuitySensor {
