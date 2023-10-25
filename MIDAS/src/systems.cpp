@@ -101,7 +101,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         FSMState current_state = arg->rocket_state.fsm_state.getRecent();
-        FSMState next_state = tick_fsm(current_state);
+        HighGData current_highg = arg->rocket_state.high_g.getRecent();
+        FSMState next_state = tick_fsm(current_state, current_highg);
+
         arg->rocket_state.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
