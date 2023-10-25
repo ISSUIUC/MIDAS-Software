@@ -26,6 +26,11 @@ struct HighGSensor {
     HighGData read();
 };
 
+struct PyroThread {
+    ErrorCode init();
+    Pyro tick();
+}
+
 struct BarometerSensor {
     ErrorCode init();
     Barometer read();
@@ -61,6 +66,7 @@ struct Sensors {
     VoltageSensor voltage;
     OrientationSensor orientation;
     MagnetometerSensor magnetometer;
+    PyroThread pyro;
 };
 
 

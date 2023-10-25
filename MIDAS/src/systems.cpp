@@ -123,7 +123,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
  * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
 */
 DECLARE_THREAD(pyro, RocketSystems* arg) {
+
     while (true) {        
+        Pyro new_pyro = arg->sensors.pyro.tick();
+        arg->rocket_state.pyro.update(new_pyro);
         THREAD_SLEEP(16);
         //Serial.println("PYRO");
     }
@@ -141,6 +144,8 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
     INIT_SENSOR(sensors.magnetometer);
+    INIT_SENSOR(sensors.pyro);
+    
     return true;
 }
 #undef INIT_SENSOR

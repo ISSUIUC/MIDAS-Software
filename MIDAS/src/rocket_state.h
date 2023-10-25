@@ -34,7 +34,6 @@ public:
 
 struct RocketState {
 public:
-    bool pyro_should_be_firing;
 
     SensorState<LowGData> low_g;
     SensorState<HighGData> high_g;
@@ -46,5 +45,6 @@ public:
     SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
     SensorState<FSMState> fsm_state;
+    SensorState<Pyro> pyro;
 };
 
