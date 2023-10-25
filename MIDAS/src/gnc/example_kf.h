@@ -1,6 +1,7 @@
 #pragma once
 
 #include "kalman_filter.h"
+// #include "mcu_main/finite-state-machines/RocketFSMBase.h"
 
 // makes a kalman filter with 3 state variables and 3 sensor inputs
 class ExampleKalmanFilter : public KalmanFilter<3, 3>
@@ -19,6 +20,8 @@ public:
     void setState(KalmanData state) override;
 
 private:
+    void kfTickFunction(float dt, float sd);
+    float s_dt = 0.050;
     KalmanData state;
 
 };
