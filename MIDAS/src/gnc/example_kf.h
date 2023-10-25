@@ -1,5 +1,5 @@
 #pragma once
-
+#include "../finite-state-machines/fsm_states.h"
 #include "kalman_filter.h"
 // #include "mcu_main/finite-state-machines/RocketFSMBase.h"
 
@@ -18,10 +18,12 @@ public:
 
     KalmanData getState() override;
     void setState(KalmanData state) override;
+    void kfTickFunction(FSM_state& curr_state, float dt);
+
 
 private:
-    void kfTickFunction(float dt, float sd);
-    float s_dt = 0.050;
+    float s_dt = 0.016; // 16 ms THREAD_SLEEP
+    float spectral_density = 13.0;
     KalmanData state;
 
 };

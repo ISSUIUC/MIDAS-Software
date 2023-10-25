@@ -110,10 +110,15 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     example_kf.initialize();
-    while (true) {        
-        example_kf.priori();
-        example_kf.update();
+    TickType_t last = xTaskGetTickCount();
+
+    while (true) { 
+        // add the tick update function 
+        FSMState current_state = arg->rocket_state.fsm_state.getRecent();
+        example_kf.kfTickFunction(current_state.curr_state, xTaskGetTickCount() - last);    
+        last = xTaskGetTickCount();
         THREAD_SLEEP(16);
+
         //Serial.println("KALMAN");
     }
     vTaskDelete(NULL);
