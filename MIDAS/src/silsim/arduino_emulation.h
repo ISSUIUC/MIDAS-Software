@@ -4,8 +4,6 @@
 uint32_t millis();
 
 struct SerialPatch {
-//    void println(const char* s);
-
     template <typename T>
     void print(T t) {
         std::cout << t;
