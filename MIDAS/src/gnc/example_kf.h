@@ -22,13 +22,8 @@ public:
 
 
 private:
-<<<<<<< HEAD
     float s_dt = 0.016; // 16 ms THREAD_SLEEP
     float spectral_density = 13.0;
-=======
-    void kfTickFunction(float dt, float sd);
-    float s_dt = 0.050;
->>>>>>> 243aac6d6047dc784b42873046275af120d87ebf
     KalmanData state;
 
 };

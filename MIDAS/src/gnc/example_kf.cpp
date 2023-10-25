@@ -11,7 +11,7 @@ void ExampleKalmanFilter::priori() {}
 
 void ExampleKalmanFilter::update() {}
 
-void ExampleKalmanFilter::setQ(float dt, float sd) : sd{spectral_density} {
+void ExampleKalmanFilter::setQ(float dt, float sd) {
     Q(0, 0) = pow(dt, 5) / 20;
     Q(0, 1) = pow(dt, 4) / 8;
     Q(0, 2) = pow(dt, 3) / 6;
