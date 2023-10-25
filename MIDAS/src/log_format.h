@@ -14,6 +14,7 @@ enum ReadingDiscriminant {
     ID_GPS              = 6,
     ID_MAGNETOMETER     = 7,
     ID_ORIENTATION      = 8,
+    ID_LOWG_LSM         = 9,
 };
 
 

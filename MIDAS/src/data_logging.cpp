@@ -9,6 +9,7 @@ constexpr ReadingDiscriminant get_discriminant();
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
 ASSOCIATE(LowGData, ID_LOWG)
+ASSOCIATE(LowGLSM, ID_LOWG_LSM)
 ASSOCIATE(HighGData, ID_HIGHG)
 ASSOCIATE(Barometer, ID_BAROMETER)
 ASSOCIATE(Continuity, ID_CONTINUITY)
@@ -44,6 +45,7 @@ void log_begin(LogSink& sink) {
 
 void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.low_g);
+    log_from_sensor_data(sink, data.low_g_lsm);
     log_from_sensor_data(sink, data.high_g);
     log_from_sensor_data(sink, data.barometer);
     log_from_sensor_data(sink, data.continuity);
