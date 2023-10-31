@@ -33,11 +33,11 @@ typedef void VoidFunc(void);
 constexpr const char* stack_end = "STACKEND";
 static ucontext_t main_context;
 static ucontext_t* current_context;
-static std::vector<std::pair<ThreadFunc, void*>> threadInfoStore;
+static std::vector<std::pair<void*, void*>> threadInfoStore;
 
 void thread_wrapper(int idx){
     auto [func, arg] = threadInfoStore.at(idx);
-    func(arg);
+    ((ThreadFunc*)func)(arg);
 }
 
 void EmuSwitchToFiber(FiberHandle handle) {
@@ -57,7 +57,7 @@ FiberHandle EmuCreateFiber(size_t stack_size, ThreadFunc func, void* arg) {
     context->uc_stack.ss_size = REAL_STACK_SIZE;
     context->uc_link = &main_context;
     threadInfoStore.push_back({func, arg});
-    makecontext(context, (VoidFunc*)thread_wrapper, 1, threadInfoStore.size());
+    makecontext(context, (VoidFunc*)thread_wrapper, 1, threadInfoStore.size()-1);
     return {.handle = context, .emu_stack_size = stack_size, .is_main = false};
 }
 
