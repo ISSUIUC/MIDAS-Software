@@ -7,7 +7,10 @@ void ExampleKalmanFilter::initialize() {
 
 }
 
-void ExampleKalmanFilter::priori() {}
+void ExampleKalmanFilter::priori() {
+    x_priori = (F_mat * x_k);
+    P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
+}
 
 void ExampleKalmanFilter::update() {}
 
