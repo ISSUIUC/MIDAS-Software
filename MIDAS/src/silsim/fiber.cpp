@@ -56,7 +56,7 @@ FiberHandle EmuCreateFiber(size_t stack_size, ThreadFunc func, void* arg) {
     context->uc_stack.ss_sp = stack;
     context->uc_stack.ss_size = REAL_STACK_SIZE;
     context->uc_link = &main_context;
-    threadInfoStore.push_back({func, arg});
+    threadInfoStore.push_back({(void*)func, arg});
     makecontext(context, (VoidFunc*)thread_wrapper, 1, threadInfoStore.size()-1);
     return {.handle = context, .emu_stack_size = stack_size, .is_main = false};
 }
