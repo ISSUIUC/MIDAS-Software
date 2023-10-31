@@ -80,7 +80,6 @@ struct Barometer {
     Barometer(float t, float p) : temperature(t), pressure(p) {}
 };
 
-// Detects if a charge or 
 struct Continuity {
     bool pins[CONTINUITY_PIN_COUNT];
 };

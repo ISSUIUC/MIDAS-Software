@@ -8,7 +8,9 @@ ADS7138_1Q ads7138_1q;
 ErrorCode ContinuitySensor::init() {
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code
-    ads7138_1q.init();
+    if (!ads7138_1q.init()) {
+        return ErrorCode::ContinuityCouldNotBeInitialized;
+    }
     // Ask ADS to init the pins, we still need to get the device to actually read
     return ErrorCode::NoError;
 }

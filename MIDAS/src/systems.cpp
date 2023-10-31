@@ -94,6 +94,7 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
         //Serial.println("CONT");
+        arg->rocket_state.continuity.update(arg->sensors.continuity.read());
     }
     vTaskDelete(NULL);
 }
