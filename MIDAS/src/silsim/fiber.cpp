@@ -25,11 +25,21 @@ FiberHandle EmuConvertThreadToFiber() {
 #include <cassert>
 #include <iostream>
 #include <string.h>
+#include <vector>
+#include <utility>
+
+typedef void VoidFunc(void);
 
 constexpr const char* stack_end = "STACKEND";
 static ucontext_t main_context;
 static ucontext_t* current_context;
-typedef void VoidFunc(void);
+static std::vector<std::pair<ThreadFunc, void*>> threadInfoStore;
+
+void thread_wrapper(int idx){
+    auto [func, arg] = threadInfoStore.at(idx);
+    func(arg);
+}
+
 void EmuSwitchToFiber(FiberHandle handle) {
     ucontext_t* to_context = current_context;
     current_context = handle.handle;
@@ -46,7 +56,8 @@ FiberHandle EmuCreateFiber(size_t stack_size, ThreadFunc func, void* arg) {
     context->uc_stack.ss_sp = stack;
     context->uc_stack.ss_size = REAL_STACK_SIZE;
     context->uc_link = &main_context;
-    makecontext(context, (VoidFunc*)func, 1, arg);
+    threadInfoStore.push_back({func, arg});
+    makecontext(context, (VoidFunc*)thread_wrapper, 1, threadInfoStore.size());
     return {.handle = context, .emu_stack_size = stack_size, .is_main = false};
 }
 
