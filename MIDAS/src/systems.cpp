@@ -115,6 +115,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) { 
         // add the tick update function 
         FSMState current_state = arg->rocket_state.fsm_state.getRecent();
+        Barometer current_barometer_buf = arg->rocket_state.barometer.getRecent();
         example_kf.kfTickFunction(current_state.curr_state, xTaskGetTickCount() - last);    
         last = xTaskGetTickCount();
         THREAD_SLEEP(16);
