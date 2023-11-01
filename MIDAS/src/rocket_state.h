@@ -3,6 +3,7 @@
 #include "sensor_data.h"
 #include "hal.h"
 #include "Buffer.h"
+#include <array>
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -51,6 +52,10 @@ public:
         return current.read();
     };
 
+    std::array<S, count> getBufferRecent() { 
+        return buffer.read_recent();
+    };
+    
     bool getQueued(S* out) {
         return queue.receive(out);
     };

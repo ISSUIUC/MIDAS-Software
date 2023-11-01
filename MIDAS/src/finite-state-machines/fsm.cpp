@@ -4,7 +4,7 @@
 
 // code for the fsm update function
 
-FSMState tick_fsm(FSMState state, HighGData hg){
+FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
     //pass current state
     double current_time = tick_to_ms(xTaskGetTickCount());
     
@@ -70,25 +70,60 @@ FSMState tick_fsm(FSMState state, HighGData hg){
             break;
         
         case STATE_APOGEE:
-            if() {
-                
+            // if() {
+                // NEED TO ADD A BUFFER
+            // }
+
+            if(apogee_time > apogee_timer_threshold) {
+                drogue_time = current_time;
+                state.curr_state = STATE_DROGUE_DEPLOY;
             }
+            break;
         case STATE_DROGUE_DEPLOY:
             // NEED TO ADD WITH BUFFER
             // if(jerk < 0) { 
 		        //rocket_state_ = FSM_State::STATE_DROUGE;
             //}
-            if(drogue_time > )
+            if(drogue_time > drogue_timer_threshold) {
+                state.curr_state = STATE_DROUGE;
+            }
 
             break;
         
         case STATE_DROUGE:
-        
+            // if(altitude <= main_deploy_altitude_threshold) { NEED TO ADD WITH BUFFER
+		    //     state.curr_state  = STATE_MAIN_DEPLOY;
+            //     main_time = current_time;
+            // }
+
+            break;
+
+        case STATE_MAIN_DEPLOY:
+            // if(jerk < 0) { NEED TO ADD WITH BUFFER
+            //     state.curr_state = STATE_MAIN;
+            // }
+
+            if(main_time > main_timer_threshold) {
+                state.curr_state = STATE_MAIN;
+            }
+            break;
+
+        case STATE_MAIN:
+            
+            // if(change in altitde = 0) { NEED TO ADD WITH BUFFER
+            //     landed_time = current_time;
+            //     state.curr_state = STATE_LANDED;
+            // }
+            break;
+
+        case STATE_LANDED:
+            // if(change_in_altitude  > 0 && current_time - landed_time > 5 sec) {
+		    //     rocket_state_ = FSM_State::MAIN;
+	        // }
             break;
         
+        
         return state;
-
-
     
     }
 }

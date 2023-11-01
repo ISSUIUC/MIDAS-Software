@@ -101,8 +101,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         FSMState current_state = arg->rocket_state.fsm_state.getRecent();
-        HighGData current_highg = arg->rocket_state.high_g.getRecent();
-        FSMState next_state = tick_fsm(current_state, current_highg);
+        std::array<HighGData, 8> buff_hg = arg->rocket_state.high_g.getBufferRecent();
+        std::array<Barometer, 8> buff_bar = arg->rocket_state.barometer.getBufferRecent();
+        FSMState next_state = tick_fsm(current_state, buff_hg, buff_bar);
 
         arg->rocket_state.fsm_state.update(next_state);
         THREAD_SLEEP(16);
