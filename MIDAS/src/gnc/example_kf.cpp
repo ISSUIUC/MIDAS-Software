@@ -1,4 +1,4 @@
-#include "example_kf.h"
+git #include "example_kf.h"
 
 ExampleKalmanFilter::ExampleKalmanFilter() : KalmanFilter() {}
 
@@ -31,7 +31,21 @@ void ExampleKalmanFilter::priori() {
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
-void ExampleKalmanFilter::update() {}
+// TODO: Finish this Methid
+void ExampleKalmanFilter::update() {
+    if (_curr_state == FSM_state::STATE_LAUNCH_DETECT) {
+        float sum = 0;
+        for (int i = 0; i < 8; i++) {
+            sum+=_curr_baro_buf.pressure;
+        }
+        setState((KalmanData){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0});
+
+    } else if (_curr_state >= FSM_state::STATE_APOGEE) {
+        H(1, 2) = 0;
+    }
+
+
+}
 
 void ExampleKalmanFilter::setQ(float dt, float sd) {
     Q(0, 0) = pow(dt, 5) / 20;
@@ -83,13 +97,23 @@ KalmanData ExampleKalmanFilter::getState() { return state; }
 
 void ExampleKalmanFilter::setState(KalmanData state) { this->state = state; }
 
-void ExampleKalmanFilter::kfTickFunction(FSM_state& curr_state, float dt) {
+void ExampleKalmanFilter::updatePrivVars(FSM_state& curr_state, Barometer& curr_baro_buf, HighGData& curr_accel, Orientation& curr_orientation, float& dt) {
+    _curr_state = curr_state;
+    _curr_baro_buf = curr_baro_buf;
+    _curr_accel = curr_accel;
+    _curr_orientation = curr_orientation;
+    _dt = dt;
+}
+
+void ExampleKalmanFilter::kfTickFunction(FSM_state& curr_state, Barometer& curr_baro_buf, HighGData& curr_accel, Orientation& curr_orientation, float dt) {
     if (curr_state >= FSM_state::STATE_IDLE) {
+        updatePrivVars(curr_state, curr_baro_buf, curr_accel, curr_orientation, dt);
         setF(dt / 1000.0);
         setQ(dt / 1000.0, spectral_density);
         priori();
         update();
     }
 }
+
 
 ExampleKalmanFilter example_kf;
