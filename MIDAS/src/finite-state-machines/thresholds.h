@@ -14,11 +14,24 @@ static constexpr float coast_detection_acceleration_threshold = 0;
 // Return state to SECOND_BOOST if not boosting for this amount of time (ms)
 static constexpr float second_boost_to_coast_time_threshold = 1000;
 
+// Reach apogee state when vertical speed is less than or equal to this value
+static constexpr float apogee_vertical_speed_threshold = 0;
+
 // Move on to drouge deploy after a second of reaching apogee
 static constexpr float apogee_timer_threshold = 1000;
+
+// Revert back to COAST if apogee was too breif 
+static constexpr float apogee_check_threshold = 1000;
 
 // Move on to drouge deploy after a second of reaching apogee
 static constexpr float drogue_timer_threshold = 3000;
 
 // Move on to drouge deploy after a second of reaching apogee
 static constexpr float main_timer_threshold = 3000;
+
+// Height required to deploy the main parachutes
+static constexpr float main_deploy_altitude_threshold = 3000; // TBD by GNC
+
+// Revert back to main if the landed was too short
+static constexpr float landed_timer_threshold = 5000;
+

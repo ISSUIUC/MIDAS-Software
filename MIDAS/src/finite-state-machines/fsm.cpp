@@ -12,7 +12,7 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
     switch (state.curr_state)
     {
         case STATE_IDLE:
-            if(hg.gz > launch_detection_acceleration_threshold) {
+            if(getAcceleration(hg) > launch_detection_acceleration_threshold) {
                 launch_time = current_time;
                 state.curr_state = STATE_FIRST_BOOST;
             }
@@ -20,10 +20,10 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
             break;
 
         case STATE_FIRST_BOOST:
-            if(hg.gz < launch_detection_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
+            if(getAcceleration(hg) < launch_detection_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
                  state.curr_state = STATE_IDLE;
             }
-            if(hg.gz < coast_detection_acceleration_threshold) {
+            if(getAcceleration(hg) < coast_detection_acceleration_threshold) {
                 burnout_time = current_time;
                 state.curr_state  = STATE_BURNOUT;
             }
@@ -31,7 +31,7 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
             break;
 
         case STATE_BURNOUT:
-            if(hg.gz >= coast_detection_acceleration_threshold && (current_time - burnout_time) < 1000) {
+            if(getAcceleration(hg) >= coast_detection_acceleration_threshold && (current_time - burnout_time) < 1000) {
                 state.curr_state = STATE_FIRST_BOOST;
             }
 
@@ -41,38 +41,37 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
             break;
 
         case STATE_SUSTAINER_IGNITION:
-            if(hg.gz > first_separation_linear_acceleration_thresh) {
+            if(getAcceleration(hg) > first_separation_linear_acceleration_thresh) {
                 second_boost_time = current_time;
                 state.curr_state = STATE_SECOND_BOOST;
             }
             
         case STATE_SECOND_BOOST:
-            if (hg.gz < first_separation_linear_acceleration_thresh && (current_time - second_boost_time) < 1) {
+            if (getAcceleration(hg) < first_separation_linear_acceleration_thresh && (current_time - second_boost_time) < 1) {
                 state.curr_state = STATE_SUSTAINER_IGNITION;
             }
-            if (hg.gz < coast_detection_acceleration_threshold) {
+            if (getAcceleration(hg) < coast_detection_acceleration_threshold) {
                 coast_time = current_time;
                 state.curr_state = STATE_COAST;
             }
             break;
             
         case STATE_COAST:
-            if (hg.gz > coast_detection_acceleration_threshold && current_time - coast_time < second_boost_to_coast_time_threshold) {
+            if (getAcceleration(hg) > coast_detection_acceleration_threshold && current_time - coast_time < second_boost_to_coast_time_threshold) {
                 state.curr_state = STATE_SECOND_BOOST;
             }
 
-            // NEED TO ADD WITH BUFFER:
-                // if(change_in_altitude <= apogee_threshold) {
-                // 	apogee_time = current_time;
-                // 	rocket_state_ = STATE_APOGEE; 
-                // }
+            if (getVerticalSpeed(bar) <= 0) {
+             	apogee_time = current_time;
+             	state.curr_state = STATE_APOGEE; 
+            }
 
             break;
         
         case STATE_APOGEE:
-            // if() {
-                // NEED TO ADD A BUFFER
-            // }
+            if(getVerticalSpeed(bar) > 0 && current_time - apogee_time < apogee_check_threshold) {
+                state.curr_state = STATE_COAST;
+            }
 
             if(apogee_time > apogee_timer_threshold) {
                 drogue_time = current_time;
@@ -80,10 +79,9 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
             }
             break;
         case STATE_DROGUE_DEPLOY:
-            // NEED TO ADD WITH BUFFER
-            // if(jerk < 0) { 
-		        //rocket_state_ = FSM_State::STATE_DROUGE;
-            //}
+            if(getJerk(hg) < 0) { 
+		        state.curr_state = STATE_DROUGE;
+            }
             if(drogue_time > drogue_timer_threshold) {
                 state.curr_state = STATE_DROUGE;
             }
@@ -91,17 +89,21 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
             break;
         
         case STATE_DROUGE:
-            // if(altitude <= main_deploy_altitude_threshold) { NEED TO ADD WITH BUFFER
-		    //     state.curr_state  = STATE_MAIN_DEPLOY;
-            //     main_time = current_time;
-            // }
-
+            double avg1 = 0;
+            for (size_t i = 0; i < bar.size()/2; i++)
+            {
+                avg1 += (bar.at(i).altitude/bar.size());
+            }
+            if(avg1 <= main_deploy_altitude_threshold) {
+                state.curr_state = STATE_MAIN_DEPLOY;
+                main_time = current_time;
+            }
             break;
 
         case STATE_MAIN_DEPLOY:
-            // if(jerk < 0) { NEED TO ADD WITH BUFFER
-            //     state.curr_state = STATE_MAIN;
-            // }
+            if(getJerk(hg) < 0) { 
+		        state.curr_state = STATE_MAIN;
+            }
 
             if(main_time > main_timer_threshold) {
                 state.curr_state = STATE_MAIN;
@@ -110,16 +112,17 @@ FSMState tick_fsm(FSMState state, std::array<HighGData, 8> hg, std::array<Barome
 
         case STATE_MAIN:
             
-            // if(change in altitde = 0) { NEED TO ADD WITH BUFFER
-            //     landed_time = current_time;
-            //     state.curr_state = STATE_LANDED;
-            // }
+            if (getVerticalSpeed(bar) <= 0) {
+             	landed_time = current_time;
+             	state.curr_state = STATE_LANDED; 
+            }
             break;
 
         case STATE_LANDED:
-            // if(change_in_altitude  > 0 && current_time - landed_time > 5 sec) {
-		    //     rocket_state_ = FSM_State::MAIN;
-	        // }
+
+            if (getVerticalSpeed(bar) > 0 && current_time - landed_time > landed_timer_threshold) {
+             	state.curr_state = STATE_MAIN; 
+            }
             break;
         
         
