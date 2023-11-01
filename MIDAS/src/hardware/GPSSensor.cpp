@@ -16,14 +16,12 @@ ErrorCode GPSSensor::init() {
 GPS GPSSensor::read() {
     teseo.update();
     auto gpgga_message = teseo.getGPGGAData();
+    auto gprmc_message = teseo.getGPRMCData();
     float lat = gpgga_message.xyz.lat;
     float lon = gpgga_message.xyz.lon;
     float alt = gpgga_message.xyz.alt;
-
-    // Replace below statement with a valid velocity read from sensor. 
-    // GPRMC is the NMEA message that has the relevant data (afaik)
-    Velocity vel();
+    float v = gprmc_message.speed;
     int sat_count = gpgga_message.sats;
 
-    return GPS(lat, lon, alt, vel, sat_count);
+    return GPS(lat, lon, alt, v, sat_count);
 }

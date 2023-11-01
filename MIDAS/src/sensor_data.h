@@ -90,7 +90,7 @@ struct GPS {
     float latitude = 0;
     float longitude = 0;
     float altitude = 0;
-    Velocity velocity;
+    float speed = 0;
     float satellite_count = 0;
 };
 
