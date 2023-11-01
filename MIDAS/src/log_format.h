@@ -57,7 +57,7 @@ struct LoggedReading {
         GPS gps;
         Magnetometer magnetometer;
         Orientation orientation;
-        LowGData lowg_lsm;
+        LowGLSM lowg_lsm;
     } data;
 };
 
@@ -70,5 +70,5 @@ using LoggedReadingType = std::tuple<
         GPS,
         Magnetometer,
         Orientation,
-        LowGData
+        LowGLSM
     >;
