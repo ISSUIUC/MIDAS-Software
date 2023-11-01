@@ -3,9 +3,28 @@
 ExampleKalmanFilter::ExampleKalmanFilter() : KalmanFilter() {}
 
 void ExampleKalmanFilter::initialize() {
-    
+    float sum = 0;
+    /* mutex lock stuff*/ 
+
+    euler_t euler = orientation.getEuler(); /* do after rebase*/
+    euler.yaw = -euler.yaw;
+    world_accel = bodyToGlobal(euler, init_accel);
+
+    x_k(0,0) = sum / 30;
+    x_k(3,0) = 0;
+    x_k(6,0) = 0;
 
 }
+
+Eigen::Matrix<float, 3, 1> bodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
+    Eigen::Matrix3f roll, pitch, yaw;
+
+    roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
+    pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
+    yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
+    return yaw * pitch * body_vect;
+}
+
 
 void ExampleKalmanFilter::priori() {
     x_priori = (F_mat * x_k);
