@@ -38,6 +38,6 @@ enum ReadingDiscriminant {
          GPS gps;
          Magnetometer magnetometer;
          Orientation orientation;
-         LowGData lowg_lsm;
+         LowGLSM lowg_lsm;
      } data;
  };
