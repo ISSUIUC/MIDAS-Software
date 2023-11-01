@@ -116,7 +116,9 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         // add the tick update function 
         FSMState current_state = arg->rocket_state.fsm_state.getRecent();
         Barometer current_barometer_buf = arg->rocket_state.barometer.getRecent();
-        example_kf.kfTickFunction(current_state.curr_state, xTaskGetTickCount() - last);    
+        HighGData current_accelerometer = arg->rocket_state.high_g.getRecent();
+        Orientation current_orientation = arg->rocket_state.orientation.getRecent();
+        example_kf.kfTickFunction(current_state.curr_state, current_barometer_buf, current_accelerometer, current_orientation ,xTaskGetTickCount() - last);    
         last = xTaskGetTickCount();
         THREAD_SLEEP(16);
 
