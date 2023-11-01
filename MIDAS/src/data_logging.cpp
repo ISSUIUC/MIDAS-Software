@@ -2,29 +2,12 @@
 #include "log_format.h"
 #include "log_checksum.h"
 
-
-template<typename T>
-constexpr ReadingDiscriminant get_discriminant();
-
-#define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
-
-ASSOCIATE(LowGData, ID_LOWG)
-ASSOCIATE(LowGLSM, ID_LOWG_LSM)
-ASSOCIATE(HighGData, ID_HIGHG)
-ASSOCIATE(Barometer, ID_BAROMETER)
-ASSOCIATE(Continuity, ID_CONTINUITY)
-ASSOCIATE(Voltage, ID_VOLTAGE)
-ASSOCIATE(GPS, ID_GPS)
-ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
-ASSOCIATE(Orientation, ID_ORIENTATION)
-
-
 template<typename T>
 void log_reading(LogSink& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
-    sink.write((uint8_t*) &discriminant, sizeof(ReadingDiscriminant));
-    sink.write((uint8_t*) &reading.timestamp_ms, sizeof(uint32_t));
-    sink.write((uint8_t*) &reading.data, sizeof(T));
+    sink.write((uint8_t*) &discriminant, sizeof(discriminant));
+    sink.write((uint8_t*) &reading.timestamp_ms, sizeof(reading.timestamp_ms));
+    sink.write((uint8_t*) &reading.data, sizeof(reading.data));
 }
 
 template<typename T>
