@@ -2,6 +2,7 @@
 #include "../finite-state-machines/fsm_states.h"
 #include "kalman_filter.h"
 
+
 #define NUM_STATES 9
 #define NUM_SENSOR_INPUTS 4
 
@@ -25,10 +26,14 @@ public:
     void kfTickFunction(FSM_state& curr_state, float dt);
 
 
+    Eigen::Matrix<float, 3, 1> bodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> x_k);
+
 private:
     float s_dt = 0.016; // 16 ms THREAD_SLEEP
     float spectral_density = 13.0;
     KalmanData state;
+    void kfTickFunction(float dt, float sd);
+    float s_dt = 0.050;
 
     Eigen::Matrix<float, NUM_STATES, 1> x_k = Eigen::Matrix<float, NUM_STATES, 1>::Zero();
     Eigen::Matrix<float, NUM_STATES, NUM_STATES> F_mat = Eigen::Matrix<float, NUM_STATES, NUM_STATES>::Zero();
