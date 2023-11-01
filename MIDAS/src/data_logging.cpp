@@ -9,7 +9,7 @@ constexpr ReadingDiscriminant get_discriminant();
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
 ASSOCIATE(LowGData, ID_LOWG)
-ASSOCIATE(LowGLSM, ID_LOWG_LSM)
+ASSOCIATE(LowGLSM, ID_LOWGLSM)
 ASSOCIATE(HighGData, ID_HIGHG)
 ASSOCIATE(Barometer, ID_BAROMETER)
 ASSOCIATE(Continuity, ID_CONTINUITY)

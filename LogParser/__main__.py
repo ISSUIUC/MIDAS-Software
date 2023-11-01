@@ -75,8 +75,8 @@ def main():
     json_out = []
     with open(args.raw, "rb") as data_file:
         found_checksum = int.from_bytes(data_file.read(4), byteorder="little")
-        if found_checksum != expected_checksum:
-            raise Exception(f"Trying to parse file with checksum {expected_checksum}, found file with checksum {found_checksum}")
+        # if found_checksum != expected_checksum:
+        #     raise Exception(f"Trying to parse file with checksum {expected_checksum}, found file with checksum {found_checksum}")
         
         while True:
             disc_bytes = data_file.read(4)

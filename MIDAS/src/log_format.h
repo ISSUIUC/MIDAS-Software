@@ -14,7 +14,7 @@ enum ReadingDiscriminant {
     ID_GPS              = 6,
     ID_MAGNETOMETER     = 7,
     ID_ORIENTATION      = 8,
-    ID_LOWG_LSM         = 9,
+    ID_LOWGLSM         = 9,
 };
 
 
@@ -24,19 +24,20 @@ enum ReadingDiscriminant {
  *
  * Instead, we use 4 bytes for the discriminant, 4 bytes for the timestamp, and then write the
  * actual data. No padding between inside these items or between readings.
- * 
- * struct LoggedReading {
- *     ReadingDiscriminant discriminant;
- *     uint32_t timestamp_ms;
- *     union {
- *         LowGData low_g;
- *         HighGData high_g;
- *         Barometer barometer;
- *         Continuity continuity;
- *         Voltage voltage;
- *         GPS gps;
- *         Magnetometer magnetometer;
- *         Orientation orientation;
- *     } data;
- * };
  */
+
+ struct LoggedReading {
+     ReadingDiscriminant discriminant;
+     uint32_t timestamp_ms;
+     union {
+         LowGData low_g;
+         HighGData high_g;
+         Barometer barometer;
+         Continuity continuity;
+         Voltage voltage;
+         GPS gps;
+         Magnetometer magnetometer;
+         Orientation orientation;
+         LowGData lowg_lsm;
+     } data;
+ };

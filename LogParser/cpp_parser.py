@@ -45,7 +45,7 @@ struct: "struct" IDENTIFIER struct_items ";"
 
 struct_items: "{" struct_item* "}"
 struct_item: type field_decl ("," field_decl)* ";" -> fields
-           | IDENTIFIER parenthesized initializer_list block -> constructor
+           | IDENTIFIER parenthesized ("=" "default" | initializer_list block) ";"? -> constructor
            | type IDENTIFIER parenthesized "const"? block -> method
 
 field_decl: decl (("=" const_expr) | "{" "}")?
@@ -472,6 +472,8 @@ class Calculate(Interpreter):
                 for f_name, field in self.visit(item):
                     fields[f_name] = field
             elif item.data == "method":
+                continue
+            elif item.data == "constructor":
                 continue
             else:
                 raise Exception(item.data)
