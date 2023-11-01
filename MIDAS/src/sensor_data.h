@@ -75,9 +75,10 @@ struct GyroscopeData {
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
+    float altitude = 0;
 
     Barometer() = default;
-    Barometer(float t, float p) : temperature(t), pressure(p) {}
+    Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
 struct Continuity {
