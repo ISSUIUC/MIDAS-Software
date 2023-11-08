@@ -11,12 +11,25 @@
 
 FSMState tick_fsm(FSMState curr_state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar);
 
-double getAcceleration(std::array<HighGData, 8> hg) { //efficent enough?
-    size_t size = hg.size();
-    double avg = 0;
+float getAcceleration(std::array<HighGData, 8> hg) { //efficent enough?
+    float avg = 0;
 
-    for (size_t i = 0; i < size; i++) { avg += (hg.at(i).gz/(double)size); }
+    for (size_t i = 0; i < hg.size(); i++) 
+    {
+         avg += (hg.at(i).gz/(float)hg.size());
+    }
     
+    return avg;
+}
+
+float getAltitude(std::array<Barometer, 8> bar) {
+    float avg = 0;
+
+    for (size_t i = 0; i < bar.size(); i++)
+    {
+        avg += (bar.at(i).altitude/(float)bar.size());
+    }
+
     return avg;
 }
 
@@ -61,6 +74,7 @@ double getVerticalSpeed(std::array<Barometer, 8> bar) {
 double tick_to_ms(TickType_t ticks) { return ((double)ticks/configTICK_RATE_HZ)*1000;}
 double launch_time;
 double burnout_time;
+double sustainer_ignition_time;
 double second_boost_time;
 double coast_time;
 double drogue_time;
