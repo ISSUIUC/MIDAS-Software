@@ -49,21 +49,21 @@ struct Acceleration {
  * Structs starting here represent specific sensors and the respective data
 */
 struct LowGData {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
+    float ax = 0;
+    float ay = 0;
+    float az = 0;
 
     LowGData() = default;
-    LowGData(float x, float y, float z) : gx(x), gy(y), gz(z) {};
+    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
 };
 
 struct HighGData {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
+    float ax = 0;
+    float ay = 0;
+    float az = 0;
 
     HighGData() = default;
-    HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
+    HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
 struct LowGLSM {

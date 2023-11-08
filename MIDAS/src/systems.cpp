@@ -28,7 +28,6 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
-
         THREAD_SLEEP(16);
     }
 }
@@ -46,7 +45,8 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
 
 DECLARE_THREAD(low_g_lsm, RocketSystems* arg) {
     while (true) {
-        arg->rocket_data.low_g_lsm.update(arg->sensors.low_g_lsm.read());
+        LowGLSM reading = arg->sensors.low_g_lsm.read();
+        arg->rocket_data.low_g_lsm.update(reading);
         THREAD_SLEEP(10);
     }
 }
@@ -79,7 +79,8 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
  */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        arg->rocket_data.magnetometer.update(arg->sensors.magnetometer.read());
+        Magnetometer reading = arg->sensors.magnetometer.read();
+        arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(7);  //data rate is 155hz so 7 is closest
     }
 }
