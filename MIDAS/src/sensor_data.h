@@ -66,10 +66,13 @@ struct HighGData {
     HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
 };
 
-struct GyroscopeData {
+struct LowGLSM {
     float gx = 0;
     float gy = 0;
     float gz = 0;
+    float ax = 0;
+    float ay = 0;
+    float az = 0;
 };
 
 struct Barometer {

@@ -1,6 +1,10 @@
+#ifdef SILSIM
+#include "silsim/emulation.h"
+#else
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
+#endif
 
 /**
  * The default maximum length for a Queue.

@@ -4,6 +4,7 @@
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
+    SDBeginFailed,
     LowGRangeCouldNotBeSet,
     LowGODRLPFCouldNotBeSet,
     HighGCouldNotBeInitialized,
