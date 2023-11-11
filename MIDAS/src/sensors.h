@@ -32,7 +32,8 @@ struct HighGSensor {
 
 struct PyroThread {
     ErrorCode init();
-    Pyro tick(FSMState fsm_state);
+    Pyro tick_lower(FSMState fsm_state);
+    Pyro tick_upper(FSMState fsm_state);
 };
 
 struct BarometerSensor {

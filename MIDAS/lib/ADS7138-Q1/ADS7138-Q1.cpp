@@ -5,7 +5,7 @@ bool GPIOADS7138::init() {
     return true; // No error
 };
 
-void GPIOADS7138::write(unsigned int pin) {
+void GPIOADS7138::write(unsigned int pin, bool state) {
     // :)
     return;
 };

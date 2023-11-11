@@ -32,7 +32,7 @@
 
 // pyro pins
 
-#define GLOBAL_ARM_PIN 0
+#define PYRO_GLOBAL_ARM_PIN 0
 #define PYROA_ARM_PIN 1
 #define PYROA_FIRE_PIN 2
 #define PYROB_ARM_PIN 3

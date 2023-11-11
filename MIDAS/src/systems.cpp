@@ -125,7 +125,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 DECLARE_THREAD(pyro, RocketSystems* arg) {
 
     while (true) {        
-        Pyro new_pyro = arg->sensors.pyro.tick(arg->rocket_state.fsm_state);
+        Pyro new_pyro = arg->sensors.pyro.tick_upper(arg->rocket_state.fsm_state.getRecent());
         arg->rocket_state.pyro.update(new_pyro);
         THREAD_SLEEP(16);
         //Serial.println("PYRO");
