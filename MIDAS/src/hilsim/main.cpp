@@ -4,12 +4,12 @@
 #include "hilsim/hilsimpacket.pb.h"
 
 void setup() {
-    pb_byte_t buffer[HILSIMPacket_size];
+    uint8_t buffer[HILSIMPacket_size];
     // Read the thing
     // Serial???
     while (true) {
         // No way the packet size goes over 128, right?
-        char length = Serial.read();
+        uint8_t length = Serial.read();
         // Parse the two bytes as integers
         size_t size = Serial.readBytes(buffer, length);
         // Kill off null zeros?
@@ -23,6 +23,9 @@ void setup() {
         // Process information
         // Loop
         // Write data
+        char out[128];
+        sprintf(out, "%f\n", packet.barometer_pressure);
+        Serial.write(out, strlen(out));
     }
 }
 

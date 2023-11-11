@@ -70,10 +70,9 @@ if __name__ == "__main__":
     MIDAS = serial.Serial(ports[0], 9600)
     # Read the csv
     csv = pandas.read_csv(os.path.dirname(os.path.abspath(sys.argv[0])) + "/flight_computer.csv")
-    for x in csv:
-        packet = csv_to_protobuf(x)
+    while True:
+        packet = csv_to_protobuf(True)
         data = packet.SerializeToString()
-        print(f"Writing length {len(data)} packet: {data}")
         # Encode the length of package in 2 bytes and then output the the information
         MIDAS.write(len(data).to_bytes())
         MIDAS.write(data)
