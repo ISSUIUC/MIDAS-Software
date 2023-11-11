@@ -86,6 +86,8 @@ struct Barometer {
 
 struct Continuity {
     bool pins[CONTINUITY_PIN_COUNT];
+
+    Continuity() = default;
 };
 
 struct Voltage {
@@ -106,16 +108,16 @@ struct Magnetometer {
 };
 
 struct Orientation {
-    float yaw = 0;
-    float pitch = 0;
-    float roll = 0;
+    float yaw;
+    float pitch;
+    float roll;
 
     Velocity orientation_velocity;
     Acceleration orientation_acceleration;
 
     Acceleration linear_acceleration;
 
-    float gx = 0, gy = 0, gz = 0;
+    float gx, gy, gz;
 
     Magnetometer magnetometer;
 

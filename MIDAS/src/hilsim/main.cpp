@@ -40,8 +40,8 @@ DECLARE_THREAD(hilsim, void*arg){
 
 void setup() {
     Serial.begin(9600);
-    while (true) {
-        Serial.println("Print");
+    while(true){
+        Serial.println("HI");
     }
     START_THREAD(hilsim, 1, nullptr);
     begin_systems(&systems);
