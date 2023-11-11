@@ -19,6 +19,7 @@ void threadSleep(int32_t time_ms);
 void delay(unsigned long ms);
 void emu_busy_wait(size_t ms);
 void silsimStepTime();
+uint32_t ledcWriteTone(uint8_t pin, uint32_t frequency);
 
 typedef int StaticTask_t;
 typedef int BaseType_t;

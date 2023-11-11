@@ -3,6 +3,7 @@
 #include "hal.h"
 #include "sensors.h"
 #include "data_logging.h"
+#include "buzzer.h"
 
 #include "gnc/example_kf.h"
 
@@ -109,6 +110,20 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
+    Continuity initial_readings = arg->sensors.continuity.read();
+
+    Sound continuity_sensor_tune[] = {
+            { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[0] ? 40u : 20u, 200 }, { 0, 200 },
+            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[1] ? 40u : 20u, 200 }, { 0, 200 },
+            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[2] ? 40u : 20u, 200 }, { 0, 200 },
+            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
+    };
+    arg->buzzer.play_tune(continuity_sensor_tune, 28);
+    
     while (true) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
@@ -122,6 +137,17 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
+    }
+}
+
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(buzzer, RocketSystems* arg) {
+    while (true) {
+        arg->buzzer.tick();
+
+        THREAD_SLEEP(1);
     }
 }
 
@@ -174,6 +200,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(voltage, SENSOR_CORE, config);
     START_THREAD(continuity, SENSOR_CORE, config);
     START_THREAD(fsm, SENSOR_CORE, config);
+    START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
 
     while (true) {

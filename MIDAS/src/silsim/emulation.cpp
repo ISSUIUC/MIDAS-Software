@@ -130,3 +130,7 @@ void vTaskDelete(void* something_probably) {
 void vTaskDelay(int32_t time) {
     threadSleep(time);
 }
+
+uint32_t ledcWriteTone(uint8_t pin, uint32_t frequency) {
+    return 0;
+}
