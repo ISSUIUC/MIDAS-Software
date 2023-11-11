@@ -67,14 +67,17 @@ if __name__ == "__main__":
     if len(ports) == 0:
         print("You need to connect MIDAS")
         exit()
+    print(f"Connecting to {ports[0]}")
     MIDAS = serial.Serial(ports[0], 9600)
     # Read the csv
     csv = pandas.read_csv(os.path.dirname(os.path.abspath(sys.argv[0])) + "/flight_computer.csv")
+    print("Connected")
     while True:
         packet = csv_to_protobuf(True)
         data = packet.SerializeToString()
         # Encode the length of package in 2 bytes and then output the the information
         MIDAS.write(len(data).to_bytes())
         MIDAS.write(data)
-        output = MIDAS.read_until()
+        print("Wrote data")
+        output = MIDAS.read_all()
         print(output)
