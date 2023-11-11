@@ -1,4 +1,5 @@
 #include "sensors.h"
+#include "../packet.h"
 
 ErrorCode LowGSensor::init()
 {
@@ -7,5 +8,5 @@ ErrorCode LowGSensor::init()
 
 LowGData LowGSensor::read()
 {
-    return LowGData{};
+    return LowGData{global_packet.imu_low_ax,global_packet.imu_low_ay,global_packet.imu_low_az};
 }

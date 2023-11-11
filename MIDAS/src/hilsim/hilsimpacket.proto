@@ -12,35 +12,53 @@
 */
 syntax = "proto2";
 
-// All of the packet data is optional because we might not be able to set all these data, however
-// it ight be more optimal to change all of this to required because protobuf for platformio (nanopb)
-// adds an extra bool for each data element to check if it exists, which could lead to some memory wastage
 message HILSIMPacket {
     // High-G IMU data
-    optional float imu_high_ax = 1;
-    optional float imu_high_ay = 2;
-    optional float imu_high_az = 3;
+    required float imu_high_ax = 1;
+    required float imu_high_ay = 2;
+    required float imu_high_az = 3;
 
     // Barometer data
-    optional float barometer_altitude = 4;
-    optional float barometer_temperature = 5;
-    optional float barometer_pressure = 6;
+    required float barometer_altitude = 4;
+    required float barometer_temperature = 5;
+    required float barometer_pressure = 6;
 
     // Low-G IMU data
-    optional float imu_low_ax = 7;
-    optional float imu_low_ay = 8;
-    optional float imu_low_az = 9;
-    optional float imu_low_gx = 10;
-    optional float imu_low_gy = 11;
-    optional float imu_low_gz = 12;
+    required float imu_low_ax = 7;
+    required float imu_low_ay = 8;
+    required float imu_low_az = 9;
+
+    // Low-G lsm IMU data
+    required float imu_low_lsm_ax = 10;
+    required float imu_low_lsm_ay = 11;
+    required float imu_low_lsm_az = 12;
+    required float imu_low_lsm_gx = 13;
+    required float imu_low_lsm_gy = 14;
+    required float imu_low_lsm_gz = 15;
 
     // Mag data
-    optional float mag_x = 13;
-    optional float mag_y = 14;
-    optional float mag_z = 15;
+    required float mag_x = 16;
+    required float mag_y = 17;
+    required float mag_z = 18;
 
     // Orientation data
-    optional float ornt_roll = 16;
-    optional float ornt_pitch = 17;
-    optional float ornt_yaw = 18;
+    required float ornt_roll = 19;
+    required float ornt_pitch = 20;
+    required float ornt_yaw = 21;
+    required float ornt_rollv = 22;
+    required float ornt_pitchv = 23;
+    required float ornt_yawv = 24;
+    required float ornt_rolla = 25;
+    required float ornt_pitcha = 26;
+    required float ornt_yawa = 27;
+    required float ornt_ax = 28;
+    required float ornt_ay = 29;
+    required float ornt_az = 30;
+    required float ornt_gx = 31;
+    required float ornt_gy = 32;
+    required float ornt_gz = 33;
+    required float ornt_mx = 34;
+    required float ornt_my = 35;
+    required float ornt_mz = 36;
+    required float ornt_temp = 37;
 }

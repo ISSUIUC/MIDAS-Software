@@ -1,5 +1,5 @@
 #include "sensors.h"
-
+#include "../packet.h"
 /**
  * Initializes barometer, returns NoError
 */
@@ -12,5 +12,5 @@ ErrorCode BarometerSensor::init() {
  * @return a barometer data packet for the thread to send to the data logger
 */
 Barometer BarometerSensor::read() {
-    return Barometer{};
+    return Barometer{global_packet.barometer_temperature,global_packet.barometer_pressure,global_packet.barometer_altitude};
 }
