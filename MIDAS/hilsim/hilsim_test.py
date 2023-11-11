@@ -4,6 +4,9 @@ import pandas
 import glob
 import sys
 
+import hilsimpacket_pb2
+import os
+
 def serial_ports():
     """ Lists serial port names
 
@@ -32,8 +35,31 @@ def serial_ports():
             pass
     return result
 
-def csv_to_protobuf(data):
-    pass
+def csv_to_protobuf(data) -> hilsimpacket_pb2.HILSIMPacket:
+    packet = hilsimpacket_pb2.HILSIMPacket()
+    packet.imu_high_ax = 1
+    packet.imu_high_ay = 2
+    packet.imu_high_az = 3
+
+    packet.barometer_altitude = 4
+    packet.barometer_temperature = 5
+    packet.barometer_pressure = 6
+
+    packet.imu_low_ax = 7
+    packet.imu_low_ay = 8
+    packet.imu_low_az = 9
+    packet.imu_low_gx = 10
+    packet.imu_low_gy = 11
+    packet.imu_low_gz = 12
+
+    packet.mag_x = 13
+    packet.mag_y = 14
+    packet.mag_z = 15
+
+    packet.ornt_roll = 16
+    packet.ornt_pitch = 17
+    packet.ornt_yaw = 18
+    return packet
 
 # Get first serial port...
 if __name__ == "__main__":
@@ -43,6 +69,13 @@ if __name__ == "__main__":
         exit()
     MIDAS = serial.Serial(ports[0], 9600)
     # Read the csv
-    csv = pandas.read_csv("flight_computer.csv")
-    #for x in csv
-    MIDAS.write()    
+    csv = pandas.read_csv(os.path.dirname(os.path.abspath(sys.argv[0])) + "/flight_computer.csv")
+    for x in csv:
+        packet = csv_to_protobuf(x)
+        data = packet.SerializeToString()
+        print(f"Writing length {len(data)} packet: {data}")
+        # Encode the length of package in 2 bytes and then output the the information
+        MIDAS.write(len(data).to_bytes())
+        MIDAS.write(data)
+        output = MIDAS.read_until()
+        print(output)

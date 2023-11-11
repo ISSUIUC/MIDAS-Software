@@ -11,7 +11,10 @@ void hilsim() {
     // Read the thing
     // Serial???
     while (true) {
-        size_t size = Serial.readBytes(buffer, HILSIMPacket_size + 1);
+        // No way the packet size goes over 128, right?
+        char length = Serial.read();
+        // Parse the two bytes as integers
+        size_t size = Serial.readBytes(buffer, length);
         // Kill off null zeros?
         HILSIMPacket packet = HILSIMPacket_init_zero;
         pb_istream_t stream = pb_istream_from_buffer(buffer, size);
@@ -22,6 +25,6 @@ void hilsim() {
         }
         // Process information
         // Loop
-        // Assign values to hilsim and do stuff
+        // Write data
     }
 }
