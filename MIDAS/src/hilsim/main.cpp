@@ -1,13 +1,10 @@
-#include "hilsim.h"
-
 #include <Arduino.h>
-#include <pb_decode.h>
 #include <pb_decode.h>
 
 #include "hilsim/hilsimpacket.pb.h"
 
-void hilsim() {
-    char buffer[HILSIMPacket_size];
+void setup() {
+    pb_byte_t buffer[HILSIMPacket_size];
     // Read the thing
     // Serial???
     while (true) {
@@ -28,3 +25,5 @@ void hilsim() {
         // Write data
     }
 }
+
+void loop(){}
