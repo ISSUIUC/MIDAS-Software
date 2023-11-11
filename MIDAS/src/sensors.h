@@ -8,6 +8,10 @@
 #include "sensor_data.h"
 #include "errors.h"
 #include "hardware/pins.h"
+
+#include "finite-state-machines/fsm_states.h"
+#include "finite-state-machines/fsm.h"
+
 #include<optional>
 
 struct LowGSensor {
@@ -28,8 +32,8 @@ struct HighGSensor {
 
 struct PyroThread {
     ErrorCode init();
-    Pyro tick();
-}
+    Pyro tick(FSMState fsm_state);
+};
 
 struct BarometerSensor {
     ErrorCode init();

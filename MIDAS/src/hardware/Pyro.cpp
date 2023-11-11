@@ -1,7 +1,8 @@
 #include "sensors.h"
+
 #include "ADS7138-Q1.h"
-#include "finite-state-machines/fsm_states.h"
-#include "finite-state-machines/fsm.h"
+
+
 
 GPIOADS7138 GPIO{};
 
@@ -22,9 +23,14 @@ ErrorCode PyroThread::init() {
 /**
  * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
 */
-Pyro PyroThread::tick() {
+Pyro PyroThread::tick(FSMState fsm_state) {
     Pyro new_pyro = Pyro();
     // do some gnarly things
+    if(fsm_state == FSM_state::STATE_IDLE) {
+        // test code, need to add other states
+    }
+    
+
     return new_pyro;
 }
 
