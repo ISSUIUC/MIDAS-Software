@@ -94,9 +94,10 @@ struct Voltage {
 
 struct GPS {
     float latitude = 0;
-    float longitudinal = 0;
+    float longitude = 0;
     float altitude = 0;
-    float satellite_count = 0;
+    float speed = 0;
+    uint16_t satellite_count = 0;
 };
 
 struct Magnetometer {
