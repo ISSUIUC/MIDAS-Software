@@ -12,12 +12,6 @@
 #include "hardware/sensors.h"
 #endif
 
-
-struct GPSSensor {
-    ErrorCode init();
-    GPS read();
-};
-
 struct Sensors {
     LowGSensor low_g;
     LowGLSMSensor low_g_lsm;
