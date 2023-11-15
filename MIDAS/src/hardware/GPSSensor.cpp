@@ -15,8 +15,8 @@ ErrorCode GPSSensor::init() {
 
 GPS GPSSensor::read() {
     teseo.update();
-    auto gpgga_message = teseo.getGPGGAData();
-    auto gprmc_message = teseo.getGPRMCData();
+    GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
+    GPRMC_Info_t gprmc_message = teseo.getGPRMCData();
     float lat = gpgga_message.xyz.lat;
     float lon = gpgga_message.xyz.lon;
     float alt = gpgga_message.xyz.alt;
