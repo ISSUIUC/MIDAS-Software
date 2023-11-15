@@ -3,4 +3,4 @@
 .vscode
 
 # Mac garbage
-.DS_Store
+**/.DS_Store
