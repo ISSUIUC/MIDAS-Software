@@ -4,10 +4,14 @@
 
 #include <array>
 
-#include "MIDAS/src/Queue.h"
-#include "packet.h"
+#include "../Queue.h"
+#include "../rocket_state.h"
+//#include "packet.h"
 #include "pins.h"
-#include "MIDAS/src/errors.h"
+#include "sensor_data.h"
+#include "sensors.h"
+#include "../systems.h"
+#include "../errors.h"
 #include <RH_RF95.h>
 
 
@@ -105,7 +109,7 @@ class Telemetry {
 #ifndef ENABLE_SILSIM_MODE
     RH_RF95 rf95;
 #endif
-    MessageQueue<TelemetryDataLite, 4> buffered_data;
+    //MessageQueue<TelemetryDataLite, 4> buffered_data;
 
     // Initializing command ID
     int16_t last_command_id = -1;

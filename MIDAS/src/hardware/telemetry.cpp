@@ -17,6 +17,7 @@
 #include <limits>
 
 #include "telemetry.h"
+#include "../rocket_state.h"
 //#include "rocket_state.h"
 //#include "mcu_main/debug.h"
 //#include "mcu_main/dataLog.h"
