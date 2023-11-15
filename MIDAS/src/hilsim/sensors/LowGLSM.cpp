@@ -1,5 +1,5 @@
 #include "sensors.h"
-#include "../packet.h"
+#include "../global_packet.h"
 
 ErrorCode LowGLSMSensor::init() {
     return ErrorCode::NoError;
