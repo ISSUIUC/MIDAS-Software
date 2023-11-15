@@ -6,6 +6,7 @@ import sys
 
 import hilsimpacket_pb2
 import os
+import time
 
 def serial_ports():
     """ Lists serial port names
@@ -35,30 +36,25 @@ def serial_ports():
             pass
     return result
 
-def csv_to_protobuf(data) -> hilsimpacket_pb2.HILSIMPacket:
-    packet = hilsimpacket_pb2.HILSIMPacket()
-    packet.imu_high_ax = 1
-    packet.imu_high_ay = 2
-    packet.imu_high_az = 3
+def csv_to_protobuf(parsed_csv) -> hilsimpacket_pb2.HILSIMPacket:
+    hilsim_packet = hilsimpacket_pb2.HILSIMPacket()
+    
+    hilsim_packet.imu_high_ax = parsed_csv['highg_ax']
+    hilsim_packet.imu_high_ay = parsed_csv["highg_ay"]
+    hilsim_packet.imu_high_az = parsed_csv["highg_az"]
+    hilsim_packet.barometer_altitude = parsed_csv["barometer_altitude"]
+    hilsim_packet.barometer_temperature = parsed_csv["temperature"]
+    hilsim_packet.barometer_pressure = parsed_csv["pressure"]
+    hilsim_packet.imu_low_ax = parsed_csv["ax"]
+    hilsim_packet.imu_low_ay = parsed_csv["ay"]
+    hilsim_packet.imu_low_az = parsed_csv["az"]
+    hilsim_packet.imu_low_gx = parsed_csv["gx"]
+    hilsim_packet.imu_low_gy = parsed_csv["gy"]
+    hilsim_packet.imu_low_gz = parsed_csv["gz"]
+    hilsim_packet.mag_x = parsed_csv["mx"]
+    hilsim_packet.mag_y = parsed_csv["my"]
+    hilsim_packet.mag_z = parsed_csv["mz"]
 
-    packet.barometer_altitude = 4
-    packet.barometer_temperature = 5
-    packet.barometer_pressure = 6
-
-    packet.imu_low_ax = 7
-    packet.imu_low_ay = 8
-    packet.imu_low_az = 9
-    packet.imu_low_gx = 10
-    packet.imu_low_gy = 11
-    packet.imu_low_gz = 12
-
-    packet.mag_x = 13
-    packet.mag_y = 14
-    packet.mag_z = 15
-
-    packet.ornt_roll = 16
-    packet.ornt_pitch = 17
-    packet.ornt_yaw = 18
     return packet
 
 # Get first serial port...
@@ -76,8 +72,8 @@ if __name__ == "__main__":
         packet = csv_to_protobuf(True)
         data = packet.SerializeToString()
         # Encode the length of package in 2 bytes and then output the the information
-        MIDAS.write(len(data).to_bytes())
+        MIDAS.write([len(data)])
         MIDAS.write(data)
-        print("Wrote data")
+        time.sleep(0.01)
         output = MIDAS.read_all()
         print(output)

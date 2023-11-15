@@ -1,4 +1,5 @@
 
 message RocketState {
     // Get the state of the rocket
+    required int rocket_state = 1;
 }
