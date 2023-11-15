@@ -5,52 +5,13 @@
  * we can switch whether we're using hardware sensors or emulated sensors.
  */
 
-#include "sensor_data.h"
-#include "errors.h"
-#include "hardware/pins.h"
-#include<optional>
+#if defined(SILSIM)
+#include "silsim/emulated_sensors.h"
+#elif defined(HILSIM)
+#else
+#include "hardware/sensors.h"
+#endif
 
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
-    void calibrate();
-};
-
-struct Gyroscope {
-    ErrorCode init();
-    GyroscopeData read();
-};
-
-struct HighGSensor {
-    ErrorCode init();
-    HighGData read();
-};
-
-struct BarometerSensor {
-    ErrorCode init();
-    Barometer read();
-    
-};
-
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
-};
-
-struct VoltageSensor {
-    ErrorCode init();
-    Voltage read();
-};
-
-struct OrientationSensor {
-    ErrorCode init();
-    Orientation read();
-};
-
-struct MagnetometerSensor {
-    ErrorCode init();
-    Magnetometer read();
-};
 
 struct GPSSensor {
     ErrorCode init();
@@ -59,7 +20,7 @@ struct GPSSensor {
 
 struct Sensors {
     LowGSensor low_g;
-    Gyroscope gyroscope;
+    LowGLSMSensor low_g_lsm;
     HighGSensor high_g;
     BarometerSensor barometer;
     ContinuitySensor continuity;
@@ -68,5 +29,3 @@ struct Sensors {
     MagnetometerSensor magnetometer;
     GPSSensor gps;
 };
-
-
