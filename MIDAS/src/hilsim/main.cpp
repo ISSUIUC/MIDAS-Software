@@ -4,6 +4,7 @@
 
 #include <systems.h>
 #include "global_packet.h"
+#include "log_checksum.h"
 
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
 pb_byte_t buffer[HILSIMPacket_size];
@@ -14,6 +15,16 @@ DECLARE_THREAD(hilsim, void*arg){
     uint8_t buffer[HILSIMPacket_size];
     while(!Serial);
     int n = 0;
+    // Debug kamaji output to verify if we're reading the correct packets
+    char magic[] = {69, 110, 117, 109, 99, 108, 97, 119};
+    Serial.print(magic);
+    Serial.print(GIT_HASH_STRING);
+    Serial.print("\n");
+    Serial.print(__TIME__);
+    Serial.print("\n");
+    Serial.print(__DATE__);
+    Serial.print("\n");
+
     while (true) {
         // No way the packet size goes over 128, right?
         if(!Serial.available()){
