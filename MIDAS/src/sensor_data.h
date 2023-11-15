@@ -91,7 +91,7 @@ struct GPS {
     float longitude = 0;
     float altitude = 0;
     float speed = 0;
-    int satellite_count = 0;
+    uint16_t satellite_count = 0;
 };
 
 struct Magnetometer {
