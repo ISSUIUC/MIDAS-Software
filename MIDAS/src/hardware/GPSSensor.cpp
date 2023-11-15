@@ -9,6 +9,7 @@
 TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);
 
 ErrorCode GPSSensor::init() {
+    // Remember to change any RESET related operations to use the GPIO expander
     if (!teseo.init()) {
         return ErrorCode::GPSCouldNotBeInitialized;
     }
