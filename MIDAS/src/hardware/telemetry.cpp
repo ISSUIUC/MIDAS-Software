@@ -82,7 +82,7 @@ ErrorCode Telemetry::init() {
 
     sei();
 #endif
-    return ErrorCode::NO_ERROR;
+    return ErrorCode::NoError;
 }
 
 #if defined(ENABLE_TELEMETRY) && !defined(ENABLE_SILSIM_MODE)
@@ -224,40 +224,39 @@ void printJSONField(const char *name, const char *val, bool comma = true) {
     Serial.print('"');
     if (comma) Serial.print(',');
 }
-void Telemetry::serialPrint(const sensorDataStruct_t &sensor_data) {
+void Telemetry::serialPrint(RocketData sensor_data) {
     Serial.print(R"({"type": "data", "value": {)");
     printJSONField("response_ID", -1);
-    printJSONField("gps_lat", sensor_data.gps_data.latitude);
-    printJSONField("gps_long", sensor_data.gps_data.longitude);
-    printJSONField("gps_alt", sensor_data.gps_data.altitude);
-    printJSONField("KX_IMU_ax", sensor_data.highG_data.hg_ax);
-    printJSONField("KX_IMU_ay", sensor_data.highG_data.hg_ay);
-    printJSONField("KX_IMU_az", sensor_data.highG_data.hg_az);
-    printJSONField("IMU_gx", sensor_data.lowG_data.gx);
-    printJSONField("IMU_gy", sensor_data.lowG_data.gy);
-    printJSONField("IMU_gz", sensor_data.lowG_data.az);
-    printJSONField("IMU_mx", sensor_data.magnetometer_data.magnetometer.mx);
-    printJSONField("IMU_my", sensor_data.magnetometer_data.magnetometer.my);
-    printJSONField("IMU_mz", sensor_data.magnetometer_data.magnetometer.mz);
-    printJSONField("FSM_state", (int)sensor_data.rocketState_data.rocketStates[0]);
+    printJSONField("gps_lat", sensor_data.gps.getRecent().latitude);
+    printJSONField("gps_long", sensor_data.gps.getRecent().longitude);
+    printJSONField("gps_alt", sensor_data.gps.getRecent().altitude);
+    printJSONField("KX_IMU_ax", sensor_data.high_g.getRecent().ax);
+    printJSONField("KX_IMU_ay", sensor_data.high_g.getRecent().ay);
+    printJSONField("KX_IMU_az", sensor_data.high_g.getRecent().az);
+    printJSONField("IMU_gx", sensor_data.low_g.getRecent().ax);
+    printJSONField("IMU_gy", sensor_data.low_g.getRecent().ay);
+    printJSONField("IMU_gz", sensor_data.low_g.getRecent().az);
+    printJSONField("IMU_mx", sensor_data.magnetometer.getRecent().mx);
+    printJSONField("IMU_my", sensor_data.magnetometer.getRecent().my);
+    printJSONField("IMU_mz", sensor_data.magnetometer.getRecent().mz);
+    // printJSONField("FSM_state", (int)sensor_data.fsm_state.rocketStates[0]);
     printJSONField("sign", "NOSIGN");
 #ifdef ENABLE_SILSIM_MODE
     printJSONField("RSSI", 0);
 #else
     printJSONField("RSSI", rf95.lastRssi());
 #endif
-    printJSONField("Voltage", sensor_data.voltage_data.v_battery);
+    printJSONField("Voltage", sensor_data.voltage.getRecent().voltage);
     printJSONField("frequency", -1);
-    printJSONField("flap_extension", sensor_data.flap_data.extension);
-    printJSONField("STE_ALT", sensor_data.kalman_data.kalman_pos_x);
-    printJSONField("STE_VEL", sensor_data.kalman_data.kalman_vel_x);
-    printJSONField("STE_ACC", sensor_data.kalman_data.kalman_acc_x);
-    printJSONField("STE_APO", sensor_data.kalman_data.kalman_apo);
-    printJSONField("BNO_YAW", sensor_data.orientation_data.angle.yaw);
-    printJSONField("BNO_PITCH", sensor_data.orientation_data.angle.pitch);
-    printJSONField("BNO_ROLL", sensor_data.orientation_data.angle.roll);
-    printJSONField("TEMP", sensor_data.barometer_data.temperature);
-    printJSONField("pressure", sensor_data.barometer_data.pressure, false);
+    // printJSONField("flap_extension", sensor_data.flap_data.extension);
+    // printJSONField("STE_VEL", sensor_data.kalman_data.kalman_vel_x);
+    // printJSONField("STE_ACC", sensor_data.kalman_data.kalman_acc_x);
+    // printJSONField("STE_APO", sensor_data.kalman_data.kalman_apo);
+    printJSONField("BNO_YAW", sensor_data.orientation.getRecent().yaw);
+    printJSONField("BNO_PITCH", sensor_data.orientation.getRecent().pitch);
+    printJSONField("BNO_ROLL", sensor_data.orientation.getRecent().roll);
+    printJSONField("TEMP", sensor_data.barometer.getRecent().temperature);
+    printJSONField("pressure", sensor_data.barometer.getRecent().pressure, false);
     Serial.println("}}");
     // Serial.print(R"({"type": "data", "value": {)");
     // Serial.print(R"("response_ID":)");
@@ -353,12 +352,14 @@ void Telemetry::serialPrint(const sensorDataStruct_t &sensor_data) {
     // Serial.println("}}\n");
 }
 
-TelemetryPacket Telemetry::makePacket(const SensorState &Sensorstate) {
+TelemetryPacket Telemetry::makePacket(RocketData Sensorstate) {
     TelemetryPacket packet{};
-    SensorState Sensorstate = SensorState.getRecent();
-    packet.gps_lat = Sensorstate.gps.latitude;
-    packet.gps_long = Sensorstate.gps.longitude;
-    packet.gps_alt = Sensorstate.gps.altitude;
+    packet.gps_lat = Sensorstate.gps.getRecent().latitude;
+    packet.gps_long = Sensorstate.gps.getRecent().longitude;
+    packet.gps_alt = Sensorstate.gps.getRecent().altitude;
+    packet.yaw = Sensorstate.orientation.getRecent().yaw;
+    packet.pitch = Sensorstate.orientation.getRecent().pitch;
+    packet.roll = Sensorstate.orientation.getRecent().roll;
 
     // packet.gnc_state_ax = Sensorstate.kalman_data.kalman_acc_x;
     // packet.gnc_state_vx = Sensorstate.kalman_data.kalman_vel_x;
@@ -373,53 +374,54 @@ TelemetryPacket Telemetry::makePacket(const SensorState &Sensorstate) {
 
     //fix the gnc stuff later
 
-    packet.mag_x = inv_convert_range<int16_t>(Sensorstate.magnetometer.mx, 8);
-    packet.mag_y = inv_convert_range<int16_t>(Sensorstate.magnetometer.my, 8);
-    packet.mag_z = inv_convert_range<int16_t>(Sensorstate.magnetometer.mz, 8);
-    packet.gyro_x = inv_convert_range<int16_t>(Sensorstate.gyroscope.gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(Sensorstate.gyroscope.gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(Sensorstate.gyroscope.gz, 8192);
+    packet.mag_x = inv_convert_range<int16_t>(Sensorstate.magnetometer.getRecent().mx, 8);
+    packet.mag_y = inv_convert_range<int16_t>(Sensorstate.magnetometer.getRecent().my, 8);
+    packet.mag_z = inv_convert_range<int16_t>(Sensorstate.magnetometer.getRecent().mz, 8);
+    packet.gyro_x = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().gx, 8192);
+    packet.gyro_y = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().gy, 8192);
+    packet.gyro_z = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().gz, 8192);
 
     packet.response_ID = last_command_id;
+    
 #ifdef ENABLE_SILSIM_MODE
     packet.rssi = 0;
 #else
     packet.rssi = rf95.lastRssi();
 #endif
-    packet.voltage_battery = inv_convert_range<uint8_t>(Sensorstate.voltage_data.v_battery, 16);
-    packet.FSM_State = (uint8_t)Sensorstate.rocketState_data.rocketStates[0];
-    packet.barometer_temp = inv_convert_range<int16_t>(Sensorstate.barometer_data.temperature, 256);
+    packet.voltage_battery = inv_convert_range<uint8_t>(Sensorstate.voltage.getRecent().voltage , 16);
+    //packet.FSM_State = (uint8_t)Sensorstate.rocketState_data.rocketStates[0];
+    packet.barometer_temp = inv_convert_range<int16_t>(Sensorstate.barometer.getRecent().temperature, 256);
 
     TelemetryDataLite data{};
     packet.datapoint_count = 0;
-    for (int8_t i = 0; i < 4 && buffered_data.pop(data); i++) {
+    for (int8_t i = 0; i < 4; i++) {
         packet.datapoints[i] = data;
         packet.datapoint_count = i + (int8_t)1;
     }
     return packet;
 }
 
-void Telemetry::bufferData(SensorState &Sensorstate) {
-#ifdef ENABLE_TELEMETRY
-//#ifndef TLM_DEBUG
-    SensorState Sensorstate = SensorState.getRecent();
-    TelemetryDataLite data{};
-    data.timestamp = TIME_I2MS(chVTGetSystemTime());
-    data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
+// void Telemetry::bufferData(RocketData &Sensorstate) {
+// #ifdef ENABLE_TELEMETRY
+// //#ifndef TLM_DEBUG
+//     SensorState Sensorstate = SensorState.getRecent();
+//     TelemetryDataLite data{};
+//     data.timestamp = TIME_I2MS(chVTGetSystemTime());
+//     data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.gx, 256);
-    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.gy, 256);
-    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.gz, 256);
+//     data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.gx, 256);
+//     data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.gy, 256);
+//     data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.gz, 256);
 
-    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.pitch, 8);
-    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.yaw, 8);
-    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.roll, 8);
+//     data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.pitch, 8);
+//     data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.yaw, 8);
+//     data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.roll, 8);
 
-    buffered_data.push(data);
+//     buffered_data.push(data);
 
-#ifdef SERIAL_PLOTTING
-    serialPrint(sensor_data);
-#endif
-//#endif
-#endif
-}
+// #ifdef SERIAL_PLOTTING
+//     serialPrint(sensor_data);
+// #endif
+// //#endif
+// #endif
+// }

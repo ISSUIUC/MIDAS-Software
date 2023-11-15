@@ -25,7 +25,7 @@ class Telemetry;
 extern Telemetry tlm;
 
 struct TelemetryDataLite {
-    systime_t timestamp;  //[0, 2^32]
+    u_int32_t timestamp;  //[0, 2^32]
 
     uint16_t barometer_pressure;  //[0, 4096]
     int16_t highG_ax;             //[128, -128]
@@ -101,10 +101,9 @@ class Telemetry {
 
     void handleCommand(const telemetry_command& cmd);
 
-    void bufferData();
+    //void bufferData();
 
-    void serialPrint(const sensorDataStruct_t& sensor_data);
-
+    void serialPrint(RocketData sensor_data);
    private:
 #ifndef ENABLE_SILSIM_MODE
     RH_RF95 rf95;
@@ -118,6 +117,7 @@ class Telemetry {
     char callsign[8] = "NO SIGN";
     command_handler_struct freq_status = {};
 
-    TelemetryPacket makePacket(const SensorState &Sensorstate);
+    TelemetryPacket 
+    makePacket(RocketData Sensorstate);
 
 };

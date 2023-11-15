@@ -94,7 +94,7 @@ struct Voltage {
 
 struct GPS {
     float latitude = 0;
-    float longitudinal = 0;
+    float longitude = 0;
     float altitude = 0;
     float satellite_count = 0;
 };

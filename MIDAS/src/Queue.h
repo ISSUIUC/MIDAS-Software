@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef SILSIM
 #include "silsim/emulation.h"
 #else
