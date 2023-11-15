@@ -1,5 +1,5 @@
 #include "sensors.h"
-#include "../packet.h"
+#include "../global_packet.h"
 /**
  * Initializes barometer, returns NoError
 */

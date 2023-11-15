@@ -1,5 +1,5 @@
 #include "sensors.h"
-#include "../packet.h"
+#include "../global_packet.h"
 
 /**
  * Initializes the high G data sensor, returns ErrorCode::CANNOT_INIT_KX134_CS if cannot initialize
