@@ -158,6 +158,7 @@ bool init_sensors(Sensors& sensors, LogSink& log_sink) {
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems* config) {
+    Serial.write("Starting mcu_main\n");
     bool success = init_sensors(config->sensors, config->log_sink);
     if (!success) {
         // todo some message probably

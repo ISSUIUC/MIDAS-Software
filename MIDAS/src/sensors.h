@@ -8,6 +8,7 @@
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
 #elif defined(HILSIM)
+#include "hilsim/sensors/sensors.h"
 #else
 #include "hardware/sensors.h"
 #endif
