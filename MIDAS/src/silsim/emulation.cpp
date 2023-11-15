@@ -131,6 +131,16 @@ void vTaskDelay(int32_t time) {
     threadSleep(time);
 }
 
-uint32_t ledcWriteTone(uint8_t pin, uint32_t frequency) {
+uint8_t channels[256];
+
+uint32_t ledcWriteTone(uint8_t channel, uint32_t frequency) {
+    std::cout << "Writing tone with frequency " << (int) frequency << " onto channel " << (int) channel << "." << std::endl;
     return 0;
 }
+
+void ledcAttachPin(uint8_t pin, uint8_t channel) {
+    channels[channel] = pin;
+}
+
+void pinMode(uint8_t pin, uint8_t mode) { }
+void digitalWrite(uint8_t pin, uint8_t value) { }

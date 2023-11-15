@@ -1,6 +1,7 @@
 #include "buzzer.h"
 
 #define BUZZER_PIN (0xDE)
+#define BUZZER_CHANNEL (1)
 
 void BuzzerController::play_tune(Sound* tune, uint32_t length) {
     current_tune_ = tune;
@@ -10,8 +11,6 @@ void BuzzerController::play_tune(Sound* tune, uint32_t length) {
 }
 
 void BuzzerController::tick() {
-
-
     tick_sounds();
 }
 
@@ -26,7 +25,7 @@ void BuzzerController::tick_sounds() {
 
     if (new_tune_started) {
         Sound& next_sound = current_tune_[index_];
-        ledcWriteTone(BUZZER_PIN, next_sound.frequency);
+        ledcWriteTone(BUZZER_CHANNEL, next_sound.frequency);
 
         when_sound_started_ = current_time;
         new_tune_started = false;
@@ -36,11 +35,21 @@ void BuzzerController::tick_sounds() {
             current_tune_ = nullptr;
             index_ = 0;
             length_ = 0;
+
+            ledcWriteTone(BUZZER_CHANNEL, 0);
         } else {
             Sound& next_sound = current_tune_[index_];
-            ledcWriteTone(BUZZER_PIN, next_sound.frequency);
+            ledcWriteTone(BUZZER_CHANNEL, next_sound.frequency);
 
             when_sound_started_ = current_time;
         }
     }
+}
+
+ErrorCode BuzzerController::init() {
+    // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I do question the knowledge of github
+    pinMode(BUZZER_PIN, OUTPUT);
+    digitalWrite(BUZZER_PIN, LOW);
+    ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
+    return NoError;
 }

@@ -2,6 +2,7 @@
 
 #include <cstdint>
 #include "hal.h"
+#include "errors.h"
 
 
 struct Sound {
@@ -24,7 +25,7 @@ private:
 public:
     BuzzerController() = default;
 
+    ErrorCode init();
     void tick();
-
     void play_tune(Sound* tune, uint32_t length);
 };

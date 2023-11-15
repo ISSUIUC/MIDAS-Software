@@ -163,28 +163,29 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
-#define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
-bool init_sensors(Sensors& sensors, LogSink& log_sink) {
+#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
+bool init_systems(RocketSystems& systems) {
     // todo message on failure
-    INIT_SENSOR(sensors.low_g);
-    INIT_SENSOR(sensors.high_g);
-    INIT_SENSOR(sensors.low_g_lsm);
-    INIT_SENSOR(sensors.barometer);
-    INIT_SENSOR(sensors.continuity);
-    INIT_SENSOR(sensors.orientation);
-    INIT_SENSOR(sensors.voltage);
-    INIT_SENSOR(sensors.magnetometer);
-    INIT_SENSOR(log_sink);
+    INIT_SYSTEM(systems.sensors.low_g);
+    INIT_SYSTEM(systems.sensors.high_g);
+    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    INIT_SYSTEM(systems.sensors.barometer);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.buzzer);
     return true;
 }
-#undef INIT_SENSOR
+#undef INIT_SYSTEM
 
 /**
  * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems* config) {
-    bool success = init_sensors(config->sensors, config->log_sink);
+    bool success = init_systems(*config);
     if (!success) {
         // todo some message probably
         return;
