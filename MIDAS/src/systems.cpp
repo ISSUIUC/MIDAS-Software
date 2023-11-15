@@ -73,8 +73,10 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
+        arg->rocket_state.gps.update(arg->sensors.gps.read());
         THREAD_SLEEP(16);
         //Serial.println("GPS");
     }
@@ -117,6 +119,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     vTaskDelete(NULL);
 }
 
+
+
 #define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
 bool init_sensors(Sensors& sensors) {
     // todo message on failure
@@ -128,6 +132,7 @@ bool init_sensors(Sensors& sensors) {
     INIT_SENSOR(sensors.orientation);
     INIT_SENSOR(sensors.voltage);
     INIT_SENSOR(sensors.magnetometer);
+    INIT_SENSOR(sensors.gps);
     return true;
 }
 #undef INIT_SENSOR

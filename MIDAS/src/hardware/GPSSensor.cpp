@@ -23,5 +23,5 @@ GPS GPSSensor::read() {
     float v = gprmc_message.speed;
     int sat_count = gpgga_message.sats;
 
-    return GPS(lat, lon, alt, v, sat_count);
+    return GPS{lat, lon, alt, v, sat_count};
 }
