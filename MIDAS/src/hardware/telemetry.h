@@ -1,7 +1,6 @@
 #pragma once
 
 
-
 #include <array>
 
 #include "../Queue.h"
@@ -10,7 +9,7 @@
 #include "pins.h"
 #include "sensor_data.h"
 #include "sensors.h"
-#include "../systems.h"
+// #include "../systems.h"
 #include "../errors.h"
 #include <RH_RF95.h>
 
@@ -21,8 +20,6 @@
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 434.0
 
-class Telemetry;
-extern Telemetry tlm;
 
 struct TelemetryDataLite {
     u_int32_t timestamp;  //[0, 2^32]
@@ -117,7 +114,6 @@ class Telemetry {
     char callsign[8] = "NO SIGN";
     command_handler_struct freq_status = {};
 
-    TelemetryPacket 
-    makePacket(RocketData Sensorstate);
+    TelemetryPacket makePacket(RocketData Sensorstate);
 
 };
