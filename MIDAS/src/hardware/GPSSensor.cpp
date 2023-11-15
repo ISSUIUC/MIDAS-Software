@@ -9,8 +9,10 @@
 TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);
 
 ErrorCode GPSSensor::init() {
-    teseo.init();
-    return ErrorCode();
+    if (!teseo.init()) {
+        return ErrorCode::GPSCouldNotBeInitialized;
+    }
+    return ErrorCode::NoError;
 }
 
 GPS GPSSensor::read() {
