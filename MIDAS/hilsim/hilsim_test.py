@@ -7,6 +7,7 @@ import sys
 import hilsimpacket_pb2
 import os
 import time
+import rocketstate_pb2
 
 def serial_ports():
     """ Lists serial port names
@@ -26,15 +27,15 @@ def serial_ports():
     else:
         raise EnvironmentError('Unsupported platform')
 
-    result = []
     for port in ports:
         try:
             s = serial.Serial(port)
-            s.close()
+            #s.close()
+            return s
             result.append(port)
         except (OSError, serial.SerialException):
             pass
-    return result
+    return None
 
 def csv_to_protobuf(parsed_csv) -> hilsimpacket_pb2.HILSIMPacket:
     hilsim_packet = hilsimpacket_pb2.HILSIMPacket()
@@ -45,35 +46,61 @@ def csv_to_protobuf(parsed_csv) -> hilsimpacket_pb2.HILSIMPacket:
     hilsim_packet.barometer_altitude = parsed_csv["barometer_altitude"]
     hilsim_packet.barometer_temperature = parsed_csv["temperature"]
     hilsim_packet.barometer_pressure = parsed_csv["pressure"]
-    hilsim_packet.imu_low_ax = parsed_csv["ax"]
-    hilsim_packet.imu_low_ay = parsed_csv["ay"]
-    hilsim_packet.imu_low_az = parsed_csv["az"]
-    hilsim_packet.imu_low_gx = parsed_csv["gx"]
-    hilsim_packet.imu_low_gy = parsed_csv["gy"]
-    hilsim_packet.imu_low_gz = parsed_csv["gz"]
+    hilsim_packet.imu_low_lsm_ax = parsed_csv["ax"]
+    hilsim_packet.imu_low_lsm_ay = parsed_csv["ay"]
+    hilsim_packet.imu_low_lsm_az = parsed_csv["az"]
+    hilsim_packet.imu_low_lsm_gx = parsed_csv["gx"]
+    hilsim_packet.imu_low_lsm_gy = parsed_csv["gy"]
+    hilsim_packet.imu_low_lsm_gz = parsed_csv["gz"]
     hilsim_packet.mag_x = parsed_csv["mx"]
     hilsim_packet.mag_y = parsed_csv["my"]
     hilsim_packet.mag_z = parsed_csv["mz"]
 
-    return packet
+    hilsim_packet.imu_low_ax = 0
+    hilsim_packet.imu_low_ay = 0
+    hilsim_packet.imu_low_az = 0
+    hilsim_packet.ornt_roll = 0
+    hilsim_packet.ornt_pitch = 0
+    hilsim_packet.ornt_yaw = 0
+    hilsim_packet.ornt_rollv = 0
+    hilsim_packet.ornt_pitchv = 0
+    hilsim_packet.ornt_yawv = 0
+    hilsim_packet.ornt_rolla = 0
+    hilsim_packet.ornt_pitcha = 0
+    hilsim_packet.ornt_yawa = 0
+    hilsim_packet.ornt_ax = 0
+    hilsim_packet.ornt_ay = 0
+    hilsim_packet.ornt_az = 0
+    hilsim_packet.ornt_gx = 0
+    hilsim_packet.ornt_gy = 0
+    hilsim_packet.ornt_gz = 0
+    hilsim_packet.ornt_mx = 0
+    hilsim_packet.ornt_my = 0
+    hilsim_packet.ornt_mz = 0
+    hilsim_packet.ornt_temp = 0
+    return hilsim_packet
 
 # Get first serial port...
 if __name__ == "__main__":
-    ports = serial_ports()
-    if len(ports) == 0:
+    MIDAS = serial_ports()
+    if MIDAS == None:
         print("You need to connect MIDAS")
         exit()
-    print(f"Connecting to {ports[0]}")
-    MIDAS = serial.Serial(ports[0], 9600)
+
     # Read the csv
-    csv = pandas.read_csv(os.path.dirname(os.path.abspath(sys.argv[0])) + "/flight_computer.csv")
-    print("Connected")
-    while True:
-        packet = csv_to_protobuf(True)
+    csv = pandas.read_csv(os.path.dirname(os.path.abspath(sys.argv[0])) + "/flight_computer.csv", index_col=0)
+    for index, line in csv.iterrows():
+        packet = csv_to_protobuf(line)
         data = packet.SerializeToString()
         # Encode the length of package in 2 bytes and then output the the information
         MIDAS.write([len(data)])
+        print("writing {} bytes".format(len(data)))
         MIDAS.write(data)
         time.sleep(0.01)
-        output = MIDAS.read_all()
-        print(output)
+        size = int.from_bytes(MIDAS.read())
+        r = MIDAS.read(size)
+        state = rocketstate_pb2.RocketState()
+        state.ParseFromString(r)
+        print(state.rocket_state)
+        #output = MIDAS.read_all()
+        #print(output)

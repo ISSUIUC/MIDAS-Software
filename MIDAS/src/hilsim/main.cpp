@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <pb_decode.h>
+#include <pb_encode.h>
 
 #include <systems.h>
 #include "global_packet.h"
@@ -11,10 +12,8 @@ RocketSystems systems;
 
 DECLARE_THREAD(hilsim, void*arg){
     uint8_t buffer[HILSIMPacket_size];
-    while(!Serial){
-
-    }
-    Serial.print("starting");
+    while(!Serial);
+    int n = 0;
     while (true) {
         // No way the packet size goes over 128, right?
         if(!Serial.available()){
@@ -23,22 +22,28 @@ DECLARE_THREAD(hilsim, void*arg){
         }
         uint8_t length = Serial.read();
         // Parse the two bytes as integers
-        Serial.println("Reading packet");
-        Serial.println(length);
         size_t size = Serial.readBytes(buffer, length);
-        // Kill off null zeros?
         HILSIMPacket packet = HILSIMPacket_init_zero;
         pb_istream_t stream = pb_istream_from_buffer(buffer, size);
         bool status = pb_decode(&stream, HILSIMPacket_fields, &packet);
         if (!status) {
-            Serial.println("Error reading packet");
+            Serial.flush();
+            THREAD_SLEEP(10);
             continue;
         }
+        RocketState rocket_state = RocketState_init_zero;
+        rocket_state.rocket_state = n;
+        uint8_t buffer[RocketState_size];
+        pb_ostream_t output_stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
+        status = pb_encode(&output_stream, RocketState_fields, &rocket_state);
+        Serial.write(output_stream.bytes_written);
+        Serial.write(buffer, output_stream.bytes_written);
+        Serial.flush();
         // Process information
         // Loop
         // Write data
-        Serial.println(packet.barometer_pressure);
         global_packet = packet;
+        n++;
         THREAD_SLEEP(10);
     }
 }
@@ -46,9 +51,6 @@ DECLARE_THREAD(hilsim, void*arg){
 void setup() {
     Serial.begin(9600);
     hilsim_thread(nullptr);
-    // START_THREAD(hilsim, 1, nullptr);
-    // begin_systems(&systems);
-    
 }
 
 void loop(){}
