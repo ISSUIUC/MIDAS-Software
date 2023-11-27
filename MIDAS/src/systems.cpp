@@ -91,6 +91,8 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
  */
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
+        GPS reading = arg->sensors.gps.read();
+        arg->rocket_data.gps.update(reading);
         THREAD_SLEEP(16);
     }
 }
@@ -174,8 +176,10 @@ bool init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
+
     return true;
 }
 #undef INIT_SYSTEM
