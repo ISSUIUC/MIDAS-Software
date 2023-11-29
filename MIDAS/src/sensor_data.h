@@ -99,7 +99,7 @@ struct Orientation {
     Magnetometer magnetometer;
 
     float temperature = 0;
-    float presssure = 0; 
+    float pressure = 0; 
 
 };
 
