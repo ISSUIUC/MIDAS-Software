@@ -16,7 +16,7 @@
  */
 #include <limits>
 
-#include "telemetry.h"
+#include "../telemetry.h"
 #include "../rocket_state.h"
 //#include "rocket_state.h"
 //#include "mcu_main/debug.h"
@@ -166,8 +166,8 @@ void Telemetry::transmit() {
     TelemetryPacket packet = makePacket(); //change to new data struct
 #ifndef ENABLE_SILSIM_MODE
     rf95.send((uint8_t *)&packet, sizeof(packet));
-
-    chThdSleepMilliseconds(170);
+    THREAD_SLEEP(170);
+    //chThdSleepMilliseconds(170);
 
     rf95.waitPacketSent();
 
@@ -224,7 +224,7 @@ void printJSONField(const char *name, const char *val, bool comma = true) {
     Serial.print('"');
     if (comma) Serial.print(',');
 }
-void Telemetry::serialPrint(RocketData sensor_data) {
+void Telemetry::serialPrint(RocketData& sensor_data) {
     Serial.print(R"({"type": "data", "value": {)");
     printJSONField("response_ID", -1);
     printJSONField("gps_lat", sensor_data.gps.getRecent().latitude);
@@ -352,7 +352,7 @@ void Telemetry::serialPrint(RocketData sensor_data) {
     // Serial.println("}}\n");
 }
 
-TelemetryPacket Telemetry::makePacket(RocketData Sensorstate) {
+TelemetryPacket Telemetry::makePacket(RocketData& Sensorstate) {
     TelemetryPacket packet{};
     packet.gps_lat = Sensorstate.gps.getRecent().latitude;
     packet.gps_long = Sensorstate.gps.getRecent().longitude;
@@ -394,34 +394,34 @@ TelemetryPacket Telemetry::makePacket(RocketData Sensorstate) {
 
     TelemetryDataLite data{};
     packet.datapoint_count = 0;
-    for (int8_t i = 0; i < 4; i++) {
+    for (int8_t i = 0; i < 4 && command_queue.receive(&data); i++) {
         packet.datapoints[i] = data;
         packet.datapoint_count = i + (int8_t)1;
     }
     return packet;
 }
 
-// void Telemetry::bufferData(RocketData &Sensorstate) {
-// #ifdef ENABLE_TELEMETRY
-// //#ifndef TLM_DEBUG
-//     SensorState Sensorstate = SensorState.getRecent();
-//     TelemetryDataLite data{};
-//     data.timestamp = TIME_I2MS(chVTGetSystemTime());
-//     data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
+void Telemetry::bufferData(RocketData &Sensorstate) {
+#ifdef ENABLE_TELEMETRY
+//#ifndef TLM_DEBUG
+    SensorState Sensorstate = SensorState.getRecent();
+    TelemetryDataLite data{};
+    data.timestamp = TIME_I2MS(chVTGetSystemTime());
+    data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
 
-//     data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.gx, 256);
-//     data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.gy, 256);
-//     data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.gz, 256);
+    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.gx, 256);
+    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.gy, 256);
+    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.gz, 256);
 
-//     data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.pitch, 8);
-//     data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.yaw, 8);
-//     data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.roll, 8);
+    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.pitch, 8);
+    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.yaw, 8);
+    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.roll, 8);
 
-//     buffered_data.push(data);
+    buffered_data.push(data);
 
-// #ifdef SERIAL_PLOTTING
-//     serialPrint(sensor_data);
-// #endif
-// //#endif
-// #endif
-// }
+#ifdef SERIAL_PLOTTING
+    serialPrint(sensor_data);
+#endif
+//#endif
+#endif
+}
