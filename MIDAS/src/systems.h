@@ -10,7 +10,7 @@ struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
     LogSink log_sink;
-    //Telemetry tlm;
+    Telemetry tlm;
 };
 
 void begin_systems(RocketSystems* config);

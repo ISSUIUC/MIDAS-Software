@@ -137,6 +137,16 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(telemetry, RocketSystems* arg) {
+    while (true) {
+        arg->tlm.transmit();
+        THREAD_SLEEP(16);
+    }
+}
+
 #define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
 bool init_sensors(Sensors& sensors, LogSink& log_sink) {
     // todo message on failure
@@ -175,6 +185,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(continuity, SENSOR_CORE, config);
     START_THREAD(fsm, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(telemetry, DATA_CORE, config);
 
     while (true) {
         THREAD_SLEEP(1000);
