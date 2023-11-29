@@ -10,7 +10,7 @@
 #include "hardware/pins.h"
 #include "sensor_data.h"
 #include "sensors.h"
-//#include "systems.h"
+#include "systems.h"
 #include "errors.h"
 #include <RH_RF95.h>
 
@@ -68,6 +68,14 @@ struct TelemetryPacket {
     uint8_t voltage_battery;  //[0, 16]
     uint8_t FSM_State;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
+    bool continuity_a;
+    bool pyro_a;
+    bool continuity_b;
+    bool pyro_b;
+    bool continuity_c;
+    bool pyro_c;
+    bool continuity_d;
+    bool pyro_d;
 };
 
 // Commands transmitted from ground station to rocket
@@ -97,7 +105,7 @@ class Telemetry {
 
     ErrorCode __attribute__((warn_unused_result)) init();
 
-    void transmit(RocketSystems* data_struct);
+    void transmit(RocketSystems*& data_struct);
 
     void handleCommand(const telemetry_command& cmd);
 

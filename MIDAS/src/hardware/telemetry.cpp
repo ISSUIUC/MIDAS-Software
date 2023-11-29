@@ -147,7 +147,7 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
  *
  * @return void
  */
-void Telemetry::transmit(RocketSystems* data_struct) {
+void Telemetry::transmit(RocketSystems*& data_struct) {
 #ifdef ENABLE_TELEMETRY
 #ifdef TLM_DEBUG
     const uint8_t data[4] = {0, 1, 2, 3};
