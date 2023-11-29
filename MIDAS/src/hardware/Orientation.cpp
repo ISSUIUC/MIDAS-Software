@@ -81,8 +81,8 @@ Orientation OrientationSensor::read() {
         sensor_reading.magnetometer.my = event.un.magneticField.y;
         sensor_reading.magnetometer.mz = event.un.magneticField.z;
     
-        _temp = event.un.temperature.value;
-        _pressure = event.un.pressure.value;
+        sensor_reading.temperature = event.un.temperature.value;
+        sensor_reading.pressure = event.un.pressure.value;
     }
     return Orientation();
 }

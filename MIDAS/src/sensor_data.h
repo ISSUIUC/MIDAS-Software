@@ -98,7 +98,9 @@ struct Orientation {
 
     Magnetometer magnetometer;
 
-    float temperature;
+    float temperature = 0;
+    float presssure = 0; 
+
 };
 
 struct KalmanData {
