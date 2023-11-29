@@ -4,7 +4,6 @@
 #include "sensors.h"
 #include "rocket_state.h"
 #include "data_logging.h"
-#include "hardware/telemetry.h"
 #include "telemetry.h"
 
 
