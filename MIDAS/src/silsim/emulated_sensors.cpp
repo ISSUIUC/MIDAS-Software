@@ -7,7 +7,7 @@ ErrorCode BarometerSensor::init() {
 }
 
 Barometer BarometerSensor::read() {
-    return { 273.15, (float) rocket->height };
+    return { 273.15, 0, (float) rocket->height };
 }
 
 ErrorCode LowGLSMSensor::init() {
@@ -23,7 +23,7 @@ ErrorCode ContinuitySensor::init() {
 }
 
 Continuity ContinuitySensor::read() {
-    return { .is_continuous = should_be_continous };
+    return { };
 }
 
 ErrorCode HighGSensor::init() {
