@@ -147,7 +147,7 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
  *
  * @return void
  */
-void Telemetry::transmit() {
+void Telemetry::transmit(RocketSystems* data_struct) {
 #ifdef ENABLE_TELEMETRY
 #ifdef TLM_DEBUG
     const uint8_t data[4] = {0, 1, 2, 3};
@@ -161,7 +161,7 @@ void Telemetry::transmit() {
     blue_state = !blue_state;
     
 
-    TelemetryPacket packet = makePacket(); //change to new data struct
+    TelemetryPacket packet = makePacket(data_struct->rocket_data); //change to new data struct
 #ifndef ENABLE_SILSIM_MODE
     rf95.send((uint8_t *)&packet, sizeof(packet));
     THREAD_SLEEP(170);

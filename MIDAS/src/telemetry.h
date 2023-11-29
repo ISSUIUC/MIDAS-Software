@@ -97,7 +97,7 @@ class Telemetry {
 
     ErrorCode __attribute__((warn_unused_result)) init();
 
-    void transmit();
+    void transmit(RocketSystems* data_struct);
 
     void handleCommand(const telemetry_command& cmd);
 

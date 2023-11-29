@@ -142,7 +142,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
  */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
-        arg->tlm.transmit();
+        arg->tlm.transmit(arg);
         THREAD_SLEEP(16);
     }
 }
