@@ -4,14 +4,14 @@
 
 #include <array>
 
-#include "../Queue.h"
-#include "../rocket_state.h"
+#include "Queue.h"
+#include "rocket_state.h"
 //#include "packet.h"
-#include "pins.h"
+#include "hardware/pins.h"
 #include "sensor_data.h"
 #include "sensors.h"
-#include "../systems.h"
-#include "../errors.h"
+#include "systems.h"
+#include "errors.h"
 #include <RH_RF95.h>
 
 
@@ -22,7 +22,7 @@
 #define RF95_FREQ 434.0
 
 class Telemetry;
-extern Telemetry tlm;
+//extern Telemetry tlm;
 
 struct TelemetryDataLite {
     u_int32_t timestamp;  //[0, 2^32]
@@ -101,14 +101,14 @@ class Telemetry {
 
     void handleCommand(const telemetry_command& cmd);
 
-    //void bufferData();
+    void bufferData(RocketData &Sensorstate);
 
-    void serialPrint(RocketData sensor_data);
+    void serialPrint(RocketData &sensor_data);
    private:
 #ifndef ENABLE_SILSIM_MODE
     RH_RF95 rf95;
 #endif
-    //MessageQueue<TelemetryDataLite, 4> buffered_data;
+    Queue<TelemetryDataLite, 4> command_queue;
 
     // Initializing command ID
     int16_t last_command_id = -1;
@@ -118,6 +118,6 @@ class Telemetry {
     command_handler_struct freq_status = {};
 
     TelemetryPacket 
-    makePacket(RocketData Sensorstate);
+    makePacket(RocketData& Sensorstate);
 
 };
