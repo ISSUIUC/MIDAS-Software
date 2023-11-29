@@ -125,7 +125,7 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
             { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
     };
     arg->buzzer.play_tune(continuity_sensor_tune, 28);
-    
+
     while (true) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
@@ -161,6 +161,16 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) {
         example_kf.priori();
         example_kf.update();
+        THREAD_SLEEP(16);
+    }
+}
+
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(telemetry, RocketSystems* arg) {
+    while (true) {
+        arg->tlm.transmit();
         THREAD_SLEEP(16);
     }
 }
@@ -207,6 +217,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(fsm, SENSOR_CORE, config);
     START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(telemetry, DATA_CORE, config);
 
     while (true) {
         THREAD_SLEEP(1000);
