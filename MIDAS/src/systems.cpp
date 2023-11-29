@@ -3,6 +3,7 @@
 #include "hal.h"
 #include "sensors.h"
 #include "data_logging.h"
+#include "buzzer.h"
 
 #include "gnc/example_kf.h"
 
@@ -90,6 +91,8 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
  */
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
+        GPS reading = arg->sensors.gps.read();
+        arg->rocket_data.gps.update(reading);
         THREAD_SLEEP(16);
     }
 }
@@ -109,6 +112,20 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
+    Continuity initial_readings = arg->sensors.continuity.read();
+
+    Sound continuity_sensor_tune[] = {
+            { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[0] ? 40u : 20u, 200 }, { 0, 200 },
+            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[1] ? 40u : 20u, 200 }, { 0, 200 },
+            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[2] ? 40u : 20u, 200 }, { 0, 200 },
+            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+            { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
+    };
+    arg->buzzer.play_tune(continuity_sensor_tune, 28);
+
     while (true) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
@@ -122,6 +139,17 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         THREAD_SLEEP(16);
+    }
+}
+
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(buzzer, RocketSystems* arg) {
+    while (true) {
+        arg->buzzer.tick();
+
+        THREAD_SLEEP(1);
     }
 }
 
@@ -147,28 +175,31 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     }
 }
 
-#define INIT_SENSOR(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
-bool init_sensors(Sensors& sensors, LogSink& log_sink) {
+#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
+bool init_systems(RocketSystems& systems) {
     // todo message on failure
-    INIT_SENSOR(sensors.low_g);
-    INIT_SENSOR(sensors.high_g);
-    INIT_SENSOR(sensors.low_g_lsm);
-    INIT_SENSOR(sensors.barometer);
-    INIT_SENSOR(sensors.continuity);
-    INIT_SENSOR(sensors.orientation);
-    INIT_SENSOR(sensors.voltage);
-    INIT_SENSOR(sensors.magnetometer);
-    INIT_SENSOR(log_sink);
+    INIT_SYSTEM(systems.sensors.low_g);
+    INIT_SYSTEM(systems.sensors.high_g);
+    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    INIT_SYSTEM(systems.sensors.barometer);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.sensors.gps);
+    INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.buzzer);
+
     return true;
 }
-#undef INIT_SENSOR
+#undef INIT_SYSTEM
 
 /**
  * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems* config) {
-    bool success = init_sensors(config->sensors, config->log_sink);
+    bool success = init_systems(*config);
     if (!success) {
         // todo some message probably
         return;
@@ -184,6 +215,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(voltage, SENSOR_CORE, config);
     START_THREAD(continuity, SENSOR_CORE, config);
     START_THREAD(fsm, SENSOR_CORE, config);
+    START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
     START_THREAD(telemetry, DATA_CORE, config);
 

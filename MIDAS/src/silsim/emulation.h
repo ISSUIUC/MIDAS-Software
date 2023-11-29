@@ -8,6 +8,9 @@
 #include "silsim/fiber.h"
 #include "silsim/arduino_emulation.h"
 
+#define LOW (0x0)
+#define OUTPUT (0x3)
+
 #define tskIDLE_PRIORITY (128)
 
 #define pdMS_TO_TICKS(ms) (ms)
@@ -19,6 +22,12 @@ void threadSleep(int32_t time_ms);
 void delay(unsigned long ms);
 void emu_busy_wait(size_t ms);
 void silsimStepTime();
+
+uint32_t ledcWriteTone(uint8_t channel, uint32_t frequency);
+void ledcAttachPin(uint8_t pin, uint8_t channel);
+
+void pinMode(uint8_t pin, uint8_t mode);
+void digitalWrite(uint8_t pin, uint8_t value);
 
 typedef int StaticTask_t;
 typedef int BaseType_t;

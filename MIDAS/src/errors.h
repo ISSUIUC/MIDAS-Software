@@ -12,5 +12,6 @@ enum ErrorCode {
     MagnetometerCoultNotBeInitialized,
     GyroCouldNotBeInitialized,
     GasCouldNotBeInitialized,
+    GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized
 };
