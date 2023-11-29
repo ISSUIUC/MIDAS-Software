@@ -5,8 +5,7 @@
 
 // global static instance of the sensor
 Adafruit_BNO08x imu;
-sh2_SensorId_t reportType = SH2_ARVR_STABILIZED_RV;
-long reportIntervalUs = 5000;
+#define REPORT_INTERVAL_US 5000
 
 #define BNO086_CS 0
 #define BNO086_INT 0
@@ -15,12 +14,12 @@ ErrorCode OrientationSensor::init() {
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code
     if (!imu.begin_SPI(BNO086_CS, BNO086_INT)) {
-        return ErrorCode::CANNOT_CONNECT_BNO;
+        return ErrorCode::CannotConnectBNO;
     }
     Serial.println("Setting desired reports");
-    if (!imu.enableReport(reportType, reportIntervalUs)) {
+    if (!imu.enableReport(SH2_ARVR_STABILIZED_RV, REPORT_INTERVAL_US)) {
         Serial.println("Could not enable stabilized remote vector");
-        return ErrorCode::CANNOT_INIT_BNO;
+        return ErrorCode::CannotInitBNO;
     }
     return ErrorCode::NoError;
 }
@@ -83,6 +82,8 @@ Orientation OrientationSensor::read() {
     
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
+
+        return sensor_reading; 
     }
     return Orientation();
 }
