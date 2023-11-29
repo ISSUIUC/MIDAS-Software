@@ -4,14 +4,14 @@
 
 #include <array>
 
-#include "Queue.h"
-#include "rocket_state.h"
+#include "../Queue.h"
+#include "../rocket_state.h"
 //#include "packet.h"
-#include "hardware/pins.h"
+#include "pins.h"
 #include "sensor_data.h"
 #include "sensors.h"
-#include "systems.h"
-#include "errors.h"
+#include "../systems.h"
+#include "../errors.h"
 #include <RH_RF95.h>
 
 
@@ -101,9 +101,9 @@ class Telemetry {
 
     void handleCommand(const telemetry_command& cmd);
 
-    void bufferData(RocketData &Sensorstate);
+    //void bufferData();
 
-    void serialPrint(RocketData& sensor_data);
+    void serialPrint(RocketData sensor_data);
    private:
 #ifndef ENABLE_SILSIM_MODE
     RH_RF95 rf95;
@@ -112,12 +112,12 @@ class Telemetry {
 
     // Initializing command ID
     int16_t last_command_id = -1;
-    Queue<TelemetryDataLite, 4> command_queue;
 
     // Initializing callsign
     char callsign[8] = "NO SIGN";
     command_handler_struct freq_status = {};
 
-    TelemetryPacket makePacket(RocketData& Sensorstate);
+    TelemetryPacket 
+    makePacket(RocketData Sensorstate);
 
 };

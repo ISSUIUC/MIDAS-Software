@@ -29,8 +29,6 @@
 #include <RHHardwareSPI.h>
 #endif
 
-Telemetry tlm;
-
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
  * size
