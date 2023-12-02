@@ -34,3 +34,8 @@
 // i2c bus pins
 #define I2C_SDA 0
 #define I2C_SCL 0
+
+// rfm96 pins
+#define RFM96_CS 10 //change this
+#define RFM96_RST 9 //change this
+#define RFM96_INT 2 //change this

@@ -29,9 +29,6 @@
 #include <RHHardwareSPI.h>
 #endif
 
-#define RFM96_CS 10 //change this
-#define RFM96_RST 9 //change this
-#define RFM96_INT 2 //change this
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
