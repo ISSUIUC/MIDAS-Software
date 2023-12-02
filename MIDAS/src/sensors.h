@@ -5,6 +5,7 @@
  * we can switch whether we're using hardware sensors or emulated sensors.
  */
 
+<<<<<<< HEAD
 #include "sensor_data.h"
 #include "errors.h"
 #include "hardware/pins.h"
@@ -61,17 +62,27 @@ struct MagnetometerSensor {
     ErrorCode init();
     Magnetometer read();
 };
+=======
+#if defined(SILSIM)
+#include "silsim/emulated_sensors.h"
+#elif defined(HILSIM)
+#else
+#include "hardware/sensors.h"
+#endif
+>>>>>>> mvp-sensor-integration
 
 struct Sensors {
     LowGSensor low_g;
-    Gyroscope gyroscope;
+    LowGLSMSensor low_g_lsm;
     HighGSensor high_g;
     BarometerSensor barometer;
     ContinuitySensor continuity;
     VoltageSensor voltage;
     OrientationSensor orientation;
     MagnetometerSensor magnetometer;
+<<<<<<< HEAD
     PyroThread pyro;
+=======
+    GPSSensor gps;
+>>>>>>> mvp-sensor-integration
 };
-
-

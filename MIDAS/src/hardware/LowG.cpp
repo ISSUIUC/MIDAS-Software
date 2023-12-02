@@ -8,17 +8,12 @@
 
 Adxl355 sensor(ADXL355_CS);
 
-void LowGSensor::calibrate()
-{
-    sensor.calibrateSensor(ADXL355_CS);
-}
-
 ErrorCode LowGSensor::init()
 {
     ErrorCode error = ErrorCode::NoError;
     sensor.initSPI(SPI);
     sensor.start();
-    delay(1000);
+    delay(100);
 
     if (sensor.isDeviceRecognized())
     {
@@ -41,6 +36,8 @@ ErrorCode LowGSensor::init()
     {
         error = ErrorCode::LowGCouldNotBeInitialized;
     }
+
+    sensor.calibrateSensor(1);
 
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code

@@ -10,30 +10,43 @@
  */
 
 template<typename SensorData>
-struct SensorState {
+struct Reading {
+    uint32_t timestamp_ms;
+    SensorData data;
+};
+
+template<typename S>
+struct SensorData {
 private:
-    Mutex<SensorData> current;
-    Queue<SensorData> queue;
+    Mutex<S> current;
+    Queue<Reading<S>> queue;
 
 public:
-    void update(SensorData data) {
+    void update(S data) {
         current.write(data);
-        queue.send(data);
+        queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
     };
 
-    SensorData getRecent() {
+    S getRecent() {
         return current.read();
     };
 
-    bool getQueued(SensorData* out) {
+    bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };
 
-    SensorState() : current(SensorData()) { }
+    SensorData() : current(S()) { }
 };
 
-struct RocketState {
+/**
+ * The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
+ *
+ *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  makes it easier to debug since all this data can be logged (and thus used when debugging).
+ */
+struct RocketData {
 public:
+<<<<<<< HEAD
 
     SensorState<LowGData> low_g;
     SensorState<HighGData> high_g;
@@ -46,5 +59,18 @@ public:
     SensorState<Orientation> orientation;
     SensorState<FSMState> fsm_state;
     SensorState<Pyro> pyro;
+=======
+    bool pyro_should_be_firing = false;
+
+    SensorData<LowGData> low_g;
+    SensorData<HighGData> high_g;
+    SensorData<LowGLSM> low_g_lsm;
+    SensorData<Barometer> barometer;
+    SensorData<Continuity> continuity;
+    SensorData<Voltage> voltage;
+    SensorData<GPS> gps;
+    SensorData<Magnetometer> magnetometer;
+    SensorData<Orientation> orientation;
+>>>>>>> mvp-sensor-integration
 };
 
