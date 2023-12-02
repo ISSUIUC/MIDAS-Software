@@ -1,9 +1,9 @@
 #include "sensors.h"
 #include "pins.h"
 
-#include "ADS7138-Q1.h"
+#include "TCAL9539-Q1.h"
 
-GPIOADS7138 gpio_expander{};
+GPIOTCAL9539 gpio_expander{};
 
 /**
  * "Initializes" the pyro thread. The main initialization will be done by the GPIO expander, so the pyro thread doesn't
