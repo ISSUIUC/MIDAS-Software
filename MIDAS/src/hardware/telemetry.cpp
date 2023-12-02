@@ -29,6 +29,10 @@
 #include <RHHardwareSPI.h>
 #endif
 
+#define RFM96_CS 10 //change this
+#define RFM96_RST 9 //change this
+#define RFM96_INT 2 //change this
+
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
  * size
@@ -47,7 +51,7 @@ T inv_convert_range(float val, float range) {
 }
 
 ErrorCode Telemetry::init() {
-#if defined(ENABLE_TELEMETRY) && !defined(ENABLE_SILSIM_MODE) 
+
     pinMode(RFM96_RST, OUTPUT);
     digitalWrite(RFM96_RST, HIGH);
     delay(10);
@@ -60,7 +64,7 @@ ErrorCode Telemetry::init() {
     delay(10);
 
     if (!rf95.init()) {
-        return ErrorCode::RADIO_INIT_FAILED;
+        return ErrorCode::RadioInitFailed;
     }
     Serial.println("[DEBUG]: Radio Initialized");
 
@@ -68,7 +72,7 @@ ErrorCode Telemetry::init() {
     // 128chips/symbol, CRC on
 
     if (!rf95.setFrequency(RF95_FREQ)) {
-        return ErrorCode::RADIO_SET_FREQUENCY_FAILED;
+        return ErrorCode::RadioSetFrequencyFailed;
     }
 
     /*
@@ -79,15 +83,12 @@ ErrorCode Telemetry::init() {
     rf95.setTxPower(6, false);
 
     sei();
-#endif
     return ErrorCode::NoError;
 }
 
-#if defined(ENABLE_TELEMETRY) && !defined(ENABLE_SILSIM_MODE)
-Telemetry::Telemetry() : rf95(RFM96_CS, RFM96_INT, hardware_spi1) {}
-#else
-Telemetry::Telemetry() {}
-#endif
+
+Telemetry::Telemetry() : rf95(RFM96_CS, RFM96_INT, hardware_spi) {}
+    
 
 /**
  * @brief  This function handles commands sent from the ground station
@@ -147,21 +148,19 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
  *
  * @return void
  */
-void Telemetry::transmit(RocketSystems*& data_struct) {
-#ifdef ENABLE_TELEMETRY
-#ifdef TLM_DEBUG
+void Telemetry::transmit(RocketData &Sensorstate) {
     const uint8_t data[4] = {0, 1, 2, 3};
     rf95.send(data, 4);
     Serial.println("Sending packet...");
     rf95.waitPacketSent();
     Serial.println("Sent packet");
-#else
+
     static bool blue_state = false;
-    digitalWrite(LED_BLUE, blue_state);
+    //digitalWrite(LED_BLUE, blue_state);
     blue_state = !blue_state;
     
 
-    TelemetryPacket packet = makePacket(data_struct->rocket_data); //change to new data struct
+    TelemetryPacket packet = makePacket(Sensorstate); //change to new data struct
 #ifndef ENABLE_SILSIM_MODE
     rf95.send((uint8_t *)&packet, sizeof(packet));
     THREAD_SLEEP(170);
@@ -184,8 +183,6 @@ void Telemetry::transmit(RocketSystems*& data_struct) {
 
         handleCommand(received);
     }
-#endif
-#endif
 #endif
 }
 
@@ -400,26 +397,23 @@ TelemetryPacket Telemetry::makePacket(RocketData& Sensorstate) {
 }
 
 void Telemetry::bufferData(RocketData &Sensorstate) {
-#ifdef ENABLE_TELEMETRY
 //#ifndef TLM_DEBUG
-    SensorState Sensorstate = SensorState.getRecent();
     TelemetryDataLite data{};
-    data.timestamp = TIME_I2MS(chVTGetSystemTime());
-    data.barometer_pressure = inv_convert_range<uint16_t>(sensor_data.barometer_data.pressure, 4096);
+    data.timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
+    data.barometer_pressure = inv_convert_range<uint16_t>(Sensorstate.barometer.getRecent().pressure , 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.gx, 256);
-    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.gy, 256);
-    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.gz, 256);
+    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.getRecent().ax, 256);
+    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.getRecent().ay , 256);
+    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.getRecent().az , 256);
 
-    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.pitch, 8);
-    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.yaw, 8);
-    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.roll, 8);
+    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().pitch , 8);
+    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().yaw , 8);
+    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().roll , 8);
 
-    buffered_data.push(data);
+    command_queue.send(data);
 
 #ifdef SERIAL_PLOTTING
     serialPrint(sensor_data);
 #endif
 //#endif
-#endif
 }

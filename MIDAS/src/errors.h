@@ -13,5 +13,8 @@ enum ErrorCode {
     GyroCouldNotBeInitialized,
     GasCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
-    ContinuityCouldNotBeInitialized
+    ContinuityCouldNotBeInitialized,
+    RadioInitFailed,
+    RadioSetFrequencyFailed
+
 };

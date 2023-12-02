@@ -10,7 +10,6 @@
 #include "hardware/pins.h"
 #include "sensor_data.h"
 #include "sensors.h"
-#include "systems.h"
 #include "errors.h"
 #include <RH_RF95.h>
 
@@ -105,7 +104,7 @@ class Telemetry {
 
     ErrorCode __attribute__((warn_unused_result)) init();
 
-    void transmit(RocketSystems*& data_struct);
+    void transmit(RocketData &Sensorstate);
 
     void handleCommand(const telemetry_command& cmd);
 
