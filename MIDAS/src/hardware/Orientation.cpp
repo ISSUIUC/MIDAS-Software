@@ -31,27 +31,27 @@ Vec3 quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees) {
     float sqk = sq(qk);
 
     Vec3 euler;
-    euler.x = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr)); //roll
-    euler.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr)); //yaw
-    euler.z = -1 * atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr)); //pitch
+    euler.x = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));        // roll
+    euler.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));       // yaw
+    euler.z = -1 * atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));  // pitch
     return euler;
 }
 
 Vec3 quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, bool degrees) {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,
-                      degrees);
-    
+                             degrees);
+
 }
 
 Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, bool degrees) {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,
-                      degrees);
+                             degrees);
 }
 
 Orientation OrientationSensor::read() {
     // read from aforementioned global instance of sensor
-     sh2_SensorValue_t event;
-     Vec3 euler;
+    sh2_SensorValue_t event;
+    Vec3 euler;
     if (imu.getSensorEvent(&event)) {
         switch (event.sensorId) {
             case SH2_ARVR_STABILIZED_RV:
@@ -61,7 +61,7 @@ Orientation OrientationSensor::read() {
                 euler = quaternionToEulerGI(&event.un.gyroIntegratedRV, true);
                 break;
         }
-    
+
 
         Orientation sensor_reading;
         sensor_reading.yaw = euler.y;
@@ -79,11 +79,11 @@ Orientation OrientationSensor::read() {
         sensor_reading.magnetometer.mx = event.un.magneticField.x;
         sensor_reading.magnetometer.my = event.un.magneticField.y;
         sensor_reading.magnetometer.mz = event.un.magneticField.z;
-    
+
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
 
-        return sensor_reading; 
+        return sensor_reading;
     }
     return Orientation();
 }

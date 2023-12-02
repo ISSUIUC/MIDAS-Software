@@ -61,3 +61,10 @@ struct OrientationSensor {
 
     SimulatedRocket* rocket;
 };
+
+struct GPSSensor {
+    ErrorCode init();
+    GPS read();
+
+    SimulatedRocket* rocket;
+};
