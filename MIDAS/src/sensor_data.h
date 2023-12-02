@@ -3,6 +3,8 @@
 #include "finite-state-machines/fsm_states.h"
 
 #include <cmath>
+
+#define CONTINUITY_PIN_COUNT 4
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
@@ -49,39 +51,43 @@ struct Acceleration {
  * Structs starting here represent specific sensors and the respective data
 */
 struct LowGData {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
+    float ax = 0;
+    float ay = 0;
+    float az = 0;
 
     LowGData() = default;
-    LowGData(float x, float y, float z) : gx(x), gy(y), gz(z) {};
+    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
 };
 
 struct HighGData {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
+    float ax = 0;
+    float ay = 0;
+    float az = 0;
 
     HighGData() = default;
-    HighGData(float x, float y, float z) : gx(x), gy(y), gz(z) {}
+    HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
-struct GyroscopeData {
+struct LowGLSM {
     float gx = 0;
     float gy = 0;
     float gz = 0;
+    float ax = 0;
+    float ay = 0;
+    float az = 0;
 };
 
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
+    float altitude = 0;
 
     Barometer() = default;
-    Barometer(float t, float p) : temperature(t), pressure(p) {}
+    Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
 struct Continuity {
-    bool is_continuous = false;
+    bool pins[CONTINUITY_PIN_COUNT];
 };
 
 struct Voltage {
@@ -90,9 +96,10 @@ struct Voltage {
 
 struct GPS {
     float latitude = 0;
-    float longitudinal = 0;
+    float longitude = 0;
     float altitude = 0;
-    float satellite_count = 0;
+    float speed = 0;
+    uint16_t satellite_count = 0;
 };
 
 struct Magnetometer {

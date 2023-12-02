@@ -4,12 +4,15 @@
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
+    SDBeginFailed,
     LowGRangeCouldNotBeSet,
     LowGODRLPFCouldNotBeSet,
     HighGCouldNotBeInitialized,
     HighGCoulNotUpdateDataRate,
     MagnetometerCoultNotBeInitialized,
     GyroCouldNotBeInitialized,
-    GasCouldNotBeInitialized,
-    PyroGPIOCouldNotBeInitialized
+    PyroGPIOCouldNotBeInitialized,
+    GPSCouldNotBeInitialized,
+    ContinuityCouldNotBeInitialized
 };
+
