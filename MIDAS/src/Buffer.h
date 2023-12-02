@@ -28,7 +28,7 @@ public:
 
     template <size_t count>
     std::array<T, count> read_recent() {
-        std::array<T, count> arr;
+        std::array<T, 8> arr;
 
         size_t i = 0;
         size_t idx = newest_idx();

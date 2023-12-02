@@ -1,5 +1,4 @@
 #pragma once
-
 #include "sensor_data.h"
 #include "hal.h"
 #include "Buffer.h"
