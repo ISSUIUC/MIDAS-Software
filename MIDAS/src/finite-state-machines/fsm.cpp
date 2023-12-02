@@ -110,7 +110,7 @@ FSMState tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, std::ar
 
             // Move to MAIN if enough time passed since MAIN_DEPLOY
             // Use 'current_time - main_time' right?
-            if(current_time - main_time > main_timer_threshold) {
+            if(current_time - main_time > main_to_main_deploy_timer_threshold) {
                 state.curr_state = STATE_MAIN;
             }
             break;
@@ -143,7 +143,7 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
     switch (state.curr_state)
     {
         case STATE_IDLE:
-            if(getAcceleration(hg) > launch_detection_acceleration_threshold) {
+            if(getAcceleration(hg) > idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
                 state.curr_state = STATE_FIRST_BOOST;
             }
@@ -151,7 +151,7 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
             break;
 
         case STATE_FIRST_BOOST:
-            if(getAcceleration(hg) < launch_detection_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
+            if(getAcceleration(hg) < idle_to_first_boost_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
                  state.curr_state = STATE_IDLE;
             }
             if(getAcceleration(hg) < coast_detection_acceleration_threshold) {
@@ -179,9 +179,9 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
                 state.curr_state = STATE_COAST;
             }
 
-            first_seperation _timer = current_time;
+            first_seperation_time = current_time;
 
-            if(current_time - first_seperation _timer > first_seperation _time_threshold) { // move on regardless if it separates or not
+            if(current_time - first_seperation_time > first_seperation_time_threshold) { // move on regardless if it separates or not
 	            state.curr_state = STATE_COAST;
                 
             }
@@ -232,7 +232,7 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
 
             // Move to MAIN if enough time passed since MAIN_DEPLOY
             // Use 'current_time - main_time' right?
-            if(current_time - main_time > main_timer_threshold) {
+            if(current_time - main_time > main_to_main_deploy_timer_threshold) {
                 state.curr_state = STATE_MAIN;
             }
             break;

@@ -64,4 +64,4 @@ static constexpr float first_boost_to_burnout_time_threshold = 1000;
 static constexpr float landed_vertical_speed_threshold = 0;
 
 // Move on regardless if it separates or not i.e. if state is FIRST_SEPERATION for over this amount of time (ms)
-static constexpr float first_seperation _time_threshold = 3000;
+static constexpr float first_seperation_time_threshold = 3000;

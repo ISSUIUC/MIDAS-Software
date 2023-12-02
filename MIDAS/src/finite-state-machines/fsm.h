@@ -81,3 +81,4 @@ double drogue_time;
 double apogee_time;
 double main_time;
 double landed_time;
+double first_seperation_time;
