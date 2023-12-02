@@ -138,9 +138,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
-        FSMState current_state = arg->rocket_state.fsm_state.getRecent();
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
         FSMState next_state = tick_fsm(current_state);
-        arg->rocket_state.fsm_state.update(next_state);
+        arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
 }
@@ -174,8 +174,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 DECLARE_THREAD(pyro, RocketSystems* arg) {
 
     while (true) {        
-        Pyro new_pyro = arg->sensors.pyro.tick_upper(arg->rocket_state.fsm_state.getRecent());
-        arg->rocket_state.pyro.update(new_pyro);
+        Pyro new_pyro = arg->sensors.pyro.tick_upper(arg->rocket_data.fsm_state.getRecent());
+        arg->rocket_data.pyro.update(new_pyro);
         THREAD_SLEEP(16);
         //Serial.println("PYRO");
     }
@@ -196,7 +196,7 @@ bool init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
-    INIT_SENSOR(systems.sensors.pyro);
+    INIT_SYSTEM(systems.sensors.pyro);
     return true;
 }
 #undef INIT_SYSTEM

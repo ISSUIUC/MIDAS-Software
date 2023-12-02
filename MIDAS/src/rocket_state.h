@@ -46,16 +46,16 @@ public:
  */
 struct RocketData {
 public:
-    SensorState<LowGData> low_g;
-    SensorState<HighGData> high_g;
-    SensorState<GyroscopeData> gyroscope;
-    SensorState<Barometer> barometer;
-    SensorState<Continuity> continuity;
-    SensorState<Voltage> voltage;
-    SensorState<GPS> gps;
-    SensorState<Magnetometer> magnetometer;
-    SensorState<Orientation> orientation;
-    SensorState<FSMState> fsm_state;
-    SensorState<Pyro> pyro;
+    SensorData<LowGData> low_g;
+    SensorData<HighGData> high_g;
+    SensorData<LowGLSM> low_g_lsm;
+    SensorData<Barometer> barometer;
+    SensorData<Continuity> continuity;
+    SensorData<Voltage> voltage;
+    SensorData<GPS> gps;
+    SensorData<Magnetometer> magnetometer;
+    SensorData<Orientation> orientation;
+    SensorData<Pyro> pyro;
+    SensorData<FSMState> fsm_state;
 };
 
