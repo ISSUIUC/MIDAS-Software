@@ -1,3 +1,5 @@
+#include <cmath>
+
 #include "telemetry.h"
 
 
@@ -19,13 +21,16 @@ T inv_convert_range(float val, float range) {
 }
 
 
+Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
+
+
 void Telemetry::transmit(RocketData& rocket_data) {
     telemetry_command command { };
     while (backend.read(&command)) {
         handleCommand(command);
     }
 
-    if (!isnan(set_frequency_to)) {
+    if (!std::isnan(set_frequency_to)) {
         backend.setFrequency(set_frequency_to);
         set_frequency_to = NAN;
     }

@@ -21,6 +21,7 @@
 #include "hardware/telemetry_backend.h"
 #include "hardware/pins.h"
 
+
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 434.0
 

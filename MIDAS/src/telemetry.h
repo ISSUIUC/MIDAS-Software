@@ -2,9 +2,10 @@
 
 #include "telemetry_packet.h"
 #include "rocket_state.h"
+#include "errors.h"
 
 #if defined(SILSIM)
-#include "silsim/telemetry.h"
+#include "silsim/emulated_telemetry.h"
 #elif defined(HILSIM)
 #else
 #include "hardware/telemetry_backend.h"
@@ -13,6 +14,8 @@
 class Telemetry {
 public:
     Telemetry() = default;
+    explicit Telemetry(TelemetryBackend&& backend);
+
     ErrorCode __attribute__((warn_unused_result)) init();
 
     void transmit(RocketData& rocket_data);
