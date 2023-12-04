@@ -74,25 +74,6 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
 
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
     TelemetryPacket packet { };
-    packet.gps_lat = data.gps.getRecent().latitude;
-    packet.gps_long = data.gps.getRecent().longitude;
-    packet.gps_alt = data.gps.getRecent().altitude;
-    packet.yaw = data.orientation.getRecent().yaw;
-    packet.pitch = data.orientation.getRecent().pitch;
-    packet.roll = data.orientation.getRecent().roll;
-
-    packet.mag_x = inv_convert_range<int16_t>(data.magnetometer.getRecent().mx, 8);
-    packet.mag_y = inv_convert_range<int16_t>(data.magnetometer.getRecent().my, 8);
-    packet.mag_z = inv_convert_range<int16_t>(data.magnetometer.getRecent().mz, 8);
-    packet.gyro_x = inv_convert_range<int16_t>(data.orientation.getRecent().gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(data.orientation.getRecent().gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(data.orientation.getRecent().gz, 8192);
-
-    packet.response_ID = last_command_id;
-
-    packet.rssi = backend.getRecentRssi();
-    packet.voltage_battery = inv_convert_range<uint8_t>(data.voltage.getRecent().voltage , 16);
-    packet.barometer_temp = inv_convert_range<int16_t>(data.barometer.getRecent().temperature, 256);
 
     TelemetryDataLite small_packet { };
     packet.datapoint_count = 0;
@@ -100,6 +81,40 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
         packet.datapoints[i] = small_packet;
         packet.datapoint_count = i + 1;
     }
+
+    GPS gps = data.gps.getRecent();
+    Orientation orientation = data.orientation.getRecent();
+    Magnetometer magnetometer = data.magnetometer.getRecent();
+    Voltage voltage = data.voltage.getRecent();
+    Barometer barometer = data.barometer.getRecent();
+    Continuity continuity = data.continuity.getRecent();
+
+    packet.gps_lat = gps.latitude;
+    packet.gps_long = gps.longitude;
+    packet.gps_alt = gps.altitude;
+    packet.yaw = orientation.yaw;
+    packet.pitch = orientation.pitch;
+    packet.roll = orientation.roll;
+
+    packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
+    packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
+    packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
+    packet.gyro_x = inv_convert_range<int16_t>(orientation.gx, 8192);
+    packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
+    packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
+
+    packet.response_ID = last_command_id;
+
+    packet.rssi = backend.getRecentRssi();
+    packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
+    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
+
+    for (int i = 0; i < 4; i++) {
+        packet.continuity[i] = continuity.pins[i];
+    }
+
+    memcpy(&packet.callsign, &callsign, sizeof(callsign));
+
     return packet;
 }
 
