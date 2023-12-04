@@ -12,6 +12,7 @@ enum ErrorCode {
     MagnetometerCoultNotBeInitialized,
     GyroCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
-    ContinuityCouldNotBeInitialized
+    ContinuityCouldNotBeInitialized,
+    CannotConnectBNO,
+    CannotInitBNO
 };
-
