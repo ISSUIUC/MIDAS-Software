@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 
 #define CONTINUITY_PIN_COUNT 4
 /**

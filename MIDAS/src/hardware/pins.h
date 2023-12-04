@@ -39,3 +39,6 @@
 #define RFM96_CS 10 //change this
 #define RFM96_RST 9 //change this
 #define RFM96_INT 2 //change this
+
+// LEDs
+#define LED_BLUE 0

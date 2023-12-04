@@ -1,130 +1,34 @@
 #pragma once
 
-
-
-#include <array>
-
-#include "Queue.h"
+#include "telemetry_packet.h"
 #include "rocket_state.h"
-//#include "packet.h"
-#include "hardware/pins.h"
-#include "sensor_data.h"
-#include "sensors.h"
-#include "errors.h"
-#include <RH_RF95.h>
 
-
-// Make sure to change these pinout depending on wiring
-// Don't forget to change the ini file to build the correct main file
-
-// Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 434.0
-
-class Telemetry;
-//extern Telemetry tlm;
-
-struct TelemetryDataLite {
-    u_int32_t timestamp;  //[0, 2^32]
-
-    uint16_t barometer_pressure;  //[0, 4096]
-    int16_t highG_ax;             //[128, -128]
-    int16_t highG_ay;             //[128, -128]
-    int16_t highG_az;             //[128, -128]
-    int16_t bno_roll;             //[-4,4]
-    int16_t bno_pitch;            //[-4,4]
-    int16_t bno_yaw;              //[-4,4]
-
-    float flap_extension;  //[0, 256]
-};
-
-struct TelemetryPacket {
-    TelemetryDataLite datapoints[4];
-    float gps_lat;
-    float gps_long;
-    float gps_alt;
-    float yaw;
-    float pitch;
-    float roll;
-    float gnc_state_x;
-    float gnc_state_vx;
-    float gnc_state_ax;
-    float gnc_state_y;
-    float gnc_state_vy;
-    float gnc_state_ay;
-    float gnc_state_z;
-    float gnc_state_vz;
-    float gnc_state_az;
-    float gns_state_apo;
-    int16_t mag_x;            //[-4, 4]
-    int16_t mag_y;            //[-4, 4]
-    int16_t mag_z;            //[-4, 4]
-    int16_t gyro_x;           //[-4096, 4096]
-    int16_t gyro_y;           //[-4096, 4096]
-    int16_t gyro_z;           //[-4096, 4096]
-    int16_t response_ID;      //[0, 2^16]
-    int8_t rssi;              //[-128, 128]
-    int8_t datapoint_count;   //[0,4]
-    uint8_t voltage_battery;  //[0, 16]
-    uint8_t FSM_State;        //[0,256]
-    int16_t barometer_temp;   //[-128, 128]
-    bool continuity_a;
-    bool pyro_a;
-    bool continuity_b;
-    bool pyro_b;
-    bool continuity_c;
-    bool pyro_c;
-    bool continuity_d;
-    bool pyro_d;
-};
-
-// Commands transmitted from ground station to rocket
-enum CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAPS, EMPTY };
-
-struct telemetry_command {
-    CommandType command;
-    int cmd_id;
-    union {
-        char callsign[8];
-        float freq;
-        bool do_abort;
-    };
-    std::array<char, 6> verify;
-};
-
-struct command_handler_struct {
-    bool should_change{};
-    float new_freq{};
-};
+#if defined(SILSIM)
+#include "silsim/telemetry.h"
+#elif defined(HILSIM)
+#else
+#include "hardware/telemetry_backend.h"
+#endif
 
 class Telemetry {
-   public:
-    bool abort = false;
-
-    Telemetry();
-
+public:
+    Telemetry() = default;
     ErrorCode __attribute__((warn_unused_result)) init();
 
-    void transmit(RocketData &Sensorstate);
+    void transmit(RocketData& rocket_data);
+    void bufferData(RocketData& rocket_data);
 
-    void handleCommand(const telemetry_command& cmd);
-
-    void bufferData(RocketData &Sensorstate);
-
-    void serialPrint(RocketData &sensor_data);
-   private:
-#ifndef ENABLE_SILSIM_MODE
-    RH_RF95 rf95;
-#endif
-    Queue<TelemetryDataLite, 4> command_queue;
+private:
+    Queue<TelemetryDataLite, 4> small_packet_queue;
 
     // Initializing command ID
     int16_t last_command_id = -1;
 
-    // Initializing callsign
+    float set_frequency_to = NAN;
     char callsign[8] = "NO SIGN";
-    command_handler_struct freq_status = {};
 
-    TelemetryPacket 
-    makePacket(RocketData& Sensorstate);
+    TelemetryPacket makePacket(RocketData& data);
+    void handleCommand(const telemetry_command& cmd);
 
+    TelemetryBackend backend;
 };
