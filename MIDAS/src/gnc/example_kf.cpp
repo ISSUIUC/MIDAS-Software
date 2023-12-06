@@ -10,7 +10,6 @@ void ExampleKalmanFilter::priori() {
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
-// TODO: Finish this Methid
 void ExampleKalmanFilter::update() {}
 
 void ExampleKalmanFilter::setQ(float dt, float sd) {}
