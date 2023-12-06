@@ -175,6 +175,9 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         };
         float dt = (xTaskGetTickCount() - last);
         displacement_kf.kfTick(dt, 13.0, current_barom_buf, current_accelerations);
+        KalmanData current_state = displacement_kf.getState();
+
+        arg->rocket_data.kalman.update(current_state);
 
         last = xTaskGetTickCount();
 

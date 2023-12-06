@@ -51,6 +51,8 @@ public:
 
     SensorData<FSMState> fsm_state;
 
+    SensorData<KalmanData> kalman;
+
     SensorData<LowGData> low_g;
     SensorData<HighGData> high_g;
     SensorData<LowGLSM> low_g_lsm;
