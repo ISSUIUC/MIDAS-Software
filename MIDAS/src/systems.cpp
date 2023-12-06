@@ -165,6 +165,18 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
+
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
+    while (true) {
+        arg->tlm.bufferData(arg->rocket_data);
+        THREAD_SLEEP(5);
+    }
+}
+
+
 /**
  * See \ref data_logger_thread
  */
@@ -218,6 +230,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
     START_THREAD(telemetry, DATA_CORE, config);
+    START_THREAD(telemetry_buffering, DATA_CORE, config);
 
     while (true) {
         THREAD_SLEEP(1000);
