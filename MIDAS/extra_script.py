@@ -8,7 +8,7 @@ assert sys.version_info >= (3, 5)
 Import("env")
 
 log_format_text = (Path("src") / "log_format.h").read_text()
-sensor_data_text = (Path("src") / "sensor_data.h").read_text()
+sensor_data_text = (Path("src") / "sensor_data.h").read_text(errors="replace")
 
 git_command = ["git", "log", "-n", "1", "--pretty=format:%H"]
 git_hash = subprocess.run(git_command, stdout=subprocess.PIPE).stdout.decode('utf-8')

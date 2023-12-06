@@ -46,8 +46,6 @@ public:
  */
 struct RocketData {
 public:
-    bool pyro_should_be_firing = false;
-
     SensorData<LowGData> low_g;
     SensorData<HighGData> high_g;
     SensorData<LowGLSM> low_g_lsm;
@@ -57,5 +55,7 @@ public:
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
+    SensorData<Pyro> pyro;
+    SensorData<FSMState> fsm_state;
 };
 

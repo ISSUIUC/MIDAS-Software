@@ -138,6 +138,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState next_state = tick_fsm(current_state);
+        arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
 }
@@ -165,6 +168,21 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
+/**
+ * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
+*/
+DECLARE_THREAD(pyro, RocketSystems* arg) {
+
+    while (true) {        
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        Pyro new_pyro = arg->sensors.pyro.tick_upper(current_state);
+        arg->rocket_data.pyro.update(new_pyro);
+        THREAD_SLEEP(16);
+        //Serial.println("PYRO");
+    }
+    vTaskDelete(NULL);
+}
+
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
 bool init_systems(RocketSystems& systems) {
     // todo message on failure
@@ -179,7 +197,7 @@ bool init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
-
+    INIT_SYSTEM(systems.sensors.pyro);
     return true;
 }
 #undef INIT_SYSTEM
@@ -194,6 +212,7 @@ void begin_systems(RocketSystems* config) {
         // todo some message probably
         return;
     }
+
     START_THREAD(data_logger, DATA_CORE, config);
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
@@ -207,6 +226,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(fsm, SENSOR_CORE, config);
     START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(pyro, SENSOR_CORE, &config);
 
     while (true) {
         THREAD_SLEEP(1000);
