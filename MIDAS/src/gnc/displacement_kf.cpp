@@ -131,3 +131,5 @@ void DisplacementKalmanFilter::kfTick(float dt, float sd, Barometer& barometerDa
 
     this->update();
 }
+
+DisplacementKalmanFilter displacement_kf;
