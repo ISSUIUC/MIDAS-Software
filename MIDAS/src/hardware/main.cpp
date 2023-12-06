@@ -20,7 +20,7 @@ void setup() {
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL);
 
-    begin_systems(systems);
+    begin_systems(&systems);
 }
 
 void loop() {

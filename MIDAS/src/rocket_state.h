@@ -10,68 +10,53 @@
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
 
+template<typename SensorData>
+struct Reading {
+    uint32_t timestamp_ms;
+    SensorData data;
+};
+
 template<typename S>
-struct SensorState {
+struct SensorData {
 private:
     Mutex<S> current;
-    Queue<S> queue;
+    Queue<Reading<S>> queue;
 
 public:
     void update(S data) {
         current.write(data);
-        queue.send(data);
+        queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
     };
 
     S getRecent() {
         return current.read();
     };
 
-    bool getQueued(S* out) {
+    bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };
 
-    SensorState() : current(S()) { }
+    SensorData() : current(S()) { }
 };
 
-template<typename S, size_t count>
-struct BufferedSensorState {
-private:
-    Mutex<S> current;
-    Queue<S> queue;
-    Buffer<S, count> buffer;
-
+/**
+ * The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
+ *
+ *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  makes it easier to debug since all this data can be logged (and thus used when debugging).
+ */
+struct RocketData {
 public:
-    void update(S data) {
-        current.write(data);
-        queue.send(data);
-        buffer.push(data);
-    };
+    bool pyro_should_be_firing = false;
 
-    S getRecent() {
-        return current.read();
-    };
-
-    bool getQueued(S* out) {
-        return queue.receive(out);
-    };
-
-    BufferedSensorState() : current(S()) { }
-};
-
-
-struct RocketState {
-public:
-    bool pyro_should_be_firing;
-
-    SensorState<LowGData> low_g;
-    BufferedSensorState<HighGData, 8> high_g;
-    SensorState<GyroscopeData> gyroscope;
-    BufferedSensorState<Barometer, 8> barometer;
-    SensorState<Continuity> continuity;
-    SensorState<Voltage> voltage;
-    SensorState<GPS> gps;
-    SensorState<Magnetometer> magnetometer;
-    SensorState<Orientation> orientation;
-    SensorState<FSMState> fsm_state;
+    SensorData<LowGData> low_g;
+    SensorData<HighGData> high_g;
+    SensorData<LowGLSM> low_g_lsm;
+    SensorData<Barometer> barometer;
+    SensorData<Continuity> continuity;
+    SensorData<Voltage> voltage;
+    SensorData<GPS> gps;
+    SensorData<Magnetometer> magnetometer;
+    SensorData<Orientation> orientation;
 };
 

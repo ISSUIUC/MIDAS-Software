@@ -27,5 +27,10 @@
 // voltage adc pin
 #define VOLTAGE_PIN 0
 
+// gps pins
+#define GPS_RESET 0
+#define GPS_ENABLE 0
+
+// i2c bus pins
 #define I2C_SDA 0
 #define I2C_SCL 0

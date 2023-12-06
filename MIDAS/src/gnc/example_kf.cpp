@@ -1,4 +1,4 @@
-git #include "example_kf.h"
+#include "example_kf.h"
 
 ExampleKalmanFilter::ExampleKalmanFilter() : KalmanFilter() {}
 
@@ -11,13 +11,7 @@ void ExampleKalmanFilter::priori() {
 }
 
 // TODO: Finish this Methid
-void ExampleKalmanFilter::update() {
-    if (_curr_state == FSM_state::STATE_LAUNCH_DETECT) {
-        float sum = 0;
-        for (int i = 0; i < 8; i++) {
-            sum+=_curr_baro_buf.pressure;
-        }
-        setState((KalmanData){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0});
+void ExampleKalmanFilter::update() {}
 
 void ExampleKalmanFilter::setQ(float dt, float sd) {}
 

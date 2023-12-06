@@ -19,7 +19,7 @@ public:
     KalmanData getState() override;
     void setState(KalmanData state) override;
 
-    void kfTick(float dt, Barometer& barometerData, Acceleration& imuData);
+    void kfTick(float dt, float sd, Barometer& barometerData, Acceleration& imuData);
 
 private:
     // im just assuming 20hz rn
