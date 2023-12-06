@@ -100,12 +100,15 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
+
+        //getting all the current data
         FSMState current_state = arg->rocket_state.fsm_state.getRecent();
         std::array<HighGData, 8> buff_hg = arg->rocket_state.high_g.getBufferRecent();
         std::array<Barometer, 8> buff_bar = arg->rocket_state.barometer.getBufferRecent();
 
         FSMState next_state;
 
+        // based on what stage the rocket run the appropriate tick_fsm
         if(arg->rocket_state.stage) { 
             next_state = arg->rocket_state.fsm.tick_fsm_sustainer(current_state, buff_hg, buff_bar);
         }  
@@ -113,6 +116,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             next_state = arg->rocket_state.fsm.tick_fsm_booster(current_state, buff_hg, buff_bar);
         }
         
+        //update the state
         arg->rocket_state.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }

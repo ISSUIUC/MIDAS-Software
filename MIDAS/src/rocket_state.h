@@ -52,6 +52,7 @@ public:
         return current.read();
     };
 
+    // wrapper function to get easy access to buffer data
     std::array<S, count> getBufferRecent() {
         std::array<S, count> arr = buffer. template read_recent<count>(); 
         return arr;
