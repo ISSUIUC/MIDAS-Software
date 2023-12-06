@@ -13,6 +13,7 @@ enum ErrorCode {
     GyroCouldNotBeInitialized,
     PyroGPIOCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
-    ContinuityCouldNotBeInitialized
+    ContinuityCouldNotBeInitialized,
+    CannotConnectBNO,
+    CannotInitBNO
 };
-
