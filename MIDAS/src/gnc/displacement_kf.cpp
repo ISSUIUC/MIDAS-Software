@@ -2,6 +2,8 @@
 
 #include <Eigen/Eigen>
 
+DisplacementKalmanFilter displacement_kf;
+
 DisplacementKalmanFilter::DisplacementKalmanFilter() : KalmanFilter()
 {
     this->initialize();
@@ -131,5 +133,3 @@ void DisplacementKalmanFilter::kfTick(float dt, float sd, Barometer& barometerDa
 
     this->update();
 }
-
-DisplacementKalmanFilter displacement_kf;
