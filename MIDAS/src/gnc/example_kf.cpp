@@ -1,119 +1,22 @@
-git #include "example_kf.h"
+#include "example_kf.h"
 
 ExampleKalmanFilter::ExampleKalmanFilter() : KalmanFilter() {}
 
-void ExampleKalmanFilter::initialize() {
-    float sum = 0;
-    /* mutex lock stuff*/ 
+void ExampleKalmanFilter::initialize() {}
 
-    euler_t euler = orientation.getEuler(); /* do after rebase*/
-    euler.yaw = -euler.yaw;
-    world_accel = bodyToGlobal(euler, init_accel);
+void ExampleKalmanFilter::priori() {}
 
-    x_k(0,0) = sum / 30;
-    x_k(3,0) = 0;
-    x_k(6,0) = 0;
+void ExampleKalmanFilter::update() {}
 
+void ExampleKalmanFilter::setQ(float dt, float sd) {}
+
+void ExampleKalmanFilter::setF(float dt) {}
+
+KalmanData ExampleKalmanFilter::getState() { return KalmanData(); }
+
+void ExampleKalmanFilter::setState(KalmanData state)
+{
+    this->state = state;
 }
-
-Eigen::Matrix<float, 3, 1> bodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
-    Eigen::Matrix3f roll, pitch, yaw;
-
-    roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
-    pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
-    yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
-    return yaw * pitch * body_vect;
-}
-
-
-void ExampleKalmanFilter::priori() {
-    x_priori = (F_mat * x_k);
-    P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
-}
-
-// TODO: Finish this Methid
-void ExampleKalmanFilter::update() {
-    if (_curr_state == FSM_state::STATE_LAUNCH_DETECT) {
-        float sum = 0;
-        for (int i = 0; i < 8; i++) {
-            sum+=_curr_baro_buf.pressure;
-        }
-        setState((KalmanData){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0});
-
-    } else if (_curr_state >= FSM_state::STATE_APOGEE) {
-        H(1, 2) = 0;
-    }
-
-
-}
-
-void ExampleKalmanFilter::setQ(float dt, float sd) {
-    Q(0, 0) = pow(dt, 5) / 20;
-    Q(0, 1) = pow(dt, 4) / 8;
-    Q(0, 2) = pow(dt, 3) / 6;
-    Q(1, 1) = pow(dt, 3) / 8;
-    Q(1, 2) = pow(dt, 2) / 2;
-    Q(2, 2) = dt;
-    Q(1, 0) = Q(0, 1);
-    Q(2, 0) = Q(0, 2);
-    Q(2, 1) = Q(1, 2);
-
-    Q(3, 3) = pow(dt, 5) / 20;
-    Q(3, 4) = pow(dt, 4) / 8;
-    Q(3, 5) = pow(dt, 3) / 6;
-    Q(4, 4) = pow(dt, 3) / 8;
-    Q(4, 5) = pow(dt, 2) / 2;
-    Q(5, 5) = dt;
-    Q(4, 3) = Q(3, 4);
-    Q(5, 3) = Q(3, 5);
-    Q(5, 4) = Q(4, 5);
-
-    Q(6, 6) = pow(dt, 5) / 20;
-    Q(6, 7) = pow(dt, 4) / 8;
-    Q(6, 8) = pow(dt, 3) / 6;
-    Q(7, 7) = pow(dt, 3) / 8;
-    Q(7, 8) = pow(dt, 2) / 2;
-    Q(8, 8) = dt;
-    Q(7, 6) = Q(6, 7);
-    Q(8, 6) = Q(6, 8);
-    Q(8, 7) = Q(7, 8);
-
-    Q *= sd;
-}
-
-void ExampleKalmanFilter::setF(float dt) {
-        for (int i = 0; i < 3; i++) {
-        F_mat(3 * i, 3 * i + 1) = dt;
-        F_mat(3 * i, 3 * i + 2) = (dt * dt) / 2;
-        F_mat(3 * i + 1, 3 * i + 2) = dt;
-
-        F_mat(3 * i, 3 * i) = 1;
-        F_mat(3 * i + 1, 3 * i + 1) = 1;
-        F_mat(3 * i + 2, 3 * i + 2) = 1;
-    }
-}
-
-KalmanData ExampleKalmanFilter::getState() { return state; }
-
-void ExampleKalmanFilter::setState(KalmanData state) { this->state = state; }
-
-void ExampleKalmanFilter::updatePrivVars(FSM_state& curr_state, Barometer& curr_baro_buf, HighGData& curr_accel, Orientation& curr_orientation, float& dt) {
-    _curr_state = curr_state;
-    _curr_baro_buf = curr_baro_buf;
-    _curr_accel = curr_accel;
-    _curr_orientation = curr_orientation;
-    _dt = dt;
-}
-
-void ExampleKalmanFilter::kfTickFunction(FSM_state& curr_state, Barometer& curr_baro_buf, HighGData& curr_accel, Orientation& curr_orientation, float dt) {
-    if (curr_state >= FSM_state::STATE_IDLE) {
-        updatePrivVars(curr_state, curr_baro_buf, curr_accel, curr_orientation, dt);
-        setF(dt / 1000.0);
-        setQ(dt / 1000.0, spectral_density);
-        priori();
-        update();
-    }
-}
-
 
 ExampleKalmanFilter example_kf;
