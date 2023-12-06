@@ -42,7 +42,7 @@ public:
         static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to receive is too large");
         uint8_t len = sizeof(T);
         if (rf95.available() && rf95.recv((uint8_t*) write, &len)) {
-            return true;
+            return len == sizeof(T);
         } else {
             return false;
         }
