@@ -132,4 +132,7 @@ void DisplacementKalmanFilter::kfTick(float dt, float sd, Barometer& barometerDa
     this->y_k(3, 0) = imuData.az;
 
     this->update();
+
+    // data needs to get normalized after filtering
+    // don't subtract normal acceleration from gravity before filtering
 }
