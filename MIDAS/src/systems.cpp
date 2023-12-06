@@ -161,13 +161,11 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    example_kf.initialize();
+    displacement_kf.initialize();
     TickType_t last = xTaskGetTickCount();
 
     while (true) { 
         // add the tick update function 
-        // FSMState current_state = arg->rocket_state.fsm_state.getRecent();
-        // Barometer current_barometer_buf = arg->rocket_state.barometer.getRecent();
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
         LowGData current_accelerometer = arg->rocket_data.low_g.getRecent();
         Acceleration current_accelerations = {
@@ -175,13 +173,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .ay = current_accelerometer.ay,
             .az = current_accelerometer.az
         };
-        // HighGData current_accelerometer = arg->rocket_state.high_g.getRecent();
-        // Orientation current_orientation = arg->rocket_state.orientation.getRecent();
-        // example_kf.kfTickFunction(current_state.curr_state, current_barometer_buf, current_accelerometer, current_orientation ,xTaskGetTickCount() - last);
         float dt = (xTaskGetTickCount() - last);
         displacement_kf.kfTick(dt, 13.0, current_barom_buf, current_accelerations);
 
-        last = xTaskGetTickCount(); // THREAD_SLEEP(16);
+        last = xTaskGetTickCount();
 
         //Serial.println("KALMAN");
         
