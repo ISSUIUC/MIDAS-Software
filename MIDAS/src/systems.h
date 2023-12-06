@@ -4,6 +4,7 @@
 #include "sensors.h"
 #include "rocket_state.h"
 #include "data_logging.h"
+#include "telemetry.h"
 
 
 struct RocketSystems {
@@ -11,6 +12,7 @@ struct RocketSystems {
     RocketData rocket_data;
     LogSink log_sink;
     BuzzerController buzzer;
+    Telemetry tlm;
 };
 
 void begin_systems(RocketSystems* config);

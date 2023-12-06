@@ -8,11 +8,14 @@ enum ErrorCode {
     LowGRangeCouldNotBeSet,
     LowGODRLPFCouldNotBeSet,
     HighGCouldNotBeInitialized,
-    HighGCoulNotUpdateDataRate,
-    MagnetometerCoultNotBeInitialized,
+    HighGCouldNotUpdateDataRate,
+    MagnetometerCouldNotBeInitialized,
     GyroCouldNotBeInitialized,
+    GasCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized,
+    RadioInitFailed,
+    RadioSetFrequencyFailed,
     CannotConnectBNO,
     CannotInitBNO
 };
