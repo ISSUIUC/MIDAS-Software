@@ -2,6 +2,7 @@
 #include "sensor_data.h"
 #include "hal.h"
 #include "Buffer.h"
+#include "finite-state-machines/fsm.h"
 #include <array>
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
@@ -51,8 +52,9 @@ public:
         return current.read();
     };
 
-    std::array<S, count> getBufferRecent() { 
-        return buffer.read_recent();
+    std::array<S, count> getBufferRecent() {
+        std::array<S, count> arr = buffer. template read_recent<count>(); 
+        return arr;
     };
     
     bool getQueued(S* out) {
@@ -66,7 +68,7 @@ public:
 struct RocketState {
 public:
     bool pyro_should_be_firing;
-
+    bool stage; // true = sustainer | false = booster
     SensorState<LowGData> low_g;
     BufferedSensorState<HighGData, 8> high_g;
     SensorState<GyroscopeData> gyroscope;
@@ -77,5 +79,6 @@ public:
     SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
     SensorState<FSMState> fsm_state;
+    FSM fsm;
 };
 

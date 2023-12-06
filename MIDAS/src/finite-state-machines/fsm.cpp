@@ -5,7 +5,7 @@
 
 // code for helper functions
 
-float getAcceleration(std::array<HighGData, 8> hg)
+float FSM::getAcceleration(std::array<HighGData, 8> hg)
 { 
     float avg = 0;
 
@@ -17,7 +17,7 @@ float getAcceleration(std::array<HighGData, 8> hg)
     return avg;
 }
 
-float getAltitude(std::array<Barometer, 8> bar)
+float FSM::getAltitude(std::array<Barometer, 8> bar)
 {
     float avg = 0;
 
@@ -29,7 +29,7 @@ float getAltitude(std::array<Barometer, 8> bar)
     return avg;
 }
 
-double getJerk(std::array<HighGData, 8> hg)
+double FSM::getJerk(std::array<HighGData, 8> hg)
 {
 
     double avg1 = 0;
@@ -49,7 +49,7 @@ double getJerk(std::array<HighGData, 8> hg)
     return (avg2 - avg1) / (sec);
 }
 
-double getVerticalSpeed(std::array<Barometer, 8> bar)
+double FSM::getVerticalSpeed(std::array<Barometer, 8> bar)
 {
     double avg1 = 0;
     for (size_t i = 0; i < bar.size() / 2; i++)
@@ -71,7 +71,7 @@ double getVerticalSpeed(std::array<Barometer, 8> bar)
 
 // code for the fsm update function
 
-FSMState tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
+FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
     //pass current state
     double current_time = tick_to_ms(xTaskGetTickCount());
     
@@ -185,8 +185,6 @@ FSMState tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, std::ar
                 break;
             }
 
-            // Move to MAIN if enough time passed since MAIN_DEPLOY
-            // Use 'current_time - main_time' right?
             if(current_time - main_time > main_to_main_deploy_timer_threshold) {
                 state.curr_state = STATE_MAIN;
             }
@@ -211,9 +209,10 @@ FSMState tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, std::ar
             return state;
     
     }
+    return state;
 }
 
-FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
+FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
     //pass current state
     double current_time = tick_to_ms(xTaskGetTickCount());
     
@@ -245,15 +244,13 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
                 break;
             }
 
-            // Move to next state after a set time?
-            // should be 'current_time - burnout_time'
             if(current_time - burnout_time > first_boost_to_burnout_time_threshold) { 
                 sustainer_ignition_time = current_time;
                 state.curr_state = STATE_SUSTAINER_IGNITION;
             }
             break;
 
-        case STATE_FIRST_SEPERATION: //incomplete
+        case STATE_FIRST_SEPERATION: 
             if (getJerk(hg) < 0) {
                 state.curr_state = STATE_COAST;
                 break;
@@ -261,7 +258,7 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
 
             first_seperation_time = current_time;
 
-            if(current_time - first_seperation_time > first_seperation_time_threshold) { // move on regardless if it separates or not
+            if(current_time - first_seperation_time > first_seperation_time_threshold) { 
 	            state.curr_state = STATE_COAST;
             }
 
@@ -315,8 +312,6 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
                 break;
             }
 
-            // Move to MAIN if enough time passed since MAIN_DEPLOY
-            // Use 'current_time - main_time' right?
             if(current_time - main_time > main_to_main_deploy_timer_threshold) {
                 state.curr_state = STATE_MAIN;
             }
@@ -340,7 +335,9 @@ FSMState tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::arra
         
         default:
             return state;
+
     
     }
+    return state;
 }
 
