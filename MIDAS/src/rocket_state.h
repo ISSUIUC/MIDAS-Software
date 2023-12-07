@@ -49,8 +49,6 @@ struct RocketData {
 public:
     bool pyro_should_be_firing = false;
 
-    SensorData<FSMState> fsm_state;
-
     SensorData<KalmanData> kalman;
 
     SensorData<LowGData> low_g;

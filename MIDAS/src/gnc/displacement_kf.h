@@ -23,7 +23,7 @@ public:
 
 private:
     // im just assuming 20hz rn
-    float s_dt_ = 0.05f;
+    float s_dt_ = 0.016f;
     float spectral_density_ = 13.0f;
 
 };
