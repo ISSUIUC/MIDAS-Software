@@ -173,7 +173,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .ay = current_accelerometer.ay,
             .az = current_accelerometer.az
         };
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last);
+        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         displacement_kf.kfTick(dt, 13.0, current_barom_buf, current_accelerations);
         KalmanData current_state = displacement_kf.getState();
 
