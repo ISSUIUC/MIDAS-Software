@@ -6,6 +6,7 @@
 #include "buzzer.h"
 
 #include "gnc/example_kf.h"
+#include "gnc/displacement_kf.h"
 
 /**
  * These are all the functions that will run in each task
@@ -157,10 +158,28 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    example_kf.initialize();
-    while (true) {
-        example_kf.priori();
-        example_kf.update();
+    displacement_kf.initialize();
+    TickType_t last = xTaskGetTickCount();
+
+    while (true) { 
+        // add the tick update function 
+        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
+        LowGData current_accelerometer = arg->rocket_data.low_g.getRecent();
+        Acceleration current_accelerations = {
+            .ax = current_accelerometer.ax,
+            .ay = current_accelerometer.ay,
+            .az = current_accelerometer.az
+        };
+        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
+        displacement_kf.kfTick(dt, 13.0, current_barom_buf, current_accelerations);
+        KalmanData current_state = displacement_kf.getState();
+
+        arg->rocket_data.kalman.update(current_state);
+
+        last = xTaskGetTickCount();
+
+        //Serial.println("KALMAN");
+        
         THREAD_SLEEP(16);
     }
 }

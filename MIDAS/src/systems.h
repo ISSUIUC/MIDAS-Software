@@ -5,7 +5,6 @@
 #include "rocket_state.h"
 #include "data_logging.h"
 
-
 struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
