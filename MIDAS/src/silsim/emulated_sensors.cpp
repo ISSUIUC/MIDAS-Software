@@ -77,3 +77,11 @@ ErrorCode MagnetometerSensor::init() {
 Magnetometer MagnetometerSensor::read() {
     return { .mx = 0, .my = 0, .mz = 0 };
 }
+
+ErrorCode GPSSensor::init() {
+    return ErrorCode::NoError;
+}
+
+GPS GPSSensor::read() {
+    return { };
+}

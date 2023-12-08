@@ -3,6 +3,7 @@
 #include "finite-state-machines/fsm_states.h"
 
 #include <cmath>
+#include <cstdint>
 
 #define CONTINUITY_PIN_COUNT 4
 /**
@@ -122,7 +123,9 @@ struct Orientation {
 
     Magnetometer magnetometer;
 
-    float temperature;
+    float temperature = 0;
+    float pressure = 0; 
+
 };
 
 struct KalmanData {
