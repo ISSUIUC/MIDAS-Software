@@ -26,13 +26,14 @@ ErrorCode PyroThread::init() {
 */
 Pyro PyroThread::tick_upper(FSMState fsm_state) {
     Pyro new_pyro = Pyro();
-    // do some gnarly things
 
+    // If the state is IDLE or any state after that, we arm the global arm pin
     if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
         new_pyro.global_armed = true;
         gpio_expander.write(PYRO_GLOBAL_ARM_PIN, HIGH);
     }
 
+    // Fire "Pyro A" to ignite sustainer
     if(fsm_state.curr_state == FSM_state::STATE_SUSTAINER_IGNITION) {
         new_pyro.channels[0].armed = true;
         new_pyro.channels[0].firing = true;
@@ -40,6 +41,7 @@ Pyro PyroThread::tick_upper(FSMState fsm_state) {
         gpio_expander.write(PYROA_FIRE_PIN, HIGH);
     }
 
+    // Fire "Pyro B" to deploy upper stage drogue
     if(fsm_state.curr_state == FSM_state::STATE_DROGUE_DEPLOY) {
         new_pyro.channels[1].armed = true;
         new_pyro.channels[1].firing = true;
@@ -47,6 +49,7 @@ Pyro PyroThread::tick_upper(FSMState fsm_state) {
         gpio_expander.write(PYROB_FIRE_PIN, HIGH);
     }
 
+    // Fire "Pyro C" to deploy upper stage main
     if(fsm_state.curr_state == FSM_state::STATE_MAIN_DEPLOY) {
         new_pyro.channels[2].armed = true;
         new_pyro.channels[2].firing = true;
@@ -64,20 +67,22 @@ Pyro PyroThread::tick_upper(FSMState fsm_state) {
 */
 Pyro PyroThread::tick_lower(FSMState fsm_state) {
     Pyro new_pyro = Pyro();
-    // do some gnarly things
 
+    // If the state is IDLE or any state after that, we arm the global arm pin
     if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
         new_pyro.global_armed = true;
         gpio_expander.write(PYRO_GLOBAL_ARM_PIN, HIGH);
     }
 
-     if(fsm_state.curr_state == FSM_state::STATE_FIRST_STAGE_SEPERATION) {
+    // Fire "Pyro D" when seperating stage 1
+    if(fsm_state.curr_state == FSM_state::STATE_FIRST_STAGE_SEPERATION) {
         new_pyro.channels[3].armed = true;
         new_pyro.channels[3].firing = true;
         gpio_expander.write(PYROD_ARM_PIN, HIGH);
         gpio_expander.write(PYROD_FIRE_PIN, HIGH);
     }
 
+    // Fire "Pyro A" to ignite sustainer
     if(fsm_state.curr_state == FSM_state::STATE_SUSTAINER_IGNITION) {
         new_pyro.channels[0].armed = true;
         new_pyro.channels[0].firing = true;
@@ -85,6 +90,7 @@ Pyro PyroThread::tick_lower(FSMState fsm_state) {
         gpio_expander.write(PYROA_FIRE_PIN, HIGH);
     }
 
+    // Fire "Pyro B" to deploy drogue
     if(fsm_state.curr_state == FSM_state::STATE_DROGUE_DEPLOY) {
         new_pyro.channels[1].armed = true;
         new_pyro.channels[1].firing = true;
@@ -92,6 +98,7 @@ Pyro PyroThread::tick_lower(FSMState fsm_state) {
         gpio_expander.write(PYROB_FIRE_PIN, HIGH);
     }
 
+    // Fire "Pyro C" to deploy Main
     if(fsm_state.curr_state == FSM_state::STATE_MAIN_DEPLOY) {
         new_pyro.channels[2].armed = true;
         new_pyro.channels[2].firing = true;
