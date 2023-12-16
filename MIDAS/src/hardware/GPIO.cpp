@@ -3,6 +3,7 @@
 #define WIRE Wire
 constexpr uint8_t GPIO0_ADDRESS = 0x74;
 constexpr uint8_t GPIO1_ADDRESS = 0x75;
+constexpr uint8_t GPIO2_ADDRESS = 0x77;
 
 constexpr uint8_t REG_INPUT0 = 0x0;
 constexpr uint8_t REG_INPUT1 = 0x1;
@@ -26,6 +27,8 @@ static PinAddress decode(GpioAddress pin){
         address = GPIO0_ADDRESS;
     } else if(pin.gpio_id == 1){
         address = GPIO1_ADDRESS;
+    } else if(pin.gpio_id == 2){
+        address = GPIO2_ADDRESS;
     } else {
         Serial.println("Err bad gpio index");
         return {.valid = false};
