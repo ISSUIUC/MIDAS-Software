@@ -19,7 +19,7 @@ struct PinAddress {
     uint8_t gpio_addres; //i2c address of expander
     uint8_t port_idx; //0 = bottom 8 bits, 1 = top 8 bits
     uint8_t pin_offset; //[0,7] bit in port, 8 * port_idx + pin_offset = pin idx;
-    bool valid; //whether the address is valid
+    bool is_valid; //whether the address is valid
 };
 
 static PinAddress decode(GpioAddress pin){
@@ -32,7 +32,7 @@ static PinAddress decode(GpioAddress pin){
         address = GPIO2_ADDRESS;
     } else {
         Serial.println("Err bad gpio index");
-        return {.valid = false};
+        return {.is_valid = false};
     }
     uint8_t pin_offset;
     uint8_t port_idx;
@@ -44,9 +44,9 @@ static PinAddress decode(GpioAddress pin){
         pin_offset = pin.pin_id - 8;
     } else {
         Serial.println("Err bad pin index");
-        return {.valid = false};
+        return {.is_valid = false};
     }
-    return {.gpio_addres = address, .port_idx=port_idx, .pin_offset=pin_offset, .valid=true};
+    return {.gpio_addres = address, .port_idx=port_idx, .pin_offset=pin_offset, .is_valid=true};
 }
 
 static uint8_t pin_state[2][2] = {{0xff,0xff},{0xff,0xff}};
@@ -54,7 +54,7 @@ static uint8_t pin_config[2][2] = {{0xff,0xff},{0xff,0xff}};
 
 void digitalWrite(GpioAddress pin, int mode){
     PinAddress addr = decode(pin);
-    if(!addr.valid) return;
+    if(!addr.is_valid) return;
 
     uint8_t current_state = pin_state[pin.gpio_id][addr.port_idx];
     if(mode == HIGH){
@@ -79,7 +79,7 @@ void digitalWrite(GpioAddress pin, int mode){
 
 int digitalRead(GpioAddress pin){
     PinAddress addr = decode(pin);
-    if(!addr.valid) return LOW;
+    if(!addr.is_valid) return LOW;
 
     WIRE.beginTransmission(addr.gpio_addres);
     WIRE.write(REG_INPUT0 + addr.port_idx);
@@ -99,7 +99,7 @@ int digitalRead(GpioAddress pin){
 
 void pinMode(GpioAddress pin, int mode){
     PinAddress addr = decode(pin);
-    if(!addr.valid) return;
+    if(!addr.is_valid) return;
 
     uint8_t current_state = pin_config[pin.gpio_id][addr.port_idx];
 
