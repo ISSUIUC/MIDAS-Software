@@ -1,15 +1,10 @@
 #pragma once
 
-#include <stdint.h>
-// Driver todo
-// https://www.ti.com/product/ADS7138-Q1
+#include<cstdint>
 
-struct ADS7138_1Q {
-    bool init() {
-        return true;
-    }
-    float read_pin(uint16_t pin) {
-        // Dummy code, read from pin
-        return 0.0;
-    }
+struct ADCAddress {
+    int pin_id;
 };
+
+uint16_t analogRead(ADCAddress pin);
+bool ADS7138Init();
