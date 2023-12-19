@@ -15,6 +15,9 @@ constexpr uint8_t POLARITY_INVERSION1 = 0x5;
 constexpr uint8_t REG_CONFIG0 = 0x6;
 constexpr uint8_t REG_CONFIG1 = 0x7;
 
+constexpr int LOW_BIT_COUNT = 8;
+constexpr int HIGH_BIT_COUNT = 16;
+
 struct PinAddress {
     uint8_t gpio_addres; //i2c address of expander
     uint8_t port_idx; //0 = bottom 8 bits, 1 = top 8 bits
@@ -36,12 +39,12 @@ static PinAddress decode(GpioAddress pin){
     }
     uint8_t pin_offset;
     uint8_t port_idx;
-    if(pin.pin_id >= 0 && pin.pin_id < 8){
+    if(pin.pin_id >= 0 && pin.pin_id < LOW_BIT_COUNT){
         port_idx = 0;
         pin_offset = pin.pin_id;
-    } else if(pin.pin_id >= 8 && pin.pin_id < 16){
+    } else if(pin.pin_id >= LOW_BIT_COUNT && pin.pin_id < HIGH_BIT_COUNT){
         port_idx = 1;
-        pin_offset = pin.pin_id - 8;
+        pin_offset = pin.pin_id - LOW_BIT_COUNT;
     } else {
         Serial.println("Err bad pin index");
         return {.is_valid = false};
@@ -49,8 +52,8 @@ static PinAddress decode(GpioAddress pin){
     return {.gpio_addres = address, .port_idx=port_idx, .pin_offset=pin_offset, .is_valid=true};
 }
 
-static uint8_t pin_state[2][2] = {{0xff,0xff},{0xff,0xff}};
-static uint8_t pin_config[2][2] = {{0xff,0xff},{0xff,0xff}};
+static uint8_t pin_state[3][2] = {{0xff,0xf},{0xff,0xff},{0xff,0xff}};
+static uint8_t pin_config[3][2] = {{0xff,0xf},{0xff,0xff},{0xff,0xff}};
 
 void digitalWrite(GpioAddress pin, int mode){
     PinAddress addr = decode(pin);
