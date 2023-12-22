@@ -175,7 +175,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 
     while (true) {        
         FSMState current_state = arg->rocket_data.fsm_state.getRecent();
-        Pyro new_pyro = arg->sensors.pyro.tick_upper(current_state);
+        Pyro new_pyro = arg->sensors.pyro.tick_upper(current_state, arg->rocket_data.orientation.getRecent());
         arg->rocket_data.pyro.update(new_pyro);
         THREAD_SLEEP(16);
         //Serial.println("PYRO");

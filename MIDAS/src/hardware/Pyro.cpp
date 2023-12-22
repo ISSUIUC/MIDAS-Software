@@ -3,6 +3,8 @@
 
 #include "TCAL9539-Q1.h"
 
+#define MAXIMUM_TILT_ANGLE 20
+
 GPIOTCAL9539 gpio_expander{};
 
 /**
@@ -24,7 +26,7 @@ ErrorCode PyroThread::init() {
  * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
  * Fires channels by setting their pin on the GPIO.
 */
-Pyro PyroThread::tick_upper(FSMState fsm_state) {
+Pyro PyroThread::tick_upper(FSMState fsm_state, Orientation orientation) {
     Pyro new_pyro = Pyro();
 
     // If the state is IDLE or any state after that, we arm the global arm pin
@@ -34,7 +36,8 @@ Pyro PyroThread::tick_upper(FSMState fsm_state) {
     }
 
     // Fire "Pyro A" to ignite sustainer
-    if(fsm_state.curr_state == FSM_state::STATE_SUSTAINER_IGNITION) {
+    // Additionally, check if orientation allows for firing
+    if(fsm_state.curr_state == FSM_state::STATE_SUSTAINER_IGNITION && std::abs(orientation.pitch) < MAXIMUM_TILT_ANGLE) {
         new_pyro.channels[0].armed = true;
         new_pyro.channels[0].firing = true;
         gpio_expander.write(PYROA_ARM_PIN, HIGH);
@@ -65,7 +68,7 @@ Pyro PyroThread::tick_upper(FSMState fsm_state) {
  * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
  * Fires channels by setting their pin on the GPIO.
 */
-Pyro PyroThread::tick_lower(FSMState fsm_state) {
+Pyro PyroThread::tick_lower(FSMState fsm_state, Orientation orientation) {
     Pyro new_pyro = Pyro();
 
     // If the state is IDLE or any state after that, we arm the global arm pin
