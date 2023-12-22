@@ -138,8 +138,8 @@ struct KalmanData {
 
 
 struct PyroChannel {
-    bool armed = false;
-    bool firing = false;
+    bool is_armed = false;
+    bool is_firing = false;
 };
 
 /** piro team defense forter 2
