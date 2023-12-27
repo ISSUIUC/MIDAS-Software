@@ -40,7 +40,7 @@ Pyro PyroThread::tick_upper(FSMState fsm_state, Orientation orientation) {
 
     // If the state is IDLE or any state after that, we arm the global arm pin
     if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
-        new_pyro.global_armed = true;
+        new_pyro.is_global_armed = true;
         gpio_expander.write(PYRO_GLOBAL_ARM_PIN, HIGH);
     }
 
@@ -82,7 +82,7 @@ Pyro PyroThread::tick_lower(FSMState fsm_state, Orientation orientation) {
 
     // If the state is IDLE or any state after that, we arm the global arm pin
     if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
-        new_pyro.global_armed = true;
+        new_pyro.is_global_armed = true;
         gpio_expander.write(PYRO_GLOBAL_ARM_PIN, HIGH);
     }
 

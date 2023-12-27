@@ -160,7 +160,7 @@ struct PyroChannel {
 ⣿⣿⠁⠁⠄⢀⠆⣞⢿⣷⢱⠄⡜⡮⡳⡹⡸⡪⣱⡪⡪⠄
 */
 struct Pyro {
-    bool global_armed = false;
+    bool is_global_armed = false;
     PyroChannel channels[4];
 };
 

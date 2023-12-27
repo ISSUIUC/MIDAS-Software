@@ -9,7 +9,3 @@ void GPIOTCAL9539::write(unsigned int pin, bool state) {
     // :)
     return;
 }
-
-GPIOTCAL9539::GPIOTCAL9539() {
-    // :)
-}
