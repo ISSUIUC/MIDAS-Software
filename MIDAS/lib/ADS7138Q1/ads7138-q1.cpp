@@ -14,47 +14,58 @@
 #define ADC_SYSTEM_STATUS 0x00
 #define ADC_MANUAL_CH_SEL 0x11
 
-static int adc_reg_read(uint8_t address, uint8_t reg_address) {
+struct AdcRegReadResult {
+  int value;
+  AdcError error;
+};
+
+static AdcRegReadResult adc_reg_read(uint8_t address, uint8_t reg_address) {
   WIRE.beginTransmission(address);
   WIRE.write(ADC_REG_READ);
   WIRE.write(reg_address);
   if(!WIRE.endTransmission(true)){
-    Serial.println("err1");
+    return AdcRegReadResult{.value=0, .error=AdcError::I2CError};
   }
   uint8_t ct = WIRE.requestFrom(address, 1, 1);
   if(ct != 1){
-    Serial.println("err2");
+    return AdcRegReadResult{.value=0, .error=AdcError::I2CError};
   }
-  return WIRE.read();
+  int value = WIRE.read();
+  return AdcRegReadResult{.value=value, .error=AdcError::NoError};
 }
 
-static void adc_reg_write(uint8_t address, uint8_t reg_address, uint8_t data) {
+static AdcError adc_reg_write(uint8_t address, uint8_t reg_address, uint8_t data) {
   WIRE.beginTransmission(address);
   WIRE.write(ADC_REG_WRITE);
   WIRE.write(reg_address);
   WIRE.write(data);
   if(!WIRE.endTransmission(true)){
-    Serial.println("err3");
+    return AdcError::I2CError;
   }
+  return AdcError::NoError;
 }
 
-uint16_t analogRead(ADCAddress pin){
+AdcReadResult adcAnalogRead(ADCAddress pin){
     if(pin.pin_id < 0 || pin.pin_id >= 8){
-        Serial.println("Err bad pin id");
-        return 0;
+        return AdcReadResult{.value=0, .error=AdcError::InvalidPinError};
     }
 
     adc_reg_write(ADC_ADDR, ADC_MANUAL_CH_SEL, pin.pin_id);
     
     int ct = WIRE.requestFrom(ADC_ADDR, 2, 1);
     if(ct != 2){
-        Serial.println("Err read error");
+        return AdcReadResult{.value=0, .error=AdcError::I2CError};
     }
     int high = WIRE.read();
     int low = WIRE.read();
-    return (high << 4) + (low >> 4);
+    uint16_t value = (high << 4) + (low >> 4);
+    return AdcReadResult{.value=value, .error=AdcError::NoError};
 }
 
 bool ADS7138Init(){
-  return adc_reg_read(ADC_ADDR, ADC_SYSTEM_STATUS) != 0;
+  AdcRegReadResult reg = adc_reg_read(ADC_ADDR, ADC_SYSTEM_STATUS);
+  if(reg.error != AdcError::NoError){
+    return false;
+  }
+  return reg.value != 0;
 }

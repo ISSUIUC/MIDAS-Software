@@ -6,5 +6,16 @@ struct ADCAddress {
     int pin_id;
 };
 
-uint16_t analogRead(ADCAddress pin);
+enum class AdcError {
+    NoError,
+    I2CError,
+    InvalidPinError,
+};
+
+struct AdcReadResult {
+    uint16_t value;
+    AdcError error;
+};
+
+AdcReadResult adcAnalogRead(ADCAddress pin);
 bool ADS7138Init();

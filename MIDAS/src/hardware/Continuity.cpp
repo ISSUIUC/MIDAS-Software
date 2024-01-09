@@ -17,7 +17,7 @@ Continuity ContinuitySensor::read() {
     // read from aforementioned global instance of sensor
     Continuity continuity;
     for (int i = 0; i < CONTINUITY_PIN_COUNT; i++) {
-        continuity.pins[i] = analogRead(ADCAddress{i});
+        continuity.pins[i] = adcAnalogRead(ADCAddress{i}).value;
     }
     return continuity;
 }
