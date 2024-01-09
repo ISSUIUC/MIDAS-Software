@@ -2,9 +2,7 @@
 #include<WIRE.h>
 
 #define WIRE Wire
-static constexpr uint8_t GPIO0_ADDRESS = 0x74;
-static constexpr uint8_t GPIO1_ADDRESS = 0x75;
-static constexpr uint8_t GPIO2_ADDRESS = 0x77;
+
 
 static constexpr uint8_t REG_INPUT0 = 0x0;
 static constexpr uint8_t REG_INPUT1 = 0x1;
@@ -14,9 +12,6 @@ static constexpr uint8_t POLARITY_INVERSION0 = 0x4;
 static constexpr uint8_t POLARITY_INVERSION1 = 0x5;
 static constexpr uint8_t REG_CONFIG0 = 0x6;
 static constexpr uint8_t REG_CONFIG1 = 0x7;
-
-static constexpr int LOW_BIT_COUNT = 8;
-static constexpr int HIGH_BIT_COUNT = 16;
 
 bool TCAL9539Init(){
     uint8_t addrs[] = {GPIO0_ADDRESS, GPIO1_ADDRESS, GPIO2_ADDRESS};
@@ -38,31 +33,6 @@ bool TCAL9539Init(){
         }
     }
     return true;
-}
-
-GpioAddress::GpioAddress(int gpio_id, int pin_id){
-    this->gpio_id = gpio_id;
-    if(gpio_id == 0){
-        gpio_address = GPIO0_ADDRESS;
-    } else if(gpio_id == 1){
-        gpio_address = GPIO1_ADDRESS;
-    } else if(gpio_id == 2){
-        gpio_address = GPIO2_ADDRESS;
-    } else {
-        is_valid = false;
-        return;
-    }
-    if(pin_id >= 0 && pin_id < LOW_BIT_COUNT){
-        port_idx = 0;
-        pin_offset = pin_id;
-    } else if(pin_id >= LOW_BIT_COUNT && pin_id < HIGH_BIT_COUNT){
-        port_idx = 1;
-        pin_offset = pin_id - LOW_BIT_COUNT;
-    } else {
-        is_valid = false;
-        return;
-    }
-    is_valid = true;
 }
 
 static uint8_t pin_state[3][2] = {{0xff,0xff},{0xff,0xff},{0xff,0xff}};
