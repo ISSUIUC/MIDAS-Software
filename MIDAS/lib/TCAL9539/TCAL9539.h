@@ -2,12 +2,27 @@
 #include<Arduino.h>
 
 struct GpioAddress {
-    int gpio_id;
-    int pin_id;
+    GpioAddress(int gpio_id, int pin_id);
+    uint8_t gpio_id;
+    uint8_t gpio_address; //i2c address of expander
+    uint8_t port_idx; //0 = bottom 8 bits, 1 = top 8 bits
+    uint8_t pin_offset; //[0,7] bit in port, 8 * port_idx + pin_offset = pin idx;
+    bool is_valid; //whether the address is valid
 };
 
-constexpr GpioAddress BNO85_RESET = {.gpio_id = 0, .pin_id = 0};
+enum class GpioError {
+    NoError,
+    I2CError,
+    InvalidPinError,
+    InvalidModeError,
+};
 
-void pinMode(GpioAddress pin, int mode);
-void digitalWrite(GpioAddress pin, int mode);
-int digitalRead(GpioAddress pin);
+struct GpioReadResult {
+    bool value;
+    GpioError error;
+};
+
+bool TCAL9539Init();
+GpioError gpioPinMode(GpioAddress pin, int mode);
+GpioError gpioDigitalWrite(GpioAddress pin, int mode);
+GpioReadResult gpioDigitalRead(GpioAddress pin);
