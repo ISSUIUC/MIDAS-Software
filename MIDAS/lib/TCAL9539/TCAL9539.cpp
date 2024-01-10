@@ -80,7 +80,7 @@ GpioReadResult gpioDigitalRead(GpioAddress addr){
     
     uint8_t val = WIRE.read();
 
-    return GpioReadResult{.value=(val & (1 << addr.pin_offset)) != 0,.error=GpioError::I2CError};
+    return GpioReadResult{.value=(val & (1 << addr.pin_offset)) != 0,.error=GpioError::NoError};
 }
 
 GpioError gpioPinMode(GpioAddress addr, int mode){

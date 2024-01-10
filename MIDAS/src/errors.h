@@ -14,6 +14,5 @@ enum ErrorCode {
     GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized,
     CannotConnectBNO,
-    CannotInitBNO,
-    CannotInitTCAL9539,
+    CannotInitBNO
 };
