@@ -5,7 +5,7 @@
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
  * The combination of all 4 lights will tell you what the error is
  *
- *
+ * NONE => Nothing is wrong
  * BLUE => LOW G could not init
  * GREEN => Could not begin SD card
  * ORANGE => Could not set LOW G range
