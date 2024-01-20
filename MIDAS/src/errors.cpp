@@ -20,7 +20,7 @@
  * BLUE, GREEN, RED => BNO could not init
  * BLUE, ORANGE, RED => 
  * GREEN, ORANGE, RED =>
- * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen
+ * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen (we're so fucked blame Aidan Costello he made me do this)
  */
 
 #define TURN_ONE_RED_LED 
