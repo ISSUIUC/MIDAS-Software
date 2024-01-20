@@ -1,6 +1,7 @@
 #pragma once
 
 #include <cmath>
+#include <cstdint>
 
 #define CONTINUITY_PIN_COUNT 4
 /**
@@ -43,6 +44,12 @@ struct Acceleration {
     float get_magnitude() {
         return sqrt(ax * ax + ay * ay + az * az);
     }
+};
+
+struct euler_t {
+    float yaw;
+    float pitch;
+    float roll;
 };
 
 /**
@@ -96,9 +103,10 @@ struct Voltage {
 
 struct GPS {
     float latitude = 0;
-    float longitudinal = 0;
+    float longitude = 0;
     float altitude = 0;
-    float satellite_count = 0;
+    float speed = 0;
+    uint16_t satellite_count = 0;
 };
 
 struct Magnetometer {
@@ -121,7 +129,9 @@ struct Orientation {
 
     Magnetometer magnetometer;
 
-    float temperature;
+    float temperature = 0;
+    float pressure = 0; 
+
 };
 
 struct KalmanData {

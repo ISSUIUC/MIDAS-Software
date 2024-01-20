@@ -13,7 +13,6 @@
 #include "hardware/sensors.h"
 #endif
 
-
 struct Sensors {
     LowGSensor low_g;
     LowGLSMSensor low_g_lsm;
@@ -23,4 +22,5 @@ struct Sensors {
     VoltageSensor voltage;
     OrientationSensor orientation;
     MagnetometerSensor magnetometer;
+    GPSSensor gps;
 };

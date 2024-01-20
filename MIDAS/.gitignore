@@ -1,3 +1,10 @@
+# User configs
 .pio
 .vscode
+<<<<<<< HEAD
 src/log_checksum.h
+=======
+
+# Mac garbage
+**/.DS_Store
+>>>>>>> mvp-sensor-integration

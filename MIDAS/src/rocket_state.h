@@ -2,6 +2,7 @@
 
 #include "sensor_data.h"
 #include "hal.h"
+#include "Buffer.h"
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -47,6 +48,8 @@ public:
 struct RocketData {
 public:
     bool pyro_should_be_firing = false;
+
+    SensorData<KalmanData> kalman;
 
     SensorData<LowGData> low_g;
     SensorData<HighGData> high_g;

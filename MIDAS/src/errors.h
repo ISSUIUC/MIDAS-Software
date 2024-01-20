@@ -11,6 +11,8 @@ enum ErrorCode {
     HighGCoulNotUpdateDataRate,
     MagnetometerCoultNotBeInitialized,
     GyroCouldNotBeInitialized,
-    GasCouldNotBeInitialized,
-    ContinuityCouldNotBeInitialized
+    GPSCouldNotBeInitialized,
+    ContinuityCouldNotBeInitialized,
+    CannotConnectBNO,
+    CannotInitBNO
 };
