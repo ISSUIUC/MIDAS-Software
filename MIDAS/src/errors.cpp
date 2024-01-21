@@ -26,10 +26,11 @@
 #define TURN_ONE_RED_LED 
 #define GPIO_EXPANDER_2 2
 
-GpioAddress blue_led(GPIO_EXPANDER_2, 13);
-GpioAddress green_led(GPIO_EXPANDER_2, 14);
-GpioAddress orange_led(GPIO_EXPANDER_2, 15);
-GpioAddress red_led(GPIO_EXPANDER_2, 16);
+// Each LED pin, with pin humbers in octal
+GpioAddress blue_led(GPIO_EXPANDER_2, 013);
+GpioAddress green_led(GPIO_EXPANDER_2, 014);
+GpioAddress orange_led(GPIO_EXPANDER_2, 015);
+GpioAddress red_led(GPIO_EXPANDER_2, 016);
 
 void update_error_LED(ErrorCode error) {
     switch (error) {
