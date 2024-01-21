@@ -20,7 +20,7 @@
  * BLUE, GREEN, RED => BNO could not init
  * BLUE, ORANGE, RED => 
  * GREEN, ORANGE, RED =>
- * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen (we're so fucked blame Aidan Costello he made me do this)
+ * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen
  */
 
 #define TURN_ONE_RED_LED 
@@ -32,112 +32,84 @@ GpioAddress orange_led(GPIO_EXPANDER_2, 15);
 GpioAddress red_led(GPIO_EXPANDER_2, 16);
 
 void update_error_LED(ErrorCode error) {
-    GpioReadResult result;
-    GpioError error;
     switch (error) {
-                case LowGCouldNotBeInitialized:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, LOW);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break;
-                case SDBeginFailed:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, LOW);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break;
-                case LowGRangeCouldNotBeSet:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, LOW);
-                        gpioDigitalWrite(green_led, LOW);
-                        gpioDigitalWrite(orange_led, HIGH);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break;
-                case LowGODRLPFCouldNotBeSet:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, LOW);
-                        gpioDigitalWrite(green_led, LOW);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, HIGH);
-                    }
-                    break;
-                case HighGCouldNotBeInitialized:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break;   
-                case HighGCoulNotUpdateDataRate:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, LOW);
-                        gpioDigitalWrite(orange_led, HIGH);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break;
-                case MagnetometerCoultNotBeInitialized:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, LOW);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, HIGH);
-                    }
-                    break;
-                case GyroCouldNotBeInitialized:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, LOW);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, HIGH);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break; 
-                case GPSCouldNotBeInitialized:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, LOW);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, HIGH);
-                    }
-                    break; 
-                case ContinuityCouldNotBeInitialized:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, LOW);
-                        gpioDigitalWrite(green_led, LOW);
-                        gpioDigitalWrite(orange_led, HIGH);
-                        gpioDigitalWrite(red_led, HIGH);
-                    }
-                    break; 
-                case CannotConnectBNO:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, HIGH);
-                        gpioDigitalWrite(red_led, LOW);
-                    }
-                    break; 
-                case CannotInitBNO:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, LOW);
-                        gpioDigitalWrite(red_led, HIGH);
-                    }
-                    break; 
-                default:
-                    while (true) {
-                        gpioDigitalWrite(blue_led, HIGH);
-                        gpioDigitalWrite(green_led, HIGH);
-                        gpioDigitalWrite(orange_led, HIGH);
-                        gpioDigitalWrite(red_led, HIGH);
-                    }
-                    break;
-            }
+        case LowGCouldNotBeInitialized:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, LOW);
+            break;
+        case SDBeginFailed:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, LOW);
+            break;
+        case LowGRangeCouldNotBeSet:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, LOW);
+            break;
+        case LowGODRLPFCouldNotBeSet:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, HIGH);
+            break;
+        case HighGCouldNotBeInitialized:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, LOW);
+            break;   
+        case HighGCoulNotUpdateDataRate:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, LOW);
+            break;
+        case MagnetometerCoultNotBeInitialized:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, HIGH);
+            break;
+        case GyroCouldNotBeInitialized:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, LOW);
+            break; 
+        case GPSCouldNotBeInitialized:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, HIGH);
+            break; 
+        case ContinuityCouldNotBeInitialized:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, HIGH);
+            break; 
+        case CannotConnectBNO:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, LOW);
+            break; 
+        case CannotInitBNO:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, HIGH);
+            break; 
+        default:
+            gpioDigitalWrite(blue_led, HIGH);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, HIGH);
+            break;
+    }
 }
