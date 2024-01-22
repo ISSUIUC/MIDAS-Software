@@ -1,11 +1,10 @@
 #include "sensors.h"
 #include "pins.h"
 
-#include "TCAL9539-Q1.h"
+#include "TCAL9539.h"
 
 #define MAXIMUM_TILT_ANGLE 20
-
-GPIOTCAL9539 gpio_expander{};
+#define GPIO_ID 0
 
 /**
  * Helper function: Determines if the orientation is within an acceptable range to fire the second stage igniter.
@@ -21,8 +20,23 @@ bool can_fire_igniter(Orientation orientation) {
  * have to do anything special.
 */
 ErrorCode PyroThread::init() {
-    bool gpio_init = gpio_expander.init();
+    bool gpio_init = TCAL9539Init();
     if(gpio_init) {
+        // global arm
+        gpioPinMode(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), OUTPUT);
+
+        // arm pins
+        gpioPinMode(GpioAddress(GPIO_ID, PYROA_ARM_PIN), OUTPUT);
+        gpioPinMode(GpioAddress(GPIO_ID, PYROB_ARM_PIN), OUTPUT);
+        gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT);
+        gpioPinMode(GpioAddress(GPIO_ID, PYROD_ARM_PIN), OUTPUT);
+
+        // fire pins
+        gpioPinMode(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), OUTPUT);
+        gpioPinMode(GpioAddress(GPIO_ID, PYROB_FIRE_PIN), OUTPUT);
+        gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT);
+        gpioPinMode(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), OUTPUT);
+
         return ErrorCode::NoError;
     } else {
         return ErrorCode::PyroGPIOCouldNotBeInitialized;
@@ -41,7 +55,7 @@ Pyro PyroThread::tick_upper(FSMState fsm_state, Orientation orientation) {
     // If the state is IDLE or any state after that, we arm the global arm pin
     if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
         new_pyro.is_global_armed = true;
-        gpio_expander.write(PYRO_GLOBAL_ARM_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
     }
 
     // Fire "Pyro A" to ignite sustainer
@@ -49,24 +63,24 @@ Pyro PyroThread::tick_upper(FSMState fsm_state, Orientation orientation) {
     if(fsm_state.curr_state == FSM_state::STATE_SUSTAINER_IGNITION && can_fire_igniter(orientation)) {
         new_pyro.channels[0].is_armed = true;
         new_pyro.channels[0].is_firing = true;
-        gpio_expander.write(PYROA_ARM_PIN, HIGH);
-        gpio_expander.write(PYROA_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), HIGH);
     }
 
     // Fire "Pyro B" to deploy upper stage drogue
     if(fsm_state.curr_state == FSM_state::STATE_DROGUE_DEPLOY) {
         new_pyro.channels[1].is_armed = true;
         new_pyro.channels[1].is_firing = true;
-        gpio_expander.write(PYROB_ARM_PIN, HIGH);
-        gpio_expander.write(PYROB_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROB_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROB_FIRE_PIN), HIGH);
     }
 
     // Fire "Pyro C" to deploy upper stage main
     if(fsm_state.curr_state == FSM_state::STATE_MAIN_DEPLOY) {
         new_pyro.channels[2].is_armed = true;
         new_pyro.channels[2].is_firing = true;
-        gpio_expander.write(PYROC_ARM_PIN, HIGH);
-        gpio_expander.write(PYROC_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_FIRE_PIN), HIGH);
     }
 
     return new_pyro;
@@ -83,39 +97,39 @@ Pyro PyroThread::tick_lower(FSMState fsm_state, Orientation orientation) {
     // If the state is IDLE or any state after that, we arm the global arm pin
     if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
         new_pyro.is_global_armed = true;
-        gpio_expander.write(PYRO_GLOBAL_ARM_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
     }
 
     // Fire "Pyro D" when seperating stage 1
     if(fsm_state.curr_state == FSM_state::STATE_FIRST_STAGE_SEPERATION) {
         new_pyro.channels[3].is_armed = true;
         new_pyro.channels[3].is_firing = true;
-        gpio_expander.write(PYROD_ARM_PIN, HIGH);
-        gpio_expander.write(PYROD_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), HIGH);
     }
 
     // Fire "Pyro A" to ignite sustainer
     if(fsm_state.curr_state == FSM_state::STATE_SUSTAINER_IGNITION) {
         new_pyro.channels[0].is_armed = true;
         new_pyro.channels[0].is_firing = true;
-        gpio_expander.write(PYROA_ARM_PIN, HIGH);
-        gpio_expander.write(PYROA_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), HIGH);
     }
 
     // Fire "Pyro B" to deploy drogue
     if(fsm_state.curr_state == FSM_state::STATE_DROGUE_DEPLOY) {
         new_pyro.channels[1].is_armed = true;
         new_pyro.channels[1].is_firing = true;
-        gpio_expander.write(PYROB_ARM_PIN, HIGH);
-        gpio_expander.write(PYROB_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROB_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROB_FIRE_PIN), HIGH);
     }
 
     // Fire "Pyro C" to deploy Main
     if(fsm_state.curr_state == FSM_state::STATE_MAIN_DEPLOY) {
         new_pyro.channels[2].is_armed = true;
         new_pyro.channels[2].is_firing = true;
-        gpio_expander.write(PYROC_ARM_PIN, HIGH);
-        gpio_expander.write(PYROC_FIRE_PIN, HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_ARM_PIN), HIGH);
+        gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_FIRE_PIN), HIGH);
     }
 
     return new_pyro;
