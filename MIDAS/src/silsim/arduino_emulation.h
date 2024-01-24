@@ -15,6 +15,8 @@ struct SerialPatch {
         std::cout << t << '\n';
     }
 
+    void write(const char* str);
+
     void begin(int baudrate);
 };
 

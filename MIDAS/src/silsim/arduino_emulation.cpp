@@ -8,6 +8,11 @@ uint32_t millis(){
     return global_ms;
 }
 
+void SerialPatch::write(const char* str) {
+    std::cout << str;
+}
+
+
 void SerialPatch::begin(int baudrate) {}
 
 SerialPatch Serial;
