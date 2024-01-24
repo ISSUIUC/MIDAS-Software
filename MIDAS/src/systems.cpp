@@ -209,7 +209,7 @@ ErrorCode init_systems(RocketSystems& systems) {
 */
 void begin_systems(RocketSystems* config) {
     ErrorCode init_error_code = init_systems(*config);
-    if (!(init_error_code == NoError)) {
+    if (init_error_code != NoError) {
         // todo some message probably
         while (true) {
             update_error_LED(init_error_code);
