@@ -184,8 +184,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
-#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
-bool init_systems(RocketSystems& systems) {
+#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
+ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.high_g);
@@ -199,7 +199,7 @@ bool init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
 
-    return true;
+    return NoError;
 }
 #undef INIT_SYSTEM
 
@@ -208,11 +208,15 @@ bool init_systems(RocketSystems& systems) {
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems* config) {
-    bool success = init_systems(*config);
-    if (!success) {
+    ErrorCode init_error_code = init_systems(*config);
+    if (init_error_code != NoError) {
         // todo some message probably
+        while (true) {
+            update_error_LED(init_error_code);
+        }
         return;
     }
+
     START_THREAD(data_logger, DATA_CORE, config);
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
