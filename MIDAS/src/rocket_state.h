@@ -55,7 +55,7 @@ public:
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
-    SensorData<Pyro> pyro;
+    SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
 };
 

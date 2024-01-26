@@ -49,8 +49,8 @@ struct GPSSensor {
     GPS read();
 };
 
-struct PyroThread {
+struct Pyro {
     ErrorCode init();
-    Pyro tick_lower(FSMState fsm_state, Orientation orientation);
-    Pyro tick_upper(FSMState fsm_state, Orientation orientation);
+    PyroState tick_lower(FSMState fsm_state, Orientation orientation);
+    PyroState tick_upper(FSMState fsm_state, Orientation orientation);
 };

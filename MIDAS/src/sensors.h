@@ -22,6 +22,6 @@ struct Sensors {
     VoltageSensor voltage;
     OrientationSensor orientation;
     MagnetometerSensor magnetometer;
-    PyroThread pyro;
+    Pyro pyro;
     GPSSensor gps;
 };

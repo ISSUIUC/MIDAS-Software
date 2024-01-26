@@ -37,12 +37,12 @@
 
 // pyro pins
 
-#define PYRO_GLOBAL_ARM_PIN 0
-#define PYROA_ARM_PIN 1
-#define PYROA_FIRE_PIN 2
-#define PYROB_ARM_PIN 3
-#define PYROB_FIRE_PIN 4
-#define PYROC_ARM_PIN 5
-#define PYROC_FIRE_PIN 6
-#define PYROD_ARM_PIN 7
-#define PYROD_FIRE_PIN 8
+#define PYRO_GLOBAL_ARM_PIN 07
+#define PYROA_ARM_PIN 016
+#define PYROA_FIRE_PIN 017
+#define PYROB_ARM_PIN 014
+#define PYROB_FIRE_PIN 015
+#define PYROC_ARM_PIN 010
+#define PYROC_FIRE_PIN 011
+#define PYROD_ARM_PIN 012
+#define PYROD_FIRE_PIN 013
