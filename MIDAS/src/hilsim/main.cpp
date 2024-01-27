@@ -17,7 +17,10 @@ DECLARE_THREAD(hilsim, void*arg){
     int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
     char magic[] = {69, 110, 117, 109, 99, 108, 97, 119};
+    while (true) {
     Serial.print(magic);
+    }
+    Serial.print("\n");
     Serial.print(GIT_HASH_STRING);
     Serial.print("\n");
     Serial.print(__TIME__);
