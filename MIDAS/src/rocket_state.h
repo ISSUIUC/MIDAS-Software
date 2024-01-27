@@ -1,9 +1,14 @@
 #pragma once
+
+#include <array>
+
+#include "finite-state-machines/fsm.h"
+
 #include "sensor_data.h"
 #include "hal.h"
 #include "Buffer.h"
-#include "finite-state-machines/fsm.h"
-#include <array>
+
+
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -65,11 +70,15 @@ public:
     BufferedSensorState() : current(S()) { }
 };
 
+enum stage {
+    sustainer = true,
+    booster = false
+};
 
 struct RocketState {
 public:
     bool pyro_should_be_firing;
-    bool stage; // true = sustainer | false = booster
+    bool stage; 
     SensorState<LowGData> low_g;
     BufferedSensorState<HighGData, 8> high_g;
     SensorState<GyroscopeData> gyroscope;

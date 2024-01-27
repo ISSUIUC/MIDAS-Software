@@ -1,8 +1,9 @@
 #pragma once
 
+#include <cmath>
+
 #include "finite-state-machines/fsm_states.h"
 
-#include <cmath>
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 

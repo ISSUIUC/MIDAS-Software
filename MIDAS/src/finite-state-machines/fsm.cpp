@@ -1,13 +1,15 @@
+#include <cmath>
+
 #include "fsm.h"
 #include "thresholds.h"
 #include "systems.h"
-#include <cmath>
+
 
 // helper functions
 
 // most of these helper functions look to average the acceleration values inside the buffer
 
-float FSM::getAcceleration(std::array<HighGData, 8> hg)
+float FSM::getAcceleration(std::array<HighGData, 8> & hg)
 { 
     float avg = 0;
 
@@ -19,7 +21,7 @@ float FSM::getAcceleration(std::array<HighGData, 8> hg)
     return avg;
 }
 
-float FSM::getAltitude(std::array<Barometer, 8> bar)
+float FSM::getAltitude(std::array<Barometer, 8> & bar)
 {
     float avg = 0;
 
@@ -31,7 +33,7 @@ float FSM::getAltitude(std::array<Barometer, 8> bar)
     return avg;
 }
 
-double FSM::getJerk(std::array<HighGData, 8> hg)
+double FSM::getJerk(std::array<HighGData, 8> & hg)
 {
 
     double avg1 = 0;
@@ -46,12 +48,12 @@ double FSM::getJerk(std::array<HighGData, 8> hg)
         avg2 += (hg.at(i).gz / hg.size());
     }
 
-    double sec = tick_to_ms(hg.size()) * 1000;
+    double sec = pdTICKS_TO_MS(hg.size()) * 1000;
 
-    return (avg2 - avg1) / (sec);
+    return (avg2 - avg1) / (sec / 2);
 }
 
-double FSM::getVerticalSpeed(std::array<Barometer, 8> bar)
+double FSM::getVerticalSpeed(std::array<Barometer, 8> & bar)
 {
     double avg1 = 0;
     for (size_t i = 0; i < bar.size() / 2; i++)
@@ -65,18 +67,19 @@ double FSM::getVerticalSpeed(std::array<Barometer, 8> bar)
         avg2 += (bar.at(i).altitude / bar.size());
     }
 
-    double sec = tick_to_ms((unsigned int)bar.size()) * 1000;
+    double sec = pdTICKS_TO_MS((unsigned int)bar.size()) * 1000;
 
-    return (avg2 - avg1) / (sec);
+    return (avg2 - avg1) / (sec / 2);
 }
 
 
 // code for the fsm update function
 
-FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
+FSMState FSM::tick_fsm_sustainer(FSMState & state, std::array<HighGData, 8> & hg, std::array<Barometer, 8> & bar){
     
     //get current time
-    double current_time = tick_to_ms(xTaskGetTickCount());
+    double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+    
     
     switch (state.curr_state)
     {
@@ -90,14 +93,16 @@ FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, st
             break;
 
         case STATE_FIRST_BOOST:
+            acceleration = getAcceleration(hg); 
+
             // if acceleration spike was too brief then go back to idle
-            if(getAcceleration(hg) < idle_to_first_boost_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
+            if(acceleration < idle_to_first_boost_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
                  state.curr_state = STATE_IDLE;
                  break;
             }
 
             // once acceleartion decreases to a the threshold go on the next state
-            if(getAcceleration(hg) < coast_detection_acceleration_threshold) {
+            if(acceleration < coast_detection_acceleration_threshold) {
                 burnout_time = current_time;
                 state.curr_state  = STATE_BURNOUT;
             }
@@ -135,14 +140,16 @@ FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, st
             break;
             
         case STATE_SECOND_BOOST:
+            acceleration = getAcceleration(hg); 
+
             // if high accleration is too brief then return to previous state
-            if (getAcceleration(hg) < sustainer_ignition_to_second_boost_acceleration_threshold && (current_time - second_boost_time) < sustainer_ignition_to_second_boost_time_threshold) { 
+            if (acceleration < sustainer_ignition_to_second_boost_acceleration_threshold && (current_time - second_boost_time) < sustainer_ignition_to_second_boost_time_threshold) { 
                 state.curr_state = STATE_SUSTAINER_IGNITION;
                 break;
             }
 
             // if low acceleration detected go to next state
-            if (getAcceleration(hg) < coast_detection_acceleration_threshold) {
+            if (acceleration < coast_detection_acceleration_threshold) {
                 coast_time = current_time;
                 state.curr_state = STATE_COAST;
             }
@@ -180,13 +187,13 @@ FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, st
             
         case STATE_DROGUE_DEPLOY:
             // if detected a sharp change in jerk then go to next state
-            if(getJerk(hg) < 0) { 
+            if(getJerk(hg) < jerk_threshold) { 
 		        state.curr_state = STATE_DROUGE;
                 break;
             }
 
             // if no transtion after a certain amount of time then just move on to next state
-            if(drogue_time > drogue_timer_threshold) {
+            if(current_time - drogue_time > drogue_timer_threshold) {
                 state.curr_state = STATE_DROUGE;
             }
 
@@ -202,7 +209,7 @@ FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, st
 
         case STATE_MAIN_DEPLOY:
             // if detected a sharp change in jerk then go to the next state
-            if(getJerk(hg) < 0) { 
+            if(getJerk(hg) < jerk_threshold) { 
 		        state.curr_state = STATE_MAIN;
                 break;
             }
@@ -236,9 +243,9 @@ FSMState FSM::tick_fsm_sustainer(FSMState state, std::array<HighGData, 8> hg, st
 }
 
 // this is similiar to the previous function but contains less states
-FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std::array<Barometer, 8> bar){
+FSMState FSM::tick_fsm_booster(FSMState & state, std::array<HighGData, 8> & hg, std::array<Barometer, 8> & bar){
 
-    double current_time = tick_to_ms(xTaskGetTickCount());
+    double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
     
     switch (state.curr_state)
     {
@@ -251,11 +258,13 @@ FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std:
             break;
 
         case STATE_FIRST_BOOST:
-            if(getAcceleration(hg) < idle_to_first_boost_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
+            acceleration = getAcceleration(hg);
+            
+            if(acceleration < idle_to_first_boost_acceleration_threshold && current_time - launch_time < idle_to_first_boost_time_threshold) {
                  state.curr_state = STATE_IDLE;
                  break;
             }
-            if(getAcceleration(hg) < coast_detection_acceleration_threshold) {
+            if(acceleration < coast_detection_acceleration_threshold) {
                 burnout_time = current_time;
                 state.curr_state  = STATE_BURNOUT;
             }
@@ -269,18 +278,16 @@ FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std:
             }
 
             if(current_time - burnout_time > first_boost_to_burnout_time_threshold) { 
-                sustainer_ignition_time = current_time;
-                state.curr_state = STATE_SUSTAINER_IGNITION;
+                first_seperation_time = current_time;
+                state.curr_state = STATE_FIRST_SEPERATION;
             }
             break;
 
         case STATE_FIRST_SEPERATION: 
-            if (getJerk(hg) < 0) {
+            if (getJerk(hg) < jerk_threshold) {
                 state.curr_state = STATE_COAST;
                 break;
             }
-
-            first_seperation_time = current_time;
 
             if(current_time - first_seperation_time > first_seperation_time_threshold) { 
 	            state.curr_state = STATE_COAST;
@@ -289,11 +296,6 @@ FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std:
             break;
             
         case STATE_COAST:
-            if (getAcceleration(hg) > coast_detection_acceleration_threshold && current_time - coast_time < second_boost_to_coast_time_threshold) {
-                state.curr_state = STATE_SECOND_BOOST;
-                break;
-            }
-
             if (getVerticalSpeed(bar) <= 0) {
              	apogee_time = current_time;
              	state.curr_state = STATE_APOGEE; 
@@ -313,11 +315,11 @@ FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std:
             break;
             
         case STATE_DROGUE_DEPLOY:
-            if(getJerk(hg) < 0) { 
+            if(getJerk(hg) < jerk_threshold) { 
 		        state.curr_state = STATE_DROUGE;
                 break;
             }
-            if(drogue_time > drogue_timer_threshold) {
+            if(current_time - drogue_time > drogue_timer_threshold) {
                 state.curr_state = STATE_DROUGE;
             }
 
@@ -331,7 +333,7 @@ FSMState FSM::tick_fsm_booster(FSMState state, std::array<HighGData, 8> hg, std:
             break;
 
         case STATE_MAIN_DEPLOY:
-            if(getJerk(hg) < 0) { 
+            if(getJerk(hg) < jerk_threshold) { 
 		        state.curr_state = STATE_MAIN;
                 break;
             }

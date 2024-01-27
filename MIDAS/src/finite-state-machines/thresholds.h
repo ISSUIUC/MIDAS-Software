@@ -26,6 +26,9 @@ static constexpr float main_deploy_altitude_threshold = 3000;
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 static constexpr float sustainer_ignition_to_second_boost_time_threshold = 1000;
 
+// Transition straight to coast after a certain amount of time not detecting second stage boost
+static constexpr float sustainer_ignition_to_coast_timer_threshold = 5000;
+
 // ----------------------------------
 // FIRST STAGE THRESHOLDS
 // ----------------------------------
@@ -54,9 +57,6 @@ static constexpr float apogee_check_threshold = 1000;
 // Revert back to main if the landed was too short
 static constexpr float landed_timer_threshold = 5000;
 
-// Transition straight to coast after a certain amount of time not detecting second stage boost
-static constexpr float sustainer_ignition_to_coast_timer_threshold = 5000;
-
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
 static constexpr float first_boost_to_burnout_time_threshold = 1000;
 
@@ -65,3 +65,6 @@ static constexpr float landed_vertical_speed_threshold = 0;
 
 // Move on regardless if it separates or not i.e. if state is FIRST_SEPERATION for over this amount of time (ms)
 static constexpr float first_seperation_time_threshold = 3000;
+
+// Stores a small jerk value 
+static constexpr float jerk_threshold = 0;
