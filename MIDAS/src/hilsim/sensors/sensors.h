@@ -42,3 +42,8 @@ struct OrientationSensor {
     ErrorCode init();
     Orientation read();
 };
+
+struct GPSSensor {
+    ErrorCode init();
+    GPS read();
+};

@@ -208,12 +208,7 @@ bool init_systems(RocketSystems& systems) {
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems* config) {
-<<<<<<< HEAD
-    Serial.write("Starting mcu_main\n");
-    bool success = init_sensors(config->sensors, config->log_sink);
-=======
     bool success = init_systems(*config);
->>>>>>> mvp-sensor-integration
     if (!success) {
         // todo some message probably
         return;
