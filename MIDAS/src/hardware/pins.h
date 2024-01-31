@@ -46,3 +46,10 @@
 #define PYROC_FIRE_PIN 011
 #define PYROD_ARM_PIN 012
 #define PYROD_FIRE_PIN 013
+// emmc pins
+#define EMMC_CLK 38
+#define EMMC_CMD 39
+#define EMMC_D0 44
+#define EMMC_D1 43
+#define EMMC_D2 2
+#define EMMC_D3 42
