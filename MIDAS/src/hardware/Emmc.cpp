@@ -1,20 +1,26 @@
 #include "Emmc.h"
 
-void writeFile(fs::FS &fs, const char * path, const char * message){
-    Serial.printf("Writing file: %s\n", path);
 
-    File file = fs.open(path, FILE_WRITE);
-    if(!file){
-        Serial.println("Failed to open file for writing");
-        return;
-    }
-    if(file.print(message)){
-        Serial.println("File written");
-    } else {
-        Serial.println("Write failed");
-    }
+void EmmcLog::write(const uint8_t* data, size_t size) {
+    // file.print(message);
+    // Get all data and write
+    file.write(data, size);
 }
+
 ErrorCode EmmcLog::init(){
-    file = fs.open("/", "Emmc_Data");
+    if(!SD_MMC.setPins(EMMC_CLK, EMMC_CMD, EMMC_D0, EMMC_D1, EMMC_D2, EMMC_D3)){
+        return ErrorCode::EmmcPinsAreWrong;
+    }
+    // if(!SD_MMC.begin()){
+    if(!SD_MMC.begin("/sdcard", true, false, SDMMC_FREQ_52M, 5)){
+        return ErrorCode::EmmcCouldNotBegin;
+    }
+
+    file = fs.open("/Emmc_Data.txt", FILE_WRITE);
+
+    if (!file) {
+        return ErrorCode::EmmcCouldNotOpenFile;
+    }
     
+    return ErrorCode::NoError;
 };

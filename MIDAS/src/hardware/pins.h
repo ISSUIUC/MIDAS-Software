@@ -34,3 +34,11 @@
 // i2c bus pins
 #define I2C_SDA 0
 #define I2C_SCL 0
+
+// emmc pins
+#define EMMC_CLK 38
+#define EMMC_CMD 39
+#define EMMC_D0 44
+#define EMMC_D1 43
+#define EMMC_D2 2
+#define EMMC_D3 42
