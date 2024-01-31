@@ -7,9 +7,6 @@
 Adafruit_BNO08x imu;
 #define REPORT_INTERVAL_US 5000
 
-#define BNO086_CS 0
-#define BNO086_INT 0
-
 ErrorCode OrientationSensor::init() {
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code

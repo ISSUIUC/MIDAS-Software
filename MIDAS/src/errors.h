@@ -8,8 +8,8 @@ enum ErrorCode {
     LowGRangeCouldNotBeSet,
     LowGODRLPFCouldNotBeSet,
     HighGCouldNotBeInitialized,
-    HighGCouldNotUpdateDataRate,
-    MagnetometerCouldNotBeInitialized,
+    HighGCoulNotUpdateDataRate,
+    MagnetometerCoultNotBeInitialized,
     GyroCouldNotBeInitialized,
     GasCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
@@ -19,3 +19,5 @@ enum ErrorCode {
     CannotConnectBNO,
     CannotInitBNO
 };
+
+void update_error_LED(ErrorCode error);

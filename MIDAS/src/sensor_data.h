@@ -46,6 +46,12 @@ struct Acceleration {
     }
 };
 
+struct euler_t {
+    float yaw;
+    float pitch;
+    float roll;
+};
+
 /**
  * Structs starting here represent specific sensors and the respective data
 */

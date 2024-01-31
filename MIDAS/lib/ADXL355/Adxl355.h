@@ -166,7 +166,7 @@ public:
     void setOdrLpf(ODR_LPF odr_lpf);
     RANGE_VALUES getRange();
     long twosComplement(unsigned long value);
-    double convertAccel(long rawValue);
+    float convertAccel(long rawValue);
     outputData getAccel();
     void calibrateSensor(int fifoReadCount);
     void setTrim(int32_t x, int32_t y, int32_t z);

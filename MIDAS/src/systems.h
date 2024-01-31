@@ -6,7 +6,6 @@
 #include "data_logging.h"
 #include "telemetry.h"
 
-
 struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
