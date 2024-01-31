@@ -14,3 +14,7 @@ void writeFile(fs::FS &fs, const char * path, const char * message){
         Serial.println("Write failed");
     }
 }
+ErrorCode EmmcLog::init(){
+    file = fs.open("/", "Emmc_Data");
+    
+};
