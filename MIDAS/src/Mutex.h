@@ -1,6 +1,10 @@
+#ifdef SILSIM
+#include "silsim/emulation.h"
+#else
 #include <FreeRTOS.h>
 #include <semphr.h>
 #include <task.h>
+#endif
 
 #define MUTEX_TIMEOUT pdMS_TO_TICKS(100)
 
@@ -22,7 +26,6 @@ public:
     Mutex() = delete;
     Mutex(const Mutex&) = delete;
     Mutex(Mutex&&) = delete;
-
 
     /**
      * Initializes the mutex with an initial contained value.
