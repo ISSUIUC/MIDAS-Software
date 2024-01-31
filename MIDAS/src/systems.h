@@ -9,6 +9,7 @@ struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
     LogSink log_sink;
+    EmmcLog emmc_sink;
     BuzzerController buzzer;
 };
 

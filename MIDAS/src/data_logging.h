@@ -7,6 +7,7 @@
 #elif defined(HILSIM)
 #else
 #include "hardware/SDLog.h"
+#include "hardware/Emmc.h"
 #endif
 
 /**
@@ -17,6 +18,13 @@
 //     ErrorCode init();
 //     void write(const uint8_t* data, size_t size);
 // };
+
+struct Logger {
+    virtual ErrorCode init() = 0;
+    virtual void write(const uint8_t* data, size_t size) = 0;
+
+    File file;
+}
 
 void log_begin(LogSink& sink);
 void log_data(LogSink& sink, RocketData& data);
