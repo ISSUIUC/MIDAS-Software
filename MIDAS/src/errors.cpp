@@ -1,5 +1,5 @@
 #include "errors.h"
-#include "lib/TCAL9539/TCAL9539.h"
+#include "TCAL9539.h"
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
@@ -64,13 +64,13 @@ void update_error_LED(ErrorCode error) {
             gpioDigitalWrite(orange_led, LOW);
             gpioDigitalWrite(red_led, LOW);
             break;   
-        case HighGCoulNotUpdateDataRate:
+        case HighGCouldNotUpdateDataRate:
             gpioDigitalWrite(blue_led, HIGH);
             gpioDigitalWrite(green_led, LOW);
             gpioDigitalWrite(orange_led, HIGH);
             gpioDigitalWrite(red_led, LOW);
             break;
-        case MagnetometerCoultNotBeInitialized:
+        case MagnetometerCouldNotBeInitialized:
             gpioDigitalWrite(blue_led, HIGH);
             gpioDigitalWrite(green_led, LOW);
             gpioDigitalWrite(orange_led, LOW);
