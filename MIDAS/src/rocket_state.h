@@ -71,14 +71,14 @@ public:
 };
 
 enum stage {
-    sustainer = true,
-    booster = false
+    SUSTAINER,
+    BOOSTER,
 };
 
 struct RocketState {
 public:
     bool pyro_should_be_firing;
-    bool stage; 
+    enum stage rocket_stage; 
     SensorState<LowGData> low_g;
     BufferedSensorState<HighGData, 8> high_g;
     SensorState<GyroscopeData> gyroscope;

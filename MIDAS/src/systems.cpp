@@ -109,7 +109,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         FSMState next_state;
 
         // based on what stage the rocket run the appropriate tick_fsm
-        if(arg->rocket_state.stage) { 
+        if(arg->rocket_state.rocket_stage == stage::SUSTAINER) { 
             next_state = arg->rocket_state.fsm.tick_fsm_sustainer(current_state, buff_hg, buff_bar);
         }  
         else {
