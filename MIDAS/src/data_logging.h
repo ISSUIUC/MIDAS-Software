@@ -19,12 +19,15 @@
 //     void write(const uint8_t* data, size_t size);
 // };
 
-struct Logger {
-    virtual ErrorCode init() = 0;
-    virtual void write(const uint8_t* data, size_t size) = 0;
+class Logger {
+    public:
+        Logger() = default;
 
-    File file;
-}
+        virtual ErrorCode init() {return ErrorCode::NoError;};
+        virtual void write(const uint8_t* data, size_t size) {return;};
 
-void log_begin(LogSink& sink);
-void log_data(LogSink& sink, RocketData& data);
+        File file;
+};
+
+void log_begin(Logger& sink);
+void log_data(Logger& sink, RocketData& data);

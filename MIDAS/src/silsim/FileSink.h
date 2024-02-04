@@ -3,8 +3,9 @@
 #include "errors.h"
 #include <fstream>
 #include <cstdint>
+#include "data_logging.h"
 
-struct LogSink {
+struct LogSink : public Logger {
     explicit LogSink(const char* file_name);
 
     ErrorCode init();
