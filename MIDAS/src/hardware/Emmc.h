@@ -4,8 +4,12 @@
 #include "sensors.h"
 #include "errors.h"
 #include "rocket_state.h"
+#include "../data_logging.h"
 
-struct EmmcLog : public Logger {
-    ErrorCode init();
-    void write(const uint8_t* data, size_t size);
+class EmmcLog : public Logger {
+    public:
+        EmmcLog() = default;
+
+        ErrorCode init();
+        void write(const uint8_t* data, size_t size);
 };

@@ -20,7 +20,7 @@ ASSOCIATE(Orientation, ID_ORIENTATION)
 
 
 template<typename T>
-void log_reading(LogSink& sink, Reading<T>& reading) {
+void log_reading(Logger& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
     sink.write((uint8_t*) &discriminant, sizeof(ReadingDiscriminant));
     sink.write((uint8_t*) &reading.timestamp_ms, sizeof(uint32_t));
@@ -28,7 +28,7 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
 }
 
 template<typename T>
-int log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
+int log_from_sensor_data(Logger& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
     int read = 0;
     while (sensor_data.getQueued(&reading)) {
@@ -38,12 +38,12 @@ int log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     return read;
 }
 
-void log_begin(LogSink& sink) {
+void log_begin(Logger& sink) {
     uint32_t checksum = LOG_CHECKSUM;
     sink.write((uint8_t*) &checksum, 4);
 }
 
-void log_data(LogSink& sink, RocketData& data) {
+void log_data(Logger& sink, RocketData& data) {
     log_from_sensor_data(sink, data.low_g);
     log_from_sensor_data(sink, data.low_g_lsm);
     log_from_sensor_data(sink, data.high_g);
