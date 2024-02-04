@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../data_logging.h"
 #include <FS.h>
 #include "sensors.h"
 #include "errors.h"
 #include "rocket_state.h"
-#include "../data_logging.h"
 
 class EmmcLog : public Logger {
     public:

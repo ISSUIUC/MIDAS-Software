@@ -6,8 +6,8 @@
 #include "silsim/FileSink.h"
 #elif defined(HILSIM)
 #else
-#include "hardware/SDLog.h"
-#include "hardware/Emmc.h"
+// #include "hardware/SDLog.h"
+// #include "hardware/Emmc.h"
 #endif
 
 /**
