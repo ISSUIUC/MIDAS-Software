@@ -23,3 +23,7 @@ file = f"""\
 
 with Path("src/log_checksum.h").open("w") as checksum_file:
     checksum_file.write(file)
+
+env.Execute("${PYTHONEXE} -m pip install -r ${PROJECT_LIBDEPS_DIR}/mcu_silsim/TARS-Controls/Simulation/6DOF_RK4/requirements.txt")
+env.Execute("${PYTHONEXE} ${PROJECT_LIBDEPS_DIR}/mcu_silsim/TARS-Controls/Simulation/6DOF_RK4/simulation/pysim.py")
+# print(env.Dump())

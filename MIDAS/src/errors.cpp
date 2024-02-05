@@ -1,5 +1,4 @@
 #include "errors.h"
-#include "lib/TCAL9539/TCAL9539.h"
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
@@ -18,10 +17,13 @@
  * ORANGE, RED => CONTINUITY could not init
  * BLUE, GREEN, ORANGE => BNO could not connect
  * BLUE, GREEN, RED => BNO could not init
- * BLUE, ORANGE, RED => 
+ * BLUE, ORANGE, RED =>
  * GREEN, ORANGE, RED =>
  * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen
  */
+
+#ifndef SILSIM
+#include "lib/TCAL9539/TCAL9539.h"
 
 #define TURN_ONE_RED_LED 
 #define GPIO_EXPANDER_2 2
@@ -114,3 +116,8 @@ void update_error_LED(ErrorCode error) {
             break;
     }
 }
+#else
+
+void update_error_LED(ErrorCode error) { (void) error; }
+
+#endif
