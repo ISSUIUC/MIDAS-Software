@@ -1,6 +1,10 @@
 #pragma once
 
 #include "rocket_state.h"
+#include "errors.h"
+#include <FS.h>
+#include <SD.h>
+#include <SD_MMC.h>
 
 #if defined(SILSIM)
 #include "silsim/FileSink.h"
@@ -31,3 +35,4 @@ class Logger {
 
 void log_begin(Logger& sink);
 void log_data(Logger& sink, RocketData& data);
+char* sdFileNamer(char* fileName, char* fileExtensionParam, int select);
