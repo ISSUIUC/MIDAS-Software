@@ -60,8 +60,9 @@ DECLARE_THREAD(hilsim, void*arg){
 
 void setup() {
     Serial.begin(9600);
-    int i = 0;
     while(!Serial);
+    char input[8];
+    Serial.readBytes(input, 8);
     hilsim_thread(nullptr);
 }
 
