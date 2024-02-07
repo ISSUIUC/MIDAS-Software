@@ -13,13 +13,10 @@ RocketSystems systems;
 
 DECLARE_THREAD(hilsim, void*arg){
     uint8_t buffer[HILSIMPacket_size];
-    while(!Serial);
     int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
-    char magic[] = {69, 110, 117, 109, 99, 108, 97, 119};
-    while (true) {
+    char magic[] = "MIDAS";
     Serial.print(magic);
-    }
     Serial.print("\n");
     Serial.print(GIT_HASH_STRING);
     Serial.print("\n");
@@ -27,9 +24,8 @@ DECLARE_THREAD(hilsim, void*arg){
     Serial.print("\n");
     Serial.print(__DATE__);
     Serial.print("\n");
-
+    Serial.flush();
     while (true) {
-        // No way the packet size goes over 128, right?
         if(!Serial.available()){
             THREAD_SLEEP(1);
             continue;
@@ -64,6 +60,8 @@ DECLARE_THREAD(hilsim, void*arg){
 
 void setup() {
     Serial.begin(9600);
+    int i = 0;
+    while(!Serial);
     hilsim_thread(nullptr);
 }
 
