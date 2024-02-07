@@ -34,5 +34,5 @@ class Logger {
 };
 
 void log_begin(Logger& sink);
-void log_data(Logger& sink, RocketData& data);
+void log_data(Logger& sd_sink, Logger& emmc_sink, RocketData& data);
 char* sdFileNamer(char* fileName, char* fileExtensionParam, int select);

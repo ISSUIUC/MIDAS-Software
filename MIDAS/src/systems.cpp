@@ -15,18 +15,11 @@
  * @param name the name of the thread, replace with the actual name
  * @param arg the config file for the rocket
  */
-DECLARE_THREAD(sd_logger, RocketSystems* arg) {
+DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
-    while (true) {
-        log_data(arg->log_sink, arg->rocket_data);
-        THREAD_SLEEP(50);
-    }
-}
-
-DECLARE_THREAD(emmc_logger, RocketSystems* arg) {
     log_begin(arg->emmc_sink);
     while (true) {
-        log_data(arg->emmc_sink, arg->rocket_data);
+        log_data(arg->log_sink, arg->emmc_sink, arg->rocket_data);
         THREAD_SLEEP(50);
     }
 }
@@ -226,8 +219,7 @@ void begin_systems(RocketSystems* config) {
         return;
     }
 
-    START_THREAD(sd_logger, DATA_CORE, config);
-    START_THREAD(emmc_logger, DATA_CORE, config);
+    START_THREAD(logger, DATA_CORE, config);
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
     START_THREAD(high_g, SENSOR_CORE, config);

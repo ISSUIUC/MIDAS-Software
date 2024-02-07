@@ -29,11 +29,12 @@ void log_reading(Logger& sink, Reading<T>& reading) {
 }
 
 template<typename T>
-int log_from_sensor_data(Logger& sink, SensorData<T>& sensor_data) {
+int log_from_sensor_data(Logger& sd_sink, Logger& emmc_sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
     int read = 0;
     while (sensor_data.getQueued(&reading)) {
-        log_reading(sink, reading);
+        log_reading(sd_sink, reading);
+        log_reading(emmc_sink, reading);
         read++;
     }
     return read;
@@ -44,16 +45,16 @@ void log_begin(Logger& sink) {
     sink.write((uint8_t*) &checksum, 4);
 }
 
-void log_data(Logger& sink, RocketData& data) {
-    log_from_sensor_data(sink, data.low_g);
-    log_from_sensor_data(sink, data.low_g_lsm);
-    log_from_sensor_data(sink, data.high_g);
-    log_from_sensor_data(sink, data.barometer);
-    log_from_sensor_data(sink, data.continuity);
-    log_from_sensor_data(sink, data.voltage);
-    log_from_sensor_data(sink, data.gps);
-    log_from_sensor_data(sink, data.magnetometer);
-    log_from_sensor_data(sink, data.orientation);
+void log_data(Logger& sd_sink, Logger& emmc_sink, RocketData& data) {
+    log_from_sensor_data(sd_sink, emmc_sink, data.low_g);
+    log_from_sensor_data(sd_sink, emmc_sink, data.low_g_lsm);
+    log_from_sensor_data(sd_sink, emmc_sink, data.high_g);
+    log_from_sensor_data(sd_sink, emmc_sink, data.barometer);
+    log_from_sensor_data(sd_sink, emmc_sink, data.continuity);
+    log_from_sensor_data(sd_sink, emmc_sink, data.voltage);
+    log_from_sensor_data(sd_sink, emmc_sink, data.gps);
+    log_from_sensor_data(sd_sink, emmc_sink, data.magnetometer);
+    log_from_sensor_data(sd_sink, emmc_sink, data.orientation);
 }
 
 char* sdFileNamer(char* fileName, char* fileExtensionParam, int select) {
