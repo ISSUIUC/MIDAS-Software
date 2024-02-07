@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../lib/TCAL9539/TCAL9539.h"
+
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,

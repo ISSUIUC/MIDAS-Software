@@ -15,8 +15,12 @@ ErrorCode EmmcLog::init(){
     if(!SD_MMC.begin("/sdcard", true, false, SDMMC_FREQ_52M, 5)){
         return ErrorCode::EmmcCouldNotBegin;
     }
+    char file_extension[8] = ".launch";
 
-    file = fs.open("/Emmc_Data.txt", FILE_WRITE);
+    char data_name[16] = "data";
+    sdFileNamer(data_name, file_extension, 1);
+
+    file = SD_MMC.open(data_name, FILE_WRITE);
 
     if (!file) {
         return ErrorCode::EmmcCouldNotOpenFile;

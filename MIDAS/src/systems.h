@@ -5,6 +5,8 @@
 #include "rocket_state.h"
 #include "finite-state-machines/fsm.h"
 #include "data_logging.h"
+#include "hardware/Emmc.h"
+#include "hardware/SDLog.h"
 
 struct RocketSystems {
     Sensors sensors;

@@ -5,6 +5,7 @@
 #include "sensors.h"
 #include "errors.h"
 #include "rocket_state.h"
+#include <SD_MMC.h>
 
 class EmmcLog : public Logger {
     public:
