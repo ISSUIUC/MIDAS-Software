@@ -15,7 +15,7 @@ DECLARE_THREAD(hilsim, void*arg){
     uint8_t buffer[HILSIMPacket_size];
     int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
-    char magic[] = "MIDAS";
+    char magic[] = {69, 110, 117, 109, 99, 108, 97, 119};
     Serial.print(magic);
     Serial.print("\n");
     Serial.print(GIT_HASH_STRING);
