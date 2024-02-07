@@ -14,7 +14,7 @@
  * BLUE, ORANGE => GPS error
  * BLUE, RED => CONTINUITY error
  * GREEN, ORANGE => BNO error
- * GREEN, RED => 
+ * GREEN, RED => EMMC error
  * ORANGE, RED => 
  * BLUE, GREEN, ORANGE => 
  * BLUE, GREEN, RED => 
@@ -85,6 +85,14 @@ void update_error_LED(ErrorCode error) {
             gpioDigitalWrite(green_led, HIGH);
             gpioDigitalWrite(orange_led, HIGH);
             gpioDigitalWrite(red_led, LOW);
+            break;
+        case EmmcPinsAreWrong:
+        case EmmcCouldNotBegin:
+        case EmmcCouldNotOpenFile:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, HIGH);
+            gpioDigitalWrite(orange_led, LOW);
+            gpioDigitalWrite(red_led, HIGH);
             break;
         default:
             gpioDigitalWrite(blue_led, HIGH);

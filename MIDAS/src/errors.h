@@ -13,7 +13,10 @@ enum ErrorCode {
     GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized,
     CannotConnectBNO,
-    CannotInitBNO
+    CannotInitBNO,
+    EmmcPinsAreWrong,
+    EmmcCouldNotBegin,
+    EmmcCouldNotOpenFile
 };
 
 void update_error_LED(ErrorCode error);
