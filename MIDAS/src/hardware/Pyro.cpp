@@ -10,10 +10,16 @@
 /**
  * Helper function: Determines if the orientation is within an acceptable range to fire the second stage igniter.
 */
-bool can_fire_igniter(Orientation orientation) {
-    // This needs to be fleshed out. The sensor may not report angles in 'world space', so we need to determine
-    // if the orientation of the rocket depends on other angles
-    return std::abs(orientation.pitch) < MAXIMUM_TILT_ANGLE && std::abs(orientation.yaw) < MAXIMUM_TILT_ANGLE;
+namespace {
+    bool gpio_error_to_fail_flag(GpioError error_code) {
+        return error_code != GpioError::NoError;
+    }
+
+    bool can_fire_igniter(Orientation orientation) {
+        // This needs to be fleshed out. The sensor may not report angles in 'world space', so we need to determine
+        // if the orientation of the rocket depends on other angles
+        return std::abs(orientation.pitch) < MAXIMUM_TILT_ANGLE && std::abs(orientation.yaw) < MAXIMUM_TILT_ANGLE;
+    }
 }
 
 /**
@@ -21,26 +27,27 @@ bool can_fire_igniter(Orientation orientation) {
  * have to do anything special.
 */
 ErrorCode Pyro::init() {
-    bool gpio_init = TCAL9539Init();
-    if(gpio_init) {
-        // global arm
-        gpioPinMode(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), OUTPUT);
+    bool fail_flag = false;
 
-        // arm pins
-        gpioPinMode(GpioAddress(GPIO_ID, PYROA_ARM_PIN), OUTPUT);
-        gpioPinMode(GpioAddress(GPIO_ID, PYROB_ARM_PIN), OUTPUT);
-        gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT);
-        gpioPinMode(GpioAddress(GPIO_ID, PYROD_ARM_PIN), OUTPUT);
+    // global arm
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), OUTPUT));
 
-        // fire pins
-        gpioPinMode(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), OUTPUT);
-        gpioPinMode(GpioAddress(GPIO_ID, PYROB_FIRE_PIN), OUTPUT);
-        gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT);
-        gpioPinMode(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), OUTPUT);
+    // arm pins
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROA_ARM_PIN), OUTPUT));
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROB_ARM_PIN), OUTPUT));
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT));
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROD_ARM_PIN), OUTPUT));
 
-        return ErrorCode::NoError;
-    } else {
+    // fire pins
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), OUTPUT));
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROB_FIRE_PIN), OUTPUT));
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT));
+    fail_flag |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), OUTPUT));
+
+    if (fail_flag) {
         return ErrorCode::PyroGPIOCouldNotBeInitialized;
+    } else {
+        return ErrorCode::NoError;
     }
     
 }
