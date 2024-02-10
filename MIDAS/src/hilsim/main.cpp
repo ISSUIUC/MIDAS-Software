@@ -25,16 +25,6 @@ DECLARE_THREAD(hilsim, void*arg){
     Serial.print(__DATE__);
     Serial.print("\n");
     Serial.flush();
-    int i = 0;
-
-    while (true) {
-        i++;
-        Serial.println(i);
-        THREAD_SLEEP(10);
-        if (i > 10000) {
-            break;
-        }
-    }
     while (true) {
         if(!Serial.available()){
             THREAD_SLEEP(1);
@@ -71,7 +61,10 @@ DECLARE_THREAD(hilsim, void*arg){
 void setup() {
     Serial.begin(9600);
     while(!Serial);
-    while (Serial.read() != 33);
+    {
+        char input[8];
+        Serial.readBytes(input, 8);
+    }
     hilsim_thread(nullptr);
 }
 
