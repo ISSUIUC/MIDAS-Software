@@ -26,10 +26,14 @@ DECLARE_THREAD(hilsim, void*arg){
     Serial.print("\n");
     Serial.flush();
     int i = 0;
+    
     while (true) {
-        i += Serial.read();
+        i++;
         Serial.println(i);
         THREAD_SLEEP(10);
+        if (i > 10000) {
+            break;
+        }
     }
     while (true) {
         if(!Serial.available()){
