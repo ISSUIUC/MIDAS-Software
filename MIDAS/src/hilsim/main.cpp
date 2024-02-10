@@ -26,7 +26,7 @@ DECLARE_THREAD(hilsim, void*arg){
     Serial.print("\n");
     Serial.flush();
     int i = 0;
-    
+
     while (true) {
         i++;
         Serial.println(i);
@@ -71,7 +71,7 @@ DECLARE_THREAD(hilsim, void*arg){
 void setup() {
     Serial.begin(9600);
     while(!Serial);
-    Serial.read();
+    while (Serial.read() != 33);
     hilsim_thread(nullptr);
 }
 
