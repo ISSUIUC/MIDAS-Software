@@ -34,3 +34,8 @@
 // i2c bus pins
 #define I2C_SDA 0
 #define I2C_SCL 0
+
+// camera pins
+#define MCP2517_CS 0
+#define MCP2517_INT 255
+#define CAN_BIT_RATE 125000 // CAN bit rate 125 kb/s

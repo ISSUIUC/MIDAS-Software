@@ -39,11 +39,6 @@ struct Acceleration {
     float ax = 0;
     float ay = 0;
     float az = 0;
-
-    // Get G-Force applied on the rocket
-    float get_magnitude() {
-        return sqrt(ax * ax + ay * ay + az * az);
-    }
 };
 
 struct euler_t {

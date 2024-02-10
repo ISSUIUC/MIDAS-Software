@@ -48,3 +48,7 @@ struct GPSSensor {
     ErrorCode init();
     GPS read();
 };
+
+
+void can_setup();
+void can_loop(bool should_turn_cam_on);

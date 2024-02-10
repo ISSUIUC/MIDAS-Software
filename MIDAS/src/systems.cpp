@@ -157,6 +157,17 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 /**
  * See \ref data_logger_thread
  */
+DECLARE_THREAD(camera, RocketSystems* arg) {
+    while (true) {
+        arg->buzzer.tick();
+
+        THREAD_SLEEP(1);
+    }
+}
+
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     displacement_kf.initialize();
     TickType_t last = xTaskGetTickCount();
@@ -214,7 +225,6 @@ void begin_systems(RocketSystems* config) {
         while (true) {
             update_error_LED(init_error_code);
         }
-        return;
     }
 
     START_THREAD(data_logger, DATA_CORE, config);
@@ -229,6 +239,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(continuity, SENSOR_CORE, config);
     START_THREAD(fsm, SENSOR_CORE, config);
     START_THREAD(buzzer, SENSOR_CORE, config);
+    START_THREAD(camera, DATA_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
 
     while (true) {

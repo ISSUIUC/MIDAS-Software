@@ -1,5 +1,6 @@
 #pragma once
 
+
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
@@ -13,7 +14,8 @@ enum ErrorCode {
     GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized,
     CannotConnectBNO,
-    CannotInitBNO
+    CannotInitBNO,
+    CanBusMessageSendFailed
 };
 
 void update_error_LED(ErrorCode error);
