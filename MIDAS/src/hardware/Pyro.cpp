@@ -8,7 +8,7 @@
 #define GPIO_ID 0
 
 #define IS_UPPER_STAGE // Only one of these should be defined!
-#define IS_LOWER_STAGE
+// #define IS_LOWER_STAGE
 
 /**
  * Helper function: Determines if the orientation is within an acceptable range to fire the second stage igniter.
@@ -61,7 +61,7 @@ ErrorCode Pyro::init() {
  * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
  * Fires channels by setting their pin on the GPIO.
 */
-PyroState Pyro::tick_upper(FSMState fsm_state, Orientation orientation) {
+PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
 
     // If the state is IDLE or any state after that, we arm the global arm pin
@@ -109,7 +109,7 @@ PyroState Pyro::tick_upper(FSMState fsm_state, Orientation orientation) {
  * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
  * Fires channels by setting their pin on the GPIO.
 */
-PyroState Pyro::tick_lower(FSMState fsm_state, Orientation orientation) {
+PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
 
     // If the state is IDLE or any state after that, we arm the global arm pin

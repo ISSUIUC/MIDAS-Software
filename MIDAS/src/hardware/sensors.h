@@ -51,6 +51,5 @@ struct GPSSensor {
 
 struct Pyro {
     ErrorCode init();
-    PyroState tick_lower(FSMState fsm_state, Orientation orientation);
-    PyroState tick_upper(FSMState fsm_state, Orientation orientation);
+    PyroState tick(FSMState fsm_state, Orientation orientation);
 };
