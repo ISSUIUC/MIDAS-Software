@@ -61,4 +61,3 @@ public:
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
 };
-

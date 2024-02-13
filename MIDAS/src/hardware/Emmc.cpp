@@ -27,4 +27,4 @@ ErrorCode EMMCSink::init(){
     }
     
     return ErrorCode::NoError;
-};
+}

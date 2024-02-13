@@ -2,8 +2,6 @@
 #include "log_format.h"
 #include "log_checksum.h"
 
-#define MAX_FILES 999
-
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
 
@@ -29,9 +27,9 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
 }
 
 template<typename T>
-int log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
+uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
-    int read = 0;
+    uint32_t read = 0;
     while (sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);
         read++;
@@ -57,6 +55,8 @@ void log_data(LogSink& sink, RocketData& data) {
 }
 
 #ifndef SILSIM
+#define MAX_FILES 999
+
 char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);
