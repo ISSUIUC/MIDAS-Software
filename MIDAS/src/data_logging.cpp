@@ -21,7 +21,7 @@ ASSOCIATE(Orientation, ID_ORIENTATION)
 
 
 template<typename T>
-void log_reading(Logger& sink, Reading<T>& reading) {
+void log_reading(LogSink& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
     sink.write((uint8_t*) &discriminant, sizeof(ReadingDiscriminant));
     sink.write((uint8_t*) &reading.timestamp_ms, sizeof(uint32_t));
@@ -29,35 +29,35 @@ void log_reading(Logger& sink, Reading<T>& reading) {
 }
 
 template<typename T>
-int log_from_sensor_data(Logger& sd_sink, Logger& emmc_sink, SensorData<T>& sensor_data) {
+int log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
     int read = 0;
     while (sensor_data.getQueued(&reading)) {
-        log_reading(sd_sink, reading);
-        log_reading(emmc_sink, reading);
+        log_reading(sink, reading);
         read++;
     }
     return read;
 }
 
-void log_begin(Logger& sink) {
+void log_begin(LogSink& sink) {
     uint32_t checksum = LOG_CHECKSUM;
     sink.write((uint8_t*) &checksum, 4);
 }
 
-void log_data(Logger& sd_sink, Logger& emmc_sink, RocketData& data) {
-    log_from_sensor_data(sd_sink, emmc_sink, data.low_g);
-    log_from_sensor_data(sd_sink, emmc_sink, data.low_g_lsm);
-    log_from_sensor_data(sd_sink, emmc_sink, data.high_g);
-    log_from_sensor_data(sd_sink, emmc_sink, data.barometer);
-    log_from_sensor_data(sd_sink, emmc_sink, data.continuity);
-    log_from_sensor_data(sd_sink, emmc_sink, data.voltage);
-    log_from_sensor_data(sd_sink, emmc_sink, data.gps);
-    log_from_sensor_data(sd_sink, emmc_sink, data.magnetometer);
-    log_from_sensor_data(sd_sink, emmc_sink, data.orientation);
+void log_data(LogSink& sink, RocketData& data) {
+    log_from_sensor_data(sink, data.low_g);
+    log_from_sensor_data(sink, data.low_g_lsm);
+    log_from_sensor_data(sink, data.high_g);
+    log_from_sensor_data(sink, data.barometer);
+    log_from_sensor_data(sink, data.continuity);
+    log_from_sensor_data(sink, data.voltage);
+    log_from_sensor_data(sink, data.gps);
+    log_from_sensor_data(sink, data.magnetometer);
+    log_from_sensor_data(sink, data.orientation);
 }
 
-char* sdFileNamer(char* fileName, char* fileExtensionParam, int select) {
+#ifndef SILSIM
+char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);
 
@@ -67,10 +67,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, int select) {
     strcat(fileName, fileExtension);
 
     // checks to see if file already exists and adds 1 to filename if it does.
-    bool SD_Exists = (select == 0) && SD.exists(fileName);
-    bool EMMC_Exists = (select == 1) && SD_MMC.exists(fileName);
-
-    bool exists = SD_Exists || EMMC_Exists;
+    bool exists = fs.exists(fileName);
 
     if (exists) {
         bool fileExists = false;
@@ -96,7 +93,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, int select) {
             strcat(fileNameTemp, iStr);
             strcat(fileNameTemp, fileExtension);
 
-            if (!SD.exists(fileNameTemp)) {
+            if (!fs.exists(fileNameTemp)) {
                 strcpy(fileName, fileNameTemp);
                 fileExists = true;
             }
@@ -107,3 +104,4 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, int select) {
 
     return fileName;
 }
+#endif

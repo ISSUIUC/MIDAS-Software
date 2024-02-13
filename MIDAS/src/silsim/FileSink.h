@@ -5,8 +5,8 @@
 #include <cstdint>
 #include "data_logging.h"
 
-struct LogSink : public Logger {
-    explicit LogSink(const char* file_name);
+struct FileSink : public LogSink {
+    explicit FileSink(const char* file_name);
 
     ErrorCode init();
     void write(const uint8_t* data, size_t size);

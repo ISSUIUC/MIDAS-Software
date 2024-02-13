@@ -2,13 +2,16 @@
 
 #include <FS.h>
 
+#include <SD.h>
 #include "sensors.h"
 #include "data_logging.h"
 
-class LogSink : public Logger {
-    public:
-        LogSink() = default;
+class FileSink : public LogSink {
+public:
+    FileSink() = default;
 
-        ErrorCode init();
-        void write(const uint8_t* data, size_t size);
+    ErrorCode init() override;
+    void write(const uint8_t* data, size_t size) override;
+private:
+    File file;
 };

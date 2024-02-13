@@ -1,13 +1,14 @@
-#include "SDLog.h"
 #include <FS.h>
 #include <SD.h>
 
-ErrorCode LogSink::init() {
+#include "SDLog.h"
+
+ErrorCode FileSink::init() {
     if (SD.begin(0)) {  // todo pin
         char file_extension[8] = ".launch";
 
         char data_name[16] = "data";
-        sdFileNamer(data_name, file_extension, 0);
+        sdFileNamer(data_name, file_extension, SD);
         // Initialize SD card
         file = SD.open(data_name, FILE_WRITE);
         // print header to file on sd card that lists each variable that is logged
@@ -21,6 +22,6 @@ ErrorCode LogSink::init() {
     return ErrorCode::NoError;
 }
 
-void LogSink::write(const uint8_t* data, size_t size) {
+void FileSink::write(const uint8_t* data, size_t size) {
     file.write(data, size);
 }

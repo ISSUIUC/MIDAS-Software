@@ -17,9 +17,8 @@
  */
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
-    log_begin(arg->emmc_sink);
     while (true) {
-        log_data(arg->log_sink, arg->emmc_sink, arg->rocket_data);
+        log_data(arg->log_sink, arg->rocket_data);
         THREAD_SLEEP(50);
     }
 }
@@ -216,7 +215,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.log_sink);
-    INIT_SYSTEM(systems.emmc_sink);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.sensors.pyro);
     return NoError;
