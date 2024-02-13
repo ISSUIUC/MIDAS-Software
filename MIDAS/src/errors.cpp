@@ -15,7 +15,7 @@
  * BLUE, RED => CONTINUITY error
  * GREEN, ORANGE => BNO error
  * GREEN, RED => EMMC error
- * ORANGE, RED => 
+ * ORANGE, RED => PYRO error
  * BLUE, GREEN, ORANGE => 
  * BLUE, GREEN, RED => 
  * BLUE, ORANGE, RED => 
@@ -42,6 +42,11 @@ void update_error_LED(ErrorCode error) {
             gpioDigitalWrite(orange_led, LOW);
             gpioDigitalWrite(red_led, LOW);
             break;
+        case PyroGPIOCouldNotBeInitialized:
+            gpioDigitalWrite(blue_led, LOW);
+            gpioDigitalWrite(green_led, LOW);
+            gpioDigitalWrite(orange_led, HIGH);
+            gpioDigitalWrite(red_led, HIGH);
         case SDBeginFailed:
             gpioDigitalWrite(blue_led, LOW);
             gpioDigitalWrite(green_led, HIGH);

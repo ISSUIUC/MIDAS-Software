@@ -16,7 +16,8 @@ enum ErrorCode {
     CannotInitBNO,
     EmmcPinsAreWrong,
     EmmcCouldNotBegin,
-    EmmcCouldNotOpenFile
+    EmmcCouldNotOpenFile,
+    PyroGPIOCouldNotBeInitialized
 };
 
 void update_error_LED(ErrorCode error);
