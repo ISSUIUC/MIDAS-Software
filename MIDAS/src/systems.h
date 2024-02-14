@@ -3,6 +3,7 @@
 #include "buzzer.h"
 #include "sensors.h"
 #include "rocket_state.h"
+#include "finite-state-machines/fsm.h"
 #include "data_logging.h"
 
 struct RocketSystems {

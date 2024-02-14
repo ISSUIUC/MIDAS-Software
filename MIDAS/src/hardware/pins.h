@@ -34,3 +34,15 @@
 // i2c bus pins
 #define I2C_SDA 0
 #define I2C_SCL 0
+
+// pyro pins
+
+#define PYRO_GLOBAL_ARM_PIN 07
+#define PYROA_ARM_PIN 016
+#define PYROA_FIRE_PIN 017
+#define PYROB_ARM_PIN 014
+#define PYROB_FIRE_PIN 015
+#define PYROC_ARM_PIN 010
+#define PYROC_FIRE_PIN 011
+#define PYROD_ARM_PIN 012
+#define PYROD_FIRE_PIN 013

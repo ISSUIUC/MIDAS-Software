@@ -1,5 +1,5 @@
 #include "errors.h"
-#include "lib/TCAL9539/TCAL9539.h"
+#include "TCAL9539.h"
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
