@@ -31,6 +31,8 @@ RocketSystems* create_and_start(SimulatedRocket* attached, const char* sink_name
 }
 
 int main() {
+    Serial.begin(9600);
+    Serial.println("Begin silsim");
     begin_silsim();
 
     SimulatedRocket* together_sim = new SimulatedRocket(true, RocketParameters(1, 1, 0.75, SimulatedMotor(100.0, 10.0)));
