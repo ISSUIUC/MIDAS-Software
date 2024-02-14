@@ -440,9 +440,9 @@ void Adxl355::calibrateSensor(int fifoReadCount)
 }
 
 // Converts raw data to G's
-double Adxl355::convertAccel(long rawValue)
+float Adxl355::convertAccel(long rawValue)
 {
-    return (double)rawValue / 260000.0;
+    return (float)rawValue / 260000.0;
 }
 
 // Returns the acceleration data

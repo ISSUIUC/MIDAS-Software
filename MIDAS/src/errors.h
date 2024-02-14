@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
@@ -17,3 +16,5 @@ enum ErrorCode {
     CannotConnectBNO,
     CannotInitBNO
 };
+
+void update_error_LED(ErrorCode error);

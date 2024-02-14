@@ -6,7 +6,6 @@
 #include "finite-state-machines/fsm.h"
 #include "data_logging.h"
 
-
 struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
