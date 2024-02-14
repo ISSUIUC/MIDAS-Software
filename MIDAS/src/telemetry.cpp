@@ -106,8 +106,15 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.response_ID = last_command_id;
 
     packet.rssi = backend.getRecentRssi();
+    packet.FSM_state = (char) data.fsm_state.getRecent();
     packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
     packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
+
+    auto pyros = data.pyro.getRecent();
+    for (int i = 0; i < 4; i++) {
+        packet.pyros_armed[i] = pyros.channels[i].is_armed;
+        packet.pyros_firing[i] = pyros.channels[i].is_firing;
+    }
 
     for (int i = 0; i < 4; i++) {
         packet.continuity[i] = continuity.pins[i];

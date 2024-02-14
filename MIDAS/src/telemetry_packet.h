@@ -34,11 +34,12 @@ struct TelemetryPacket {
     int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
     uint8_t voltage_battery;  //[0, 16]
-    uint8_t FSM_State;        //[0,256]
+    uint8_t FSM_state;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
 
     bool continuity[4];
-    bool pyros[4];
+    bool pyros_armed[4];
+    bool pyros_firing[4];
 
     char callsign[8];
 };

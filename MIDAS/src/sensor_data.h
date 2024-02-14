@@ -169,7 +169,3 @@ struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
 };
-
-struct FSMState {
-    FSM_state curr_state = STATE_IDLE;
-};
