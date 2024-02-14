@@ -1,5 +1,5 @@
 #include"TCAL9539.h"
-#include<WIRE.h>
+#include<Wire.h>
 
 #define WIRE Wire
 
