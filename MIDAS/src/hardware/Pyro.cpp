@@ -100,7 +100,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
 
 #endif
 
-#ifdef IS_LOWER_STAGE
+#ifdef IS_BOOSTER
 
 /**
  * Lower stage only!
@@ -114,29 +114,29 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     new_pyro_state.is_global_armed = true;
     gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
 
-    switch (fsm_state.curr_state) {
-        case FSM_state::STATE_FIRST_STAGE_SEPARATION:
+    switch (fsm_state) {
+        case FSMState::STATE_FIRST_STAGE_SEPARATION:
             // Fire "Pyro D" when separating stage 1
             new_pyro_state.channels[3].is_armed = true;
             new_pyro_state.channels[3].is_firing = true;
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_ARM_PIN), HIGH);
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), HIGH);
             break;
-        case FSM_state::STATE_SUSTAINER_IGNITION:
+        case FSMState::STATE_SUSTAINER_IGNITION:
             // Fire "Pyro A" to ignite sustainer
             new_pyro_state.channels[0].is_armed = true;
             new_pyro_state.channels[0].is_firing = true;
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_ARM_PIN), HIGH);
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), HIGH);
             break;
-        case FSM_state::STATE_DROGUE_DEPLOY:
+        case FSMState::STATE_DROGUE_DEPLOY:
             // Fire "Pyro B" to deploy drogue
             new_pyro_state.channels[1].is_armed = true;
             new_pyro_state.channels[1].is_firing = true;
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROB_ARM_PIN), HIGH);
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROB_FIRE_PIN), HIGH);
             break;
-        case FSM_state::STATE_MAIN_DEPLOY:
+        case FSMState::STATE_MAIN_DEPLOY:
             // Fire "Pyro C" to deploy Main
             new_pyro_state.channels[2].is_armed = true;
             new_pyro_state.channels[2].is_firing = true;
