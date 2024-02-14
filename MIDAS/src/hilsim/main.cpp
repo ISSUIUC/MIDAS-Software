@@ -26,6 +26,16 @@ DECLARE_THREAD(hilsim, void*arg) {
     Serial.print(__DATE__);
     Serial.print("\n");
     Serial.flush();
+    for (int i = 0; i < 10; i++) {
+        Serial.println("Crazy?");
+        Serial.println("I was crazy once.");
+        Serial.println("They locked me in a room.");
+        Serial.println("A rubber room.");
+        Serial.println("A rubber room with rats.");
+        Serial.println("And rats make me crazy");
+        Serial.flush();
+    }
+    return;
     while (true) {
         if(!Serial.available()){
             THREAD_SLEEP(1);
