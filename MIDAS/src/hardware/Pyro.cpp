@@ -1,10 +1,11 @@
+#include <cmath>
+
 #include "sensors.h"
 #include "pins.h"
-#include <cmath>
 
 #include "TCAL9539.h"
 
-#define MAXIMUM_TILT_ANGLE M_PI/9 // 20 degrees
+#define MAXIMUM_TILT_ANGLE (M_PI/9) // 20 degrees
 #define GPIO_ID 0
 
 #define IS_UPPER_STAGE // Only one of these should be defined!
@@ -51,7 +52,6 @@ ErrorCode Pyro::init() {
     } else {
         return ErrorCode::NoError;
     }
-    
 }
 
 #ifdef IS_UPPER_STAGE
@@ -65,10 +65,8 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
 
     // If the state is IDLE or any state after that, we arm the global arm pin
-    if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
-        new_pyro_state.is_global_armed = true;
-        gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
-    }
+    new_pyro_state.is_global_armed = true;
+    gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
 
     switch (fsm_state.curr_state) {
         case FSM_state::STATE_SUSTAINER_IGNITION:
@@ -95,6 +93,8 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_ARM_PIN), HIGH);
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_FIRE_PIN), HIGH);
             break;
+        default:
+            break;
     }
 
     return new_pyro_state;
@@ -113,14 +113,12 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
 
     // If the state is IDLE or any state after that, we arm the global arm pin
-    if(fsm_state.curr_state >= FSM_state::STATE_IDLE) {
-        new_pyro_state.is_global_armed = true;
-        gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
-    }
+    new_pyro_state.is_global_armed = true;
+    gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
 
     switch (fsm_state.curr_state) {
-        case FSM_state::STATE_FIRST_STAGE_SEPERATION:
-            // Fire "Pyro D" when seperating stage 1
+        case FSM_state::STATE_FIRST_STAGE_SEPARATION:
+            // Fire "Pyro D" when separating stage 1
             new_pyro_state.channels[3].is_armed = true;
             new_pyro_state.channels[3].is_firing = true;
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_ARM_PIN), HIGH);
@@ -147,7 +145,8 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_ARM_PIN), HIGH);
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROC_FIRE_PIN), HIGH);
             break;
-
+        default:
+            break;
     }
 
     return new_pyro_state;
