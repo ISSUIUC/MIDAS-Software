@@ -8,8 +8,6 @@
 #define MAXIMUM_TILT_ANGLE (M_PI/9) // 20 degrees
 #define GPIO_ID 0
 
-#define IS_UPPER_STAGE // Only one of these should be defined!
-// #define IS_LOWER_STAGE
 
 /**
  * Helper function: Determines if the orientation is within an acceptable range to fire the second stage igniter.
@@ -54,7 +52,7 @@ ErrorCode Pyro::init() {
     }
 }
 
-#ifdef IS_UPPER_STAGE
+#ifdef IS_SUSTAINER
 
 /**
  * Upper stage only!

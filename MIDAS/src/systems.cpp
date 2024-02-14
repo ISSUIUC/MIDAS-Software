@@ -193,7 +193,6 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecent();
         PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
         arg->rocket_data.pyro.update(new_pyro_state);
-
         THREAD_SLEEP(16);
     }
 }
