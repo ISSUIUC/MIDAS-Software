@@ -35,7 +35,7 @@ DECLARE_THREAD(hilsim, void*arg) {
         Serial.println("And rats make me crazy");
         Serial.flush();
     }
-    return;
+
     while (true) {
         if(!Serial.available()){
             THREAD_SLEEP(1);
