@@ -5,6 +5,7 @@
  * we can switch whether we're using hardware sensors or emulated sensors.
  */
 
+
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
 #elif defined(HILSIM)
@@ -21,5 +22,6 @@ struct Sensors {
     VoltageSensor voltage;
     OrientationSensor orientation;
     MagnetometerSensor magnetometer;
+    Pyro pyro;
     GPSSensor gps;
 };

@@ -126,7 +126,7 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
             { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
     };
     arg->buzzer.play_tune(continuity_sensor_tune, 28);
-
+    
     while (true) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
@@ -139,6 +139,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState next_state = tick_fsm(current_state);
+        arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
 }
@@ -184,6 +187,21 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
+/**
+ * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
+*/
+DECLARE_THREAD(pyro, RocketSystems* arg) {
+
+    while (true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
+        arg->rocket_data.pyro.update(new_pyro_state);
+        THREAD_SLEEP(16);
+        //Serial.println("PYRO");
+    }
+    vTaskDelete(NULL);
+}
+
 
 /**
  * See \ref data_logger_thread
@@ -220,7 +238,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
-
+    INIT_SYSTEM(systems.sensors.pyro);
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -252,6 +270,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(fsm, SENSOR_CORE, config);
     START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(pyro, SENSOR_CORE, &config);
     START_THREAD(telemetry, DATA_CORE, config);
     START_THREAD(telemetry_buffering, DATA_CORE, config);
 

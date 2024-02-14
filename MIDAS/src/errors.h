@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
@@ -11,7 +10,7 @@ enum ErrorCode {
     HighGCouldNotUpdateDataRate,
     MagnetometerCouldNotBeInitialized,
     GyroCouldNotBeInitialized,
-    GasCouldNotBeInitialized,
+    PyroGPIOCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized,
     RadioInitFailed,
