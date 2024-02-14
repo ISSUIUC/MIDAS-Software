@@ -87,6 +87,14 @@ if __name__ == "__main__":
         print("You need to connect MIDAS")
         exit()
 
+    MIDAS.write(b'!')
+    print("Reading")
+    MIDAS.flush()
+    # Read input
+    print(MIDAS.read_until())
+    print(MIDAS.read_until())
+    print(MIDAS.read_until())
+    print(MIDAS.read_until())
     # Read the csv
     csv = pandas.read_csv(os.path.dirname(os.path.abspath(sys.argv[0])) + "/flight_computer.csv", index_col=0)
     for index, line in csv.iterrows():

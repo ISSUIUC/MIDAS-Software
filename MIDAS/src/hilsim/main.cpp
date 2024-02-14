@@ -11,11 +11,12 @@ pb_byte_t buffer[HILSIMPacket_size];
 
 RocketSystems systems;
 
-DECLARE_THREAD(hilsim, void*arg){
+DECLARE_THREAD(hilsim, void*arg) {
     uint8_t buffer[HILSIMPacket_size];
     int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
-    char magic[] = {69, 110, 117, 109, 99, 108, 97, 119};
+    while (Serial.read() != 33);
+    char magic[] = {69, 110, 117, 109, 99, 108, 97, 119, 0};
     Serial.print(magic);
     Serial.print("\n");
     Serial.print(GIT_HASH_STRING);
@@ -60,11 +61,7 @@ DECLARE_THREAD(hilsim, void*arg){
 
 void setup() {
     Serial.begin(9600);
-    while(!Serial);
-    {
-        char input[8];
-        Serial.readBytes(input, 8);
-    }
+    while (!Serial);
     hilsim_thread(nullptr);
 }
 
