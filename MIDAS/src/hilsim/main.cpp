@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <pb_decode.h>
 #include <pb_encode.h>
+#include <format>
 
 #include <systems.h>
 #include "global_packet.h"
@@ -26,15 +27,14 @@ DECLARE_THREAD(hilsim, void*arg) {
     Serial.print(__DATE__);
     Serial.print("\n");
     Serial.flush();
-    for (int i = 0; i < 10; i++) {
-        Serial.println("Crazy?");
-        Serial.println("I was crazy once.");
-        Serial.println("They locked me in a room.");
-        Serial.println("A rubber room.");
-        Serial.println("A rubber room with rats.");
-        Serial.println("And rats make me crazy");
-        Serial.flush();
-    }
+    Serial.println("It works! Here's some information about me :)");
+    Serial.print("Git hash:");
+    Serial.println(GIT_HASH_STRING);
+    Serial.print("Compile time: ");
+    Serial.print(__TIME__);
+    Serial.print(" ");
+    Serial.println(__DATE__);
+    Serial.println("Per aspera ad astra");
 
     while (true) {
         if(!Serial.available()){
