@@ -254,3 +254,20 @@ void begin_systems(RocketSystems* config) {
         THREAD_SLEEP(1000);
     }
 }
+
+void begin_hilsim(RocketSystems* config) {
+    START_THREAD(data_logger, DATA_CORE, config);
+    START_THREAD(barometer, SENSOR_CORE, config);
+    START_THREAD(low_g, SENSOR_CORE, config);
+    START_THREAD(high_g, SENSOR_CORE, config);
+    START_THREAD(low_g_lsm, SENSOR_CORE, config);
+    START_THREAD(orientation, SENSOR_CORE, config);
+    START_THREAD(magnetometer, SENSOR_CORE, config);
+    START_THREAD(gps, DATA_CORE, config);
+    START_THREAD(voltage, SENSOR_CORE, config);
+    START_THREAD(continuity, SENSOR_CORE, config);
+    START_THREAD(fsm, SENSOR_CORE, config);
+    START_THREAD(buzzer, SENSOR_CORE, config);
+    START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(pyro, SENSOR_CORE, &config);    
+}

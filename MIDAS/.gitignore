@@ -1,8 +1,8 @@
 # User configs
 .pio
 .vscode
-src/log_checksum.h
 .vscode/
 
 # Mac garbage
 **/.DS_Store
+src/git_hash.h

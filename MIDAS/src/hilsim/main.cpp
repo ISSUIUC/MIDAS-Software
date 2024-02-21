@@ -4,7 +4,7 @@
 
 #include <systems.h>
 #include "global_packet.h"
-#include "log_checksum.h"
+#include "git_hash.h"
 
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
 pb_byte_t buffer[HILSIMPacket_size];
@@ -17,34 +17,22 @@ DECLARE_THREAD(hilsim, void*arg) {
     // Debug kamaji output to verify if we're reading the correct packets
     while (Serial.read() != 33);
     char magic[] = {69, 110, 117, 109, 99, 108, 97, 119, 0};
-    Serial.print(magic);
-    Serial.print("\n");
-    Serial.print(GIT_HASH_STRING);
-    Serial.print("\n");
-    Serial.print(__TIME__);
-    Serial.print("\n");
-    Serial.print(__DATE__);
-    Serial.print("\n");
-    Serial.flush();
-    Serial.println("It works! Here's some information about me :)");
-    Serial.print("Git hash:");
+    Serial.println(magic);
     Serial.println(GIT_HASH_STRING);
-    Serial.print("Compile time: ");
-    Serial.print(__TIME__);
-    Serial.print(" ");
+    Serial.println(__TIME__);
     Serial.println(__DATE__);
-    Serial.println("Per aspera ad astra");
+    Serial.flush();
 
     while (true) {
         if(!Serial.available()){
             THREAD_SLEEP(1);
             continue;
         }
-        uint8_t length = Serial.read();
+        uint16_t length = ((uint16_t) Serial.read()) << 8 + Serial.read();
         // Parse the two bytes as integers
-        size_t size = Serial.readBytes(buffer, length);
+        size_t hilsim_packet_size = Serial.readBytes(buffer, length);
         HILSIMPacket packet = HILSIMPacket_init_zero;
-        pb_istream_t stream = pb_istream_from_buffer(buffer, size);
+        pb_istream_t stream = pb_istream_from_buffer(buffer, hilsim_packet_size);
         bool status = pb_decode(&stream, HILSIMPacket_fields, &packet);
         if (!status) {
             Serial.flush();
@@ -59,9 +47,6 @@ DECLARE_THREAD(hilsim, void*arg) {
         Serial.write(output_stream.bytes_written);
         Serial.write(buffer, output_stream.bytes_written);
         Serial.flush();
-        // Process information
-        // Loop
-        // Write data
         global_packet = packet;
         n++;
         THREAD_SLEEP(10);
@@ -71,6 +56,7 @@ DECLARE_THREAD(hilsim, void*arg) {
 void setup() {
     Serial.begin(9600);
     while (!Serial);
+    begin_hilsim(&systems);
     hilsim_thread(nullptr);
 }
 
