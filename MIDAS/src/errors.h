@@ -1,6 +1,5 @@
 #pragma once
 
-
 enum ErrorCode {
     NoError,
     LowGCouldNotBeInitialized,
@@ -11,8 +10,11 @@ enum ErrorCode {
     HighGCoulNotUpdateDataRate,
     MagnetometerCoultNotBeInitialized,
     GyroCouldNotBeInitialized,
+    PyroGPIOCouldNotBeInitialized,
     GPSCouldNotBeInitialized,
     ContinuityCouldNotBeInitialized,
     CannotConnectBNO,
     CannotInitBNO
 };
+
+void update_error_LED(ErrorCode error);

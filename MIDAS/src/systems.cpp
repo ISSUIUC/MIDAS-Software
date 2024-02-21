@@ -139,6 +139,9 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState next_state = tick_fsm(current_state);
+        arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
 }
@@ -161,8 +164,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     displacement_kf.initialize();
     TickType_t last = xTaskGetTickCount();
 
-    while (true) { 
-        // add the tick update function 
+    while (true) {
+        // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
         LowGData current_accelerometer = arg->rocket_data.low_g.getRecent();
         Acceleration current_accelerations = {
@@ -179,13 +182,28 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         last = xTaskGetTickCount();
 
         //Serial.println("KALMAN");
-        
+
         THREAD_SLEEP(16);
     }
 }
 
-#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return false; } } while (0)
-bool init_systems(RocketSystems& systems) {
+/**
+ * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
+*/
+DECLARE_THREAD(pyro, RocketSystems* arg) {
+
+    while (true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
+        arg->rocket_data.pyro.update(new_pyro_state);
+        THREAD_SLEEP(16);
+        //Serial.println("PYRO");
+    }
+    vTaskDelete(NULL);
+}
+
+#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
+ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.high_g);
@@ -198,8 +216,8 @@ bool init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
-
-    return true;
+    INIT_SYSTEM(systems.sensors.pyro);
+    return NoError;
 }
 #undef INIT_SYSTEM
 
@@ -208,11 +226,15 @@ bool init_systems(RocketSystems& systems) {
  * Starts thread scheduler to actually start doing jobs
 */
 void begin_systems(RocketSystems* config) {
-    bool success = init_systems(*config);
-    if (!success) {
+    ErrorCode init_error_code = init_systems(*config);
+    if (init_error_code != NoError) {
         // todo some message probably
+        while (true) {
+            update_error_LED(init_error_code);
+        }
         return;
     }
+
     START_THREAD(data_logger, DATA_CORE, config);
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
@@ -226,6 +248,7 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(fsm, SENSOR_CORE, config);
     START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(pyro, SENSOR_CORE, &config);
 
     while (true) {
         THREAD_SLEEP(1000);

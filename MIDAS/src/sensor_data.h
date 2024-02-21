@@ -1,5 +1,7 @@
 #pragma once
 
+#include "finite-state-machines/fsm_states.h"
+
 #include <cmath>
 #include <cstdint>
 
@@ -142,6 +144,34 @@ struct KalmanData {
     float altitude;
 };
 
-struct Pyro {
-    bool is_active = false;
+
+struct PyroChannel {
+    bool is_armed = false;
+    bool is_firing = false;
+};
+
+/** piro team defense forter 2
+⠂⠄⡂⡐⠠⠠⠠⠄⠄⠄⣀⡠⡤⡤⣆⢦⣄
+⠈⡀⠄⠄⠂⠁⠄⠁⡠⡪⡢⡫⡎⡧⡳⣝⣷⣧
+⠐⢀⠐⠈⠄⠄⢠⠎⢜⢸⢸⢜⡪⣪⢪⢲⢹⢽⡳⡄
+⡈⠠⢀⢡⠋⠉⠫⢶⡨⡪⣊⣦⠗⠚⠺⢾⣎⡧⣏⠇
+⠐⠄⢂⠧⠄⠄⠄⣽⢪⠚⡞⠄⠄⠄⠄⠄⠙⡾⡸⡕
+⠈⡀⠸⣱⠄⠄⢀⠞⡜⡹⡇⠄⠄⠄⠄⠄⠄⡯⡪⡝⠄
+⠂⡠⢁⡪⣂⢠⠪⠁⣇⢣⢣⣀⠄⠄⠐⣀⡼⡑⡜⠆
+⡼⢡⠢⡠⠄⠄⠄⡌⡆⣇⡅⠍⠛⠛⢛⠍⡔⢅⠣⠥⠤⣄
+⡝⡐⢕⢌⠄⠈⠠⠵⣹⣙⠎⡕⢅⢊⠢⡱⡸⢈⠢⠁⢸⣿
+⡯⠐⢅⠢⡂⠄⡘⣈⢂⢢⢑⠌⡢⠡⣫⡮⡨⠠⠁⠂⣸⣿
+⠱⢅⠨⠐⠠⠊⠎⠞⢵⡳⣥⡈⠢⡁⠢⠐⠄⠄⢀⣾⣿⣿
+⠄⡁⠄⢀⡸⢪⠲⠵⣄⠍⢪⢞⡐⠌⠈⠄⠄⢀⣾⡿⣿⡿
+⠄⠂⣴⣿⡐⢡⠑⡸⢠⠫⡀⠕⠁⢀⡠⣔⣮⡿⡯⣟⣿⢿
+⣠⣾⡿⠟⢁⢠⢐⣁⡂⣈⢴⠄⢘⣾⡺⡯⡫⣏⢯⡳⡝⡇
+⣿⣿⠁⠁⠄⢀⠆⣞⢿⣷⢱⠄⡜⡮⡳⡹⡸⡪⣱⡪⡪⠄
+*/
+struct PyroState {
+    bool is_global_armed = false;
+    PyroChannel channels[4];
+};
+
+struct FSMState {
+    FSM_state curr_state = STATE_IDLE;
 };
