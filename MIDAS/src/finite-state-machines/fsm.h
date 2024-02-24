@@ -16,17 +16,17 @@ class FSM {
    public:
     FSM() = default;
 
-    FSMState tick_fsm_sustainer(FSMState & curr_state, std::array<HighGData, 8> & hg, std::array<Barometer, 8> & bar);
+    FSMState tick_fsm_sustainer(FSMState & curr_state, std::array<HighGData, 8> & hg, std::array<Barometer, 8> & bar, double time_delta);
 
-    FSMState tick_fsm_booster(FSMState & state, std::array<HighGData, 8> & hg, std::array<Barometer, 8> & bar);
+    FSMState tick_fsm_booster(FSMState & state, std::array<HighGData, 8> & hg, std::array<Barometer, 8> & bar, double time_delta);
 
     float getAcceleration(std::array<HighGData, 8> & hg);
 
     float getAltitude(std::array<Barometer, 8> & bar);
 
-    double getJerk(std::array<HighGData, 8> & hg);
+    double getJerk(std::array<HighGData, 8> & hg, double time_delta);
 
-    double getVerticalSpeed(std::array<Barometer, 8> & bar);
+    double getVerticalSpeed(std::array<Barometer, 8> & bar, double time_delta);
 
    private:
     double launch_time;

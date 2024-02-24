@@ -133,7 +133,7 @@ struct Pyro {
 };
 
 struct FSMState {
-    FSM_state curr_state = STATE_IDLE;
+    fsm_state curr_state = STATE_IDLE;
 };
 
 

@@ -45,12 +45,14 @@ private:
     Mutex<S> current;
     Queue<S> queue;
     Buffer<S, count> buffer;
-
+    Buffer<TickType_t, count> data_time;
+    
 public:
     void update(S data) {
         current.write(data);
         queue.send(data);
         buffer.push(data);
+        data_time.push(xTaskGetTickCount());
     };
 
     S getRecent() {
@@ -62,6 +64,14 @@ public:
         std::array<S, count> arr = buffer. template read_recent<count>(); 
         return arr;
     };
+
+    // function to get the tick when the oldest data point was recorded
+    TickType_t getStartTime() {
+        TickType_t time;
+        if(data_time.read_oldest(time)) {return time;}
+        return S();
+    }
+
     
     bool getQueued(S* out) {
         return queue.receive(out);
@@ -70,7 +80,7 @@ public:
     BufferedSensorState() : current(S()) { }
 };
 
-enum stage {
+enum Stage {
     SUSTAINER,
     BOOSTER,
 };
@@ -78,9 +88,10 @@ enum stage {
 struct RocketState {
 public:
     bool pyro_should_be_firing;
-    enum stage rocket_stage; 
+    Stage rocket_stage; 
     SensorState<LowGData> low_g;
     BufferedSensorState<HighGData, 8> high_g;
+    BufferedSensorState<TickType_t, 8> data_time;
     SensorState<GyroscopeData> gyroscope;
     BufferedSensorState<Barometer, 8> barometer;
     SensorState<Continuity> continuity;
