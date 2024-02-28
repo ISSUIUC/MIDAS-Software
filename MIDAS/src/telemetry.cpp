@@ -66,7 +66,11 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
     }
 
     if (cmd.command == SET_CALLSIGN) {
-        memcpy(callsign, cmd.callsign, sizeof(cmd.callsign));
+        size_t callsign_size = sizeof(callsign);
+
+        for (size_t i = 0; i < callsign_size; ++i) {
+            callsign[i] = cmd.callsign[i];
+        }
         Serial.println("[DEBUG]: Got callsign");
     }
 }
