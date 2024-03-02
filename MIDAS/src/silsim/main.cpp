@@ -1,5 +1,6 @@
 #include "silsim/emulation.h"
 #include "systems.h"
+#include "FileSink.h"
 
 void rocket_main_thread(RocketSystems* systems) {
     begin_systems(systems);
@@ -18,11 +19,12 @@ Sensors create_sensors_attached_to(SimulatedRocket* sim, bool should_be_continuo
     };
 }
 
-RocketSystems* create_and_start(SimulatedRocket* attached, const char* sink_name, const char* tlm_sink) {
+RocketSystems* create_and_start(SimulatedRocket* attached, const char* sink_name) {
+    FileSink* sink = new FileSink(sink_name);
     RocketSystems* systems = new RocketSystems {
-            .sensors = create_sensors_attached_to(attached, true),
-            .log_sink = LogSink(sink_name),
-            .tlm = Telemetry(TelemetryBackend(tlm_sink))
+            create_sensors_attached_to(attached, true),
+            {},
+            *sink
     };
 
     uint8_t* stack = new uint8_t[4096];
@@ -39,8 +41,8 @@ int main() {
 
     Simulation sim({ .density_of_air = 0.001, .gravity = 9.81 }, std::vector<SimulatedRocket*> { together_sim, stage1_sim, stage2_sim });
 
-    RocketSystems* stage1_systems = create_and_start(together_sim, "stage1_sink.launch", "stage1_tlm.dat");
-    RocketSystems* stage2_systems = create_and_start(together_sim, "stage2_sink.launch", "stage2_tlm.dat");
+    RocketSystems* stage1_systems = create_and_start(together_sim, "stage1_sink.launch");
+    RocketSystems* stage2_systems = create_and_start(together_sim, "stage2_sink.launch");
 
     sim.ignite_rocket(together_sim);
 
