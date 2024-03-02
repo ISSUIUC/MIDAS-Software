@@ -4,8 +4,7 @@
 
 PL::ADXL355 sensor(ADXL355_CS);
 
-ErrorCode LowGSensor::init()
-{
+ErrorCode LowGSensor::init() {
     ErrorCode error = ErrorCode::NoError;
     sensor.begin();
     sensor.setRange(PL::ADXL355_Range::range2g);

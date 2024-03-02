@@ -1,5 +1,6 @@
 #include "silsim/emulation.h"
 #include "systems.h"
+#include "FileSink.h"
 
 void rocket_main_thread(RocketSystems* systems) {
     begin_systems(systems);
@@ -19,10 +20,11 @@ Sensors create_sensors_attached_to(SimulatedRocket* sim, bool should_be_continuo
 }
 
 RocketSystems* create_and_start(SimulatedRocket* attached, const char* sink_name) {
+    FileSink* sink = new FileSink(sink_name);
     RocketSystems* systems = new RocketSystems {
             create_sensors_attached_to(attached, true),
             {},
-            LogSink(sink_name)
+            *sink
     };
 
     uint8_t* stack = new uint8_t[4096];
