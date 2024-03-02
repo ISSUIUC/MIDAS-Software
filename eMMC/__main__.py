@@ -48,7 +48,7 @@ with serial.Serial(port, 9600) as ser:
 
             with open(current_root / file_name, "wb") as out_file:
                 while size != 0:
-                    buf = ser.read(size=1024)
+                    buf = ser.read(size=min(1024, size))
                     out_file.write(buf)
                     size -= len(buf)
             if ser.readline() != b"<done>\n":
