@@ -1,0 +1,59 @@
+import subprocess
+from pathlib import Path
+import os
+import serial
+
+current_root = Path.cwd()
+os.chdir(Path(__file__).absolute().parent)
+
+subprocess.run(["platformio", "run", "-e", "eMMC", "-t", "upload"])
+
+print("Listing connected devices:")
+subprocess.run(["platformio", "device", "list"])
+
+port = input("Choose a port name from the above list: ")
+with serial.Serial(port, 9600) as ser:
+    start = ser.readline()
+    if start != b"eMMC Connected\n":
+        raise Exception(f"Unexpected message: {start=}")
+    while True:
+        command = input(">> ")
+        if command == "help":
+            print("Available commands: ls, help, quit, dump <file>")
+        elif command == "quit":
+            break
+        elif command == "ls":
+            ser.write(b"ls\n")
+
+            text = ser.readline()
+            while text != b"" and text != b"<done>\n":
+                print(text[:-1].decode("utf-8", errors="ignore"))
+                text = ser.readline()
+            print("\n")
+        elif command.startswith("dump "):
+            file_name = command[5:]
+            ser.write(b"dump\n")
+            ser.write(file_name.encode("utf-8") + b"\n")
+
+            if ser.readline() != b"Success\n":
+                print("Could not read file!")
+                continue
+
+            b0 = ser.read()[0]
+            b1 = ser.read()[0]
+            b2 = ser.read()[0]
+            b3 = ser.read()[0]
+
+            size = (b3 << 24) + (b2 << 16) + (b1 << 8) + b0
+
+            with open(current_root / file_name, "wb") as out_file:
+                while size != 0:
+                    buf = ser.read(size=1024)
+                    out_file.write(buf)
+                    size -= len(buf)
+            if ser.readline() != b"<done>\n":
+                raise Exception("Fatal error when reading file!")
+        elif command == "":
+            pass
+        else:
+            print("Unknown Command")
