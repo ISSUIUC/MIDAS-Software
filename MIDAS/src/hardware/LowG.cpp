@@ -8,32 +8,26 @@
 
 Adxl355 sensor(ADXL355_CS);
 
-ErrorCode LowGSensor::init()
-{
+ErrorCode LowGSensor::init() {
     ErrorCode error = ErrorCode::NoError;
     sensor.initSPI(SPI);
     sensor.start();
     delay(100);
 
-    if (sensor.isDeviceRecognized())
-    {
+    if (sensor.isDeviceRecognized()) {
         // On boot, defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
         // Change to 2G range and Output Data Rate: 1000Hz and Low Pass Filter: 250Hz
         sensor.initializeSensor(Adxl355::RANGE_VALUES::RANGE_2G, Adxl355::ODR_LPF::ODR_1000_AND_250);
 
         // Swap check if the sensor is changed from different values
-        if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange())
-        {
+        if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange()) {
             error = ErrorCode::LowGRangeCouldNotBeSet;
         }
 
-        if (Adxl355::ODR_LPF::ODR_4000_AND_1000 != sensor.getOdrLpf())
-        {
+        if (Adxl355::ODR_LPF::ODR_4000_AND_1000 != sensor.getOdrLpf()) {
             error = ErrorCode::LowGODRLPFCouldNotBeSet;
         }
-    }
-    else
-    {
+    } else {
         error = ErrorCode::LowGCouldNotBeInitialized;
     }
 
@@ -44,8 +38,7 @@ ErrorCode LowGSensor::init()
     return error;
 }
 
-LowGData LowGSensor::read()
-{
+LowGData LowGSensor::read() {
     // read from aforementioned global instance of sensor
     auto data = sensor.getAccel();
 

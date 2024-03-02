@@ -10,7 +10,7 @@
 struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
-    LogSink log_sink;
+    LogSink& log_sink;
     BuzzerController buzzer;
     Telemetry tlm;
 };
