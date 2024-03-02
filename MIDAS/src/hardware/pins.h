@@ -46,3 +46,8 @@
 #define PYROC_FIRE_PIN 011
 #define PYROD_ARM_PIN 012
 #define PYROD_FIRE_PIN 013
+
+// Telemetry pins
+#define TELEMETRY_CS 1
+#define TELEMETRY_INT 7
+#define TELEMETRY_RESET 15
