@@ -6,35 +6,39 @@
 #include "hal.h"
 #include "Buffer.h"
 
-
-
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
  *  Normally, this would be considered a poor decision. However, the fact that all this data is here
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
 
+template<typename SensorData>
+struct Reading {
+    uint32_t timestamp_ms;
+    SensorData data;
+};
+
 template<typename S>
-struct SensorState {
+struct SensorData {
 private:
     Mutex<S> current;
-    Queue<S> queue;
+    Queue<Reading<S>> queue;
 
 public:
     void update(S data) {
         current.write(data);
-        queue.send(data);
+        queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
     };
 
     S getRecent() {
         return current.read();
     };
 
-    bool getQueued(S* out) {
+    bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };
 
-    SensorState() : current(S()) { }
+    SensorData() : current(SensorData()) { }
 };
 
 template<typename S, size_t count>
@@ -44,7 +48,7 @@ private:
     Queue<S> queue;
     Buffer<S, count> buffer;
     Buffer<TickType_t, count> data_time;
-    
+
 public:
     void update(S data) {
         current.write(data);
@@ -77,7 +81,7 @@ public:
         return S();
     }
 
-    
+
     bool getQueued(S* out) {
         return queue.receive(out);
     };
@@ -90,20 +94,26 @@ enum Stage {
     BOOSTER,
 };
 
-struct RocketState {
+/**
+ * The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
+ *
+ *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  makes it easier to debug since all this data can be logged (and thus used when debugging).
+ */
+struct RocketData {
 public:
-    bool pyro_should_be_firing;
-    Stage rocket_stage; 
-    SensorState<LowGData> low_g;
+    bool pyro_should_be_firing = false;
+    Stage rocket_stage;
+
+    SensorData<KalmanData> kalman;
+    SensorData<LowGData> low_g;
     BufferedSensorState<HighGData, 8> high_g;
-    BufferedSensorState<TickType_t, 8> data_time;
-    SensorState<GyroscopeData> gyroscope;
     BufferedSensorState<Barometer, 8> barometer;
-    SensorState<Continuity> continuity;
-    SensorState<Voltage> voltage;
-    SensorState<GPS> gps;
-    SensorState<Magnetometer> magnetometer;
-    SensorState<Orientation> orientation;
-    SensorState<FSMState> fsm_state;
+    SensorData<Continuity> continuity;
+    SensorData<Voltage> voltage;
+    SensorData<GPS> gps;
+    SensorData<Magnetometer> magnetometer;
+    SensorData<Orientation> orientation;
+    SensorData<FSMState> fsm_state;
 };
 
