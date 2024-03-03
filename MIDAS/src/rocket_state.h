@@ -25,7 +25,9 @@ private:
     Queue<Reading<S>> queue;
 
 public:
-    void update(S data) {
+    SensorData() : current(S()) { }
+
+    virtual void update(S data) {
         current.write(data);
         queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
     };
@@ -37,28 +39,21 @@ public:
     bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };
-
-    SensorData() : current(SensorData()) { }
 };
 
 template<typename S, size_t count>
-struct BufferedSensorState {
+struct BufferedSensorData : public SensorData<S> {
 private:
-    Mutex<S> current;
-    Queue<S> queue;
     Buffer<S, count> buffer;
     Buffer<TickType_t, count> data_time;
 
 public:
-    void update(S data) {
-        current.write(data);
-        queue.send(data);
+    BufferedSensorData() : SensorData<S>() { }
+
+    void update(S data) override {
+        SensorData<S>::update(data);
         buffer.push(data);
         data_time.push(xTaskGetTickCount());
-    };
-
-    S getRecent() {
-        return current.read();
     };
 
     // wrapper function to get easy access to buffer data
@@ -73,25 +68,6 @@ public:
         std::array<TickType_t, arr_count> arr = data_time. template read_recent<arr_count>();
         return arr;
     };
-
-    // function to get the tick when the oldest data point was recorded
-    TickType_t getStartTime() {
-        TickType_t time;
-        if(data_time.read_oldest(time)) {return time;}
-        return S();
-    }
-
-
-    bool getQueued(S* out) {
-        return queue.receive(out);
-    };
-
-    BufferedSensorState() : current(S()) { }
-};
-
-enum Stage {
-    SUSTAINER,
-    BOOSTER,
 };
 
 /**
@@ -102,18 +78,17 @@ enum Stage {
  */
 struct RocketData {
 public:
-    bool pyro_should_be_firing = false;
-    Stage rocket_stage;
-
     SensorData<KalmanData> kalman;
     SensorData<LowGData> low_g;
-    BufferedSensorState<HighGData, 8> high_g;
-    BufferedSensorState<Barometer, 8> barometer;
+    BufferedSensorData<HighGData, 8> high_g;
+    BufferedSensorData<Barometer, 8> barometer;
+    SensorData<LowGLSM> low_g_lsm;
     SensorData<Continuity> continuity;
     SensorData<Voltage> voltage;
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
+    SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
 };
 

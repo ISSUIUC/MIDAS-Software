@@ -5,8 +5,13 @@
 #include "data_logging.h"
 #include "buzzer.h"
 
-#include "gnc/example_kf.h"
 #include "gnc/displacement_kf.h"
+
+#if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
+#error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
+#elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
+#error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
+#endif
 
 /**
  * These are all the functions that will run in each task
@@ -141,18 +146,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
 
     while (true) {
-        FSMState current_state = arg->rocket_state.fsm_state.getRecent();
-        StateEstimate state_estimate(arg->rocket_state);
+        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        StateEstimate state_estimate(arg->rocket_data);
 
-        FSMState next_state;
-        // based on what stage of the rocket run the appropriate tick_fsm
-        if (arg->rocket_state.rocket_stage == Stage::SUSTAINER) {
-            next_state = fsm.tick_fsm_sustainer(current_state, state_estimate);
-        } else {
-            next_state = fsm.tick_fsm_booster(current_state, state_estimate);
-        }
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
 
-        arg->rocket_state.fsm_state.update(next_state);
+        arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
 }
@@ -202,7 +201,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
  * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
 */
 DECLARE_THREAD(pyro, RocketSystems* arg) {
-
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecent();
         PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
@@ -243,7 +241,6 @@ void begin_systems(RocketSystems* config) {
         while (true) {
             update_error_LED(init_error_code);
         }
-        return;
     }
 
     START_THREAD(logger, DATA_CORE, config);

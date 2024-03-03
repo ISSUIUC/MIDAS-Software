@@ -19,7 +19,7 @@ struct StateEstimate {
     double jerk;
     double vertical_speed;
 
-    explicit StateEstimate(RocketState& state);
+    explicit StateEstimate(RocketData& state);
 };
 
 
@@ -27,13 +27,7 @@ class FSM {
 public:
     FSM() = default;
 
-    FSMState tick_fsm_sustainer(FSMState& curr_state, StateEstimate state_estimate);
-    FSMState tick_fsm_booster(FSMState& state, StateEstimate state_estimate);
-
-    float getAcceleration(std::array<HighGData, 8>& hg);
-    float getAltitude(std::array<Barometer, 8>& bar);
-    double getJerk(std::array<HighGData, 8>& hg, double time_delta);
-    double getVerticalSpeed(std::array<Barometer, 8>& bar, double time_delta);
+    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate);
 
 private:
     double launch_time;
@@ -46,5 +40,4 @@ private:
     double main_time;
     double landed_time;
     double first_separation_time;
-//    float acceleration;
 };
