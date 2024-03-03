@@ -2,8 +2,6 @@
 
 #include <array>
 
-#include "finite-state-machines/fsm.h"
-
 #include "sensor_data.h"
 #include "hal.h"
 #include "Buffer.h"
@@ -60,8 +58,15 @@ public:
     };
 
     // wrapper function to get easy access to buffer data
-    std::array<S, count> getBufferRecent() {
-        std::array<S, count> arr = buffer. template read_recent<count>(); 
+    template<size_t arr_count>
+    std::array<S, arr_count> getBufferRecent() {
+        std::array<S, arr_count> arr = buffer. template read_recent<arr_count>();
+        return arr;
+    };
+
+    template<size_t arr_count>
+    std::array<TickType_t, arr_count> getTimesRecent() {
+        std::array<TickType_t, arr_count> arr = data_time. template read_recent<arr_count>();
         return arr;
     };
 
@@ -100,6 +105,5 @@ public:
     SensorState<Magnetometer> magnetometer;
     SensorState<Orientation> orientation;
     SensorState<FSMState> fsm_state;
-    FSM fsm;
 };
 

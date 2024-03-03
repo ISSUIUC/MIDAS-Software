@@ -132,8 +132,4 @@ struct Pyro {
     bool is_active = false;
 };
 
-struct FSMState {
-    fsm_state curr_state = STATE_IDLE;
-};
-
 

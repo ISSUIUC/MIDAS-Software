@@ -99,32 +99,23 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(fsm, RocketSystems* arg) {
+    FSM fsm {};
+
     while (true) {
-
-
-        //getting all the current data
         FSMState current_state = arg->rocket_state.fsm_state.getRecent();
-
-        std::array<HighGData, 8> buff_hg = arg->rocket_state.high_g.getBufferRecent();
-        std::array<Barometer, 8> buff_bar = arg->rocket_state.barometer.getBufferRecent();
-
-        double time_delta = (pdTICKS_TO_MS(xTaskGetTickCount()) - pdTICKS_TO_MS(arg->rocket_state.data_time.getStartTime()))/ 1000;
+        StateEstimate state_estimate(arg->rocket_state);
 
         FSMState next_state;
-
         // based on what stage of the rocket run the appropriate tick_fsm
-        if(arg->rocket_state.rocket_stage == Stage::SUSTAINER) { 
-            next_state = arg->rocket_state.fsm.tick_fsm_sustainer(current_state, buff_hg, buff_bar, time_delta);
-        }  
-        else {
-            next_state = arg->rocket_state.fsm.tick_fsm_booster(current_state, buff_hg, buff_bar, time_delta);
+        if (arg->rocket_state.rocket_stage == Stage::SUSTAINER) {
+            next_state = fsm.tick_fsm_sustainer(current_state, state_estimate);
+        } else {
+            next_state = fsm.tick_fsm_booster(current_state, state_estimate);
         }
-        
-        //update the state
+
         arg->rocket_state.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
-    vTaskDelete(NULL);
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
