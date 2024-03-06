@@ -8,7 +8,7 @@
 #define configSUPPORT_DYNAMIC_ALLOCATION 0
 #define INCLUDE_vTaskDelay 1
 
-#define configMINIMAL_STACK_SIZE 128
+#define configMINIMAL_STACK_SIZE 8192
 #define configMAX_PRIORITIES 5
 #define configUSE_IDLE_HOOK 0
 #define configUSE_TICK_HOOK 0

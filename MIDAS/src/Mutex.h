@@ -17,10 +17,10 @@
 template<typename T>
 struct Mutex {
 private:
-    StaticSemaphore_t mutex_buffer{};
+    uint8_t mutex_buffer[sizeof(StaticSemaphore_t) + 64]{};
     SemaphoreHandle_t mutex_handle{};
-
     T data;
+    SemaphoreHandle_t check{};
 
 public:
     Mutex() = delete;
@@ -33,7 +33,10 @@ public:
      * @param data The initial value in the mutex.
      */
     explicit Mutex(T data) : mutex_buffer() {
-        mutex_handle = xSemaphoreCreateMutexStatic(&mutex_buffer);
+        mutex_handle = xSemaphoreCreateMutexStatic((StaticSemaphore_t*) &mutex_buffer[32]);
+        check = mutex_handle;
+//        memset(mutex_buffer, 0xAD, 32);
+//        memset(&mutex_buffer[sizeof(StaticSemaphore_t) + 32], 0xAD, 32);
         // configASSERT(mutex_handle);
     }
 
@@ -54,9 +57,22 @@ public:
      * @param value What to update the mutex to.
      */
     void write(T value) {
+        if (mutex_handle != check) {
+            Serial.println("Aw shucks");
+            Serial.flush();
+        }
+
         while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         data = value;
         xSemaphoreGive(mutex_handle);
+
+//        if (mutex_buffer[0] != 0xAD) {
+//            Serial.println("Overflowing buffer top");
+//        }
+//
+//        if (mutex_buffer[sizeof(StaticSemaphore_t) + 64 - 1] != 0xAD) {
+//            Serial.println("Overflowing buffer bottom");
+//        }
     }
 
     // todo lock/unlock?
