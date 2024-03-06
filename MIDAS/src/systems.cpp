@@ -5,8 +5,13 @@
 #include "data_logging.h"
 #include "buzzer.h"
 
-#include "gnc/example_kf.h"
 #include "gnc/displacement_kf.h"
+
+#if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
+#error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
+#elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
+#error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
+#endif
 
 /**
  * These are all the functions that will run in each task
@@ -126,7 +131,7 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
             { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
     };
     arg->buzzer.play_tune(continuity_sensor_tune, 28);
-    
+
     while (true) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
@@ -138,9 +143,14 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
+    FSM fsm {};
+
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecent();
-        FSMState next_state = tick_fsm(current_state);
+        StateEstimate state_estimate(arg->rocket_data);
+
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+
         arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
     }
@@ -249,7 +259,6 @@ void begin_systems(RocketSystems* config) {
         while (true) {
             update_error_LED(init_error_code);
         }
-        return;
     }
 
     START_THREAD(logger, DATA_CORE, config);

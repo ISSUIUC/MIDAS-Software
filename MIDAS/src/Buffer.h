@@ -9,13 +9,15 @@ public:
     Buffer() = default;
 
     void push(T const& element) {
-        buffer[tail_idx++] = element;
+        buffer[tail_idx] = element;
+        tail_idx++;
         if (tail_idx == BUFFER_SIZE) {
             tail_idx = 0;
         }
         if (count < BUFFER_SIZE) {
             count++;
         }
+        
     }
 
     bool read(T& item) {
@@ -23,6 +25,14 @@ public:
             return false;
         }
         item = buffer[newest_idx()];
+        return true;
+    }
+
+    bool read_oldest(T&item) {
+        if (count == 0) {
+            return false;
+        }
+        item = buffer[oldest_idx()];
         return true;
     }
 
@@ -40,6 +50,7 @@ public:
         }
         return arr;
     }
+    
 
 private:
     size_t oldest_idx() {
