@@ -191,8 +191,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 
         last = xTaskGetTickCount();
 
-        //Serial.println("KALMAN");
-
         THREAD_SLEEP(16);
     }
 }
@@ -206,9 +204,29 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
         PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
         arg->rocket_data.pyro.update(new_pyro_state);
         THREAD_SLEEP(16);
-        //Serial.println("PYRO");
     }
-    vTaskDelete(NULL);
+}
+
+
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
+    while (true) {
+        arg->tlm.bufferData(arg->rocket_data);
+        THREAD_SLEEP(5);
+    }
+}
+
+
+/**
+ * See \ref data_logger_thread
+ */
+DECLARE_THREAD(telemetry, RocketSystems* arg) {
+    while (true) {
+        arg->tlm.transmit(arg->rocket_data);
+        THREAD_SLEEP(16);
+    }
 }
 
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
@@ -257,6 +275,8 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(buzzer, SENSOR_CORE, config);
     START_THREAD(kalman, SENSOR_CORE, config);
     START_THREAD(pyro, SENSOR_CORE, &config);
+    START_THREAD(telemetry, DATA_CORE, config);
+    START_THREAD(telemetry_buffering, DATA_CORE, config);
 
     while (true) {
         THREAD_SLEEP(1000);

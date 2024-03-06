@@ -62,3 +62,6 @@
 #define TELEMETRY_CS 1
 #define TELEMETRY_INT 7
 #define TELEMETRY_RESET 15
+
+// LEDs
+#define LED_BLUE 0

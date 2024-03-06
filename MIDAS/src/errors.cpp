@@ -66,13 +66,13 @@ void update_error_LED(ErrorCode error) {
             gpioDigitalWrite(orange_led, LOW);
             gpioDigitalWrite(red_led, LOW);
             break;   
-        case HighGCoulNotUpdateDataRate:
+        case HighGCouldNotUpdateDataRate:
             gpioDigitalWrite(blue_led, HIGH);
             gpioDigitalWrite(green_led, LOW);
             gpioDigitalWrite(orange_led, HIGH);
             gpioDigitalWrite(red_led, LOW);
             break;
-        case MagnetometerCoultNotBeInitialized:
+        case MagnetometerCouldNotBeInitialized:
             gpioDigitalWrite(blue_led, HIGH);
             gpioDigitalWrite(green_led, LOW);
             gpioDigitalWrite(orange_led, LOW);
