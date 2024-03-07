@@ -11,12 +11,14 @@
  * Sets the config file and then starts all the threads using the config.
  */
 // todo re-enable
-MultipleLogSink<EMMCSink> sinks;
+MultipleLogSink<> sinks;
 RocketSystems systems { .log_sink = sinks };
 
 void setup() {
     //begin serial port
     Serial.begin(9600);
+
+    while (!Serial);
 
     delay(200);
 

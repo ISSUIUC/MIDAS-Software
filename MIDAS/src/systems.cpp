@@ -40,13 +40,13 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
 
-//        Serial.print("Baro Alt: ");
-//        Serial.print(reading.altitude);
-//        Serial.print(" Pressure: ");
-//        Serial.print(reading.pressure);
-//        Serial.print(" Temp: ");
-//        Serial.print(reading.temperature);
-//        Serial.print("\n");
+        Serial.print("Baro Alt: ");
+        Serial.print(reading.altitude);
+        Serial.print(" Pressure: ");
+        Serial.print(reading.pressure);
+        Serial.print(" Temp: ");
+        Serial.print(reading.temperature);
+        Serial.print("\n");
         THREAD_SLEEP(16);
     }
 }
@@ -328,6 +328,8 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         Serial.println("Entered Telem Transmit");
 
         arg->tlm.transmit(arg->rocket_data);
+
+        Serial.println("Exit Telem Transmit");
         THREAD_SLEEP(16);
     }
 }
@@ -335,18 +337,19 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
-    INIT_SYSTEM(systems.sensors.low_g);
-    INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
+//    INIT_SYSTEM(systems.sensors.low_g);
+//    INIT_SYSTEM(systems.sensors.high_g);
+//    INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.orientation);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.gps);
+//    INIT_SYSTEM(systems.sensors.continuity);
+//    INIT_SYSTEM(systems.sensors.orientation);
+//    INIT_SYSTEM(systems.sensors.voltage);
+//    INIT_SYSTEM(systems.sensors.magnetometer);
+//    INIT_SYSTEM(systems.sensors.gps);
 //    INIT_SYSTEM(systems.log_sink);
 //    INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.sensors.pyro);
+//    INIT_SYSTEM(systems.sensors.pyro);
+    INIT_SYSTEM(systems.tlm);
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -370,19 +373,19 @@ void begin_systems(RocketSystems* config) {
 
 //    START_THREAD(logger, SENSOR_CORE, config);
     START_THREAD(barometer, SENSOR_CORE, config);
-    START_THREAD(low_g, SENSOR_CORE, config);
-    START_THREAD(high_g, SENSOR_CORE, config);
-    START_THREAD(low_g_lsm, SENSOR_CORE, config);
-    START_THREAD(orientation, SENSOR_CORE, config);
-    START_THREAD(magnetometer, SENSOR_CORE, config);
-    START_THREAD(gps, SENSOR_CORE, config);
-    START_THREAD(voltage, SENSOR_CORE, config);
-    START_THREAD(continuity, SENSOR_CORE, config);
-    START_THREAD(fsm, SENSOR_CORE, config);
+//    START_THREAD(low_g, SENSOR_CORE, config);
+//    START_THREAD(high_g, SENSOR_CORE, config);
+//    START_THREAD(low_g_lsm, SENSOR_CORE, config);
+//    START_THREAD(orientation, SENSOR_CORE, config);
+//    START_THREAD(magnetometer, SENSOR_CORE, config);
+//    START_THREAD(gps, SENSOR_CORE, config);
+//    START_THREAD(voltage, SENSOR_CORE, config);
+//    START_THREAD(continuity, SENSOR_CORE, config);
+//    START_THREAD(fsm, SENSOR_CORE, config);
 //    START_THREAD(buzzer, SENSOR_CORE, config);
-    START_THREAD(kalman, SENSOR_CORE, config);
-    START_THREAD(pyro, SENSOR_CORE, config);
-    START_THREAD(telemetry, DATA_CORE, config);
+//    START_THREAD(kalman, SENSOR_CORE, config);
+//    START_THREAD(pyro, SENSOR_CORE, config);
+    START_THREAD(telemetry, SENSOR_CORE, config);
 //    START_THREAD(telemetry_buffering, DATA_CORE, config);
 
     while (true) {

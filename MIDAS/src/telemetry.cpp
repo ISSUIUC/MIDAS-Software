@@ -25,18 +25,24 @@ Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) {
 
 
 void Telemetry::transmit(RocketData& rocket_data) {
-    telemetry_command command { };
-    while (backend.read(&command)) {
-        handleCommand(command);
-    }
+//    telemetry_command command { };
+//    while (backend.read(&command)) {
+//        handleCommand(command);
+//    }
 
-    if (!std::isnan(set_frequency_to)) {
-        backend.setFrequency(set_frequency_to);
-        set_frequency_to = NAN;
-    }
+//    if (!std::isnan(set_frequency_to)) {
+//        backend.setFrequency(set_frequency_to);
+//        set_frequency_to = NAN;
+//    }
 
+    Serial.println("Making Packet...");  Serial.flush();
     TelemetryPacket packet = makePacket(rocket_data);
+    Serial.println("Sending Packet...");  Serial.flush();
+//    char packet[200] = "moooooo";
+
     backend.send(packet);
+
+    Serial.println("Sent Packet..."); Serial.flush();
 }
 
 
@@ -79,6 +85,8 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
     TelemetryPacket packet { };
 
+
+    Serial.println("Making Buffered packets"); Serial.flush();
     TelemetryDataLite small_packet { };
     packet.datapoint_count = 0;
     for (int8_t i = 0; i < 4 && small_packet_queue.receive(&small_packet); i++) {
@@ -86,33 +94,37 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
         packet.datapoint_count = i + 1;
     }
 
-    GPS gps = data.gps.getRecent();
-    Orientation orientation = data.orientation.getRecent();
-    Magnetometer magnetometer = data.magnetometer.getRecent();
-    Voltage voltage = data.voltage.getRecent();
-    Barometer barometer = data.barometer.getRecent();
-    Continuity continuity = data.continuity.getRecent();
 
-    packet.gps_lat = gps.latitude;
-    packet.gps_long = gps.longitude;
-    packet.gps_alt = gps.altitude;
-    packet.yaw = orientation.yaw;
-    packet.pitch = orientation.pitch;
-    packet.roll = orientation.roll;
+//    GPS gps = data.gps.getRecent();
+//    Orientation orientation = data.orientation.getRecent();
+//    Magnetometer magnetometer = data.magnetometer.getRecent();
+//    Voltage voltage = data.voltage.getRecent();
+//    packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
+//    Barometer barometer = data.barometer.getRecent();
 
-    packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
-    packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
-    packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
-    packet.gyro_x = inv_convert_range<int16_t>(orientation.gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
+//    packet.gps_lat = gps.latitude;
+//    packet.gps_long = gps.longitude;
+//    packet.gps_alt = gps.altitude;
+//    packet.yaw = orientation.yaw;
+//    packet.pitch = orientation.pitch;
+//    packet.roll = orientation.roll;
+
+//    packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
+//    packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
+//    packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
+//    packet.gyro_x = inv_convert_range<int16_t>(orientation.gx, 8192);
+//    packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
+//    packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
 
     packet.response_ID = last_command_id;
 
     packet.rssi = backend.getRecentRssi();
+    Serial.println("Getting fsm"); Serial.flush();
     packet.FSM_state = (char) data.fsm_state.getRecent();
-    packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
-    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
+
+    Serial.println("Getting pyros"); Serial.flush();
+
+//    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
 
     auto pyros = data.pyro.getRecent();
     for (int i = 0; i < 4; i++) {
@@ -120,11 +132,18 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
         packet.pyros_firing[i] = pyros.channels[i].is_firing;
     }
 
-    for (int i = 0; i < 4; i++) {
-        packet.continuity[i] = continuity.pins[i];
-    }
+//    Continuity continuity{};
+//    data.continuity.getRecent2(&continuity);
+//    Continuity continuity = data.continuity.getRecent();
+//    for (int i = 0; i < 4; i++) {
+//        packet.continuity[i] = continuity.pins[i];
+//    }
+
+    Serial.println("Memcpy'ing"); Serial.flush();
 
     memcpy(&packet.callsign, &callsign, sizeof(callsign));
+
+    Serial.println("Done with packet"); Serial.flush();
 
     return packet;
 }

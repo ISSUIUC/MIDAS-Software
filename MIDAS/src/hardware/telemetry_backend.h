@@ -29,12 +29,12 @@ public:
     template<typename T>
     void send(const T& data) {
         static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to send is too large");
-        digitalWrite(led_pin, led_state);
-        led_state = !led_state;
+//        digitalWrite(led_pin, led_state);
+//        led_state = !led_state;
 
         rf95.send((uint8_t*) &data, sizeof(T));
-        THREAD_SLEEP(170);
         rf95.waitPacketSent();
+        THREAD_SLEEP(170);
     }
 
     template<typename T>
@@ -51,6 +51,6 @@ public:
 private:
     RH_RF95 rf95;
 
-    uint8_t led_pin;
-    bool led_state;
+//    uint8_t led_pin;
+//    bool led_state;
 };

@@ -36,6 +36,10 @@ public:
         return current.read();
     };
 
+    void getRecent2(S* ptr) {
+        current.read2(ptr);
+    }
+
     bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };
@@ -84,11 +88,10 @@ public:
     BufferedSensorData<Barometer, 8> barometer;
     SensorData<LowGLSM> low_g_lsm;
     SensorData<Continuity> continuity;
-    SensorData<Voltage> voltage;
+    SensorData<PyroState> pyro;
+    SensorData<FSMState> fsm_state;
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
-    SensorData<PyroState> pyro;
-    SensorData<FSMState> fsm_state;
+    SensorData<Voltage> voltage;
 };
-

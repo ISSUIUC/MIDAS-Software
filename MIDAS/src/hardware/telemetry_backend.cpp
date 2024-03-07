@@ -23,22 +23,21 @@
 
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 434.0
+#define RF95_FREQ 433.0
 
-TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT, hardware_spi) {
-    led_state = false;
-    led_pin = LED_BLUE;
+TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
+//    led_state = false;
+//    led_pin = LED_BLUE;
 }
 
 ErrorCode TelemetryBackend::init() {
     pinMode(RFM96_RESET, OUTPUT);
     digitalWrite(RFM96_RESET, HIGH);
-    delay(10);
-
+    delay(100);
     digitalWrite(RFM96_RESET, LOW);
-    delay(10);
+    delay(100);
     digitalWrite(RFM96_RESET, HIGH);
-    delay(10);
+    delay(5);
 
     if (!rf95.init()) {
         return ErrorCode::RadioInitFailed;
@@ -57,7 +56,7 @@ ErrorCode TelemetryBackend::init() {
      * If you are using RFM95/96/97/98 modules which uses the PA_BOOST
      * transmitter pin, then you can set transmitter powers from 5 to 23 dBm:
      */
-    rf95.setTxPower(6, false);
+    rf95.setTxPower(23, false);
 
     sei();
     return ErrorCode::NoError;
