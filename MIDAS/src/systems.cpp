@@ -26,7 +26,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         Serial.println("Entered Logger");
 
         log_data(arg->log_sink, arg->rocket_data);
-        THREAD_SLEEP(50);
+//        THREAD_SLEEP(50);
     }
 }
 
@@ -40,13 +40,13 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
 
-        Serial.print("Baro Alt: ");
-        Serial.print(reading.altitude);
-        Serial.print(" Pressure: ");
-        Serial.print(reading.pressure);
-        Serial.print(" Temp: ");
-        Serial.print(reading.temperature);
-        Serial.print("\n");
+//        Serial.print("Baro Alt: ");
+//        Serial.print(reading.altitude);
+//        Serial.print(" Pressure: ");
+//        Serial.print(reading.pressure);
+//        Serial.print(" Temp: ");
+//        Serial.print(reading.temperature);
+//        Serial.print("\n");
         THREAD_SLEEP(16);
     }
 }

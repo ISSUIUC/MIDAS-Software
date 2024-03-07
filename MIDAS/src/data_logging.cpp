@@ -30,7 +30,7 @@ template<typename T>
 uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
     uint32_t read = 0;
-    while (sensor_data.getQueued(&reading)) {
+    while (read < 20 && sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);
         read++;
     }

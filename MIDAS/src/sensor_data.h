@@ -5,7 +5,7 @@
 
 #include "finite-state-machines/fsm_states.h"
 
-#define CONTINUITY_PIN_COUNT 5
+//#define CONTINUITY_PIN_COUNT 5
 
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
@@ -152,23 +152,6 @@ struct PyroChannel {
     bool is_firing = false;
 };
 
-/** piro team defense forter 2
-⠂⠄⡂⡐⠠⠠⠠⠄⠄⠄⣀⡠⡤⡤⣆⢦⣄
-⠈⡀⠄⠄⠂⠁⠄⠁⡠⡪⡢⡫⡎⡧⡳⣝⣷⣧
-⠐⢀⠐⠈⠄⠄⢠⠎⢜⢸⢸⢜⡪⣪⢪⢲⢹⢽⡳⡄
-⡈⠠⢀⢡⠋⠉⠫⢶⡨⡪⣊⣦⠗⠚⠺⢾⣎⡧⣏⠇
-⠐⠄⢂⠧⠄⠄⠄⣽⢪⠚⡞⠄⠄⠄⠄⠄⠙⡾⡸⡕
-⠈⡀⠸⣱⠄⠄⢀⠞⡜⡹⡇⠄⠄⠄⠄⠄⠄⡯⡪⡝⠄
-⠂⡠⢁⡪⣂⢠⠪⠁⣇⢣⢣⣀⠄⠄⠐⣀⡼⡑⡜⠆
-⡼⢡⠢⡠⠄⠄⠄⡌⡆⣇⡅⠍⠛⠛⢛⠍⡔⢅⠣⠥⠤⣄
-⡝⡐⢕⢌⠄⠈⠠⠵⣹⣙⠎⡕⢅⢊⠢⡱⡸⢈⠢⠁⢸⣿
-⡯⠐⢅⠢⡂⠄⡘⣈⢂⢢⢑⠌⡢⠡⣫⡮⡨⠠⠁⠂⣸⣿
-⠱⢅⠨⠐⠠⠊⠎⠞⢵⡳⣥⡈⠢⡁⠢⠐⠄⠄⢀⣾⣿⣿
-⠄⡁⠄⢀⡸⢪⠲⠵⣄⠍⢪⢞⡐⠌⠈⠄⠄⢀⣾⡿⣿⡿
-⠄⠂⣴⣿⡐⢡⠑⡸⢠⠫⡀⠕⠁⢀⡠⣔⣮⡿⡯⣟⣿⢿
-⣠⣾⡿⠟⢁⢠⢐⣁⡂⣈⢴⠄⢘⣾⡺⡯⡫⣏⢯⡳⡝⡇
-⣿⣿⠁⠁⠄⢀⠆⣞⢿⣷⢱⠄⡜⡮⡳⡹⡸⡪⣱⡪⡪⠄
-*/
 struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
