@@ -35,10 +35,18 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
  */
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Barometer"); Serial.flush();
+//        Serial.println("Entered Barometer");
 
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
+
+        Serial.print("Baro Alt: ");
+        Serial.print(reading.altitude);
+        Serial.print(" Pressure: ");
+        Serial.print(reading.pressure);
+        Serial.print("temp: ");
+        Serial.print(reading.temperature);
+        Serial.print("\n");
         THREAD_SLEEP(16);
     }
 }
@@ -48,7 +56,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
  */
 DECLARE_THREAD(low_g, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Low G"); Serial.flush();
+//        Serial.println("Entered Low G");
 
         LowGData reading = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(reading);
@@ -71,7 +79,7 @@ DECLARE_THREAD(low_g_lsm, RocketSystems* arg) {
  */
 DECLARE_THREAD(high_g, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered High G"); Serial.flush();
+//        Serial.println("Entered High G");
 
         HighGData reading = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(reading);
@@ -166,7 +174,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
 
     while (true) {
-        Serial.println("Entered FSM");
+//        Serial.println("Entered FSM");
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecent();
         StateEstimate state_estimate(arg->rocket_data);
@@ -183,7 +191,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
  */
 DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Buzzer");
+//        Serial.println("Entered Buzzer");
 
         arg->buzzer.tick();
 
@@ -199,7 +207,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     TickType_t last = xTaskGetTickCount();
 
     while (true) {
-        Serial.println("Entered Kalman");
+//        Serial.println("Entered Kalman");
 
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
