@@ -5,6 +5,7 @@ void EMMCSink::write(const uint8_t* data, size_t size) {
     // file.print(message);
     // Get all data and write
     file.write(data, size);
+    file.flush();
 }
 
 ErrorCode EMMCSink::init(){
@@ -15,10 +16,7 @@ ErrorCode EMMCSink::init(){
     if(!SD_MMC.begin("/sdcard", true, false, SDMMC_FREQ_52M, 5)){
         return ErrorCode::EmmcCouldNotBegin;
     }
-    char file_extension[8] = ".launch";
-
-    char data_name[16] = "data";
-    sdFileNamer(data_name, file_extension, SD_MMC);
+    char data_name[] = "/data.launch";
 
     file = SD_MMC.open(data_name, FILE_WRITE);
 

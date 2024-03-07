@@ -3,7 +3,7 @@
 // #include sensor library
 #include "Adafruit_BNO08x.h"
 
-GpioAddress bno_reset(1, 0x75);
+GpioAddress bno_reset(1, 07);
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(bno_reset);
@@ -67,9 +67,6 @@ Orientation OrientationSensor::read() {
         sensor_reading.yaw = euler.y;
         sensor_reading.pitch = euler.z;
         sensor_reading.roll = euler.x;
-
-        Serial.println("Got yaw: ");
-        Serial.println(euler.y);
 
         sensor_reading.linear_acceleration.ax = event.un.accelerometer.x;
         sensor_reading.linear_acceleration.ay = event.un.accelerometer.y;

@@ -115,19 +115,19 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
  */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Orientation");
+//        Serial.println("Entered Orientation");
 
         Orientation reading = arg->sensors.orientation.read();
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
 
-            Serial.print(" Yaw: ");
-            Serial.print(reading.yaw);
-            Serial.print(" Pitch: ");
-            Serial.print(reading.pitch);
-            Serial.print(" Roll: ");
-            Serial.print(reading.roll);
-            Serial.print("\n");
+//            Serial.print(" Yaw: ");
+//            Serial.print(reading.yaw);
+//            Serial.print(" Pitch: ");
+//            Serial.print(reading.pitch);
+//            Serial.print(" Roll: ");
+//            Serial.print(reading.roll);
+//            Serial.print("\n");
         }
 
         THREAD_SLEEP(500);
@@ -160,10 +160,16 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
  */
 DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered GPS");
+//        Serial.println("Entered GPS");
 
         GPS reading = arg->sensors.gps.read();
         arg->rocket_data.gps.update(reading);
+
+//        Serial.print(" Satellite count: ");
+//        Serial.print(reading.satellite_count);
+//        Serial.print(" Alt: ");
+//        Serial.print(reading.altitude);
+//        Serial.print("\n");
         THREAD_SLEEP(16);
     }
 }
@@ -173,10 +179,13 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
  */
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Voltage");
+//        Serial.println("Entered Voltage");
 
         Voltage reading = arg->sensors.voltage.read();
         arg->rocket_data.voltage.update(reading);
+//        Serial.print(" Voltage: ");
+//        Serial.print(reading.voltage);
+//        Serial.print("\n");
         THREAD_SLEEP(20);
     }
 }
@@ -185,25 +194,32 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
-    Continuity initial_readings = arg->sensors.continuity.read();
-
-    Sound continuity_sensor_tune[] = {
-            { 20, 200 }, { 0, 200 },
-            { initial_readings.pins[0] ? 40u : 20u, 200 }, { 0, 200 },
-            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
-            { initial_readings.pins[1] ? 40u : 20u, 200 }, { 0, 200 },
-            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
-            { initial_readings.pins[2] ? 40u : 20u, 200 }, { 0, 200 },
-            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
-            { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
-    };
-    arg->buzzer.play_tune(continuity_sensor_tune, 28);
+//    Continuity initial_readings = arg->sensors.continuity.read();
+//
+//    Sound continuity_sensor_tune[] = {
+//            { 20, 200 }, { 0, 200 },
+//            { initial_readings.sense_apogee ? 40u : 20u, 200 }, { 0, 200 },
+//            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+//            { initial_readings.sense_main ? 40u : 20u, 200 }, { 0, 200 },
+//            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+//            { initial_readings.pins[2] ? 40u : 20u, 200 }, { 0, 200 },
+//            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
+//            { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
+//    };
+//    arg->buzzer.play_tune(continuity_sensor_tune, 28);
 
     while (true) {
-        Serial.println("Entered Continuity");
+//        Serial.println("Entered Continuity");
 
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
+
+//        Serial.print(reading.sense_pyro);
+//        Serial.print(reading.pins[0]);
+//        Serial.print(reading.pins[1]);
+//        Serial.print(reading.pins[2]);
+//        Serial.print(reading.pins[3]);
+
         THREAD_SLEEP(16);
     }
 }
@@ -221,6 +237,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         StateEstimate state_estimate(arg->rocket_data);
 
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+
+//        Serial.print("Est altitude: ");
+//        Serial.print(state_estimate.altitude);
+//        Serial.print(" Est jerk: ");
+//        Serial.print(state_estimate.jerk);
+//        Serial.print("\n");
 
         arg->rocket_data.fsm_state.update(next_state);
         THREAD_SLEEP(16);
@@ -275,7 +297,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 */
 DECLARE_THREAD(pyro, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Pyro");
+//        Serial.println("Entered Pyro");
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecent();
         PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
@@ -317,14 +339,14 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
-//    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.orientation);
-//    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.magnetometer);
-//    INIT_SYSTEM(systems.sensors.gps);
+    INIT_SYSTEM(systems.sensors.gps);
 //    INIT_SYSTEM(systems.log_sink);
 //    INIT_SYSTEM(systems.buzzer);
-//    INIT_SYSTEM(systems.sensors.pyro);
+    INIT_SYSTEM(systems.sensors.pyro);
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -346,21 +368,21 @@ void begin_systems(RocketSystems* config) {
         }
     }
 
-//    START_THREAD(logger, DATA_CORE, config);
+//    START_THREAD(logger, SENSOR_CORE, config);
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
     START_THREAD(high_g, SENSOR_CORE, config);
     START_THREAD(low_g_lsm, SENSOR_CORE, config);
     START_THREAD(orientation, SENSOR_CORE, config);
     START_THREAD(magnetometer, SENSOR_CORE, config);
-//    START_THREAD(gps, DATA_CORE, config);
-//    START_THREAD(voltage, SENSOR_CORE, config);
-//    START_THREAD(continuity, SENSOR_CORE, config);
-//    START_THREAD(fsm, SENSOR_CORE, config);
+    START_THREAD(gps, SENSOR_CORE, config);
+    START_THREAD(voltage, SENSOR_CORE, config);
+    START_THREAD(continuity, SENSOR_CORE, config);
+    START_THREAD(fsm, SENSOR_CORE, config);
 //    START_THREAD(buzzer, SENSOR_CORE, config);
-//    START_THREAD(kalman, SENSOR_CORE, config);
-//    START_THREAD(pyro, SENSOR_CORE, &config);
-//    START_THREAD(telemetry, DATA_CORE, config);
+    START_THREAD(kalman, SENSOR_CORE, config);
+    START_THREAD(pyro, SENSOR_CORE, config);
+    START_THREAD(telemetry, DATA_CORE, config);
 //    START_THREAD(telemetry_buffering, DATA_CORE, config);
 
     while (true) {

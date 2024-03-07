@@ -62,8 +62,8 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
     strcpy(fileExtension, fileExtensionParam);
 
     char inputName[strlen(fileName) + 1];
-    strcpy(inputName, fileName);
-
+    strcpy(fileName, "/");
+    strcat(inputName, fileName);
     strcat(fileName, fileExtension);
 
     // checks to see if file already exists and adds 1 to filename if it does.
@@ -89,7 +89,8 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
 
             // writes "(sensor)_data(number).csv to fileNameTemp"
             char fileNameTemp[strlen(inputName) + strlen(iStr) + 6];
-            strcpy(fileNameTemp, inputName);
+            strcpy(fileNameTemp, "/");
+            strcat(fileNameTemp, inputName);
             strcat(fileNameTemp, iStr);
             strcat(fileNameTemp, fileExtension);
 

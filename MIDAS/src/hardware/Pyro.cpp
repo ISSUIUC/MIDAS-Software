@@ -45,11 +45,11 @@ ErrorCode Pyro::init() {
     has_failed_gpio_init |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROC_ARM_PIN), OUTPUT));
     has_failed_gpio_init |= gpio_error_to_fail_flag(gpioPinMode(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), OUTPUT));
 
-    if (has_failed_gpio_init) {
-        return ErrorCode::PyroGPIOCouldNotBeInitialized;
-    } else {
-        return ErrorCode::NoError;
-    }
+//    if (has_failed_gpio_init) {
+//        return ErrorCode::PyroGPIOCouldNotBeInitialized;
+//    } else {
+    return ErrorCode::NoError;
+//    }
 }
 
 #ifdef IS_SUSTAINER

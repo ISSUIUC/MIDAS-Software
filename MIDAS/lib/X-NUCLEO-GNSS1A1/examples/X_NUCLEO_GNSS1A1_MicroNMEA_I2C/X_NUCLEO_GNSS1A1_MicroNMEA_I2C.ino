@@ -111,6 +111,7 @@ void readI2C(char *inBuff)
       inBuff[i]= gps.read();
       i++;
    }
+   Serial.print(inBuff, 32);
 }
 
 //Send a NMEA command via I2C

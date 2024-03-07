@@ -47,6 +47,9 @@
 #define EMMC_D2 2
 #define EMMC_D3 42
 
+// SD Pin(s)
+#define SD_PIN 6
+
 // pyro pins
 #define PYRO_GLOBAL_ARM_PIN 07
 #define PYROA_ARM_PIN 016
@@ -57,6 +60,13 @@
 #define PYROC_FIRE_PIN 011
 #define PYROD_ARM_PIN 012
 #define PYROD_FIRE_PIN 013
+
+// Continuity Pins
+#define SENSE_PYRO 1
+#define SENSE_APOGEE 6
+#define SENSE_MAIN 7
+#define SENSE_MOTOR 4
+#define SENSE_AUX 5
 
 // Telemetry pins
 #define RFM96_CS 1

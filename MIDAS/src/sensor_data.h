@@ -5,7 +5,7 @@
 
 #include "finite-state-machines/fsm_states.h"
 
-#define CONTINUITY_PIN_COUNT 4
+#define CONTINUITY_PIN_COUNT 5
 
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
@@ -95,7 +95,8 @@ struct Barometer {
 };
 
 struct Continuity {
-    bool pins[CONTINUITY_PIN_COUNT];
+    float sense_pyro;
+    float pins[4];
 };
 
 struct Voltage {
