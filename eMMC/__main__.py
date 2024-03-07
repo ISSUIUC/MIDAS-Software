@@ -13,8 +13,9 @@ subprocess.run(["platformio", "device", "list"])
 
 port = input("Choose a port name from the above list: ")
 with serial.Serial(port, 9600) as ser:
+    ser.write(b"<restart>\n")
     start = ser.readline()
-    if start != b"eMMC Connected\n":
+    if start != b"eMMC Connected\r\n":
         raise Exception(f"Unexpected message: {start=}")
     while True:
         command = input(">> ")
@@ -26,18 +27,21 @@ with serial.Serial(port, 9600) as ser:
             ser.write(b"ls\n")
 
             text = ser.readline()
-            while text != b"" and text != b"<done>\n":
+            while text != b"" and text != b"<done>\r\n":
                 print(text[:-1].decode("utf-8", errors="ignore"))
                 text = ser.readline()
-            print("\n")
         elif command.startswith("dump "):
             file_name = command[5:]
             ser.write(b"dump\n")
             ser.write(file_name.encode("utf-8") + b"\n")
 
-            if ser.readline() != b"Success\n":
-                print("Could not read file!")
+            line = ser.readline()
+            if line != b"Success\r\n":
+                print(f"Could not read file! (got {line!r})")
                 continue
+
+            line = ser.readline()
+            print(line.decode("utf-8", errors="ignore")[:-2])
 
             b0 = ser.read()[0]
             b1 = ser.read()[0]
@@ -51,8 +55,10 @@ with serial.Serial(port, 9600) as ser:
                     buf = ser.read(size=min(1024, size))
                     out_file.write(buf)
                     size -= len(buf)
-            if ser.readline() != b"<done>\n":
-                raise Exception("Fatal error when reading file!")
+            line = ser.readline()
+            if line != b"<done>\r\n":
+                raise Exception(f"Fatal error when reading file! (Got {line!r})")
+            print(f"Wrote into {current_root / file_name}!")
         elif command == "":
             pass
         else:

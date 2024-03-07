@@ -16,8 +16,6 @@ void setup() {
 
     while (!Serial) { }
 
-    Serial.println("eMMC Connected");
-
     if (!SD_MMC.setPins(EMMC_CLK, EMMC_CMD, EMMC_D0, EMMC_D1, EMMC_D2, EMMC_D3)) {
         Serial.println("Pin change failed!");
         return;
@@ -34,11 +32,19 @@ void setup() {
     }
 }
 
-void loop() {
-    String message = Serial.readStringUntil('\n');
 
-    if (message == "ls\n") {
-        File root = fs.open("/");
+void loop() {
+    String message;
+    while (true) {
+        message = Serial.readStringUntil('\n');
+        message.trim();
+        if (message != "") {
+            break;
+        }
+    }
+
+    if (message == "ls") {
+        File root = SD_MMC.open("/");
         if (!root){
             Serial.println("Failed to open directory");
             Serial.println("<done>");
@@ -50,19 +56,25 @@ void loop() {
             return;
         }
 
+        Serial.println(" | name (size) ");
+        Serial.println("-+-------------");
         File file = root.openNextFile();
         while (file) {
-            Serial.println(file.name());
+            Serial.print(" | ");
+            Serial.print(file.name());
+            Serial.print(" (");
+            Serial.print(file.size());
+            Serial.println(" bytes)");
             file = root.openNextFile();
         }
         Serial.println("<done>");
-    } else if (message == "dump\n") {
+    } else if (message == "dump") {
         String file_name = Serial.readStringUntil('\n');
         file_name.trim();
 
-        File file = fs.open("/" + file_name);
+        File file = SD_MMC.open("/" + file_name);
         if (!file) {
-            Serial.println("Failure");
+            Serial.println("Could not open file.");
             Serial.println("<done>");
             return;
         }
@@ -70,23 +82,30 @@ void loop() {
         Serial.println("Success");
 
         uint32_t size = file.size();
+        Serial.print("Dumping ");
+        Serial.print(size);
+        Serial.println(" bytes...");
+
         Serial.write((size) & 0xFF);
         Serial.write((size >> 8) & 0xFF);
         Serial.write((size >> 16) & 0xFF);
         Serial.write((size >> 24) & 0xFF);
 
         while (size) {
-            file.read(buf, 1024);
-            Serial.write(buf, 1024);
+            file.read(buffer, 1024);
             if (size >= 1024) {
+                Serial.write(buffer, 1024);
                 size -= 1024;
             } else {
+                Serial.write(buffer, size);
                 size = 0;
             }
         }
         Serial.println("<done>");
+    } else if (message == "<restart>") {
+        Serial.println("eMMC Connected");
     } else {
-        Serial.println("Unrecognized command");
+        Serial.println("Unrecognized command: " + message);
         Serial.println("<done>");
     }
 }
