@@ -9,7 +9,7 @@ static constexpr int GPIO_LOW_BIT_COUNT = 8;
 static constexpr int GPIO_HIGH_BIT_COUNT = 16;
 
 struct GpioAddress {
-    constexpr GpioAddress(int gpio_id, int pin_id);
+    GpioAddress(int gpio_id, int pin_id);
     uint8_t gpio_id; //id of the expander
     uint8_t gpio_address; //i2c address of expander
     uint8_t port_idx; //0 = bottom 8 bits, 1 = top 8 bits
@@ -18,7 +18,7 @@ struct GpioAddress {
 };
 
 
-constexpr GpioAddress::GpioAddress(int gpio_id, int pin_id): gpio_id(gpio_id), gpio_address(0), port_idx(0), pin_offset(0), is_valid(false) {
+inline GpioAddress::GpioAddress(int gpio_id, int pin_id): gpio_id(gpio_id), gpio_address(0), port_idx(0), pin_offset(0), is_valid(false) {
     if(gpio_id == 0){
         gpio_address = GPIO0_ADDRESS;
     } else if(gpio_id == 1){

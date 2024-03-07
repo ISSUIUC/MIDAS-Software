@@ -3,13 +3,15 @@
 // #include sensor library
 #include "Adafruit_BNO08x.h"
 
-GpioAddress bno_reset(GPIO1_ADDRESS, 07);
+GpioAddress bno_reset(1, 0x75);
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(bno_reset);
 #define REPORT_INTERVAL_US 5000
 
 ErrorCode OrientationSensor::init() {
+    gpioPinMode(bno_reset, OUTPUT);
+    delay(100);
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code
     if (!imu.begin_SPI(BNO086_CS, BNO086_INT)) {
@@ -17,7 +19,6 @@ ErrorCode OrientationSensor::init() {
     }
     Serial.println("Setting desired reports");
     if (!imu.enableReport(SH2_ARVR_STABILIZED_RV, REPORT_INTERVAL_US)) {
-        Serial.println("Could not enable stabilized remote vector");
         return ErrorCode::CannotInitBNO;
     }
     return ErrorCode::NoError;
@@ -61,11 +62,14 @@ Orientation OrientationSensor::read() {
                 break;
         }
 
-
         Orientation sensor_reading;
+        sensor_reading.has_data = true;
         sensor_reading.yaw = euler.y;
         sensor_reading.pitch = euler.z;
         sensor_reading.roll = euler.x;
+
+        Serial.println("Got yaw: ");
+        Serial.println(euler.y);
 
         sensor_reading.linear_acceleration.ax = event.un.accelerometer.x;
         sensor_reading.linear_acceleration.ay = event.un.accelerometer.y;
@@ -84,5 +88,5 @@ Orientation OrientationSensor::read() {
 
         return sensor_reading;
     }
-    return Orientation();
+    return { .has_data = false };
 }

@@ -26,5 +26,5 @@ Barometer BarometerSensor::read() {
     float temperature = static_cast<float>(MS.getTemperature() * 0.01);
     float altitude = static_cast<float>(-log(pressure * 0.000987) * (temperature + 273.15) * 29.254);
 
-    return Barometer(pressure, temperature, altitude);
+    return Barometer(temperature, pressure, altitude);
 }

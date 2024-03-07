@@ -17,18 +17,23 @@ bool TCAL9539Init(){
     uint8_t addrs[] = {GPIO0_ADDRESS, GPIO1_ADDRESS, GPIO2_ADDRESS};
 
     for(uint8_t addr : addrs){
-        WIRE.beginTransmission(GPIO0_ADDRESS);
+        Serial.print("Testing ");
+        Serial.println(addr);
+        WIRE.beginTransmission(addr);
         WIRE.write(REG_OUTPUT0);
         if(!WIRE.endTransmission()){
+            Serial.println("Failed at endTransmission");
             return false;
         }
-        int ct = WIRE.requestFrom(GPIO0_ADDRESS, 1);
+        int ct = WIRE.requestFrom(addr, 1);
         if(ct != 1){
+            Serial.println("Failed at requestFrom");
             return false;
         }
         int v = WIRE.read();
         //REG_OUTPUT0 is set all ones on power up
         if(v != 0xff){
+            Serial.println("Failed at REG_OUTPUT0");
             return false;
         }
     }
@@ -99,10 +104,9 @@ GpioError gpioPinMode(GpioAddress addr, int mode){
     }
 
     GpioError err = gpioDigitalWrite(addr, LOW); //set pin low as default state
-    // todo ACK is broken
-//    if(err != GpioError::NoError){
-//        return err;
-//    }
+    // if(err != GpioError::NoError){
+    //     return err;
+    // }
 
     WIRE.beginTransmission(addr.gpio_address);
     WIRE.write(REG_CONFIG0 + addr.port_idx);

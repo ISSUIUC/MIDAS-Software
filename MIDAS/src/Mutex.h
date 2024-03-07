@@ -17,6 +17,7 @@
 template<typename T>
 struct Mutex {
 private:
+//    StaticSemaphore_t mutex_buffer;
     uint8_t mutex_buffer[sizeof(StaticSemaphore_t) + 64]{};
     SemaphoreHandle_t mutex_handle{};
     T data;

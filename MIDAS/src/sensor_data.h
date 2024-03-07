@@ -117,6 +117,8 @@ struct Magnetometer {
 };
 
 struct Orientation {
+    bool has_data = false;
+
     float yaw = 0;
     float pitch = 0;
     float roll = 0;

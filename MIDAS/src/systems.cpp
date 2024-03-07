@@ -40,13 +40,13 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
 
-        Serial.print("Baro Alt: ");
-        Serial.print(reading.altitude);
-        Serial.print(" Pressure: ");
-        Serial.print(reading.pressure);
-        Serial.print("temp: ");
-        Serial.print(reading.temperature);
-        Serial.print("\n");
+//        Serial.print("Baro Alt: ");
+//        Serial.print(reading.altitude);
+//        Serial.print(" Pressure: ");
+//        Serial.print(reading.pressure);
+//        Serial.print(" Temp: ");
+//        Serial.print(reading.temperature);
+//        Serial.print("\n");
         THREAD_SLEEP(16);
     }
 }
@@ -60,16 +60,32 @@ DECLARE_THREAD(low_g, RocketSystems* arg) {
 
         LowGData reading = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(reading);
+
+//        Serial.print(" Ax: ");
+//        Serial.print(reading.ax);
+//        Serial.print(" Ay: ");
+//        Serial.print(reading.ay);
+//        Serial.print(" Az: ");
+//        Serial.print(reading.az);
+//        Serial.print("\n");
         THREAD_SLEEP(1);
     }
 }
 
 DECLARE_THREAD(low_g_lsm, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered LowG LSM"); Serial.flush();
+//        Serial.println("Entered LowG LSM");
 
         LowGLSM reading = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(reading);
+
+//        Serial.print("gx: ");
+//        Serial.print(reading.gx);
+//        Serial.print(" gy: ");
+//        Serial.print(reading.gy);
+//        Serial.print(" gz: ");
+//        Serial.print(reading.gz);
+//        Serial.print("\n");
         THREAD_SLEEP(10);
     }
 }
@@ -83,6 +99,13 @@ DECLARE_THREAD(high_g, RocketSystems* arg) {
 
         HighGData reading = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(reading);
+//        Serial.print("Ax: ");
+//        Serial.print(reading.ax);
+//        Serial.print(" Ay: ");
+//        Serial.print(reading.ay);
+//        Serial.print(" Az: ");
+//        Serial.print(reading.az);
+//        Serial.print("\n");
         THREAD_SLEEP(1);
     }
 }
@@ -95,9 +118,19 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         Serial.println("Entered Orientation");
 
         Orientation reading = arg->sensors.orientation.read();
-        arg->rocket_data.orientation.update(reading);
+        if (reading.has_data) {
+            arg->rocket_data.orientation.update(reading);
 
-        THREAD_SLEEP(16);
+            Serial.print(" Yaw: ");
+            Serial.print(reading.yaw);
+            Serial.print(" Pitch: ");
+            Serial.print(reading.pitch);
+            Serial.print(" Roll: ");
+            Serial.print(reading.roll);
+            Serial.print("\n");
+        }
+
+        THREAD_SLEEP(500);
     }
 }
 
@@ -106,10 +139,18 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
  */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        Serial.println("Entered Magnetometer");
+//        Serial.println("Entered Magnetometer");
 
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
+
+//        Serial.print(" mx: ");
+//        Serial.print(reading.mx);
+//        Serial.print(" my: ");
+//        Serial.print(reading.my);
+//        Serial.print(" mz: ");
+//        Serial.print(reading.mz);
+//        Serial.print("\n");
         THREAD_SLEEP(7);  //data rate is 155hz so 7 is closest
     }
 }
@@ -274,15 +315,15 @@ ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.high_g);
-//    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
 //    INIT_SYSTEM(systems.sensors.continuity);
-//    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.orientation);
 //    INIT_SYSTEM(systems.sensors.voltage);
-//    INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.sensors.magnetometer);
 //    INIT_SYSTEM(systems.sensors.gps);
 //    INIT_SYSTEM(systems.log_sink);
-    INIT_SYSTEM(systems.buzzer);
+//    INIT_SYSTEM(systems.buzzer);
 //    INIT_SYSTEM(systems.sensors.pyro);
     return NoError;
 }
@@ -297,6 +338,10 @@ void begin_systems(RocketSystems* config) {
     if (init_error_code != NoError) {
         // todo some message probably
         while (true) {
+            Serial.print("Had Error: ");
+            Serial.print((int) init_error_code);
+            Serial.print("\n");
+            Serial.flush();
             update_error_LED(init_error_code);
         }
     }
@@ -305,15 +350,15 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
     START_THREAD(high_g, SENSOR_CORE, config);
-//    START_THREAD(low_g_lsm, SENSOR_CORE, config);
-//    START_THREAD(orientation, SENSOR_CORE, config);
-//    START_THREAD(magnetometer, SENSOR_CORE, config);
+    START_THREAD(low_g_lsm, SENSOR_CORE, config);
+    START_THREAD(orientation, SENSOR_CORE, config);
+    START_THREAD(magnetometer, SENSOR_CORE, config);
 //    START_THREAD(gps, DATA_CORE, config);
 //    START_THREAD(voltage, SENSOR_CORE, config);
 //    START_THREAD(continuity, SENSOR_CORE, config);
-    START_THREAD(fsm, SENSOR_CORE, config);
-    START_THREAD(buzzer, SENSOR_CORE, config);
-    START_THREAD(kalman, SENSOR_CORE, config);
+//    START_THREAD(fsm, SENSOR_CORE, config);
+//    START_THREAD(buzzer, SENSOR_CORE, config);
+//    START_THREAD(kalman, SENSOR_CORE, config);
 //    START_THREAD(pyro, SENSOR_CORE, &config);
 //    START_THREAD(telemetry, DATA_CORE, config);
 //    START_THREAD(telemetry_buffering, DATA_CORE, config);

@@ -25,19 +25,19 @@
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 434.0
 
-TelemetryBackend::TelemetryBackend() : rf95(TELEMETRY_CS, TELEMETRY_INT, hardware_spi) {
+TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT, hardware_spi) {
     led_state = false;
     led_pin = LED_BLUE;
 }
 
 ErrorCode TelemetryBackend::init() {
-    pinMode(TELEMETRY_RESET, OUTPUT);
-    digitalWrite(TELEMETRY_RESET, HIGH);
+    pinMode(RFM96_RESET, OUTPUT);
+    digitalWrite(RFM96_RESET, HIGH);
     delay(10);
 
-    digitalWrite(TELEMETRY_RESET, LOW);
+    digitalWrite(RFM96_RESET, LOW);
     delay(10);
-    digitalWrite(TELEMETRY_RESET, HIGH);
+    digitalWrite(RFM96_RESET, HIGH);
     delay(10);
 
     if (!rf95.init()) {
