@@ -141,7 +141,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     Serial.println("Memcpy'ing"); Serial.flush();
 
-    memcpy(&packet.callsign, &callsign, sizeof(callsign));
+//    memcpy(&packet.callsign, &callsign, sizeof(callsign));
 
     Serial.println("Done with packet"); Serial.flush();
 

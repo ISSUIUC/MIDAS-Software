@@ -32,8 +32,11 @@ public:
 //        digitalWrite(led_pin, led_state);
 //        led_state = !led_state;
 
+        Serial.println("Sending bytes"); Serial.flush();
         rf95.send((uint8_t*) &data, sizeof(T));
+        Serial.println("Sent bytes, waiting for send"); Serial.flush();
         rf95.waitPacketSent();
+        Serial.println("Finishing sending, waiting"); Serial.flush();
         THREAD_SLEEP(170);
     }
 
