@@ -18,6 +18,7 @@ ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
 ASSOCIATE(Orientation, ID_ORIENTATION)
 ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
+ASSOCIATE(PyroState, ID_PYRO)
 
 
 template<typename T>
@@ -56,6 +57,7 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.orientation);
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
+    log_from_sensor_data(sink, data.pyro);
 }
 
 #ifndef SILSIM

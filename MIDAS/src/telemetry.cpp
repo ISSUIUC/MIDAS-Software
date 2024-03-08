@@ -120,13 +120,13 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     packet.rssi = backend.getRecentRssi();
     // Serial.println("Getting fsm"); Serial.flush();
-    packet.FSM_state = (char) data.fsm_state.getRecent();
+    packet.FSM_state = (char) data.fsm_state.getRecentUnsync();
 
     // Serial.println("Getting pyros"); Serial.flush();
 
 //    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
 
-    auto pyros = data.pyro.getRecent();
+    auto pyros = data.pyro.getRecentUnsync();
     for (int i = 0; i < 4; i++) {
         packet.pyros_armed[i] = pyros.channels[i].is_armed;
         packet.pyros_firing[i] = pyros.channels[i].is_firing;

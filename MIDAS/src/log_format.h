@@ -17,6 +17,7 @@ enum ReadingDiscriminant {
     ID_LOWGLSM = 9,
     ID_FSM = 10,
     ID_KALMAN = 11,
+    ID_PYRO = 12,
 };
 
 
@@ -43,5 +44,6 @@ struct LoggedReading {
         LowGLSM lowg_lsm;
         KalmanData kalman_data;
         FSMState fsm_data;
+        PyroState pyro;
     } data;
 };

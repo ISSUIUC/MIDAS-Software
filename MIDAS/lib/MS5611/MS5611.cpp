@@ -182,7 +182,7 @@ void MS5611::reset() {
     digitalWrite(_cspin, HIGH);  // pull CS line high
     SPI.endTransaction();        // end SPI transaction
 }
-
+#include"../../src/hal.h"
 void MS5611::convert(const uint8_t addr, uint8_t bits) {
     uint8_t del[5] = {1, 2, 3, 5,
                       10};  // array of MS5611 conversion time (in ms)
@@ -191,10 +191,12 @@ void MS5611::convert(const uint8_t addr, uint8_t bits) {
     SPI.beginTransaction(settingsA);  // start SPI transaction
     digitalWrite(_cspin, LOW);        // pull CS line low
     SPI.transfer(addr + offset);      // send command
-    delay(del[offset /
-              2]);  // MS5611 needs some time for conversion; wait for this...
-    digitalWrite(_cspin, HIGH);  // pull CS line high
+    digitalWrite(_cspin, HIGH);
     SPI.endTransaction();        // end SPI transaction
+    THREAD_SLEEP(del[offset /
+              2]);  // MS5611 needs some time for conversion; wait for this...
+    // digitalWrite(_cspin, HIGH);  // pull CS line high
+    // SPI.endTransaction();        // end SPI transaction
 }
 
 uint16_t MS5611::readProm(uint8_t reg) {
@@ -202,11 +204,13 @@ uint16_t MS5611::readProm(uint8_t reg) {
     reg = min(reg, (uint8_t)7);
     uint8_t offset = reg * 2;
     uint16_t val = 0;
+    SPI.beginTransaction(settingsA);  // start SPI transaction
     digitalWrite(_cspin, LOW);       // pull CS line low
     SPI.transfer(0xA0 + offset);     // send command
     val = SPI.transfer(0x00) * 256;  // read 8 bits of data (MSB)
     val += SPI.transfer(0x00);       // read 8 bits of data (LSB)
     digitalWrite(_cspin, HIGH);      // pull CS line high
+    SPI.endTransaction();
     return val;
 }
 

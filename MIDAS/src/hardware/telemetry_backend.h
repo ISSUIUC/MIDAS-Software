@@ -33,8 +33,14 @@ public:
 //        led_state = !led_state;
 
         rf95.send((uint8_t*) &data, sizeof(T));
-        while(!digitalRead(rf95._interruptPin)){
+        for(int i = 1;; i++){
             THREAD_SLEEP(1);
+            if(digitalRead(rf95._interruptPin)){
+                break;
+            }
+            if(i % 256 == 0){
+                Serial.println("long telem wait");
+            }
         }
         rf95.handleInterrupt();
     }
