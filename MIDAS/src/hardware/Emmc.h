@@ -16,4 +16,5 @@ public:
     void write(const uint8_t* data, size_t size);
 private:
     File file;
+    size_t unflushed_bytes = 0;
 };

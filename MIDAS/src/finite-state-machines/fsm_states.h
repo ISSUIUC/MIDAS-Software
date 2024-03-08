@@ -13,10 +13,10 @@ enum class FSMState {
     STATE_MAIN_DEPLOY,
     STATE_MAIN,
     STATE_LANDED,
-//#ifdef IS_SUSTAINER
+// #ifdef IS_SUSTAINER
     STATE_SUSTAINER_IGNITION,
     STATE_SECOND_BOOST,
-//#else
+// #else
     STATE_FIRST_SEPARATION,
-//#endif
+// #endif
 };

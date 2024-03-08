@@ -42,7 +42,9 @@ public:
      * @param value The value to put in the queue.
      */
     void send(T value) {
-        xQueueSendToBack(queue, &value, 0);
+        if(xQueueSendToBack(queue, &value, 0) == errQUEUE_FULL){
+            Serial.println("FULL QUEUE!!!!!\\n\\n\\n");
+        }
     }
 
     /**
