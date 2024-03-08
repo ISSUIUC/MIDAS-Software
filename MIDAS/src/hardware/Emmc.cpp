@@ -2,10 +2,13 @@
 
 
 void EMMCSink::write(const uint8_t* data, size_t size) {
-    // file.print(message);
-    // Get all data and write
     file.write(data, size);
-    file.flush();
+    unflushed_bytes += size;
+    if(unflushed_bytes > 32768){
+        Serial.println("Flushed");
+        file.flush();
+        unflushed_bytes = 0;
+    }
 }
 
 ErrorCode EMMCSink::init(){
@@ -18,7 +21,7 @@ ErrorCode EMMCSink::init(){
     }
     char data_name[] = "/data.launch";
 
-    file = SD_MMC.open(data_name, FILE_WRITE);
+    file = SD_MMC.open(data_name, FILE_WRITE, true);
 
     if (!file) {
         return ErrorCode::EmmcCouldNotOpenFile;

@@ -35,14 +35,14 @@ void Telemetry::transmit(RocketData& rocket_data) {
 //        set_frequency_to = NAN;
 //    }
 
-    Serial.println("Making Packet...");  Serial.flush();
+    // Serial.println("Making Packet...");  Serial.flush();
     TelemetryPacket packet = makePacket(rocket_data);
-    Serial.println("Sending Packet...");  Serial.flush();
+    // Serial.println("Sending Packet...");  Serial.flush();
 //    char packet[200] = "moooooo";
 
     backend.send(packet);
 
-    Serial.println("Sent Packet..."); Serial.flush();
+    // Serial.println("Sent Packet..."); Serial.flush();
 }
 
 
@@ -86,7 +86,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     TelemetryPacket packet { };
 
 
-    Serial.println("Making Buffered packets"); Serial.flush();
+    // Serial.println("Making Buffered packets"); Serial.flush();
     TelemetryDataLite small_packet { };
     packet.datapoint_count = 0;
     for (int8_t i = 0; i < 4 && small_packet_queue.receive(&small_packet); i++) {
@@ -119,10 +119,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.response_ID = last_command_id;
 
     packet.rssi = backend.getRecentRssi();
-    Serial.println("Getting fsm"); Serial.flush();
+    // Serial.println("Getting fsm"); Serial.flush();
     packet.FSM_state = (char) data.fsm_state.getRecent();
 
-    Serial.println("Getting pyros"); Serial.flush();
+    // Serial.println("Getting pyros"); Serial.flush();
 
 //    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
 
@@ -139,11 +139,11 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 //        packet.continuity[i] = continuity.pins[i];
 //    }
 
-    Serial.println("Memcpy'ing"); Serial.flush();
+    // Serial.println("Memcpy'ing"); Serial.flush();
 
     memcpy(&packet.callsign, &callsign, sizeof(callsign));
 
-    Serial.println("Done with packet"); Serial.flush();
+    // Serial.println("Done with packet"); Serial.flush();
 
     return packet;
 }

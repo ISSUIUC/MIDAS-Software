@@ -11,7 +11,7 @@
  * Sets the config file and then starts all the threads using the config.
  */
 // todo re-enable
-MultipleLogSink<> sinks;
+MultipleLogSink<EMMCSink> sinks;
 RocketSystems systems { .log_sink = sinks };
 
 void setup() {
@@ -23,9 +23,9 @@ void setup() {
     delay(200);
 
     //begin sensor SPI bus
+
     Serial.println("Starting SPI...");
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
-
     //begin I2C bus
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL);
