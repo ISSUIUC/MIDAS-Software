@@ -67,16 +67,19 @@ struct TelemetryDataLite {
     uint16_t barometer_pressure;  //[0, 4096]
     int16_t highG_ax;             //[128, -128]
     int16_t highG_ay;             //[128, -128]
-    int16_t highG_az;             //[128, -128]
+    int16_t highG_az;
+    
     int16_t bno_roll;             //[-4,4]
-    int16_t bno_pitch;            //[-4,4]
+    int16_t bno_pitch;             //[128, -128]
     int16_t bno_yaw;              //[-4,4]
+    
+
 };
 
 struct TelemetryPacket {
-    int8_t datapoint_count;   //[0,4]
+    int8_t datapoint_count;
+          //[0, 2^16]
     TelemetryDataLite datapoints[4];
-
     float gps_lat;
     float gps_long;
     float gps_alt;
@@ -92,14 +95,30 @@ struct TelemetryPacket {
     int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
     uint8_t voltage_battery;  //[0, 16]
-    uint8_t FSM_state;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
 
+    // Add pyros array for pyro channels
+
     bool continuity[4];
+
     bool pyros_armed[4];
     bool pyros_firing[4];
 
     char callsign[8];
+    // Add continuity array for continuity pins
+
+
+    float gnc_state_x;
+    float gnc_state_vx;
+    float gnc_state_ax;
+    float gnc_state_y;
+    float gnc_state_vy;
+    float gnc_state_ay;
+    float gnc_state_z;
+    float gnc_state_vz;
+    float gnc_state_az;
+    float gnc_state_apo;    
+    uint8_t FSM_State;        //[0,256]
 };
 
 struct FullTelemetryData {
@@ -133,11 +152,13 @@ struct FullTelemetryData {
     int16_t barometer_temp;   //[-128, 128]
 
     // Add pyros array for pyro channels
+    bool continuity[4];
     bool pyros_armed[4];
     bool pyros_firing[4];
+    char callsign[8];
 
     // Add continuity array for continuity pins
-    uint8_t continuity[4];
+    
 
 
     float gnc_state_x;
@@ -224,14 +245,39 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.gps_lat = packet.gps_lat;
         item.gps_long = packet.gps_long;
         //item.freq = frequency;
-        item.FSM_State = packet.FSM_state;
-        // item.gnc_state_ax = packet.gnc_state_ax;
-        // item.gnc_state_vx = packet.gnc_state_vx;
-        // item.gnc_state_x = packet.gnc_state_x;
-        // item.gnc_state_apo = packet.gnc_state_apo;
+        item.FSM_State = packet.FSM_State;
+        item.gnc_state_ax = packet.gnc_state_ax;
+        item.gnc_state_vx = packet.gnc_state_vx;
+        item.gnc_state_x = packet.gnc_state_x;
+        item.gnc_state_apo = packet.gnc_state_apo;
         item.response_ID = packet.response_ID;
         item.rssi = packet.rssi;
         item.voltage_battery = convert_range(packet.voltage_battery, 16);
+        item.continuity[0] = packet.continuity[0];
+        item.continuity[1] = packet.continuity[1];
+        item.continuity[2] = packet.continuity[2];
+        item.continuity[3] = packet.continuity[3];
+        item.pyros_armed[0] = packet.pyros_armed[0];
+        item.pyros_armed[1] = packet.pyros_armed[1];
+        item.pyros_armed[2] = packet.pyros_armed[2];
+        item.pyros_armed[3] = packet.pyros_armed[3];
+        item.pyros_firing[0] = packet.pyros_firing[0];
+        item.pyros_firing[1] = packet.pyros_firing[1];
+        item.pyros_firing[2] = packet.pyros_firing[2];
+        item.pyros_firing[3] = packet.pyros_firing[3];
+        item.bno_roll = packet.roll;
+        item.bno_pitch = packet.pitch;
+        item.bno_yaw = packet.yaw;
+        item.callsign[0] = packet.callsign[0];
+        item.callsign[1] = packet.callsign[1];
+        item.callsign[2] = packet.callsign[2];
+        item.callsign[3] = packet.callsign[3];
+        item.callsign[4] = packet.callsign[4];
+        item.callsign[5] = packet.callsign[5];
+        item.callsign[6] = packet.callsign[6];
+        item.callsign[7] = packet.callsign[7];
+
+
         item.print_time = start_printing - start_timestamp + data.timestamp;
         print_queue.emplace(item);
     }
@@ -295,6 +341,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("Pyro2Firing", packet.pyros_firing[1]);
     printJSONField("Pyro3Firing", packet.pyros_firing[2]);
     printJSONField("Pyro4Firing", packet.pyros_firing[3]);
+    printJSONField("callsign", packet.callsign);
 
     printJSONField("STE_ALT", packet.gnc_state_x);
     printJSONField("STE_VEL", packet.gnc_state_vx);
@@ -453,9 +500,14 @@ void loop() {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         // telemetry_data data{};
         TelemetryPacket packet;
+        TelemetryDataLite data;
         uint8_t len = sizeof(buf);
 
-        if (rf95.recv(buf, &len) && len == sizeof(packet)) {
+        if (rf95.recv(buf, &len)) {
+            Serial.println(len);
+            Serial.println("Received packet");
+            Serial.println(packet.datapoints[0].barometer_pressure);
+            
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
