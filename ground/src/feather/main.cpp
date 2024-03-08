@@ -39,7 +39,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 434.0
+#define RF95_FREQ 433.0
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -62,7 +62,7 @@ float convert_range(T val, float range) {
 }
 
 struct TelemetryDataLite {
-    systime_t timestamp;  //[0, 2^32]
+    uint32_t timestamp;  //[0, 2^32]
 
     uint16_t barometer_pressure;  //[0, 4096]
     int16_t highG_ax;             //[128, -128]
@@ -70,13 +70,15 @@ struct TelemetryDataLite {
     int16_t highG_az;
     
     int16_t bno_roll;             //[-4,4]
-               //[-4,4]
-    int16_t bno_yaw;              //[-4,4]
     int16_t bno_pitch;             //[128, -128]
+    int16_t bno_yaw;              //[-4,4]
+    
 
 };
 
 struct TelemetryPacket {
+    int8_t datapoint_count;
+          //[0, 2^16]
     TelemetryDataLite datapoints[4];
     float gps_lat;
     float gps_long;
@@ -92,7 +94,6 @@ struct TelemetryPacket {
     int16_t gyro_z;           //[-4096, 4096]
     int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
-    int8_t datapoint_count;   //[0,4]
     uint8_t voltage_battery;  //[0, 16]
     int16_t barometer_temp;   //[-128, 128]
 
@@ -468,9 +469,14 @@ void loop() {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         // telemetry_data data{};
         TelemetryPacket packet;
+        TelemetryDataLite data;
         uint8_t len = sizeof(buf);
 
-        if (rf95.recv(buf, &len) && len == sizeof(packet)) {
+        if (rf95.recv(buf, &len)) {
+            Serial.println(len);
+            Serial.println("Received packet");
+            Serial.println(packet.datapoints[0].barometer_pressure);
+            
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
