@@ -39,7 +39,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 434.0
+#define RF95_FREQ 433.0
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -62,22 +62,21 @@ float convert_range(T val, float range) {
 }
 
 struct TelemetryDataLite {
-    systime_t timestamp;  //[0, 2^32]
+    uint32_t timestamp;  //[0, 2^32]
 
     uint16_t barometer_pressure;  //[0, 4096]
     int16_t highG_ax;             //[128, -128]
     int16_t highG_ay;             //[128, -128]
-    int16_t highG_az;
-    
+    int16_t highG_az;             //[128, -128]
     int16_t bno_roll;             //[-4,4]
-               //[-4,4]
+    int16_t bno_pitch;            //[-4,4]
     int16_t bno_yaw;              //[-4,4]
-    int16_t bno_pitch;             //[128, -128]
-
 };
 
 struct TelemetryPacket {
+    int8_t datapoint_count;   //[0,4]
     TelemetryDataLite datapoints[4];
+
     float gps_lat;
     float gps_long;
     float gps_alt;
@@ -92,29 +91,15 @@ struct TelemetryPacket {
     int16_t gyro_z;           //[-4096, 4096]
     int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
-    int8_t datapoint_count;   //[0,4]
     uint8_t voltage_battery;  //[0, 16]
+    uint8_t FSM_state;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
 
-    // Add pyros array for pyro channels
+    bool continuity[4];
     bool pyros_armed[4];
     bool pyros_firing[4];
 
-    // Add continuity array for continuity pins
-    uint8_t continuity[4];
-
-
-    float gnc_state_x;
-    float gnc_state_vx;
-    float gnc_state_ax;
-    float gnc_state_y;
-    float gnc_state_vy;
-    float gnc_state_ay;
-    float gnc_state_z;
-    float gnc_state_vz;
-    float gnc_state_az;
-    float gnc_state_apo;    
-    uint8_t FSM_State;        //[0,256]
+    char callsign[8];
 };
 
 struct FullTelemetryData {
@@ -239,11 +224,11 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.gps_lat = packet.gps_lat;
         item.gps_long = packet.gps_long;
         //item.freq = frequency;
-        item.FSM_State = packet.FSM_State;
-        item.gnc_state_ax = packet.gnc_state_ax;
-        item.gnc_state_vx = packet.gnc_state_vx;
-        item.gnc_state_x = packet.gnc_state_x;
-        item.gnc_state_apo = packet.gnc_state_apo;
+        item.FSM_State = packet.FSM_state;
+        // item.gnc_state_ax = packet.gnc_state_ax;
+        // item.gnc_state_vx = packet.gnc_state_vx;
+        // item.gnc_state_x = packet.gnc_state_x;
+        // item.gnc_state_apo = packet.gnc_state_apo;
         item.response_ID = packet.response_ID;
         item.rssi = packet.rssi;
         item.voltage_battery = convert_range(packet.voltage_battery, 16);
