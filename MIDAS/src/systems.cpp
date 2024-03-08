@@ -177,6 +177,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     displacement_kf.initialize();
     TickType_t last = xTaskGetTickCount();
 
+    while (true) { THREAD_SLEEP(1); }
     while (true) {
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
@@ -249,7 +250,7 @@ ErrorCode init_systems(RocketSystems& systems) {
    INIT_SYSTEM(systems.sensors.magnetometer);
    INIT_SYSTEM(systems.sensors.gps);
    INIT_SYSTEM(systems.log_sink);
-   INIT_SYSTEM(systems.buzzer);
+//    INIT_SYSTEM(systems.buzzer);
    INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.tlm);
     return NoError;
@@ -283,12 +284,12 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(continuity, SENSOR_CORE, config);
 
     // START_THREAD(orientation, SENSOR_CORE, config);
-    // START_THREAD(gps, SENSOR_CORE, config);
-    // START_THREAD(voltage, SENSOR_CORE, config);
-    // START_THREAD(fsm, SENSOR_CORE, config);
+    START_THREAD(gps, SENSOR_CORE, config);
+    START_THREAD(voltage, SENSOR_CORE, config);
+    START_THREAD(fsm, SENSOR_CORE, config);
 //    START_THREAD(buzzer, SENSOR_CORE, config);
-//    START_THREAD(kalman, SENSOR_CORE, config);
-//    START_THREAD(pyro, SENSOR_CORE, config);
+    START_THREAD(kalman, SENSOR_CORE, config);
+    // START_THREAD(pyro, SENSOR_CORE, config);
     START_THREAD(telemetry, SENSOR_CORE, config);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config);
 

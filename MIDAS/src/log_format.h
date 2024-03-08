@@ -15,6 +15,8 @@ enum ReadingDiscriminant {
     ID_MAGNETOMETER = 7,
     ID_ORIENTATION = 8,
     ID_LOWGLSM = 9,
+    ID_FSM = 10,
+    ID_KALMAN = 11,
 };
 
 
@@ -39,5 +41,7 @@ struct LoggedReading {
         Magnetometer magnetometer;
         Orientation orientation;
         LowGLSM lowg_lsm;
+        KalmanData kalman_data;
+        FSMState fsm_data;
     } data;
 };
