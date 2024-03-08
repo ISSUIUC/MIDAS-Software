@@ -15,7 +15,7 @@
 /**
  *  The size of a thread stack, in bytes.
  */
-#define STACK_SIZE 8192
+#define STACK_SIZE 16384
 
 /**
  * The two cores we have: 

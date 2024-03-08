@@ -11,7 +11,7 @@
  * Sets the config file and then starts all the threads using the config.
  */
 // todo re-enable
-MultipleLogSink<> sinks;
+MultipleLogSink<EMMCSink> sinks;
 RocketSystems systems { .log_sink = sinks };
 
 void setup() {

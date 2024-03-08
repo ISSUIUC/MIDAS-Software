@@ -694,6 +694,7 @@ class Preprocessor:
 
                 if include_path.startswith("\"") and include_path.endswith("\""):
                     include_path = Path(file_path).absolute().parent / include_path[1:-1]
+                    print(f"Including File: {include_path}")
                     processed += self.include_file(include_path)
                 elif include_path in STD_HEADERS:
                     processed += self.preprocess(include_path[1:-1], STD_HEADERS[include_path])
