@@ -149,7 +149,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
 
     while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
 
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
@@ -180,8 +180,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     while (true) { THREAD_SLEEP(1); }
     while (true) {
         // add the tick update function
-        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
-        LowGData current_accelerometer = arg->rocket_data.low_g.getRecent();
+        Barometer current_barom_buf = arg->rocket_data.barometer.getRecentUnsync();
+        LowGData current_accelerometer = arg->rocket_data.low_g.getRecentUnsync();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
             .ay = current_accelerometer.ay,
@@ -204,8 +204,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 */
 DECLARE_THREAD(pyro, RocketSystems* arg) {
     while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
         arg->rocket_data.pyro.update(new_pyro_state);
         THREAD_SLEEP(16);
     }
@@ -275,20 +275,20 @@ void begin_systems(RocketSystems* config) {
     }
 
     START_THREAD(logger, DATA_CORE, config);
-    START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(low_g, SENSOR_CORE, config);
-    START_THREAD(high_g, SENSOR_CORE, config);
     START_THREAD(low_g_lsm, SENSOR_CORE, config);
-    START_THREAD(magnetometer, SENSOR_CORE, config);
-    
+    START_THREAD(high_g, SENSOR_CORE, config);
+    START_THREAD(barometer, SENSOR_CORE, config);
     START_THREAD(continuity, SENSOR_CORE, config);
-
-    // START_THREAD(orientation, SENSOR_CORE, config);
-    START_THREAD(gps, SENSOR_CORE, config);
     START_THREAD(voltage, SENSOR_CORE, config);
-    START_THREAD(fsm, SENSOR_CORE, config);
+    START_THREAD(gps, SENSOR_CORE, config);
+    START_THREAD(magnetometer, SENSOR_CORE, config);
+    START_THREAD(orientation, SENSOR_CORE, config);
+    // START_THREAD(kalman, SENSOR_CORE, config);
+    // START_THREAD(fsm, SENSOR_CORE, config);
+
+
 //    START_THREAD(buzzer, SENSOR_CORE, config);
-    START_THREAD(kalman, SENSOR_CORE, config);
     // START_THREAD(pyro, SENSOR_CORE, config);
     START_THREAD(telemetry, SENSOR_CORE, config);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config);

@@ -4,7 +4,7 @@
 #define configTICK_RATE_HZ 1000
 #define configUSE_PREEMPTION 0
 #define configUSE_MUTEXES 1
-#define configSUPPORT_STATIC_ALLOCATION 1
+#define configSUPPORT_STATIC_ALLOCATION 0
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 #define INCLUDE_vTaskDelay 1
 
