@@ -42,8 +42,8 @@ struct LoggedReading {
         Magnetometer magnetometer;
         Orientation orientation;
         LowGLSM lowg_lsm;
-        KalmanData kalman_data;
-        FSMState fsm_data;
+        KalmanData kalman;
+        FSMState fsm;
         PyroState pyro;
     } data;
 };
