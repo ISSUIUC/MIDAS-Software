@@ -1,6 +1,4 @@
-# User configs
 .pio
-.vscode/
-
-# Mac garbage
+.vscode
+/src/log_checksum.h
 **/.DS_Store

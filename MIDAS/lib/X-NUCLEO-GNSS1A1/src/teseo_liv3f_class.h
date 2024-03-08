@@ -44,6 +44,7 @@
 #include "Wire.h"
 #include "teseo.h"
 #include "gnss_parser.h"
+#include "TCAL9539.h"
 #include "NMEA_parser.h"
 
 #define DEFAULT_BUS 0
@@ -58,7 +59,7 @@
 #define MAX_STRING_LENGTH 100
 #define MAX_RESPONSE_LENGTH 40
 
-
+#define GPS_GPIO GpioAddress(2, 017)
 typedef struct
 {
    char inputString[MAX_STRING_LENGTH];
@@ -95,8 +96,10 @@ public:
 
    TeseoLIV3F(TwoWire *i2c, int resetPin, int enablePin) : dev_i2c(i2c), pinRes(resetPin), pinEn(enablePin)
    {
-      pinMode(pinRes, OUTPUT);
-      pinMode(pinEn, OUTPUT);
+      // We probably have to change this to something reasonable that can be passed in the arguments
+      gpioPinMode(GPS_GPIO, OUTPUT);
+
+      //pinMode(pinEn, OUTPUT);
       useI2C = 1;
       i2ch.stringComplete = false;
       i2ch.index = 0;
@@ -121,9 +124,9 @@ public:
     */
    GNSS_StatusTypeDef init()
    {
-      digitalWrite(pinRes, LOW);
+      gpioDigitalWrite(GPS_GPIO, LOW);
       delay(1000);
-      digitalWrite(pinRes, HIGH);
+      gpioDigitalWrite(GPS_GPIO, HIGH);
       delay(5000);
       GNSS_PARSER_Init(&data);
       if (useI2C)
@@ -139,6 +142,7 @@ public:
       }
       sendCommand((char *)"$PSTMRESTOREPAR");
       sendCommand((char *)"$PSTMSRR");
+
       delay(4000);
       return GNSS_OK;
    }

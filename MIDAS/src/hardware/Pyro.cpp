@@ -115,19 +115,12 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     gpioDigitalWrite(GpioAddress(GPIO_ID, PYRO_GLOBAL_ARM_PIN), HIGH);
 
     switch (fsm_state) {
-        case FSMState::STATE_FIRST_STAGE_SEPARATION:
+        case FSMState::STATE_FIRST_SEPARATION:
             // Fire "Pyro D" when separating stage 1
             new_pyro_state.channels[3].is_armed = true;
             new_pyro_state.channels[3].is_firing = true;
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_ARM_PIN), HIGH);
             gpioDigitalWrite(GpioAddress(GPIO_ID, PYROD_FIRE_PIN), HIGH);
-            break;
-        case FSMState::STATE_SUSTAINER_IGNITION:
-            // Fire "Pyro A" to ignite sustainer
-            new_pyro_state.channels[0].is_armed = true;
-            new_pyro_state.channels[0].is_firing = true;
-            gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_ARM_PIN), HIGH);
-            gpioDigitalWrite(GpioAddress(GPIO_ID, PYROA_FIRE_PIN), HIGH);
             break;
         case FSMState::STATE_DROGUE_DEPLOY:
             // Fire "Pyro B" to deploy drogue

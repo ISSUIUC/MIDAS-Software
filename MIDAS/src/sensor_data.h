@@ -1,11 +1,12 @@
 #pragma once
 
-#include "finite-state-machines/fsm_states.h"
-
 #include <cmath>
 #include <cstdint>
 
+#include "finite-state-machines/fsm_states.h"
+
 #define CONTINUITY_PIN_COUNT 4
+
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
@@ -130,7 +131,7 @@ struct Orientation {
     Magnetometer magnetometer;
 
     float temperature = 0;
-    float pressure = 0; 
+    float pressure = 0;
 
 };
 

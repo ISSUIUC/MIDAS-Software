@@ -99,9 +99,10 @@ GpioError gpioPinMode(GpioAddress addr, int mode){
     }
 
     GpioError err = gpioDigitalWrite(addr, LOW); //set pin low as default state
-    if(err != GpioError::NoError){
-        return err;
-    }
+    // todo ACK is broken
+//    if(err != GpioError::NoError){
+//        return err;
+//    }
 
     WIRE.beginTransmission(addr.gpio_address);
     WIRE.write(REG_CONFIG0 + addr.port_idx);
