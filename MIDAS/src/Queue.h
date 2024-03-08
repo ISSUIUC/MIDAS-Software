@@ -43,7 +43,8 @@ public:
      */
     void send(T value) {
         if(xQueueSendToBack(queue, &value, 0) == errQUEUE_FULL){
-            Serial.println("FULL QUEUE!!!!!\\n\\n\\n");
+            Serial.print("FULL QUEUE");
+            Serial.println(pcTaskGetName(nullptr));
         }
     }
 

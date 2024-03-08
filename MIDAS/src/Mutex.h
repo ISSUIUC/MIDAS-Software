@@ -61,6 +61,10 @@ public:
         return ret;
     }
 
+    T read_unsync() {
+        return data;
+    }
+
 
     void read2(T* ptr) {
         if (!mutex_handle || mutex_handle != check) {

@@ -35,37 +35,20 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
-DECLARE_THREAD(low_g, RocketSystems* arg) {
-    while (true) {
-        LowGData reading = arg->sensors.low_g.read();
-        arg->rocket_data.low_g.update(reading);
-        THREAD_SLEEP(1);
-    }
-}
 
-DECLARE_THREAD(low_g_lsm, RocketSystems* arg) {
+DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
-        LowGLSM reading = arg->sensors.low_g_lsm.read();
-        arg->rocket_data.low_g_lsm.update(reading);
-        THREAD_SLEEP(10);
-    }
-}
-
-/**
- * See \ref data_logger_thread
- */
-DECLARE_THREAD(high_g, RocketSystems* arg) {
-    while (true) {
-        HighGData reading = arg->sensors.high_g.read();
-        arg->rocket_data.high_g.update(reading);
-        THREAD_SLEEP(1);
+        LowGData lowg = arg->sensors.low_g.read();
+        arg->rocket_data.low_g.update(lowg);
+        LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
+        arg->rocket_data.low_g_lsm.update(lowglsm);
+        HighGData highg = arg->sensors.high_g.read();
+        arg->rocket_data.high_g.update(highg);
+        THREAD_SLEEP(2);
     }
 }
 
@@ -90,7 +73,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
-        THREAD_SLEEP(7);  //data rate is 155hz so 7 is closest
+        THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
     }
 }
 
@@ -101,7 +84,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         GPS reading = arg->sensors.gps.read();
         arg->rocket_data.gps.update(reading);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -112,7 +95,7 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         Voltage reading = arg->sensors.voltage.read();
         arg->rocket_data.voltage.update(reading);
-        THREAD_SLEEP(20);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -138,7 +121,7 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
 
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -149,13 +132,13 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
 
     while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
 
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
 
         arg->rocket_data.fsm_state.update(next_state);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -166,7 +149,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
         arg->buzzer.tick();
 
-        THREAD_SLEEP(1);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -177,11 +160,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     displacement_kf.initialize();
     TickType_t last = xTaskGetTickCount();
 
-    while (true) { THREAD_SLEEP(1); }
     while (true) {
         // add the tick update function
-        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
-        LowGData current_accelerometer = arg->rocket_data.low_g.getRecent();
+        Barometer current_barom_buf = arg->rocket_data.barometer.getRecentUnsync();
+        LowGData current_accelerometer = arg->rocket_data.low_g.getRecentUnsync();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
             .ay = current_accelerometer.ay,
@@ -195,7 +177,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 
         last = xTaskGetTickCount();
 
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -204,10 +186,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 */
 DECLARE_THREAD(pyro, RocketSystems* arg) {
     while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecent();
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecent());
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
         arg->rocket_data.pyro.update(new_pyro_state);
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(200);
     }
 }
 
@@ -233,25 +215,26 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data);
 
         // Serial.println("Exit Telem Transmit");
-        THREAD_SLEEP(16);
+        THREAD_SLEEP(50);
     }
 }
+
 
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
-   INIT_SYSTEM(systems.sensors.low_g);
-   INIT_SYSTEM(systems.sensors.high_g);
-   INIT_SYSTEM(systems.sensors.low_g_lsm);
-   INIT_SYSTEM(systems.sensors.barometer);
-   INIT_SYSTEM(systems.sensors.continuity);
-   INIT_SYSTEM(systems.sensors.orientation);
-   INIT_SYSTEM(systems.sensors.voltage);
-   INIT_SYSTEM(systems.sensors.magnetometer);
-   INIT_SYSTEM(systems.sensors.gps);
-   INIT_SYSTEM(systems.log_sink);
-//    INIT_SYSTEM(systems.buzzer);
-   INIT_SYSTEM(systems.sensors.pyro);
+    INIT_SYSTEM(systems.sensors.low_g);
+    INIT_SYSTEM(systems.sensors.high_g);
+    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    INIT_SYSTEM(systems.sensors.barometer);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.sensors.gps);
+    INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.buzzer);
+    INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.tlm);
     return NoError;
 }
@@ -274,27 +257,29 @@ void begin_systems(RocketSystems* config) {
         }
     }
 
-    START_THREAD(logger, DATA_CORE, config);
-    START_THREAD(barometer, SENSOR_CORE, config);
-    START_THREAD(low_g, SENSOR_CORE, config);
-    START_THREAD(high_g, SENSOR_CORE, config);
-    START_THREAD(low_g_lsm, SENSOR_CORE, config);
-    START_THREAD(magnetometer, SENSOR_CORE, config);
-    
-    START_THREAD(continuity, SENSOR_CORE, config);
+    START_THREAD(logger, DATA_CORE, config, 5);
+    START_THREAD(accelerometers, SENSOR_CORE, config, 4);
+    START_THREAD(barometer, SENSOR_CORE, config, 4);
+    START_THREAD(continuity, SENSOR_CORE, config, 3);
+    START_THREAD(voltage, SENSOR_CORE, config, 3);
+    START_THREAD(gps, SENSOR_CORE, config, 4);
+    START_THREAD(magnetometer, SENSOR_CORE, config, 3);
+    START_THREAD(orientation, SENSOR_CORE, config, 2);
+    START_THREAD(kalman, SENSOR_CORE, config, 4);
+    START_THREAD(fsm, SENSOR_CORE, config, 5);
 
-    // START_THREAD(orientation, SENSOR_CORE, config);
-    START_THREAD(gps, SENSOR_CORE, config);
-    START_THREAD(voltage, SENSOR_CORE, config);
-    START_THREAD(fsm, SENSOR_CORE, config);
-//    START_THREAD(buzzer, SENSOR_CORE, config);
-    START_THREAD(kalman, SENSOR_CORE, config);
-    // START_THREAD(pyro, SENSOR_CORE, config);
-    START_THREAD(telemetry, SENSOR_CORE, config);
-    START_THREAD(telemetry_buffering, SENSOR_CORE, config);
+    START_THREAD(buzzer, SENSOR_CORE, config, 1);
+    START_THREAD(pyro, SENSOR_CORE, config, 4);
+    START_THREAD(telemetry, SENSOR_CORE, config, 5);
+    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
 
     while (true) {
         THREAD_SLEEP(1000);
         Serial.println("running");
     }
+}
+
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
+    Serial.println("OVERFLOW");
+    Serial.println((char*)pcTaskName);
 }
