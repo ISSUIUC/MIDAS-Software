@@ -33,8 +33,10 @@ public:
 //        led_state = !led_state;
 
         rf95.send((uint8_t*) &data, sizeof(T));
-        rf95.waitPacketSent();
-        THREAD_SLEEP(170);
+        while(!digitalRead(rf95._interruptPin)){
+            THREAD_SLEEP(1);
+        }
+        rf95.handleInterrupt();
     }
 
     template<typename T>

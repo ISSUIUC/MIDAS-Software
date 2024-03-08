@@ -857,7 +857,9 @@ protected:
     /// This is a low level function to handle the interrupts for one instance of RH_RF95.
     /// Called automatically by isr*()
     /// Should not need to be called by user code.
+    public:
     void           handleInterrupt();
+protected:
 
     /// Examine the revceive buffer to determine whether the message is for this node
     void validateRxBuf();
@@ -892,7 +894,9 @@ private:
     static uint8_t      _interruptCount;
 
     /// The configured interrupt pin connected to this instance
+public:
     uint8_t             _interruptPin;
+private:
 
     /// The index into _deviceForInterrupt[] for this device (if an interrupt is already allocated)
     /// else 0xff

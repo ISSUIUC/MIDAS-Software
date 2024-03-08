@@ -1797,8 +1797,11 @@ these examples and explanations and extend them to suit your needs.
 // #define ATOMIC_BLOCK_END portCLEAR_INTERRUPT_MASK_FROM_ISR(RH_ATOMIC_state);
 // These appear to be defined for all ESP32 type:
   #include "freertos/atomic.h"
- #define ATOMIC_BLOCK_START ATOMIC_ENTER_CRITICAL()
- #define ATOMIC_BLOCK_END ATOMIC_EXIT_CRITICAL()
+// Hacky fix, if all spi stuff is on the same thread then this is unnessary
+#define ATOMIC_BLOCK_START
+#define ATOMIC_BLOCK_END
+//  #define ATOMIC_BLOCK_START ATOMIC_ENTER_CRITICAL()
+//  #define ATOMIC_BLOCK_END ATOMIC_EXIT_CRITICAL()
 #else 
  // TO BE DONE:
  #define ATOMIC_BLOCK_START

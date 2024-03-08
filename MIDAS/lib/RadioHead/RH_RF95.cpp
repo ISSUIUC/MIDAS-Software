@@ -98,6 +98,11 @@ bool RH_RF95::init()
 
 bool RH_RF95::setupInterruptHandler()
 {
+    //were using polling so no interrupts should be setup
+    pinMode(_interruptPin, INPUT);
+    return true;
+
+
     // For some subclasses (eg RH_ABZ)  we dont want to set up interrupt
     int interruptNumber = NOT_AN_INTERRUPT;
     if (_interruptPin != RH_INVALID_PIN)
