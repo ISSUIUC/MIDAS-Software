@@ -1,11 +1,12 @@
 #pragma once
 
-#include "finite-state-machines/fsm_states.h"
-
 #include <cmath>
 #include <cstdint>
 
-#define CONTINUITY_PIN_COUNT 4
+#include "finite-state-machines/fsm_states.h"
+
+//#define CONTINUITY_PIN_COUNT 5
+
 /**
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
@@ -94,9 +95,8 @@ struct Barometer {
 };
 
 struct Continuity {
-    bool pins[CONTINUITY_PIN_COUNT];
-
-    Continuity() = default;
+    float sense_pyro;
+    float pins[4];
 };
 
 struct Voltage {
@@ -118,9 +118,11 @@ struct Magnetometer {
 };
 
 struct Orientation {
-    float yaw;
-    float pitch;
-    float roll;
+    bool has_data = false;
+
+    float yaw = 0;
+    float pitch = 0;
+    float roll = 0;
 
     Velocity orientation_velocity;
     Acceleration orientation_acceleration;
@@ -132,7 +134,7 @@ struct Orientation {
     Magnetometer magnetometer;
 
     float temperature = 0;
-    float pressure = 0; 
+    float pressure = 0;
 
 };
 
@@ -150,28 +152,7 @@ struct PyroChannel {
     bool is_firing = false;
 };
 
-/** piro team defense forter 2
-⠂⠄⡂⡐⠠⠠⠠⠄⠄⠄⣀⡠⡤⡤⣆⢦⣄
-⠈⡀⠄⠄⠂⠁⠄⠁⡠⡪⡢⡫⡎⡧⡳⣝⣷⣧
-⠐⢀⠐⠈⠄⠄⢠⠎⢜⢸⢸⢜⡪⣪⢪⢲⢹⢽⡳⡄
-⡈⠠⢀⢡⠋⠉⠫⢶⡨⡪⣊⣦⠗⠚⠺⢾⣎⡧⣏⠇
-⠐⠄⢂⠧⠄⠄⠄⣽⢪⠚⡞⠄⠄⠄⠄⠄⠙⡾⡸⡕
-⠈⡀⠸⣱⠄⠄⢀⠞⡜⡹⡇⠄⠄⠄⠄⠄⠄⡯⡪⡝⠄
-⠂⡠⢁⡪⣂⢠⠪⠁⣇⢣⢣⣀⠄⠄⠐⣀⡼⡑⡜⠆
-⡼⢡⠢⡠⠄⠄⠄⡌⡆⣇⡅⠍⠛⠛⢛⠍⡔⢅⠣⠥⠤⣄
-⡝⡐⢕⢌⠄⠈⠠⠵⣹⣙⠎⡕⢅⢊⠢⡱⡸⢈⠢⠁⢸⣿
-⡯⠐⢅⠢⡂⠄⡘⣈⢂⢢⢑⠌⡢⠡⣫⡮⡨⠠⠁⠂⣸⣿
-⠱⢅⠨⠐⠠⠊⠎⠞⢵⡳⣥⡈⠢⡁⠢⠐⠄⠄⢀⣾⣿⣿
-⠄⡁⠄⢀⡸⢪⠲⠵⣄⠍⢪⢞⡐⠌⠈⠄⠄⢀⣾⡿⣿⡿
-⠄⠂⣴⣿⡐⢡⠑⡸⢠⠫⡀⠕⠁⢀⡠⣔⣮⡿⡯⣟⣿⢿
-⣠⣾⡿⠟⢁⢠⢐⣁⡂⣈⢴⠄⢘⣾⡺⡯⡫⣏⢯⡳⡝⡇
-⣿⣿⠁⠁⠄⢀⠆⣞⢿⣷⢱⠄⡜⡮⡳⡹⡸⡪⣱⡪⡪⠄
-*/
 struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
-};
-
-struct FSMState {
-    FSM_state curr_state = STATE_IDLE;
 };

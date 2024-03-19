@@ -1,63 +1,25 @@
-#include "SDLog.h"
 #include <FS.h>
-#include <SD.h>
+//#include <SD.h>
+#include <SD_MMC.h>
 
-#define MAX_FILES 999
+#include "SDLog.h"
 
-char* sdFileNamer(char* fileName, char* fileExtensionParam) {
-    char fileExtension[strlen(fileExtensionParam) + 1];
-    strcpy(fileExtension, fileExtensionParam);
 
-    char inputName[strlen(fileName) + 1];
-    strcpy(inputName, fileName);
+// todo none of this works
 
-    strcat(fileName, fileExtension);
 
-    // checks to see if file already exists and adds 1 to filename if it does.
-    if (SD.exists(fileName)) {
-        bool fileExists = false;
-        int i = 1;
-        while (!fileExists) {
-            if (i > MAX_FILES) {
-                // max number of files reached. Don't want to overflow
-                // fileName[]. Will write new data to already existing
-                // data999.csv
-                strcpy(fileName, inputName);
-                strcat(fileName, "999");
-                strcat(fileName, fileExtension);
-                break;
-            }
-
-            // converts int i to char[]
-            char iStr[16];
-            itoa(i, iStr, 10);
-
-            // writes "(sensor)_data(number).csv to fileNameTemp"
-            char fileNameTemp[strlen(inputName) + strlen(iStr) + 6];
-            strcpy(fileNameTemp, inputName);
-            strcat(fileNameTemp, iStr);
-            strcat(fileNameTemp, fileExtension);
-
-            if (!SD.exists(fileNameTemp)) {
-                strcpy(fileName, fileNameTemp);
-                fileExists = true;
-            }
-
-            i++;
-        }
+ErrorCode FileSink::init() {
+    Serial.println("Connecting to SD...");
+    if (!SD_MMC.setPins(5, 4, 6)) {
+        return ErrorCode::SDBeginFailed;
     }
+    if (SD_MMC.begin("/sd", true, true, 40000, 5)) {
+//        char file_extension[8] = ".launch";
 
-    return fileName;
-}
-
-ErrorCode LogSink::init() {
-    if (SD.begin(0)) {  // todo pin
-        char file_extension[8] = ".launch";
-
-        char data_name[16] = "data";
-        sdFileNamer(data_name, file_extension);
+        char data_name[16] = "/data.launch";
+//        sdFileNamer(data_name, file_extension, SD_MMC);
         // Initialize SD card
-        file = SD.open(data_name, FILE_WRITE);
+        file = SD_MMC.open(data_name, FILE_WRITE);
         // print header to file on sd card that lists each variable that is logged
         // sd_file.println("binary logging of sensor_data_t");
         file.flush();
@@ -69,6 +31,7 @@ ErrorCode LogSink::init() {
     return ErrorCode::NoError;
 }
 
-void LogSink::write(const uint8_t* data, size_t size) {
+void FileSink::write(const uint8_t* data, size_t size) {
     file.write(data, size);
+    file.flush();
 }

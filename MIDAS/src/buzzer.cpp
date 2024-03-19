@@ -1,6 +1,6 @@
 #include "buzzer.h"
 
-#define BUZZER_PIN (0xDE)
+#define BUZZER_PIN (48)
 #define BUZZER_CHANNEL (1)
 
 void BuzzerController::play_tune(Sound* tune, uint32_t length) {

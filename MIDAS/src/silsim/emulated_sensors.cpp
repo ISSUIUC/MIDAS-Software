@@ -48,6 +48,7 @@ ErrorCode OrientationSensor::init() {
 
 Orientation OrientationSensor::read() {
     return {
+            .has_data = true,
             .yaw = 0,
             .pitch = 0,
             .roll = 0,

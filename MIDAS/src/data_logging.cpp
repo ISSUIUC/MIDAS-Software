@@ -2,7 +2,6 @@
 #include "log_format.h"
 #include "log_checksum.h"
 
-
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
 
@@ -17,6 +16,9 @@ ASSOCIATE(Voltage, ID_VOLTAGE)
 ASSOCIATE(GPS, ID_GPS)
 ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
 ASSOCIATE(Orientation, ID_ORIENTATION)
+ASSOCIATE(FSMState, ID_FSM)
+ASSOCIATE(KalmanData, ID_KALMAN)
+ASSOCIATE(PyroState, ID_PYRO)
 
 
 template<typename T>
@@ -28,10 +30,10 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
 }
 
 template<typename T>
-int log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
+uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
-    int read = 0;
-    while (sensor_data.getQueued(&reading)) {
+    uint32_t read = 0;
+    while (read < 20 && sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);
         read++;
     }
@@ -53,4 +55,60 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.gps);
     log_from_sensor_data(sink, data.magnetometer);
     log_from_sensor_data(sink, data.orientation);
+    log_from_sensor_data(sink, data.fsm_state);
+    log_from_sensor_data(sink, data.kalman);
+    log_from_sensor_data(sink, data.pyro);
 }
+
+#ifndef SILSIM
+#define MAX_FILES 999
+
+char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
+    char fileExtension[strlen(fileExtensionParam) + 1];
+    strcpy(fileExtension, fileExtensionParam);
+
+    char inputName[strlen(fileName) + 1];
+    strcpy(fileName, "/");
+    strcat(inputName, fileName);
+    strcat(fileName, fileExtension);
+
+    // checks to see if file already exists and adds 1 to filename if it does.
+    bool exists = fs.exists(fileName);
+
+    if (exists) {
+        bool fileExists = false;
+        int i = 1;
+        while (!fileExists) {
+            if (i > MAX_FILES) {
+                // max number of files reached. Don't want to overflow
+                // fileName[]. Will write new data to already existing
+                // data999.csv
+                strcpy(fileName, inputName);
+                strcat(fileName, "999");
+                strcat(fileName, fileExtension);
+                break;
+            }
+
+            // converts int i to char[]
+            char iStr[16];
+            itoa(i, iStr, 10);
+
+            // writes "(sensor)_data(number).csv to fileNameTemp"
+            char fileNameTemp[strlen(inputName) + strlen(iStr) + 6];
+            strcpy(fileNameTemp, "/");
+            strcat(fileNameTemp, inputName);
+            strcat(fileNameTemp, iStr);
+            strcat(fileNameTemp, fileExtension);
+
+            if (!fs.exists(fileNameTemp)) {
+                strcpy(fileName, fileNameTemp);
+                fileExists = true;
+            }
+
+            i++;
+        }
+    }
+
+    return fileName;
+}
+#endif

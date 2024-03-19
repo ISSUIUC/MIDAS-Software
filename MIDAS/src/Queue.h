@@ -1,3 +1,5 @@
+#pragma once
+
 #ifdef SILSIM
 #include "silsim/emulation.h"
 #else
@@ -22,13 +24,13 @@ class Queue {
 // private:
 public:
     // todo probably have the Queue Store the timestamps too
-    StaticQueue_t queue_area{};
+    uint8_t queue_area[sizeof(StaticQueue_t) + 64];
     uint8_t buffer[sizeof(T) * length]{};
     QueueHandle_t queue{};
 
 public:
     Queue() {
-        queue = xQueueCreateStatic(length, sizeof(T), buffer, &queue_area);
+        queue = xQueueCreateStatic(length, sizeof(T), buffer, (StaticQueue_t*) &queue_area[32]);
         // configASSERT(mutex_handle);
     }
     Queue(const Queue&) = delete;
@@ -40,7 +42,10 @@ public:
      * @param value The value to put in the queue.
      */
     void send(T value) {
-        xQueueSendToBack(queue, &value, 0);
+        if(xQueueSendToBack(queue, &value, 0) == errQUEUE_FULL){
+            Serial.print("FULL QUEUE");
+            Serial.println(pcTaskGetName(nullptr));
+        }
     }
 
     /**

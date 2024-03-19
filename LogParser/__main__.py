@@ -1,7 +1,10 @@
 import json
 import pathlib
+import struct
 import zlib
 from argparse import ArgumentParser
+from sys import stderr
+
 from LogParser.cpp_parser import Context, parse_file, Type, Struct, Enum, Integer, Union
 
 
@@ -51,7 +54,7 @@ def construct_values_mapping(ctxt: Context) -> dict[int, tuple[str, Type]]:
 
 def calculate_checksum() -> int:
     src = pathlib.Path(__file__).parent.parent / "MIDAS" / "src"
-    text = (src / "log_format.h").read_text() + (src / "sensor_data.h").read_text()
+    text = (src / "log_format.h").read_text(errors="replace") + (src / "sensor_data.h").read_text(errors="replace")
     expected_checksum = zlib.crc32(text.encode("utf-8"))
     return expected_checksum
 
@@ -76,7 +79,7 @@ def main():
     with open(args.raw, "rb") as data_file:
         found_checksum = int.from_bytes(data_file.read(4), byteorder="little")
         if found_checksum != expected_checksum:
-            raise Exception(f"Trying to parse file with checksum {expected_checksum}, found file with checksum {found_checksum}")
+            print(f"Warning: Trying to parse file with checksum {expected_checksum}, found file with checksum {found_checksum}", file=stderr)
         
         while True:
             disc_bytes = data_file.read(4)
@@ -85,7 +88,10 @@ def main():
             discriminant = int.from_bytes(disc_bytes, byteorder='little')
             timestamp_ms = int.from_bytes(data_file.read(4), byteorder="little")
             data_name, data_type = mapping[discriminant]
-            data = data_type.parse(data_file.read(data_type.size))
+            try:
+                data = data_type.parse(data_file.read(data_type.size))
+            except struct.error:
+                break
             json_out.append({"type": data_name, "timestamp": timestamp_ms, "data": data})
 
         data_file.read()

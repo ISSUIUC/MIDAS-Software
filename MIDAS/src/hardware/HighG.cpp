@@ -16,7 +16,7 @@ ErrorCode HighGSensor::init() {
     }
 
     if(!KX.setOutputDataRate(0xb)) {
-        return ErrorCode::HighGCoulNotUpdateDataRate;
+        return ErrorCode::HighGCouldNotUpdateDataRate;
     }
 
     KX.setRange(3);

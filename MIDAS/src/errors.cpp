@@ -23,7 +23,9 @@
  * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen
  */
 
-#define TURN_ONE_RED_LED 
+#ifndef SILSIM
+#include <TCAL9539.h>
+
 #define GPIO_EXPANDER_2 2
 
 // Each LED pin, with pin humbers in octal
@@ -64,13 +66,13 @@ void update_error_LED(ErrorCode error) {
             gpioDigitalWrite(orange_led, LOW);
             gpioDigitalWrite(red_led, LOW);
             break;   
-        case HighGCoulNotUpdateDataRate:
+        case HighGCouldNotUpdateDataRate:
             gpioDigitalWrite(blue_led, HIGH);
             gpioDigitalWrite(green_led, LOW);
             gpioDigitalWrite(orange_led, HIGH);
             gpioDigitalWrite(red_led, LOW);
             break;
-        case MagnetometerCoultNotBeInitialized:
+        case MagnetometerCouldNotBeInitialized:
             gpioDigitalWrite(blue_led, HIGH);
             gpioDigitalWrite(green_led, LOW);
             gpioDigitalWrite(orange_led, LOW);
@@ -114,3 +116,10 @@ void update_error_LED(ErrorCode error) {
             break;
     }
 }
+#else
+
+void update_error_LED(ErrorCode error) {
+
+};
+
+#endif
