@@ -24,7 +24,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
     while (true) {
         log_data(arg->log_sink, arg->rocket_data);
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(30);
     }
 }
 
@@ -48,7 +48,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        THREAD_SLEEP(20);
+        THREAD_SLEEP(2);
     }
 }
 
@@ -62,7 +62,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
             arg->rocket_data.orientation.update(reading);
         }
 
-        THREAD_SLEEP(500);
+        THREAD_SLEEP(100);
     }
 }
 
@@ -84,7 +84,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         GPS reading = arg->sensors.gps.read();
         arg->rocket_data.gps.update(reading);
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(100);
     }
 }
 
@@ -200,7 +200,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
     while (true) {
         arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(260/4);
     }
 }
 
@@ -210,12 +210,15 @@ DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
  */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
-        // Serial.println("Entered Telem Transmit");
+//        TickType_t last = xTaskGetTickCount();
 
         arg->tlm.transmit(arg->rocket_data);
 
-        // Serial.println("Exit Telem Transmit");
-        THREAD_SLEEP(5);
+//        TickType_t curr = xTaskGetTickCount();
+//        Serial.print("Telem latency: ");
+//        Serial.print(pdTICKS_TO_MS(curr - last));
+//        Serial.println(" ms");
+        THREAD_SLEEP(1);
     }
 }
 
@@ -267,7 +270,6 @@ void begin_systems(RocketSystems* config) {
     START_THREAD(orientation, SENSOR_CORE, config, 2);
     START_THREAD(kalman, SENSOR_CORE, config, 4);
     START_THREAD(fsm, SENSOR_CORE, config, 5);
-
     START_THREAD(buzzer, SENSOR_CORE, config, 1);
     START_THREAD(pyro, SENSOR_CORE, config, 4);
     START_THREAD(telemetry, SENSOR_CORE, config, 5);
