@@ -5,7 +5,7 @@
 #include "data_logging.h"
 #include "buzzer.h"
 
-#include "gnc/displacement_kf.h"
+#include "gnc/yessir.h"
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -170,8 +170,9 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .az = current_accelerometer.az
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        displacement_kf.kfTick(dt, 13.0, current_barom_buf, current_accelerations);
-        KalmanData current_state = displacement_kf.getState();
+
+        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations);
+        KalmanData current_state = yessir.getState();
 
         arg->rocket_data.kalman.update(current_state);
 
