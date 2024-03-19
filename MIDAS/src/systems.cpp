@@ -48,7 +48,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        THREAD_SLEEP(2);
+        THREAD_SLEEP(20);
     }
 }
 
@@ -201,7 +201,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
     while (true) {
         arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(100);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -216,7 +216,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data);
 
         // Serial.println("Exit Telem Transmit");
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(5);
     }
 }
 
