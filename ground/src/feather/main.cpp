@@ -68,6 +68,10 @@ struct TelemetryDataLite {
     int16_t highG_ax;             //[128, -128]
     int16_t highG_ay;             //[128, -128]
     int16_t highG_az;
+
+    int16_t lowg_ax;
+    int16_t lowg_ay;
+    int16_t lowg_az;
     
     int16_t bno_roll;             //[-4,4]
     int16_t bno_pitch;             //[128, -128]
@@ -83,16 +87,13 @@ struct TelemetryPacket {
     float gps_lat;
     float gps_long;
     float gps_alt;
-    float yaw;
-    float pitch;
-    float roll;
+
     int16_t mag_x;            //[-4, 4]
     int16_t mag_y;            //[-4, 4]
     int16_t mag_z;            //[-4, 4]
     int16_t gyro_x;           //[-4096, 4096]
     int16_t gyro_y;           //[-4096, 4096]
     int16_t gyro_z;           //[-4096, 4096]
-    int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
     uint8_t voltage_battery;  //[0, 16]
     uint8_t FSM_State;        //[0,256]
@@ -118,7 +119,8 @@ struct TelemetryPacket {
     // float gnc_state_az;
     // float gnc_state_apo;    
     // uint8_t FSM_State;        //[0,256]
-
+    
+    uint8_t is_booster;
     char callsign[8];
 };
 
@@ -129,6 +131,10 @@ struct FullTelemetryData {
     float highG_ax;             //[128, -128]
     float highG_ay;             //[128, -128]
     float highG_az;
+
+    int16_t lowg_ax;
+    int16_t lowg_ay;
+    int16_t lowg_az;
     
     float bno_roll;             //[-4,4]
                //[-4,4]
@@ -137,16 +143,12 @@ struct FullTelemetryData {
     float gps_lat;
     float gps_long;
     float gps_alt;
-    float yaw;
-    float pitch;
-    float roll;
     float mag_x;            //[-4, 4]
     float mag_y;            //[-4, 4]
     float mag_z;            //[-4, 4]
     float gyro_x;           //[-4096, 4096]
     float gyro_y;           //[-4096, 4096]
     float gyro_z;           //[-4096, 4096]
-    int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
     int8_t datapoint_count;   //[0,4]
     float voltage_battery;  //[0, 16]
@@ -231,6 +233,9 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.highG_ax = convert_range(data.highG_ax, 256);
         item.highG_ay = convert_range(data.highG_ay, 256);
         item.highG_az = convert_range(data.highG_az, 256);
+        item.lowg_ax = convert_range(data.lowg_ax, 8);
+        item.lowg_ay = convert_range(data.lowg_ay, 8);
+        item.lowg_az = convert_range(data.lowg_az, 8);
         item.gyro_x = convert_range(packet.gyro_x, 8192);
         item.gyro_y = convert_range(packet.gyro_y, 8192);
         item.gyro_z = convert_range(packet.gyro_z, 8192);
@@ -250,7 +255,6 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         // item.gnc_state_vx = packet.gnc_state_vx;
         // item.gnc_state_x = packet.gnc_state_x;
         // item.gnc_state_apo = packet.gnc_state_apo;
-        item.response_ID = packet.response_ID;
         item.rssi = packet.rssi;
         item.voltage_battery = convert_range(packet.voltage_battery, 16);
         item.print_time = start_printing - start_timestamp + data.timestamp;
@@ -307,13 +311,15 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 
 void printPacketJson(FullTelemetryData const& packet) {
     Serial.print(R"({"type": "data", "value": {)");
-    printJSONField("response_ID", packet.response_ID);
     printJSONField("gps_lat", packet.gps_lat);
     printJSONField("gps_long", packet.gps_long);
     printJSONField("gps_alt", packet.gps_alt);
     printJSONField("KX_IMU_ax", packet.highG_ax);
     printJSONField("KX_IMU_ay", packet.highG_ay);
     printJSONField("KX_IMU_az", packet.highG_az);
+    printJSONField("LOW_G_LSM_ax", packet.lowg_ax);
+    printJSONField("LOW_G_LSM_ay", packet.lowg_ay);
+    printJSONField("LOW_G_LSM_az", packet.lowg_az);
     printJSONField("IMU_gx", packet.gyro_x);
     printJSONField("IMU_gy", packet.gyro_y);
     printJSONField("IMU_gz", packet.gyro_z);
@@ -512,21 +518,21 @@ void loop() {
 
             if (!cmd_queue.empty()) {
                 auto& cmd = cmd_queue.front();
-                if (cmd.command.id == packet.response_ID) {
-                    if (cmd.command.command == CommandType::SET_FREQ) {
-                        set_freq_local_bug_fix(cmd.command.freq);
-                        Serial.print(R"({"type": "freq_success", "frequency":)");
-                        Serial.print(cmd.command.freq);
-                        Serial.println("}");
-                    }
-                    cmd_queue.pop();
-                } else {
+                // if (cmd.command.id == packet.response_ID) {
+                //     if (cmd.command.command == CommandType::SET_FREQ) {
+                //         set_freq_local_bug_fix(cmd.command.freq);
+                //         Serial.print(R"({"type": "freq_success", "frequency":)");
+                //         Serial.print(cmd.command.freq);
+                //         Serial.println("}");
+                //     }
+                //     cmd_queue.pop();
+                // } else {
                     cmd.retry_count++;
                     if (cmd.retry_count >= max_command_retries) {
                         cmd_queue.pop();
                         Serial.println(json_send_failure);
                     }
-                }
+                // }
             }
 
             process_command_queue();
