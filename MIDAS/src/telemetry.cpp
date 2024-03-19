@@ -35,14 +35,8 @@ void Telemetry::transmit(RocketData& rocket_data) {
 //        set_frequency_to = NAN;
 //    }
 
-    // Serial.println("Making Packet...");  Serial.flush();
     TelemetryPacket packet = makePacket(rocket_data);
-    // Serial.println("Sending Packet...");  Serial.flush();
-//    char packet[200] = "moooooo";
-
     backend.send(packet);
-
-    // Serial.println("Sent Packet..."); Serial.flush();
 }
 
 
@@ -85,8 +79,6 @@ void Telemetry::handleCommand(const telemetry_command &cmd) {
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
     TelemetryPacket packet { };
 
-
-    // Serial.println("Making Buffered packets"); Serial.flush();
     TelemetryDataLite small_packet { };
     packet.datapoint_count = 0;
     for (int8_t i = 0; i < 4 && small_packet_queue.receive(&small_packet); i++) {
@@ -95,36 +87,33 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     }
 
 
-//    GPS gps = data.gps.getRecent();
-//    Orientation orientation = data.orientation.getRecent();
-//    Magnetometer magnetometer = data.magnetometer.getRecent();
-//    Voltage voltage = data.voltage.getRecent();
-//    packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
-//    Barometer barometer = data.barometer.getRecent();
+   GPS gps = data.gps.getRecentUnsync();
+   Orientation orientation = data.orientation.getRecentUnsync();
+   Magnetometer magnetometer = data.magnetometer.getRecentUnsync();
+   Voltage voltage = data.voltage.getRecentUnsync();
+   packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
+   Barometer barometer = data.barometer.getRecentUnsync();
 
-//    packet.gps_lat = gps.latitude;
-//    packet.gps_long = gps.longitude;
-//    packet.gps_alt = gps.altitude;
-//    packet.yaw = orientation.yaw;
-//    packet.pitch = orientation.pitch;
-//    packet.roll = orientation.roll;
+   packet.gps_lat = gps.latitude;
+   packet.gps_long = gps.longitude;
+   packet.gps_alt = gps.altitude;
+   packet.yaw = orientation.yaw;
+   packet.pitch = orientation.pitch;
+   packet.roll = orientation.roll;
 
-//    packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
-//    packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
-//    packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
-//    packet.gyro_x = inv_convert_range<int16_t>(orientation.gx, 8192);
-//    packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
-//    packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
+   packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
+   packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
+   packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
+   packet.gyro_x = inv_convert_range<int16_t>(orientation.gx, 8192);
+   packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
+   packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
 
     packet.response_ID = last_command_id;
 
     packet.rssi = backend.getRecentRssi();
-    // Serial.println("Getting fsm"); Serial.flush();
     packet.FSM_state = (char) data.fsm_state.getRecentUnsync();
 
-    // Serial.println("Getting pyros"); Serial.flush();
-
-//    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
+   packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
 
     auto pyros = data.pyro.getRecentUnsync();
     for (int i = 0; i < 4; i++) {
@@ -132,18 +121,12 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
         packet.pyros_firing[i] = pyros.channels[i].is_firing;
     }
 
-//    Continuity continuity{};
-//    data.continuity.getRecent2(&continuity);
-//    Continuity continuity = data.continuity.getRecent();
-//    for (int i = 0; i < 4; i++) {
-//        packet.continuity[i] = continuity.pins[i];
-//    }
-
-    // Serial.println("Memcpy'ing"); Serial.flush();
+   Continuity continuity = data.continuity.getRecentUnsync();
+   for (int i = 0; i < 4; i++) {
+       packet.continuity[i] = continuity.pins[i];
+   }
 
     memcpy(&packet.callsign, &callsign, sizeof(callsign));
-
-    // Serial.println("Done with packet"); Serial.flush();
 
     return packet;
 }
@@ -151,15 +134,15 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 void Telemetry::bufferData(RocketData& Sensorstate) {
     TelemetryDataLite data { };
     data.timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
-    data.barometer_pressure = inv_convert_range<uint16_t>(Sensorstate.barometer.getRecent().pressure , 4096);
+    data.barometer_pressure = inv_convert_range<uint16_t>(Sensorstate.barometer.getRecentUnsync().pressure , 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.getRecent().ax, 256);
-    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.getRecent().ay , 256);
-    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.getRecent().az , 256);
+    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.getRecentUnsync().ax, 256);
+    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.getRecentUnsync().ay , 256);
+    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.getRecentUnsync().az , 256);
 
-    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().pitch , 8);
-    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().yaw , 8);
-    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.getRecent().roll , 8);
+    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.getRecentUnsync().pitch , 8);
+    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.getRecentUnsync().yaw , 8);
+    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.getRecentUnsync().roll , 8);
 
     small_packet_queue.send(data);
 }
