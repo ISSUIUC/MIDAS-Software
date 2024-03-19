@@ -100,7 +100,7 @@ struct TelemetryPacket {
     int16_t barometer_temp;   //[-128, 128]
 
     // Add pyros array for pyro channels
-    bool continuity[4];
+    int8_t continuity[4]; // [-10, 10]
     bool pyros_armed[4];
     bool pyros_firing[4];
 
@@ -159,7 +159,7 @@ struct FullTelemetryData {
     bool pyros_firing[4];
 
     // Add continuity array for continuity pins
-    bool continuity[4];
+    float continuity[4];
 
 
     float gnc_state_x;
@@ -258,10 +258,10 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.rssi = packet.rssi;
         item.voltage_battery = convert_range(packet.voltage_battery, 16);
         item.print_time = start_printing - start_timestamp + data.timestamp;
-        item.continuity[0] = packet.continuity[0];
-        item.continuity[1] = packet.continuity[1];
-        item.continuity[2] = packet.continuity[2];
-        item.continuity[3] = packet.continuity[3];
+        item.continuity[0] = convert_range(packet.continuity[0], 20);
+        item.continuity[1] = convert_range(packet.continuity[1], 20);
+        item.continuity[2] = convert_range(packet.continuity[2], 20);
+        item.continuity[3] = convert_range(packet.continuity[3], 20);
         item.pyros_armed[0] = packet.pyros_armed[0];
         item.pyros_armed[1] = packet.pyros_armed[1];
         item.pyros_armed[2] = packet.pyros_armed[2];
