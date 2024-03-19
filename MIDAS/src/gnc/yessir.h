@@ -3,13 +3,12 @@
 #include "kalman_filter.h"
 #include "sensor_data.h"
 
-class DisplacementKalmanFilter : public KalmanFilter<9, 4>
+class Yessir : public KalmanFilter<3, 3>
 {
 public:
-    DisplacementKalmanFilter();
+    Yessir();
 
     void initialize() override;
-    void initialize(Barometer& barometerData, Acceleration& imuData);
     void priori() override;
     void update() override;
 
@@ -19,13 +18,13 @@ public:
     KalmanData getState() override;
     void setState(KalmanData state) override;
 
-    void kfTick(float dt, float sd, Barometer& barometerData, Acceleration& imuData);
+    void tick(float dt, float sd, Barometer &barometerData, Acceleration &imuData);
 
 private:
-    // im just assuming 20hz rn
-    float s_dt_ = 0.016f;
+    float s_dt_ = 0.05f;
     float spectral_density_ = 13.0f;
 
+    KalmanData state;
 };
 
-extern DisplacementKalmanFilter displacement_kf;
+extern Yessir yessir;
