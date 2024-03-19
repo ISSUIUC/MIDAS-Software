@@ -86,7 +86,6 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
         packet.datapoint_count = i + 1;
     }
 
-
     GPS gps = data.gps.getRecentUnsync();
     Orientation orientation = data.orientation.getRecentUnsync();
     Magnetometer magnetometer = data.magnetometer.getRecentUnsync();

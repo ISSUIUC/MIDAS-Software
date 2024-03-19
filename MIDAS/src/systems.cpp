@@ -5,7 +5,7 @@
 #include "data_logging.h"
 #include "buzzer.h"
 
-#include "gnc/displacement_kf.h"
+#include "gnc/yessir.h"
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -23,7 +23,15 @@
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
     while (true) {
+//        TickType_t last = xTaskGetTickCount();
+
         log_data(arg->log_sink, arg->rocket_data);
+
+//        TickType_t curr = xTaskGetTickCount();
+//        Serial.print("Logger latency: ");
+//        Serial.print(pdTICKS_TO_MS(curr - last));
+//        Serial.println(" ms");
+
         THREAD_SLEEP(30);
     }
 }
@@ -157,7 +165,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    displacement_kf.initialize();
+    yessir.initialize();
     TickType_t last = xTaskGetTickCount();
 
     while (true) {
@@ -170,8 +178,9 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .az = current_accelerometer.az
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        displacement_kf.kfTick(dt, 13.0, current_barom_buf, current_accelerations);
-        KalmanData current_state = displacement_kf.getState();
+
+        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations);
+        KalmanData current_state = yessir.getState();
 
         arg->rocket_data.kalman.update(current_state);
 
@@ -218,6 +227,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 //        Serial.print("Telem latency: ");
 //        Serial.print(pdTICKS_TO_MS(curr - last));
 //        Serial.println(" ms");
+
         THREAD_SLEEP(1);
     }
 }
