@@ -157,7 +157,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    displacement_kf.initialize();
+    yessir.initialize();
     TickType_t last = xTaskGetTickCount();
 
     while (true) {
