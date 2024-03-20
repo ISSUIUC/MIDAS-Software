@@ -101,8 +101,9 @@ struct TelemetryPacket {
 
     // Add pyros array for pyro channels
     int8_t continuity[4]; // [-10, 10]
-    bool pyros_armed[4];
-    bool pyros_firing[4];
+    uint8_t pyro_bits;
+    // bool pyros_armed[4];
+    // bool pyros_firing[4];
 
     uint8_t telem_latency; // [0, 1024]
     uint8_t log_latency; // [0, 1024]
@@ -267,14 +268,14 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.continuity[1] = convert_range(packet.continuity[1], 20);
         item.continuity[2] = convert_range(packet.continuity[2], 20);
         item.continuity[3] = convert_range(packet.continuity[3], 20);
-        item.pyros_armed[0] = packet.pyros_armed[0];
-        item.pyros_armed[1] = packet.pyros_armed[1];
-        item.pyros_armed[2] = packet.pyros_armed[2];
-        item.pyros_armed[3] = packet.pyros_armed[3];
-        item.pyros_firing[0] = packet.pyros_firing[0];
-        item.pyros_firing[1] = packet.pyros_firing[1];
-        item.pyros_firing[2] = packet.pyros_firing[2];
-        item.pyros_firing[3] = packet.pyros_firing[3];
+        item.pyros_armed[0] = (packet.pyro_bits >> 0) & 1;
+        item.pyros_armed[1] = (packet.pyro_bits >> 1) & 1;
+        item.pyros_armed[2] = (packet.pyro_bits >> 2) & 1;
+        item.pyros_armed[3] = (packet.pyro_bits >> 3) & 1;
+        item.pyros_firing[0] = (packet.pyro_bits >> 4) & 1;
+        item.pyros_firing[1] = (packet.pyro_bits >> 5) & 1;
+        item.pyros_firing[2] = (packet.pyro_bits >> 6) & 1;
+        item.pyros_firing[3] = (packet.pyro_bits >> 7) & 1;
 
         item.callsign[0] = packet.callsign[0];
         item.callsign[1] = packet.callsign[1];
