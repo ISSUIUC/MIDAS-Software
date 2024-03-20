@@ -12,8 +12,7 @@
  */
 
 #ifdef IS_SUSTAINER
-//MultipleLogSink<EMMCSink> sinks;
-MultipleLogSink<> sinks;
+MultipleLogSink<EMMCSink> sinks;
 #else
 MultipleLogSink<> sinks;
 #endif

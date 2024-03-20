@@ -249,6 +249,7 @@ ErrorCode init_systems(RocketSystems& systems) {
  * Starts thread scheduler to actually start doing jobs
 */
 [[noreturn]] void begin_systems(RocketSystems* config) {
+    Serial.println("Starting Systems...");
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError) {
         // todo some message probably
