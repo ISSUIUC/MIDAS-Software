@@ -226,6 +226,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.sensors.pyro);
 #endif
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
@@ -233,7 +234,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.tlm);
     return NoError;
 }
@@ -262,6 +262,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         START_THREAD(continuity, SENSOR_CORE, config, 3);
         START_THREAD(voltage, SENSOR_CORE, config, 3);
         START_THREAD(logger, DATA_CORE, config, 5);
+        START_THREAD(pyro, SENSOR_CORE, config, 4);
     #endif
     
     START_THREAD(accelerometers, SENSOR_CORE, config, 4);
@@ -270,7 +271,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(magnetometer, SENSOR_CORE, config, 3);
     START_THREAD(kalman, SENSOR_CORE, config, 4);
     START_THREAD(fsm, SENSOR_CORE, config, 5);
-    START_THREAD(pyro, SENSOR_CORE, config, 4);
     START_THREAD(buzzer, SENSOR_CORE, config, 1);
     START_THREAD(telemetry, SENSOR_CORE, config, 5);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
