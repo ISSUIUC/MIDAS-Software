@@ -23,7 +23,11 @@
 
 
 // Change to 434.0 or other frequency, must match RX's freq!
+#ifdef IS_BOOSTER
 #define RF95_FREQ 433.0
+#else
+#define RF95_FREQ 434.0
+#endif
 
 TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
 //    led_state = false;

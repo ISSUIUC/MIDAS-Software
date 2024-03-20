@@ -10,9 +10,13 @@
 /**
  * Sets the config file and then starts all the threads using the config.
  */
-// todo re-enable
+
+#ifdef IS_SUSTAINER
 //MultipleLogSink<EMMCSink> sinks;
 MultipleLogSink<> sinks;
+#else
+MultipleLogSink<> sinks;
+#endif
 RocketSystems systems { .log_sink = sinks };
 
 void setup() {

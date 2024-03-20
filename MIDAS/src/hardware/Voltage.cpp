@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <ads7138-q1.h>
 
+#define VOLTAGE_DIVIDER (100.0 / (100.0 + 220.0))
+
 /**
  * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
 */
@@ -15,6 +17,6 @@ ErrorCode VoltageSensor::init() {
 */
 Voltage VoltageSensor::read() {
     Voltage v_battery;
-    v_battery.voltage = adcAnalogRead(ADCAddress{VOLTAGE_PIN}).value * 3.3f / 4096.f;
+    v_battery.voltage = adcAnalogRead(ADCAddress{VOLTAGE_PIN}).value * 3.3f / 4095.f / VOLTAGE_DIVIDER;
     return v_battery;
 }
