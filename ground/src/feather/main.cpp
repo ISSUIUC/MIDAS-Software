@@ -104,6 +104,9 @@ struct TelemetryPacket {
     bool pyros_armed[4];
     bool pyros_firing[4];
 
+    uint8_t telem_latency; // [0, 1024]
+    uint8_t log_latency; // [0, 1024]
+
     // // Add continuity array for continuity pins
     // uint8_t continuity[4];
 
@@ -173,6 +176,8 @@ struct FullTelemetryData {
     float gnc_state_az;
     float gnc_state_apo;    
     uint8_t FSM_State;        //[0,256]
+    uint8_t telem_latency; // [0, 1024]
+    uint8_t log_latency; // [0, 1024]
     long unsigned int print_time;
     char callsign[8];
 };
@@ -279,6 +284,9 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.callsign[5] = packet.callsign[5];
         item.callsign[6] = packet.callsign[6];
         item.callsign[7] = packet.callsign[7];
+
+        item.telem_latency = packet.telem_latency;
+        item.log_latency = packet.log_latency;
 
         print_queue.emplace(item);
     }
