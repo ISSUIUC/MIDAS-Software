@@ -39,7 +39,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 433.0
+#define RF95_FREQ 434.0
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -95,7 +95,7 @@ struct TelemetryPacket {
     int16_t gyro_y;           //[-4096, 4096]
     int16_t gyro_z;           //[-4096, 4096]
     int8_t rssi;              //[-128, 128]
-    uint8_t voltage_battery;  //[0, 16]
+    uint16_t voltage_battery;  //[0, 16]
     uint8_t FSM_State;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
 
@@ -262,7 +262,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         // item.gnc_state_x = packet.gnc_state_x;
         // item.gnc_state_apo = packet.gnc_state_apo;
         item.rssi = packet.rssi;
-        item.voltage_battery = convert_range(packet.voltage_battery, 16);
+        item.voltage_battery = convert_range(packet.voltage_battery, 4096);
         item.print_time = start_printing - start_timestamp + data.timestamp;
         item.continuity[0] = convert_range(packet.continuity[0], 20);
         item.continuity[1] = convert_range(packet.continuity[1], 20);
@@ -526,6 +526,8 @@ void loop() {
             digitalWrite(LED_BUILTIN, LOW);
             memcpy(&packet, buf, sizeof(packet));
             EnqueuePacket(packet, current_freq);
+            Serial.print("Queue size: ");
+            Serial.println((print_queue.size()));
 
             if (!cmd_queue.empty()) {
                 auto& cmd = cmd_queue.front();
