@@ -133,6 +133,28 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
+    bool already_played_freebird = false;
+    uint16_t ms_per_beat = 1000;
+
+    Sound d4_eight = {294, 0.125 * ms_per_beat};
+    Sound g4_eight = {392, 0.125 * ms_per_beat};
+    Sound f_nat_4_eight = {350, 0.125 * ms_per_beat};
+    Sound b_flat_4_eight = {466, 0.125 * ms_per_beat};
+    Sound e4_eight = {330, 0.125 * ms_per_beat};
+
+    Sound d4_quart = {294, 0.25 * ms_per_beat};
+    Sound g4_quart = {392, 0.25 * ms_per_beat};
+    Sound f_nat_4_quart = {350, 0.25 * ms_per_beat};
+    Sound b_flat_4_quart = {466, 0.25 * ms_per_beat};
+    Sound e4_quart = {330, 0.25 * ms_per_beat};
+
+    Sound free_bird[] = {d4_eight, g4_eight, d4_eight, f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, 
+                         d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
+                         f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
+                         f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
+                         f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
+                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart
+                        };
 
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
@@ -141,6 +163,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
 
         arg->rocket_data.fsm_state.update(next_state);
+
+        if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
+            arg->buzzer.play_tune(free_bird, 48);
+            already_played_freebird = true;
+        }
+
         THREAD_SLEEP(50);
     }
 }
