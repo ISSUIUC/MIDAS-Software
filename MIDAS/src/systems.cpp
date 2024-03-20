@@ -23,7 +23,7 @@
 
 // FREE BIRD
 
-uint16_t ms_per_4beat = 1655;
+    uint16_t ms_per_4beat = 1655;
 
     Sound d4_eight = {294, 0.125 * ms_per_4beat};
     Sound g4_eight = {392, 0.125 * ms_per_4beat};
@@ -47,19 +47,18 @@ uint16_t ms_per_4beat = 1655;
     Sound f_nat_4_2fifth = {350, 0.1 * ms_per_4beat};
 
 
-    Sound free_bird[] = {d4_eight, g4_eight, d4_eight, 
-                        f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                        f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                         f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
-                         f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
-                         f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
+    Sound free_bird[] = {/*measure 1*/d4_eight, g4_eight, d4_eight, 
+                        /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight, 
+                        /*measure 3*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
+                        /*measure 4*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
+                        /*measure 5*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
+                        /*measure 6*/ f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
+                        /*measure 7*/ f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
+                        /*measure 8*/ f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
+                        /*measure 9*/ f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
 
                         };
-    
-    config->buzzer.play_tune(free_bird, 64);
+
 
     // END FREE BIRD
 
@@ -178,28 +177,6 @@ DECLARE_THREAD(continuity, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
     bool already_played_freebird = false;
-    uint16_t ms_per_beat = 1000;
-
-    Sound d4_eight = {294, 0.125 * ms_per_beat};
-    Sound g4_eight = {392, 0.125 * ms_per_beat};
-    Sound f_nat_4_eight = {350, 0.125 * ms_per_beat};
-    Sound b_flat_4_eight = {466, 0.125 * ms_per_beat};
-    Sound e4_eight = {330, 0.125 * ms_per_beat};
-
-    Sound d4_quart = {294, 0.25 * ms_per_beat};
-    Sound g4_quart = {392, 0.25 * ms_per_beat};
-    Sound f_nat_4_quart = {350, 0.25 * ms_per_beat};
-    Sound b_flat_4_quart = {466, 0.25 * ms_per_beat};
-    Sound e4_quart = {330, 0.25 * ms_per_beat};
-
-    Sound free_bird[] = {d4_eight, g4_eight, d4_eight, f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, 
-                         d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                         f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
-                         f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
-                         f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart
-                        };
-
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
@@ -350,42 +327,6 @@ ErrorCode init_systems(RocketSystems& systems) {
 #ifdef IS_SUSTAINER
     START_THREAD(orientation, SENSOR_CORE, config, 2);
 #endif
-
-    uint16_t ms_per_4beat = 1655;
-
-    Sound d4_eight = {294, 0.125 * ms_per_4beat};
-    Sound g4_eight = {392, 0.125 * ms_per_4beat};
-    Sound f_nat_4_eight = {350, 0.125 * ms_per_4beat};
-    Sound b_flat_4_eight = {466, 0.125 * ms_per_4beat};
-    Sound e4_eight = {330, 0.125 * ms_per_4beat};
-
-    Sound d4_quart = {294, 0.25 * ms_per_4beat};
-    Sound g4_quart = {392, 0.25 * ms_per_4beat};
-    Sound f_nat_4_quart = {350, 0.25 * ms_per_4beat};
-    Sound b_flat_4_quart = {466, 0.25 * ms_per_4beat};
-    Sound e4_quart = {330, 0.25 * ms_per_4beat};
-
-    //quintuplet(?) sounds
-    Sound d4_fifth = {294, 0.05 * ms_per_4beat};
-    Sound f_nat_4_fifth = {350, 0.05 * ms_per_4beat};
-
-    // tied quintuplet(?) sounds
-
-    Sound d4_2fifth = {294, 0.1 * ms_per_4beat};
-    Sound f_nat_4_2fifth = {350, 0.1 * ms_per_4beat};
-
-
-    Sound free_bird[] = {d4_eight, g4_eight, d4_eight, 
-                        f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                        f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                         f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
-                         f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
-                         f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-
-                        };
     
     config->buzzer.play_tune(free_bird, 64);
     
