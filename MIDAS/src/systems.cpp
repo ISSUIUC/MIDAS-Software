@@ -47,16 +47,19 @@
     Sound f_nat_4_2fifth = {350, 0.1 * ms_per_4beat};
 
 
-    Sound free_bird[] = {/*measure 1*/d4_eight, g4_eight, d4_eight, 
+    Sound free_bird[] = {/*measure 1*/ d4_eight, g4_eight, d4_eight, 
                         /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight, 
                         /*measure 3*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                        /*measure 4*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
-                        /*measure 5*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
-                        /*measure 6*/ f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
-                        /*measure 7*/ f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                        /*measure 8*/ f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                        /*measure 9*/ f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-
+                        /*measure 4*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, 
+                        /*measure 5 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, g4_eight, d4_eight,  
+                        /*measure 6*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight,  
+                        /*measure 7*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
+                        /*measure 8*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
+                        /*measure 9 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight
+                        /*measure 10*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
+                        /*measure 11*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
+                        /*measure 12*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
+                        /*measure 13*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight
                         };
 
 
