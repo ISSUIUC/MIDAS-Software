@@ -55,7 +55,7 @@
                         /*measure 6*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight,  
                         /*measure 7*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
                         /*measure 8*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                        /*measure 9 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight
+                        /*measure 9 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
                         /*measure 10*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
                         /*measure 11*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
                         /*measure 12*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
