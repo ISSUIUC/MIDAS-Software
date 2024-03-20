@@ -90,7 +90,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Orientation orientation = data.orientation.getRecentUnsync();
     Magnetometer magnetometer = data.magnetometer.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
-    packet.voltage_battery = inv_convert_range<uint8_t>(voltage.voltage , 16);
+    packet.voltage_battery = inv_convert_range<uint16_t>(voltage.voltage, 4096);
     Barometer barometer = data.barometer.getRecentUnsync();
 
     packet.gps_lat = gps.latitude;

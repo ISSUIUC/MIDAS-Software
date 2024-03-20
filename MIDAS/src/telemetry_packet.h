@@ -32,7 +32,7 @@ struct TelemetryPacket {
     int16_t gyro_y;           // [-4096, 4096]
     int16_t gyro_z;           // [-4096, 4096]
     int8_t rssi;              // [-128, 128]
-    uint8_t voltage_battery;  // [0, 16]
+    uint16_t voltage_battery;  // [0, 16]
     uint8_t FSM_state;        // [0,256]
     int16_t barometer_temp;   // [-128, 128]
 

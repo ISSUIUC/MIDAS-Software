@@ -22,7 +22,7 @@ void setup() {
     //begin serial port
     Serial.begin(9600);
 
-    while (!Serial);
+//    while (!Serial);
 
     delay(200);
 
