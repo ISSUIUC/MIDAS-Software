@@ -306,6 +306,30 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(orientation, SENSOR_CORE, config, 2);
 #endif
 
+    uint16_t ms_per_beat = 1000;
+
+    Sound d4_eight = {294, 0.125 * ms_per_beat};
+    Sound g4_eight = {392, 0.125 * ms_per_beat};
+    Sound f_nat_4_eight = {350, 0.125 * ms_per_beat};
+    Sound b_flat_4_eight = {466, 0.125 * ms_per_beat};
+    Sound e4_eight = {330, 0.125 * ms_per_beat};
+
+    Sound d4_quart = {294, 0.25 * ms_per_beat};
+    Sound g4_quart = {392, 0.25 * ms_per_beat};
+    Sound f_nat_4_quart = {350, 0.25 * ms_per_beat};
+    Sound b_flat_4_quart = {466, 0.25 * ms_per_beat};
+    Sound e4_quart = {330, 0.25 * ms_per_beat};
+
+    Sound free_bird[] = {d4_eight, g4_eight, d4_eight, f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, 
+                         d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
+                         f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, 
+                         f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, e4_eight, d4_eight, f_nat_4_eight, e4_eight, f_nat_4_quart, 
+                         f_nat_4_quart, f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, 
+                         f_nat_4_eight, d4_eight, f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart
+                        };
+    
+    config->buzzer.play_tune(free_bird, 48);
+    
     while (true) {
         THREAD_SLEEP(1000);
         Serial.println("running");
