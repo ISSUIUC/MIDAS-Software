@@ -113,9 +113,9 @@ public:
    GNSS_StatusTypeDef init()
    {
       gpioDigitalWrite(pinReset, LOW);
-      delay(500);
+      delay(250);
       gpioDigitalWrite(pinReset, HIGH);
-      delay(2000);
+      delay(250);
       GNSS_PARSER_Init(&data);
       if (useI2C)
       {

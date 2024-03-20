@@ -29,3 +29,6 @@ public:
     void tick();
     void play_tune(Sound* tune, uint32_t length);
 };
+
+#define FREE_BIRD_LENGTH 93
+extern Sound free_bird[FREE_BIRD_LENGTH];

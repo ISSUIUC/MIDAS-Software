@@ -21,54 +21,6 @@
  * @param arg the config file for the rocket
  */
 
-// FREE BIRD
-
-    uint16_t ms_per_4beat = 6000;
-
-    Sound d4_eight = {294, 0.125 * ms_per_4beat};
-    Sound g4_eight = {392, 0.125 * ms_per_4beat};
-    Sound f_nat_4_eight = {350, 0.125 * ms_per_4beat};
-    Sound b_flat_4_eight = {466, 0.125 * ms_per_4beat};
-    Sound e4_eight = {330, 0.125 * ms_per_4beat};
-
-    Sound rest = {0, 10};
-
-    Sound d4_quart = {294, 0.25 * ms_per_4beat};
-    Sound g4_quart = {392, 0.25 * ms_per_4beat};
-    Sound f_nat_4_quart = {350, 0.25 * ms_per_4beat};
-    Sound b_flat_4_quart = {466, 0.25 * ms_per_4beat};
-    Sound e4_quart = {330, 0.25 * ms_per_4beat};
-
-    //quintuplet(?) sounds
-    Sound d4_fifth = {294, 0.05 * ms_per_4beat};
-    Sound f_nat_4_fifth = {350, 0.05 * ms_per_4beat};
-
-    // tied quintuplet(?) sounds
-
-    Sound d4_2fifth = {294, 0.1 * ms_per_4beat};
-    Sound f_nat_4_2fifth = {350, 0.1 * ms_per_4beat};
-
-    uint32_t free_bird_length = 80;
-
-    Sound free_bird[] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
-                        /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight,
-                        /*measure 3*/ f_nat_4_eight, rest, f_nat_4_eight, rest, f_nat_4_eight, d4_eight, f_nat_4_quart, rest, f_nat_4_eight, d4_eight,
-                        /*measure 4*/ f_nat_4_eight, rest, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                        /*measure 5 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, g4_eight, d4_eight,
-                        /*measure 6*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight,
-                        /*measure 7*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight,
-                        /*measure 8*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart,
-                        /*measure 9 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
-                        /*measure 10*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
-                        /*measure 11*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
-                        /*measure 12*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight,
-                        /*measure 13*/ f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight,b_flat_4_eight
-                        };
-
-
-    // END FREE BIRD
-
-
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
     while (true) {
@@ -87,15 +39,17 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(6);
     }
 }
 
 
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
+#ifdef IS_SUSTAINER
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);
+#endif
         LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
@@ -155,20 +109,6 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
  * See \ref data_logger_thread
  */
 DECLARE_THREAD(continuity, RocketSystems* arg) {
-//    Continuity initial_readings = arg->sensors.continuity.read();
-//
-//    Sound continuity_sensor_tune[] = {
-//            { 20, 200 }, { 0, 200 },
-//            { initial_readings.sense_apogee ? 40u : 20u, 200 }, { 0, 200 },
-//            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
-//            { initial_readings.sense_main ? 40u : 20u, 200 }, { 0, 200 },
-//            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
-//            { initial_readings.pins[2] ? 40u : 20u, 200 }, { 0, 200 },
-//            { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 }, { 20, 200 }, { 0, 200 },
-//            { initial_readings.pins[3] ? 40u : 20u, 200 }, { 0, 200 },
-//    };
-//    arg->buzzer.play_tune(continuity_sensor_tune, 28);
-
     while (true) {
         Continuity reading = arg->sensors.continuity.read();
         arg->rocket_data.continuity.update(reading);
@@ -280,7 +220,9 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
+#ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
+#endif
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
@@ -334,7 +276,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(orientation, SENSOR_CORE, config, 2);
 #endif
 
-    config->buzzer.play_tune(free_bird, free_bird_length);
+    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     
     while (true) {
         THREAD_SLEEP(1000);
