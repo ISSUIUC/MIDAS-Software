@@ -23,13 +23,15 @@
 
 // FREE BIRD
 
-    uint16_t ms_per_4beat = 1655;
+    uint16_t ms_per_4beat = 6000;
 
     Sound d4_eight = {294, 0.125 * ms_per_4beat};
     Sound g4_eight = {392, 0.125 * ms_per_4beat};
     Sound f_nat_4_eight = {350, 0.125 * ms_per_4beat};
     Sound b_flat_4_eight = {466, 0.125 * ms_per_4beat};
     Sound e4_eight = {330, 0.125 * ms_per_4beat};
+
+    Sound rest = {0, 10};
 
     Sound d4_quart = {294, 0.25 * ms_per_4beat};
     Sound g4_quart = {392, 0.25 * ms_per_4beat};
@@ -46,11 +48,12 @@
     Sound d4_2fifth = {294, 0.1 * ms_per_4beat};
     Sound f_nat_4_2fifth = {350, 0.1 * ms_per_4beat};
 
+    uint32_t free_bird_length = 80;
 
     Sound free_bird[] = {/*measure 1*/ d4_eight, g4_eight, d4_eight, 
-                        /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                        /*measure 3*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
-                        /*measure 4*/ f_nat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, 
+                        /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight, 
+                        /*measure 3*/ f_nat_4_eight, rest, f_nat_4_eight, rest, f_nat_4_eight, d4_eight, f_nat_4_quart, rest, f_nat_4_eight, d4_eight, 
+                        /*measure 4*/ f_nat_4_eight, rest, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, b_flat_4_eight, f_nat_4_quart, 
                         /*measure 5 (post tie)*/ b_flat_4_eight, f_nat_4_eight, b_flat_4_eight, f_nat_4_eight, d4_eight, g4_eight, d4_eight,  
                         /*measure 6*/ f_nat_4_eight, g4_eight, f_nat_4_quart, f_nat_4_quart, f_nat_4_eight, d4_eight,  
                         /*measure 7*/ f_nat_4_eight, f_nat_4_eight, f_nat_4_eight, d4_eight, f_nat_4_quart, f_nat_4_eight, d4_eight, 
@@ -204,7 +207,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
         arg->buzzer.tick();
 
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(10);
     }
 }
 
@@ -331,7 +334,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(orientation, SENSOR_CORE, config, 2);
 #endif
     
-    config->buzzer.play_tune(free_bird, 64);
+    config->buzzer.play_tune(free_bird, free_bird_length);
     
     while (true) {
         THREAD_SLEEP(1000);
