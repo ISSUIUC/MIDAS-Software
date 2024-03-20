@@ -222,21 +222,19 @@ ErrorCode init_systems(RocketSystems& systems) {
     // todo message on failure
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
+    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.log_sink);
 #endif
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.gps);
-    INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.tlm);
-#ifdef IS_SUSTAINER
-    INIT_SYSTEM(systems.sensors.orientation);
-#endif
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -259,24 +257,26 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    START_THREAD(logger, DATA_CORE, config, 5);
+    #ifdef IS_SUSTAINER
+        START_THREAD(orientation, SENSOR_CORE, config, 2);
+        START_THREAD(continuity, SENSOR_CORE, config, 3);
+        START_THREAD(voltage, SENSOR_CORE, config, 3);
+        START_THREAD(logger, DATA_CORE, config, 5);
+    #endif
+    
     START_THREAD(accelerometers, SENSOR_CORE, config, 4);
     START_THREAD(barometer, SENSOR_CORE, config, 4);
-    START_THREAD(continuity, SENSOR_CORE, config, 3);
-    START_THREAD(voltage, SENSOR_CORE, config, 3);
     START_THREAD(gps, SENSOR_CORE, config, 4);
     START_THREAD(magnetometer, SENSOR_CORE, config, 3);
     START_THREAD(kalman, SENSOR_CORE, config, 4);
     START_THREAD(fsm, SENSOR_CORE, config, 5);
-    START_THREAD(buzzer, SENSOR_CORE, config, 1);
     START_THREAD(pyro, SENSOR_CORE, config, 4);
+    START_THREAD(buzzer, SENSOR_CORE, config, 1);
     START_THREAD(telemetry, SENSOR_CORE, config, 5);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
-#ifdef IS_SUSTAINER
-    START_THREAD(orientation, SENSOR_CORE, config, 2);
-#endif
 
-    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+
+    // config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     
     while (true) {
         THREAD_SLEEP(1000);
