@@ -6,7 +6,7 @@
 #if defined(SILSIM)
 //#include "silsim/FileSink.h"
 #elif defined(HILSIM)
-#include "hilsim/SDLog.h"
+//#include "hilsim/SDLog.h"
 #else
 //#include "hardware/SDLog.h"
 //#include "hardware/Emmc.h"

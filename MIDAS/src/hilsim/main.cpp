@@ -9,7 +9,8 @@
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
 pb_byte_t buffer[HILSIMPacket_size];
 
-RocketSystems systems;
+MultipleLogSink<> sink;
+RocketSystems systems{.log_sink = sink};
 
 DECLARE_THREAD(hilsim, void*arg) {
     uint8_t buffer[HILSIMPacket_size];
