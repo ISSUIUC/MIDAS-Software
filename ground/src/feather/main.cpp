@@ -353,6 +353,8 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("Pyro2Firing", packet.pyros_firing[1]);
     printJSONField("Pyro3Firing", packet.pyros_firing[2]);
     printJSONField("Pyro4Firing", packet.pyros_firing[3]);
+    printJSONField("TelemLatency",(int) packet.telem_latency);
+    printJSONField("LogLatency", (int) packet.log_latency);
 
     // printJSONField("STE_ALT", packet.gnc_state_x);
     // printJSONField("STE_VEL", packet.gnc_state_vx);
