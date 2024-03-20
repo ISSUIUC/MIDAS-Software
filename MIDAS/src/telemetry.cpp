@@ -96,9 +96,6 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.gps_lat = gps.latitude;
     packet.gps_long = gps.longitude;
     packet.gps_alt = gps.altitude;
-    packet.yaw = orientation.yaw;
-    packet.pitch = orientation.pitch;
-    packet.roll = orientation.roll;
 
     packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
     packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
@@ -107,41 +104,57 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
     packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
 
-    packet.response_ID = last_command_id;
-
     packet.rssi = backend.getRecentRssi();
     packet.FSM_state = (char) data.fsm_state.getRecentUnsync();
 
     packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
 
     auto pyros = data.pyro.getRecentUnsync();
-    for (int i = 0; i < 4; i++) {
-        packet.pyros_armed[i] = pyros.channels[i].is_armed;
-        packet.pyros_firing[i] = pyros.channels[i].is_firing;
-    }
+    packet.pyros_bits = 0;
+    packet.pyros_bits |= pyros.channels[0].is_armed << 0;
+    packet.pyros_bits |= pyros.channels[1].is_armed << 1;
+    packet.pyros_bits |= pyros.channels[2].is_armed << 2;
+    packet.pyros_bits |= pyros.channels[3].is_armed << 3;
+    packet.pyros_bits |= pyros.channels[0].is_firing << 4;
+    packet.pyros_bits |= pyros.channels[1].is_firing << 5;
+    packet.pyros_bits |= pyros.channels[2].is_firing << 6;
+    packet.pyros_bits |= pyros.channels[3].is_firing << 7;
 
     Continuity continuity = data.continuity.getRecentUnsync();
     for (int i = 0; i < 4; i++) {
-       packet.continuity[i] = continuity.pins[i];
+       packet.continuity[i] = inv_convert_range<int8_t>(continuity.pins[i], 20);
     }
+
+    packet.telem_latency = inv_convert_range<int8_t>((float) data.telem_latency.getLatency(), 1024);
+    packet.log_latency = inv_convert_range<int8_t>((float) data.log_latency.getLatency(), 1024);
+
+#ifdef IS_BOOSTER
+    packet.is_booster = true;
+#else
+    packet.is_booster = false;
+#endif
 
     memcpy(&packet.callsign, &callsign, sizeof(callsign));
 
     return packet;
 }
 
-void Telemetry::bufferData(RocketData& Sensorstate) {
+void Telemetry::bufferData(RocketData& rocket) {
     TelemetryDataLite data { };
     data.timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
-    data.barometer_pressure = inv_convert_range<uint16_t>(Sensorstate.barometer.getRecentUnsync().pressure , 4096);
+    data.barometer_pressure = inv_convert_range<uint16_t>(rocket.barometer.getRecentUnsync().pressure , 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(Sensorstate.high_g.getRecentUnsync().ax, 256);
-    data.highG_ay = inv_convert_range<int16_t>(Sensorstate.high_g.getRecentUnsync().ay , 256);
-    data.highG_az = inv_convert_range<int16_t>(Sensorstate.high_g.getRecentUnsync().az , 256);
+    data.highG_ax = inv_convert_range<int16_t>(rocket.high_g.getRecentUnsync().ax, 256);
+    data.highG_ay = inv_convert_range<int16_t>(rocket.high_g.getRecentUnsync().ay , 256);
+    data.highG_az = inv_convert_range<int16_t>(rocket.high_g.getRecentUnsync().az , 256);
 
-    data.bno_pitch = inv_convert_range<int16_t>(Sensorstate.orientation.getRecentUnsync().pitch , 8);
-    data.bno_yaw = inv_convert_range<int16_t>(Sensorstate.orientation.getRecentUnsync().yaw , 8);
-    data.bno_roll = inv_convert_range<int16_t>(Sensorstate.orientation.getRecentUnsync().roll , 8);
+    data.lowg_ax = inv_convert_range<int16_t>(rocket.low_g_lsm.getRecentUnsync().ax, 8);
+    data.lowg_ay = inv_convert_range<int16_t>(rocket.low_g_lsm.getRecentUnsync().ay, 8);
+    data.lowg_az = inv_convert_range<int16_t>(rocket.low_g_lsm.getRecentUnsync().az, 8);
+
+    data.bno_pitch = inv_convert_range<int16_t>(rocket.orientation.getRecentUnsync().pitch , 8);
+    data.bno_yaw = inv_convert_range<int16_t>(rocket.orientation.getRecentUnsync().yaw , 8);
+    data.bno_roll = inv_convert_range<int16_t>(rocket.orientation.getRecentUnsync().roll , 8);
 
     small_packet_queue.send(data);
 }

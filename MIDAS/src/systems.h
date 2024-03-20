@@ -15,4 +15,4 @@ struct RocketSystems {
     Telemetry tlm;
 };
 
-void begin_systems(RocketSystems* config);
+[[noreturn]] void begin_systems(RocketSystems* config);

@@ -19,7 +19,7 @@ public:
     ErrorCode __attribute__((warn_unused_result)) init();
 
     void transmit(RocketData& rocket_data);
-    void bufferData(RocketData& rocket_data);
+    void bufferData(RocketData& rocket);
 
 private:
     Queue<TelemetryDataLite, 4> small_packet_queue;

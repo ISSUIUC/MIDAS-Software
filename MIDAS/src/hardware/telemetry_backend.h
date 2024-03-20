@@ -39,7 +39,7 @@ public:
             if(digitalRead(rf95._interruptPin)){
                 break;
             }
-            if(i % 256 == 0){
+            if(i % 1024 == 0){
                 Serial.println("long telem wait");
             }
         }

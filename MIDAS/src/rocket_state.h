@@ -78,6 +78,22 @@ public:
     };
 };
 
+class Latency {
+    uint32_t latency = 0;
+    TickType_t last_tick = 0;
+
+public:
+    void tick() {
+        TickType_t now = xTaskGetTickCount();
+        latency = now - last_tick;
+        last_tick = now;
+    }
+
+    [[nodiscard]] uint32_t getLatency() const {
+        return latency;
+    }
+};
+
 /**
  * The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
  *
@@ -98,4 +114,7 @@ public:
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
+
+    Latency telem_latency;
+    Latency log_latency;
 };

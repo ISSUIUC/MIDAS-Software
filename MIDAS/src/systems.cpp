@@ -23,14 +23,9 @@
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
     while (true) {
-//        TickType_t last = xTaskGetTickCount();
-
         log_data(arg->log_sink, arg->rocket_data);
 
-//        TickType_t curr = xTaskGetTickCount();
-//        Serial.print("Logger latency: ");
-//        Serial.print(pdTICKS_TO_MS(curr - last));
-//        Serial.println(" ms");
+        arg->rocket_data.log_latency.tick();
 
         THREAD_SLEEP(30);
     }
@@ -209,7 +204,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
     while (true) {
         arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(260/4);
+        THREAD_SLEEP(250/4);
     }
 }
 
@@ -219,14 +214,8 @@ DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
  */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
-//        TickType_t last = xTaskGetTickCount();
-
         arg->tlm.transmit(arg->rocket_data);
-
-//        TickType_t curr = xTaskGetTickCount();
-//        Serial.print("Telem latency: ");
-//        Serial.print(pdTICKS_TO_MS(curr - last));
-//        Serial.println(" ms");
+        arg->rocket_data.telem_latency.tick();
 
         THREAD_SLEEP(1);
     }
@@ -257,7 +246,7 @@ ErrorCode init_systems(RocketSystems& systems) {
  * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
  * Starts thread scheduler to actually start doing jobs
 */
-void begin_systems(RocketSystems* config) {
+[[noreturn]] void begin_systems(RocketSystems* config) {
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError) {
         // todo some message probably
@@ -291,7 +280,7 @@ void begin_systems(RocketSystems* config) {
     }
 }
 
-void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
-    Serial.println("OVERFLOW");
-    Serial.println((char*)pcTaskName);
-}
+//void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
+//    Serial.println("OVERFLOW");
+//    Serial.println((char*)pcTaskName);
+//}
