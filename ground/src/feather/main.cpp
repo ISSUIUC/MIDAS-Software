@@ -180,6 +180,7 @@ struct FullTelemetryData {
     uint32_t telem_latency; // [0, 1024]
     uint32_t log_latency; // [0, 1024]
     long unsigned int print_time;
+    bool is_booster;
     char callsign[8];
 };
 
@@ -285,6 +286,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.callsign[5] = packet.callsign[5];
         item.callsign[6] = packet.callsign[6];
         item.callsign[7] = packet.callsign[7];
+        item.is_booster = packet.is_booster;
 
         item.telem_latency = (uint32_t) convert_range(packet.telem_latency, 1024);
         item.log_latency = (uint32_t) convert_range(packet.log_latency, 1024);
@@ -355,6 +357,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("Pyro4Firing", packet.pyros_firing[3]);
     printJSONField("TelemLatency",(int) packet.telem_latency);
     printJSONField("LogLatency", (int) packet.log_latency);
+    printJSONField("is_booster", packet.is_booster);
 
     // printJSONField("STE_ALT", packet.gnc_state_x);
     // printJSONField("STE_VEL", packet.gnc_state_vx);
