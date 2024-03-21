@@ -67,7 +67,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);
 
-    char inputName[strlen(fileName) + 1];
+    char inputName[256] = {0};
     strcpy(inputName, "/");
     strcat(inputName, fileName);
     strcat(inputName, fileExtension);
@@ -91,7 +91,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
             }
 
             // converts int i to char[]
-            char iStr[16];
+            char iStr[16] = {0};
             itoa(i, iStr, 10);
 
             // writes "(sensor)_data(number).csv to fileNameTemp"
