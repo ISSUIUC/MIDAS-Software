@@ -225,9 +225,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.pyro);
 #endif
+    INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
