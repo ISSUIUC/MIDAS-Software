@@ -261,10 +261,10 @@ ErrorCode init_systems(RocketSystems& systems) {
         START_THREAD(orientation, SENSOR_CORE, config, 2);
         START_THREAD(continuity, SENSOR_CORE, config, 3);
         START_THREAD(voltage, SENSOR_CORE, config, 3);
-        START_THREAD(logger, DATA_CORE, config, 5);
         START_THREAD(pyro, SENSOR_CORE, config, 4);
     #endif
-    
+
+    START_THREAD(logger, DATA_CORE, config, 5);
     START_THREAD(accelerometers, SENSOR_CORE, config, 4);
     START_THREAD(barometer, SENSOR_CORE, config, 4);
     START_THREAD(gps, SENSOR_CORE, config, 4);
