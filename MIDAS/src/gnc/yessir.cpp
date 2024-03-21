@@ -15,7 +15,7 @@ void Yessir::tick(float dt, float sd, Barometer &barometerData, Acceleration &im
     state.acceleration = {
         .ax = imuData.ax * 9.8f,
         .ay = imuData.ay * 9.8f,
-        .az = imuData.az * 9.8f
+        .az = imuData.az * 9.8f - 9.8f
     };
 
     state.velocity = {
