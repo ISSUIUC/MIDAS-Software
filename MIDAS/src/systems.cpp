@@ -219,7 +219,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 ErrorCode init_systems(RocketSystems& systems) {
-    // todo message on failure
+    gpioDigitalWrite(LED_ORANGE, HIGH);
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
@@ -232,9 +232,10 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
+    INIT_SYSTEM(systems.sensors.gps);
+    gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -274,7 +275,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(buzzer, SENSOR_CORE, config, 1);
     START_THREAD(telemetry, SENSOR_CORE, config, 5);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
-
 
     // config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     

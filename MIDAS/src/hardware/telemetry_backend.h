@@ -5,6 +5,7 @@
 #include "errors.h"
 #include "hal.h"
 #include "TCAL9539.h"
+#include "pins.h"
 
 
 class TelemetryBackend {
@@ -30,7 +31,7 @@ public:
     template<typename T>
     void send(const T& data) {
         static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to send is too large");
-        gpioDigitalWrite(led_pin, led_state);
+        gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
 //        Serial.println("Sending bytes");
@@ -61,6 +62,5 @@ public:
 private:
     RH_RF95 rf95;
 
-    GpioAddress led_pin;
     bool led_state;
 };

@@ -44,13 +44,13 @@ double sensor_derivative(BufferedSensorData<T, count>& sensor, double (* get_ite
 
 StateEstimate::StateEstimate(RocketData& state) {
     acceleration = sensor_average<HighGData, 8>(state.high_g, [](HighGData& data) {
-        return (double) data.az;
+        return (double) data.ax;
     });
     altitude = sensor_average<Barometer, 8>(state.barometer, [](Barometer& data) {
         return (double) data.altitude;
     });
     jerk = sensor_derivative<HighGData, 8>(state.high_g, [](HighGData& data) {
-        return (double) data.az;
+        return (double) data.ax;
     });
     vertical_speed = sensor_derivative<Barometer, 8>(state.barometer, [](Barometer& data) {
         return (double) data.altitude;
@@ -59,6 +59,7 @@ StateEstimate::StateEstimate(RocketData& state) {
 
 
 #ifdef IS_SUSTAINER
+
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     //get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -161,7 +162,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_DROGUE_DEPLOY:
             // if detected a sharp change in jerk then go to next state
-            if (state_estimate.jerk < sustainer_drogue_jerk_threshold) {
+            if (abs(state_estimate.jerk) < sustainer_drogue_jerk_threshold) {
                 state = FSMState::STATE_DROGUE;
                 break;
             }
@@ -183,7 +184,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_MAIN_DEPLOY:
             // if detected a sharp change in jerk then go to the next state
-            if (state_estimate.jerk < sustainer_main_jerk_threshold) {
+            if (abs(state_estimate.jerk) < sustainer_main_jerk_threshold) {
                 state = FSMState::STATE_MAIN;
                 break;
             }
@@ -253,7 +254,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_FIRST_SEPARATION:
-            if (state_estimate.jerk < booster_first_seperation_jerk_threshold) {
+            if (abs(state_estimate.jerk) < booster_first_separation_jerk_threshold) {
                 state = FSMState::STATE_COAST;
                 break;
             }
@@ -265,14 +266,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_COAST:
-            if (state_estimate.vertical_speed <= 0) {
+            if (state_estimate.vertical_speed <= booster_coast_to_apogee_vertical_speed_threshold) {
                 apogee_time = current_time;
                 state = FSMState::STATE_APOGEE;
             }
             break;
 
         case FSMState::STATE_APOGEE:
-            if (state_estimate.vertical_speed > 0 && ((current_time - apogee_time) < booster_apogee_check_threshold)) {
+            if (state_estimate.vertical_speed > booster_coast_to_apogee_vertical_speed_threshold && ((current_time - apogee_time) < booster_apogee_check_threshold)) {
                 state = FSMState::STATE_COAST;
                 break;
             }
@@ -284,7 +285,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_DROGUE_DEPLOY:
-            if (state_estimate.jerk < booster_drogue_jerk_threshold) {
+            if (abs(state_estimate.jerk) < booster_drogue_jerk_threshold) {
                 state = FSMState::STATE_DROGUE;
                 break;
             }
@@ -302,7 +303,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_MAIN_DEPLOY:
-            if (state_estimate.jerk < booster_main_jerk_threshold) {
+            if (abs(state_estimate.jerk) < booster_main_jerk_threshold) {
                 state = FSMState::STATE_MAIN;
                 break;
             }

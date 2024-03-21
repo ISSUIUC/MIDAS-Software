@@ -23,13 +23,14 @@
 // orientation chip select, interrupt
 #define BNO086_CS 21
 #define BNO086_INT 47
+#define BNO086_RESET GpioAddress(1, 07)
 
 // voltage adc pin
 #define VOLTAGE_PIN 0
 
 // gps pins
 #define GNSS_I2C_LOCATION 0x3A
-#define GPS_RESET 017
+#define GPS_RESET GpioAddress(2, 017)
 #define GPS_ENABLE 0
 
 // i2c bus pins
@@ -51,15 +52,15 @@
 #define SD_PIN 6
 
 // pyro pins
-#define PYRO_GLOBAL_ARM_PIN 07
-#define PYROA_ARM_PIN 016
-#define PYROA_FIRE_PIN 017
-#define PYROB_ARM_PIN 014
-#define PYROB_FIRE_PIN 015
-#define PYROC_ARM_PIN 010
-#define PYROC_FIRE_PIN 011
-#define PYROD_ARM_PIN 012
-#define PYROD_FIRE_PIN 013
+#define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 07)
+#define PYROA_ARM_PIN GpioAddress(0, 016)
+#define PYROA_FIRE_PIN GpioAddress(0, 017)
+#define PYROB_ARM_PIN GpioAddress(0, 014)
+#define PYROB_FIRE_PIN GpioAddress(0, 015)
+#define PYROC_ARM_PIN GpioAddress(0, 010)
+#define PYROC_FIRE_PIN GpioAddress(0, 011)
+#define PYROD_ARM_PIN GpioAddress(0, 012)
+#define PYROD_FIRE_PIN GpioAddress(0, 013)
 
 // Continuity Pins
 #define SENSE_PYRO 1
@@ -74,4 +75,7 @@
 #define RFM96_RESET 15
 
 // LEDs
-#define LED_BLUE GpioAddress(2, 013)
+#define LED_BLUE   GpioAddress(2, 013)
+#define LED_GREEN  GpioAddress(2, 014)
+#define LED_ORANGE GpioAddress(2, 015)
+#define LED_RED    GpioAddress(2, 016)

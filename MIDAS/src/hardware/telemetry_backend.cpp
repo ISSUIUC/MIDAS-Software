@@ -29,7 +29,7 @@
 #define RF95_FREQ 434.0
 #endif
 
-TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT), led_pin(LED_BLUE) {
+TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
     led_state = false;
 }
 
@@ -41,8 +41,6 @@ ErrorCode TelemetryBackend::init() {
     delay(100);
     digitalWrite(RFM96_RESET, HIGH);
     delay(5);
-
-    gpioPinMode(led_pin, OUTPUT);
 
     if (!rf95.init()) {
         return ErrorCode::RadioInitFailed;

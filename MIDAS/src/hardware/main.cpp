@@ -52,6 +52,11 @@ void setup() {
     digitalWrite(CAN_CS, HIGH);
     digitalWrite(RFM96_CS, HIGH);
 
+    gpioPinMode(LED_BLUE, OUTPUT);
+    gpioPinMode(LED_GREEN, OUTPUT);
+    gpioPinMode(LED_ORANGE, OUTPUT);
+    gpioPinMode(LED_RED, OUTPUT);
+
     delay(200);
 
     begin_systems(&systems);
