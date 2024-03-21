@@ -21,14 +21,13 @@ enum ReadingDiscriminant {
 };
 
 
-/*
+/**
  * This struct isn't actually logged as-is, because if we did we'd waste extra space since
  * unions are the size of their largest member. This is just a reference struct.
  *
  * Instead, we use 4 bytes for the discriminant, 4 bytes for the timestamp, and then write the
  * actual data. No padding between inside these items or between readings.
  */
-
 struct LoggedReading {
     ReadingDiscriminant discriminant;
     uint32_t timestamp_ms;

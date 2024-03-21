@@ -2,7 +2,7 @@
 
 // holds the enum for different FSM states
 
-enum class FSMState {
+enum FSMState {
     STATE_IDLE,
     STATE_FIRST_BOOST,
     STATE_BURNOUT,

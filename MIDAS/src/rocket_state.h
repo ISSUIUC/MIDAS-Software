@@ -40,10 +40,6 @@ public:
         return current.read_unsync();
     }
 
-    void getRecent2(S* ptr) {
-        current.read2(ptr);
-    }
-
     bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };

@@ -1,10 +1,6 @@
 #include "systems.h"
 
 #include "hal.h"
-#include "sensors.h"
-#include "data_logging.h"
-#include "buzzer.h"
-
 #include "gnc/yessir.h"
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
@@ -87,48 +83,33 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
 /**
  * See \ref data_logger_thread
  */
-DECLARE_THREAD(gps, RocketSystems* arg) {
-    while (true) {
-        GPS reading = arg->sensors.gps.read();
-        arg->rocket_data.gps.update(reading);
+DECLARE_THREAD(i2c, RocketSystems* arg) {
+    int i = 0;
 
+    while (true) {
+        if (i % 10 == 0) {
+            GPS reading = arg->sensors.gps.read();
+            arg->rocket_data.gps.update(reading);
+        }
 
 #ifdef IS_SUSTAINER
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
-        arg->rocket_data.pyro.update(new_pyro_state);
+        if (i % 10 == 0) {
+            FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
+            arg->rocket_data.pyro.update(new_pyro_state);
 
-        Continuity reading2 = arg->sensors.continuity.read();
-        arg->rocket_data.continuity.update(reading2);
+            Continuity reading2 = arg->sensors.continuity.read();
+            arg->rocket_data.continuity.update(reading2);
 
-        Voltage reading3 = arg->sensors.voltage.read();
-        arg->rocket_data.voltage.update(reading3);
+            Voltage reading3 = arg->sensors.voltage.read();
+            arg->rocket_data.voltage.update(reading3);
+        }
+
+        arg->led.update();
 #endif
+        i += 1;
 
-        THREAD_SLEEP(100);
-    }
-}
-
-/**
- * See \ref data_logger_thread
- */
-DECLARE_THREAD(voltage, RocketSystems* arg) {
-    while (true) {
-        Voltage reading = arg->sensors.voltage.read();
-        arg->rocket_data.voltage.update(reading);
-        THREAD_SLEEP(50);
-    }
-}
-
-/**
- * See \ref data_logger_thread
- */
-DECLARE_THREAD(continuity, RocketSystems* arg) {
-    while (true) {
-        Continuity reading = arg->sensors.continuity.read();
-        arg->rocket_data.continuity.update(reading);
-
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(10);
     }
 }
 
@@ -195,18 +176,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
-/**
- * This thread will handle the firing of pyro channels when the FSM sets the pyro flags
-*/
-DECLARE_THREAD(pyro, RocketSystems* arg) {
-    while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
-        arg->rocket_data.pyro.update(new_pyro_state);
-        THREAD_SLEEP(200);
-    }
-}
-
 
 /**
  * See \ref data_logger_thread
@@ -214,7 +183,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
     while (true) {
         arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(260/4);
+        THREAD_SLEEP(248/4);
     }
 }
 
@@ -224,7 +193,7 @@ DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
  */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
-        arg->tlm.transmit(arg->rocket_data);
+        arg->tlm.transmit(arg->rocket_data, arg->led);
         arg->rocket_data.telem_latency.tick();
 
         THREAD_SLEEP(1);
@@ -238,12 +207,17 @@ ErrorCode init_systems(RocketSystems& systems) {
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
+    // these are ignored anyways
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.pyro);
 #endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
     INIT_SYSTEM(systems.sensors.gps);
@@ -270,17 +244,14 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    #ifdef IS_SUSTAINER
-        START_THREAD(orientation, SENSOR_CORE, config, 10);
-        // START_THREAD(continuity, SENSOR_CORE, config, 9);
-        // START_THREAD(voltage, SENSOR_CORE, config, 8);
-        // START_THREAD(pyro, SENSOR_CORE, config, 7);
-    #endif
+#ifdef IS_SUSTAINER
+    START_THREAD(orientation, SENSOR_CORE, config, 10);
+#endif
 
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
-    START_THREAD(gps, SENSOR_CORE, config, 9);
+    START_THREAD(i2c, SENSOR_CORE, config, 9);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);

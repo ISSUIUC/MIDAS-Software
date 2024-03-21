@@ -1,5 +1,6 @@
 #include <Wire.h>
 #include <SPI.h>
+#include "TCAL9539.h"
 
 #include "systems.h"
 #include "hardware/pins.h"

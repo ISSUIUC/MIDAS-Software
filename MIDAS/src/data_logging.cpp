@@ -68,12 +68,12 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
     strcpy(fileExtension, fileExtensionParam);
 
     char inputName[strlen(fileName) + 1];
-    strcpy(fileName, "/");
+    strcpy(inputName, "/");
     strcat(inputName, fileName);
-    strcat(fileName, fileExtension);
+    strcat(inputName, fileExtension);
 
     // checks to see if file already exists and adds 1 to filename if it does.
-    bool exists = fs.exists(fileName);
+    bool exists = fs.exists(inputName);
 
     if (exists) {
         bool fileExists = false;
@@ -83,9 +83,10 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
                 // max number of files reached. Don't want to overflow
                 // fileName[]. Will write new data to already existing
                 // data999.csv
-                strcpy(fileName, inputName);
-                strcat(fileName, "999");
-                strcat(fileName, fileExtension);
+                strcpy(inputName, "/");
+                strcat(inputName, fileName);
+                strcat(inputName, "999");
+                strcat(inputName, fileExtension);
                 break;
             }
 
@@ -94,20 +95,20 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
             itoa(i, iStr, 10);
 
             // writes "(sensor)_data(number).csv to fileNameTemp"
-            char fileNameTemp[strlen(inputName) + strlen(iStr) + 6];
-            strcpy(fileNameTemp, "/");
-            strcat(fileNameTemp, inputName);
-            strcat(fileNameTemp, iStr);
-            strcat(fileNameTemp, fileExtension);
+            strcpy(inputName, "/");
+            strcat(inputName, fileName);
+            strcat(inputName, iStr);
+            strcat(inputName, fileExtension);
 
-            if (!fs.exists(fileNameTemp)) {
-                strcpy(fileName, fileNameTemp);
+            if (!fs.exists(inputName)) {
                 fileExists = true;
             }
 
             i++;
         }
     }
+
+    strcpy(fileName, inputName);
 
     return fileName;
 }

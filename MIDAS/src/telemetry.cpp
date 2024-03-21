@@ -24,7 +24,7 @@ T inv_convert_range(float val, float range) {
 Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
 
 
-void Telemetry::transmit(RocketData& rocket_data) {
+void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
 //    telemetry_command command { };
 //    while (backend.read(&command)) {
 //        handleCommand(command);
@@ -36,6 +36,7 @@ void Telemetry::transmit(RocketData& rocket_data) {
 //    }
 
     TelemetryPacket packet = makePacket(rocket_data);
+    led.toggle(LED::BLUE);
     backend.send(packet);
 }
 
@@ -146,8 +147,8 @@ void Telemetry::bufferData(RocketData& rocket) {
 
     HighGData highGData = rocket.high_g.getRecentUnsync();
     data.highG_ax = inv_convert_range<int16_t>(highGData.ax, 256);
-    data.highG_ay = inv_convert_range<int16_t>(highGData.ay , 256);
-    data.highG_az = inv_convert_range<int16_t>(highGData.az , 256);
+    data.highG_ay = inv_convert_range<int16_t>(highGData.ay, 256);
+    data.highG_az = inv_convert_range<int16_t>(highGData.az, 256);
 
     LowGLSM lowGlsm = rocket.low_g_lsm.getRecentUnsync();
     data.lowg_ax = inv_convert_range<int16_t>(lowGlsm.ax, 8);
