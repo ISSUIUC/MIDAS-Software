@@ -7,7 +7,6 @@
 #include "git_hash.h"
 
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
-pb_byte_t buffer[HILSIMPacket_size];
 
 MultipleLogSink<> sink;
 RocketSystems systems{.log_sink = sink};
@@ -25,30 +24,32 @@ DECLARE_THREAD(hilsim, void*arg) {
     Serial.flush();
 
     while (true) {
-        if(!Serial.available()){
-            THREAD_SLEEP(1);
-            continue;
-        }
-        uint16_t length = ((uint16_t) Serial.read()) << 8 + Serial.read();
+        while (!Serial.available());
+        uint8_t a = Serial.read();
+        uint8_t b = Serial.read();
+        uint16_t length = (uint16_t) b + (((uint16_t) a) << 8);
         // Parse the two bytes as integers
+
         size_t hilsim_packet_size = Serial.readBytes(buffer, length);
+        // Serial.print(length);
+        // Serial.print(" ");
+        // Serial.printf("%d %d ", a, b);
         HILSIMPacket packet = HILSIMPacket_init_zero;
         pb_istream_t stream = pb_istream_from_buffer(buffer, hilsim_packet_size);
         bool status = pb_decode(&stream, HILSIMPacket_fields, &packet);
         if (!status) {
-            Serial.flush();
             THREAD_SLEEP(10);
             continue;
         }
+        global_packet = packet;
         RocketState rocket_state = RocketState_init_zero;
-        rocket_state.rocket_state = n;
-        uint8_t buffer[RocketState_size];
+        rocket_state.rocket_state = (int) (100 * sin((double)n / 360));
+        uint8_t buffer2[RocketState_size];
         pb_ostream_t output_stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
         status = pb_encode(&output_stream, RocketState_fields, &rocket_state);
         Serial.write(output_stream.bytes_written);
         Serial.write(buffer, output_stream.bytes_written);
         Serial.flush();
-        global_packet = packet;
         n++;
         THREAD_SLEEP(10);
     }

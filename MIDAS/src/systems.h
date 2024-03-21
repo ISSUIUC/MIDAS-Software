@@ -16,4 +16,6 @@ struct RocketSystems {
 };
 
 void begin_systems(RocketSystems* config);
+#ifdef HILSIM
 void begin_hilsim(RocketSystems* config);
+#endif

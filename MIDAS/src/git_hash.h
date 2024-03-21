@@ -1,3 +1,3 @@
     #pragma once
-    #define GIT_HASH_STRING "d0250c5-dirty"
+    #define GIT_HASH_STRING "dd4ab7f-dirty"
     

@@ -296,19 +296,21 @@ void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
     Serial.println((char*)pcTaskName);
 }
 
+#ifdef HILSIM
 void begin_hilsim(RocketSystems* config) {
-    START_THREAD(logger, DATA_CORE, config, 5);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 4);
-    START_THREAD(barometer, SENSOR_CORE, config, 4);
-    START_THREAD(continuity, SENSOR_CORE, config, 3);
-    START_THREAD(voltage, SENSOR_CORE, config, 3);
-    START_THREAD(gps, SENSOR_CORE, config, 4);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 3);
+    // START_THREAD(logger, DATA_CORE, config, 5);
+    // START_THREAD(accelerometers, SENSOR_CORE, config, 4);
+    // START_THREAD(barometer, SENSOR_CORE, config, 4);
+    // START_THREAD(continuity, SENSOR_CORE, config, 3);
+    // START_THREAD(voltage, SENSOR_CORE, config, 3);
+    // START_THREAD(gps, SENSOR_CORE, config, 4);
+    // START_THREAD(magnetometer, SENSOR_CORE, config, 3);
     START_THREAD(orientation, SENSOR_CORE, config, 2);
-    START_THREAD(kalman, SENSOR_CORE, config, 4);
-    START_THREAD(fsm, SENSOR_CORE, config, 5);
-    START_THREAD(buzzer, SENSOR_CORE, config, 1);
-    START_THREAD(pyro, SENSOR_CORE, config, 4);
-    START_THREAD(telemetry, SENSOR_CORE, config, 5);
-    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
+    //START_THREAD(kalman, SENSOR_CORE, config, 4);
+    //START_THREAD(fsm, SENSOR_CORE, config, 5);
+    //START_THREAD(buzzer, SENSOR_CORE, config, 1);
+    //START_THREAD(pyro, SENSOR_CORE, config, 4);
+    //START_THREAD(telemetry, SENSOR_CORE, config, 5);
+    //START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
 }
+#endif
