@@ -28,7 +28,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 
         arg->rocket_data.log_latency.tick();
 
-        THREAD_SLEEP(30);
+        THREAD_SLEEP(1);
     }
 }
 
@@ -259,22 +259,22 @@ ErrorCode init_systems(RocketSystems& systems) {
     }
 
     #ifdef IS_SUSTAINER
-        START_THREAD(orientation, SENSOR_CORE, config, 2);
-        START_THREAD(continuity, SENSOR_CORE, config, 3);
-        START_THREAD(voltage, SENSOR_CORE, config, 3);
-        START_THREAD(pyro, SENSOR_CORE, config, 4);
+        START_THREAD(orientation, SENSOR_CORE, config, 10);
+        START_THREAD(continuity, SENSOR_CORE, config, 9);
+        START_THREAD(voltage, SENSOR_CORE, config, 8);
+        START_THREAD(pyro, SENSOR_CORE, config, 7);
     #endif
 
-    START_THREAD(logger, DATA_CORE, config, 5);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 4);
-    START_THREAD(barometer, SENSOR_CORE, config, 4);
-    START_THREAD(gps, SENSOR_CORE, config, 4);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 3);
-    START_THREAD(kalman, SENSOR_CORE, config, 4);
-    START_THREAD(fsm, SENSOR_CORE, config, 5);
-    START_THREAD(buzzer, SENSOR_CORE, config, 1);
-    START_THREAD(telemetry, SENSOR_CORE, config, 5);
-    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
+    START_THREAD(logger, DATA_CORE, config, 15);
+    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    START_THREAD(barometer, SENSOR_CORE, config, 12);
+    START_THREAD(gps, SENSOR_CORE, config, 9);
+    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
+    START_THREAD(kalman, SENSOR_CORE, config, 7);
+    START_THREAD(fsm, SENSOR_CORE, config, 8);
+    START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 14);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     
