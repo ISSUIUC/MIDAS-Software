@@ -22,8 +22,6 @@ void setup() {
     //begin serial port
     Serial.begin(9600);
 
-   while (!Serial);
-
     delay(200);
 
     //begin sensor SPI bus
@@ -33,7 +31,6 @@ void setup() {
     //begin I2C bus
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL);
-
     pinMode(MS5611_CS, OUTPUT);
     pinMode(LSM6DS3_CS, OUTPUT);
     pinMode(KX134_CS, OUTPUT);

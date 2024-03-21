@@ -54,7 +54,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        THREAD_SLEEP(2);
+        THREAD_SLEEP(1);
     }
 }
 
@@ -151,69 +151,6 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-DECLARE_THREAD(mess_around, RocketSystems* arg) {
-    while(true){
-        SPI.beginTransaction(SPISettings());
-        SPI.transfer(3);
-        SPI.transfer(4);
-        SPI.transfer(5);
-        SPI.transfer(6);
-        SPI.transfer(7);
-        SPI.endTransaction();
-        THREAD_SLEEP(1); 
-    }
-}
-
-DECLARE_THREAD(mess_around2, RocketSystems* arg) {
-    while(true){
-        SPI.beginTransaction(SPISettings());
-        SPI.transfer(3);
-        SPI.transfer(4);
-        SPI.transfer(5);
-        SPI.transfer(6);
-        SPI.transfer(7);
-        SPI.transfer(8);
-        SPI.transfer(9);
-        SPI.transfer(10);
-        SPI.endTransaction();
-        THREAD_SLEEP(1); 
-    }
-}
-
-
-DECLARE_THREAD(mess_around3, RocketSystems* arg) {
-    while(true){
-        SPI.beginTransaction(SPISettings());
-        SPI.transfer(3);
-        SPI.transfer(4);
-        SPI.transfer(5);
-        SPI.transfer(6);
-        SPI.transfer(7);
-        SPI.transfer(8);
-        SPI.transfer(9);
-        SPI.transfer(10);
-        SPI.endTransaction();
-        THREAD_SLEEP(1); 
-    }
-}
-
-
-DECLARE_THREAD(mess_around4, RocketSystems* arg) {
-    while(true){
-        SPI.beginTransaction(SPISettings());
-        SPI.transfer(3);
-        SPI.transfer(4);
-        SPI.transfer(5);
-        SPI.transfer(6);
-        SPI.transfer(7);
-        SPI.transfer(8);
-        SPI.transfer(9);
-        SPI.transfer(10);
-        SPI.endTransaction();
-        THREAD_SLEEP(1); 
-    }
-}
-
 /**
  * See \ref data_logger_thread
  */
@@ -279,6 +216,51 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         THREAD_SLEEP(1);
     }
 }
+// #include<Wire.h>
+// DECLARE_THREAD(mess_around_1, RocketSystems* arg) {
+//     while(true){
+//         Wire.beginTransmission(0x33);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.endTransmission();
+//         THREAD_SLEEP(1);
+//     }
+// }
+// DECLARE_THREAD(mess_around_2, RocketSystems* arg) {
+//     while(true){
+//         Wire.beginTransmission(0x33);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.endTransmission();
+//         THREAD_SLEEP(1);
+//     }
+// }
+// DECLARE_THREAD(mess_around_3, RocketSystems* arg) {
+//     while(true){
+//         Wire.beginTransmission(0x33);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.endTransmission();
+//         THREAD_SLEEP(1);
+//     }
+// }
+// DECLARE_THREAD(mess_around_4, RocketSystems* arg) {
+//     while(true){
+//         Wire.beginTransmission(0x33);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.write(3);
+//         Wire.endTransmission();
+//         THREAD_SLEEP(1);
+//     }
+// }
 
 
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
@@ -339,13 +321,11 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config, 14);
-    START_THREAD(mess_around, SENSOR_CORE, config, 1);
-    START_THREAD(mess_around2, SENSOR_CORE, config, 1);
-    START_THREAD(mess_around3, SENSOR_CORE, config, 1);
-    START_THREAD(mess_around4, SENSOR_CORE, config, 1);
-
-
-    // config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    // START_THREAD(mess_around_1, SENSOR_CORE, config, 1);
+    // START_THREAD(mess_around_2, SENSOR_CORE, config, 2);
+    // START_THREAD(mess_around_3, SENSOR_CORE, config, 3);
+    // START_THREAD(mess_around_4, SENSOR_CORE, config, 4);
+    config->buzzer.play_tune(free_bird, 6);
     
     while (true) {
         THREAD_SLEEP(1000);

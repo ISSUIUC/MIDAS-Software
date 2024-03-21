@@ -458,6 +458,7 @@ KX13X_STATUS_t QwiicKX13xCore::overBufLenI2CRead(uint8_t reg,
         i2cResult =
             _i2cPort->requestFrom(_deviceAddress, resizedRead,
                                   uint8_t(false));  // false = repeated start
+
         if (i2cResult == 0) return KX13X_I2C_ERROR;
         for (size_t i = 0; i < resizedRead; i++) {
             dataBuffer[arrayPlaceHolder] = _i2cPort->read();

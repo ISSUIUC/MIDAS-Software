@@ -206,7 +206,6 @@ GNSS_StatusTypeDef TeseoLIV3F::I2CRead(uint16_t RegisterAddr, uint8_t* pBuffer, 
 //End of fix
    }
    while(status != 0);
-
    dev_i2c->requestFrom((uint8_t)DEFAULT_DEVICE_ADDRESS, (uint8_t) NumByteToRead);
 
    int i=0;
@@ -214,6 +213,9 @@ GNSS_StatusTypeDef TeseoLIV3F::I2CRead(uint16_t RegisterAddr, uint8_t* pBuffer, 
    {
       pBuffer[i] = dev_i2c->read();
       i++;
+      if(i >= NumByteToRead){
+         i = NumByteToRead - 1;
+      }
    }
    return (GNSS_StatusTypeDef) status;
 }
