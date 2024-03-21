@@ -3,14 +3,12 @@
 // #include sensor library
 #include "Adafruit_BNO08x.h"
 
-GpioAddress bno_reset(1, 07);
-
 // global static instance of the sensor
-Adafruit_BNO08x imu(bno_reset);
+Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
 
 ErrorCode OrientationSensor::init() {
-    gpioPinMode(bno_reset, OUTPUT);
+    gpioPinMode(BNO086_RESET, OUTPUT);
     delay(100);
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code

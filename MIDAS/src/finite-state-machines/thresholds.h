@@ -18,12 +18,12 @@
 #define sustainer_second_boost_to_coast_time_threshold 1000
 
 // Transition to COAST if acceleration is less than this value (g)
-#define sustainer_coast_detection_acceleration_threshold 0
+#define sustainer_coast_detection_acceleration_threshold 0.2
 
 // Reach apogee state when vertical speed is less than or equal to this value
-#define sustainer_coast_to_apogee_vertical_speed_threshold 0
+#define sustainer_coast_to_apogee_vertical_speed_threshold 20
 
-// Revert back to COAST if apogee was too brief 
+// Revert back to COAST if apogee was too brief
 #define sustainer_apogee_check_threshold 1000
 
 // Move on to DROGUE_DEPLOT after being in apogee for this amount of time
@@ -51,15 +51,13 @@
 #define sustainer_first_boost_to_burnout_time_threshold 1000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold
-#define sustainer_landed_vertical_speed_threshold 0
+#define sustainer_landed_vertical_speed_threshold 20
 
-// Stores a small jerk value 
-#define sustainer_drogue_jerk_threshold 0
+// Stores a small jerk value
+#define sustainer_drogue_jerk_threshold 200
 
-// Stores a small jerk value 
-#define sustainer_main_jerk_threshold 0
-
-
+// Stores a small jerk value
+#define sustainer_main_jerk_threshold 300
 // ----------------------------------
 // FIRST STAGE THRESHOLDS
 // ----------------------------------
@@ -74,12 +72,12 @@
 #define booster_first_seperation_time_threshold 3000
 
 // Transition to COAST if acceleration is less than this value (g)
-#define booster_coast_detection_acceleration_threshold 0
+#define booster_coast_detection_acceleration_threshold 0.2
 
 // Reach apogee state when vertical speed is less than or equal to this value
-#define booster_coast_to_apogee_vertical_speed_threshold 0
+#define booster_coast_to_apogee_vertical_speed_threshold 20
 
-// Revert back to COAST if apogee was too brief 
+// Revert back to COAST if apogee was too brief
 #define booster_apogee_check_threshold 1000
 
 // Move on to DROGUE_DEPLOT after being in apogee for this amount of time
@@ -93,7 +91,6 @@
 
 // Height required to deploy the main parachutes
 #define booster_main_deploy_altitude_threshold 3000
-
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define booster_ignition_to_second_boost_time_threshold 1000
 
@@ -107,15 +104,13 @@
 #define booster_first_boost_to_burnout_time_threshold 1000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold
-#define booster_landed_vertical_speed_threshold 0
+#define booster_landed_vertical_speed_threshold 20
 
-// Stores a small jerk value 
-#define booster_first_seperation_jerk_threshold 0
+// Stores a small jerk value
+#define booster_first_separation_jerk_threshold 300
 
-// Stores a small jerk value 
-#define booster_drogue_jerk_threshold 0
+// Stores a small jerk value
+#define booster_drogue_jerk_threshold 200
 
-// Stores a small jerk value 
-#define booster_main_jerk_threshold 0
-
-
+// Stores a small jerk value
+#define booster_main_jerk_threshold 300

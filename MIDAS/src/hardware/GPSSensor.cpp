@@ -5,10 +5,8 @@
 #include "sensor_data.h"
 #include <Wire.h>
 
-GpioAddress gps_reset(2, 017);
-
 // Replace "Wire" with a reference to the I2C object to be used by the sensor
-TeseoLIV3F teseo(&Wire, gps_reset, GPS_ENABLE);
+TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);
 
 ErrorCode GPSSensor::init() {
     // Remember to change any RESET related operations to use the GPIO expander

@@ -132,7 +132,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         arg->rocket_data.fsm_state.update(next_state);
 
         if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
-            arg->buzzer.play_tune(free_bird, 48);
+            arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
 
@@ -265,7 +265,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 ErrorCode init_systems(RocketSystems& systems) {
-    // todo message on failure
+    gpioDigitalWrite(LED_ORANGE, HIGH);
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
@@ -278,9 +278,10 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.gps);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
+    INIT_SYSTEM(systems.sensors.gps);
+    gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -321,11 +322,8 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config, 14);
-    // START_THREAD(mess_around_1, SENSOR_CORE, config, 1);
-    // START_THREAD(mess_around_2, SENSOR_CORE, config, 2);
-    // START_THREAD(mess_around_3, SENSOR_CORE, config, 3);
-    // START_THREAD(mess_around_4, SENSOR_CORE, config, 4);
-    config->buzzer.play_tune(free_bird, 6);
+
+    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     
     while (true) {
         THREAD_SLEEP(1000);

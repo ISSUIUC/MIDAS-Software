@@ -83,15 +83,15 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.datapoint_count = 0;
     for (int8_t i = 0; i < 4 && small_packet_queue.receive(&small_packet); i++) {
         packet.datapoints[i] = small_packet;
-        packet.datapoint_count = i + 1;
+        packet.datapoint_count++;
     }
 
     GPS gps = data.gps.getRecentUnsync();
-    Orientation orientation = data.orientation.getRecentUnsync();
     Magnetometer magnetometer = data.magnetometer.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
     packet.voltage_battery = inv_convert_range<uint16_t>(voltage.voltage, 4096);
     Barometer barometer = data.barometer.getRecentUnsync();
+    LowGLSM lowGlsm = data.low_g_lsm.getRecentUnsync();
 
     packet.gps_lat = gps.latitude;
     packet.gps_long = gps.longitude;
@@ -100,9 +100,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
     packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
     packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
-    packet.gyro_x = inv_convert_range<int16_t>(orientation.gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(orientation.gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(orientation.gz, 8192);
+    packet.gyro_x = inv_convert_range<int16_t>(lowGlsm.gx, 8192);
+    packet.gyro_y = inv_convert_range<int16_t>(lowGlsm.gy, 8192);
+    packet.gyro_z = inv_convert_range<int16_t>(lowGlsm.gz, 8192);
 
     packet.rssi = backend.getRecentRssi();
     packet.FSM_state = (char) data.fsm_state.getRecentUnsync();
@@ -144,17 +144,20 @@ void Telemetry::bufferData(RocketData& rocket) {
     data.timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
     data.barometer_pressure = inv_convert_range<uint16_t>(rocket.barometer.getRecentUnsync().pressure , 4096);
 
-    data.highG_ax = inv_convert_range<int16_t>(rocket.high_g.getRecentUnsync().ax, 256);
-    data.highG_ay = inv_convert_range<int16_t>(rocket.high_g.getRecentUnsync().ay , 256);
-    data.highG_az = inv_convert_range<int16_t>(rocket.high_g.getRecentUnsync().az , 256);
+    HighGData highGData = rocket.high_g.getRecentUnsync();
+    data.highG_ax = inv_convert_range<int16_t>(highGData.ax, 256);
+    data.highG_ay = inv_convert_range<int16_t>(highGData.ay , 256);
+    data.highG_az = inv_convert_range<int16_t>(highGData.az , 256);
 
-    data.lowg_ax = inv_convert_range<int16_t>(rocket.low_g_lsm.getRecentUnsync().ax, 8);
-    data.lowg_ay = inv_convert_range<int16_t>(rocket.low_g_lsm.getRecentUnsync().ay, 8);
-    data.lowg_az = inv_convert_range<int16_t>(rocket.low_g_lsm.getRecentUnsync().az, 8);
+    LowGLSM lowGlsm = rocket.low_g_lsm.getRecentUnsync();
+    data.lowg_ax = inv_convert_range<int16_t>(lowGlsm.ax, 8);
+    data.lowg_ay = inv_convert_range<int16_t>(lowGlsm.ay, 8);
+    data.lowg_az = inv_convert_range<int16_t>(lowGlsm.az, 8);
 
-    data.bno_pitch = inv_convert_range<int16_t>(rocket.orientation.getRecentUnsync().pitch , 8);
-    data.bno_yaw = inv_convert_range<int16_t>(rocket.orientation.getRecentUnsync().yaw , 8);
-    data.bno_roll = inv_convert_range<int16_t>(rocket.orientation.getRecentUnsync().roll , 8);
+    Orientation orient = rocket.orientation.getRecentUnsync();
+    data.bno_pitch = inv_convert_range<int16_t>(orient.pitch , 8);
+    data.bno_yaw = inv_convert_range<int16_t>(orient.yaw , 8);
+    data.bno_roll = inv_convert_range<int16_t>(orient.roll , 8);
 
     small_packet_queue.send(data);
 }
