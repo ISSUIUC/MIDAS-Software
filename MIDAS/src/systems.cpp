@@ -28,7 +28,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 
         arg->rocket_data.log_latency.tick();
 
-        THREAD_SLEEP(30);
+        THREAD_SLEEP(1);
     }
 }
 
@@ -151,6 +151,69 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
+DECLARE_THREAD(mess_around, RocketSystems* arg) {
+    while(true){
+        SPI.beginTransaction(SPISettings());
+        SPI.transfer(3);
+        SPI.transfer(4);
+        SPI.transfer(5);
+        SPI.transfer(6);
+        SPI.transfer(7);
+        SPI.endTransaction();
+        THREAD_SLEEP(1); 
+    }
+}
+
+DECLARE_THREAD(mess_around2, RocketSystems* arg) {
+    while(true){
+        SPI.beginTransaction(SPISettings());
+        SPI.transfer(3);
+        SPI.transfer(4);
+        SPI.transfer(5);
+        SPI.transfer(6);
+        SPI.transfer(7);
+        SPI.transfer(8);
+        SPI.transfer(9);
+        SPI.transfer(10);
+        SPI.endTransaction();
+        THREAD_SLEEP(1); 
+    }
+}
+
+
+DECLARE_THREAD(mess_around3, RocketSystems* arg) {
+    while(true){
+        SPI.beginTransaction(SPISettings());
+        SPI.transfer(3);
+        SPI.transfer(4);
+        SPI.transfer(5);
+        SPI.transfer(6);
+        SPI.transfer(7);
+        SPI.transfer(8);
+        SPI.transfer(9);
+        SPI.transfer(10);
+        SPI.endTransaction();
+        THREAD_SLEEP(1); 
+    }
+}
+
+
+DECLARE_THREAD(mess_around4, RocketSystems* arg) {
+    while(true){
+        SPI.beginTransaction(SPISettings());
+        SPI.transfer(3);
+        SPI.transfer(4);
+        SPI.transfer(5);
+        SPI.transfer(6);
+        SPI.transfer(7);
+        SPI.transfer(8);
+        SPI.transfer(9);
+        SPI.transfer(10);
+        SPI.endTransaction();
+        THREAD_SLEEP(1); 
+    }
+}
+
 /**
  * See \ref data_logger_thread
  */
@@ -209,9 +272,10 @@ DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
  */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
+        // Serial.println("Telem enter");
         arg->tlm.transmit(arg->rocket_data);
         arg->rocket_data.telem_latency.tick();
-
+        // Serial.println("Telem exit");
         THREAD_SLEEP(1);
     }
 }
@@ -248,32 +312,37 @@ ErrorCode init_systems(RocketSystems& systems) {
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError) {
         // todo some message probably
+        Serial.print("Had Error: ");
+        Serial.print((int) init_error_code);
+        Serial.print("\n");
+        Serial.flush();
+        update_error_LED(init_error_code);
         while (true) {
-            Serial.print("Had Error: ");
-            Serial.print((int) init_error_code);
-            Serial.print("\n");
-            Serial.flush();
-            update_error_LED(init_error_code);
+            
         }
     }
 
     #ifdef IS_SUSTAINER
-        START_THREAD(orientation, SENSOR_CORE, config, 2);
-        START_THREAD(continuity, SENSOR_CORE, config, 3);
-        START_THREAD(voltage, SENSOR_CORE, config, 3);
-        START_THREAD(pyro, SENSOR_CORE, config, 4);
+        START_THREAD(orientation, SENSOR_CORE, config, 10);
+        START_THREAD(continuity, SENSOR_CORE, config, 9);
+        START_THREAD(voltage, SENSOR_CORE, config, 8);
+        START_THREAD(pyro, SENSOR_CORE, config, 7);
     #endif
 
-    START_THREAD(logger, DATA_CORE, config, 5);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 4);
-    START_THREAD(barometer, SENSOR_CORE, config, 4);
-    START_THREAD(gps, SENSOR_CORE, config, 4);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 3);
-    START_THREAD(kalman, SENSOR_CORE, config, 4);
-    START_THREAD(fsm, SENSOR_CORE, config, 5);
-    START_THREAD(buzzer, SENSOR_CORE, config, 1);
-    START_THREAD(telemetry, SENSOR_CORE, config, 5);
-    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
+    START_THREAD(logger, DATA_CORE, config, 15);
+    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    START_THREAD(barometer, SENSOR_CORE, config, 12);
+    START_THREAD(gps, SENSOR_CORE, config, 9);
+    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
+    START_THREAD(kalman, SENSOR_CORE, config, 7);
+    START_THREAD(fsm, SENSOR_CORE, config, 8);
+    START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 14);
+    START_THREAD(mess_around, SENSOR_CORE, config, 1);
+    START_THREAD(mess_around2, SENSOR_CORE, config, 1);
+    START_THREAD(mess_around3, SENSOR_CORE, config, 1);
+    START_THREAD(mess_around4, SENSOR_CORE, config, 1);
 
 
     // config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);

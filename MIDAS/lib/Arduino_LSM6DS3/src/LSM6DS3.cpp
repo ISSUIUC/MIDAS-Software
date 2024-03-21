@@ -49,7 +49,11 @@ int LSM6DS3Class::begin()
     _wire->begin();
   }
 
-  if (!(readRegister(LSM6DS3_WHO_AM_I_REG) == 0x6A || readRegister(LSM6DS3_WHO_AM_I_REG) == 0x69)) {
+  uint8_t reg1 = readRegister(LSM6DS3_WHO_AM_I_REG);
+  uint8_t reg2 = readRegister(LSM6DS3_WHO_AM_I_REG);
+  if (!(reg1 == 0x6A || reg2 == 0x69)) {
+    Serial.println(reg1);
+    Serial.println(reg2);
     end();
     return 0;
   }

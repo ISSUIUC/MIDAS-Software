@@ -37,7 +37,7 @@ public:
     };
 
     S getRecentUnsync() {
-        return current.read_unsync();
+        return current.read();
     }
 
     void getRecent2(S* ptr) {

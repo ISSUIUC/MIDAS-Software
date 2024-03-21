@@ -43,7 +43,7 @@
  */
 #define START_THREAD(name, core, arg, prio) StaticTask_t name##_task;                \
                                       static unsigned char name##_stack[STACK_SIZE];            \
-                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + prio, name##_stack, &name##_task, core)
+                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY, name##_stack, &name##_task, core)
 /**
  * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
  * Function to be run by the thread, this contains a `while(true)` loop
