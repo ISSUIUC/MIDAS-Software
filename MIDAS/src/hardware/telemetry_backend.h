@@ -31,7 +31,7 @@ public:
     template<typename T>
     void send(const T& data) {
         static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to send is too large");
-        gpioDigitalWrite(LED_BLUE, led_state);
+        // gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
 //        Serial.println("Sending bytes");

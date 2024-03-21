@@ -13,6 +13,7 @@
 #error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
 #endif
 
+
 /**
  * These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
@@ -90,6 +91,20 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
     while (true) {
         GPS reading = arg->sensors.gps.read();
         arg->rocket_data.gps.update(reading);
+
+
+#ifdef IS_SUSTAINER
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
+        arg->rocket_data.pyro.update(new_pyro_state);
+
+        Continuity reading2 = arg->sensors.continuity.read();
+        arg->rocket_data.continuity.update(reading2);
+
+        Voltage reading3 = arg->sensors.voltage.read();
+        arg->rocket_data.voltage.update(reading3);
+#endif
+
         THREAD_SLEEP(100);
     }
 }
@@ -223,9 +238,6 @@ ErrorCode init_systems(RocketSystems& systems) {
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
 #endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
@@ -260,9 +272,9 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     #ifdef IS_SUSTAINER
         START_THREAD(orientation, SENSOR_CORE, config, 10);
-        START_THREAD(continuity, SENSOR_CORE, config, 9);
-        START_THREAD(voltage, SENSOR_CORE, config, 8);
-        START_THREAD(pyro, SENSOR_CORE, config, 7);
+        // START_THREAD(continuity, SENSOR_CORE, config, 9);
+        // START_THREAD(voltage, SENSOR_CORE, config, 8);
+        // START_THREAD(pyro, SENSOR_CORE, config, 7);
     #endif
 
     START_THREAD(logger, DATA_CORE, config, 15);
