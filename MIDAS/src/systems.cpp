@@ -132,7 +132,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         arg->rocket_data.fsm_state.update(next_state);
 
         if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
-            arg->buzzer.play_tune(free_bird, 48);
+            arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
 
@@ -276,7 +276,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(telemetry, SENSOR_CORE, config, 5);
     START_THREAD(telemetry_buffering, SENSOR_CORE, config, 3);
 
-    // config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     
     while (true) {
         THREAD_SLEEP(1000);
