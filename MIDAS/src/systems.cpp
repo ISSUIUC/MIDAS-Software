@@ -214,7 +214,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
     while (true) {
         arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(260/4);
+        THREAD_SLEEP(250/4);
     }
 }
 
