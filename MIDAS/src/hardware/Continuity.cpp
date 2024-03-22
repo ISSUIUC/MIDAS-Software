@@ -3,8 +3,8 @@
 
 #include <hal.h>
 
-#define PYRO_VOLTAGE_DIVIDER (220.0 / (100.0 + 220.0 ))
-#define CONT_VOLTAGE_DIVIDER (22.0 / (10.0 + 22.0))
+#define PYRO_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
+#define CONT_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
 
 ErrorCode ContinuitySensor::init() {
     // do whatever steps to initialize the sensor

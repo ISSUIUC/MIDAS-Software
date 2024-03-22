@@ -29,7 +29,15 @@ private:
     int16_t last_command_id = -1;
 
     float set_frequency_to = NAN;
-    char callsign[8] = "NO SIGN";
+
+    #ifdef IS_SUSTAINER
+        char callsign[8] = "KD9ZMJ";
+    #endif
+    
+    #ifdef IS_BOOSTER
+        char callsign[8] = "KD9ZPM";
+    #endif
+    
 
     TelemetryPacket makePacket(RocketData& data);
     void handleCommand(const telemetry_command& cmd);

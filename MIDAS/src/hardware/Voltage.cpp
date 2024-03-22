@@ -2,7 +2,7 @@
 #include <Arduino.h>
 #include <ads7138-q1.h>
 
-#define VOLTAGE_DIVIDER (220.0 / (100.0 + 220.0))
+#define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
 
 /**
  * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
