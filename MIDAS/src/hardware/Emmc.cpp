@@ -16,7 +16,7 @@ ErrorCode EMMCSink::init(){
         return ErrorCode::EmmcPinsAreWrong;
     }
     // if(!SD_MMC.begin()){
-    if(!SD_MMC.begin("/sdcard", true, false, SDMMC_FREQ_52M, 5)){
+    if(!SD_MMC.begin("/sdcard", false, false, SDMMC_FREQ_52M, 5)){
         return ErrorCode::EmmcCouldNotBegin;
     }
     char file_name[16] = "data";
