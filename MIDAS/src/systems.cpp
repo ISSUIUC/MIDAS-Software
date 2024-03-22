@@ -105,8 +105,8 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.voltage.update(reading3);
         }
 
-        arg->led.update();
 #endif
+        arg->led.update();
         i += 1;
 
         THREAD_SLEEP(10);
@@ -183,7 +183,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
     while (true) {
         arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(248/4);
+        THREAD_SLEEP(260/4);
     }
 }
 

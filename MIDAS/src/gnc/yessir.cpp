@@ -13,9 +13,9 @@ void Yessir::update() {}
 void Yessir::tick(float dt, float sd, Barometer &barometerData, Acceleration &imuData) {
     // double integrate accelerometer data and store in state struct
     state.acceleration = {
-        .ax = imuData.ax * 9.8f,
+        .ax = imuData.ax * 9.8f - 9.8f,
         .ay = imuData.ay * 9.8f,
-        .az = imuData.az * 9.8f - 9.8f
+        .az = imuData.az * 9.8f
     };
 
     state.velocity = {

@@ -35,7 +35,7 @@ struct TelemetryPacket {
     uint16_t voltage_battery;  // [0, 16]
     uint8_t FSM_state;        // [0,256]
     int16_t barometer_temp;   // [-128, 128]
-
+    uint16_t sense_pyro;      // [0, 16]
     int8_t continuity[4];     // [-10, 10]
     /** Pyros bit format:
      *  Lowest order bit is 0

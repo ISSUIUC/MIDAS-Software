@@ -122,6 +122,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.pyros_bits |= pyros.channels[3].is_firing << 7;
 
     Continuity continuity = data.continuity.getRecentUnsync();
+    packet.sense_pyro = inv_convert_range<uint16_t>(continuity.sense_pyro, 4096);
     for (int i = 0; i < 4; i++) {
        packet.continuity[i] = inv_convert_range<int8_t>(continuity.pins[i], 20);
     }
