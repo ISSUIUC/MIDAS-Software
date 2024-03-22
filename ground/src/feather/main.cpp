@@ -98,7 +98,7 @@ struct TelemetryPacket {
     uint16_t voltage_battery;  //[0, 16]
     uint8_t FSM_State;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
-
+    uint16_t sense_pyro;      //[0, 2^16]
     // Add pyros array for pyro channels
     int8_t continuity[4]; // [-10, 10]
     uint8_t pyro_bits;
@@ -182,6 +182,7 @@ struct FullTelemetryData {
     long unsigned int print_time;
     bool is_booster;
     char callsign[8];
+    float sense_pyro;
 };
 
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
@@ -287,6 +288,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.callsign[6] = packet.callsign[6];
         item.callsign[7] = packet.callsign[7];
         item.is_booster = packet.is_booster;
+        item.sense_pyro = convert_range(packet.sense_pyro, 4096);
 
         item.telem_latency = (uint32_t) convert_range(packet.telem_latency, 1024);
         item.log_latency = (uint32_t) convert_range(packet.log_latency, 1024);
@@ -358,6 +360,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("TelemLatency",(int) packet.telem_latency);
     printJSONField("LogLatency", (int) packet.log_latency);
     printJSONField("is_booster", packet.is_booster);
+    printJSONField("sense_pyro", packet.sense_pyro);
 
     // printJSONField("STE_ALT", packet.gnc_state_x);
     // printJSONField("STE_VEL", packet.gnc_state_vx);
