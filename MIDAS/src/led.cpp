@@ -27,8 +27,6 @@ void LEDController::toggle(LED led) {
 void LEDController::update() {
     for (int i = 0; i < 4; i++) {
         if (targets[i] != states[i]) {
-            Serial.print("Writing ");
-            Serial.print(targets[i]);
             gpioDigitalWrite(LED_pins[i], targets[i]);
             states[i] = targets[i];
         }

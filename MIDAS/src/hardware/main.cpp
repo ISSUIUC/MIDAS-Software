@@ -14,7 +14,7 @@
 
 #ifdef IS_SUSTAINER
 // MultipleLogSink<EMMCSink> sinks;
-MultipleLogSink<> sinks;
+MultipleLogSink<SDSink> sinks;
 #else
 MultipleLogSink<> sinks;
 #endif

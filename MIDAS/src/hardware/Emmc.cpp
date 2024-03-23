@@ -5,7 +5,6 @@ void EMMCSink::write(const uint8_t* data, size_t size) {
     file.write(data, size);
     unflushed_bytes += size;
     if(unflushed_bytes > 32768){
-//        Serial.println("Flushed");
         file.flush();
         unflushed_bytes = 0;
     }

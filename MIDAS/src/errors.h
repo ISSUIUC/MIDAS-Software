@@ -19,7 +19,8 @@ enum ErrorCode {
     CannotInitBNO = 15,
     EmmcPinsAreWrong = 16,
     EmmcCouldNotBegin = 17,
-    EmmcCouldNotOpenFile = 19
+    EmmcCouldNotOpenFile = 19,
+    SDCouldNotOpenFile = 20,
 };
 
 void update_error_LED(ErrorCode error);

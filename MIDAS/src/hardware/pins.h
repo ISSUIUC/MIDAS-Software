@@ -49,7 +49,9 @@
 #define EMMC_D3 42
 
 // SD Pin(s)
-#define SD_PIN 6
+#define SD_CLK 5
+#define SD_CMD 4
+#define SD_D0 6
 
 // pyro pins
 #define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 07)

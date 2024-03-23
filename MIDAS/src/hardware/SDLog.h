@@ -6,12 +6,13 @@
 #include "sensors.h"
 #include "data_logging.h"
 
-class FileSink : public LogSink {
+class SDSink : public LogSink {
 public:
-    FileSink() = default;
+    SDSink() = default;
 
     ErrorCode init() override;
     void write(const uint8_t* data, size_t size) override;
 private:
     File file;
+    size_t unflushed_bytes = 0;
 };

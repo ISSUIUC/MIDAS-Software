@@ -263,7 +263,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.println("running");
+        Serial.print("Running (Log Latency: ");
+        Serial.print(config->rocket_data.log_latency.getLatency());
+        Serial.println(")");
     }
 }
 

@@ -20,7 +20,7 @@ Sensors create_sensors_attached_to(SimulatedRocket* sim, bool should_be_continuo
 }
 
 RocketSystems* create_and_start(SimulatedRocket* attached, const char* sink_name) {
-    FileSink* sink = new FileSink(sink_name);
+    SDSink* sink = new SDSink(sink_name);
     RocketSystems* systems = new RocketSystems {
             create_sensors_attached_to(attached, true),
             {},
