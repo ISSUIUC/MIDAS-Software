@@ -1,17 +1,22 @@
 #include "sensors.h"
+#include "PL_ADXL355.h"
+#include "pins.h"
 
-// #include sensor library
-
-// global static instance of the sensor
-
+PL::ADXL355 sensor(ADXL355_CS);
 
 ErrorCode LowGSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
-    return ErrorCode::NoError;
+    ErrorCode error = ErrorCode::NoError;
+    sensor.begin();
+    sensor.setRange(PL::ADXL355_Range::range2g);
+    sensor.setOutputDataRate(PL::ADXL355_OutputDataRate::odr1000);
+    // todo set low pass filter frequency to 250hx
+    sensor.enableMeasurement();
+    return error;
 }
 
-LowGData LowGSensor::read() {
-    // read from aforementioned global instance of sensor
-    return LowGData();
+LowGData LowGSensor::read()
+{
+    auto data = sensor.getAccelerations();
+
+    return { data.x, data.y, data.z };
 }

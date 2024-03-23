@@ -1,21 +1,21 @@
 #pragma once
 
+// the only thing #ifdef we need, theoretically
 #ifdef SILSIM
-
 #include "silsim/emulation.h"
-
 #else
 #include <Arduino.h>
-#include "FreeRTOSConfig.h"
-
-#include "hardware/Mutex.h"
-#include "hardware/Queue.h"
 #endif
 
+#include "FreeRTOSConfig.h"
+
+#include "Mutex.h"
+#include "Queue.h"
+
 /**
- *  The size of a stack, in bytes.
+ *  The size of a thread stack, in bytes.
  */
-#define STACK_SIZE 1024
+#define STACK_SIZE 8192
 
 /**
  * The two cores we have: 
@@ -41,9 +41,9 @@
  * @param core core for the task to be pinned to
  * @param arg config arguments for the task to take in
  */
-#define START_THREAD(name, core, arg) StaticTask_t name##_task;                \
+#define START_THREAD(name, core, arg, prio) StaticTask_t name##_task;                \
                                       static unsigned char name##_stack[STACK_SIZE];            \
-                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + 1, name##_stack, &name##_task, core)
+                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + prio, name##_stack, &name##_task, core)
 /**
  * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
  * Function to be run by the thread, this contains a `while(true)` loop

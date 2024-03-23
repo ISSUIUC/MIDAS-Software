@@ -6,7 +6,7 @@
 #undef B1
 
 #include <Eigen/Eigen>
-#include "sensors.h"
+#include "sensor_data.h"
 
 template <int _NumStates, int _NumInputs>
 class KalmanFilter
