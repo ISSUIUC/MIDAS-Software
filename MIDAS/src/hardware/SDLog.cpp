@@ -10,7 +10,8 @@ ErrorCode SDSink::init() {
         return ErrorCode::SDBeginFailed;
     }
     if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
-        return ErrorCode::SDBeginFailed;
+        failed = true;
+        return ErrorCode::NoError;
     }
 
     char file_name[16] = "data";
@@ -19,18 +20,23 @@ ErrorCode SDSink::init() {
 
     file = SD_MMC.open(file_name, FILE_WRITE, true);
     if (!file) {
-        return ErrorCode::SDCouldNotOpenFile;
+        failed = true;
+        return ErrorCode::NoError;
     }
 
     return ErrorCode::NoError;
 }
 
 void SDSink::write(const uint8_t* data, size_t size) {
-    file.write(data, size);
-    unflushed_bytes += size;
-    if(unflushed_bytes > 32768){
+    if (failed) {
+
+    } else {
+        file.write(data, size);
+        unflushed_bytes += size;
+        if(unflushed_bytes > 32768){
 //        Serial.println("Flushed");
-        file.flush();
-        unflushed_bytes = 0;
+            file.flush();
+            unflushed_bytes = 0;
+        }
     }
 }

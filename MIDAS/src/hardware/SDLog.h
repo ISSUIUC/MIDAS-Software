@@ -8,6 +8,8 @@
 
 class SDSink : public LogSink {
 public:
+    bool failed = false;
+
     SDSink() = default;
 
     ErrorCode init() override;
