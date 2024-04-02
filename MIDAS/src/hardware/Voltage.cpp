@@ -1,17 +1,26 @@
 #include "sensors.h"
+#include <Arduino.h>
+#include <ads7138-q1.h>
 
-// #include sensor library
+#define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
 
-// global static instance of the sensor
-
-
+/**
+ * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
+*/
 ErrorCode VoltageSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     return ErrorCode::NoError;
 }
 
+/**
+ * Reads the value of the given analog pin and converts it to a battery voltage with the assumption that the voltage sensor is plugged into that pin
+ * \return The scaled voltage given by the voltage sensor
+*/
 Voltage VoltageSensor::read() {
-    // read from aforementioned global instance of sensor
-    return Voltage();
+    Voltage v_battery;
+    v_battery.voltage = adcAnalogRead(ADCAddress{VOLTAGE_PIN}).value * 3.3f / 4095.0f / VOLTAGE_DIVIDER;
+//    Serial.print("Raw voltage reading: ");
+//    Serial.print(v_battery.voltage);
+//    Serial.println("");
+    //* 3.3f / 4095.f / VOLTAGE_DIVIDER;
+    return v_battery;
 }

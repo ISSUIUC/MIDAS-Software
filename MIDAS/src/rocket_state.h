@@ -1,7 +1,10 @@
 #pragma once
 
+#include <array>
+
 #include "sensor_data.h"
 #include "hal.h"
+#include "Buffer.h"
 
 /** The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -10,40 +13,104 @@
  */
 
 template<typename SensorData>
-struct SensorState {
+struct Reading {
+    uint32_t timestamp_ms;
+    SensorData data;
+};
+
+template<typename S>
+struct SensorData {
 private:
-    Mutex<SensorData> current;
-    Queue<SensorData> queue;
+    Mutex<S> current;
+    Queue<Reading<S>> queue;
 
 public:
-    void update(SensorData data) {
+    SensorData() : current(S()) { }
+
+    virtual void update(S data) {
         current.write(data);
-        queue.send(data);
+        queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
     };
 
-    SensorData getRecent() {
+    S getRecent() {
         return current.read();
     };
 
-    bool getQueued(SensorData* out) {
+    S getRecentUnsync() {
+        return current.read_unsync();
+    }
+
+    bool getQueued(Reading<S>* out) {
         return queue.receive(out);
     };
-
-    SensorState() : current(SensorData()) { }
 };
 
-struct RocketState {
+template<typename S, size_t count>
+struct BufferedSensorData : public SensorData<S> {
+private:
+    Buffer<S, count> buffer;
+    Buffer<TickType_t, count> data_time;
+
 public:
-    bool pyro_should_be_firing;
+    BufferedSensorData() : SensorData<S>() { }
 
-    SensorState<LowGData> low_g;
-    SensorState<HighGData> high_g;
-    SensorState<GyroscopeData> gyroscope;
-    SensorState<Barometer> barometer;
-    SensorState<Continuity> continuity;
-    SensorState<Voltage> voltage;
-    SensorState<GPS> gps;
-    SensorState<Magnetometer> magnometer;
-    SensorState<Orientation> orientation;
+    void update(S data) override {
+        SensorData<S>::update(data);
+        buffer.push(data);
+        data_time.push(xTaskGetTickCount());
+    };
+
+    // wrapper function to get easy access to buffer data
+    template<size_t arr_count>
+    std::array<S, arr_count> getBufferRecent() {
+        std::array<S, arr_count> arr = buffer. template read_recent<arr_count>();
+        return arr;
+    };
+
+    template<size_t arr_count>
+    std::array<TickType_t, arr_count> getTimesRecent() {
+        std::array<TickType_t, arr_count> arr = data_time. template read_recent<arr_count>();
+        return arr;
+    };
 };
 
+class Latency {
+    uint32_t latency = 0;
+    TickType_t last_tick = 0;
+
+public:
+    void tick() {
+        TickType_t now = xTaskGetTickCount();
+        latency = now - last_tick;
+        last_tick = now;
+    }
+
+    [[nodiscard]] uint32_t getLatency() const {
+        return latency;
+    }
+};
+
+/**
+ * The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
+ *
+ *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  makes it easier to debug since all this data can be logged (and thus used when debugging).
+ */
+struct RocketData {
+public:
+    SensorData<KalmanData> kalman;
+    SensorData<LowGData> low_g;
+    BufferedSensorData<HighGData, 8> high_g;
+    BufferedSensorData<Barometer, 8> barometer;
+    SensorData<LowGLSM> low_g_lsm;
+    SensorData<Continuity> continuity;
+    SensorData<PyroState> pyro;
+    SensorData<FSMState> fsm_state;
+    SensorData<GPS> gps;
+    SensorData<Magnetometer> magnetometer;
+    SensorData<Orientation> orientation;
+    SensorData<Voltage> voltage;
+
+    Latency telem_latency;
+    Latency log_latency;
+};
