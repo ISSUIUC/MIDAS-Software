@@ -26,6 +26,9 @@ GPS GPSSensor::read() {
     float lat = gpgga_message.xyz.lat * ((gpgga_message.xyz.ns == 'N') ? 1. : -1.);
     float lon = gpgga_message.xyz.lon * ((gpgga_message.xyz.ns == 'E') ? 1. : -1.);
 
+    lat = static_cast<int>(lat)/100 + std::fmod(lat, 100.f)/60.f;
+    lon = static_cast<int>(lon)/100 + std::fmod(lon, 100.f)/60.f;
+
     float alt = gpgga_message.xyz.alt;
     float v = gprmc_message.speed;
     uint16_t sat_count = gpgga_message.sats;
