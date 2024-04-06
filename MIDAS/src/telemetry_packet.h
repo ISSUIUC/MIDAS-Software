@@ -22,8 +22,8 @@ struct TelemetryPacket {
     int8_t datapoint_count;   //[0,4]
     TelemetryDataLite datapoints[4];
 
-    float gps_lat;
-    float gps_long;
+    int32_t gps_lat;
+    int32_t gps_long;
     float gps_alt;
     int16_t mag_x;            // [-4, 4]
     int16_t mag_y;            // [-4, 4]
