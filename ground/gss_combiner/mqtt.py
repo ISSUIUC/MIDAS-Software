@@ -1,16 +1,39 @@
-import paho.mqtt.client as mqtt
+import paho.mqtt.publish as publish
 import threading
 
 class TelemetryThread(threading.Thread):
-    def __init__(self, target_MAC) -> None:
-        self.target_mac__ = target_MAC
-        self.queue__ = []
+    def __init__(self, com_port) -> None:
+        self.__comport = com_port
+        self.__queue = []
 
-
+    def run(self) -> None:
+        while True:
+            # read from the comport
+            # edit queue / store mac address
+            pass
 
     def get_queue(self):
-        return self.queue__
+        return self.__queue
     pass
+
+
+class MQTTThread(threading.Thread):
+    
+    def __init__(self, combiners, server_uri, topic) -> None:
+        self.__combiners = combiners
+        self.__topic = topic
+        self.__uri = server_uri
+
+
+    def run(self) -> None:
+        while True:
+            for combiner in self.combiners__:
+                if combiner.empty():
+                    continue
+
+                data = combiner.get_best()
+                publish.single(self.__topic, data, hostname=self.__uri)
+        
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, flags, reason_code, properties):
@@ -19,15 +42,9 @@ def on_connect(client, userdata, flags, reason_code, properties):
     # reconnect then subscriptions will be renewed.
     client.subscribe("$SYS/#")
 
-# The callback for when a PUBLISH message is received from the server.
-def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
 
-mqttc = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+
 mqttc.on_connect = on_connect
-mqttc.on_message = on_message
-
-mqttc.connect("mqtt.eclipseprojects.io", 1883, 60)
 
 # Blocking call that processes network traffic, dispatches callbacks and
 # handles reconnecting.
