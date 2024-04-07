@@ -648,6 +648,9 @@ BASE_TYPES: dict[str, Type] = {
     'uint16_t': Integer(4, signed=False),
     'uint32_t': Integer(4, signed=False),
     'uint64_t': Integer(8, signed=False),
+    'int16_t': Integer(4, signed=True),
+    'int32_t': Integer(4, signed=True),
+    'int64_t': Integer(8, signed=True),
     # 'systime_t': Integer(4)
 }
 BASE_TEMPLATES: dict[str, Template] = {}
@@ -694,7 +697,6 @@ class Preprocessor:
 
                 if include_path.startswith("\"") and include_path.endswith("\""):
                     include_path = Path(file_path).absolute().parent / include_path[1:-1]
-                    print(f"Including File: {include_path}")
                     processed += self.include_file(include_path)
                 elif include_path in STD_HEADERS:
                     processed += self.preprocess(include_path[1:-1], STD_HEADERS[include_path])
