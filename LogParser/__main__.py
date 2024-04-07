@@ -96,7 +96,7 @@ class Format(enum.Enum):
                 items = ["type", "timestamp"]
                 for _, (name, ty) in headers.items():
                     items.extend(flatten_headers(name, ty))
-                file.write(", ".join(items).encode("utf-8"))
+                file.write(",".join(items).encode("utf-8"))
                 file.write("\n".encode("utf-8"))
                 return items
 
@@ -114,7 +114,7 @@ class Format(enum.Enum):
                         rows.append(flatted[header])
                     else:
                         rows.append("")
-                file.write(", ".join(rows).encode("utf-8"))
+                file.write(",".join(rows).encode("utf-8"))
                 file.write("\n".encode("utf-8"))
 
     def write_footer(self, file: IO):
