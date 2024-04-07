@@ -1,16 +1,3 @@
-"""
-A tool which can extract data written by TARS to its SD card into a much more usable JSON file.
-
-Steps to use this wonderful software:
-
-  1. Install Python 3.9+. Notably, as of 1/14/2023, Python 3.9 cannot be installed, so you'll have to go up to 3.10.
-  2. Install the library lark (also called lark-parser). Make sure you are installing for the right Python.
-  3. Run using `python data_parser.py <path-to-header> <path-to-raw>`
-    - There are numerous reasons this might not work out of the box. Some reasons I can think of right now include
-      not having python on your path, having the wrong python on your path, not being in the right working directory,
-      or not having installed the right lark.
-"""
-
 from __future__ import annotations
 
 from abc import ABC, abstractmethod

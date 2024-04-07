@@ -1,5 +1,4 @@
 import enum
-import io
 import json
 import pathlib
 import struct
