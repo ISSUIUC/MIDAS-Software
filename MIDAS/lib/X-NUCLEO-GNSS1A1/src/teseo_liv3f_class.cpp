@@ -1869,7 +1869,7 @@ int32_t TeseoLIV3F::NMEA_CheckAGPSMsg(const char header[])
    return is_passmsg;
 }
 
-void TeseoLIV3F::NMEA_Copy_Data(GPGGA_Info_t *pInfo, GPGGA_Info_t GPGGAInfo)
+void TeseoLIV3F::NMEA_Copy_Data(GPGGA_Info_t *pInfo, const GPGGA_Info_t& GPGGAInfo)
 {
    pInfo->acc          = GPGGAInfo.acc;
    pInfo->geoid.height = GPGGAInfo.geoid.height;

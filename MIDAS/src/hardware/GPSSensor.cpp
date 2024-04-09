@@ -17,11 +17,21 @@ ErrorCode GPSSensor::init() {
     return ErrorCode::NoError;
 }
 
+// This is needed because GPS doesn't provide unix time and just gives
+// dd mm yy
+uint16_t months[12] = {
+    0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
+};
+
+inline bool is_leapyear(int year) {
+    return (!(year % 100 == 0) || (year % 400 == 0)) && year % 4 == 0;
+}
+
 GPS GPSSensor::read() {
     teseo.update();
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
     GPRMC_Info_t gprmc_message = teseo.getGPRMCData();
-    // Also check if it's north or south
+
     float64_t lat = gpgga_message.xyz.lat;
     float64_t lon = gpgga_message.xyz.lon;
 
@@ -39,5 +49,21 @@ GPS GPSSensor::read() {
     float v = gprmc_message.speed;
     uint16_t sat_count = gpgga_message.sats;
 
-    return GPS{lat_int, lon_int, alt, v, sat_count};
+    if (!is_leapyear(gprmc_message.date % 100)) {
+        is_leap = true;
+    }
+    if (!is_leap && is_leapyear(gprmc_message.date % 100)) {
+        is_leap = true;
+        for (int i = 2; i < 12; i++) {
+            months[i]++;
+        }
+    }
+
+    uint32_t day = gprmc_message.date / 10000 * 86400;
+    uint32_t month = gprmc_message.date / 100 % 100;
+    uint32_t time = day + months[month - 1] * 86400 + gprmc_message.date % 100 * 31536000;
+    // Sum everything together now
+    uint32_t time_of_day = gprmc_message.utc.hh * 3600 + gprmc_message.utc.mm * 60 + gprmc_message.utc.ss;
+    time += time_of_day;
+    return GPS{lat_int, lon_int, alt, v, sat_count, time};
 }

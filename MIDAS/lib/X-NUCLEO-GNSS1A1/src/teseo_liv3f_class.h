@@ -556,7 +556,7 @@ protected:
     * @param  GPGGAInfo Instance of a GPGGA_Info_t object pointer where the GPGGA_Info_t stored into pInfo have to be copied
     * @retval None
     */
-   void NMEA_Copy_Data(GPGGA_Info_t *pInfo, GPGGA_Info_t GPGGAInfo);
+   void NMEA_Copy_Data(GPGGA_Info_t *pInfo, const GPGGA_Info_t& GPGGAInfo);
 
    /**
     * @brief  This function converts a character to unsigned integer
