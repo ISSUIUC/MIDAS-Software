@@ -1,27 +1,36 @@
 import paho.mqtt.publish as publish
 import threading
+from collections import deque
+import json
+
+packet = json.load(open("./ground/gss_combiner/telem_packet.json"))
 
 class TelemetryThread(threading.Thread):
-    def __init__(self, com_port) -> None:
+    def __init__(self, com_port, mqtt_uri, all_data_topic) -> None:
+        self.__topic = all_data_topic
         self.__comport = com_port
-        self.__queue = []
+        self.__uri = mqtt_uri
+        self.__queue: deque = deque()
+
+        
 
     def run(self) -> None:
         while True:
             # read from the comport
             # edit queue / store mac address
+            self.__queue.append(packet)
+            print(self.__topic, self.__queue.pop(), self.__uri)
+            # publish.single(self.__topic, self.__queue.pop(), hostname=self.__uri)
             pass
 
     def get_queue(self):
         return self.__queue
-    pass
 
 
 class MQTTThread(threading.Thread):
     
-    def __init__(self, combiners, server_uri, topic) -> None:
+    def __init__(self, combiners, server_uri) -> None:
         self.__combiners = combiners
-        self.__topic = topic
         self.__uri = server_uri
 
 
@@ -32,22 +41,5 @@ class MQTTThread(threading.Thread):
                     continue
 
                 data = combiner.get_best()
-                publish.single(self.__topic, data, hostname=self.__uri)
+                publish.single(combiner.get_mqtt_topic(), data, hostname=self.__uri)
         
-
-# The callback for when the client receives a CONNACK response from the server.
-def on_connect(client, userdata, flags, reason_code, properties):
-    print(f"Connected with result code {reason_code}")
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("$SYS/#")
-
-
-
-mqttc.on_connect = on_connect
-
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
-mqttc.loop_forever()
