@@ -19,12 +19,12 @@ ErrorCode GPSSensor::init() {
 
 // This is needed because GPS doesn't provide unix time and just gives
 // dd mm yy
-uint16_t months[12] = {
+const uint16_t months[12] = {
     0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
 };
 
 inline bool is_leapyear(int year) {
-    return (!(year % 100 == 0) || (year % 400 == 0)) && year % 4 == 0;
+    return (!(year % 100) || (year % 400 == 0)) && year % 4 == 0;
 }
 
 GPS GPSSensor::read() {
@@ -49,19 +49,13 @@ GPS GPSSensor::read() {
     float v = gprmc_message.speed;
     uint16_t sat_count = gpgga_message.sats;
 
-    if (!is_leapyear(gprmc_message.date % 100)) {
-        is_leap = true;
-    }
-    if (!is_leap && is_leapyear(2000 + gprmc_message.date % 100)) {
-        is_leap = true;
-        for (int i = 2; i < 12; i++) {
-            months[i]++;
-        }
-    }
-
     uint32_t day = gprmc_message.date / 10000 * 86400;
-    uint32_t month = gprmc_message.date / 100 % 100;
-    uint32_t time = day + months[month - 1] * 86400 + (30 + gprmc_message.date % 100) * 31536000;
+    int32_t month = gprmc_message.date / 100 % 100;
+    int month_time = months[month - 1];
+    if (is_leapyear(gprmc_message.date % 100) && month >= 2) {
+        month_time++;
+    }
+    uint32_t time = day +month_time * 86400 + (30 + gprmc_message.date % 100) * 31536000;
     // Sum everything together now
     uint32_t time_of_day = gprmc_message.utc.hh * 3600 + gprmc_message.utc.mm * 60 + gprmc_message.utc.ss;
     time += time_of_day;
