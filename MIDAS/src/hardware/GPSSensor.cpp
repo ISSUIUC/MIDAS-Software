@@ -52,7 +52,7 @@ GPS GPSSensor::read() {
     if (!is_leapyear(gprmc_message.date % 100)) {
         is_leap = true;
     }
-    if (!is_leap && is_leapyear(gprmc_message.date % 100)) {
+    if (!is_leap && is_leapyear(2000 + gprmc_message.date % 100)) {
         is_leap = true;
         for (int i = 2; i < 12; i++) {
             months[i]++;
@@ -61,7 +61,7 @@ GPS GPSSensor::read() {
 
     uint32_t day = gprmc_message.date / 10000 * 86400;
     uint32_t month = gprmc_message.date / 100 % 100;
-    uint32_t time = day + months[month - 1] * 86400 + gprmc_message.date % 100 * 31536000;
+    uint32_t time = day + months[month - 1] * 86400 + (30 + gprmc_message.date % 100) * 31536000;
     // Sum everything together now
     uint32_t time_of_day = gprmc_message.utc.hh * 3600 + gprmc_message.utc.mm * 60 + gprmc_message.utc.ss;
     time += time_of_day;
