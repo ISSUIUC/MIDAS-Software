@@ -11,6 +11,7 @@ import math
 # COM20 <-> COM21
 
 com_in = ["COM16", "COM17", "COM19", "COM21"]
+# com_in = ["COM16"]
 
 s_time = time.time()
 
@@ -40,7 +41,7 @@ print("Start sending:")
 i = 0
 
 while True:
-    time.sleep(0.01)
+    time.sleep(0.05)
     p = ports[i]
     p.write(enc(get_packet()))
     print(f"Sent packet to port {com_in[i]}")

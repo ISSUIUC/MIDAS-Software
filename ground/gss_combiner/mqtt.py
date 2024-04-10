@@ -11,7 +11,7 @@ class TelemetryThread(threading.Thread):
     def __init__(self, com_port, mqtt_uri, all_data_topic) -> None:
         super(TelemetryThread, self).__init__(daemon=True)
         self.__topic = all_data_topic
-        self.__comport: serial.Serial = serial.Serial(com_port)
+        self.__comport: serial.Serial = serial.Serial(com_port, baudrate=57600)
         self.__uri = mqtt_uri
         self.__queue: deque = deque()
         self.__comport.reset_input_buffer()
@@ -35,36 +35,40 @@ class TelemetryThread(threading.Thread):
         print(f"[Telem {self.__comport.name}] Connecting to MQTT @ {self.__uri}")
         self.__mqttclient.connect(self.__uri)
         print(f"[Telem {self.__comport.name}] Telemetry thread ready.")
+
         while True:
-            # Read all from the comport
-            raw_in = self.__read_comport()
-            if len(raw_in) == 0:
-                # No data in
-                continue
-
-            packets = bytes.decode(raw_in, encoding='utf-8').split('\n') # Split packets by delimeter
-            
-            # Process raw to packet
-
-            for pkt in packets:
-                if(len(pkt) == 0):
-                    continue # Ignore empty data
-                try:
-                    packet_in = json.loads(pkt)
-                except json.decoder.JSONDecodeError as json_err:
-                    print(f"[Telem {self.__comport.name}] Recieved corrupted JSON packet. Flushing buffer.")
-                    print(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)}")
-                    self.__comport.reset_input_buffer()
+            # Wrap all in a try-except to catch errors.
+            try:
+                # Read all from the comport
+                raw_in = self.__read_comport()
+                if len(raw_in) == 0:
+                    # No data in
                     continue
-                processed = TelemetryThread.process_packet(packet_in)
 
-                # Edit queue and send data out.
-                self.__queue.appendleft(processed) # Append left since newer packets will be further down the serial input stream.
+                packets = bytes.decode(raw_in, encoding='utf-8').split('\n') # Split packets by delimeter
+                
+                # Process raw to packet
 
-                proc_string = json.dumps(processed).encode('utf-8')
-                self.__mqttclient.publish(self.__topic, proc_string)
-                print(f"[Telem {self.__comport.name}] Processed packet @ {processed['unix']} --> '{self.__topic}'")
-            
+                for pkt in packets:
+                    if(len(pkt) == 0):
+                        continue # Ignore empty data
+                    try:
+                        packet_in = json.loads(pkt)
+                    except json.decoder.JSONDecodeError as json_err:
+                        print(f"[Telem {self.__comport.name}] Recieved corrupted JSON packet. Flushing buffer.")
+                        print(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
+                        continue
+                    processed = TelemetryThread.process_packet(packet_in)
+
+                    # Edit queue and send data out.
+                    self.__queue.appendleft(processed) # Append left since newer packets will be further down the serial input stream.
+
+                    proc_string = json.dumps(processed).encode('utf-8')
+                    self.__mqttclient.publish(self.__topic, proc_string)
+                    print(f"[Telem {self.__comport.name}] Processed packet @ {processed['unix']} --> '{self.__topic}'")
+            except Exception as e:
+                print(f"[Telem {self.__comport.name}] Ran into an uncaught exception.. continuing gracefully.")
+                print(f"[Telem {self.__comport.name}] Error dump:", str(e))
 
     def empty(self):
         return len(self.__queue) == 0
@@ -91,19 +95,21 @@ class MQTTThread(threading.Thread):
 
     def run(self) -> None:
         while True:
+            try:
+                for combiner in self.__combiners:
+                    if combiner.empty():
+                        continue
 
+                    data = combiner.get_best()
+                    data_encoded = json.dumps(data).encode("utf-8")
+                    print(f"[MQTT] Published {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_topic()}'")
 
-            for combiner in self.__combiners:
-                if combiner.empty():
-                    continue
-
-                data = combiner.get_best()
-                data_encoded = json.dumps(data).encode("utf-8")
-                print(f"[MQTT] Published {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_topic()}'")
-
-                try:
-                    self.__mqttclient.publish(combiner.get_mqtt_topic(), data_encoded)
-                except Exception as e:
-                    print("Unresolved packet dump: ", data_encoded)
-                    print(f"[MQTT] Unable to publish to '{combiner.get_mqtt_topic()}' : ", str(e))
+                    try:
+                        self.__mqttclient.publish(combiner.get_mqtt_topic(), data_encoded)
+                    except Exception as e:
+                        print("Unresolved packet dump: ", data_encoded)
+                        print(f"[MQTT] Unable to publish to '{combiner.get_mqtt_topic()}' : ", str(e))
+            except Exception as e:
+                print(f"[MQTT] Ran into an uncaught exception.. continuing gracefully.")
+                print(f"[MQTT] Error dump: ", str(e))
         
