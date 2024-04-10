@@ -30,8 +30,8 @@ if __name__ == "__main__":
             t3.start()
             t4.start()
 
-            combiner_sus = combiner.TelemetryCombiner("FlightData-Sustainer", [t1,t2])
-            combiner_boo = combiner.TelemetryCombiner("FlightData-Booster", [t3,t4])
+            combiner_sus = combiner.TelemetryCombiner("Sustainer", [t1,t2])
+            combiner_boo = combiner.TelemetryCombiner("Booster", [t3,t4])
 
 
             broadcast_thread = mqtt.MQTTThread([combiner_sus, combiner_boo], "localhost")

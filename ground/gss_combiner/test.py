@@ -3,6 +3,7 @@ import serial
 import time
 import random
 import math
+import paho.mqtt.publish as publish
 
 # com0com setup:
 # COM1 <-> COM16
@@ -10,6 +11,14 @@ import math
 # COM18 <-> COM19
 # COM20 <-> COM21
 
+
+# print("Sleep 1s")
+# time.sleep(1)
+# publish.single("Control-Sustainer", "payload", hostname="localhost")
+# print("sent")
+
+
+# exit(0)
 com_in = ["COM16", "COM17", "COM19", "COM21"]
 # com_in = ["COM16"]
 

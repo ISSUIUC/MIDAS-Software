@@ -90,10 +90,24 @@ class MQTTThread(threading.Thread):
 
         print("[MQTT] Connecting to broker...")
         self.__mqttclient.connect(self.__uri)
-        print("[MQTT] Connected to MQTT")
+        print("[MQTT] Subscribing to control streams...")
+
+        def on_message(client, userdata, msg):
+            print(msg.topic+" "+str(msg.payload))
+
+        self.__mqttclient.on_message = on_message
+        
+
+        for combiner in self.__combiners:
+            topic = combiner.get_mqtt_control_topic()
+            self.__mqttclient.subscribe(topic) 
+            print("[MQTT] Subscribed to control stream", topic)
+
+        print("[MQTT] MQTT systems initialized.")
 
 
     def run(self) -> None:
+        self.__mqttclient.loop_start()
         while True:
             try:
                 for combiner in self.__combiners:
@@ -102,13 +116,13 @@ class MQTTThread(threading.Thread):
 
                     data = combiner.get_best()
                     data_encoded = json.dumps(data).encode("utf-8")
-                    print(f"[MQTT] Published {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_topic()}'")
+                    print(f"[MQTT] Published {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")
 
                     try:
-                        self.__mqttclient.publish(combiner.get_mqtt_topic(), data_encoded)
+                        self.__mqttclient.publish(combiner.get_mqtt_data_topic(), data_encoded)
                     except Exception as e:
                         print("Unresolved packet dump: ", data_encoded)
-                        print(f"[MQTT] Unable to publish to '{combiner.get_mqtt_topic()}' : ", str(e))
+                        print(f"[MQTT] Unable to publish to '{combiner.get_mqtt_data_topic()}' : ", str(e))
             except Exception as e:
                 print(f"[MQTT] Ran into an uncaught exception.. continuing gracefully.")
                 print(f"[MQTT] Error dump: ", str(e))

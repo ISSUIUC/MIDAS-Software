@@ -8,9 +8,9 @@ import mqtt
 
 class TelemetryCombiner():
     
-    def __init__(self, mqtt_topic, thread_list: mqtt.TelemetryThread):
+    def __init__(self, stage, thread_list: mqtt.TelemetryThread):
         self.__threads = thread_list
-        self.__mqtt_topic = mqtt_topic
+        self.__stage = stage
 
     def empty(self) -> bool:
         for thread in self.__threads:
@@ -19,8 +19,11 @@ class TelemetryCombiner():
                 return False
         return True
     
-    def get_mqtt_topic(self) -> str:
-        return self.__mqtt_topic
+    def get_mqtt_data_topic(self) -> str:
+        return "FlightData-" + self.__stage
+    
+    def get_mqtt_control_topic(self) -> str:
+        return "Control-" + self.__stage
 
     def get_best(self):
         best_packet = None
