@@ -2,6 +2,7 @@ import threading
 import serial
 import serial.tools.list_ports
 import paho.mqtt.publish as publish
+from datetime import datetime, timezone
 
 import mqtt
 
@@ -11,6 +12,7 @@ class TelemetryCombiner():
     def __init__(self, stage, thread_list: mqtt.TelemetryThread):
         self.__threads = thread_list
         self.__stage = stage
+        self.__ts_latest = time = datetime.now(timezone.utc).timestamp()
 
     def empty(self) -> bool:
         for thread in self.__threads:
@@ -40,4 +42,8 @@ class TelemetryCombiner():
                 
                 thread.clear()
     
+        if(self.__ts_latest > best_packet['unix']):
+            print(f"[Combiner {self.__stage}] Released packets out of order! >>>>> ${self.__ts_latest} < ${best_packet['unix']} evaluated ${self.__ts_latest < best_packet['unix']}")
+
+        self.__ts_latest = best_packet['unix']
         return best_packet

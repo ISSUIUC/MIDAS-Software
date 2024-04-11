@@ -5,13 +5,14 @@ import json
 from datetime import datetime, timezone
 import serial # PySerial
 from sys import getsizeof
+import traceback
 
 
 class TelemetryThread(threading.Thread):
     def __init__(self, com_port, mqtt_uri, all_data_topic) -> None:
         super(TelemetryThread, self).__init__(daemon=True)
         self.__topic = all_data_topic
-        self.__comport: serial.Serial = serial.Serial(com_port, baudrate=57600)
+        self.__comport: serial.Serial = serial.Serial(com_port, baudrate=4800)
         self.__uri = mqtt_uri
         self.__queue: deque = deque()
         self.__comport.reset_input_buffer()
@@ -20,8 +21,11 @@ class TelemetryThread(threading.Thread):
 
         
     def process_packet(packet_json):
+        # Incoming packets are of form {"type": "data", value: { ... }}
         time = datetime.now(timezone.utc)
-        return {'value': packet_json, 'type': 'data', 'utc': str(time), 'unix': datetime.timestamp(time)}
+
+        # Append timestamps :)
+        return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time)}
     
     def __read_comport(self):
         if self.__comport.in_waiting:
@@ -45,11 +49,14 @@ class TelemetryThread(threading.Thread):
                     # No data in
                     continue
 
-                packets = bytes.decode(raw_in, encoding='utf-8').split('\n') # Split packets by delimeter
-                
-                # Process raw to packet
+                packets = bytes.decode(raw_in, encoding='utf-8').split('\n')[:-1] # Split packets by delimeter, get newest packets first.
 
-                for pkt in packets:
+                # Process raw to packet
+                print(f"[Telem {self.__comport.name}] Processing {len(packets)} packets..")
+                for i in range(len(packets)):
+
+                    pkt = packets[len(packets) - 1 - i]
+
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
@@ -58,17 +65,21 @@ class TelemetryThread(threading.Thread):
                         print(f"[Telem {self.__comport.name}] Recieved corrupted JSON packet. Flushing buffer.")
                         print(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
                         continue
+
                     processed = TelemetryThread.process_packet(packet_in)
 
                     # Edit queue and send data out.
-                    self.__queue.appendleft(processed) # Append left since newer packets will be further down the serial input stream.
+                    self.__queue.append(processed) # Append left since newer packets will be further down the serial input stream.
 
                     proc_string = json.dumps(processed).encode('utf-8')
                     self.__mqttclient.publish(self.__topic, proc_string)
                     print(f"[Telem {self.__comport.name}] Processed packet @ {processed['unix']} --> '{self.__topic}'")
+                    break
+
+
             except Exception as e:
                 print(f"[Telem {self.__comport.name}] Ran into an uncaught exception.. continuing gracefully.")
-                print(f"[Telem {self.__comport.name}] Error dump:", str(e))
+                print(f"[Telem {self.__comport.name}] Error dump:", traceback.format_exc(e))
 
     def empty(self):
         return len(self.__queue) == 0
