@@ -8,6 +8,8 @@ def assert_alive(threads: list[threading.Thread]):
     for thread in threads:
         assert thread.is_alive()
 
+uri_target = "192.168.0.69"
+
 if __name__ == "__main__":
     threads = []
     if len(sys.argv) == 5:
@@ -34,11 +36,11 @@ if __name__ == "__main__":
             telem_threads_sustainer = []
 
             for port in booster_sources:
-                new_thread = mqtt.TelemetryThread(port, "localhost", "FlightData-All")
+                new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All")
                 telem_threads_booster.append(new_thread)
 
             for port in sustainer_sources:
-                new_thread = mqtt.TelemetryThread(port, "localhost", "FlightData-All")
+                new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All")
                 telem_threads_sustainer.append(new_thread)
 
 
@@ -52,7 +54,7 @@ if __name__ == "__main__":
             combiner_boo = combiner.TelemetryCombiner("Booster", telem_threads_booster)
 
 
-            broadcast_thread = mqtt.MQTTThread([combiner_sus, combiner_boo], "localhost")
+            broadcast_thread = mqtt.MQTTThread([combiner_sus, combiner_boo], uri_target)
             broadcast_thread.start()
 
             threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer
