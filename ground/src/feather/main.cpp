@@ -39,7 +39,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 433.0
+#define RF95_FREQ 434.0
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10

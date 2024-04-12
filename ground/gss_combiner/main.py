@@ -20,6 +20,9 @@ if __name__ == "__main__":
             print("Using sustainer sources: ", sustainer_sources)
             print("Using booster sources: ", booster_sources)
 
+            telem_threads_booster = [mqtt.TelemetryThread(src, "localhost", "FlightData-All") for src in booster_sources]
+            telem_threads_sustainer = [mqtt.TelemetryThread(src, "localhost", "FlightData-All") for src in booster_sources]
+
             t1 = mqtt.TelemetryThread(sustainer_sources[0], "localhost", "FlightData-All")
             t2 = mqtt.TelemetryThread(sustainer_sources[1], "localhost", "FlightData-All")
             t3 = mqtt.TelemetryThread(booster_sources[0], "localhost", "FlightData-All")
