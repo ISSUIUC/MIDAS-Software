@@ -14,33 +14,48 @@ if __name__ == "__main__":
         
         if sys.argv[1] == "--sustainer" and sys.argv[3] == "--booster":
             print("Arguments OK")
-            sustainer_sources = sys.argv[2].split(",")
-            booster_sources = sys.argv[4].split(",")
+
+            if sys.argv[2] == "E":
+                sustainer_sources = []
+            else:
+                sustainer_sources = sys.argv[2].split(",")
+
+            if sys.argv[4] == "E":
+                booster_sources = []
+            else:
+                booster_sources = sys.argv[4].split(",")
+
+
 
             print("Using sustainer sources: ", sustainer_sources)
             print("Using booster sources: ", booster_sources)
 
-            telem_threads_booster = [mqtt.TelemetryThread(src, "localhost", "FlightData-All") for src in booster_sources]
-            telem_threads_sustainer = [mqtt.TelemetryThread(src, "localhost", "FlightData-All") for src in booster_sources]
+            telem_threads_booster = []
+            telem_threads_sustainer = []
 
-            t1 = mqtt.TelemetryThread(sustainer_sources[0], "localhost", "FlightData-All")
-            t2 = mqtt.TelemetryThread(sustainer_sources[1], "localhost", "FlightData-All")
-            t3 = mqtt.TelemetryThread(booster_sources[0], "localhost", "FlightData-All")
-            t4 = mqtt.TelemetryThread(booster_sources[1], "localhost", "FlightData-All")
+            for port in booster_sources:
+                new_thread = mqtt.TelemetryThread(port, "localhost", "FlightData-All")
+                telem_threads_booster.append(new_thread)
 
-            t1.start()
-            t2.start()
-            t3.start()
-            t4.start()
+            for port in sustainer_sources:
+                new_thread = mqtt.TelemetryThread(port, "localhost", "FlightData-All")
+                telem_threads_sustainer.append(new_thread)
 
-            combiner_sus = combiner.TelemetryCombiner("Sustainer", [t1,t2])
-            combiner_boo = combiner.TelemetryCombiner("Booster", [t3,t4])
+
+            for thd in telem_threads_booster:
+                thd.start()
+
+            for thd in telem_threads_sustainer:
+                thd.start()
+
+            combiner_sus = combiner.TelemetryCombiner("Sustainer", telem_threads_sustainer)
+            combiner_boo = combiner.TelemetryCombiner("Booster", telem_threads_booster)
 
 
             broadcast_thread = mqtt.MQTTThread([combiner_sus, combiner_boo], "localhost")
             broadcast_thread.start()
 
-            threads = [t1,t2,t3,t4,broadcast_thread]
+            threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer
 
             assert_alive(threads)
             

@@ -12,6 +12,7 @@ class TelemetryThread(threading.Thread):
     def __init__(self, com_port, mqtt_uri, all_data_topic) -> None:
         super(TelemetryThread, self).__init__(daemon=True)
         self.__topic = all_data_topic
+        print(f"[Telem {com_port}] Opening {com_port}")
         self.__comport: serial.Serial = serial.Serial(com_port, baudrate=4800)
         self.__uri = mqtt_uri
         self.__queue: deque = deque()
