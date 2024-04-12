@@ -36,8 +36,9 @@ class TelemetryCombiner():
                 if best_packet is None:
                     best_packet = queue[0]
 
-                if queue[0]['unix'] > best_packet['unix']:
-                    best_packet = queue[0]
+                for packet in queue:
+                    if packet['unix'] > best_packet['unix']:
+                        best_packet = packet
                     
                 
                 thread.clear()

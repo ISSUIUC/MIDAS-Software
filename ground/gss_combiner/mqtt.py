@@ -75,7 +75,7 @@ class TelemetryThread(threading.Thread):
                     proc_string = json.dumps(processed).encode('utf-8')
                     self.__mqttclient.publish(self.__topic, proc_string)
                     print(f"[Telem {self.__comport.name}] Processed packet @ {processed['unix']} --> '{self.__topic}'")
-                    break
+                    
 
 
             except Exception as e:
