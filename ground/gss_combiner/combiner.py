@@ -28,6 +28,8 @@ class TelemetryCombiner():
         return "Control-" + self.__stage
 
     def get_best(self):
+        seen_timestamps = set()
+        packet_release = []
         best_packet = None
         for thread in self.__threads:
             if not thread.empty():
@@ -37,14 +39,11 @@ class TelemetryCombiner():
                     best_packet = queue[0]
 
                 for packet in queue:
-                    if packet['unix'] > best_packet['unix']:
-                        best_packet = packet
+                    if not (packet['unix'] in seen_timestamps):
+                        # Do not send this packet
+                        seen_timestamps.add(packet['unix'])
+                        packet_release.append(packet)
                     
-                
                 thread.clear()
     
-        if(self.__ts_latest > best_packet['unix']):
-            print(f"[Combiner {self.__stage}] Released packets out of order! >>>>> ${self.__ts_latest} < ${best_packet['unix']} evaluated ${self.__ts_latest < best_packet['unix']}")
-
-        self.__ts_latest = best_packet['unix']
-        return best_packet
+        return packet_release

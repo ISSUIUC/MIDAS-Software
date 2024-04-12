@@ -54,10 +54,7 @@ class TelemetryThread(threading.Thread):
 
                 # Process raw to packet
                 print(f"[Telem {self.__comport.name}] Processing {len(packets)} packets..")
-                for i in range(len(packets)):
-
-                    pkt = packets[len(packets) - 1 - i]
-
+                for pkt in packets:
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
@@ -126,15 +123,16 @@ class MQTTThread(threading.Thread):
                     if combiner.empty():
                         continue
 
-                    data = combiner.get_best()
-                    data_encoded = json.dumps(data).encode("utf-8")
-                    print(f"[MQTT] Published {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")
 
-                    try:
-                        self.__mqttclient.publish(combiner.get_mqtt_data_topic(), data_encoded)
-                    except Exception as e:
-                        print("Unresolved packet dump: ", data_encoded)
-                        print(f"[MQTT] Unable to publish to '{combiner.get_mqtt_data_topic()}' : ", str(e))
+                    for data in combiner.get_best():
+                        data_encoded = json.dumps(data).encode("utf-8")
+                        print(f"[MQTT] Published {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")
+
+                        try:
+                            self.__mqttclient.publish(combiner.get_mqtt_data_topic(), data_encoded)
+                        except Exception as e:
+                            print("Unresolved packet dump: ", data_encoded)
+                            print(f"[MQTT] Unable to publish to '{combiner.get_mqtt_data_topic()}' : ", str(e))
             except Exception as e:
                 print(f"[MQTT] Ran into an uncaught exception.. continuing gracefully.")
                 print(f"[MQTT] Error dump: ", str(e))
