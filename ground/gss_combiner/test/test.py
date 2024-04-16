@@ -43,8 +43,8 @@ def enc(dict):
     json_s = json.dumps(dict) + "\n"
     return json_s.encode("utf-8")
 
-print("wait 2s")
-time.sleep(2.0)
+print("wait 1s")
+time.sleep(1)
 print("Start sending:")
 
 i = 0
