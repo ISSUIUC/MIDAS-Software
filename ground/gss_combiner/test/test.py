@@ -20,7 +20,7 @@ import paho.mqtt.publish as publish
 
 # exit(0)
 com_in = ["COM16", "COM17", "COM19", "COM21"]
-# com_in = ["COM16", "COM17"]
+# com_in = ["COM16"]
 
 s_time = time.time()
 
@@ -32,6 +32,9 @@ def get_packet():
     packet['value']['BNO_YAW'] = (math.sin(delta_s/3) * math.pi/2) + math.pi/2
     packet['value']['KX_IMU_ax'] = delta_s*0.05
     packet['value']['RSSI'] = (math.sin(delta_s/3) * 75) - 75
+
+    packet['value']['gps_lat'] = (math.sin(delta_s / 5) * 80)
+    packet['value']['gps_long'] = (math.sin(delta_s / 3) * 180)
 
     # print(packet['BNO_YAW'])
     return packet
@@ -50,7 +53,7 @@ print("Start sending:")
 i = 0
 
 while True:
-    time.sleep(0.01)
+    time.sleep(0.05)
     p = ports[i]
     p.write(enc(get_packet()))
     print(f"Sent packet to port {com_in[i]}")
