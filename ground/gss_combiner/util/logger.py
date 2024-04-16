@@ -24,14 +24,14 @@ class LoggerStream():
 
         self.__last_result = datetime.datetime.now().timestamp()
 
-        if self.__opts.should_log:
+        if self.__opts.should_log and type != LoggerType.MQTT:
             self.__file = open(self.__filename, "w")
 
     def __print(self, line: str):
         print(f"[{self.__title}] {line}")
 
     def __log(self, line: str):
-        self.__file.write(line)
+        self.__file.write(str(line))
 
     def get_last_result_time(self):
         return self.__last_result

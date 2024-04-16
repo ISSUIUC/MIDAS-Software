@@ -14,7 +14,7 @@ class TelemetryCombiner():
         self.__log = log_stream
         self.__threads = thread_list
         self.__stage = stage
-        self.__ts_latest = time = datetime.now(timezone.utc).timestamp()
+        self.__ts_latest = datetime.now(timezone.utc).timestamp()
 
     def empty(self) -> bool:
         for thread in self.__threads:
@@ -33,6 +33,7 @@ class TelemetryCombiner():
         seen_timestamps = set()
         packet_release = []
         best_packet = None
+        cur_latest = self.__ts_latest
         self.__log.set_waiting(0)
         for thread in self.__threads:
             
@@ -46,12 +47,24 @@ class TelemetryCombiner():
 
                 for packet in queue:
                     if not (packet['unix'] in seen_timestamps):
-                        # Do not send this packet
+                        # Do send this packet
+
+                        if self.__ts_latest > packet['unix']:
+                            self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['unix']}")
+
+                        if (packet['unix'] > cur_latest):
+                            cur_latest = packet['unix']
+
                         seen_timestamps.add(packet['unix'])
                         packet_release.append(packet)
+                        
                         self.__log.success()
                         self.__log.waiting_delta(-1)
+
+                    
+
                     
                 thread.clear()
-    
+        self.__ts_latest = cur_latest
+        self.__log.file_log(str(packet_release))
         return packet_release

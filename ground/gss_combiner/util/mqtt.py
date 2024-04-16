@@ -76,8 +76,10 @@ class TelemetryThread(threading.Thread):
                     # Edit queue and send data out.
                     self.__queue.append(processed) # Append left since newer packets will be further down the serial input stream.
 
-                    proc_string = json.dumps(processed).encode('utf-8')
+                    proc_json = json.dumps(processed)
+                    proc_string = proc_json.encode('utf-8')
                     self.__mqttclient.publish(self.__topic, proc_string)
+                    self.__log.file_log(proc_json)
                     self.__log.console_log(f"Processed packet @ {processed['unix']} --> '{self.__topic}'")
                     self.__log.waiting_delta(-1)
                     self.__log.success()
@@ -142,7 +144,6 @@ class MQTTThread(threading.Thread):
                         data_encoded = json.dumps(data).encode("utf-8")
                         
                         self.__log.console_log(f"Publishing {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")
-
 
 
                         try:
