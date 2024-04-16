@@ -33,6 +33,9 @@ def get_packet():
     packet['value']['KX_IMU_ax'] = delta_s*0.05
     packet['value']['RSSI'] = (math.sin(delta_s/3) * 75) - 75
 
+    packet['value']['gps_lat'] = (math.sin(delta_s / 5) * 80)
+    packet['value']['gps_long'] = (math.sin(delta_s / 3) * 180)
+
     # print(packet['BNO_YAW'])
     return packet
 

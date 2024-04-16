@@ -25,7 +25,7 @@ def assert_alive(threads: list[threading.Thread]):
     for thread in threads:
         assert thread.is_alive()
 
-uri_target = "192.168.0.69"
+uri_target = "10.195.167.19"
 
 def is_tl_arg(argument):
     return argument.startswith("--") or argument.startswith("-")
