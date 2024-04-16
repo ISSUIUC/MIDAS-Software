@@ -1,33 +1,37 @@
-# import folium
-
-# def main():
-#     map_osm = folium.Map(location=[51.5074, -0.1278], zoom_start=10)
-#     folium.TileLayer('openstreetmap').add_to(map_osm)
-#     map_osm.save('osm_map.html')
-# if __name__ == "__main__":
-#     main()
-
-
+import paho.mqtt.client as mqtt
 import folium
+import json
+import time
 
-# Latitude and Longitude of Champaign County
-champaign_county_coords = (40.1397, -88.2001)
+mymap = folium.Map(location=[0, 0], zoom_start=2)
 
-# Create map centered around Champaign County
-mymap = folium.Map(location=champaign_county_coords, zoom_start=10)
+def on_message(client, userdata, message):
+    data = json.loads(message.payload.decode())
+    print("Received MQTT message:", data)
+    
+    lat = data['value']['gps_lat']
+    lon = data['value']['gps_long']
 
-# List of points to plot (latitude, longitude)
-points = [
-    (40.1164, -88.2434),  # Point 1
-    (40.1234, -88.2615),  # Point 2
-    (40.1629, -88.1506),  # Point 3
-    (40.2284, -88.2614),  # Point 4
-    (40.0971, -88.2017)   # Point 5
-]
+    print(lat, lon)
+    
+    if lat is not None and lon is not None:
+        folium.Marker(location=[lat, lon]).add_to(mymap)
 
-# Add markers for each point
-for point in points:
-    folium.Marker(location=point).add_to(mymap)
 
-# Save the map as an HTML file
-mymap.save("champaign_county_map.html")
+# MQTT broker details
+broker_address = "localhost"
+topic = "MapData"
+
+# Initialize MQTT client
+client = mqtt.Client()
+client.on_message = on_message
+client.connect(broker_address)
+client.subscribe(topic)
+client.loop_start()
+
+try:
+    while True:
+        time.sleep(1)
+        mymap.save("mqtt_map.html")
+except KeyboardInterrupt:
+    client.disconnect()
