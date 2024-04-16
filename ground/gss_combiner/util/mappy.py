@@ -6,7 +6,7 @@ import time
 
 mymap = folium.Map(location=[0, 0], zoom_start=2)
 map_lock = threading.Lock()
-client = None  # Global variable for MQTT client
+client = None
 
 def on_message(client, userdata, message):
     data = json.loads(message.payload.decode())
