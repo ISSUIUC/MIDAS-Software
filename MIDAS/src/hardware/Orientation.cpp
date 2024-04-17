@@ -62,21 +62,37 @@ Orientation OrientationSensor::read() {
 
         Orientation sensor_reading;
         sensor_reading.has_data = true;
-        sensor_reading.yaw = euler.y;
-        sensor_reading.pitch = euler.z;
-        sensor_reading.roll = euler.x;
+        // sensor_reading.yaw = euler.y;
+        // sensor_reading.pitch = euler.z;
+        // sensor_reading.roll = euler.x;
 
-        sensor_reading.linear_acceleration.ax = event.un.accelerometer.x;
-        sensor_reading.linear_acceleration.ay = event.un.accelerometer.y;
-        sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
+        // sensor_reading.linear_acceleration.ax = event.un.accelerometer.x;
+        // sensor_reading.linear_acceleration.ay = event.un.accelerometer.y;
+        // sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
 
-        sensor_reading.gx = event.un.gyroscope.x;
-        sensor_reading.gy = event.un.gyroscope.y;
-        sensor_reading.gz = event.un.gyroscope.z;
+        // sensor_reading.gx = event.un.gyroscope.x;
+        // sensor_reading.gy = event.un.gyroscope.y;
+        // sensor_reading.gz = event.un.gyroscope.z;
 
-        sensor_reading.magnetometer.mx = event.un.magneticField.x;
-        sensor_reading.magnetometer.my = event.un.magneticField.y;
-        sensor_reading.magnetometer.mz = event.un.magneticField.z;
+        // sensor_reading.magnetometer.mx = event.un.magneticField.x;
+        // sensor_reading.magnetometer.my = event.un.magneticField.y;
+        // sensor_reading.magnetometer.mz = event.un.magneticField.z;
+
+        sensor_reading.yaw = euler.z;
+        sensor_reading.pitch = euler.x;
+        sensor_reading.roll = euler.y;
+
+        sensor_reading.linear_acceleration.ax = event.un.accelerometer.y;
+        sensor_reading.linear_acceleration.ay = event.un.accelerometer.z;
+        sensor_reading.linear_acceleration.az = event.un.accelerometer.x;
+
+        sensor_reading.gx = event.un.gyroscope.y;
+        sensor_reading.gy = event.un.gyroscope.z;
+        sensor_reading.gz = event.un.gyroscope.x;
+
+        sensor_reading.magnetometer.mx = event.un.magneticField.y;
+        sensor_reading.magnetometer.my = event.un.magneticField.z;
+        sensor_reading.magnetometer.mz = event.un.magneticField.x;
 
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
