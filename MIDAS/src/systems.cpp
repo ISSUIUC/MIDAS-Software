@@ -176,18 +176,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
-
-/**
- * See \ref data_logger_thread
- */
-DECLARE_THREAD(telemetry_buffering, RocketSystems* arg) {
-    while (true) {
-        arg->tlm.bufferData(arg->rocket_data);
-        THREAD_SLEEP(260/4);
-    }
-}
-
-
 /**
  * See \ref data_logger_thread
  */
@@ -257,7 +245,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
-    START_THREAD(telemetry_buffering, SENSOR_CORE, config, 14);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
     
