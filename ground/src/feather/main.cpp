@@ -254,7 +254,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.mag_y = convert_range(packet.mag_y, 8);
         item.mag_z = convert_range(packet.mag_z, 8);
         //item.flap_extension = data.flap_extension;
-        item.gps_alt = static_cast<float>( packet.gps_alt)/10000000;
+        item.gps_alt = static_cast<float>(packet.gps_alt)/10000000;
         item.gps_lat = static_cast<float>(packet.gps_lat)/10000000;
         item.gps_long = static_cast<float>(packet.gps_long)/10000000;
         //item.freq = frequency;
