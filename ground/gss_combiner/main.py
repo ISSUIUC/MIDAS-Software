@@ -7,9 +7,9 @@
 #    --booster [source1],[source2],[etc..]      -> Selects which COM ports should be interpreted as a data stream from the booster stage
 #    --sustainer [source1],[source2],[etc..]    -> Selects which COM ports should be interpreted as a data stream from the sustainer stage
 #    --local   (or -l)                          -> Streams all data to 'localhost' for testing.
-#    --no-log  (or -nl)                         -> Will not log data to logfiles for this run
+#    --no-log  (or -n)                         -> Will not log data to logfiles for this run
 #    --verbose (or -v)                          -> Prints all telemetry events to console
-#    --no-vis  (or -n)                          -> Shows a visual display of all systems
+#    --no-vis  (or -nv)                          -> Shows a visual display of all systems
 
 import sys
 import threading
@@ -77,13 +77,13 @@ def parse_params(arguments):
         if (arg == "--local" or arg == "-l"):
             is_local = True
 
-        if (arg == "--no-log" or arg == "-nl"):
+        if (arg == "--no-log" or arg == "-n"):
             should_log = False
 
         if (arg == "--verbose" or arg == "-v"):
             is_verbose = True
 
-        if (arg == "--no-vis" or arg == "-n"):
+        if (arg == "--no-vis" or arg == "-nv"):
             is_visual = False
 
         arg_ptr += 1
