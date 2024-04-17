@@ -68,6 +68,10 @@ struct TelemetryDataLite {
     int16_t highG_ax;             //[128, -128]
     int16_t highG_ay;             //[128, -128]
     int16_t highG_az;
+
+    int16_t lowg_ax;
+    int16_t lowg_ay;
+    int16_t lowg_az;
     
     int16_t bno_roll;             //[-4,4]
     int16_t bno_pitch;             //[128, -128]
@@ -83,25 +87,26 @@ struct TelemetryPacket {
     float gps_lat;
     float gps_long;
     float gps_alt;
-    float yaw;
-    float pitch;
-    float roll;
+
     int16_t mag_x;            //[-4, 4]
     int16_t mag_y;            //[-4, 4]
     int16_t mag_z;            //[-4, 4]
     int16_t gyro_x;           //[-4096, 4096]
     int16_t gyro_y;           //[-4096, 4096]
     int16_t gyro_z;           //[-4096, 4096]
-    int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
-    uint8_t voltage_battery;  //[0, 16]
+    uint16_t voltage_battery;  //[0, 16]
     uint8_t FSM_State;        //[0,256]
     int16_t barometer_temp;   //[-128, 128]
-
+    uint16_t sense_pyro;      //[0, 2^16]
     // Add pyros array for pyro channels
-    bool continuity[4];
-    bool pyros_armed[4];
-    bool pyros_firing[4];
+    int8_t continuity[4]; // [-10, 10]
+    uint8_t pyro_bits;
+    // bool pyros_armed[4];
+    // bool pyros_firing[4];
+
+    uint8_t telem_latency; // [0, 1024]
+    uint8_t log_latency; // [0, 1024]
 
     // // Add continuity array for continuity pins
     // uint8_t continuity[4];
@@ -118,7 +123,8 @@ struct TelemetryPacket {
     // float gnc_state_az;
     // float gnc_state_apo;    
     // uint8_t FSM_State;        //[0,256]
-
+    
+    uint8_t is_booster;
     char callsign[8];
 };
 
@@ -129,6 +135,10 @@ struct FullTelemetryData {
     float highG_ax;             //[128, -128]
     float highG_ay;             //[128, -128]
     float highG_az;
+
+    int16_t lowg_ax;
+    int16_t lowg_ay;
+    int16_t lowg_az;
     
     float bno_roll;             //[-4,4]
                //[-4,4]
@@ -137,16 +147,12 @@ struct FullTelemetryData {
     float gps_lat;
     float gps_long;
     float gps_alt;
-    float yaw;
-    float pitch;
-    float roll;
     float mag_x;            //[-4, 4]
     float mag_y;            //[-4, 4]
     float mag_z;            //[-4, 4]
     float gyro_x;           //[-4096, 4096]
     float gyro_y;           //[-4096, 4096]
     float gyro_z;           //[-4096, 4096]
-    int16_t response_ID;      //[0, 2^16]
     int8_t rssi;              //[-128, 128]
     int8_t datapoint_count;   //[0,4]
     float voltage_battery;  //[0, 16]
@@ -157,7 +163,7 @@ struct FullTelemetryData {
     bool pyros_firing[4];
 
     // Add continuity array for continuity pins
-    bool continuity[4];
+    float continuity[4];
 
 
     float gnc_state_x;
@@ -171,8 +177,12 @@ struct FullTelemetryData {
     float gnc_state_az;
     float gnc_state_apo;    
     uint8_t FSM_State;        //[0,256]
+    uint32_t telem_latency; // [0, 1024]
+    uint32_t log_latency; // [0, 1024]
     long unsigned int print_time;
+    bool is_booster;
     char callsign[8];
+    float sense_pyro;
 };
 
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
@@ -231,6 +241,9 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.highG_ax = convert_range(data.highG_ax, 256);
         item.highG_ay = convert_range(data.highG_ay, 256);
         item.highG_az = convert_range(data.highG_az, 256);
+        item.lowg_ax = convert_range(data.lowg_ax, 8);
+        item.lowg_ay = convert_range(data.lowg_ay, 8);
+        item.lowg_az = convert_range(data.lowg_az, 8);
         item.gyro_x = convert_range(packet.gyro_x, 8192);
         item.gyro_y = convert_range(packet.gyro_y, 8192);
         item.gyro_z = convert_range(packet.gyro_z, 8192);
@@ -241,31 +254,30 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.mag_y = convert_range(packet.mag_y, 8);
         item.mag_z = convert_range(packet.mag_z, 8);
         //item.flap_extension = data.flap_extension;
-        item.gps_alt = packet.gps_alt;
-        item.gps_lat = packet.gps_lat;
-        item.gps_long = packet.gps_long;
+        item.gps_alt = static_cast<float>( packet.gps_alt)/10000000;
+        item.gps_lat = static_cast<float>(packet.gps_lat)/10000000;
+        item.gps_long = static_cast<float>(packet.gps_long)/10000000;
         //item.freq = frequency;
         item.FSM_State = packet.FSM_State;
         // item.gnc_state_ax = packet.gnc_state_ax;
         // item.gnc_state_vx = packet.gnc_state_vx;
         // item.gnc_state_x = packet.gnc_state_x;
         // item.gnc_state_apo = packet.gnc_state_apo;
-        item.response_ID = packet.response_ID;
         item.rssi = packet.rssi;
-        item.voltage_battery = convert_range(packet.voltage_battery, 16);
+        item.voltage_battery = convert_range(packet.voltage_battery, 4096);
         item.print_time = start_printing - start_timestamp + data.timestamp;
-        item.continuity[0] = packet.continuity[0];
-        item.continuity[1] = packet.continuity[1];
-        item.continuity[2] = packet.continuity[2];
-        item.continuity[3] = packet.continuity[3];
-        item.pyros_armed[0] = packet.pyros_armed[0];
-        item.pyros_armed[1] = packet.pyros_armed[1];
-        item.pyros_armed[2] = packet.pyros_armed[2];
-        item.pyros_armed[3] = packet.pyros_armed[3];
-        item.pyros_firing[0] = packet.pyros_firing[0];
-        item.pyros_firing[1] = packet.pyros_firing[1];
-        item.pyros_firing[2] = packet.pyros_firing[2];
-        item.pyros_firing[3] = packet.pyros_firing[3];
+        item.continuity[0] = convert_range(packet.continuity[0], 20);
+        item.continuity[1] = convert_range(packet.continuity[1], 20);
+        item.continuity[2] = convert_range(packet.continuity[2], 20);
+        item.continuity[3] = convert_range(packet.continuity[3], 20);
+        item.pyros_armed[0] = (packet.pyro_bits >> 0) & 1;
+        item.pyros_armed[1] = (packet.pyro_bits >> 1) & 1;
+        item.pyros_armed[2] = (packet.pyro_bits >> 2) & 1;
+        item.pyros_armed[3] = (packet.pyro_bits >> 3) & 1;
+        item.pyros_firing[0] = (packet.pyro_bits >> 4) & 1;
+        item.pyros_firing[1] = (packet.pyro_bits >> 5) & 1;
+        item.pyros_firing[2] = (packet.pyro_bits >> 6) & 1;
+        item.pyros_firing[3] = (packet.pyro_bits >> 7) & 1;
 
         item.callsign[0] = packet.callsign[0];
         item.callsign[1] = packet.callsign[1];
@@ -275,6 +287,11 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
         item.callsign[5] = packet.callsign[5];
         item.callsign[6] = packet.callsign[6];
         item.callsign[7] = packet.callsign[7];
+        item.is_booster = packet.is_booster;
+        item.sense_pyro = convert_range(packet.sense_pyro, 4096);
+
+        item.telem_latency = (uint32_t) convert_range(packet.telem_latency, 1024);
+        item.log_latency = (uint32_t) convert_range(packet.log_latency, 1024);
 
         print_queue.emplace(item);
     }
@@ -307,13 +324,15 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 
 void printPacketJson(FullTelemetryData const& packet) {
     Serial.print(R"({"type": "data", "value": {)");
-    printJSONField("response_ID", packet.response_ID);
     printJSONField("gps_lat", packet.gps_lat);
     printJSONField("gps_long", packet.gps_long);
     printJSONField("gps_alt", packet.gps_alt);
     printJSONField("KX_IMU_ax", packet.highG_ax);
     printJSONField("KX_IMU_ay", packet.highG_ay);
     printJSONField("KX_IMU_az", packet.highG_az);
+    printJSONField("LOW_G_LSM_ax", packet.lowg_ax);
+    printJSONField("LOW_G_LSM_ay", packet.lowg_ay);
+    printJSONField("LOW_G_LSM_az", packet.lowg_az);
     printJSONField("IMU_gx", packet.gyro_x);
     printJSONField("IMU_gy", packet.gyro_y);
     printJSONField("IMU_gz", packet.gyro_z);
@@ -338,6 +357,10 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("Pyro2Firing", packet.pyros_firing[1]);
     printJSONField("Pyro3Firing", packet.pyros_firing[2]);
     printJSONField("Pyro4Firing", packet.pyros_firing[3]);
+    printJSONField("TelemLatency",(int) packet.telem_latency);
+    printJSONField("LogLatency", (int) packet.log_latency);
+    printJSONField("is_booster", packet.is_booster);
+    printJSONField("sense_pyro", packet.sense_pyro);
 
     // printJSONField("STE_ALT", packet.gnc_state_x);
     // printJSONField("STE_VEL", packet.gnc_state_vx);
@@ -500,33 +523,35 @@ void loop() {
         uint8_t len = sizeof(buf);
 
         if (rf95.recv(buf, &len)) {
-            Serial.println(len);
-            Serial.println("Received packet");
-            Serial.println(packet.datapoints[0].barometer_pressure);
+            // Serial.println(len);
+            // Serial.println("Received packet");
+            // Serial.println(packet.datapoints[0].barometer_pressure);
             
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
             memcpy(&packet, buf, sizeof(packet));
             EnqueuePacket(packet, current_freq);
+            // Serial.print("Queue size: ");
+            // Serial.println((print_queue.size()));
 
             if (!cmd_queue.empty()) {
                 auto& cmd = cmd_queue.front();
-                if (cmd.command.id == packet.response_ID) {
-                    if (cmd.command.command == CommandType::SET_FREQ) {
-                        set_freq_local_bug_fix(cmd.command.freq);
-                        Serial.print(R"({"type": "freq_success", "frequency":)");
-                        Serial.print(cmd.command.freq);
-                        Serial.println("}");
-                    }
-                    cmd_queue.pop();
-                } else {
+                // if (cmd.command.id == packet.response_ID) {
+                //     if (cmd.command.command == CommandType::SET_FREQ) {
+                //         set_freq_local_bug_fix(cmd.command.freq);
+                //         Serial.print(R"({"type": "freq_success", "frequency":)");
+                //         Serial.print(cmd.command.freq);
+                //         Serial.println("}");
+                //     }
+                //     cmd_queue.pop();
+                // } else {
                     cmd.retry_count++;
                     if (cmd.retry_count >= max_command_retries) {
                         cmd_queue.pop();
                         Serial.println(json_send_failure);
                     }
-                }
+                // }
             }
 
             process_command_queue();
