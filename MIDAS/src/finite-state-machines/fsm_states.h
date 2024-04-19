@@ -19,4 +19,5 @@ enum FSMState {
 // #else
     STATE_FIRST_SEPARATION,
 // #endif
+    FSM_STATE_COUNT,
 };

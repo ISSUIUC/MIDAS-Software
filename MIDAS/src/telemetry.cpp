@@ -40,14 +40,20 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     FSMState fsm = data.fsm_state.getRecentUnsync();
     Continuity continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
+    PyroState pyro = data.pyro.getRecentUnsync();
 
     packet.alt = uint16_t(gps.altitude);
+    packet.lat = gps.
     packet.highg_ax = inv_convert_range<int16_t>(highg.ax,128);
     packet.highg_ay = inv_convert_range<int16_t>(highg.ay,128);
     packet.highg_az = inv_convert_range<int16_t>(highg.az,128);
     packet.baro_alt = uint16_t(barometer.altitude);
 
-    packet.batt_volt
+
+    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage,16);
+    static_assert(FSMState::FSM_STATE_COUNT < 16);
+    uint8_t sat_count = gps.satellite_count < 16 ? gps.satellite_count : 15;
+    packet.fsm_satcount = ((int)fsm) + (sat_count << 4);
 
     return packet;
 }
