@@ -10,6 +10,7 @@
  * Patrick Marschoun
  * Peter Giannetos
  * Aaditya Voruganti
+ * Micheal Karpov
  */
 
 #include <RH_RF95.h>
