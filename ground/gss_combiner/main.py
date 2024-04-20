@@ -6,10 +6,11 @@
 #  
 #    --booster [source1],[source2],[etc..]      -> Selects which COM ports should be interpreted as a data stream from the booster stage
 #    --sustainer [source1],[source2],[etc..]    -> Selects which COM ports should be interpreted as a data stream from the sustainer stage
-#    --local   (or -l)                          -> Streams all data to 'localhost' for testing.
-#    --no-log  (or -n)                         -> Will not log data to logfiles for this run
+#    --local   (or -l)                          -> Streams all data to 'localhost' for testing. (Same as --ip localhost)
+#    --no-log  (or -n)                          -> Will not log data to logfiles for this run
 #    --verbose (or -v)                          -> Prints all telemetry events to console
-#    --no-vis  (or -nv)                          -> Shows a visual display of all systems
+#    --no-vis  (or -nv)                         -> Shows a visual display of all systems
+#    --ip [IP] (or -i [IP])                     -> Connects to a specific IP. (Overrides --local)
 
 import sys
 import threading
@@ -44,6 +45,8 @@ def parse_params(arguments):
     is_verbose = False
     is_visual = True
 
+    use_ip = None
+
     while (arg_ptr < num_params):
         arg = arguments[arg_ptr]
         if(not is_tl_arg(arg)):
@@ -74,6 +77,14 @@ def parse_params(arguments):
             arg_ptr += 2
             continue
 
+        if (arg == "--ip" or arg == "-i"):
+            next_arg = arguments[arg_ptr + 1]
+            if(is_tl_arg(next_arg)):
+                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
+            use_ip = next_arg
+            arg_ptr += 2
+            continue
+
         if (arg == "--local" or arg == "-l"):
             is_local = True
 
@@ -92,15 +103,18 @@ def parse_params(arguments):
     if not has_sustainer and not has_booster:
         print("\n\x1b[1m\x1b[33mWARNING: No booster or sustainer sources have been selected! You will not read data!\x1b[0m\n")
     
-    return booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual
+    return booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual, use_ip
 
 if __name__ == "__main__":
     threads = []
 
-    booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual = parse_params(sys.argv)
+    booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
 
     if is_local:
         uri_target = "localhost"
+
+    if ip_override is not None:
+        uri_target = ip_override
 
     log = logger.Logger(logger.LoggerOptions(should_log, is_verbose))
 
