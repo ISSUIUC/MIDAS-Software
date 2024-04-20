@@ -434,6 +434,34 @@ void SerialInput(const char* key, const char* value) {
     cmd_queue.push({command, 0});
 }
 
+// Define the new frequency for transmission
+#define TRANSMIT_FREQUENCY 433.0
+
+void switchToTransmitFrequency() {
+    if (!rf95.setFrequency(TRANSMIT_FREQUENCY)) {
+        Serial.println("Failed to set transmit frequency");
+        // Handle failure to set frequency
+    }
+}
+void switchToRecieveFrequency() {
+    if (!rf95.setFrequency(RF95_FREQ)) {
+        Serial.println("Failed to set transmit frequency");
+        // Handle failure to set frequency
+    }
+}
+void transmitPacket(const uint8_t* buffer, uint8_t len) {
+    // Switch to transmit frequency
+    switchToTransmitFrequency();
+
+    // Transmit the packet
+    if (!rf95.send(buffer, len)) {
+        Serial.println("Failed to transmit packet");
+        // Handle failure to transmit packet
+    }
+    switchToRecieveFrequency();
+}
+
+
 void process_command_queue() {
     if (cmd_queue.empty()) return;
 
@@ -555,6 +583,7 @@ void loop() {
             }
 
             process_command_queue();
+            transmitPacket(buf, len);
 
         } else {
             Serial.println(json_receive_failure);
