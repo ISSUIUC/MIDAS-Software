@@ -20,6 +20,18 @@ T inv_convert_range(float val, float range) {
     return std::max(std::min((float)std::numeric_limits<T>::max(), converted), (float)std::numeric_limits<T>::min());
 }
 
+std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint8_t tilt) {
+    uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
+    uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
+    uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
+
+    uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
+    uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
+    uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
+
+    return {x,y,z};
+}
+
 
 Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
 
@@ -42,18 +54,18 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
 
+    packet.lat = gps.latitude;
+    packet.lon = gps.longitude;
     packet.alt = uint16_t(gps.altitude);
-    packet.lat = gps.
-    packet.highg_ax = inv_convert_range<int16_t>(highg.ax,128);
-    packet.highg_ay = inv_convert_range<int16_t>(highg.ay,128);
-    packet.highg_az = inv_convert_range<int16_t>(highg.az,128);
     packet.baro_alt = uint16_t(barometer.altitude);
-
-
-    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage,16);
+    auto [ax,ay,az] = pack_highg_tilt(highg, 33);
+    packet.highg_ax = ax;
+    packet.highg_ay = ay;
+    packet.highg_az = az;
+    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
     static_assert(FSMState::FSM_STATE_COUNT < 16);
     uint8_t sat_count = gps.satellite_count < 16 ? gps.satellite_count : 15;
-    packet.fsm_satcount = ((int)fsm) + (sat_count << 4);
+    packet.fsm_satcount = ((uint8_t)fsm) | (sat_count << 4);
 
     return packet;
 }

@@ -182,7 +182,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
-        arg->rocket_data.telem_latency.tick();
 
         THREAD_SLEEP(1);
     }

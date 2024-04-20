@@ -24,9 +24,9 @@
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #ifdef IS_BOOSTER
-#define RF95_FREQ 433.0
+#define RF95_FREQ 425.15
 #else
-#define RF95_FREQ 434.0
+#define RF95_FREQ 426.15
 #endif
 
 TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
@@ -53,9 +53,9 @@ ErrorCode TelemetryBackend::init() {
     if (!rf95.setFrequency(RF95_FREQ)) {
         return ErrorCode::RadioSetFrequencyFailed;
     }
-    rf95.setSignalBandwidth(500000);
+    rf95.setSignalBandwidth(125000);
     rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(12);
+    rf95.setSpreadingFactor(10);
     rf95.setPayloadCRC(true);
     /*
      * The default transmitter power is 13dBm, using PA_BOOST.
