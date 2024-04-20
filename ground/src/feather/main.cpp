@@ -480,6 +480,26 @@ void setup() {
 
 void loop() {
     PrintDequeue();
+    if (Serial.available()) {
+        String input = Serial.readStringUntil('\n');
+        input.trim(); // Remove leading/trailing whitespace
+
+        // Check if input is a frequency value
+        float frequency = input.toFloat();
+        if (frequency >= 390 && frequency <= 445) { // Check if within valid range
+            // Set the LoRa frequency
+            rf95.setFrequency(frequency);
+            current_freq = frequency;
+
+            // Send success message over serial
+            Serial.print(R"({"type": "freq_success", "frequency":)");
+            Serial.print(frequency);
+            Serial.println("}");
+        } else {
+            // Send error message over serial for invalid frequency
+            Serial.println(R"({"type": "freq_error", "error": "invalid frequency"})");
+        }
+    }
     // static float f = 0;
     // static float f2 = 0;
     // f+=0.1;
