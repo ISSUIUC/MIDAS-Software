@@ -41,6 +41,8 @@
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 434.0
+#define TRANSMIT_FREQUENCY 433.0
+
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -548,7 +550,7 @@ void loop() {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         // telemetry_data data{};
         TelemetryPacket packet;
-        TelemetryDataLite data;
+        //TelemetryDataLite data;
         uint8_t len = sizeof(buf);
 
         if (rf95.recv(buf, &len)) {
