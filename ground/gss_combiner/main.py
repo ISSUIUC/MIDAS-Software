@@ -11,6 +11,7 @@
 #    --verbose (or -v)                          -> Prints all telemetry events to console
 #    --no-vis  (or -nv)                         -> Shows a visual display of all systems
 #    --ip [IP] (or -i [IP])                     -> Connects to a specific IP. (Overrides --local)
+#    --help    (or -h)                          -> Prints this menu
 
 import sys
 import threading
@@ -19,7 +20,7 @@ import datetime
 import util.mqtt as mqtt
 import util.combiner as combiner
 import util.logger as logger
-
+import util.print_util
 
 
 def assert_alive(threads: list[threading.Thread]):
@@ -90,6 +91,10 @@ def parse_params(arguments):
 
         if (arg == "--no-log" or arg == "-n"):
             should_log = False
+
+        if (arg == "--help" or arg == "-h"):
+            print(util.print_util.HELP_OUTPUT)
+            exit(0)
 
         if (arg == "--verbose" or arg == "-v"):
             is_verbose = True

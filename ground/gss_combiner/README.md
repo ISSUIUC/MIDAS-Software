@@ -33,11 +33,19 @@ $ python ./main.py <options>
 `<options>` refers to a set of command line arguments that can be passed to `main.py`, listed below:
 
 `--booster <COM1,COM2,COM3,...>`: Pass in a comma-separated list of COM ports to receive telemetry from, and transmit to the `Booster` data topics. 
+
 `--sustainer <COM1,COM2,COM3,...>`: Pass in a comma-separated list of COM ports to receive telemetry from, and transmit to the `Sustainer` data topics. 
+
 `--local (alias -l)`: Use `localhost` as the MQTT target. Useful for debugging.
+
 `--no-log (alias -n)`: Do not generate logs for this run.
+
 `--verbose (alias -v)`: Print out all combiner actions. This may slow down the combiner due to print volume.
+
 `--no-vis (alias -nv)`:  Disable the visualization for system health (Also disabled with `-v`).
+
+`--help (alias -h)`: Display a set of these options.
+
 
 Not including sustainer / booster sources will throw a warning, but will still run the system, allowing you to check the connectivity for the backend MQTT broker.
 
