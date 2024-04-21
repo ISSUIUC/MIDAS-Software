@@ -6,11 +6,11 @@ System architecture:
 
 Changes from **GSS 1.0**: Unlike GSS 1.0, the new system uses a single laptop to combine streams from our antenna array and send out the data to a network, with all other data consumers subscribing to a stream over [MQTT](https://mqtt.org/). Additionally, this architecture allows us to implement other systems into our ecosystem which use telemetry data but would otherwise slow down our telemetry computers.
 
+![System Architecture](https://i.ibb.co/YtWs14w/Screenshot-2024-04-16-190354.png)
+
 ## Installation and Operation
 This repository contains code specific to the **MQTT Telemetry Combiner**.
 First, begin by cloning the repository to your computer and opening the `gss_combiner` folder:
-
-![System Architecture](https://i.ibb.co/YtWs14w/Screenshot-2024-04-16-190354.png)
 
 ```bash
 $ git clone https://github.com/ISSUIUC/MIDAS-Software.git
