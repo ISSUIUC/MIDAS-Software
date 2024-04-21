@@ -10,7 +10,7 @@ Changes from **GSS 1.0**: Unlike GSS 1.0, the new system uses a single laptop to
 This repository contains code specific to the **MQTT Telemetry Combiner**.
 First, begin by cloning the repository to your computer and opening the `gss_combiner` folder:
 
-![System Architecture](https://ibb.co/VvN4z05)
+![System Architecture](https://i.ibb.co/YtWs14w/Screenshot-2024-04-16-190354.png)
 
 ```bash
 $ git clone https://github.com/ISSUIUC/MIDAS-Software.git
