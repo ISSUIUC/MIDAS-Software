@@ -185,7 +185,7 @@ if __name__ == "__main__":
             print(f"Status: {status_text}", end="\r")
 
             # Send status
-            send_data = {"source": "gss_combiner", "time": datetime.datetime.now().timestamp(), "data": raw_data}
+            send_data = {"source": "gss_combiner", "action": "none", "time": datetime.datetime.now().timestamp(), "data": raw_data}
             broadcast_thread.publish_common(json.dumps(send_data))
 
 
