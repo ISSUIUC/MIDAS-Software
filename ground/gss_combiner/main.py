@@ -16,6 +16,7 @@
 import sys
 import threading
 import datetime
+import json
 
 import util.mqtt as mqtt
 import util.combiner as combiner
@@ -155,14 +156,14 @@ if __name__ == "__main__":
 
     assert_alive(threads)
 
-    print("\nTelemetry system initialized successfully!\nListening for packets..")
+    print("\nTelemetry system initialized successfully!\n\n")
 
 
     print_delay = 0.5
     last_print_db = datetime.datetime.now().timestamp() + print_delay
 
     if (not is_verbose and is_visual):
-        logger.print_legend()
+        logger.print_legend(uri_target)
 
     while True:
         assert_alive(threads)
@@ -175,13 +176,17 @@ if __name__ == "__main__":
 
             # Print status
             status_text = ""
+            raw_data = {}
             for ls_name, log_stream in log.streams().items():
                 log_stream: logger.LoggerStream = log_stream
                 status_text += logger.format_stat_string(ls_name, log_stream)
+                raw_data[log_stream.get_name()] = log_stream.serialize()
                 
-
-
             print(f"Status: {status_text}", end="\r")
+
+            # Send status
+            send_data = {"source": "gss_combiner", "time": datetime.datetime.now().timestamp(), "data": raw_data}
+            broadcast_thread.publish_common(json.dumps(send_data))
 
 
 # com0com setup:

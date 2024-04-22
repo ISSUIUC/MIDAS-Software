@@ -27,6 +27,12 @@ class LoggerStream():
         if self.__opts.should_log and type != LoggerType.MQTT:
             self.__file = open(self.__filename, "w")
 
+    def serialize(self) -> dict:
+        return {"success": self.__success, "fail": self.__failures, "waiting": self.__waiting}
+    
+    def get_name(self) -> str:
+        return self.__title
+
     def __print(self, line: str):
         print(f"[{self.__title}] {line}")
 
@@ -119,7 +125,7 @@ def format_stat_string(name, logstream: LoggerStream):
 
     return f"\x1b[1m{col_sysname}{name}\x1b[0m ({col}{(pct*100):.0f}%\x1b[0m : {col_waiting}{waiting}\x1b[0m) " 
 
-def print_legend():
-    print()
+def print_legend(uri_target):
+    print("Listening on MQTT URI: \x1b[34mmqtt://" + uri_target + ":1883\x1b[0m")
     print("LEGEND:         System   \x1b[1m\x1b[90mInactive   \x1b[32mNominal   \x1b[33mDelayed   \x1b[31mDisconnected\x1b[0m      (Success %  :  Operations Waiting)")
     print()

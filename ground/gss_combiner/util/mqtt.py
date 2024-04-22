@@ -113,10 +113,11 @@ class MQTTThread(threading.Thread):
         self.__mqttclient.connect(self.__uri)
         self.__log.console_log("Subscribing to control streams...")
 
-        def on_message(client, userdata, msg):
-            self.__log.console_log(msg.topic+" "+str(msg.payload))
+        # As of now this system has no need to listen to the control stream.
+        # def on_message(client, userdata, msg): 
+        #     print(msg.topic+" "+str(msg.payload))
 
-        self.__mqttclient.on_message = on_message
+        # self.__mqttclient.on_message = on_message
         
 
         for combiner in self.__combiners:
@@ -129,8 +130,8 @@ class MQTTThread(threading.Thread):
 
     def run(self) -> None:
         self.__mqttclient.loop_start()
+
         while True:
-            
             try:
                 for combiner in self.__combiners:
                     
@@ -145,7 +146,6 @@ class MQTTThread(threading.Thread):
                         
                         self.__log.console_log(f"Publishing {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")
 
-
                         try:
                             self.__mqttclient.publish(combiner.get_mqtt_data_topic(), data_encoded)
                             self.__log.success()
@@ -158,4 +158,11 @@ class MQTTThread(threading.Thread):
             except Exception as e:
                 print(f"Ran into an uncaught exception.. continuing gracefully.") # Always print
                 self.__log.console_log(f"Error dump: ", str(e))
-        
+    
+    def publish_common(self, data: str):
+        try:
+            self.__mqttclient.publish("Common", data)
+            self.__log.success()
+        except Exception as e:
+            print(f"Unable to publish to 'Common' : ", str(e)) # Always print
+            self.__log.fail()
