@@ -9,8 +9,8 @@ struct TelemetryPacket {
     uint16_t alt;
     uint16_t baro_alt;
     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint16_t highg_ay;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
-    uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
+    uint16_t highg_ay; //14 bit signed ax [-16,16) 2 bit tilt angle
+    uint16_t highg_az; //14 bit signed ax [-16,16) 2 bit tilt angle
     uint8_t batt_volt;
     uint8_t fsm_satcount;
 };
