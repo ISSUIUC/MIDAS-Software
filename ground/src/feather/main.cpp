@@ -30,14 +30,6 @@
 #define RFM95_INT 3
 // #define LED 13 // Blinks on receipt
 
-/* Pins for Teensy 31*/
-// Ensure to change depending on wiring
-// #define RFM95_CS 10
-// #define RFM95_RST 15
-// #define RFM95_EN 14
-// #define RFM95_INT 16
-// #define LED 13 // Blinks on receipt
-
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 434.0
 
