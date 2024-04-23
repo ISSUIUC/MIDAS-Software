@@ -20,148 +20,54 @@ T inv_convert_range(float val, float range) {
     return std::max(std::min((float)std::numeric_limits<T>::max(), converted), (float)std::numeric_limits<T>::min());
 }
 
+std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint8_t tilt) {
+    uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
+    uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
+    uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
+
+    uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
+    uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
+    uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
+
+    return {x,y,z};
+}
+
 
 Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
 
 
 void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
-//    telemetry_command command { };
-//    while (backend.read(&command)) {
-//        handleCommand(command);
-//    }
-
-//    if (!std::isnan(set_frequency_to)) {
-//        backend.setFrequency(set_frequency_to);
-//        set_frequency_to = NAN;
-//    }
+    static_assert(sizeof(TelemetryPacket) == 20);
 
     TelemetryPacket packet = makePacket(rocket_data);
     led.toggle(LED::BLUE);
     backend.send(packet);
 }
 
-
-/**
- * @brief  This function handles commands sent from the ground station
- * to TARS. The effects of this function depend on the command
- * sent.
- *
- * @param cmd: struct containing information necessary to process
- *             ground station command.
- *
- * @return void
- */
-void Telemetry::handleCommand(const telemetry_command &cmd) {
-    /* Check if the security code is present and matches on ground and on the rocket */
-    if (cmd.verify != std::array<char, 6>{'A', 'Y', 'B', 'E', 'R', 'K'}) {
-        return;
-    }
-    /* Check if lasted command ID matched current command ID */
-    if (last_command_id == cmd.cmd_id) {
-        return;
-    }
-    last_command_id = (int16_t)cmd.cmd_id;
-
-    if (cmd.command == SET_FREQ) {
-        set_frequency_to = cmd.freq;
-    }
-
-    if (cmd.command == SET_CALLSIGN) {
-        size_t callsign_size = sizeof(callsign);
-
-        for (size_t i = 0; i < callsign_size; ++i) {
-            callsign[i] = cmd.callsign[i];
-        }
-        Serial.println("[DEBUG]: Got callsign");
-    }
-}
-
-
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
     TelemetryPacket packet { };
-
-    TelemetryDataLite small_packet { };
-    packet.datapoint_count = 0;
-    for (int8_t i = 0; i < 4 && small_packet_queue.receive(&small_packet); i++) {
-        packet.datapoints[i] = small_packet;
-        packet.datapoint_count++;
-    }
-
     GPS gps = data.gps.getRecentUnsync();
-    Magnetometer magnetometer = data.magnetometer.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
-    packet.voltage_battery = inv_convert_range<uint16_t>(voltage.voltage, 4096);
     Barometer barometer = data.barometer.getRecentUnsync();
-    LowGLSM lowGlsm = data.low_g_lsm.getRecentUnsync();
-
-    packet.gps_lat = gps.latitude;
-    packet.gps_long = gps.longitude;
-    packet.gps_alt = gps.altitude;
-
-    packet.mag_x = inv_convert_range<int16_t>(magnetometer.mx, 8);
-    packet.mag_y = inv_convert_range<int16_t>(magnetometer.my, 8);
-    packet.mag_z = inv_convert_range<int16_t>(magnetometer.mz, 8);
-    packet.gyro_x = inv_convert_range<int16_t>(lowGlsm.gx, 8192);
-    packet.gyro_y = inv_convert_range<int16_t>(lowGlsm.gy, 8192);
-    packet.gyro_z = inv_convert_range<int16_t>(lowGlsm.gz, 8192);
-
-    packet.rssi = backend.getRecentRssi();
-    packet.FSM_state = (char) data.fsm_state.getRecentUnsync();
-
-    packet.barometer_temp = inv_convert_range<int16_t>(barometer.temperature, 256);
-
-    auto pyros = data.pyro.getRecentUnsync();
-    packet.pyros_bits = 0;
-    packet.pyros_bits |= pyros.channels[0].is_armed << 0;
-    packet.pyros_bits |= pyros.channels[1].is_armed << 1;
-    packet.pyros_bits |= pyros.channels[2].is_armed << 2;
-    packet.pyros_bits |= pyros.channels[3].is_armed << 3;
-    packet.pyros_bits |= pyros.channels[0].is_firing << 4;
-    packet.pyros_bits |= pyros.channels[1].is_firing << 5;
-    packet.pyros_bits |= pyros.channels[2].is_firing << 6;
-    packet.pyros_bits |= pyros.channels[3].is_firing << 7;
-
+    FSMState fsm = data.fsm_state.getRecentUnsync();
     Continuity continuity = data.continuity.getRecentUnsync();
-    packet.sense_pyro = inv_convert_range<uint16_t>(continuity.sense_pyro, 4096);
-    for (int i = 0; i < 4; i++) {
-       packet.continuity[i] = inv_convert_range<int8_t>(continuity.pins[i], 20);
-    }
+    HighGData highg = data.high_g.getRecentUnsync();
+    PyroState pyro = data.pyro.getRecentUnsync();
 
-    packet.telem_latency = inv_convert_range<int8_t>((float) data.telem_latency.getLatency(), 1024);
-    packet.log_latency = inv_convert_range<int8_t>((float) data.log_latency.getLatency(), 1024);
-
-#ifdef IS_BOOSTER
-    packet.is_booster = true;
-#else
-    packet.is_booster = false;
-#endif
-
-    memcpy(&packet.callsign, &callsign, sizeof(callsign));
+    packet.lat = gps.latitude;
+    packet.lon = gps.longitude;
+    packet.alt = uint16_t(gps.altitude);
+    packet.baro_alt = uint16_t(barometer.altitude);
+    auto [ax,ay,az] = pack_highg_tilt(highg, 33);
+    packet.highg_ax = ax;
+    packet.highg_ay = ay;
+    packet.highg_az = az;
+    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
+    static_assert(FSMState::FSM_STATE_COUNT < 16);
+    uint8_t sat_count = gps.satellite_count < 16 ? gps.satellite_count : 15;
+    packet.fsm_satcount = ((uint8_t)fsm) | (sat_count << 4);
 
     return packet;
-}
-
-void Telemetry::bufferData(RocketData& rocket) {
-    TelemetryDataLite data { };
-    data.timestamp = pdTICKS_TO_MS(xTaskGetTickCount());
-    data.barometer_pressure = inv_convert_range<uint16_t>(rocket.barometer.getRecentUnsync().pressure , 4096);
-
-    HighGData highGData = rocket.high_g.getRecentUnsync();
-    data.highG_ax = inv_convert_range<int16_t>(highGData.ax, 256);
-    data.highG_ay = inv_convert_range<int16_t>(highGData.ay, 256);
-    data.highG_az = inv_convert_range<int16_t>(highGData.az, 256);
-
-    LowGLSM lowGlsm = rocket.low_g_lsm.getRecentUnsync();
-    data.lowg_ax = inv_convert_range<int16_t>(lowGlsm.ax, 8);
-    data.lowg_ay = inv_convert_range<int16_t>(lowGlsm.ay, 8);
-    data.lowg_az = inv_convert_range<int16_t>(lowGlsm.az, 8);
-
-    Orientation orient = rocket.orientation.getRecentUnsync();
-    data.bno_pitch = inv_convert_range<int16_t>(orient.pitch , 8);
-    data.bno_yaw = inv_convert_range<int16_t>(orient.yaw , 8);
-    data.bno_roll = inv_convert_range<int16_t>(orient.roll , 8);
-
-    small_packet_queue.send(data);
 }
 
 ErrorCode __attribute__((warn_unused_result)) Telemetry::init() {
