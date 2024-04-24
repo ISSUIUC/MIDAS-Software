@@ -76,6 +76,7 @@ struct FullTelemetryData {
     float highG_az; // [-16, 16]
     float battery_voltage; // [0, 5]
     uint8_t FSM_State; // [0, 255]
+    float tilt_angle; // [-90, 90]
     float freq;
 };
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
@@ -119,6 +120,13 @@ void printFloat(float f, int precision = 5) {
         Serial.print(f, precision);
     }
 }
+int decodeLastTwoBits(uint16_t ax, uint16_t ay, uint16_t az) {
+    int tilt_ax = ax & 0b11;
+    int tilt_ay = ay & 0b11;
+    int tilt_az = az & 0b11;
+    int tilt = (tilt_ax << 4) | (tilt_ay << 2) | tilt_az;
+    return tilt;
+}
 
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
@@ -130,9 +138,14 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.latitude = static_cast<float>(packet.lat)/10000000;
     data.longitude = static_cast<float>(packet.lon)/10000000;
     data.barometer_altitude = convert_range(packet.baro_alt, 4096);
-    data.highG_ax = convert_range(packet.highg_ax, 32);
-    data.highG_ay = convert_range(packet.highg_ay, 32);
-    data.highG_az = convert_range(packet.highg_az, 32);
+    int tilt = decodeLastTwoBits(packet.highg_ax, packet.highg_ay, packet.highg_az);
+    int ax = packet.highg_ax >> 2;
+    int ay = packet.highg_ay >> 2;
+    int az = packet.highg_az >> 2;
+    data.highG_ax = ax;
+    data.highG_ay = ay;
+    data.highG_az = az;
+    data.tilt_angle = tilt;
     data.battery_voltage = convert_range(packet.batt_volt, 5);
     data.FSM_State = packet.fsm_satcount;
     data.freq = RF95_FREQ;
@@ -176,6 +189,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("highG_az", packet.highG_az);
     printJSONField("battery_voltage", packet.battery_voltage);
     printJSONField("FSM_State", packet.FSM_State, false);
+    printJSONField("tilt_angle", packet.tilt_angle, false);
     Serial.println("}}");
 }
 
