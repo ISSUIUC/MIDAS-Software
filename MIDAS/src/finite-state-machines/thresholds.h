@@ -21,7 +21,10 @@
 #define sustainer_coast_detection_acceleration_threshold 0.2
 
 // Reach apogee state when vertical speed is less than or equal to this value
-#define sustainer_coast_to_apogee_vertical_speed_threshold 20
+#define sustainer_coast_to_apogee_vertical_speed_threshold 15
+
+// Revert back to COAST if the vertical speed in apogee is too high (was 0 before which may have caused it keep jumping back to COAST)
+#define sustainer_apogee_backto_coast_vertical_speed_threshold 10
 
 // Revert back to COAST if apogee was too brief
 #define sustainer_apogee_check_threshold 1000
