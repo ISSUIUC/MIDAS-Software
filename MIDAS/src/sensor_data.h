@@ -136,6 +136,8 @@ struct Orientation {
     float temperature = 0;
     float pressure = 0;
 
+    float tilt = 0;
+
 };
 
 struct KalmanData {

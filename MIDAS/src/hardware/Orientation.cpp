@@ -2,6 +2,7 @@
 
 // #include sensor library
 #include "Adafruit_BNO08x.h"
+// #include <Eigen/Eigen>
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
@@ -96,6 +97,21 @@ Orientation OrientationSensor::read() {
 
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
+
+        if (initial_flag == 0) {
+            initial_orientation = sensor_reading;
+            initial_flag = 1;
+        }
+
+        // calculate tilt from initial orientation
+        Orientation deviation;
+        deviation.yaw = min(abs(sensor_reading.yaw - initial_orientation.yaw), 2 * 3.14F - abs(sensor_reading.yaw - initial_orientation.yaw));
+        deviation.pitch = min(abs(sensor_reading.pitch - initial_orientation.pitch), 2 * 3.14F - abs(sensor_reading.pitch - initial_orientation.pitch));
+        // deviation.roll = sensor_reading.roll - initial_orientation.roll;
+
+        sensor_reading.tilt = sqrt(pow(deviation.yaw, 2) + pow(deviation.pitch, 2));
+
+        // Serial.println(sensor_reading.tilt);
 
         // Serial.print("yaw: ");
         // Serial.println(sensor_reading.yaw);
