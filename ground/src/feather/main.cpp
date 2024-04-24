@@ -67,9 +67,10 @@ struct TelemetryPacket {
 
 struct FullTelemetryData {
     systime_t timestamp;  //[0, 2^32]
-    uint16_t barometer_altitude; // [0, 4096]
+    uint16_t altitude; // [0, 4096]
     float latitude; // [-90, 90]
     float longitude; // [-180, 180]
+    float barometer_altitude; // [0, 4096]
     float highG_ax; // [-16, 16]
     float highG_ay; // [-16, 16]
     float highG_az; // [-16, 16]
@@ -125,9 +126,10 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     FullTelemetryData data;
     data.timestamp = start_printing;
-    data.barometer_altitude = packet.alt;
-    data.latitude = convert_range(packet.lat, 180);
-    data.longitude = convert_range(packet.lon, 360);
+    data.altitude = static_cast<float>(packet.lat)/10000000;
+    data.latitude = static_cast<float>(packet.lat)/10000000;
+    data.longitude = static_cast<float>(packet.lon)/10000000;
+    data.barometer_altitude = convert_range(packet.baro_alt, 4096);
     data.highG_ax = convert_range(packet.highg_ax, 32);
     data.highG_ay = convert_range(packet.highg_ay, 32);
     data.highG_az = convert_range(packet.highg_az, 32);
@@ -168,6 +170,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("barometer_altitude", packet.barometer_altitude);
     printJSONField("latitude", packet.latitude);
     printJSONField("longitude", packet.longitude);
+    printJSONField("altitude", packet.altitude);
     printJSONField("highG_ax", packet.highG_ax);
     printJSONField("highG_ay", packet.highG_ay);
     printJSONField("highG_az", packet.highG_az);
@@ -275,8 +278,8 @@ void loop() {
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
-            Serial.println("Received packet");
-            Serial.println(len);
+            // Serial.println("Received packet");
+            // Serial.println(len);
             memcpy(&packet, buf, sizeof(packet));
             EnqueuePacket(packet, current_freq);
             if (!cmd_queue.empty()) {
