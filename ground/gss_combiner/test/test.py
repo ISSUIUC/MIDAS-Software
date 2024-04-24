@@ -30,14 +30,17 @@ def get_packet():
     packet = json.load(open("./telem_packet.json"))
     packet['value']['barometer_altitude'] = (delta_s*10)
     packet['value']['gps_altitude'] = (delta_s*10)
+    packet['value']['altitude'] = (delta_s*10)
     packet['value']['latitude'] = (math.sin(delta_s / 5) * 80)
     packet['value']['longitude'] = (math.sin(delta_s / 3) * 180)
     packet['value']['highG_ax'] = delta_s*0.05
     packet['value']['highG_ay'] = delta_s*0.1
     packet['value']['highG_az'] = (delta_s**2)*0.0001
     packet['value']['battery_voltage'] = math.fabs(math.sin(delta_s/5) * 14)
-    packet['value']['tilt_angle'] = math.floor(math.fabs(math.sin(delta_s/3) * 64))
+    packet['value']['tilt_angle'] = math.fabs(math.sin(delta_s/3) * 180)
+    packet['value']['FSM_state'] = math.floor(math.fabs(math.sin(delta_s/3) * 10))
     packet['value']['RSSI'] = (math.sin(delta_s/3) * 75) - 75
+    packet['value']['sat_count'] = math.floor(math.fabs(math.sin(delta_s/3) * 12))
 
 
 
@@ -58,7 +61,7 @@ print("Start sending:")
 i = 0
 
 while True:
-    time.sleep(0.05)
+    time.sleep(0.2)
     p = ports[i]
     p.write(enc(get_packet()))
     print(f"Sent packet to port {com_in[i]}")
