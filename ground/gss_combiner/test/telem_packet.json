@@ -11,6 +11,7 @@
         "battery_voltage": 1,
         "FSM_state": 0,
         "tilt_angle": 0,
+        "frequency": 400,
         "RSSI": 0
     }
 }
