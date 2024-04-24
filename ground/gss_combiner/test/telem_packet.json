@@ -2,7 +2,7 @@
     "type": "data",
     "value": {
         "barometer_altitude": 0,
-        "gps_altitude": 0,
+        "altitude": 0,
         "latitude": 0,
         "longitude": 0,
         "highG_ax": 0.31641,
