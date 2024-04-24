@@ -148,7 +148,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.highG_ax = ax;
     data.highG_ay = ay;
     data.highG_az = az;
-    data.tilt_angle = tilt;
+    data.tilt_angle = convert_range(tilt, 180);
     data.battery_voltage = convert_range(packet.batt_volt, 5);
     data.sat_count = packet.fsm_satcount >> 4;
     data.FSM_State = packet.fsm_satcount & 0b1111;
