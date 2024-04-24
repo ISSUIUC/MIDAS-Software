@@ -79,6 +79,7 @@ struct FullTelemetryData {
     float tilt_angle; // [-90, 90]
     float freq;
     float rssi;
+    float sat_count;
 };
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
 // Commands transmitted from ground station to rocket
@@ -129,6 +130,7 @@ int decodeLastTwoBits(uint16_t ax, uint16_t ay, uint16_t az) {
     return tilt;
 }
 
+
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     int64_t start_printing = millis();
@@ -148,7 +150,8 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.highG_az = az;
     data.tilt_angle = tilt;
     data.battery_voltage = convert_range(packet.batt_volt, 5);
-    data.FSM_State = packet.fsm_satcount;
+    data.sat_count = packet.fsm_satcount >> 4;
+    data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
     data.rssi = rf95.lastRssi();
     print_queue.emplace(data);
@@ -194,6 +197,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("tilt_angle", packet.tilt_angle, false);
     printJSONField("frequency", packet.freq, false);
     printJSONField("RSSI", packet.rssi, false);
+    printJSONField("sat_count", packet.sat_count, false);
     Serial.println("}}");
 }
 
