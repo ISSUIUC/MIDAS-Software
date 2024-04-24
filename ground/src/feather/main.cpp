@@ -75,6 +75,7 @@ struct FullTelemetryData {
     float highG_az; // [-16, 16]
     float battery_voltage; // [0, 5]
     uint8_t FSM_State; // [0, 255]
+    float freq;
 };
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
 // Commands transmitted from ground station to rocket
@@ -132,6 +133,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.highG_az = convert_range(packet.highg_az, 32);
     data.battery_voltage = convert_range(packet.batt_volt, 5);
     data.FSM_State = packet.fsm_satcount;
+    data.freq = RF95_FREQ;
     print_queue.emplace(data);
 
 }
