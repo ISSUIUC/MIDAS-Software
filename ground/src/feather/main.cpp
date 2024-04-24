@@ -192,6 +192,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("battery_voltage", packet.battery_voltage);
     printJSONField("FSM_State", packet.FSM_State, false);
     printJSONField("tilt_angle", packet.tilt_angle, false);
+    printJSONField("frequency", packet.freq, false);
     printJSONField("RSSI", packet.rssi, false);
     Serial.println("}}");
 }
