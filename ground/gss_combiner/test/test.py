@@ -28,13 +28,18 @@ def get_packet():
     delta_s = time.time() - s_time - 2
     # edits packet based on elapsed time to simulate ascent!!
     packet = json.load(open("./telem_packet.json"))
-    packet['value']['pressure'] = 1000 - (delta_s*10)
-    packet['value']['BNO_YAW'] = (math.sin(delta_s/3) * math.pi/2) + math.pi/2
-    packet['value']['KX_IMU_ax'] = delta_s*0.05
+    packet['value']['barometer_altitude'] = (delta_s*10)
+    packet['value']['gps_altitude'] = (delta_s*10)
+    packet['value']['latitude'] = (math.sin(delta_s / 5) * 80)
+    packet['value']['longitude'] = (math.sin(delta_s / 3) * 180)
+    packet['value']['highG_ax'] = delta_s*0.05
+    packet['value']['highG_ay'] = delta_s*0.1
+    packet['value']['highG_az'] = (delta_s**2)*0.0001
+    packet['value']['battery_voltage'] = math.fabs(math.sin(delta_s/5) * 14)
+    packet['value']['tilt_angle'] = math.floor(math.fabs(math.sin(delta_s/3) * 64))
     packet['value']['RSSI'] = (math.sin(delta_s/3) * 75) - 75
 
-    packet['value']['gps_lat'] = (math.sin(delta_s / 5) * 80)
-    packet['value']['gps_long'] = (math.sin(delta_s / 3) * 180)
+
 
     # print(packet['BNO_YAW'])
     return packet
