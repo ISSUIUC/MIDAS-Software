@@ -50,7 +50,7 @@ Orientation OrientationSensor::read() {
     // read from aforementioned global instance of sensor
     sh2_SensorValue_t event;
     Vec3 euler;
-    if (imu.getSensorEvent(&event)) {
+    if (imu.getSensorEvent(&event)) {;
         switch (event.sensorId) {
             case SH2_ARVR_STABILIZED_RV:
                 euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
@@ -78,24 +78,31 @@ Orientation OrientationSensor::read() {
         // sensor_reading.magnetometer.my = event.un.magneticField.y;
         // sensor_reading.magnetometer.mz = event.un.magneticField.z;
 
-        sensor_reading.yaw = euler.z;
+        sensor_reading.yaw = -euler.y;
         sensor_reading.pitch = euler.x;
-        sensor_reading.roll = euler.y;
+        sensor_reading.roll = euler.z;
 
-        sensor_reading.linear_acceleration.ax = event.un.accelerometer.y;
-        sensor_reading.linear_acceleration.ay = event.un.accelerometer.z;
-        sensor_reading.linear_acceleration.az = event.un.accelerometer.x;
+        sensor_reading.linear_acceleration.ax =  -event.un.accelerometer.y;
+        sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;
+        sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
 
-        sensor_reading.gx = event.un.gyroscope.y;
-        sensor_reading.gy = event.un.gyroscope.z;
-        sensor_reading.gz = event.un.gyroscope.x;
+        sensor_reading.gx = -event.un.gyroscope.y;
+        sensor_reading.gy = event.un.gyroscope.x;
+        sensor_reading.gz = event.un.gyroscope.z;
 
-        sensor_reading.magnetometer.mx = event.un.magneticField.y;
-        sensor_reading.magnetometer.my = event.un.magneticField.z;
-        sensor_reading.magnetometer.mz = event.un.magneticField.x;
+        sensor_reading.magnetometer.mx = -event.un.magneticField.y;
+        sensor_reading.magnetometer.my = event.un.magneticField.x;
+        sensor_reading.magnetometer.mz = event.un.magneticField.z;
 
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
+
+        // Serial.print("yaw: ");
+        // Serial.println(sensor_reading.yaw);
+        // Serial.print(" pitch: ");
+        // Serial.println(sensor_reading.pitch);
+        // Serial.print(" roll: ");
+        // Serial.println(sensor_reading.roll);
 
         return sensor_reading;
     }
