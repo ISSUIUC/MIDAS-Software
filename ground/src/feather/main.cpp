@@ -296,6 +296,10 @@ void setup() {
         while (1)
             ;
     }
+    rf95.setCodingRate4(8);
+    rf95.setSpreadingFactor(10);
+    rf95.setPayloadCRC(true);
+    rf95.setSignalBandwidth(125000);
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(RF95_FREQ);
     Serial.println("}");
