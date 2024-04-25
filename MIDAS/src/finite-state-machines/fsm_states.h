@@ -1,6 +1,16 @@
+/**
+ * @file fsm_states.h
+ * 
+ * @brief Header file to hold the FSM state enum
+*/
+
 #pragma once
 
-// holds the enum for different FSM states
+/**
+ * @enum FSMState
+ * 
+ * @brief Enum for the different FSM states
+*/
 
 enum FSMState {
     STATE_IDLE,
@@ -13,11 +23,8 @@ enum FSMState {
     STATE_MAIN_DEPLOY,
     STATE_MAIN,
     STATE_LANDED,
-// #ifdef IS_SUSTAINER
     STATE_SUSTAINER_IGNITION,
     STATE_SECOND_BOOST,
-// #else
     STATE_FIRST_SEPARATION,
-// #endif
-    FSM_STATE_COUNT, //used to get the total number of fsm states so we can assert that the fsm will fit in 4 bits
+    FSM_STATE_COUNT                 //used to get the total number of fsm states so we can assert that the fsm will fit in 4 bits
 };

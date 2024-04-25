@@ -1,6 +1,4 @@
 #include "sensors.h"
-
-// #include sensor library
 #include "Adafruit_BNO08x.h"
 
 // global static instance of the sensor

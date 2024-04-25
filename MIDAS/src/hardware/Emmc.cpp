@@ -1,6 +1,17 @@
+/**
+ * @file Emmc.cpp
+ * 
+ * @brief Function definitions for the emmc
+*/
+
 #include "Emmc.h"
 
-
+/**
+ * @brief Writes a byte buffer to the emmc
+ * 
+ * @param data byte buffer of data
+ * @param size size of buffer 
+*/
 void EMMCSink::write(const uint8_t* data, size_t size) {
     file.write(data, size);
     unflushed_bytes += size;
@@ -10,6 +21,11 @@ void EMMCSink::write(const uint8_t* data, size_t size) {
     }
 }
 
+/**
+ * @brief Init the emmc
+ * 
+ * @return Error code
+*/
 ErrorCode EMMCSink::init(){
     if(!SD_MMC.setPins(EMMC_CLK, EMMC_CMD, EMMC_D0, EMMC_D1, EMMC_D2, EMMC_D3)){
         return ErrorCode::EmmcPinsAreWrong;

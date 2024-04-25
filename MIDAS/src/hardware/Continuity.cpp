@@ -1,26 +1,35 @@
+/**
+ * @file Continuity.cpp
+ * 
+ * @brief Holds the function definitions for the continuity values
+*/
+
 #include "sensors.h"
 #include "ads7138-q1.h"
-
 #include <hal.h>
 
-#define PYRO_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
-#define CONT_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
+#define PYRO_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for pyro batt voltage, check hardware schematic
+#define CONT_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for continuity voltage, check hardware schematic
 
+/**
+ * @brief Initializes ADC, returns NoError
+ * 
+ * @return Error code
+*/
 ErrorCode ContinuitySensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
-    ADS7138Init();
-//    if (!) {
-//        return ErrorCode::ContinuityCouldNotBeInitialized;
-//    }
-    // Ask ADS to init the pins, we still need to get the device to actually read
+    ADS7138Init();              // Ask ADS to init the pins, we still need to get the device to actually read
+
     return ErrorCode::NoError;
 }
 
+/**
+ * @brief Reads the value of the ADC
+ * 
+ * @return Continuity data packet
+*/
 Continuity ContinuitySensor::read() {
-    // read from aforementioned global instance of sensor
     Continuity continuity;
-    // todo convert to bool
+    //ADC reference voltage is 3.3, returns 12 bit value
     continuity.sense_pyro = adcAnalogRead(ADCAddress{SENSE_PYRO}).value * 3.3f / 4096.f / PYRO_VOLTAGE_DIVIDER;
     continuity.pins[0] = adcAnalogRead(ADCAddress{SENSE_MOTOR}).value * 3.3f / 4096.f / CONT_VOLTAGE_DIVIDER;
     continuity.pins[1] = adcAnalogRead(ADCAddress{SENSE_MAIN}).value * 3.3f / 4096.f / CONT_VOLTAGE_DIVIDER;

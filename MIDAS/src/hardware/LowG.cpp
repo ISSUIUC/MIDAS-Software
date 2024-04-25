@@ -1,9 +1,19 @@
+/**
+ * @file LowG.cpp
+ * 
+ * @brief Holds the function definitions for the ADXL accelerometer
+*/
+
 #include "sensors.h"
 #include "PL_ADXL355.h"
-#include "pins.h"
 
-PL::ADXL355 sensor(ADXL355_CS);
+PL::ADXL355 sensor(ADXL355_CS);         //singleton object for the adxl
 
+/**
+ * @brief Initializes the low G sensor
+ * 
+ * @return Error Code
+*/
 ErrorCode LowGSensor::init() {
     ErrorCode error = ErrorCode::NoError;
     sensor.begin();
@@ -14,6 +24,11 @@ ErrorCode LowGSensor::init() {
     return error;
 }
 
+/**
+ * @brief Reads and returns the data from the sensor
+ * 
+ * @return a LowGData packet with current acceleration in all three axes
+*/
 LowGData LowGSensor::read()
 {
     auto data = sensor.getAccelerations();

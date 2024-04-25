@@ -1,13 +1,18 @@
-#include "sensors.h"
+/**
+ * @file HighG.cpp
+ * 
+ * @brief Holds the function definitions for the KX accelerometer
+*/
 
-// #include sensor library
+#include "sensors.h"
 #include "SparkFun_Qwiic_KX13X.h"
 
-// global static instance of the sensor
-QwiicKX134 KX;
+QwiicKX134 KX;      // global static instance of the sensor
 
 /**
- * Initializes the high G data sensor, returns ErrorCode::CANNOT_INIT_KX134_CS if cannot initialize
+ * @brief Initializes the high G sensor
+ * 
+ * @return Error Code
 */
 ErrorCode HighGSensor::init() {
     KX.beginSPI(KX134_CS);
@@ -24,8 +29,9 @@ ErrorCode HighGSensor::init() {
 }
 
 /**
- * Reads and returns the data from the sensor
- * @return a HighGData packet with current acceleration in all three axies
+ * @brief Reads and returns the data from the sensor
+ * 
+ * @return a HighGData packet with current acceleration in all three axes
 */
 HighGData HighGSensor::read() {
     auto data = KX.getAccelData();

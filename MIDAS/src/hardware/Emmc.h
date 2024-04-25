@@ -1,3 +1,10 @@
+/**
+ * @file Emmc.h
+ * 
+ * @brief header file for the emmc log sink
+*/
+
+
 #pragma once
 
 #include <FS.h>
@@ -8,6 +15,11 @@
 #include "errors.h"
 #include "rocket_state.h"
 
+/**
+ * @class EMMCSink
+ * 
+ * @brief Class that wraps the emmc functions
+*/
 class EMMCSink : public LogSink {
 public:
     EMMCSink() = default;

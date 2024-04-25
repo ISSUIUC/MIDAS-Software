@@ -1,5 +1,10 @@
+/**
+ * @file thresholds.h
+ * 
+ * @brief Stores macro definitions for thresholds used by the FSM
+*/
+
 #pragma once
-#include <cmath>
 
 // ----------------------------------
 // SECOND STAGE THRESHOLDS
@@ -61,6 +66,8 @@
 
 // Stores a small jerk value
 #define sustainer_main_jerk_threshold 300
+
+
 // ----------------------------------
 // FIRST STAGE THRESHOLDS
 // ----------------------------------

@@ -1,10 +1,20 @@
+/**
+ * @file Magnetometer.cpp
+ * 
+ * @brief Holds the function definitions for the LIS magnetometer
+*/
+
 #include "sensors.h"
 #include <Adafruit_LIS3MDL.h>
 #include "hal.h"
 
-// global static instance of the sensor
-Adafruit_LIS3MDL LIS3MDL;
+Adafruit_LIS3MDL LIS3MDL;           // global static instance of the sensor
 
+/**
+ * @brief Initializes the magnetometer sensor
+ * 
+ * @return Error Code
+*/
 ErrorCode MagnetometerSensor::init() {
     if (!LIS3MDL.begin_SPI(LIS3MDL_CS)) { //Checks if sensor is connected
         return ErrorCode::MagnetometerCouldNotBeInitialized;
@@ -15,6 +25,11 @@ ErrorCode MagnetometerSensor::init() {
     return ErrorCode::NoError;
 }
 
+/**
+ * @brief Reads and returns the data from the sensor
+ * 
+ * @return a magnetometer packet with current flux in all three axes
+*/
 Magnetometer MagnetometerSensor::read() {
     // read from aforementioned global instance of sensor
     LIS3MDL.read();
