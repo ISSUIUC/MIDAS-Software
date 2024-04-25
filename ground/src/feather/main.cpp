@@ -137,6 +137,8 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     FullTelemetryData data;
     data.timestamp = start_printing;
+
+    double lat = packet.lat % 10000000 / 100;
     data.altitude = static_cast<float>(packet.lat)/10000000;
     data.latitude = static_cast<float>(packet.lat)/10000000;
     data.longitude = static_cast<float>(packet.lon)/10000000;
