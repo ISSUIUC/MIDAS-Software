@@ -130,6 +130,19 @@ int decodeLastTwoBits(uint16_t ax, uint16_t ay, uint16_t az) {
     return tilt;
 }
 
+namespace {
+
+double ConvertGPS(int32_t coord) {
+    double mins = fmod(static_cast<double>(std::abs(coord)), 10000000) / 100000.;
+    double degs = floor(static_cast<double>(std::abs(coord)) / 10000000.);
+    double complete = (degs + (mins / 60.));
+    if (coord < 0) {
+        complete *= -1.;
+    }
+    return complete;
+}
+
+}
 
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
@@ -138,10 +151,9 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     FullTelemetryData data;
     data.timestamp = start_printing;
 
-    double lat = packet.lat % 10000000 / 100;
-    data.altitude = static_cast<float>(packet.lat)/10000000;
-    data.latitude = static_cast<float>(packet.lat)/10000000;
-    data.longitude = static_cast<float>(packet.lon)/10000000;
+    data.altitude = static_cast<float>(packet.alt);
+    data.latitude = ConvertGPS(packet.lat);
+    data.longitude = ConvertGPS(packet.lon);
     data.barometer_altitude = convert_range(packet.baro_alt, 4096);
     int tilt = decodeLastTwoBits(packet.highg_ax, packet.highg_ay, packet.highg_az);
     int ax = packet.highg_ax >> 2;
