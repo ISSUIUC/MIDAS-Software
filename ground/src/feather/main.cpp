@@ -50,14 +50,14 @@ short cmd_number = 0;
 template <typename T>
 float convert_range(T val, float range) {
     size_t numeric_range = (int64_t)std::numeric_limits<T>::max() - (int64_t)std::numeric_limits<T>::min() + 1;
-    return val * range / (float)numeric_range;
+    return static_cast<float>(val) * range / (float)numeric_range;
 }
 
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
-    uint16_t alt;
-    uint16_t baro_alt;
+    int16_t alt;
+    int16_t baro_alt;
     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
     uint16_t highg_ay;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
     uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
@@ -126,11 +126,9 @@ int decodeLastTwoBits(uint16_t ax, uint16_t ay, uint16_t az) {
     int tilt_ax = ax & 0b11;
     int tilt_ay = ay & 0b11;
     int tilt_az = az & 0b11;
-    int tilt = (tilt_ax << 4) | (tilt_ay << 2) | tilt_az;
+    int tilt = (tilt_ax << 0) | (tilt_ay << 2) | (tilt_az << 4);
     return tilt;
 }
-
-namespace {
 
 double ConvertGPS(int32_t coord) {
     double mins = fmod(static_cast<double>(std::abs(coord)), 10000000) / 100000.;
@@ -140,8 +138,6 @@ double ConvertGPS(int32_t coord) {
         complete *= -1.;
     }
     return complete;
-}
-
 }
 
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
@@ -154,16 +150,16 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.altitude = static_cast<float>(packet.alt);
     data.latitude = ConvertGPS(packet.lat);
     data.longitude = ConvertGPS(packet.lon);
-    data.barometer_altitude = convert_range(packet.baro_alt, 4096);
+    data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
     int tilt = decodeLastTwoBits(packet.highg_ax, packet.highg_ay, packet.highg_az);
-    int ax = packet.highg_ax >> 2;
-    int ay = packet.highg_ay >> 2;
-    int az = packet.highg_az >> 2;
-    data.highG_ax = ax;
-    data.highG_ay = ay;
-    data.highG_az = az;
-    data.tilt_angle = convert_range(tilt, 180); // [-90, 90]
-    data.battery_voltage = convert_range(packet.batt_volt, 5);
+    int16_t ax = packet.highg_ax & 0xfffc;
+    int16_t ay = packet.highg_ay & 0xfffc;
+    int16_t az = packet.highg_az & 0xfffc;
+    data.highG_ax = convert_range<int16_t>(ax, 32);
+    data.highG_ay = convert_range<int16_t>(ay, 32);
+    data.highG_az = convert_range<int16_t>(az, 32);
+    data.tilt_angle = tilt; //convert_range(tilt, 180); // [-90, 90]
+    data.battery_voltage = convert_range(packet.batt_volt, 16);
     data.sat_count = packet.fsm_satcount >> 4;
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
