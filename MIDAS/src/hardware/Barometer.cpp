@@ -25,6 +25,12 @@ Barometer BarometerSensor::read() {
     float pressure = static_cast<float>(MS.getPressure() * 0.01 + 26.03);
     float temperature = static_cast<float>(MS.getTemperature() * 0.01);
     float altitude = static_cast<float>(-log(pressure * 0.000987) * (temperature + 273.15) * 29.254);
-
+    Serial.print("Alt: ");
+    Serial.print(altitude);
+    Serial.print(" pressure ");
+    Serial.print(pressure);
+    Serial.print(" temp ");
+    Serial.print(temperature);
+    Serial.println();
     return Barometer(temperature, pressure, altitude);
 }

@@ -19,4 +19,5 @@ enum FSMState {
 // #else
     STATE_FIRST_SEPARATION,
 // #endif
+    FSM_STATE_COUNT, //used to get the total number of fsm states so we can assert that the fsm will fit in 4 bits
 };

@@ -111,6 +111,5 @@ public:
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
 
-    Latency telem_latency;
     Latency log_latency;
 };
