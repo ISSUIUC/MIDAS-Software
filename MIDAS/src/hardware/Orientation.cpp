@@ -62,24 +62,37 @@ Orientation OrientationSensor::read() {
 
         Orientation sensor_reading;
         sensor_reading.has_data = true;
-        sensor_reading.yaw = euler.y;
-        sensor_reading.pitch = euler.z;
-        sensor_reading.roll = euler.x;
 
-        sensor_reading.linear_acceleration.ax = event.un.accelerometer.x;
-        sensor_reading.linear_acceleration.ay = event.un.accelerometer.y;
+        sensor_reading.yaw = -euler.y;
+        sensor_reading.pitch = euler.x;
+        sensor_reading.roll = euler.z;
+
+        sensor_reading.linear_acceleration.ax =  -event.un.accelerometer.y;
+        sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;
         sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
 
-        sensor_reading.gx = event.un.gyroscope.x;
-        sensor_reading.gy = event.un.gyroscope.y;
+        sensor_reading.gx = -event.un.gyroscope.y;
+        sensor_reading.gy = event.un.gyroscope.x;
         sensor_reading.gz = event.un.gyroscope.z;
 
-        sensor_reading.magnetometer.mx = event.un.magneticField.x;
-        sensor_reading.magnetometer.my = event.un.magneticField.y;
+        sensor_reading.magnetometer.mx = -event.un.magneticField.y;
+        sensor_reading.magnetometer.my = event.un.magneticField.x;
         sensor_reading.magnetometer.mz = event.un.magneticField.z;
 
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
+
+        if (initial_flag == 0) {
+            initial_orientation = sensor_reading;
+            initial_flag = 1;
+        }
+
+        // calculate tilt from initial orientation
+        Orientation deviation;
+        deviation.yaw = min(abs(sensor_reading.yaw - initial_orientation.yaw), 2 * 3.14F - abs(sensor_reading.yaw - initial_orientation.yaw));
+        deviation.pitch = min(abs(sensor_reading.pitch - initial_orientation.pitch), 2 * 3.14F - abs(sensor_reading.pitch - initial_orientation.pitch));
+
+        sensor_reading.tilt = sqrt(pow(deviation.yaw, 2) + pow(deviation.pitch, 2));
 
         return sensor_reading;
     }

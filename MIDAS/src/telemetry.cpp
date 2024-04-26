@@ -45,6 +45,7 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
 }
 
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
+
     TelemetryPacket packet { };
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
@@ -53,13 +54,15 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Continuity continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
+    Orientation orientation = data.orientation.getRecentUnsync();
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
     packet.alt = (int16_t) gps.altitude;
     // Convert range of value so that we can also account for negative altitudes
     packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
-    auto [ax,ay,az] = pack_highg_tilt(highg, 33);
+  
+    auto [ax,ay,az] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 63));
     packet.highg_ax = ax;
     packet.highg_ay = ay;
     packet.highg_az = az;
