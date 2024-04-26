@@ -90,10 +90,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         if (i % 10 == 0) {
             GPS reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
-        }
 
-#ifdef IS_SUSTAINER
-        if (i % 10 == 0) {
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
             arg->rocket_data.pyro.update(new_pyro_state);
@@ -105,7 +102,6 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.voltage.update(reading3);
         }
 
-#endif
         arg->led.update();
         i += 1;
 
@@ -194,16 +190,15 @@ ErrorCode init_systems(RocketSystems& systems) {
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-    // these are ignored anyways
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
 #endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
