@@ -58,8 +58,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
-    packet.alt = uint16_t(gps.altitude);
-    packet.baro_alt = uint16_t(barometer.altitude);
+    packet.alt = (int16_t) gps.altitude;
+    // Convert range of value so that we can also account for negative altitudes
+    packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
+  
     auto [ax,ay,az] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 63));
     packet.highg_ax = ax;
     packet.highg_ay = ay;

@@ -17,6 +17,7 @@ ErrorCode GPSSensor::init() {
     return ErrorCode::NoError;
 }
 
+// GPS Coordinates are ddmm.mmmm, so please convert with some code
 GPS GPSSensor::read() {
     teseo.update();
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
