@@ -33,6 +33,13 @@
 
 // Change to 434.0 or other frequency, must match RX's freq!
 #define RF95_FREQ 426.15
+#ifdef IS_DRONE
+#define SUSTAINER_FREQ 426.15
+#define BOOSTER_FREQ 427
+#define GROUND_FREQ 425
+#endif
+
+float current_freq = 0;
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -76,6 +83,9 @@ struct TelemetryPacket {
     uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
     uint8_t batt_volt;
     uint8_t fsm_satcount;
+    #ifdef IS_DRONE
+    bool IS_SUSTAINER;
+    #endif
 };
 
 struct FullTelemetryData {
@@ -117,7 +127,6 @@ std::queue<FullTelemetryData> print_queue;
 
 
 
-float current_freq = RF95_FREQ;
 
 void printFloat(float f, int precision = 5) {
     if (isinf(f) || isnan(f)) {
@@ -292,11 +301,20 @@ void setup() {
     }
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.println(json_init_success);
+    #ifdef IS_GROUND
     if (!rf95.setFrequency(RF95_FREQ)) {
         Serial.println(json_set_frequency_failure);
-        while (1)
-            ;
+        while (1);
     }
+    #endif
+    #ifdef IS_DRONE
+    if (!rf95.setFrequency(SUSTAINER_FREQ)) {
+        Serial.println(json_set_frequency_failure);
+        current_freq = SUSTAINER_FREQ;
+        while (1);
+
+    }
+    #endif
     rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(10);
     rf95.setPayloadCRC(true);
@@ -366,6 +384,8 @@ void loop() {
 void loop() {
     
     PrintDequeue();
+    TelemetryPacket packet;
+
     if (rf95.available()) {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         uint8_t len = sizeof(buf);
@@ -374,10 +394,21 @@ void loop() {
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
-            ChangeFrequency(427);
-            rf95.send(buf, len);
-            ChangeFrequency(426.15);
-
+            ChangeFrequency(GROUND_FREQ);
+            memcpy(&packet, buf, sizeof(packet));
+            if(current_freq == SUSTAINER_FREQ) {
+                packet.IS_SUSTAINER = true;
+            } else {
+                packet.IS_SUSTAINER = false;
+            }
+            uint8_t packetBuffer[sizeof(packet)];
+            memcpy(packetBuffer, &packet, sizeof(packet));
+            rf95.send(packetBuffer, len);
+            if(current_freq == SUSTAINER_FREQ) {
+                ChangeFrequency(BOOSTER_FREQ);
+            } else {
+                ChangeFrequency(SUSTAINER_FREQ);
+            }
         } else {
             Serial.println(json_receive_failure);
         }
