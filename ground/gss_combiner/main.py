@@ -6,6 +6,7 @@
 #  
 #    --booster [source1],[source2],[etc..]      -> Selects which COM ports should be interpreted as a data stream from the booster stage
 #    --sustainer [source1],[source2],[etc..]    -> Selects which COM ports should be interpreted as a data stream from the sustainer stage
+#    --relay [source1],[source2],[etc..]        -> Selects which COM ports should be interpreted as a data stream from the telemetry relay
 #    --local   (or -l)                          -> Streams all data to 'localhost' for testing. (Same as --ip localhost)
 #    --no-log  (or -n)                          -> Will not log data to logfiles for this run
 #    --verbose (or -v)                          -> Prints all telemetry events to console
@@ -39,11 +40,13 @@ def parse_params(arguments):
 
     booster_sources = []
     sustainer_sources = []
+    relay_sources = []
     is_local = False
     should_log = True
 
     has_booster = False
     has_sustainer = False
+    has_relay = False
     is_verbose = False
     is_visual = True
 
@@ -79,6 +82,18 @@ def parse_params(arguments):
             arg_ptr += 2
             continue
 
+        if (arg == "--relay"):
+            if (has_relay):
+                raise ValueError("Argument '--relay' is unique (You have defined relay sources twice.)")
+            has_relay = True
+
+            next_arg = arguments[arg_ptr + 1]
+            if(is_tl_arg(next_arg)):
+                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
+            relay_sources = next_arg.split(',')
+            arg_ptr += 2
+            continue
+
         if (arg == "--ip" or arg == "-i"):
             next_arg = arguments[arg_ptr + 1]
             if(is_tl_arg(next_arg)):
@@ -106,15 +121,15 @@ def parse_params(arguments):
         arg_ptr += 1
 
 
-    if not has_sustainer and not has_booster:
-        print("\n\x1b[1m\x1b[33mWARNING: No booster or sustainer sources have been selected! You will not read data!\x1b[0m\n")
+    if not has_sustainer and not has_booster and not has_relay:
+        print("\n\x1b[1m\x1b[33mWARNING: No sources have been selected! You will not read data!\x1b[0m\n")
     
-    return booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual, use_ip
+    return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip
 
 if __name__ == "__main__":
     threads = []
 
-    booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
+    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
 
     if is_local:
         uri_target = "localhost"
@@ -126,9 +141,11 @@ if __name__ == "__main__":
 
     print("Using sustainer sources: ", sustainer_sources)
     print("Using booster sources: ", booster_sources)
+    print("Using relay sources: ", relay_sources)
 
     telem_threads_booster = []
     telem_threads_sustainer = []
+    telem_threads_relay = []
 
     for port in booster_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
@@ -138,6 +155,10 @@ if __name__ == "__main__":
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         telem_threads_sustainer.append(new_thread)
 
+    for port in relay_sources:
+        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        telem_threads_relay.append(new_thread)
+
 
     for thd in telem_threads_booster:
         thd.start()
@@ -145,8 +166,12 @@ if __name__ == "__main__":
     for thd in telem_threads_sustainer:
         thd.start()
 
-    combiner_sus = combiner.TelemetryCombiner("Sustainer", telem_threads_sustainer, log.create_stream(logger.LoggerType.COMBINER, "Sustainer"))
-    combiner_boo = combiner.TelemetryCombiner("Booster", telem_threads_booster, log.create_stream(logger.LoggerType.COMBINER, "Booster"))
+    for thd in telem_threads_relay:
+        thd.start()
+
+    combiner_sus = combiner.TelemetryCombiner("Sustainer", telem_threads_sustainer + telem_threads_relay, log.create_stream(logger.LoggerType.COMBINER, "Sustainer"), filter=combiner.TelemetryCombiner.FilterOptions(allow_sustainer=True))
+    combiner_boo = combiner.TelemetryCombiner("Booster", telem_threads_booster + telem_threads_relay, log.create_stream(logger.LoggerType.COMBINER, "Booster"), filter=combiner.TelemetryCombiner.FilterOptions(allow_booster=True))
+    
 
 
     broadcast_thread = mqtt.MQTTThread([combiner_sus, combiner_boo], uri_target, log.create_stream(logger.LoggerType.MQTT, "main"))

@@ -13,6 +13,7 @@
         "tilt_angle": 0,
         "frequency": 400,
         "RSSI": 0,
-        "sat_count": 0
+        "sat_count": 0,
+        "is_sustainer": 0
     }
 }

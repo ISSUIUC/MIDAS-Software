@@ -9,12 +9,30 @@ import util.logger
 
 
 class TelemetryCombiner():
-    
-    def __init__(self, stage, thread_list: mqtt.TelemetryThread, log_stream: util.logger.LoggerStream):
+
+    class FilterOptions():
+        def __init__(self, allow_booster=False, allow_sustainer=False) -> None:
+            self.__allow_booster = allow_booster
+            self.__allow_sustainer = allow_sustainer
+
+        def test(self, packet) -> bool:
+            if (packet['value']['is_sustainer'] and self.__allow_sustainer):
+                return True
+            
+            if (not packet['value']['is_sustainer'] and self.__allow_booster):
+                return True
+            
+            return False
+            
+            
+
+    # splitter_list is a list of TelemetryCombiners acting as relay recievers.
+    def __init__(self, stage, dedicated_thread_list: list[mqtt.TelemetryThread], log_stream: util.logger.LoggerStream, filter=FilterOptions()):
         self.__log = log_stream
-        self.__threads = thread_list
+        self.__threads = dedicated_thread_list
         self.__stage = stage
         self.__ts_latest = datetime.now(timezone.utc).timestamp()
+        self.__filter = filter
 
     def empty(self) -> bool:
         for thread in self.__threads:
@@ -28,6 +46,11 @@ class TelemetryCombiner():
     
     def get_mqtt_control_topic(self) -> str:
         return "Control-" + self.__stage
+
+    def clear_threads(self):
+        for thread in self.__threads:
+            thread.clear()
+
 
     def get_best(self):
         seen_timestamps = set()
@@ -46,8 +69,10 @@ class TelemetryCombiner():
                     best_packet = queue[0]
 
                 for packet in queue:
-                    if not (packet['unix'] in seen_timestamps):
-                        # Do send this packet
+                    # Check if packet passes filter
+                    if not (packet['unix'] in seen_timestamps) and self.__filter.test(packet):
+                        # Do use this packet
+
 
                         if self.__ts_latest > packet['unix']:
                             self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['unix']}")
@@ -61,10 +86,7 @@ class TelemetryCombiner():
                         self.__log.success()
                         self.__log.waiting_delta(-1)
 
-                    
-
-                    
-                thread.clear()
+                
         self.__ts_latest = cur_latest
         self.__log.file_log(str(packet_release))
         return packet_release

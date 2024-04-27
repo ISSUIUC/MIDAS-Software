@@ -55,16 +55,20 @@ class TelemetryThread(threading.Thread):
                     continue
 
                 packets = bytes.decode(raw_in, encoding='utf-8').split('\n')[:-1] # Split packets by delimeter, get newest packets first.
-
+                
                 # Process raw to packet
                 self.__log.console_log(f"Processing {len(packets)} packets..")
                 self.__log.set_waiting(len(packets))
-                for pkt in packets:
+                for pkt_r in packets:
+                    pkt = pkt_r.rstrip()
+                    # print(pkt)
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
                         packet_in = json.loads(pkt)
                     except json.decoder.JSONDecodeError as json_err:
+                        print(json_err)
+                        print(pkt)
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")
                         self.__log.console_log(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
                         self.__log.fail()
@@ -155,6 +159,11 @@ class MQTTThread(threading.Thread):
                             print(f"Unable to publish to '{combiner.get_mqtt_data_topic()}' : ", str(e)) # Always print
                             self.__log.fail()
                         self.__log.waiting_delta(-1)
+
+
+                # Clear threads
+                for combiner in self.__combiners:
+                    combiner.clear_threads()
             except Exception as e:
                 print(f"Ran into an uncaught exception.. continuing gracefully.") # Always print
                 self.__log.console_log(f"Error dump: ", str(e))

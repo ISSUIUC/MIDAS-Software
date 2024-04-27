@@ -116,9 +116,9 @@ def format_stat_string(name, logstream: LoggerStream):
 
     col_sysname = "\x1b[90m"
     if successes > 0:
-        if delta_last < 1:
+        if delta_last < 1.5:
             col_sysname = "\x1b[32m"
-        elif delta_last < 2:
+        elif delta_last < 3:
             col_sysname = "\x1b[33m"
         else:
             col_sysname = "\x1b[31m"
