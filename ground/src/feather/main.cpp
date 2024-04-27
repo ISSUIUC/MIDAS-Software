@@ -33,7 +33,7 @@
 
 float RF95_FREQ = 427;
 float SUSTAINER_FREQ = 426.15;
-float BOOSTER_FREQ = 427;
+float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 425;
 
 float current_freq = 0;
@@ -217,7 +217,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("frequency", packet.freq);
     printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count);
-    printJSONField("IS_SUSTAINER", packet.is_sustainer, false);
+    printJSONField("is_sustainer", packet.is_sustainer, false);
     Serial.println("}}");
 }
 
@@ -404,6 +404,10 @@ void loop() {
         uint8_t len = sizeof(buf);
 
         if (rf95.recv(buf, &len)) {
+            Serial.print("Recieved ");
+            Serial.print(len);
+            Serial.print(" bytes on ");
+            Serial.println(current_freq);
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
@@ -416,9 +420,11 @@ void loop() {
             } else {
                 ChangeFrequency(SUSTAINER_FREQ);
                 current_freq = SUSTAINER_FREQ;
-                Serial.println("Switching to sustainer freq");
+                Serial.println("Switching to sust69ainer freq");
             }
             prev_time = millis();
+            Serial.print(current_time);
+            Serial.print(" ");
             Serial.println(prev_time);
         } else {
             Serial.println(json_receive_failure);
