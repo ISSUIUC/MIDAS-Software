@@ -113,7 +113,7 @@ struct GPS {
     // This isn't included in the telem packet because this is
     // solely for the SD logger. We do not need to know what time it is
     // when we are recieving telem packets.
-    uint32_t time = -1;
+    uint32_t time;
 };
 
 struct Magnetometer {
