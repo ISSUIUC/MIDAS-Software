@@ -381,12 +381,23 @@ void loop() {
 
 
 #ifdef IS_DRONE
+unsigned long prev_time = 0;
 
 void loop() {
     
     PrintDequeue();
     TelemetryPacket packet;
-
+    unsigned long current_time = millis();
+    if (current_time - prev_time > 2000) {
+        if(current_freq == SUSTAINER_FREQ) {
+            ChangeFrequency(BOOSTER_FREQ);
+            current_freq = BOOSTER_FREQ;
+        } else {
+            ChangeFrequency(SUSTAINER_FREQ);
+            current_freq = SUSTAINER_FREQ;
+        }
+        prev_time = millis();
+    }
     if (rf95.available()) {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         uint8_t len = sizeof(buf);
@@ -404,6 +415,7 @@ void loop() {
                 ChangeFrequency(SUSTAINER_FREQ);
                 current_freq = SUSTAINER_FREQ;
             }
+            prev_time = millis();
         } else {
             Serial.println(json_receive_failure);
         }
