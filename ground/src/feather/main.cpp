@@ -33,11 +33,9 @@
 
 // Change to 434.0 or other frequency, must match RX's freq!
 float RF95_FREQ = 426.15;
-#ifdef IS_DRONE
 #define SUSTAINER_FREQ 426.15
 #define BOOSTER_FREQ 427
 #define GROUND_FREQ 425
-#endif
 
 float current_freq = 0;
 
@@ -83,9 +81,7 @@ struct TelemetryPacket {
     uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
     uint8_t batt_volt;
     uint8_t fsm_satcount;
-    #ifdef IS_DRONE
     bool IS_SUSTAINER;
-    #endif
 };
 
 struct FullTelemetryData {
@@ -103,6 +99,7 @@ struct FullTelemetryData {
     float freq;
     float rssi;
     float sat_count;
+    bool IS_SUSTAINER;
 };
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
 // Commands transmitted from ground station to rocket
@@ -177,6 +174,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
     data.rssi = rf95.lastRssi();
+    data.IS_SUSTAINER = packet.IS_SUSTAINER;
     print_queue.emplace(data);
 
 }
@@ -220,7 +218,8 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("tilt_angle", packet.tilt_angle);
     printJSONField("frequency", packet.freq);
     printJSONField("RSSI", packet.rssi);
-    printJSONField("sat_count", packet.sat_count, false);
+    printJSONField("sat_count", packet.sat_count);
+    printJSONField("IS_SUSTAINER", packet.IS_SUSTAINER, false);
     Serial.println("}}");
 }
 
@@ -296,14 +295,14 @@ void setup() {
     Serial.begin(9600);
     if (!rf95.init()) {
         Serial.println(json_init_failure);
-        while (1)
-            ;
+        while (1);
     }
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.println(json_init_success);
     #ifdef IS_GROUND
     if (!rf95.setFrequency(RF95_FREQ)) {
         Serial.println(json_set_frequency_failure);
+        current_freq = RF95_FREQ;
         while (1);
     }
     #endif
@@ -350,6 +349,11 @@ void loop() {
             // Serial.println("Received packet");
             // Serial.println(len);
             memcpy(&packet, buf, sizeof(packet));
+            if(current_freq == SUSTAINER_FREQ) {
+                packet.IS_SUSTAINER = true;
+            } else {
+                packet.IS_SUSTAINER = false;
+            }
             EnqueuePacket(packet, current_freq);
             if (!cmd_queue.empty()) {
                 auto& cmd = cmd_queue.front();
@@ -373,6 +377,7 @@ void loop() {
             float freq = input.substring(5).toFloat(); // Extract frequency value
             ChangeFrequency(freq);
             RF95_FREQ = freq;
+            current_freq = freq;
         }
     }
 }
