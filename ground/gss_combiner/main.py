@@ -129,8 +129,13 @@ def parse_params(arguments):
 if __name__ == "__main__":
     threads = []
 
+<<<<<<< HEAD
     booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
 
+=======
+    booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
+    print("Should_log", should_log)
+>>>>>>> 71d15db59fab851a6fbb2c5d133e5b03c75a85f9
     if is_local:
         uri_target = "localhost"
 

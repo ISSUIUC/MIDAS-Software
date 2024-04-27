@@ -10,6 +10,7 @@
  * Patrick Marschoun
  * Peter Giannetos
  * Aaditya Voruganti
+ * Micheal Karpov
  */
 
 #include <RH_RF95.h>
@@ -30,8 +31,12 @@
 #define RFM95_INT 3
 // #define LED 13 // Blinks on receipt
 
-// Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 426.15
+float RF95_FREQ = 426.15;
+#define SUSTAINER_FREQ 427
+#define BOOSTER_FREQ 427
+#define GROUND_FREQ 425
+
+float current_freq = 0;
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -46,6 +51,18 @@ short charIdx = 0;
 short readySend = 0;
 int command_ID = 0;
 short cmd_number = 0;
+
+constexpr const char* json_command_success = R"({"type": "command_success"})";
+constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
+constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
+
+constexpr const char* json_init_failure = R"({"type": "init_error", "error": "failed to initilize LORA"})";
+constexpr const char* json_init_success = R"({"type": "init_success"})";
+constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
+constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
+constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
+constexpr int max_command_retries = 5;
+
 
 template <typename T>
 float convert_range(T val, float range) {
@@ -63,6 +80,7 @@ struct TelemetryPacket {
     uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
     uint8_t batt_volt;
     uint8_t fsm_satcount;
+    bool IS_SUSTAINER;
 };
 
 struct FullTelemetryData {
@@ -80,6 +98,7 @@ struct FullTelemetryData {
     float freq;
     float rssi;
     float sat_count;
+    bool IS_SUSTAINER;
 };
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
 // Commands transmitted from ground station to rocket
@@ -102,18 +121,8 @@ struct TelemetryCommandQueueElement {
 std::queue<TelemetryCommandQueueElement> cmd_queue;
 std::queue<FullTelemetryData> print_queue;
 
-constexpr const char* json_command_success = R"({"type": "command_success"})";
-constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
-constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
 
-constexpr const char* json_init_failure = R"({"type": "init_error", "error": "failed to initilize LORA"})";
-constexpr const char* json_init_success = R"({"type": "init_success"})";
-constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
-constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
-constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
-constexpr int max_command_retries = 5;
 
-float current_freq = RF95_FREQ;
 
 void printFloat(float f, int precision = 5) {
     if (isinf(f) || isnan(f)) {
@@ -164,6 +173,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
     data.rssi = rf95.lastRssi();
+    data.IS_SUSTAINER = packet.IS_SUSTAINER;
     print_queue.emplace(data);
 
 }
@@ -203,11 +213,12 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("highG_ay", packet.highG_ay);
     printJSONField("highG_az", packet.highG_az);
     printJSONField("battery_voltage", packet.battery_voltage);
-    printJSONField("FSM_State", packet.FSM_State, false);
-    printJSONField("tilt_angle", packet.tilt_angle, false);
-    printJSONField("frequency", packet.freq, false);
-    printJSONField("RSSI", packet.rssi, false);
-    printJSONField("sat_count", packet.sat_count, false);
+    printJSONField("FSM_State", packet.FSM_State);
+    printJSONField("tilt_angle", packet.tilt_angle);
+    printJSONField("frequency", packet.freq);
+    printJSONField("RSSI", packet.rssi);
+    printJSONField("sat_count", packet.sat_count);
+    printJSONField("IS_SUSTAINER", packet.IS_SUSTAINER, false);
     Serial.println("}}");
 }
 
@@ -276,22 +287,32 @@ void process_command_queue() {
 }
 
 SerialParser serial_parser(SerialInput, SerialError);
+
 void setup() {
     while (!Serial)
         ;
     Serial.begin(9600);
     if (!rf95.init()) {
         Serial.println(json_init_failure);
-        while (1)
-            ;
+        while (1);
     }
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.println(json_init_success);
+    #ifdef IS_GROUND
     if (!rf95.setFrequency(RF95_FREQ)) {
         Serial.println(json_set_frequency_failure);
-        while (1)
-            ;
+        current_freq = RF95_FREQ;
+        while (1);
     }
+    #endif
+    #ifdef IS_DRONE
+    if (!rf95.setFrequency(SUSTAINER_FREQ)) {
+        Serial.println(json_set_frequency_failure);
+        current_freq = SUSTAINER_FREQ;
+        while (1);
+
+    }
+    #endif
     rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(10);
     rf95.setPayloadCRC(true);
@@ -301,6 +322,16 @@ void setup() {
     Serial.println("}");
     rf95.setTxPower(23, false);
 }
+
+void ChangeFrequency(float freq) {
+    rf95.setFrequency(freq);
+    Serial.println(json_command_success);
+    Serial.print(R"({"type": "freq_success", "frequency":)");
+    Serial.print(freq);
+    Serial.println("}");
+}
+
+#ifdef IS_GROUND
 
 void loop() {
     
@@ -317,6 +348,11 @@ void loop() {
             // Serial.println("Received packet");
             // Serial.println(len);
             memcpy(&packet, buf, sizeof(packet));
+            if(current_freq == SUSTAINER_FREQ) {
+                packet.IS_SUSTAINER = true;
+            } else {
+                packet.IS_SUSTAINER = false;
+            }
             EnqueuePacket(packet, current_freq);
             if (!cmd_queue.empty()) {
                 auto& cmd = cmd_queue.front();
@@ -334,4 +370,57 @@ void loop() {
         }
     }
     serial_parser.read();
+    if (Serial.available()) {
+        String input = Serial.readStringUntil('\n');
+        if (input.startsWith("FREQ:")) {
+            float freq = input.substring(5).toFloat(); // Extract frequency value
+            ChangeFrequency(freq);
+            RF95_FREQ = freq;
+            current_freq = freq;
+        }
+    }
 }
+#endif
+
+
+
+#ifdef IS_DRONE
+
+void loop() {
+    
+    PrintDequeue();
+    TelemetryPacket packet;
+
+    if (rf95.available()) {
+        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+        uint8_t len = sizeof(buf);
+
+        if (rf95.recv(buf, &len)) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(50);
+            digitalWrite(LED_BUILTIN, LOW);
+            ChangeFrequency(GROUND_FREQ);
+            memcpy(&packet, buf, sizeof(packet));
+            if(current_freq == SUSTAINER_FREQ) {
+                packet.IS_SUSTAINER = true;
+            } else {
+                packet.IS_SUSTAINER = false;
+            }
+            uint8_t packetBuffer[sizeof(packet)];
+            memcpy(packetBuffer, &packet, sizeof(packet));
+            rf95.send(packetBuffer, len);\
+            ChangeFrequency(SUSTAINER_FREQ);
+            // if(current_freq == SUSTAINER_FREQ) {
+            //     ChangeFrequency(BOOSTER_FREQ);
+            //     current_freq = BOOSTER_FREQ;
+            // } else {
+            //     ChangeFrequency(SUSTAINER_FREQ);
+            //     current_freq = SUSTAINER_FREQ;
+            // }
+        } else {
+            Serial.println(json_receive_failure);
+        }
+    }
+    serial_parser.read();
+}
+#endif
