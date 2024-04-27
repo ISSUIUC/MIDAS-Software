@@ -115,7 +115,7 @@ if __name__ == "__main__":
     threads = []
 
     booster_sources, sustainer_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
-
+    print("Should_log", should_log)
     if is_local:
         uri_target = "localhost"
 

@@ -47,6 +47,18 @@ short readySend = 0;
 int command_ID = 0;
 short cmd_number = 0;
 
+constexpr const char* json_command_success = R"({"type": "command_success"})";
+constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
+constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
+
+constexpr const char* json_init_failure = R"({"type": "init_error", "error": "failed to initilize LORA"})";
+constexpr const char* json_init_success = R"({"type": "init_success"})";
+constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
+constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
+constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
+constexpr int max_command_retries = 5;
+
+
 template <typename T>
 float convert_range(T val, float range) {
     size_t numeric_range = (int64_t)std::numeric_limits<T>::max() - (int64_t)std::numeric_limits<T>::min() + 1;
@@ -102,16 +114,7 @@ struct TelemetryCommandQueueElement {
 std::queue<TelemetryCommandQueueElement> cmd_queue;
 std::queue<FullTelemetryData> print_queue;
 
-constexpr const char* json_command_success = R"({"type": "command_success"})";
-constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
-constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
 
-constexpr const char* json_init_failure = R"({"type": "init_error", "error": "failed to initilize LORA"})";
-constexpr const char* json_init_success = R"({"type": "init_success"})";
-constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
-constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
-constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
-constexpr int max_command_retries = 5;
 
 float current_freq = RF95_FREQ;
 
@@ -203,10 +206,10 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("highG_ay", packet.highG_ay);
     printJSONField("highG_az", packet.highG_az);
     printJSONField("battery_voltage", packet.battery_voltage);
-    printJSONField("FSM_State", packet.FSM_State, false);
-    printJSONField("tilt_angle", packet.tilt_angle, false);
-    printJSONField("frequency", packet.freq, false);
-    printJSONField("RSSI", packet.rssi, false);
+    printJSONField("FSM_State", packet.FSM_State);
+    printJSONField("tilt_angle", packet.tilt_angle);
+    printJSONField("frequency", packet.freq);
+    printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count, false);
     Serial.println("}}");
 }
@@ -276,6 +279,7 @@ void process_command_queue() {
 }
 
 SerialParser serial_parser(SerialInput, SerialError);
+
 void setup() {
     while (!Serial)
         ;
@@ -301,6 +305,16 @@ void setup() {
     Serial.println("}");
     rf95.setTxPower(23, false);
 }
+
+void ChangeFrequency(float freq) {
+    rf95.setFrequency(freq);
+    Serial.println(json_command_success);
+    Serial.print(R"({"type": "freq_success", "frequency":)");
+    Serial.print(freq);
+    Serial.println("}");
+}
+
+#ifdef IS_GROUND
 
 void loop() {
     
@@ -335,3 +349,31 @@ void loop() {
     }
     serial_parser.read();
 }
+#endif
+
+
+
+#ifdef IS_DRONE
+
+void loop() {
+    
+    PrintDequeue();
+    if (rf95.available()) {
+        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+        uint8_t len = sizeof(buf);
+
+        if (rf95.recv(buf, &len)) {
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(50);
+            digitalWrite(LED_BUILTIN, LOW);
+            ChangeFrequency(427);
+            rf95.send(buf, len);
+            ChangeFrequency(426.15);
+
+        } else {
+            Serial.println(json_receive_failure);
+        }
+    }
+    serial_parser.read();
+}
+#endif
