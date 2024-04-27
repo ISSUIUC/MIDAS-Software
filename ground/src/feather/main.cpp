@@ -31,8 +31,8 @@
 #define RFM95_INT 3
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 426.15;
-#define SUSTAINER_FREQ 427
+float RF95_FREQ = 427;
+#define SUSTAINER_FREQ 426.15
 #define BOOSTER_FREQ 427
 #define GROUND_FREQ 425
 
@@ -80,7 +80,6 @@ struct TelemetryPacket {
     uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
     uint8_t batt_volt;
     uint8_t fsm_satcount;
-    bool IS_SUSTAINER;
 };
 
 struct FullTelemetryData {
@@ -98,7 +97,7 @@ struct FullTelemetryData {
     float freq;
     float rssi;
     float sat_count;
-    bool IS_SUSTAINER;
+    bool is_sustainer;
 };
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
 // Commands transmitted from ground station to rocket
@@ -169,11 +168,11 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.highG_az = convert_range<int16_t>(az, 32);
     data.tilt_angle = tilt; //convert_range(tilt, 180); // [-90, 90]
     data.battery_voltage = convert_range(packet.batt_volt, 16);
-    data.sat_count = packet.fsm_satcount >> 4;
+    data.sat_count = packet.fsm_satcount >> 4 & 0b0111;
+    data.is_sustainer = packet.fsm_satcount >> 7;
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
     data.rssi = rf95.lastRssi();
-    data.IS_SUSTAINER = packet.IS_SUSTAINER;
     print_queue.emplace(data);
 
 }
@@ -218,7 +217,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("frequency", packet.freq);
     printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count);
-    printJSONField("IS_SUSTAINER", packet.IS_SUSTAINER, false);
+    printJSONField("IS_SUSTAINER", packet.is_sustainer, false);
     Serial.println("}}");
 }
 
@@ -301,24 +300,26 @@ void setup() {
     #ifdef IS_GROUND
     if (!rf95.setFrequency(RF95_FREQ)) {
         Serial.println(json_set_frequency_failure);
-        current_freq = RF95_FREQ;
         while (1);
     }
+    
+    current_freq = RF95_FREQ;
     #endif
     #ifdef IS_DRONE
     if (!rf95.setFrequency(SUSTAINER_FREQ)) {
         Serial.println(json_set_frequency_failure);
-        current_freq = SUSTAINER_FREQ;
+        
         while (1);
 
     }
+    current_freq = SUSTAINER_FREQ;
     #endif
     rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(10);
     rf95.setPayloadCRC(true);
     rf95.setSignalBandwidth(125000);
     Serial.print(R"({"type": "freq_success", "frequency":)");
-    Serial.print(RF95_FREQ);
+    Serial.print(current_freq);
     Serial.println("}");
     rf95.setTxPower(23, false);
 }
@@ -348,11 +349,6 @@ void loop() {
             // Serial.println("Received packet");
             // Serial.println(len);
             memcpy(&packet, buf, sizeof(packet));
-            if(current_freq == SUSTAINER_FREQ) {
-                packet.IS_SUSTAINER = true;
-            } else {
-                packet.IS_SUSTAINER = false;
-            }
             EnqueuePacket(packet, current_freq);
             if (!cmd_queue.empty()) {
                 auto& cmd = cmd_queue.front();
@@ -400,23 +396,14 @@ void loop() {
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
             ChangeFrequency(GROUND_FREQ);
-            memcpy(&packet, buf, sizeof(packet));
+            rf95.send(buf, len);
             if(current_freq == SUSTAINER_FREQ) {
-                packet.IS_SUSTAINER = true;
+                ChangeFrequency(BOOSTER_FREQ);
+                current_freq = BOOSTER_FREQ;
             } else {
-                packet.IS_SUSTAINER = false;
+                ChangeFrequency(SUSTAINER_FREQ);
+                current_freq = SUSTAINER_FREQ;
             }
-            uint8_t packetBuffer[sizeof(packet)];
-            memcpy(packetBuffer, &packet, sizeof(packet));
-            rf95.send(packetBuffer, len);\
-            ChangeFrequency(SUSTAINER_FREQ);
-            // if(current_freq == SUSTAINER_FREQ) {
-            //     ChangeFrequency(BOOSTER_FREQ);
-            //     current_freq = BOOSTER_FREQ;
-            // } else {
-            //     ChangeFrequency(SUSTAINER_FREQ);
-            //     current_freq = SUSTAINER_FREQ;
-            // }
         } else {
             Serial.println(json_receive_failure);
         }
