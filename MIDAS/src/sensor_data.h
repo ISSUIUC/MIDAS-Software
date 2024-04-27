@@ -53,7 +53,7 @@ struct Acceleration {
 /**
  * @struct euler_t
  * 
- * @brief euler represnetation 
+ * @brief euler represnetation of rotation
 */
 struct euler_t {
     float yaw;
@@ -62,7 +62,13 @@ struct euler_t {
 };
 
 /**
- * Structs starting here represent specific sensors and the respective data
+ * @brief Structs starting here represent specific sensors and the respective data
+*/
+
+/**
+ * @struct LowGData
+ * 
+ * @brief data from the LowG sensor
 */
 struct LowGData {
     float ax = 0;
@@ -73,6 +79,11 @@ struct LowGData {
     LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
 };
 
+/**
+ * @struct HighGData
+ * 
+ * @brief data from the HighG sensor
+*/
 struct HighGData {
     float ax = 0;
     float ay = 0;
@@ -82,6 +93,11 @@ struct HighGData {
     HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
+/**
+ * @struct LowGLSM
+ * 
+ * @brief data from the LowGLSM sensor
+*/
 struct LowGLSM {
     float gx = 0;
     float gy = 0;
@@ -91,6 +107,11 @@ struct LowGLSM {
     float az = 0;
 };
 
+/**
+ * @struct Barometer
+ * 
+ * @brief data from the barometer
+*/
 struct Barometer {
     float temperature = 0;
     float pressure = 0;
@@ -100,15 +121,30 @@ struct Barometer {
     Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
+/**
+ * @struct Continuity
+ * 
+ * @brief data about pyro continuity
+*/
 struct Continuity {
     float sense_pyro;
     float pins[4];
 };
 
+/**
+ * @struct Voltage
+ * 
+ * @brief data about battery voltage
+*/
 struct Voltage {
     float voltage = 0;
 };
 
+/**
+ * @struct GPS
+ * 
+ * @brief data from the GPS
+*/
 struct GPS {
     int32_t latitude = 0;
     int32_t longitude = 0;
@@ -117,12 +153,22 @@ struct GPS {
     uint16_t satellite_count = 0;
 };
 
+/**
+ * @struct Magnetometer
+ * 
+ * @brief data from the magnetometer
+*/
 struct Magnetometer {
     float mx;
     float my;
     float mz;
 };
 
+/**
+ * @struct Orientation
+ * 
+ * @brief data from the BNO
+*/
 struct Orientation {
     bool has_data = false;
 
@@ -146,6 +192,11 @@ struct Orientation {
 
 };
 
+/**
+ * @struct KalmanData
+ * 
+ * @brief data from the Kalman thread
+*/
 struct KalmanData {
     Position position;
     Velocity velocity;
@@ -154,12 +205,21 @@ struct KalmanData {
     float altitude;
 };
 
-
+/**
+ * @struct PyroChannel
+ * 
+ * @brief data about a specific pyro channel
+*/
 struct PyroChannel {
     bool is_armed = false;
     bool is_firing = false;
 };
 
+/**
+ * @struct PyroState
+ * 
+ * @brief data regarding all pyro channels
+*/
 struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];

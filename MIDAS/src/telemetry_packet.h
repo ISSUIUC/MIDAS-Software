@@ -3,6 +3,11 @@
 #include <array>
 #include <cstdint>
 
+/**
+ * @struct TelemetryPacket
+ * 
+ * @brief format of the telemetry acket
+*/
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
