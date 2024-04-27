@@ -67,11 +67,13 @@ class TelemetryThread(threading.Thread):
                 self.__log.set_waiting(len(packets))
                 for pkt_r in packets:
                     pkt = pkt_r.rstrip()
-                    # print(pkt)
+
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
                         packet_in = json.loads(pkt)
+                        # print(packet_in)
+                        print("Packet type: ", "sustainer" if packet_in['value']['is_sustainer'] else "booster")
                     except json.decoder.JSONDecodeError as json_err:
                         # print(json_err)
                         # print(pkt)

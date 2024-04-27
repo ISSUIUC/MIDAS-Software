@@ -16,10 +16,10 @@ class TelemetryCombiner():
             self.__allow_sustainer = allow_sustainer
 
         def test(self, packet) -> bool:
-            if (packet['value']['IS_SUSTAINER'] and self.__allow_sustainer):
+            if (packet['value']['is_sustainer'] and self.__allow_sustainer):
                 return True
             
-            if (not packet['value']['IS_SUSTAINER'] and self.__allow_booster):
+            if (not packet['value']['is_sustainer'] and self.__allow_booster):
                 return True
             
             return False
