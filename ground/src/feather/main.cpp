@@ -32,7 +32,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 426.15
+float RF95_FREQ = 426.15;
 #ifdef IS_DRONE
 #define SUSTAINER_FREQ 426.15
 #define BOOSTER_FREQ 427
@@ -372,6 +372,7 @@ void loop() {
         if (input.startsWith("FREQ:")) {
             float freq = input.substring(5).toFloat(); // Extract frequency value
             ChangeFrequency(freq);
+            RF95_FREQ = freq;
         }
     }
 }
