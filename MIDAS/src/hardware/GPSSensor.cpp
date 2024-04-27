@@ -35,6 +35,9 @@ GPS GPSSensor::read() {
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
     GPRMC_Info_t gprmc_message = teseo.getGPRMCData();
 
+    float64_t lat = gpgga_message.xyz.lat;
+    float64_t lon = gpgga_message.xyz.lon;
+
     //                                            d ddm m.mm mmm
     // the max value of an unsigned 32 bit int is 2,147,4 83,647
     // Since the maximum longitude is 180, we can store 3 degree digits, and
@@ -55,7 +58,7 @@ GPS GPSSensor::read() {
     if (is_leapyear(gprmc_message.date % 100) && month >= 2) {
         month_time++;
     }
-    uint32_t time = day +month_time * 86400 + (30 + gprmc_message.date % 100) * 31536000;
+    uint32_t time = day + month_time * 86400 + (30 + gprmc_message.date % 100) * 31536000;
     // Sum everything together now
     uint32_t time_of_day = gprmc_message.utc.hh * 3600 + gprmc_message.utc.mm * 60 + gprmc_message.utc.ss;
     time += time_of_day;
