@@ -24,16 +24,16 @@ const uint16_t months[12] = {
 };
 
 inline bool is_leapyear(int year) {
-    return (!(year % 100) || (year % 400 == 0)) && year % 4 == 0;
+    return ((year % 100 != 0) || (year % 400 == 0)) && (year % 4 == 0);
 }
+
+
+// GPS Coordinates are ddmm.mmmm, so please convert with some code
 
 GPS GPSSensor::read() {
     teseo.update();
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
     GPRMC_Info_t gprmc_message = teseo.getGPRMCData();
-
-    float64_t lat = gpgga_message.xyz.lat;
-    float64_t lon = gpgga_message.xyz.lon;
 
     //                                            d ddm m.mm mmm
     // the max value of an unsigned 32 bit int is 2,147,4 83,647

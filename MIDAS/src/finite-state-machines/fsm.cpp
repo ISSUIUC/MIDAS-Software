@@ -148,7 +148,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_APOGEE:
             // if the slow speed was too brief then return to previous state
-            if ((state_estimate.vertical_speed) > 0 && ((current_time - apogee_time) < sustainer_apogee_check_threshold)) {
+            if ((state_estimate.vertical_speed) > sustainer_apogee_backto_coast_vertical_speed_threshold && ((current_time - apogee_time) < sustainer_apogee_check_threshold)) {
                 state = FSMState::STATE_COAST;
                 break;
             }

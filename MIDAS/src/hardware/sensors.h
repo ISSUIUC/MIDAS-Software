@@ -40,6 +40,8 @@ struct VoltageSensor {
 };
 
 struct OrientationSensor {
+    Orientation initial_orientation;
+    uint8_t initial_flag;
     ErrorCode init();
     Orientation read();
 };
