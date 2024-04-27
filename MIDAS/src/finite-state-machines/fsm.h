@@ -1,10 +1,3 @@
-/**
- * @file fsm.cpp
- * 
- * @brief Header for fsm governing state transitions and in-flight event control
- * 
-*/
-
 #pragma once 
 
 #include <numeric>

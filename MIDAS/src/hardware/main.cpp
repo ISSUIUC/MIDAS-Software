@@ -1,9 +1,3 @@
-/**
- * @file main.cpp
- * 
- * @brief Entry point into the code, initializes serial, spi, uart, etc
-*/
-
 #include <Wire.h>
 #include <SPI.h>
 #include "TCAL9539.h"
@@ -25,6 +19,9 @@ MultipleLogSink<SDSink> sinks;
 MultipleLogSink<> sinks;
 #endif
 RocketSystems systems { .log_sink = sinks };
+/**
+ * @brief Sets up pinmodes for all sensors and starts threads
+*/
 
 void setup() {
     //begin serial port

@@ -1,9 +1,3 @@
-/**
- * @file thresholds.h
- * 
- * @brief Stores macro definitions for thresholds used by the FSM
-*/
-
 #pragma once
 
 // ----------------------------------

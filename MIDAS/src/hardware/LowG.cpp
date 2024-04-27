@@ -1,9 +1,3 @@
-/**
- * @file LowG.cpp
- * 
- * @brief Holds the function definitions for the ADXL accelerometer
-*/
-
 #include "sensors.h"
 #include "PL_ADXL355.h"
 

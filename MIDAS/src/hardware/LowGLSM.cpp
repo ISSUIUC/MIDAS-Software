@@ -1,9 +1,3 @@
-/**
- * @file LowGLSM.cpp
- * 
- * @brief Holds the function definitions for the LSM accelerometer + gyro
-*/
-
 #include "sensors.h"
 #include <Arduino_LSM6DS3.h>
 

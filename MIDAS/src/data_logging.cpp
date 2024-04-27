@@ -2,9 +2,15 @@
 #include "log_format.h"
 #include "log_checksum.h"
 
+/**
+ * Forward decleration of the id recieving function
+*/
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
 
+/**
+ * @brief macro to associate a certain sensor with a specific number ID
+*/
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
 ASSOCIATE(LowGData, ID_LOWG)
@@ -20,7 +26,12 @@ ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
 ASSOCIATE(PyroState, ID_PYRO)
 
-
+/**
+ * @brief writes a reading, with its ID, timestamp, and data to a specific sink
+ * 
+ * @param sink the LogSink to write to
+ * @param reading the data to read
+*/
 template<typename T>
 void log_reading(LogSink& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
@@ -29,6 +40,14 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
     sink.write((uint8_t*) &reading.data, sizeof(T));
 }
 
+/**
+ * @brief wites a SensorData's entire queue reading to a sink
+ * 
+ * @param sink the LogSink to write to
+ * @param sensor_data the sensor data, with queue, to write from
+ * 
+ * @return the number of packets written to the LogSink
+*/
 template<typename T>
 uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
@@ -40,11 +59,22 @@ uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     return read;
 }
 
+/**
+ * @brief Initializes a specific LogSink
+ * 
+ * @param sink the LogSink to initialize
+*/
 void log_begin(LogSink& sink) {
     uint32_t checksum = LOG_CHECKSUM;
     sink.write((uint8_t*) &checksum, 4);
 }
 
+/**
+ * @brief logs all sensor data from the rocket
+ * 
+ * @param sink the LogSink to write data to
+ * @param data the rocket which holds all the sensor data to write
+*/
 void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.low_g);
     log_from_sensor_data(sink, data.low_g_lsm);
@@ -63,6 +93,15 @@ void log_data(LogSink& sink, RocketData& data) {
 #ifndef SILSIM
 #define MAX_FILES 999
 
+/**
+ * @brief names a new fole for a log sink depending on the files currently on said LogSink
+ * 
+ * @param fileName buffer to write the file name to
+ * @param fileExtensionParam the file extension required for the file
+ * @param fs the FileSystem to check files off of
+ * 
+ * @return buffer contianing string of file name
+*/
 char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);

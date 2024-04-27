@@ -1,9 +1,3 @@
-/**
- * @file GPSSensor.cpp
- * 
- * @brief Holds the function definitions for the Teseo GPS
-*/
-
 #include "sensors.h"
 #include "pins.h"
 #include "MicroNMEA.h"

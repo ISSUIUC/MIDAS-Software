@@ -1,9 +1,3 @@
-/**
- * @file fsm_states.h
- * 
- * @brief Header file to hold the FSM state enum
-*/
-
 #pragma once
 
 /**

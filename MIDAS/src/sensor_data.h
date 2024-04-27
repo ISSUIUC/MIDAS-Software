@@ -8,13 +8,14 @@
 //#define CONTINUITY_PIN_COUNT 5
 
 /**
+ * @brief
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
  * rocket_state struct, and each will be tagged with a timestamp.
 */
 
 /**
- * First 4 structs are base vector, pos, vel, and accel data to be used elsewhere
+ * @brief First 4 structs are base vector, pos, vel, and accel data to be used elsewhere
 */
 struct Vec3 {
     float x = 0;
@@ -49,6 +50,11 @@ struct Acceleration {
     }
 };
 
+/**
+ * @struct euler_t
+ * 
+ * @brief euler represnetation 
+*/
 struct euler_t {
     float yaw;
     float pitch;

@@ -1,9 +1,3 @@
-/**
- * @file Continuity.cpp
- * 
- * @brief Holds the function definitions for the continuity values
-*/
-
 #include "sensors.h"
 #include "ads7138-q1.h"
 #include <hal.h>

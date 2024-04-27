@@ -1,9 +1,3 @@
-/**
- * @file Barometer.cpp
- * 
- * @brief Holds the function definitions for the MS5611 barometer
-*/
-
 #include "sensors.h"
 #include <MS5611.h>
 

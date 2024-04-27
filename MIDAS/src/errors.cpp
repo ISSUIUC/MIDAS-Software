@@ -27,6 +27,11 @@
 #include <TCAL9539.h>
 #include "hardware/pins.h"
 
+/**
+ * @brief writes LEDS to indicate errors as described above
+ * 
+ * @param error Error Code to indicate
+*/
 void update_error_LED(ErrorCode error) {
     switch (error) {
         case LowGCouldNotBeInitialized:

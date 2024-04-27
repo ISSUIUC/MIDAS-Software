@@ -1,9 +1,3 @@
-/**
- * @file fsm.cpp
- * 
- * @brief Implements functions defined in fsm.h for FSM state transitions and helper funcitons.
-*/
-
 #include <cmath>
 
 #include "fsm.h"

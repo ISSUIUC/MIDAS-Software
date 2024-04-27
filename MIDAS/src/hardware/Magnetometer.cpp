@@ -1,9 +1,3 @@
-/**
- * @file Magnetometer.cpp
- * 
- * @brief Holds the function definitions for the LIS magnetometer
-*/
-
 #include "sensors.h"
 #include <Adafruit_LIS3MDL.h>
 #include "hal.h"

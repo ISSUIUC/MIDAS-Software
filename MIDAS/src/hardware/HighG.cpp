@@ -1,9 +1,3 @@
-/**
- * @file HighG.cpp
- * 
- * @brief Holds the function definitions for the KX accelerometer
-*/
-
 #include "sensors.h"
 #include "SparkFun_Qwiic_KX13X.h"
 

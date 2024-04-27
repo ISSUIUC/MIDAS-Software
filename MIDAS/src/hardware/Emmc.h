@@ -1,10 +1,3 @@
-/**
- * @file Emmc.h
- * 
- * @brief header file for the emmc log sink
-*/
-
-
 #pragma once
 
 #include <FS.h>

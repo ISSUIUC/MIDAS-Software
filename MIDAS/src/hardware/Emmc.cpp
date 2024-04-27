@@ -1,9 +1,3 @@
-/**
- * @file Emmc.cpp
- * 
- * @brief Function definitions for the emmc
-*/
-
 #include "Emmc.h"
 
 /**
