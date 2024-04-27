@@ -58,7 +58,7 @@ GPS GPSSensor::read() {
         month = 1;
     }
     int month_time = months[month - 1];
-    if (is_leapyear(gprmc_message.date % 100) && month >= 2) {
+    if (is_leapyear(gprmc_message.date % 100) && month >= 3) {
         month_time++;
     }
     uint32_t time = (day - 1) + month_time * 86400 + (30 + gprmc_message.date % 100) * 31536000;
