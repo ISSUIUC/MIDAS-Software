@@ -72,7 +72,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
 
     #ifdef IS_SUSTAINER
-    packet.fsm_satcount |= (1 << 7);
+    packet.fsm_callsign_satcount |= (1 << 7);
     #endif
 
     return packet;
