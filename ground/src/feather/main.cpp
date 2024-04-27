@@ -349,6 +349,13 @@ void loop() {
         }
     }
     serial_parser.read();
+    if (Serial.available()) {
+        String input = Serial.readStringUntil('\n');
+        if (input.startsWith("FREQ:")) {
+            float freq = input.substring(5).toFloat(); // Extract frequency value
+            ChangeFrequency(freq);
+        }
+    }
 }
 #endif
 
