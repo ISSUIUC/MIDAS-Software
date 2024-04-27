@@ -48,6 +48,12 @@ class TelemetryThread(threading.Thread):
         while True:
             # Wrap all in a try-except to catch errors.
             try:
+                # Defer if we have unsent packets.
+                if len(self.__queue) != 0:
+                    # If queue is not empty, defer.
+                    continue
+
+
                 # Read all from the comport
                 raw_in = self.__read_comport()
                 if len(raw_in) == 0:
@@ -67,8 +73,8 @@ class TelemetryThread(threading.Thread):
                     try:
                         packet_in = json.loads(pkt)
                     except json.decoder.JSONDecodeError as json_err:
-                        print(json_err)
-                        print(pkt)
+                        # print(json_err)
+                        # print(pkt)
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")
                         self.__log.console_log(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
                         self.__log.fail()
@@ -98,6 +104,7 @@ class TelemetryThread(threading.Thread):
         return len(self.__queue) == 0
 
     def get_queue(self):
+        print("getting queue")
         return self.__queue
     
     def clear(self):
@@ -142,10 +149,12 @@ class MQTTThread(threading.Thread):
                     if combiner.empty():
                         continue
 
+                    
+
                     packets = combiner.get_best()
+                    # print(combiner.get_mqtt_data_topic(), packets)
                     self.__log.set_waiting(len(packets))
                     for data in packets:
-                        
                         data_encoded = json.dumps(data).encode("utf-8")
                         
                         self.__log.console_log(f"Publishing {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")

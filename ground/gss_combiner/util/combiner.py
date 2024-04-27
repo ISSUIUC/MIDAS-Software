@@ -16,10 +16,10 @@ class TelemetryCombiner():
             self.__allow_sustainer = allow_sustainer
 
         def test(self, packet) -> bool:
-            if (packet['value']['is_sustainer'] and self.__allow_sustainer):
+            if (packet['value']['IS_SUSTAINER'] and self.__allow_sustainer):
                 return True
             
-            if (not packet['value']['is_sustainer'] and self.__allow_booster):
+            if (not packet['value']['IS_SUSTAINER'] and self.__allow_booster):
                 return True
             
             return False
@@ -35,8 +35,10 @@ class TelemetryCombiner():
         self.__filter = filter
 
     def empty(self) -> bool:
+        o = ""
         for thread in self.__threads:
             # print("Try thread .. ", thread.get_queue())
+
             if not thread.empty():
                 return False
         return True
