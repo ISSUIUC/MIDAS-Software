@@ -32,9 +32,9 @@
 // #define LED 13 // Blinks on receipt
 
 float RF95_FREQ = 427;
-#define SUSTAINER_FREQ 426.15
-#define BOOSTER_FREQ 427
-#define GROUND_FREQ 425
+float SUSTAINER_FREQ = 426.15;
+float BOOSTER_FREQ = 427;
+float GROUND_FREQ = 425;
 
 float current_freq = 0;
 
@@ -326,10 +326,10 @@ void setup() {
 
 void ChangeFrequency(float freq) {
     rf95.setFrequency(freq);
-    Serial.println(json_command_success);
-    Serial.print(R"({"type": "freq_success", "frequency":)");
-    Serial.print(freq);
-    Serial.println("}");
+    // Serial.println(json_command_success);
+    // Serial.print(R"({"type": "freq_success", "frequency":)");
+    // Serial.print(freq);
+    // Serial.println("}");
 }
 
 #ifdef IS_GROUND
@@ -386,15 +386,16 @@ unsigned long prev_time = 0;
 void loop() {
     
     PrintDequeue();
-    TelemetryPacket packet;
     unsigned long current_time = millis();
     if (current_time - prev_time > 2000) {
         if(current_freq == SUSTAINER_FREQ) {
             ChangeFrequency(BOOSTER_FREQ);
             current_freq = BOOSTER_FREQ;
+            Serial.println("Sustainer timeout, Switching to booster freq");
         } else {
             ChangeFrequency(SUSTAINER_FREQ);
             current_freq = SUSTAINER_FREQ;
+            Serial.println("Booster timeout, Switching to sustainer freq");
         }
         prev_time = millis();
     }
@@ -411,11 +412,14 @@ void loop() {
             if(current_freq == SUSTAINER_FREQ) {
                 ChangeFrequency(BOOSTER_FREQ);
                 current_freq = BOOSTER_FREQ;
+                Serial.println("Switching to booster freq");
             } else {
                 ChangeFrequency(SUSTAINER_FREQ);
                 current_freq = SUSTAINER_FREQ;
+                Serial.println("Switching to sustainer freq");
             }
             prev_time = millis();
+            Serial.println(prev_time);
         } else {
             Serial.println(json_receive_failure);
         }
