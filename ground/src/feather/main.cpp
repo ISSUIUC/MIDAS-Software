@@ -31,9 +31,8 @@
 #define RFM95_INT 3
 // #define LED 13 // Blinks on receipt
 
-// Change to 434.0 or other frequency, must match RX's freq!
 float RF95_FREQ = 426.15;
-#define SUSTAINER_FREQ 426.15
+#define SUSTAINER_FREQ 427
 #define BOOSTER_FREQ 427
 #define GROUND_FREQ 425
 
@@ -409,12 +408,15 @@ void loop() {
             }
             uint8_t packetBuffer[sizeof(packet)];
             memcpy(packetBuffer, &packet, sizeof(packet));
-            rf95.send(packetBuffer, len);
-            if(current_freq == SUSTAINER_FREQ) {
-                ChangeFrequency(BOOSTER_FREQ);
-            } else {
-                ChangeFrequency(SUSTAINER_FREQ);
-            }
+            rf95.send(packetBuffer, len);\
+            ChangeFrequency(SUSTAINER_FREQ);
+            // if(current_freq == SUSTAINER_FREQ) {
+            //     ChangeFrequency(BOOSTER_FREQ);
+            //     current_freq = BOOSTER_FREQ;
+            // } else {
+            //     ChangeFrequency(SUSTAINER_FREQ);
+            //     current_freq = SUSTAINER_FREQ;
+            // }
         } else {
             Serial.println(json_receive_failure);
         }
