@@ -75,9 +75,20 @@ Additionally, for this launch we have adopted the following lookup scheme for de
 This system uses [MQTT](https://mqtt.org/) as the primary data transfer method to other sections of the telemetry system. This is accomplished using multiple data streams. While technically unsecured, `data` streams are intended to be read-only (and only written to by this service), while `control` streams are intended to allow control of the system. As of writing (4/16), the current accepted data streams for GSS 1.1 are the following:
 
 `FlightData-All` (`data`): Subscribe to receive all telemetry packets (Both booster and sustainer)
+
 `FlightData-Sustainer` (`data`): Subscribe to receive sustainer telemetry packets
+
 `FlightData-Booster` (`data`): Subscribe to receive booster telemetry packets
+
 `Control-Sustainer` (`control`): Publish to edit Sustainer telemetry system functionality.
+
 `Control-Booster` (`control`): Publish to edit Booster telemetry system functionality.
+
 `Common` (`control / data`): Data published by auxiliary services or non-critical systems. 
+
+
+## Null-Modem Emulation
+It is possible to run full tests of this telemetry system without access to the telemetry hardware. Installing a null-modem emulator such as [this one](https://com0com.sourceforge.net/) will allow you to emulate COM ports on your device and run the `test/test.py` script. 
+
+While this is the software we use for internal testing of this system, we cannot guarantee your results regarding installation and software safety.
 

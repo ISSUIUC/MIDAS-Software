@@ -1,5 +1,11 @@
 # GSS Combiner. ISS Spaceshot Avionics 2024
-# Allows for a centralized telemetry system with a pub/sub architecture.
+# A pub-sub architecture telemetry system to allow for rapid development of telemetry-consuming systems
+# -----------------------------------------------------------------------------------------------------
+# Peter Giannetos (2025)
+# Aidan Costello (2026)
+# Aaditya Voruganti (2026)
+# Zyun Lam (2027)
+# Michael Karpov (2027)
 
 # USAGE:
 # py ./main.py [options]
@@ -28,19 +34,23 @@ import util.logger as logger
 import util.print_util
 
 
-def assert_alive(threads: list[threading.Thread]):
-    for thread in threads:
-        assert thread.is_alive()
-
 uri_target = ""
 cfg = configparser.ConfigParser()
 cfg.read("./config.ini")
 
-
-def is_tl_arg(argument):
-    return argument.startswith("--") or argument.startswith("-")
+def assert_alive(threads: list[threading.Thread]):
+    """Used in the main loop of the combiner to ensure that all threads stay alive."""
+    for thread in threads:
+        assert thread.is_alive()
 
 def parse_params(arguments):
+    """Parse parameters passed into this script and return them as a flat tuple."""
+
+    def is_tl_arg(argument):
+        """Helper function for determining whether a cli argument is a top-level argument or not.
+        Returns true if the argument is a top-level argument."""
+        return argument.startswith("--") or argument.startswith("-")
+
     num_params = len(arguments)
     arg_ptr = 1 # Skip ./main.py arg
 
@@ -102,6 +112,7 @@ def parse_params(arguments):
             arg_ptr += 2
             continue
 
+        # Handle misc arguments
         if (arg == "--ip" or arg == "-i"):
             next_arg = arguments[arg_ptr + 1]
             if(is_tl_arg(next_arg)):
@@ -149,6 +160,7 @@ if __name__ == "__main__":
     booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv)
 
     if(use_config is not None):
+        # If a config is specified, re-interpret parameters once using the config.
         try:
             CFG_ARGS = cfg[use_config]['args'].split(" ")
         except:
@@ -159,9 +171,9 @@ if __name__ == "__main__":
         print("Using command", " ".join(sys.argv + CFG_ARGS) + "\n")
         booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv + CFG_ARGS)
     
+    # Ensure that the user is notified if they do not specify any data sources.
     if len(booster_sources)==0 and len(sustainer_sources)==0 and len(relay_sources)==0:
         print("\n\x1b[1m\x1b[33mWARNING: No sources have been selected! You will not read data!\x1b[0m\n")
-
 
     if is_local:
         uri_target = "localhost"
@@ -179,25 +191,34 @@ if __name__ == "__main__":
     telem_threads_sustainer = []
     telem_threads_relay = []
 
-
-
+    # Initialize primary MQTT thread
     broadcast_thread = mqtt.MQTTThread(uri_target, log.create_stream(logger.LoggerType.MQTT, "main"))    
 
+    # Initialize telemetry combiners
     combiner_sustainer = combiner.TelemetryCombiner("Sustainer", log.create_stream(logger.LoggerType.COMBINER, "Sustainer"), filter=combiner.TelemetryCombiner.FilterOptions(allow_sustainer=True))
     combiner_booster = combiner.TelemetryCombiner("Booster", log.create_stream(logger.LoggerType.COMBINER, "Booster"), filter=combiner.TelemetryCombiner.FilterOptions(allow_booster=True))
 
+    # Set up MQTT and control streams
     combiner_sustainer.add_mqtt(broadcast_thread)
     combiner_booster.add_mqtt(broadcast_thread)
     broadcast_thread.subscribe_control(combiner_booster)
     broadcast_thread.subscribe_control(combiner_sustainer)
 
+    # Determine RF frequencies from config
     FREQ_SUSTAINER = cfg['config:rf']['rfSustainer']
     FREQ_BOOSTER = cfg['config:rf']['rfBooster']
     FREQ_RELAY = cfg['config:rf']['rfRelay']
 
+    # IMPORTANT! --------------------------------------------------------------------------------------------------------------------------------------
+    # When decoding packets for telemetry purposes, we encode callsign in a 'callsign bit' which determines which callsign is being used for that stage
+    # When this bit is set, the callsign is interpreted as KD9ZMJ
+    # When this bit is NOT set, the callsign is interpreted as KD9ZPM
+    # -------------------------------------------------------------------------------------------------------------------------------------------------
+
     if not overwrite_rf:
         print("Skipping Frequency override")
 
+    # Set up booster telemetry threads
     for port in booster_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_booster)
@@ -205,6 +226,7 @@ if __name__ == "__main__":
             new_thread.write_frequency(FREQ_BOOSTER)
         telem_threads_booster.append(new_thread)
 
+    # Set up sustainer telemetry threads
     for port in sustainer_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_sustainer)
@@ -212,6 +234,7 @@ if __name__ == "__main__":
             new_thread.write_frequency(FREQ_SUSTAINER)
         telem_threads_sustainer.append(new_thread)
 
+    # Set up telemetry threads for drone relay
     for port in relay_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_booster)
@@ -221,6 +244,7 @@ if __name__ == "__main__":
         telem_threads_relay.append(new_thread)
 
 
+    # Start all threads
     for thd in telem_threads_booster:
         thd.start()
 
@@ -230,29 +254,31 @@ if __name__ == "__main__":
     for thd in telem_threads_relay:
         thd.start()
 
-
-    
     broadcast_thread.start()
-
     threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer
-
-    assert_alive(threads)
+    assert_alive(threads) # Ensure all threads initialized successfully
 
     print("\nTelemetry system initialized successfully!\n\n")
 
-
+    # Set up visualization variables
     print_delay = 0.5
     last_print_db = datetime.datetime.now().timestamp() + print_delay
 
+    # Print visualization legend
     if (not is_verbose and is_visual):
         logger.print_legend(uri_target)
 
+
     while True:
+        # Main loop:
+        # Ensures threads stay alive and displays visualization of system health
+
         assert_alive(threads)
 
         if (is_verbose or not is_visual):
             continue
 
+        # Only print occasionally to not flood standard print
         if(datetime.datetime.now().timestamp() - last_print_db > 0):
             last_print_db = datetime.datetime.now().timestamp() + print_delay
 
@@ -269,11 +295,3 @@ if __name__ == "__main__":
             # Send status
             send_data = {"source": "gss_combiner", "action": "none", "time": datetime.datetime.now().timestamp(), "data": raw_data}
             broadcast_thread.publish_common(json.dumps(send_data))
-
-
-# com0com setup:
-# COM1 <-> COM16
-# COM2 <-> COM17
-# COM18 <-> COM19
-# COM20 <-> COM21
-# & C:/Python311/python.exe c:/Users/mpkar/Documents/ISS/MIDAS-Software/ground/gss_combiner/main.py --sustainer COM1,COM2 --booster COM18,COM20

@@ -1,24 +1,26 @@
-import threading
-import serial
-import serial.tools.list_ports
-import paho.mqtt.publish as publish
+# Telemetry Combiner
+# ISS Spaceshot Avionics 2024
+
 from datetime import datetime, timezone
 from collections import deque
 import copy
-import json
 
 import util.mqtt as mqtt
 import util.logger
 
-
 class TelemetryCombiner():
+    """A class that combines multiple data streams from an antenna array into a single coherent stream to be interpreted by ISS telemetry systems
+    
+    Allows for filtering packets based on rocket stages as well as fine control over the handling of duplicate packets"""
 
     class FilterOptions():
+        """A helper filter class to define which packets are allowed to be sent to a `TelemetryCombiner`"""
         def __init__(self, allow_booster=False, allow_sustainer=False) -> None:
             self.__allow_booster = allow_booster
             self.__allow_sustainer = allow_sustainer
 
         def test(self, packet) -> bool:
+            """Returns whether or not this packet should be sent to this `TelemetryCombiner`"""
             if (packet['value']['is_sustainer'] and self.__allow_sustainer):
                 return True
             
@@ -28,15 +30,19 @@ class TelemetryCombiner():
             return False
         
     class DuplicateDatapoints():
+        """Helper class to handle duplicate handling in `TelemetryCombiner`"""
         class DP():
+            """A single duplicate packet list checker"""
             def __init__(self, packets) -> None:
                 self.__packets = packets
                 self.__ts = datetime.now().timestamp()
 
             def get_ts(self) -> float:
+                """Return the timestamp this packet list was added"""
                 return self.__ts
 
             def check(self, packet) -> bool:
+                """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` (Tests for duplicates)"""
                 try:
                     for pkt in self.__packets:
                         if packet['value'] == pkt['value']:
@@ -53,9 +59,11 @@ class TelemetryCombiner():
             self.__timeout = timeout
 
         def insert(self, pkt_list):
+            """Add a packet list to the `DuplicateDatapoints` checker"""
             self.__duplicates.append(TelemetryCombiner.DuplicateDatapoints.DP(pkt_list))
 
         def clear_old(self):
+            """Removes packet lists whose `timeout` has expired."""
             new_list = []
             for dp in self.__duplicates:
                 if (datetime.now().timestamp() + self.__timeout > dp.get_ts()):
@@ -63,7 +71,7 @@ class TelemetryCombiner():
             self.__duplicates = new_list
 
         def check(self, packet) -> bool:
-            
+            """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` (Tests for duplicates)"""
             self.clear_old()
             for dp in self.__duplicates:
                 if not dp.check(packet):
@@ -83,7 +91,7 @@ class TelemetryCombiner():
         self.__duplicate = TelemetryCombiner.DuplicateDatapoints(2)
 
     def enqueue_packet(self, packet):
-
+        """Add a packet to this telemetry combiner to be checked and sent"""
         self.__packets_in.append(packet)
         filter = self.filter()
         self.__duplicate.insert(filter)
@@ -91,22 +99,27 @@ class TelemetryCombiner():
             mqtt_src.publish(filter, self.get_mqtt_data_topic())
 
     def add_mqtt(self, mqtt_thread: mqtt.MQTTThread):
+        """Add an MQTT data sink to this combiner"""
         self.__mqtt_threads.append(mqtt_thread)
 
     def empty(self) -> bool:
+        """Returns whether or not this combiner is empty (has no waiting packets)"""
         return len(self.__packets_in) == 0
     
     def get_mqtt_data_topic(self) -> str:
+        """Return the data topic for the MQTT stream for this combiner"""
         return "FlightData-" + self.__stage
     
     def get_mqtt_control_topic(self) -> str:
+        """Return the control topic for the MQTT stream for this combiner"""
         return "Control-" + self.__stage
 
     def clear(self):
+        """Clear the packet queue of this combiner"""
         self.__packets_in.clear()
 
-
     def filter(self):
+        """Returns a filtered list of packets that should be sent to the system from this combiner"""
         seen_timestamps = set()
         packet_release = []
         cur_latest = self.__ts_latest

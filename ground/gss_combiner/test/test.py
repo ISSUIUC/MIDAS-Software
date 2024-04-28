@@ -11,7 +11,6 @@ import paho.mqtt.publish as publish
 # COM18 <-> COM19
 # COM20 <-> COM21
 
-
 # print("Sleep 1s")
 # time.sleep(1)
 # publish.single("Control-Sustainer", "payload", hostname="localhost")
