@@ -4,12 +4,12 @@ import threading
 import json
 import traceback
 import copy
+import io
 
 import serial # PySerial
 import paho.mqtt.client as mqtt
 
 import util.logger
-
 
 class TelemetryThread(threading.Thread):
     """A thread class handling all communications between COM ports to which telemetry devices are connected."""
@@ -49,9 +49,15 @@ class TelemetryThread(threading.Thread):
     def __read_comport(self):
         """Read all data from the associated COM port"""
         if self.__comport.in_waiting:
-            return self.__comport.read_all()
+            p_full = ""
+            while self.__comport.in_waiting:
+                data = self.__comport.read_all()
+                p_full += bytes.decode(data, encoding="ascii")
+                
+            
+            return p_full.split("\n")
         else:
-            return ""
+            return []
         
     def add_combiner(self, combiner):
         """Add a combiner data sink for this telemetry thread"""
@@ -68,13 +74,11 @@ class TelemetryThread(threading.Thread):
             # Wrap all in a try-except to catch errors.
             try:
                 # Read all from the comport
-                raw_in = self.__read_comport()
+                packets = self.__read_comport()
 
-                if len(raw_in) == 0:
+                if(len(packets) == 0):
                     # Defer if no data in COM port
                     continue
-
-                packets = bytes.decode(raw_in, encoding='utf-8').split('\n')[:-1] # Split packets by delimeter, get newest packets first.
                 
                 # Process raw to packet
                 self.__log.console_log(f"Processing {len(packets)} packets..")
@@ -92,12 +96,6 @@ class TelemetryThread(threading.Thread):
                             print(packet_in)
                             continue
                     except json.decoder.JSONDecodeError as json_err:
-                        print()
-                        print(json_err)
-                        print(pkt)
-                        print()
-                        print(raw_in)
-                        print()
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")
                         self.__log.console_log(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
                         self.__log.fail()

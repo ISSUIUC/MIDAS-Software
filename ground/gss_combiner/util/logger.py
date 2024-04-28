@@ -17,10 +17,11 @@ class LoggerType(str, Enum):
 
 class LoggerStream():
     """Class to encapsulate logging at different levels for the GSS combiner system"""
-    def __init__(self, options: LoggerOptions, type: LoggerType, name: str) -> None:
+    def __init__(self, options: LoggerOptions, type: LoggerType, name: str, meta_category:str) -> None:
         self.__title = type.value + " " + name
         self.__filename = "./outputs/" + str(int(datetime.datetime.now().timestamp())) + "_" + type.value + name + "_raw_output.txt"
         self.__lstype = type
+        self.__meta_cat = meta_category
         self.__opts = options
         self.__file = None
         self.__failures = 0
@@ -34,7 +35,9 @@ class LoggerStream():
 
     def serialize(self) -> dict:
         """Turn this stream's vitals into an easy-to-send format"""
-        return {"success": self.__success, "fail": self.__failures, "waiting": self.__waiting}
+        return self.__meta_cat, {"success": self.__success, "fail": self.__failures, "waiting": self.__waiting}
+    
+
     
     def get_name(self) -> str:
         return self.__title
@@ -94,8 +97,8 @@ class Logger():
         self.__options = options
         self.__streams = {}
         
-    def create_stream(self, stream_type: LoggerType, stream_name: str) -> LoggerStream:
-        stream = LoggerStream(self.__options, stream_type, stream_name)
+    def create_stream(self, stream_type: LoggerType, stream_name: str, stream_meta: str) -> LoggerStream:
+        stream = LoggerStream(self.__options, stream_type, stream_name, stream_meta)
         self.__streams[stream_type + stream_name] = stream
         return stream
     

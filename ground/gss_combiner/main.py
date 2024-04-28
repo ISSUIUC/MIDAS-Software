@@ -192,11 +192,11 @@ if __name__ == "__main__":
     telem_threads_relay = []
 
     # Initialize primary MQTT thread
-    broadcast_thread = mqtt.MQTTThread(uri_target, log.create_stream(logger.LoggerType.MQTT, "main"))    
+    broadcast_thread = mqtt.MQTTThread(uri_target, log.create_stream(logger.LoggerType.MQTT, "main", "mqtt"))    
 
     # Initialize telemetry combiners
-    combiner_sustainer = combiner.TelemetryCombiner("Sustainer", log.create_stream(logger.LoggerType.COMBINER, "Sustainer"), filter=combiner.TelemetryCombiner.FilterOptions(allow_sustainer=True))
-    combiner_booster = combiner.TelemetryCombiner("Booster", log.create_stream(logger.LoggerType.COMBINER, "Booster"), filter=combiner.TelemetryCombiner.FilterOptions(allow_booster=True))
+    combiner_sustainer = combiner.TelemetryCombiner("Sustainer", log.create_stream(logger.LoggerType.COMBINER, "Sustainer", "sustainer_comb"), filter=combiner.TelemetryCombiner.FilterOptions(allow_sustainer=True))
+    combiner_booster = combiner.TelemetryCombiner("Booster", log.create_stream(logger.LoggerType.COMBINER, "Booster", "booster_comb"), filter=combiner.TelemetryCombiner.FilterOptions(allow_booster=True))
 
     # Set up MQTT and control streams
     combiner_sustainer.add_mqtt(broadcast_thread)
@@ -220,7 +220,7 @@ if __name__ == "__main__":
 
     # Set up booster telemetry threads
     for port in booster_sources:
-        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port, "booster_telem"))
         new_thread.add_combiner(combiner_booster)
         if overwrite_rf:
             new_thread.write_frequency(FREQ_BOOSTER)
@@ -228,7 +228,7 @@ if __name__ == "__main__":
 
     # Set up sustainer telemetry threads
     for port in sustainer_sources:
-        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port, "sustainer_telem"))
         new_thread.add_combiner(combiner_sustainer)
         if overwrite_rf:
             new_thread.write_frequency(FREQ_SUSTAINER)
@@ -236,7 +236,7 @@ if __name__ == "__main__":
 
     # Set up telemetry threads for drone relay
     for port in relay_sources:
-        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port, "relay_telem"))
         new_thread.add_combiner(combiner_booster)
         new_thread.add_combiner(combiner_sustainer)
         if overwrite_rf:
@@ -288,7 +288,12 @@ if __name__ == "__main__":
             for ls_name, log_stream in log.streams().items():
                 log_stream: logger.LoggerStream = log_stream
                 status_text += logger.format_stat_string(ls_name, log_stream)
-                raw_data[log_stream.get_name()] = log_stream.serialize()
+                meta_cat, data = log_stream.serialize()
+
+                if not (meta_cat in raw_data):
+                    raw_data[meta_cat] = {}
+                     
+                raw_data[meta_cat][log_stream.get_name()] = data
                 
             print(f"Status: {status_text}", end="\r")
 

@@ -51,7 +51,7 @@ ports = [serial.Serial(c, write_timeout=3) for c in com_in]
 
 def enc(dict):
     json_s = json.dumps(dict) + "\n"
-    return json_s.encode("utf-8")
+    return json_s.encode("ascii")
 
 print("wait 1s")
 time.sleep(1)
