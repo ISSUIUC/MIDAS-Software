@@ -13,11 +13,13 @@
 #    --no-vis  (or -nv)                         -> Shows a visual display of all systems
 #    --ip [IP] (or -i [IP])                     -> Connects to a specific IP. (Overrides --local)
 #    --help    (or -h)                          -> Prints this menu
+#    --config [config] (or -c [config])         -> Uses an argument config defined in config.ini. Added on top of existing params.
 
 import sys
 import threading
 import datetime
 import json
+import configparser
 
 import util.mqtt as mqtt
 import util.combiner as combiner
@@ -29,7 +31,10 @@ def assert_alive(threads: list[threading.Thread]):
     for thread in threads:
         assert thread.is_alive()
 
-uri_target = "10.195.167.19"
+uri_target = ""
+cfg = configparser.ConfigParser()
+cfg.read("./config.ini")
+
 
 def is_tl_arg(argument):
     return argument.startswith("--") or argument.startswith("-")
@@ -51,6 +56,7 @@ def parse_params(arguments):
     is_visual = True
 
     use_ip = None
+    use_config = None
 
     while (arg_ptr < num_params):
         arg = arguments[arg_ptr]
@@ -102,6 +108,14 @@ def parse_params(arguments):
             arg_ptr += 2
             continue
 
+        if (arg == "--config" or arg == "-c"):
+            next_arg = arguments[arg_ptr + 1]
+            if(is_tl_arg(next_arg)):
+                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
+            use_config = next_arg
+            arg_ptr += 2
+            continue
+
         if (arg == "--local" or arg == "-l"):
             is_local = True
 
@@ -121,15 +135,28 @@ def parse_params(arguments):
         arg_ptr += 1
 
 
-    if not has_sustainer and not has_booster and not has_relay:
-        print("\n\x1b[1m\x1b[33mWARNING: No sources have been selected! You will not read data!\x1b[0m\n")
     
-    return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip
+    return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip, use_config
 
 if __name__ == "__main__":
     threads = []
 
-    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override = parse_params(sys.argv)
+    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, use_config = parse_params(sys.argv)
+
+    if(use_config is not None):
+        try:
+            CFG_ARGS = cfg[use_config]['args'].split(" ")
+        except:
+            print("Argument config does not exist!")
+            exit(1)
+
+        print("Using config ", use_config)
+        print("Using command", " ".join(sys.argv + CFG_ARGS) + "\n")
+        booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, use_config = parse_params(sys.argv + CFG_ARGS)
+    
+    if len(booster_sources)==0 and len(sustainer_sources)==0 and len(relay_sources)==0:
+        print("\n\x1b[1m\x1b[33mWARNING: No sources have been selected! You will not read data!\x1b[0m\n")
+
 
     if is_local:
         uri_target = "localhost"
@@ -141,7 +168,7 @@ if __name__ == "__main__":
 
     print("Using sustainer sources: ", sustainer_sources)
     print("Using booster sources: ", booster_sources)
-    print("Using relay sources: ", relay_sources)
+    print("Using relay sources: ", relay_sources, "\n\n")
 
     telem_threads_booster = []
     telem_threads_sustainer = []
@@ -159,20 +186,27 @@ if __name__ == "__main__":
     broadcast_thread.subscribe_control(combiner_booster)
     broadcast_thread.subscribe_control(combiner_sustainer)
 
+    FREQ_SUSTAINER = cfg['config:rf']['rfSustainer']
+    FREQ_BOOSTER = cfg['config:rf']['rfBooster']
+    FREQ_RELAY = cfg['config:rf']['rfRelay']
+
     for port in booster_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_booster)
+        new_thread.write_frequency(FREQ_BOOSTER)
         telem_threads_booster.append(new_thread)
 
     for port in sustainer_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_sustainer)
+        new_thread.write_frequency(FREQ_SUSTAINER)
         telem_threads_sustainer.append(new_thread)
 
     for port in relay_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_booster)
         new_thread.add_combiner(combiner_sustainer)
+        new_thread.write_frequency(FREQ_RELAY)
         telem_threads_relay.append(new_thread)
 
 

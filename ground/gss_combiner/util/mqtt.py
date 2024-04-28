@@ -18,7 +18,7 @@ class TelemetryThread(threading.Thread):
         self.__log = log_stream
         self.__topic = all_data_topic
         self.__log.console_log(f"Opening {com_port}")
-        self.__comport: serial.Serial = serial.Serial(com_port, baudrate=4800)
+        self.__comport: serial.Serial = serial.Serial(com_port, baudrate=4800, write_timeout=1)
         self.__uri = mqtt_uri
         self.__queue: deque = deque()
         self.__comport.reset_input_buffer()
@@ -34,6 +34,16 @@ class TelemetryThread(threading.Thread):
         # Append timestamps :)
         return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time)}
     
+    def write_frequency(self, frequency:float):
+        self.__log.console_log("Writing frequency command (FREQ:" + str(frequency) + ")")
+        try:
+            self.__send_comport("FREQ:" + str(frequency))
+        except Exception as e:
+            print("Unable to send FREQ command: ", e, "Continuing with no FREQ change.")
+
+    def __send_comport(self, msg: str):
+        self.__comport.write(msg.encode())
+
     def __read_comport(self):
         if self.__comport.in_waiting:
             return self.__comport.read_all()

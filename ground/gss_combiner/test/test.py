@@ -61,6 +61,14 @@ print("Start sending:")
 i = 0
 
 while True:
+
+
+    for port in ports:
+        write_in = port.read_all().decode()
+        if(len(write_in) > 0):
+            print("READ:", port.name, write_in)
+
+
     time.sleep(0.5)
     packet = enc(get_packet())
     p = ports[i]
@@ -68,11 +76,11 @@ while True:
     print(f"Sent packet to port {com_in[i]}")
     i = (i + 1) % len(ports)
 
-    time.sleep(0.1)
-    p = ports[i]
-    p.write(packet)
-    print(f"Sent packet to port {com_in[i]}")
-    i = (i + 1) % len(ports)
+    # time.sleep(0.1)
+    # p = ports[i]
+    # p.write(packet)
+    # print(f"Sent packet to port {com_in[i]}")
+    # i = (i + 1) % len(ports)
 
 
     pass
