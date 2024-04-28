@@ -69,6 +69,7 @@ class TelemetryThread(threading.Thread):
             try:
                 # Read all from the comport
                 raw_in = self.__read_comport()
+
                 if len(raw_in) == 0:
                     # Defer if no data in COM port
                     continue
@@ -85,8 +86,18 @@ class TelemetryThread(threading.Thread):
                         continue # Ignore empty data
                     try:
                         packet_in = json.loads(pkt)
-                        self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
+                        if packet_in['type'] == 'data':
+                            self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
+                        else:
+                            print(packet_in)
+                            continue
                     except json.decoder.JSONDecodeError as json_err:
+                        print()
+                        print(json_err)
+                        print(pkt)
+                        print()
+                        print(raw_in)
+                        print()
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")
                         self.__log.console_log(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
                         self.__log.fail()
