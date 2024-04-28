@@ -14,6 +14,7 @@
 #    --ip [IP] (or -i [IP])                     -> Connects to a specific IP. (Overrides --local)
 #    --help    (or -h)                          -> Prints this menu
 #    --config [config] (or -c [config])         -> Uses an argument config defined in config.ini. Added on top of existing params.
+#    --no-rf                                    -> Does not overwrite feather frequencies on startup
 
 import sys
 import threading
@@ -57,6 +58,7 @@ def parse_params(arguments):
 
     use_ip = None
     use_config = None
+    overwrite_rf = True
 
     while (arg_ptr < num_params):
         arg = arguments[arg_ptr]
@@ -122,6 +124,9 @@ def parse_params(arguments):
         if (arg == "--no-log" or arg == "-n"):
             should_log = False
 
+        if (arg == "--no-rf"):
+            overwrite_rf = False
+
         if (arg == "--help" or arg == "-h"):
             print(util.print_util.HELP_OUTPUT)
             exit(0)
@@ -136,12 +141,12 @@ def parse_params(arguments):
 
 
     
-    return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip, use_config
+    return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip, overwrite_rf, use_config
 
 if __name__ == "__main__":
     threads = []
 
-    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, use_config = parse_params(sys.argv)
+    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv)
 
     if(use_config is not None):
         try:
@@ -152,7 +157,7 @@ if __name__ == "__main__":
 
         print("Using config ", use_config)
         print("Using command", " ".join(sys.argv + CFG_ARGS) + "\n")
-        booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, use_config = parse_params(sys.argv + CFG_ARGS)
+        booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv + CFG_ARGS)
     
     if len(booster_sources)==0 and len(sustainer_sources)==0 and len(relay_sources)==0:
         print("\n\x1b[1m\x1b[33mWARNING: No sources have been selected! You will not read data!\x1b[0m\n")
@@ -190,23 +195,29 @@ if __name__ == "__main__":
     FREQ_BOOSTER = cfg['config:rf']['rfBooster']
     FREQ_RELAY = cfg['config:rf']['rfRelay']
 
+    if not overwrite_rf:
+        print("Skipping Frequency override")
+
     for port in booster_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_booster)
-        new_thread.write_frequency(FREQ_BOOSTER)
+        if overwrite_rf:
+            new_thread.write_frequency(FREQ_BOOSTER)
         telem_threads_booster.append(new_thread)
 
     for port in sustainer_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_sustainer)
-        new_thread.write_frequency(FREQ_SUSTAINER)
+        if overwrite_rf:
+            new_thread.write_frequency(FREQ_SUSTAINER)
         telem_threads_sustainer.append(new_thread)
 
     for port in relay_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
         new_thread.add_combiner(combiner_booster)
         new_thread.add_combiner(combiner_sustainer)
-        new_thread.write_frequency(FREQ_RELAY)
+        if overwrite_rf:
+            new_thread.write_frequency(FREQ_RELAY)
         telem_threads_relay.append(new_thread)
 
 

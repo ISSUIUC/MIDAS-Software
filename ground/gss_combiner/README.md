@@ -36,20 +36,41 @@ $ python ./main.py <options>
 
 `--sustainer <COM1,COM2,COM3,...>`: Pass in a comma-separated list of COM ports to receive telemetry from, and transmit to the `Sustainer` data topics. 
 
+`--relay <COM1,COM2,COM3,...>`: Pass in a comma-separated list of COM ports to receive telemetry from, specifically for the `Drone Relay` system.
+
 `--local (alias -l)`: Use `localhost` as the MQTT target. Useful for debugging.
 
 `--no-log (alias -n)`: Do not generate logs for this run.
 
 `--verbose (alias -v)`: Print out all combiner actions. This may slow down the combiner due to print volume.
 
-`--no-vis (alias -nv)`:  Disable the visualization for system health (Also disabled with `-v`).
+`--no-vis (alias -nv)`:  Disable the visualization for system health (Also disabled with `--verbose`).
+
+`--config <config> (alias -c)`: Load an argument configuration from the `config.ini` file
+
+`--no-rf`: Skip overriding RF frequencies for the feather reciever.
 
 `--help (alias -h)`: Display a set of these options.
 
 
 Not including sustainer / booster sources will throw a warning, but will still run the system, allowing you to check the connectivity for the backend MQTT broker.
 
-*(MK) Note: This repository also contains Mappy code.. we should probably move it to the Ground-Station-App repository*
+### For Kairos II Summer Launch 2024:
+The `config.ini` file will be updated to include all necessary configuration within the `launch` config. As such you will only need to edit the COM ports present in the file, and you will be able to execute the system with the command
+
+```bash
+$ python ./main.py -c launch
+```
+
+
+Additionally, for this launch we have adopted the following lookup scheme for determining the stage callsign:
+
+| Callsign bit value (highest bit of `fsm_callsign_satcount`) | Callsign |
+| ----------------------------------------------------------- | -------- |
+| 0                                                           | KD9ZPM   |
+| 1                                                           | KD9ZMJ   |
+
+
 ## MQTT Streams
 This system uses [MQTT](https://mqtt.org/) as the primary data transfer method to other sections of the telemetry system. This is accomplished using multiple data streams. While technically unsecured, `data` streams are intended to be read-only (and only written to by this service), while `control` streams are intended to allow control of the system. As of writing (4/16), the current accepted data streams for GSS 1.1 are the following:
 

@@ -12,4 +12,6 @@ py ./main.py [options]
    --no-vis  (or -nv)                         -> Shows a visual display of all systems
    --ip [IP] (or -i [IP])                     -> Connects to a specific IP. (Overrides --local)
    --help    (or -h)                          -> Prints this menu
+   --config [config] (or -c [config])         -> Uses an argument config defined in config.ini. Added on top of existing params.
+   --no-rf                                    -> Does not overwrite feather frequencies on startup
 """

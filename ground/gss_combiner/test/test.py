@@ -69,7 +69,7 @@ while True:
             print("READ:", port.name, write_in)
 
 
-    time.sleep(0.5)
+    time.sleep(0.1)
     packet = enc(get_packet())
     p = ports[i]
     p.write(packet)
