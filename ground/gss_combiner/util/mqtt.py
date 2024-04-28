@@ -4,6 +4,7 @@ from collections import deque
 import threading
 import json
 import traceback
+import copy
 
 import serial # PySerial
 import paho.mqtt.client as mqtt
@@ -23,6 +24,7 @@ class TelemetryThread(threading.Thread):
         self.__comport.reset_input_buffer()
         self.__mqttclient = None
         self.__log.console_log(f"Telemetry thread created.")
+        self.__combiners = []
 
         
     def process_packet(packet_json):
@@ -37,6 +39,10 @@ class TelemetryThread(threading.Thread):
             return self.__comport.read_all()
         else:
             return ""
+        
+    def add_combiner(self, combiner):
+        self.__combiners.append(combiner)
+        
 
     def run(self) -> None:
 
@@ -73,7 +79,7 @@ class TelemetryThread(threading.Thread):
                     try:
                         packet_in = json.loads(pkt)
                         # print(packet_in)
-                        print("Packet type: ", "sustainer" if packet_in['value']['is_sustainer'] else "booster")
+                        self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
                     except json.decoder.JSONDecodeError as json_err:
                         # print(json_err)
                         # print(pkt)
@@ -85,8 +91,9 @@ class TelemetryThread(threading.Thread):
 
                     processed = TelemetryThread.process_packet(packet_in)
 
-                    # Edit queue and send data out.
-                    self.__queue.append(processed) # Append left since newer packets will be further down the serial input stream.
+                    for combiner in self.__combiners:
+                        combiner.enqueue_packet(processed)
+
 
                     proc_json = json.dumps(processed)
                     proc_string = proc_json.encode('utf-8')
@@ -115,10 +122,9 @@ class TelemetryThread(threading.Thread):
 
 class MQTTThread(threading.Thread):
     
-    def __init__(self, combiners, server_uri, log_stream: util.logger.LoggerStream) -> None:
+    def __init__(self, server_uri, log_stream: util.logger.LoggerStream) -> None:
         super(MQTTThread, self).__init__(daemon=True)
         self.__log = log_stream
-        self.__combiners = combiners
         self.__uri = server_uri
         self.__mqttclient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
@@ -132,52 +138,36 @@ class MQTTThread(threading.Thread):
 
         # self.__mqttclient.on_message = on_message
         
-
-        for combiner in self.__combiners:
-            topic = combiner.get_mqtt_control_topic()
-            self.__mqttclient.subscribe(topic) 
-            self.__log.console_log("Subscribed to control stream " + str(topic))
-
         self.__log.console_log("MQTT systems initialized.")
 
+
+    def subscribe_control(self, combiner):
+        topic = combiner.get_mqtt_control_topic()
+        self.__mqttclient.subscribe(topic) 
+        self.__log.console_log("Subscribed to control stream " + str(topic))
+
+    def publish(self, packet_list, topic) -> None:
+        self.__log.waiting_delta(len(packet_list))
+        for data in packet_list:
+            data_encoded = json.dumps(data).encode("utf-8")
+            
+            self.__log.console_log(f"Publishing {getsizeof(data_encoded)} bytes to MQTT stream --> '{topic}'")
+
+            try:
+                self.__mqttclient.publish(topic, data_encoded)
+                self.__log.success()
+
+            except Exception as e:
+                self.__log.console_log("Unresolved packet dump: ", data_encoded)
+                print(f"Unable to publish to '{topic}' : ", str(e)) # Always print
+                self.__log.fail()
+            self.__log.waiting_delta(-1)
 
     def run(self) -> None:
         self.__mqttclient.loop_start()
 
         while True:
-            try:
-                for combiner in self.__combiners:
-                    
-                    if combiner.empty():
-                        continue
-
-                    
-
-                    packets = combiner.get_best()
-                    # print(combiner.get_mqtt_data_topic(), packets)
-                    self.__log.set_waiting(len(packets))
-                    for data in packets:
-                        data_encoded = json.dumps(data).encode("utf-8")
-                        
-                        self.__log.console_log(f"Publishing {getsizeof(data_encoded)} bytes to MQTT stream --> '{combiner.get_mqtt_data_topic()}'")
-
-                        try:
-                            self.__mqttclient.publish(combiner.get_mqtt_data_topic(), data_encoded)
-                            self.__log.success()
-            
-                        except Exception as e:
-                            self.__log.console_log("Unresolved packet dump: ", data_encoded)
-                            print(f"Unable to publish to '{combiner.get_mqtt_data_topic()}' : ", str(e)) # Always print
-                            self.__log.fail()
-                        self.__log.waiting_delta(-1)
-
-
-                # Clear threads
-                for combiner in self.__combiners:
-                    combiner.clear_threads()
-            except Exception as e:
-                print(f"Ran into an uncaught exception.. continuing gracefully.") # Always print
-                self.__log.console_log(f"Error dump: ", str(e))
+            pass
     
     def publish_common(self, data: str):
         try:

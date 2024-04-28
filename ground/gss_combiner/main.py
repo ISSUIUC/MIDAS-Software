@@ -147,16 +147,32 @@ if __name__ == "__main__":
     telem_threads_sustainer = []
     telem_threads_relay = []
 
+
+
+    broadcast_thread = mqtt.MQTTThread(uri_target, log.create_stream(logger.LoggerType.MQTT, "main"))    
+
+    combiner_sustainer = combiner.TelemetryCombiner("Sustainer", log.create_stream(logger.LoggerType.COMBINER, "Sustainer"), filter=combiner.TelemetryCombiner.FilterOptions(allow_sustainer=True))
+    combiner_booster = combiner.TelemetryCombiner("Booster", log.create_stream(logger.LoggerType.COMBINER, "Booster"), filter=combiner.TelemetryCombiner.FilterOptions(allow_booster=True))
+
+    combiner_sustainer.add_mqtt(broadcast_thread)
+    combiner_booster.add_mqtt(broadcast_thread)
+    broadcast_thread.subscribe_control(combiner_booster)
+    broadcast_thread.subscribe_control(combiner_sustainer)
+
     for port in booster_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        new_thread.add_combiner(combiner_booster)
         telem_threads_booster.append(new_thread)
 
     for port in sustainer_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        new_thread.add_combiner(combiner_sustainer)
         telem_threads_sustainer.append(new_thread)
 
     for port in relay_sources:
         new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port))
+        new_thread.add_combiner(combiner_booster)
+        new_thread.add_combiner(combiner_sustainer)
         telem_threads_relay.append(new_thread)
 
 
@@ -169,12 +185,8 @@ if __name__ == "__main__":
     for thd in telem_threads_relay:
         thd.start()
 
-    combiner_sus = combiner.TelemetryCombiner("Sustainer", telem_threads_sustainer + telem_threads_relay, log.create_stream(logger.LoggerType.COMBINER, "Sustainer"), filter=combiner.TelemetryCombiner.FilterOptions(allow_sustainer=True))
-    combiner_boo = combiner.TelemetryCombiner("Booster", telem_threads_booster + telem_threads_relay, log.create_stream(logger.LoggerType.COMBINER, "Booster"), filter=combiner.TelemetryCombiner.FilterOptions(allow_booster=True))
+
     
-
-
-    broadcast_thread = mqtt.MQTTThread([combiner_sus, combiner_boo], uri_target, log.create_stream(logger.LoggerType.MQTT, "main"))
     broadcast_thread.start()
 
     threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer
