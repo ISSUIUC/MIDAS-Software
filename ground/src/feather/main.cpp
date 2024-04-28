@@ -326,10 +326,10 @@ void setup() {
 
 void ChangeFrequency(float freq) {
     rf95.setFrequency(freq);
-    // Serial.println(json_command_success);
-    // Serial.print(R"({"type": "freq_success", "frequency":)");
-    // Serial.print(freq);
-    // Serial.println("}");
+    Serial.println(json_command_success);
+    Serial.print(R"({"type": "freq_success", "frequency":)");
+    Serial.print(freq);
+    Serial.println("}");
 }
 
 #ifdef IS_GROUND
