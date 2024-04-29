@@ -35,7 +35,7 @@ class LoggerStream():
 
     def serialize(self) -> dict:
         """Turn this stream's vitals into an easy-to-send format"""
-        return self.__meta_cat, {"success": self.__success, "fail": self.__failures, "waiting": self.__waiting}
+        return self.__meta_cat, {"success": self.__success, "fail": self.__failures, "waiting": self.__waiting, "last": self.__last_result}
     
 
     
