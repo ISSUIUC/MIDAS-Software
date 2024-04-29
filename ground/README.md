@@ -8,7 +8,7 @@ This is the primary source of information for all things related to **GSS 1.1**,
 - Patrick Marschoun
 - Peter Giannetos
 - Aaditya Voruganti
-- Micheal Karpov
+- Michael Karpov
 
 System architecture:
 
