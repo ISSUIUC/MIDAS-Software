@@ -169,7 +169,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.tilt_angle = tilt; //convert_range(tilt, 180); // [-90, 90]
     data.battery_voltage = convert_range(packet.batt_volt, 16);
     data.sat_count = packet.fsm_satcount >> 4 & 0b0111;
-    data.is_sustainer = packet.fsm_satcount >> 7;
+    data.is_sustainer = !(packet.fsm_satcount >> 7);
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
     data.rssi = rf95.lastRssi();
@@ -237,7 +237,10 @@ void set_freq_local_bug_fix(float freq) {
     rf95.send((uint8_t*)&t, sizeof(t));
     rf95.waitPacketSent();
     rf95.setFrequency(freq);
-    current_freq = freq;
+    Serial.println(json_command_success);
+    Serial.print(R"({"type": "freq_success", "frequency":)");
+    Serial.print(freq);
+    Serial.println("}");
 }
 
 void SerialInput(const char* key, const char* value) {
