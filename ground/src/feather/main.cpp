@@ -34,7 +34,7 @@
 float RF95_FREQ = 427;
 float SUSTAINER_FREQ = 426.15;
 float BOOSTER_FREQ = 425.15;
-float GROUND_FREQ = 423;
+float GROUND_FREQ = 420;
 
 float current_freq = 0;
 
@@ -325,6 +325,7 @@ void setup() {
 }
 
 void ChangeFrequency(float freq) {
+    float current_time = millis();
     rf95.setFrequency(freq);
     Serial.println(json_command_success);
     Serial.print(R"({"type": "freq_success", "frequency":)");
@@ -370,7 +371,7 @@ void loop() {
         String input = Serial.readStringUntil('\n');
         if (input.startsWith("FREQ:")) {
             float freq = input.substring(5).toFloat(); // Extract frequency value
-            ChangeFrequency(freq);
+            set_freq_local_bug_fix(freq);
             RF95_FREQ = freq;
             current_freq = freq;
         }
@@ -414,14 +415,15 @@ void loop() {
             digitalWrite(LED_BUILTIN, LOW);
             memcpy(&packet, buf, sizeof(packet));
             EnqueuePacket(packet, current_freq);
-            ChangeFrequency(GROUND_FREQ);
+            set_freq_local_bug_fix(GROUND_FREQ);
+            
             rf95.send(buf, len);
             if(current_freq == SUSTAINER_FREQ) {
-                ChangeFrequency(BOOSTER_FREQ);
+                set_freq_local_bug_fix(BOOSTER_FREQ);
                 current_freq = BOOSTER_FREQ;
                 Serial.println("Switching to booster freq");
             } else {
-                ChangeFrequency(SUSTAINER_FREQ);
+                set_freq_local_bug_fix(SUSTAINER_FREQ);
                 current_freq = SUSTAINER_FREQ;
                 Serial.println("Switching to sust69ainer freq");
             }
