@@ -234,7 +234,8 @@ void SerialError() { Serial.println(json_command_parse_error); }
 void set_freq_local_bug_fix(float freq) {
     telemetry_command t;
     t.command = CommandType::EMPTY;
-    rf95.send((uint8_t*)&t, sizeof(t));
+    rf95.send((uint8_t*)&t, 0);
+    Serial.println(sizeof(t));
     rf95.waitPacketSent();
     rf95.setFrequency(freq);
     Serial.println(json_command_success);
@@ -416,8 +417,8 @@ void loop() {
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
-            memcpy(&packet, buf, sizeof(packet));
-            EnqueuePacket(packet, current_freq);
+            // memcpy(&packet, buf, sizeof(packet));
+            // EnqueuePacket(packet, current_freq);
             set_freq_local_bug_fix(GROUND_FREQ);
             
             rf95.send(buf, len);
