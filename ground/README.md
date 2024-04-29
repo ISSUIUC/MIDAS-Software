@@ -1,6 +1,15 @@
 # GSS v1.1
 This is the primary source of information for all things related to **GSS 1.1**, the telemetry system used for Spaceshot's 2024 launch of *Kairos II* at FAR 51025!
 
+## Contributors
+
+- Nicholas Phillips
+- Gautam Dayal
+- Patrick Marschoun
+- Peter Giannetos
+- Aaditya Voruganti
+- Micheal Karpov
+
 System architecture:
 
 Changes from **GSS 1.0**: Unlike GSS 1.0, the new system uses a single laptop to combine streams from our antenna array and send out the data to a network, with all other data consumers subscribing to a stream over [MQTT](https://mqtt.org/). Additionally, this architecture allows us to implement other systems into our ecosystem which use telemetry data but would otherwise slow down our telemetry computers.
@@ -15,15 +24,6 @@ This repository contains the software for the ground station hardware (LoRa Feat
 ## Description
 
 The ground station software is responsible for receiving telemetry data from the rocket, processing commands sent from the ground station GUI, and interfacing with the LoRa Feather module. It includes functionalities such as setting frequency, sending commands to the rocket, and parsing telemetry data.
-
-## Contributors
-
-- Nicholas Phillips
-- Gautam Dayal
-- Patrick Marschoun
-- Peter Giannetos
-- Aaditya Voruganti
-- Micheal Karpov
 
 ## Features
 
