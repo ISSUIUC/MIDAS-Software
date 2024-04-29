@@ -34,7 +34,7 @@
 float RF95_FREQ = 427;
 float SUSTAINER_FREQ = 426.15;
 float BOOSTER_FREQ = 425.15;
-float GROUND_FREQ = 425;
+float GROUND_FREQ = 423;
 
 float current_freq = 0;
 
@@ -386,20 +386,21 @@ unsigned long prev_time = 0;
 void loop() {
     
     PrintDequeue();
-    unsigned long current_time = millis();
-    if (current_time - prev_time > 2000) {
-        if(current_freq == SUSTAINER_FREQ) {
-            ChangeFrequency(BOOSTER_FREQ);
-            current_freq = BOOSTER_FREQ;
-            Serial.println("Sustainer timeout, Switching to booster freq");
-        } else {
-            ChangeFrequency(SUSTAINER_FREQ);
-            current_freq = SUSTAINER_FREQ;
-            Serial.println("Booster timeout, Switching to sustainer freq");
-        }
-        prev_time = millis();
-    }
+    // unsigned long current_time = millis();
+    // if (current_time - prev_time > 2000) {
+    //     if(current_freq == SUSTAINER_FREQ) {
+    //         ChangeFrequency(BOOSTER_FREQ);
+    //         current_freq = BOOSTER_FREQ;
+    //         Serial.println("Sustainer timeout, Switching to booster freq");
+    //     } else {
+    //         ChangeFrequency(SUSTAINER_FREQ);
+    //         current_freq = SUSTAINER_FREQ;
+    //         Serial.println("Booster timeout, Switching to sustainer freq");
+    //     }
+    //     prev_time = millis();
+    // }
     if (rf95.available()) {
+        TelemetryPacket packet;
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         uint8_t len = sizeof(buf);
 
@@ -411,6 +412,8 @@ void loop() {
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
+            memcpy(&packet, buf, sizeof(packet));
+            EnqueuePacket(packet, current_freq);
             ChangeFrequency(GROUND_FREQ);
             rf95.send(buf, len);
             if(current_freq == SUSTAINER_FREQ) {
@@ -423,7 +426,7 @@ void loop() {
                 Serial.println("Switching to sust69ainer freq");
             }
             prev_time = millis();
-            Serial.print(current_time);
+            // Serial.print(current_time);
             Serial.print(" ");
             Serial.println(prev_time);
         } else {
