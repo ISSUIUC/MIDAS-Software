@@ -12,7 +12,7 @@
 /**
  * @struct StateEstimate
  * 
- * @brief Holds current alttitude, acceleration, jerk, and speed values based off of averages and derivatives.
+ * @brief Holds current altitude, acceleration, jerk, and speed values based off of averages and derivatives.
 */
 struct StateEstimate {
     double altitude;

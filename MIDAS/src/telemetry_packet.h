@@ -6,7 +6,7 @@
 /**
  * @struct TelemetryPacket
  * 
- * @brief format of the telemetry acket
+ * @brief format of the telemetry packet
 */
 struct TelemetryPacket {
     int32_t lat;

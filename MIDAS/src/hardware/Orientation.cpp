@@ -50,12 +50,12 @@ Vec3 quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees) {
 }
 
 /**
- * @brief Takes a rotation quaternion and turns it into its Euler 3D counterpart
+ * @brief Takes a rotation quaternion and turns it into its Euler angle counterpart
  * 
  * @param rotational_vector Rotation quaternion
  * @param degrees Quaternion degrees, not used
  * 
- * @return Euler 3D vector representation of the quaternion
+ * @return Euler angle vector representation of the quaternion
 */
 Vec3 quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, bool degrees) {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,
@@ -69,7 +69,7 @@ Vec3 quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, bool degre
  * @param rotational_vector Gyroscope quaternion
  * @param degrees Quaternion degrees, not used
  * 
- * @return Euler 3D vector representation of the quaternion
+ * @return Euler angle vector representation of the quaternion
 */
 Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, bool degrees) {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,

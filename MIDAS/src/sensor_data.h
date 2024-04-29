@@ -53,7 +53,7 @@ struct Acceleration {
 /**
  * @struct euler_t
  * 
- * @brief euler represnetation of rotation
+ * @brief euler representation of rotation
 */
 struct euler_t {
     float yaw;
@@ -96,7 +96,7 @@ struct HighGData {
 /**
  * @struct LowGLSM
  * 
- * @brief data from the LowGLSM sensor
+ * @brief data from the Low G LSM sensor
 */
 struct LowGLSM {
     float gx = 0;

@@ -77,7 +77,7 @@ ErrorCode TelemetryBackend::init() {
 }
 
 /**
- * @brief Gets rssi of recent packets
+ * @brief Gets RSSI of recent packets
  * 
  * @return RSSI of most recent packet
 */
@@ -88,7 +88,7 @@ int8_t TelemetryBackend::getRecentRssi() {
 /**
  * @brief Sets new frequency for the LoRa module
  * 
- * @param freq New frequence to set the LoRa module to
+ * @param freq New frequency to set the LoRa module to
 */
 void TelemetryBackend::setFrequency(float freq) {
     rf95.setFrequency(freq);

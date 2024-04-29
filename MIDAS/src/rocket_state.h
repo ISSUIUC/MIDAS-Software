@@ -31,7 +31,7 @@ struct Reading {
 /**
  * @struct SensorData 
  * 
- * @brief Wrapper for thread safe sensore data stroage
+ * @brief Wrapper for thread safe sensor data storage
  * 
  * @tparam S Type of data we are storing
 */
@@ -47,7 +47,7 @@ public:
     /**
      * @brief pushes to the queue with new data
      * 
-     * @param data New data of the templeted type to add to queue
+     * @param data New data of the templated type to add to queue
     */
     virtual void update(S data) {
         current.write(data);

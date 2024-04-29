@@ -3,7 +3,7 @@
 #include "log_checksum.h"
 
 /**
- * Forward decleration of the id recieving function
+ * @brief Forward decleration of the ID recieving function
 */
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
@@ -41,7 +41,7 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
 }
 
 /**
- * @brief wites a SensorData's entire queue reading to a sink
+ * @brief writes a SensorData's entire queue reading to a sink
  * 
  * @param sink the LogSink to write to
  * @param sensor_data the sensor data, with queue, to write from
@@ -94,7 +94,7 @@ void log_data(LogSink& sink, RocketData& data) {
 #define MAX_FILES 999
 
 /**
- * @brief names a new fole for a log sink depending on the files currently on said LogSink
+ * @brief names a new file for a log sink depending on the files currently on said LogSink
  * 
  * @param fileName buffer to write the file name to
  * @param fileExtensionParam the file extension required for the file
