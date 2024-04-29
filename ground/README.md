@@ -10,7 +10,76 @@ Changes from **GSS 1.0**: Unlike GSS 1.0, the new system uses a single laptop to
 # Telemetry Recievers
 This section refers to the Feather Reciever software which is stored at `./src/feather`.
 
-*TODO: Add feather documentation here*
+This repository contains the software for the ground station hardware (LoRa Feather module) used by the Spaceshot Telemetry Team during the 2023-24 season.
+
+## Description
+
+The ground station software is responsible for receiving telemetry data from the rocket, processing commands sent from the ground station GUI, and interfacing with the LoRa Feather module. It includes functionalities such as setting frequency, sending commands to the rocket, and parsing telemetry data.
+
+## Contributors
+
+- Nicholas Phillips
+- Gautam Dayal
+- Patrick Marschoun
+- Peter Giannetos
+- Aaditya Voruganti
+- Micheal Karpov
+
+## Features
+
+- Receive telemetry data from the rocket
+- Send commands to the rocket
+- Interface with the ground station GUI through serial communication
+- Parse incoming commands from the ground station GUI
+- Set frequency for communication with the rocket
+- Decode and process telemetry data packets
+- Handle errors and retries in command transmission
+
+## Dependencies
+
+- [RH_RF95 library](https://github.com/PaulStoffregen/RadioHead) - for LoRa communication
+- [SPI library](https://github.com/PaulStoffregen/SPI) - for SPI communication
+- [SerialParser library](link-to-serial-parser-library) - for parsing serial input
+
+## Usage
+
+1. Connect the LoRa Feather module to the ground station hardware.
+2. Upload the appropriate version of the code to the ground station hardware using the Arduino IDE or compatible software.
+   - **For Ground Station**: Upload the code with `IS_GROUND` defined.
+   - **For Drone**: Upload the code with `IS_DRONE` defined.
+3. Open the serial monitor to view output messages and interact with the ground station GUI.
+4. Follow the commands and instructions provided by the ground station GUI to control the rocket and receive telemetry data.
+
+## Configuration
+
+- Adjust default frequencies (`RF95_FREQ`, `SUSTAINER_FREQ`, `BOOSTER_FREQ`, `GROUND_FREQ`) as needed for your application.
+- RF95_FREQ is used only when `IS_GROUND` is active
+- `SUSTAINER_FREQ`, `BOOSTER_FREQ`, `GROUND_FREQ` is used only when `IS_DRONE` is active
+
+## Flashing Instructions
+
+### Ground Station
+
+It is used for the typical feathers on the ground and will be able to receive any code either directly from the rocket or from the drone relay.
+
+1. Connect the ground station hardware to your computer.
+2. Open the Arduino IDE or compatible software.
+3. Load the code with `IS_GROUND` defined.
+4. Compile and upload the code to the ground station hardware.
+
+### Drone
+
+This code is used by feathers to relay information via a drone from the rocket to ground, this is for better connectivity when the rocket is further away from us or is covered by earth elements.
+
+1. Connect the drone hardware to your computer.
+2. Open the Arduino IDE or compatible software.
+3. Load the code with `IS_DRONE` defined.
+4. Compile and upload the code to the drone hardware.
+
+
+
+
+
 
 
 To upload to the reciever you must navigate to the `ground` directory and use the `Platformio` vscode extension and upload using either the `feather` or `drone` build environments.
