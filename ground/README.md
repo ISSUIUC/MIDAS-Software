@@ -53,7 +53,7 @@ The ground station software is responsible for receiving telemetry data from the
 ## Configuration
 
 - Adjust default frequencies (`RF95_FREQ`, `SUSTAINER_FREQ`, `BOOSTER_FREQ`, `GROUND_FREQ`) as needed for your application.
-- RF95_FREQ is used only when `IS_GROUND` is active
+- `RF95_FREQ` is used only when `IS_GROUND` is active
 - `SUSTAINER_FREQ`, `BOOSTER_FREQ`, `GROUND_FREQ` is used only when `IS_DRONE` is active
 
 ## Flashing Instructions
