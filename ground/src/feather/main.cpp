@@ -169,7 +169,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.tilt_angle = tilt; //convert_range(tilt, 180); // [-90, 90]
     data.battery_voltage = convert_range(packet.batt_volt, 16);
     data.sat_count = packet.fsm_satcount >> 4 & 0b0111;
-    data.is_sustainer = !(packet.fsm_satcount >> 7);
+    data.is_sustainer = (packet.fsm_satcount >> 7);
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
     data.rssi = rf95.lastRssi();
@@ -432,8 +432,6 @@ void loop() {
             }
             prev_time = millis();
             // Serial.print(current_time);
-            Serial.print(" ");
-            Serial.println(prev_time);
         } else {
             Serial.println(json_receive_failure);
         }
