@@ -65,5 +65,7 @@ GPS GPSSensor::read() {
     // Sum everything together now
     uint32_t time_of_day = gprmc_message.utc.hh * 3600 + gprmc_message.utc.mm * 60 + gprmc_message.utc.ss;
     time += time_of_day;
+    time += (int) ((30 + gprmc_message.date % 100) / 4) * 86400;
+
     return GPS{lat_int, lon_int, alt, v, sat_count, time};
 }
