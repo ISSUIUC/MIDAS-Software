@@ -81,8 +81,8 @@ class TelemetryThread(threading.Thread):
                     continue
                 
                 # Process raw to packet
-                self.__log.console_log(f"Processing {len(packets)} packets..")
-                self.__log.set_waiting(len(packets))
+                self.__log.console_log(f"Processing {len(packets) - 1} packets..")
+                self.__log.set_waiting(len(packets) - 1)
                 for pkt_r in packets:
                     pkt = pkt_r.rstrip() # Strip whitespace characters
 
@@ -90,9 +90,11 @@ class TelemetryThread(threading.Thread):
                         continue # Ignore empty data
                     try:
                         packet_in = json.loads(pkt)
+                        # self.__log.console_log(str(packet_in))
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
                         else:
+                            print()
                             print(packet_in)
                             continue
                     except json.decoder.JSONDecodeError as json_err:
