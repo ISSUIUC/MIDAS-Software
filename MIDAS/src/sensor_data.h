@@ -109,6 +109,11 @@ struct GPS {
     float altitude = 0;
     float speed = 0;
     uint16_t satellite_count = 0;
+    // Unix timestamp since 1970
+    // This isn't included in the telem packet because this is
+    // solely for the SD logger. We do not need to know what time it is
+    // when we are recieving telem packets.
+    uint32_t time;
 };
 
 struct Magnetometer {

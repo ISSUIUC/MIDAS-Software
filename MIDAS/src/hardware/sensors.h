@@ -49,6 +49,7 @@ struct OrientationSensor {
 struct GPSSensor {
     ErrorCode init();
     GPS read();
+    bool is_leap = false;
 };
 
 struct Pyro {
