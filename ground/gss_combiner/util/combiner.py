@@ -43,6 +43,7 @@ class TelemetryCombiner():
 
             def check(self, packet) -> bool:
                 """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` (Tests for duplicates)"""
+                return True
                 try:
                     for pkt in self.__packets:
                         incoming = copy.copy(packet['value'])

@@ -91,6 +91,12 @@ class TelemetryThread(threading.Thread):
                     try:
                         packet_in = json.loads(pkt)
                         # self.__log.console_log(str(packet_in))
+                        # print(packet_in)
+
+                        if type(packet_in) == int:
+                            self.__log.console_log("Read int? Discarding")
+                            continue
+
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
                         else:
