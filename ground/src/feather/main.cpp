@@ -31,7 +31,7 @@
 #define RFM95_INT 3
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 427;
+float RF95_FREQ = 410;
 float SUSTAINER_FREQ = 426.15;
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
@@ -391,19 +391,19 @@ unsigned long prev_time = 0;
 void loop() {
     
     PrintDequeue();
-    // unsigned long current_time = millis();
-    // if (current_time - prev_time > 2000) {
-    //     if(current_freq == SUSTAINER_FREQ) {
-    //         ChangeFrequency(BOOSTER_FREQ);
-    //         current_freq = BOOSTER_FREQ;
-    //         Serial.println("Sustainer timeout, Switching to booster freq");
-    //     } else {
-    //         ChangeFrequency(SUSTAINER_FREQ);
-    //         current_freq = SUSTAINER_FREQ;
-    //         Serial.println("Booster timeout, Switching to sustainer freq");
-    //     }
-    //     prev_time = millis();
-    // }
+    unsigned long current_time = millis();
+    if (current_time - prev_time > 2000) {
+        if(current_freq == SUSTAINER_FREQ) {
+            ChangeFrequency(BOOSTER_FREQ);
+            current_freq = BOOSTER_FREQ;
+            Serial.println("Sustainer timeout, Switching to booster freq");
+        } else {
+            ChangeFrequency(SUSTAINER_FREQ);
+            current_freq = SUSTAINER_FREQ;
+            Serial.println("Booster timeout, Switching to sustainer freq");
+        }
+        prev_time = millis();
+    }
     if (rf95.available()) {
         TelemetryPacket packet;
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
@@ -417,8 +417,8 @@ void loop() {
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
-            // memcpy(&packet, buf, sizeof(packet));
-            // EnqueuePacket(packet, current_freq);
+            memcpy(&packet, buf, sizeof(packet));
+            EnqueuePacket(packet, current_freq);
             set_freq_local_bug_fix(GROUND_FREQ);
             
             rf95.send(buf, len);
