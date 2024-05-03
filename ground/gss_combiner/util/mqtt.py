@@ -25,6 +25,11 @@ class TelemetryThread(threading.Thread):
         self.__log.console_log(f"Telemetry thread created.")
         self.__combiners = []
 
+        self.__rf_set = True
+        self.__rf_freq = 0
+        self.__last_rf_command_sent = datetime.now().timestamp()
+        self.__rf_command_period = 5
+
         
     def process_packet(packet_json):
         """Append metadata to a packet to conform to GSS v1.1 packet structure"""
@@ -35,10 +40,13 @@ class TelemetryThread(threading.Thread):
         return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time)}
     
     def write_frequency(self, frequency:float):
-        """Send a FREQ command to the associated telemetry device to change frequencies"""
+        """Send a FREQ command to the associated telemetry device to change frequencies, then wait for a response."""
         self.__log.console_log("Writing frequency command (FREQ:" + str(frequency) + ")")
         try:
-            self.__send_comport("FREQ:" + str(frequency))
+            self.__send_comport("FREQ:" + str(frequency) + "\n")
+            self.__rf_freq = frequency
+            self.__rf_set = False
+            self.__last_rf_command_sent = datetime.now().timestamp()
         except Exception as e:
             print("Unable to send FREQ command: ", e, "Continuing with no FREQ change.")
 
@@ -72,7 +80,15 @@ class TelemetryThread(threading.Thread):
 
         while True:
             # Wrap all in a try-except to catch errors.
+
             try:
+
+                if not self.__rf_set and datetime.now().timestamp() - self.__last_rf_command_sent >= self.__rf_command_period:
+                    # Send a new frequency command if the last one went unacknowledged.
+                    self.__send_comport("FREQ:" + self.__rf_freq + "\n")
+                    self.__last_rf_command_sent = datetime.now().timestamp()
+                    
+
                 # Read all from the comport
                 packets = self.__read_comport()
 
@@ -97,11 +113,24 @@ class TelemetryThread(threading.Thread):
                             self.__log.console_log("Read int? Discarding")
                             continue
 
+                        if not self.__rf_set:
+                            # Wait for freq change and periodically send new command to try to change freq.
+                            if packet_in['type'] == "freq_success":
+
+                                if str(packet_in['frequency']) == self.__rf_freq:
+                                    self.__rf_set = True
+                                else:
+                                    self.__log.console_log("Recieved incorrect frequency!")
+                                    continue    
+                            else:
+                                self.__log.console_log("Recieved packet from wrong stream.. Discarding due to freq change.")
+                                continue
+
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
                         else:
-                            print()
-                            print(packet_in)
+                            # print()
+                            # print(packet_in)
                             continue
                     except json.decoder.JSONDecodeError as json_err:
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")

@@ -19,7 +19,7 @@ import datetime
 
 
 # exit(0)
-com_in = ["COM16", "COM17", "COM19", "COM21"]
+com_in = ["COM16"]
 # com_in = ["COM16", "COM17", "COM19", "C"]
 
 s_time = time.time()
@@ -54,6 +54,8 @@ class Sim():
 
         if(fltime < self.__launchdelay + self.__burntime1 + self.__delay + self.__burntime2):
             return self.__burnaccel2
+        
+        return -9.8
 
     def step(self):
         dt = datetime.datetime.now().timestamp() - self.__s
@@ -120,9 +122,27 @@ while True:
 
 
     for port in ports:
-        write_in = port.read_all().decode()
+        write_in = ""
+
+        while port.in_waiting:
+            write_in += port.read_all().decode()
+
         if(len(write_in) > 0):
             print("READ:", port.name, write_in)
+            pkts = write_in.split("\n")
+
+            for pk in pkts:
+                if pk.startswith("FREQ:"):
+                    frq = float(pk.split(":")[1])
+                    print("Handling freq test... delay 4 seconds then writeback")
+                    time.sleep(4)
+                    print("Switching to freq ", frq)
+                    port.write((json.dumps({'type': 'freq_success', 'frequency': frq}) + "\n").encode())
+                    print("Written", json.dumps({'type': 'freq_success', 'frequency': frq}))
+                    print("Freq changed. continuing")
+
+
+
 
 
     

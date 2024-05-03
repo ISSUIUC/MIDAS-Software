@@ -31,7 +31,7 @@
 #define RFM95_INT 3
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 410;
+float RF95_FREQ = 420;
 float SUSTAINER_FREQ = 426.15;
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
