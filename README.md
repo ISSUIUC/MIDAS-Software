@@ -8,7 +8,7 @@ Illinois Space Society's flight software codebase for the MIDAS avionics system
     - `docs/`: Files related to documentation.
 	- `lib/`: Hardware drivers to interface with sensors and more. Some are downloaded from the internet and some were written by us.- `src/`: All the flight code that we write ourselves is in this directory. 
 
-### Avionics Software Team 23-24
+### Avionics Software Team 23-24:
 Aidan Costello,
 Magilan Sendhil,
 Aaditya Voruganti,
