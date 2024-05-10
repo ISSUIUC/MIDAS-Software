@@ -29,6 +29,7 @@
 #define RFM95_RST 4
 // #define RFM95_EN
 #define RFM95_INT 3
+#define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
 float RF95_FREQ = 420;
@@ -414,6 +415,8 @@ void loop() {
             Serial.print(len);
             Serial.print(" bytes on ");
             Serial.println(current_freq);
+            
+
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
@@ -439,4 +442,16 @@ void loop() {
     }
     serial_parser.read();
 }
+#endif
+#ifdef IS_TEST
+void loop() {
+    int batteryADC = analogRead(9);
+    float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0;
+    Serial.print("Battery Voltage: ");
+    Serial.print(9);
+    Serial.print(" ");
+    Serial.println(batteryVoltage);
+    delay(1000);
+}
+
 #endif
