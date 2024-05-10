@@ -176,6 +176,12 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.sat_count = packet.fsm_satcount >> 4 & 0b0111;
     data.is_sustainer = (packet.fsm_satcount >> 7);
     data.FSM_State = packet.fsm_satcount & 0b1111;
+
+    // kinda hacky but it will work
+    if (packet.fsm_satcount == -1) {
+        data.FSM_State = -1;
+    }
+
     data.freq = RF95_FREQ;
     if(packet.RSSI == 0.0) {
         data.rssi = packet.RSSI;
@@ -214,10 +220,10 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 
 void printPacketJson(FullTelemetryData const& packet) {
 
-    bool is_heartbeat = packet.battery_voltage == -1;
+    bool is_heartbeat = packet.FSM_State == -1;
 
     Serial.print(R"({"type": ")");
-    Serial.print(is_heartbeat ? "heartbeat" : "data")
+    Serial.print(is_heartbeat ? "heartbeat" : "data");
     Serial.print(R"(", "value": {)");
     printJSONField("barometer_altitude", packet.barometer_altitude);
     printJSONField("latitude", packet.latitude);
