@@ -99,6 +99,8 @@ class TelemetryThread(threading.Thread):
                 if(len(packets) == 0):
                     # Defer if no data in COM port
                     continue
+
+                
                 
                 # Process raw to packet
                 self.__log.console_log(f"Processing {len(packets) - 1} packets..")
@@ -108,7 +110,9 @@ class TelemetryThread(threading.Thread):
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
+                        
                         packet_in = json.loads(pkt)
+                    
                         # self.__log.console_log(str(packet_in))
                         if type(packet_in) == int:
                             self.__log.console_log("Read int? Discarding")
@@ -128,6 +132,15 @@ class TelemetryThread(threading.Thread):
                             else:
                                 self.__log.console_log("Recieved packet from wrong stream.. Discarding due to freq change.")
                                 continue
+
+                        if packet_in['type'] == "heartbeat":
+                            # Send heartbeat to common stream
+                            heartbeat_only = {"battery_voltage": packet_in['value']['battery_voltage'], 'rssi': packet_in['value']['RSSI']}
+                            raw_in = {"source": "gss_combiner", "action": "heartbeat", "time": datetime.now().timestamp(), "data": heartbeat_only}
+                            proc_string = json.dumps(raw_in).encode('utf-8')
+                            self.__mqttclient.publish("Common", proc_string)
+                            self.__log.success()
+                            continue
 
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
