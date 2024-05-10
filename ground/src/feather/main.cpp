@@ -431,12 +431,12 @@ void loop() {
         Serial.println("Heartbeat");
         TelemetryPacket packet;
         rf95.setFrequency(GROUND_FREQ);
-        packet.batt_volt = -1;
+        packet.batt_volt = readBatteryVoltage();
+        packet.fsm_satcount = -1;
         rf95.send((uint8_t*)&packet, sizeof(packet)); 
         rf95.waitPacketSent();
         rf95.setFrequency(current_freq);
         heartbeat_time = millis();
-        
     }
     if (rf95.available()) {
         TelemetryPacket packet;
@@ -477,15 +477,11 @@ void loop() {
     serial_parser.read();
 }
 #endif
-#ifdef IS_TEST
-void loop() {
+
+float readBatteryVoltage() {
     int batteryADC = analogRead(9);
     float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0;
-    Serial.print("Battery Voltage: ");
-    Serial.print(9);
-    Serial.print(" ");
-    Serial.println(batteryVoltage);
-    delay(1000);
+    return batteryVoltage;
 }
 
-#endif
+
