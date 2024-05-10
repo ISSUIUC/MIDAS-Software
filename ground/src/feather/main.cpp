@@ -178,8 +178,8 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.FSM_State = packet.fsm_satcount & 0b1111;
 
     // kinda hacky but it will work
-    if (packet.fsm_satcount == -1) {
-        data.FSM_State = -1;
+    if (packet.fsm_satcount == static_cast<uint8_t>(-1)) {
+        data.FSM_State = static_cast<uint8_t>(-1);
     }
 
     data.freq = RF95_FREQ;
@@ -220,7 +220,7 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 
 void printPacketJson(FullTelemetryData const& packet) {
 
-    bool is_heartbeat = packet.FSM_State == -1;
+    bool is_heartbeat = packet.FSM_State == static_cast<uint8_t>(-1);
 
     Serial.print(R"({"type": ")");
     Serial.print(is_heartbeat ? "heartbeat" : "data");
