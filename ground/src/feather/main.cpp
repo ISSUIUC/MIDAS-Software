@@ -20,6 +20,7 @@
 #include <limits>
 #include <numeric>
 #include <queue>
+#include <algorithm>
 
 #include "SerialParser.h"
 
@@ -411,6 +412,21 @@ void loop() {
 unsigned long prev_time = 0;
 unsigned long heartbeat_time = 0;
 
+uint8_t readBatteryVoltage() {
+    int batteryADC = analogRead(9);
+    float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0; //5.0Vmax
+    if (batteryVoltage > 5.0) {
+        batteryVoltage = 5.0;
+    }
+    if (batteryVoltage < 0.0) {
+        batteryVoltage = 0.0;
+    }
+
+    uint8_t battery = static_cast<uint8_t>((batteryVoltage/5.0)*255);
+    return battery;
+}
+
+
 void loop() {
     
     PrintDequeue();
@@ -478,10 +494,5 @@ void loop() {
 }
 #endif
 
-float readBatteryVoltage() {
-    int batteryADC = analogRead(9);
-    float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0;
-    return batteryVoltage;
-}
 
 
