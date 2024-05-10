@@ -99,6 +99,9 @@ struct FullTelemetryData {
     float sat_count;
     bool is_sustainer;
 };
+
+
+
 enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
 // Commands transmitted from ground station to rocket
 struct telemetry_command {
@@ -172,6 +175,9 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.is_sustainer = (packet.fsm_satcount >> 7);
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
+
+    
+
     data.rssi = rf95.lastRssi();
     print_queue.emplace(data);
 
@@ -203,7 +209,12 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 }
 
 void printPacketJson(FullTelemetryData const& packet) {
-    Serial.print(R"({"type": "data", "value": {)");
+
+    bool is_heartbeat = packet.battery_voltage == -1;
+
+    Serial.print(R"({"type": ")");
+    Serial.print(is_heartbeat ? "heartbeat" : "data")
+    Serial.print(R"(", "value": {)");
     printJSONField("barometer_altitude", packet.barometer_altitude);
     printJSONField("latitude", packet.latitude);
     printJSONField("longitude", packet.longitude);
@@ -220,6 +231,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("is_sustainer", packet.is_sustainer, false);
     Serial.println("}}");
 }
+
 
 void PrintDequeue() {
     if (print_queue.empty()) return;

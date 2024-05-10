@@ -28,16 +28,16 @@ class TelemetryThread(threading.Thread):
         self.__rf_set = True
         self.__rf_freq = 0
         self.__last_rf_command_sent = datetime.now().timestamp()
-        self.__rf_command_period = 5
+        self.__rf_command_period = 3
 
         
-    def process_packet(packet_json):
+    def process_packet(self, packet_json):
         """Append metadata to a packet to conform to GSS v1.1 packet structure"""
         # Incoming packets are of form {"type": "data", value: { ... }}
         time = datetime.now(timezone.utc)
 
         # Append timestamps :)
-        return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time)}
+        return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time), 'src': self.__comport.name}
     
     def write_frequency(self, frequency:float):
         """Send a FREQ command to the associated telemetry device to change frequencies, then wait for a response."""
@@ -70,6 +70,10 @@ class TelemetryThread(threading.Thread):
     def add_combiner(self, combiner):
         """Add a combiner data sink for this telemetry thread"""
         self.__combiners.append(combiner)
+
+    def ready(self) -> bool:
+        # On startup, tells the main process if this thread is ready
+        return self.__rf_set
         
     def run(self) -> None:
         # Initialize MQTT
@@ -101,23 +105,22 @@ class TelemetryThread(threading.Thread):
                 self.__log.set_waiting(len(packets) - 1)
                 for pkt_r in packets:
                     pkt = pkt_r.rstrip() # Strip whitespace characters
-
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
                         packet_in = json.loads(pkt)
                         # self.__log.console_log(str(packet_in))
-                        # print(packet_in)
-
                         if type(packet_in) == int:
                             self.__log.console_log("Read int? Discarding")
                             continue
 
+                        # print(packet_in)
                         if not self.__rf_set:
                             # Wait for freq change and periodically send new command to try to change freq.
                             if packet_in['type'] == "freq_success":
 
-                                if str(packet_in['frequency']) == self.__rf_freq:
+                                if float(packet_in['frequency']) == float(self.__rf_freq):
+                                    self.__log.console_log_always("Frequency set: Listening on " + str(self.__rf_freq))
                                     self.__rf_set = True
                                 else:
                                     self.__log.console_log("Recieved incorrect frequency!")

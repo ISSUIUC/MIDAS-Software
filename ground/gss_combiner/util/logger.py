@@ -59,6 +59,10 @@ class LoggerStream():
         if (self.__opts.is_verbose):
             self.__print(line)
 
+    def console_log_always(self, line: str):
+        """Log to a console depending on verbosity level"""
+        self.__print(line)
+
     def file_log(self, data: str):
         """Log to a file depending on whether logging is enabled or not."""
         if (self.__opts.should_log):

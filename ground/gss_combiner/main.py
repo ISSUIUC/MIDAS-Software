@@ -43,6 +43,13 @@ def assert_alive(threads: list[threading.Thread]):
     for thread in threads:
         assert thread.is_alive()
 
+def threads_ready(threads: list[mqtt.TelemetryThread]):
+    """Used to ensure telemetry threads are ready"""
+    for thread in threads:
+        if not thread.ready():
+            return False
+    return True
+
 def parse_params(arguments):
     """Parse parameters passed into this script and return them as a flat tuple."""
 
@@ -155,6 +162,7 @@ def parse_params(arguments):
     return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip, overwrite_rf, use_config
 
 if __name__ == "__main__":
+    SCRIPT_START_TIME = datetime.datetime.now().timestamp()
     threads = []
 
     booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv)
@@ -215,7 +223,9 @@ if __name__ == "__main__":
     # When this bit is NOT set, the callsign is interpreted as KD9ZPM
     # -------------------------------------------------------------------------------------------------------------------------------------------------
 
-    if not overwrite_rf:
+    if overwrite_rf:
+        print("Waiting for telemetry thread RF initialization... (This may take a bit)")
+    else:
         print("Skipping Frequency override")
 
     # Set up booster telemetry threads
@@ -258,11 +268,24 @@ if __name__ == "__main__":
     threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer
     assert_alive(threads) # Ensure all threads initialized successfully
 
-    print("\nTelemetry system initialized successfully!\n\n")
-
     # Set up visualization variables
     print_delay = 0.5
     last_print_db = datetime.datetime.now().timestamp() + print_delay
+
+    # Wait for telem threads to be ready
+    init_time_warned = False
+    while True:
+        if threads_ready(telem_threads_booster + telem_threads_relay + telem_threads_sustainer):
+            break
+
+        # Inform user of possible errors if init takes too long..
+        time_delta = datetime.datetime.now().timestamp() - SCRIPT_START_TIME
+        if time_delta > 20 and not init_time_warned:
+            print("\x1b[33mWARNING: RF initialization is taking longer than expected... Make sure that the \x1b[36mconfig.ini\x1b[33m RF configuration is within Feather range.\x1b[0m")
+            init_time_warned = True
+
+
+    print("\n\n\nTelemetry system initialized successfully!\n\n")
 
     # Print visualization legend
     if (not is_verbose and is_visual):

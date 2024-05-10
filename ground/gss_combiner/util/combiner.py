@@ -27,6 +27,12 @@ class TelemetryCombiner():
             if (not packet['value']['is_sustainer'] and self.__allow_booster):
                 return True
             
+            if(packet['value']['battery_voltage'] >= 15.75):
+                return False
+            
+            if(packet['value']['battery_voltage'] <= 0.1):
+                return False
+            
             return False
         
     class DuplicateDatapoints():
