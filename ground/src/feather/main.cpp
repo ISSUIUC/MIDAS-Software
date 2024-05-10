@@ -29,6 +29,7 @@
 #define RFM95_RST 4
 // #define RFM95_EN
 #define RFM95_INT 3
+#define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
 float RF95_FREQ = 420;
@@ -80,6 +81,7 @@ struct TelemetryPacket {
     uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
     uint8_t batt_volt;
     uint8_t fsm_satcount;
+    float RSSI = 0.0;
 };
 
 struct FullTelemetryData {
@@ -175,9 +177,11 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.is_sustainer = (packet.fsm_satcount >> 7);
     data.FSM_State = packet.fsm_satcount & 0b1111;
     data.freq = RF95_FREQ;
-
-    
-
+    if(packet.RSSI == 0.0) {
+        data.rssi = packet.RSSI;
+    } else {
+        data.rssi = rf95.lastRssi();
+    }
     data.rssi = rf95.lastRssi();
     print_queue.emplace(data);
 
@@ -399,6 +403,7 @@ void loop() {
 
 #ifdef IS_DRONE
 unsigned long prev_time = 0;
+unsigned long heartbeat_time = 0;
 
 void loop() {
     
@@ -416,6 +421,17 @@ void loop() {
         }
         prev_time = millis();
     }
+    if(millis() - heartbeat_time > 2000) {
+        Serial.println("Heartbeat");
+        TelemetryPacket packet;
+        rf95.setFrequency(GROUND_FREQ);
+        packet.batt_volt = -1;
+        rf95.send((uint8_t*)&packet, sizeof(packet)); 
+        rf95.waitPacketSent();
+        rf95.setFrequency(current_freq);
+        heartbeat_time = millis();
+        
+    }
     if (rf95.available()) {
         TelemetryPacket packet;
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
@@ -426,14 +442,17 @@ void loop() {
             Serial.print(len);
             Serial.print(" bytes on ");
             Serial.println(current_freq);
+            
+
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
             memcpy(&packet, buf, sizeof(packet));
+            packet.RSSI = rf95.lastRssi();
             EnqueuePacket(packet, current_freq);
             set_freq_local_bug_fix(GROUND_FREQ);
-            
-            rf95.send(buf, len);
+            rf95.send((uint8_t*)&packet, sizeof(packet)); 
+
             if(current_freq == SUSTAINER_FREQ) {
                 set_freq_local_bug_fix(BOOSTER_FREQ);
                 current_freq = BOOSTER_FREQ;
@@ -451,4 +470,16 @@ void loop() {
     }
     serial_parser.read();
 }
+#endif
+#ifdef IS_TEST
+void loop() {
+    int batteryADC = analogRead(9);
+    float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0;
+    Serial.print("Battery Voltage: ");
+    Serial.print(9);
+    Serial.print(" ");
+    Serial.println(batteryVoltage);
+    delay(1000);
+}
+
 #endif
