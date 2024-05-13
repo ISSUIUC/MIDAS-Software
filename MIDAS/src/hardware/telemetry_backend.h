@@ -7,7 +7,11 @@
 #include "TCAL9539.h"
 #include "pins.h"
 
-
+/**
+ * @class TelemetryBackend
+ * 
+ * @brief Class that wraps the Telemetry functions
+*/
 class TelemetryBackend {
 public:
     TelemetryBackend();
@@ -48,6 +52,13 @@ public:
         rf95.handleInterrupt();
     }
 
+    /**
+     * @brief Reads message from the LoRa
+     * 
+     * @param write The buffer to write the data to
+     * 
+     * @return bool indicating a successful read and write to buffer
+    */
     template<typename T>
     bool read(T* write) {
         static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to receive is too large");

@@ -6,6 +6,11 @@
 #include "sensors.h"
 #include "data_logging.h"
 
+/**
+ * @class SDSink
+ * 
+ * @brief Class that wraps the SD card functions
+*/
 class SDSink : public LogSink {
 public:
     bool failed = false;

@@ -3,6 +3,12 @@
 #define BUZZER_PIN (48)
 #define BUZZER_CHANNEL (1)
 
+/**
+ * @brief starts playing a new song
+ * 
+ * @param tune Song to be played
+ * @param length Length of song to be played
+*/
 void BuzzerController::play_tune(Sound* tune, uint32_t length) {
     current_tune_ = tune;
     index_ = 0;
@@ -10,10 +16,16 @@ void BuzzerController::play_tune(Sound* tune, uint32_t length) {
     new_tune_started = true;
 }
 
+/**
+ * @brief public interface to tick the buzzer
+*/
 void BuzzerController::tick() {
     tick_sounds();
 }
 
+/**
+ * @brief ticks the bizzer, plays next note/ starts new song if applicable
+*/
 void BuzzerController::tick_sounds() {
     if (current_tune_ == nullptr) {
         return;
@@ -46,6 +58,11 @@ void BuzzerController::tick_sounds() {
     }
 }
 
+/**
+ * @brief Initializes buzzer
+ * 
+ * @return Error code
+*/
 ErrorCode BuzzerController::init() {
     // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I do question the knowledge of github
     pinMode(BUZZER_PIN, OUTPUT);
@@ -54,6 +71,9 @@ ErrorCode BuzzerController::init() {
     return NoError;
 }
 
+/**
+ * @brief notes to use for creating a song, along with a tempo
+*/
 #define MS_PER_4BEAT 6000
 
 #define rest Sound{0, 10}
@@ -72,6 +92,9 @@ ErrorCode BuzzerController::init() {
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 
+/**
+ * @brief free bird solo song, to be played on startup/ second stage iginition
+*/
 Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
     /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight
 };

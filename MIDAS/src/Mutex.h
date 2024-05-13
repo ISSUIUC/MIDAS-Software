@@ -10,7 +10,7 @@
 
 
 /**
- * A mutex which holds a single value.
+ * @brief A mutex which holds a single value.
  *
  * @tparam T The type of the value to hold. Should have copy semantics.
  */
@@ -45,7 +45,7 @@ public:
     }
 
     /**
-     * Read the current value in the mutex (will spin until it acquires the lock).
+     * @brief Read the current value in the mutex (will spin until it acquires the lock).
      *
      * @return The value in the mutex.
      */
@@ -61,11 +61,20 @@ public:
         return ret;
     }
 
+    /**
+     * @brief Read the current value in the mutex, will not acquire lock
+     *
+     * @return The value in the mutex.
+     */
     T read_unsync() {
         return data;
     }
 
-
+    /**
+     * @brief reads value in mutex, will acquire lock
+     * 
+     * @param ptr buffer to store data in
+    */
     void read2(T* ptr) {
         if (!mutex_handle || mutex_handle != check) {
             Serial.println("Aw shucks");
@@ -78,7 +87,7 @@ public:
     }
 
     /**
-     * Update the value in the mutex (will spin until it acquires the lock).
+     * @brief Update the value in the mutex (will spin until it acquires the lock).
      *
      * @param value What to update the mutex to.
      */

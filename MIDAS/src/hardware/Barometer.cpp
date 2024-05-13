@@ -1,10 +1,12 @@
 #include "sensors.h"
 #include <MS5611.h>
 
-MS5611 MS(MS5611_CS); 
+MS5611 MS(MS5611_CS);       //singleton object for the MS sensor
 
 /**
- * Initializes barometer, returns NoError
+ * @brief Initializes barometer, returns NoError
+ * 
+ * @return Error code
 */
 ErrorCode BarometerSensor::init() {
     MS.init();
@@ -13,8 +15,9 @@ ErrorCode BarometerSensor::init() {
 }
 
 /**
- * Reads the pressure and temperature from the MS5611
- * @return a barometer data packet for the thread to send to the data logger
+ * @brief Reads the pressure and temperature from the MS5611
+ * 
+ * @return Barometer data packet
 */
 Barometer BarometerSensor::read() {
     MS.read(12);

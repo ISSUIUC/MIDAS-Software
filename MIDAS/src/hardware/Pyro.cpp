@@ -8,12 +8,19 @@
 #define MAXIMUM_TILT_ANGLE (M_PI/9) // 20 degrees
 
 /**
- * Helper function: Determines if the orientation is within an acceptable range to fire the second stage igniter.
+ * @brief Helper function: Determines if the orientation is within an acceptable range to fire the second stage igniter.
+ * 
+ * @return Boolean indication no error if true, error if false
 */
 bool gpio_error_to_fail_flag(GpioError error_code) {
     return error_code != GpioError::NoError;
 }
 
+/**
+ * @brief Determines if orientation is in an acceptable range to fire second stage
+ * 
+ * @return boolean indicating an acceptable range, true if acceptable, false if not
+*/
 bool can_fire_igniter(Orientation orientation) {
     // This needs to be fleshed out. The sensor may not report angles in 'world space', so we need to determine
     // if the orientation of the rocket depends on other angles
@@ -23,8 +30,9 @@ bool can_fire_igniter(Orientation orientation) {
 
 
 /**
- * "Initializes" the pyro thread. The main initialization will be done by the GPIO expander, so the pyro thread doesn't
- * have to do anything special.
+ * @brief "Initializes" the pyro thread. The main initialization will be done by the GPIO expander, so the pyro thread doesn't have to do anything special.
+ * 
+ * @return Error code
 */
 ErrorCode Pyro::init() {
     bool has_failed_gpio_init = false;
@@ -55,8 +63,10 @@ ErrorCode Pyro::init() {
 
 /**
  * Upper stage only!
- * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
- * Fires channels by setting their pin on the GPIO.
+ * 
+ * @brief Fires channels by setting their pin on the GPIO.
+ * 
+ * @return A new pyro struct, with data depending on whether or not each pyro channel should be firing.
 */
 PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
@@ -103,8 +113,10 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
 
 /**
  * Lower stage only!
- * Returns a new pyro struct, with data depending on whether or not each pyro channel should be firing.
- * Fires channels by setting their pin on the GPIO.
+ * 
+ * @brief Fires channels by setting their pin on the GPIO.
+ * 
+ * @return A new pyro struct, with data depending on whether or not each pyro channel should be firing.
 */
 PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();

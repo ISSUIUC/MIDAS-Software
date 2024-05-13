@@ -9,12 +9,12 @@
 #endif
 
 /**
- * The default maximum length for a Queue.
+ * @brief The default maximum length for a Queue.
  */
 #define QUEUE_LENGTH 128
 
 /**
- * A Thread-safe Queue containing a single data type.
+ * @brief A Thread-safe Queue containing a single data type.
  *
  * @tparam T The data type stored in the queue.
  * @tparam length The maximum length of the queue. Defaults to QUEUE_LENGTH.
@@ -37,7 +37,7 @@ public:
     Queue(Queue&&) = delete;
 
     /**
-     * Put a value in the queue. If the queue is full or timed out, do nothing.
+     * @brief Put a value in the queue. If the queue is full or timed out, do nothing.
      *
      * @param value The value to put in the queue.
      */
@@ -49,7 +49,7 @@ public:
     }
 
     /**
-     * Fetch a value from the queue.
+     * @brief Fetch a value from the queue.
      *
      * @param out Where to put the value from the queue. It is undefined if there is no value in the queue, or if the queue timed out.
      * @return True if there was a value in the queue that was read into `out`, false otherwise.

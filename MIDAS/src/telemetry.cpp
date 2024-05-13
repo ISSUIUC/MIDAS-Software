@@ -20,6 +20,14 @@ T inv_convert_range(float val, float range) {
     return std::max(std::min((float)std::numeric_limits<T>::max(), converted), (float)std::numeric_limits<T>::min());
 }
 
+/**
+ * @brief packs highg and tilt infomation into 3, 2 byte integers
+ * 
+ * @param highg highg data to store
+ * @param tilt tilt information to store
+ * 
+ * @return tuple with packed data
+*/
 std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint8_t tilt) {
     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
@@ -32,10 +40,17 @@ std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg,
     return {x,y,z};
 }
 
-
+/**
+ * @brief move constructor for the telemetry backend
+*/
 Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
 
-
+/**
+ * @brief transmit telemetry data through LoRa
+ * 
+ * @param rocket_data rocket_data to transmit
+ * @param led led state to transmit
+*/
 void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     static_assert(sizeof(TelemetryPacket) == 20);
 
@@ -44,6 +59,11 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
+/**
+ * @brief creates the packet to send through the telemetry system
+ * 
+ * @param data the data to serialize into a packet
+*/
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
@@ -78,6 +98,11 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     return packet;
 }
 
+/**
+ * @brief initializes the Telemetry system
+ * 
+ * @return Error Code
+*/
 ErrorCode __attribute__((warn_unused_result)) Telemetry::init() {
     return backend.init();
 }

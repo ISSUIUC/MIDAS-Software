@@ -46,9 +46,6 @@ public:
     virtual void priori() = 0;
     virtual void update() = 0;
 
-    virtual void setQ(float dt, float sd) = 0;
-    virtual void setF(float dt) = 0;
-
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanData state) = 0;
 };

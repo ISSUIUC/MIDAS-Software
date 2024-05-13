@@ -12,8 +12,8 @@ public:
     void priori() override;
     void update() override;
 
-    void setQ(float dt, float sd) override;
-    void setF(float dt) override;
+    void setQ(float dt, float sd);
+    void setF(float dt);
 
     KalmanData getState() override;
     void setState(KalmanData state) override;

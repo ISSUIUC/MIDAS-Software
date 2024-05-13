@@ -3,11 +3,24 @@
 #include <cstdlib>
 #include <array>
 
+/**
+ * @class Buffer
+ * 
+ * @brief Templeted buffer to quickly calculate averages and derivatives for the FSM
+ * 
+ * @tparam T type of data to hold in the buffer
+ * @tparam BUFFER_SIZE size of the buffer
+*/
 template<typename T, size_t BUFFER_SIZE>
 struct Buffer {
 public:
     Buffer() = default;
 
+    /**
+     * @brief Append data to the end of the circular buffer
+     * 
+     * @param element Element to add to thebuffer
+    */
     void push(T const& element) {
         buffer[tail_idx] = element;
         tail_idx++;
@@ -20,6 +33,13 @@ public:
         
     }
 
+    /**
+     * @brief Reads newest value into the buffer
+     * 
+     * @param item reference in which to store the most recent reading
+     * 
+     * @return boolean indicating a successful read
+    */
     bool read(T& item) {
         if (count == 0) {
             return false;
@@ -28,6 +48,13 @@ public:
         return true;
     }
 
+   /**
+     * @brief Reads oldest value into the buffer
+     * 
+     * @param item reference in which to store the oldest reading
+     * 
+     * @return boolean indicating a successful read
+    */
     bool read_oldest(T&item) {
         if (count == 0) {
             return false;
@@ -53,6 +80,11 @@ public:
     
 
 private:
+    /**
+     * @brief gets oldest index in the circular buffer
+     * 
+     * @return the oldest indext in the buffer
+    */
     size_t oldest_idx() {
         if (tail_idx < count) {
             return tail_idx + BUFFER_SIZE - count;
@@ -61,6 +93,11 @@ private:
         }
     }
 
+    /**
+     * @brief gets newest index in the circular buffer
+     * 
+     * @return the newest index in the buffer
+    */
     size_t newest_idx() {
         if (tail_idx == 0) {
             return BUFFER_SIZE - 1;

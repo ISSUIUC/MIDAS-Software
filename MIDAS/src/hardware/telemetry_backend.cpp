@@ -29,10 +29,18 @@
 #define RF95_FREQ 426.15
 #endif
 
+/**
+ * @brief Default constructor for the telemetry system
+*/
 TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
     led_state = false;
 }
 
+/**
+ * @brief Initializes the telemetry system
+ * 
+ * @return Error Code
+*/
 ErrorCode TelemetryBackend::init() {
     pinMode(RFM96_RESET, OUTPUT);
     digitalWrite(RFM96_RESET, HIGH);
@@ -68,10 +76,20 @@ ErrorCode TelemetryBackend::init() {
     return ErrorCode::NoError;
 }
 
+/**
+ * @brief Gets RSSI of recent packets
+ * 
+ * @return RSSI of most recent packet
+*/
 int8_t TelemetryBackend::getRecentRssi() {
     return rf95.lastRssi();
 }
 
+/**
+ * @brief Sets new frequency for the LoRa module
+ * 
+ * @param freq New frequency to set the LoRa module to
+*/
 void TelemetryBackend::setFrequency(float freq) {
     rf95.setFrequency(freq);
 }

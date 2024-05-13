@@ -4,6 +4,11 @@
 
 #include "SDLog.h"
 
+/**
+ * @brief Initializes the SD card logger
+ * 
+ * @return Error Code
+*/
 ErrorCode SDSink::init() {
     Serial.println("Connecting to SD...");
     if (!SD_MMC.setPins(SD_CLK, SD_CMD, SD_D0)) {
@@ -27,6 +32,12 @@ ErrorCode SDSink::init() {
     return ErrorCode::NoError;
 }
 
+/**
+ * @brief Writes a byte buffer to the SD card
+ * 
+ * @param data byte buffer of data
+ * @param size size of buffer 
+*/
 void SDSink::write(const uint8_t* data, size_t size) {
     if (failed) {
 

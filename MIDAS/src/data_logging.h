@@ -12,7 +12,9 @@
 #endif
 
 /**
- * Protocol for a sink, which is implemented as an SD card in hardware.
+ * @class LogSink
+ * 
+ * @brief Protocol for a sink, which is implemented as an SD card in hardware.
  */
 class LogSink {
 public:

@@ -18,6 +18,11 @@
 #include "hardware/sensors.h"
 #endif
 
+/**
+ * @struct Sensors
+ * 
+ * @brief holds all interfaces for all sensors on MIDAS
+*/
 struct Sensors {
     LowGSensor low_g;
     LowGLSMSensor low_g_lsm;
@@ -31,6 +36,11 @@ struct Sensors {
     GPSSensor gps;
 };
 
+/**
+ * @struct RocketData
+ * 
+ * @brief holds all information about the rocket, sensors, and controllers
+*/
 struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;

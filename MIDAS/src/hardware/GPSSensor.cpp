@@ -5,17 +5,19 @@
 #include "sensor_data.h"
 #include <Wire.h>
 
-// Replace "Wire" with a reference to the I2C object to be used by the sensor
-TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);
+TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);     //singleton for the teseo gps
 
+/**
+ * @brief Initializes GPS, returns NoError
+ * 
+ * @return Error code
+*/
 ErrorCode GPSSensor::init() {
-    // Remember to change any RESET related operations to use the GPIO expander
-    teseo.init();
-//    if (!teseo.init()) {
-//        return ErrorCode::GPSCouldNotBeInitialized;
-//    }
+    teseo.init();       //function always returns ok for some reason
+
     return ErrorCode::NoError;
 }
+
 
 // This is needed because GPS doesn't provide unix time and just gives
 // dd mm yy
@@ -28,8 +30,11 @@ inline bool is_leapyear(int year) {
 }
 
 
-// GPS Coordinates are ddmm.mmmm, so please convert with some code
-
+/**
+ * @brief Reads the GPS data from the sensor (lat, long, altitude, sat count, etc)
+ * 
+ * @return GPS data packet
+*/
 GPS GPSSensor::read() {
     teseo.update();
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
