@@ -1,12 +1,15 @@
 #include "sensors.h"
-
-// #include sensor library
 #include "Adafruit_BNO08x.h"
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
 
+/**
+ * @brief Initializes the bno sensor
+ * 
+ * @return Error Code
+*/
 ErrorCode OrientationSensor::init() {
     gpioPinMode(BNO086_RESET, OUTPUT);
     delay(100);
@@ -22,6 +25,17 @@ ErrorCode OrientationSensor::init() {
     return ErrorCode::NoError;
 }
 
+/**
+ * @brief Turns a quaternion into its corresponding Euler 3D vector representation
+ * 
+ * @param qr Quaternion real component
+ * @param qi Quaternion i component
+ * @param qj Quaternion j component
+ * @param qk Quaternion k component
+ * @param degrees Quaternion degrees, not used
+ * 
+ * @return 3D representation of the quaternion
+*/
 Vec3 quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees) {
     float sqr = sq(qr);
     float sqi = sq(qi);
@@ -35,17 +49,38 @@ Vec3 quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees) {
     return euler;
 }
 
+/**
+ * @brief Takes a rotation quaternion and turns it into its Euler angle counterpart
+ * 
+ * @param rotational_vector Rotation quaternion
+ * @param degrees Quaternion degrees, not used
+ * 
+ * @return Euler angle vector representation of the quaternion
+*/
 Vec3 quaternionToEulerRV(sh2_RotationVectorWAcc_t* rotational_vector, bool degrees) {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,
                              degrees);
 
 }
 
+/**
+ * @brief Takes a gyroscope quaternion and turns it into its Euler 3D counterpart
+ * 
+ * @param rotational_vector Gyroscope quaternion
+ * @param degrees Quaternion degrees, not used
+ * 
+ * @return Euler angle vector representation of the quaternion
+*/
 Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, bool degrees) {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,
                              degrees);
 }
 
+/**
+ * @brief Reads and returns the data from the sensor
+ * 
+ * @return An orientation packet with orientation, acceleration, gyroscope, and magenetometer for all axes, along with temperature and pressure
+*/
 Orientation OrientationSensor::read() {
     // read from aforementioned global instance of sensor
     sh2_SensorValue_t event;

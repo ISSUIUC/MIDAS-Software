@@ -11,13 +11,17 @@
 
 
 /**
- * These are all the functions that will run in each task
+ * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
  * 
  * @param name the name of the thread, replace with the actual name
  * @param arg the config file for the rocket
  */
 
+
+/**
+ * See \ref data_logger_thread
+ */
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
     while (true) {
@@ -30,7 +34,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref barometer_thread
  */
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
@@ -40,7 +44,9 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     }
 }
 
-
+/**
+ * See \ref accelerometers_thread
+ */
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
 #ifdef IS_SUSTAINER
@@ -56,7 +62,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref orientation_thread
  */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
@@ -70,7 +76,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref magnetometer_thread
  */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
@@ -81,7 +87,10 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref i2c_thread
+ * 
+ * @note
+ * this thread holds all instructios for all components on i2c
  */
 DECLARE_THREAD(i2c, RocketSystems* arg) {
     int i = 0;
@@ -110,7 +119,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref fsm_thread
  */
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm {};
@@ -133,7 +142,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref buzzer_thread
  */
 DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
@@ -144,7 +153,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref kalman_thread
  */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     yessir.initialize();
@@ -173,7 +182,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 }
 
 /**
- * See \ref data_logger_thread
+ * See \ref telemetry_thread
  */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
@@ -183,7 +192,9 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     }
 }
 
-
+/**
+ * @brief initializes all systems
+*/
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
@@ -209,6 +220,7 @@ ErrorCode init_systems(RocketSystems& systems) {
 #undef INIT_SYSTEM
 
 /**
+ * @brief
  * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
  * Starts thread scheduler to actually start doing jobs
 */

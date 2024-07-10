@@ -3,8 +3,14 @@
 #include "fsm.h"
 #include "thresholds.h"
 
-// helper functions
-
+/**
+ * @brief Helper to calculate the average value of a buffered sensor data
+ * 
+ * @param sensor Buffered sensor struct
+ * @param get_item Lambda get function 
+ * 
+ * @return Average value
+*/
 template<typename T, size_t count>
 double sensor_average(BufferedSensorData<T, count>& sensor, double (* get_item)(T&)) {
     auto arr = sensor.template getBufferRecent<count>();
@@ -15,6 +21,14 @@ double sensor_average(BufferedSensorData<T, count>& sensor, double (* get_item)(
     return sum / count;
 }
 
+/**
+ * @brief Helper to calculate the derivative over a buffered sensor data
+ * 
+ * @param sensor Buffered sensor struct
+ * @param get_item Lambda get function 
+ * 
+ * @return Derivative
+*/
 template<typename T, size_t count>
 double sensor_derivative(BufferedSensorData<T, count>& sensor, double (* get_item)(T&)) {
     auto arr = sensor.template getBufferRecent<count>();
@@ -41,7 +55,9 @@ double sensor_derivative(BufferedSensorData<T, count>& sensor, double (* get_ite
     return (second_average - first_average) / (second_average_time - first_average_time);
 }
 
-
+/**
+ * @brief Populates StateEstimate struct with the correct values for accel, alt, jerk, and speed
+*/
 StateEstimate::StateEstimate(RocketData& state) {
     acceleration = sensor_average<HighGData, 8>(state.high_g, [](HighGData& data) {
         return (double) data.ax;
@@ -60,6 +76,14 @@ StateEstimate::StateEstimate(RocketData& state) {
 
 #ifdef IS_SUSTAINER
 
+/**
+ * @brief Sustainer FSM tick function, which will advance the current state if necessary
+ * 
+ * @param state current FSM state
+ * @param state_estimate StateEstimate struct for the current estimate for accel, alt, jerk, and speed
+ * 
+ * @return New FSM State
+*/
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     //get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -216,7 +240,16 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
 #else
 
-// this is similar to the previous function but contains less states
+/**
+ * @brief Booster FSM tick function, which will advance the current state if necessary
+ * 
+ * This is similar to the previous function but contains less states
+ * 
+ * @param state current FSM state
+ * @param state_estimate StateEstimate struct for the current estimate for accel, alt, jerk, and speed
+ * 
+ * @return New FSM State
+*/
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 

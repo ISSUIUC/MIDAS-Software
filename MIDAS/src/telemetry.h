@@ -12,6 +12,11 @@
 #include "hardware/telemetry_backend.h"
 #endif
 
+/**
+ * @class Telemetry
+ * 
+ * @brief wraps the telemetry system to create and send a packet
+*/
 class Telemetry {
 public:
     Telemetry() = default;

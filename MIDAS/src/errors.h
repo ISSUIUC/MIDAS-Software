@@ -1,5 +1,10 @@
 #pragma once
 
+/**
+ * @enum ErrorCode
+ * 
+ * @brief list of all error codes that can arise
+*/
 enum ErrorCode {
     NoError = 0,
     LowGCouldNotBeInitialized = 1,
