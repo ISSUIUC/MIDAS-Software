@@ -13,14 +13,8 @@
 /**
  * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
- * 
- * @param name the name of the thread, replace with the actual name
- * @param arg the config file for the rocket
- */
-
-
-/**
- * See \ref data_logger_thread
+ *
+ * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
@@ -33,9 +27,6 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref barometer_thread
- */
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
@@ -44,9 +35,6 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref accelerometers_thread
- */
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
 #ifdef IS_SUSTAINER
@@ -61,9 +49,6 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref orientation_thread
- */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         Orientation reading = arg->sensors.orientation.read();
@@ -75,9 +60,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref magnetometer_thread
- */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         Magnetometer reading = arg->sensors.magnetometer.read();
@@ -86,12 +68,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref i2c_thread
- * 
- * @note
- * this thread holds all instructios for all components on i2c
- */
+// Ever device which communicates over i2c is on this thread to avoid interference
 DECLARE_THREAD(i2c, RocketSystems* arg) {
     int i = 0;
 
@@ -118,11 +95,9 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref fsm_thread
- */
+// This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
-    FSM fsm {};
+    FSM fsm{};
     bool already_played_freebird = false;
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
@@ -141,9 +116,6 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref buzzer_thread
- */
 DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
         arg->buzzer.tick();
@@ -152,9 +124,6 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref kalman_thread
- */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     yessir.initialize();
     TickType_t last = xTaskGetTickCount();
@@ -181,9 +150,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref telemetry_thread
- */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
@@ -192,10 +158,12 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     }
 }
 
-/**
- * @brief initializes all systems
-*/
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
+
+/**
+ * @brief Initializes all systems in order, returning early if a system's initialization process errors out.
+ *        Turns on the Orange LED while initialization is running.
+ */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
 #ifdef IS_SUSTAINER
@@ -217,13 +185,14 @@ ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
+
 #undef INIT_SYSTEM
 
+
 /**
- * @brief
- * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
- * Starts thread scheduler to actually start doing jobs
-*/
+ * @brief Initializes the systems, and then creates and starts the thread for each system.
+ *        If initialization fails, then this enters an infinite loop.
+ */
 [[noreturn]] void begin_systems(RocketSystems* config) {
     Serial.println("Starting Systems...");
     ErrorCode init_error_code = init_systems(*config);
@@ -253,7 +222,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
-    
+
     while (true) {
         THREAD_SLEEP(1000);
         Serial.print("Running (Log Latency: ");

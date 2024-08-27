@@ -6,7 +6,7 @@
 
 /**
  * @struct LowG interface
-*/
+ */
 struct LowGSensor {
     ErrorCode init();
     LowGData read();
@@ -14,7 +14,7 @@ struct LowGSensor {
 
 /**
  * @struct HighG interface
-*/
+ */
 struct HighGSensor {
     ErrorCode init();
     HighGData read();
@@ -22,7 +22,7 @@ struct HighGSensor {
 
 /**
  * @struct Magnetometer interface
-*/
+ */
 struct MagnetometerSensor {
     ErrorCode init();
     Magnetometer read();
@@ -30,7 +30,7 @@ struct MagnetometerSensor {
 
 /**
  * @struct Barometer interface
-*/
+ */
 struct BarometerSensor {
     ErrorCode init();
     Barometer read();
@@ -38,7 +38,7 @@ struct BarometerSensor {
 
 /**
  * @struct LowGLSM interface
-*/
+ */
 struct LowGLSMSensor {
     ErrorCode init();
     LowGLSM read();
@@ -46,7 +46,7 @@ struct LowGLSMSensor {
 
 /**
  * @struct Continuity interface
-*/
+ */
 struct ContinuitySensor {
     ErrorCode init();
     Continuity read();
@@ -54,7 +54,7 @@ struct ContinuitySensor {
 
 /**
  * @struct Voltage interface
-*/
+ */
 struct VoltageSensor {
     ErrorCode init();
     Voltage read();
@@ -62,7 +62,7 @@ struct VoltageSensor {
 
 /**
  * @struct BNO interface
-*/
+ */
 struct OrientationSensor {
     Orientation initial_orientation;
     uint8_t initial_flag;
@@ -72,7 +72,7 @@ struct OrientationSensor {
 
 /**
  * @struct GPS interface
-*/
+ */
 struct GPSSensor {
     ErrorCode init();
     GPS read();
@@ -81,7 +81,7 @@ struct GPSSensor {
 
 /**
  * @struct Pyro interface
-*/
+ */
 struct Pyro {
     ErrorCode init();
     PyroState tick(FSMState fsm_state, Orientation orientation);
