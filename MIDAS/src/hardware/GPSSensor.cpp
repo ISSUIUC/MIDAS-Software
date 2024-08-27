@@ -1,26 +1,28 @@
-#include "sensors.h"
-#include "pins.h"
-#include "MicroNMEA.h"
-#include "teseo_liv3f_class.h"
-#include "sensor_data.h"
 #include <Wire.h>
 
-TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);     //singleton for the teseo gps
+#include "MicroNMEA.h"
+#include "teseo_liv3f_class.h"
+
+#include "pins.h"
+#include "sensors.h"
+#include "sensor_data.h"
+
+TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);     // singleton for the teseo gps
 
 /**
  * @brief Initializes GPS, returns NoError
  * 
  * @return Error code
-*/
+ */
 ErrorCode GPSSensor::init() {
-    teseo.init();       //function always returns ok for some reason
+    teseo.init();       // always returns ok for some reason
 
     return ErrorCode::NoError;
 }
 
 
-// This is needed because GPS doesn't provide unix time and just gives
-// dd mm yy
+// This is needed because GPS doesn't provide unix time and just gives dd mm yy
+// 'needed' is a strong word
 const uint16_t months[12] = {
     0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334
 };
@@ -34,7 +36,7 @@ inline bool is_leapyear(int year) {
  * @brief Reads the GPS data from the sensor (lat, long, altitude, sat count, etc)
  * 
  * @return GPS data packet
-*/
+ */
 GPS GPSSensor::read() {
     teseo.update();
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
