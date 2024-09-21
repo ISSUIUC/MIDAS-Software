@@ -31,7 +31,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 426.15
+#define RF95_FREQ 425.15
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -137,6 +137,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.FSM_State = packet.fsm_satcount;
     data.freq = RF95_FREQ;
     print_queue.emplace(data);
+    Serial.println(rf95.lastRssi());
 
 }
 
@@ -264,6 +265,19 @@ void setup() {
     Serial.print(RF95_FREQ);
     Serial.println("}");
     rf95.setTxPower(23, false);
+    rf95.setSignalBandwidth(125000);
+    rf95.setCodingRate4(8);
+    rf95.setSpreadingFactor(8); // time on air: 156.14 ms link budget: 142.5 db
+   //rf95.setSpreadingFactor(10); time on air: 493.56 ms  link budget: 148.2 db
+    rf95.setPayloadCRC(true);
+
+    /* Maximize Link Budget   time on air: 1.32 s   link budget: 153.0 db
+    bandwidth stays the same
+    
+    rf95.setSpreadingFactor(12);
+    rf95.setCodingRate4(5);
+    
+    */
 }
 
 void loop() {
