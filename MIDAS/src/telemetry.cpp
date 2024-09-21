@@ -59,6 +59,23 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
+struct receivedDataStruct {
+    bool kalmanFilterReset;
+    // frequency
+    // call sign
+};
+
+void Telemetry::receive() {
+    // FSM says in flight, then keep transmitting don't read
+    receivedDataStruct *received;
+    if (!backend.read(received)) {
+        return;
+    }
+    if (received->kalmanFilterReset) {
+        // reset kalman filter
+    }
+}
+
 /**
  * @brief creates the packet to send through the telemetry system
  * 
