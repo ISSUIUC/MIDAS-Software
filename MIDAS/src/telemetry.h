@@ -4,6 +4,7 @@
 #include "rocket_state.h"
 #include "errors.h"
 #include "led.h"
+#include "yessir.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_telemetry.h"
@@ -11,6 +12,7 @@
 #else
 #include "hardware/telemetry_backend.h"
 #endif
+
 
 /**
  * @class Telemetry

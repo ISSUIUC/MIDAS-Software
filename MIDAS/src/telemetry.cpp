@@ -3,6 +3,7 @@
 #include "telemetry.h"
 #include "telemetry_received.h"
 
+
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
  * size
@@ -65,20 +66,7 @@ void Telemetry::receive(RocketData& rocket_data) {
         return;
     }
     if (received->kalmanFilterReset) {
-        KalmanData kalman = rocket_data.kalman.getRecentUnsync();
-        kalman.acceleration.ax = 0;
-        kalman.acceleration.ay = 0;
-        kalman.acceleration.az = 0;
-
-        kalman.position.px = 0;
-        kalman.position.py = 0;
-        kalman.position.pz = 0;
-
-        kalman.velocity.vx = 0;
-        kalman.velocity.vy = 0;
-        kalman.velocity.vz = 0;
-
-        kalman.altitude = 0.0;
+        yessir.reset();
     }
 }
 
