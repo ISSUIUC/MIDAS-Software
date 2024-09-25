@@ -26,7 +26,7 @@ public:
 
     void transmit(RocketData& rocket_data, LEDController& led);
 
-    void receive();
+    void receive(RocketData& rocket_data);
 private:
     TelemetryPacket makePacket(RocketData& data);
 

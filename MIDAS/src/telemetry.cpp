@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "telemetry.h"
-
+#include "telemetry_received.h"
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
@@ -59,20 +59,26 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
-struct receivedDataStruct {
-    bool kalmanFilterReset;
-    // frequency
-    // call sign
-};
-
-void Telemetry::receive() {
-    // FSM says in flight, then keep transmitting don't read
-    receivedDataStruct *received;
+void Telemetry::receive(RocketData& rocket_data) {
+    TelemetryReceivedData *received;
     if (!backend.read(received)) {
         return;
     }
     if (received->kalmanFilterReset) {
-        // reset kalman filter
+        KalmanData kalman = rocket_data.kalman.getRecentUnsync();
+        kalman.acceleration.ax = 0;
+        kalman.acceleration.ay = 0;
+        kalman.acceleration.az = 0;
+
+        kalman.position.px = 0;
+        kalman.position.py = 0;
+        kalman.position.pz = 0;
+
+        kalman.velocity.vx = 0;
+        kalman.velocity.vy = 0;
+        kalman.velocity.vz = 0;
+
+        kalman.altitude = 0.0;
     }
 }
 
