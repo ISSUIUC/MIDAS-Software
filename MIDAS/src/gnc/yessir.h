@@ -19,7 +19,7 @@ public:
     void setState(KalmanData state) override;
 
     void tick(float dt, float sd, Barometer &barometerData, Acceleration &imuData);
-
+    void reset();
 private:
     float s_dt_ = 0.05f;
     float spectral_density_ = 13.0f;

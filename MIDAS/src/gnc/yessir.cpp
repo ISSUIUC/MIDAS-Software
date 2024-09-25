@@ -10,6 +10,10 @@ void Yessir::priori() {}
 
 void Yessir::update() {}
 
+void Yessir::reset() {
+    this->setState(KalmanData());
+}
+
 void Yessir::tick(float dt, float sd, Barometer &barometerData, Acceleration &imuData) {
     // double integrate accelerometer data and store in state struct
     state.acceleration = {

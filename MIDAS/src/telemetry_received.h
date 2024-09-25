@@ -6,6 +6,6 @@
 */
 struct TelemetryReceivedData {
     bool kalmanFilterReset;
-    // frequency
-    // call sign
+    // TODO: Add frequency setting
+    // TODO: Add changing call sign
 };
