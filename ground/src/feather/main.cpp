@@ -175,7 +175,7 @@ struct FullTelemetryData {
     char callsign[8];
 };
 
-enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
+enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY, RESET_KF };
 // Commands transmitted from ground station to rocket
 struct telemetry_command {
     CommandType command;
@@ -184,6 +184,7 @@ struct telemetry_command {
         char callsign[8];
         float freq;
         bool do_abort;
+        bool reset_KF;
     };
     std::array<char, 6> verify = {{'A', 'Y', 'B', 'E', 'R', 'K'}};
 };
@@ -401,6 +402,9 @@ void SerialInput(const char* key, const char* value) {
         return;
     } else if (strcmp(key, "FLAP") == 0) {
         command.command = CommandType::TEST_FLAP;
+    } else if (strcmp(key, "RESET_KF") == 0){
+        command.command = CommandType::RESET_KF;
+        command.reset_KF = true;
     } else {
         SerialError();
         return;
