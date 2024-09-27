@@ -40,4 +40,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: compiled-code
-        path: .pio/build/mcu_main_sustainer/
+        path: MIDAS/.pio/build/
