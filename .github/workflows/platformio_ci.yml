@@ -1,10 +1,6 @@
 name: PlatformIO CI
 
-on:
-  # pull_request:
-  #   types:
-  #   - opened
-  workflow_dispatch:
+on: workflow_dispatch
 
 jobs:
   build:
