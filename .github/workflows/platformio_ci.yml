@@ -13,18 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Cache pip
-      uses: actions/cache@v2
-      with:
-        path: ~/.cache/pip
-        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-        restore-keys: |
-          ${{ runner.os }}-pip-
-    - name: Cache PlatformIO
-      uses: actions/cache@v2
-      with:
-        path: ~/.platformio
-        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
+    # - name: Cache pip
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: ~/.cache/pip
+    #     key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+    #     restore-keys: |
+    #       ${{ runner.os }}-pip-
+    # - name: Cache PlatformIO
+    #   uses: actions/cache@v2
+    #   with:
+    #     path: ~/.platformio
+    #     key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
     - name: Set up Python
       uses: actions/setup-python@v2
     - name: Install PlatformIO
@@ -36,3 +36,8 @@ jobs:
         cd MIDAS
         pio platform install teensy
         pio run -e mcu_main_sustainer
+    - name: Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: compiled-code
+          path: .
