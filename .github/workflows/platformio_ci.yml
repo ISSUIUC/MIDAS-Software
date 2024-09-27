@@ -37,7 +37,7 @@ jobs:
         pio platform install teensy
         pio run -e mcu_main_sustainer
     - name: Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: compiled-code
-          path: .
+      uses: actions/upload-artifact@v4
+      with:
+        name: compiled-code
+        path: .
