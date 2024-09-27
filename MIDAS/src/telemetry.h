@@ -4,7 +4,7 @@
 #include "rocket_state.h"
 #include "errors.h"
 #include "led.h"
-#include "yessir.h"
+#include "gnc/yessir.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_telemetry.h"

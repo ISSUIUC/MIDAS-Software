@@ -61,12 +61,15 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
 }
 
 void Telemetry::receive(RocketData& rocket_data) {
-    TelemetryReceivedData *received;
+    TelemetryCommand *received;
     if (!backend.read(received)) {
         return;
     }
-    if (received->kalmanFilterReset) {
-        yessir.reset();
+    if (received->command == CommandType::RESET_KF) {
+        if(received->reset_KF == 1) {
+            yessir.reset();
+            Serial.println("Reset KF");
+        }
     }
 }
 
