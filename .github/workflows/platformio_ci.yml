@@ -1,9 +1,10 @@
 name: PlatformIO CI
 
+on:
   push:
     branches:
       - action  # Replace 'main' with your branch if different
-    workflow_dispatch:  # This keeps the option to trigger manually
+  workflow_dispatch:  # This keeps the option to trigger manually
 
 jobs:
   build:
