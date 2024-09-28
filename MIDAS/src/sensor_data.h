@@ -229,3 +229,15 @@ struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
 };
+
+/**
+ * @struct ProcessTime
+ * 
+ * @brief The process time of the processes in the thread
+*/
+struct ProcessTime
+{
+    char ProcessName[32];
+    float dt;
+};
+
