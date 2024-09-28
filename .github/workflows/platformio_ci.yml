@@ -23,8 +23,8 @@ jobs:
       run: |
         cd MIDAS
         pio platform install teensy
-        pio run -e mcu_main_sustainer || true
         pio run -e mcu_main_booster || true
+        pio run -e mcu_main_sustainer || true
         pio run -e mcu_hilsim_sustainer || true
         pio run -e mcu_hilsim_booster || true
     - name: Artifacts
