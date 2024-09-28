@@ -7,6 +7,7 @@
 
 #include <Eigen/Eigen>
 #include "sensor_data.h"
+#include "systems.h"
 
 
 #define NUM_STATES 9
@@ -69,9 +70,10 @@ public:
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
 
-    virtual void void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
+    virtual void initialize(RocketSystems* args);
+    //virtual void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
     virtual void priori();
-    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation);
+    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state);
 
     virtual KalmanData getState();
     virtual void setState(KalmanState state);

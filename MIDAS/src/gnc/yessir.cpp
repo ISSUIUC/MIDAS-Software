@@ -6,23 +6,48 @@ Yessir::Yessir() : KalmanFilter() {
     state = KalmanData();
 }
 
-void Yessir::initialize(Orientation &orientation, Barometer &barometer, Acceleration &acceleration) {
-    // TODO: The altitude initialization is the same code as
-    //   setLaunchPadElevation() in AC. Maybe use the same one?
+/**
+ * @brief Sets altitude by averaging 30 barometer measurements taken 100 ms
+ * apart
+ *
+ * The following for loop takes a series of barometer measurements on start
+ * up and takes the average of them in order to initialize the kalman filter
+ * to the correct initial barometric altitude. This is done so that the
+ * kalman filter takes minimal time to converge to an accurate state
+ * estimate. This process is significantly faster than allowing the state as
+ * letting the filter to converge to the correct state can take up to 3 min.
+ * This specific process was used because the barometric altitude will
+ * change depending on the weather and thus, the initial state estimate
+ * cannot be hard coded. A GPS altitude may be used instead but due to GPS
+ * losses during high speed/high altitude flight, it is inadvisable with the
+ * current hardware to use this as a solution. Reference frames should also
+ * be kept consistent (do not mix GPS altitude and barometric).
+ *
+ */
+void Yessir::initialize(RocketSystems* args) {
+    Orientation orientation = arg->rocket_data.orientation.getRecentUnsync();
+    
     float sum = 0;
     
     for (int i = 0; i < 30; i++) {
+        Barometer initial_barom_buf = arg->rocket_data.barometer.getRecent();
+        LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
+        Acceleration accelerations = {
+            .ax = initial_accelerometer.ax,
+            .ay = initial_accelerometer.ay,
+            .az = initial_accelerometer.az
+        };
         // TODO This mutex lock is almost certainly not necessary
         //chMtxLock(&barometer.mutex);
         sum += barometer.altitude;
         //chMtxUnlock(&barometer.mutex);
 
         //chMtxLock(&highG.mutex);
-        init_accel(0, 0) += acceleration.az;
-        init_accel(1, 0) += acceleration.ay;
-        init_accel(2, 0) += -acceleration.ax;
+        init_accel(0, 0) += accelerations.az;
+        init_accel(1, 0) += accelerations.ay;
+        init_accel(2, 0) += -accelerations.ax;
         //chMtxUnlock(&highG.mutex);
-        //chThdSleepMilliseconds(100);
+        chThdSleepMilliseconds(100);
     }
 
     init_accel(0, 0) /= 30;
@@ -101,6 +126,127 @@ void Yessir::initialize(Orientation &orientation, Barometer &barometer, Accelera
     B(2, 0) = -1;
 }
 
+
+/**
+ * @brief Sets altitude by averaging 30 barometer measurements taken 100 ms
+ * apart
+ *
+ * The following for loop takes a series of barometer measurements on start
+ * up and takes the average of them in order to initialize the kalman filter
+ * to the correct initial barometric altitude. This is done so that the
+ * kalman filter takes minimal time to converge to an accurate state
+ * estimate. This process is significantly faster than allowing the state as
+ * letting the filter to converge to the correct state can take up to 3 min.
+ * This specific process was used because the barometric altitude will
+ * change depending on the weather and thus, the initial state estimate
+ * cannot be hard coded. A GPS altitude may be used instead but due to GPS
+ * losses during high speed/high altitude flight, it is inadvisable with the
+ * current hardware to use this as a solution. Reference frames should also
+ * be kept consistent (do not mix GPS altitude and barometric).
+ *
+ *
+void Yessir::initialize(Orientation &orientation, Barometer &barometer, Acceleration &acceleration) {
+    // TODO: The altitude initialization is the same code as
+    //   setLaunchPadElevation() in AC. Maybe use the same one?
+    float sum = 0;
+    
+    for (int i = 0; i < 30; i++) {
+        // TODO This mutex lock is almost certainly not necessary
+        //chMtxLock(&barometer.mutex);
+        sum += barometer.altitude;
+        //chMtxUnlock(&barometer.mutex);
+
+        //chMtxLock(&highG.mutex);
+        init_accel(0, 0) += acceleration.az;
+        init_accel(1, 0) += acceleration.ay;
+        init_accel(2, 0) += -acceleration.ax;
+        // chMtxUnlock(&highG.mutex); // anything starting with ch is chibios specific
+        //chThdSleepMilliseconds(100);
+    }
+
+    init_accel(0, 0) /= 30;
+    init_accel(1, 0) /= 30;
+    init_accel(2, 0) /= 30;
+
+    //chMtxLock(&orientation.mutex);
+    euler_t euler = orientation.getEuler();
+    //chMtxUnlock(&orientation.mutex);
+    euler.yaw = -euler.yaw;
+    world_accel = BodyToGlobal(euler, init_accel);
+
+    // set x_k
+    x_k(0, 0) = sum / 30;
+    // x_k(0,0) = 1401;
+    x_k(3, 0) = 0;
+    x_k(6, 0) = 0;
+
+    // set F
+    for (int i = 0; i < 3; i++) {
+        F_mat(3 * i, 3 * i + 1) = s_dt;
+        F_mat(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;
+        F_mat(3 * i + 1, 3 * i + 2) = s_dt;
+
+        F_mat(3 * i, 3 * i) = 1;
+        F_mat(3 * i + 1, 3 * i + 1) = 1;
+        F_mat(3 * i + 2, 3 * i + 2) = 1;
+    }
+
+    Q(0, 0) = pow(s_dt, 5) / 20;
+    Q(0, 1) = pow(s_dt, 4) / 8;
+    Q(0, 2) = pow(s_dt, 3) / 6;
+    Q(1, 1) = pow(s_dt, 3) / 8;
+    Q(1, 2) = pow(s_dt, 2) / 2;
+    Q(2, 2) = s_dt;
+    Q(1, 0) = Q(0, 1);
+    Q(2, 0) = Q(0, 2);
+    Q(2, 1) = Q(1, 2);
+
+    Q(3, 3) = pow(s_dt, 5) / 20;
+    Q(3, 4) = pow(s_dt, 4) / 8;
+    Q(3, 5) = pow(s_dt, 3) / 6;
+    Q(4, 4) = pow(s_dt, 3) / 8;
+    Q(4, 5) = pow(s_dt, 2) / 2;
+    Q(5, 5) = s_dt;
+    Q(4, 3) = Q(3, 4);
+    Q(5, 3) = Q(3, 5);
+    Q(5, 4) = Q(4, 5);
+
+    Q(6, 6) = pow(s_dt, 5) / 20;
+    Q(6, 7) = pow(s_dt, 4) / 8;
+    Q(6, 8) = pow(s_dt, 3) / 6;
+    Q(7, 7) = pow(s_dt, 3) / 8;
+    Q(7, 8) = pow(s_dt, 2) / 2;
+    Q(8, 8) = s_dt;
+    Q(7, 6) = Q(6, 7);
+    Q(8, 6) = Q(6, 8);
+    Q(8, 7) = Q(7, 8);
+
+    // set H
+    H(0, 0) = 1;
+    H(1, 2) = 1;
+    H(2, 5) = 1;
+    H(3, 8) = 1;
+
+    float spectral_density = 13.0;
+    Q = Q * spectral_density;
+
+    // set R
+    R(0, 0) = 2.0;
+    R(1, 1) = 1.9;
+    R(2, 2) = 10;
+    R(3, 3) = 10;
+
+    // set B (don't care about what's in B since we have no control input)
+    B(2, 0) = -1;
+}*/
+
+/**
+ * @brief Estimates current state of the rocket without current sensor data
+ *
+ * The priori step of the Kalman filter is used to estimate the current state
+ * of the rocket without knowledge of the current sensor data. In other words,
+ * it extrapolates the state at time n+1 based on the state at time n.
+ */
 void Yessir::priori() {
      // x_priori = (F @ x_k) + ((B @ u).T) #* For some reason doesnt work when B
     // or u is = 0
@@ -108,9 +254,17 @@ void Yessir::priori() {
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
-void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation) {
+/**
+ * @brief Update Kalman Gain and state estimate with current sensor data
+ *
+ * After receiving new sensor data, the Kalman filter updates the state estimate
+ * and Kalman gain. The Kalman gain can be considered as a measure of how uncertain
+ * the new sensor data is. After updating the gain, the state estimate is updated.
+ *
+ */
+void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) {
     // Ask correct state
-    if (getActiveFSM().getFSMState() == FSM_State::STATE_LAUNCH_DETECT) { 
+    if (current_state == FSMState::STATE_FIRST_BOOST) { 
         float sum = 0;
         float data[10];
         alt_buffer.readSlice(data, 0, 10);
@@ -118,7 +272,7 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
             sum += i;
         }
         setState((KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-    } else if (getActiveFSM().getFSMState() >= FSMState::STATE_APOGEE) {
+    } else if (current_state >= FSMState::STATE_APOGEE) {
         H(1, 2) = 0;
     }
 
@@ -183,12 +337,22 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     //dataLogger.pushKalmanFifo(kalman_data); Do I need this?
 }
 
-void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation) {
-    if (getActiveFSM().getFSMState() >= FSMState::STATE_IDLE) {
+/**
+ * @brief Run Kalman filter calculations as long as FSM has passed IDLE
+ *
+ * @param dt Time step calculated by the Kalman Filter Thread
+ * @param sd Spectral density of the noise
+ * @param &barometer Data of the current barometer
+ * @param acceleration Current acceleration
+ * @param &orientation Current orientation
+ * @param current_state Current FSMstate
+ */
+void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState current_state) {
+    if (current_state >= FSMState::STATE_IDLE) {
         setF(float(dt) / 1000);
         setQ(float(dt) / 1000, sd);
         priori();
-        update(barometer, acceleration, orientation);
+        update(barometer, acceleration, orientation, current_state);
     }
     
 }
@@ -209,10 +373,21 @@ Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<fl
     return yaw * pitch * body_vect;
 }
 
+
+/**
+ * @brief Getter for state X
+ *
+ * @return the current state, see sensor_data.h for kalman_data
+ */
 KalmanData Yessir::getState() {
     return state;
 }
 
+/**
+ * @brief Sets state vector x
+ *
+ * @param state Wanted state vector
+ */
 void Yessir::setState(KalmanState state) {
     this->state.position.px = state.state_est_pos_x;
     this->state.position.py = state.state_est_pos_y;
@@ -225,6 +400,15 @@ void Yessir::setState(KalmanState state) {
     this->state.velocity.vz =state.state_est_vel_z;
 }
 
+/**
+ * @brief Sets the Q matrix given time step and spectral density.
+ *
+ * @param dt Time step calculated by the Kalman Filter Thread
+ * @param sd Spectral density of the noise
+ *
+ * The Q matrix is the covariance matrix for the process noise and is
+ * updated based on the time taken per cycle of the Kalman Filter Thread.
+ */
 void Yessir::setQ(float dt, float sd) {
     Q(0, 0) = pow(dt, 5) / 20;
     Q(0, 1) = pow(dt, 4) / 8;
@@ -259,6 +443,14 @@ void Yessir::setQ(float dt, float sd) {
     Q *= sd;
 }
 
+/**
+ * @brief Sets the F matrix given time step.
+ *
+ * @param dt Time step calculated by the Kalman Filter Thread
+ *
+ * The F matrix is the state transition matrix and is defined
+ * by how the states change over time.
+ */
 void Yessir::setF(float dt) {
         for (int i = 0; i < 3; i++) {
         F_mat(3 * i, 3 * i + 1) = s_dt;

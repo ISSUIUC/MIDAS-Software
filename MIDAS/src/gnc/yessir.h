@@ -3,15 +3,16 @@
 #include "kalman_filter.h"
 #include "sensor_data.h"
 #include "FifoBuffer.h"
+//#include "systems.h"
 
 class Yessir : public KalmanFilter<3, 3>
 {
 public:
     Yessir();
-
-    void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration) override; //Works
+    void initialize(RocketSystems* args) override; // y is this getting args
+    //void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration) override; //Works
     void priori() override; //works
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation) override;
+    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
 
     void setQ(float dt, float sd); //Works
     void setF(float dt); //Works
@@ -20,7 +21,7 @@ public:
     KalmanData getState() override;
     void setState(KalmanState state) override;
 
-    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation);
+    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
     void updateApogee(float estimate);
 
 private:

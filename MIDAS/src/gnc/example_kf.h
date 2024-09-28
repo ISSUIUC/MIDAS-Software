@@ -8,15 +8,16 @@ class ExampleKalmanFilter : public KalmanFilter<9, 3>
 public:
     ExampleKalmanFilter();
 
-    void initialize() override;
+    void initialize(RocketSystems* args) override;
+    //virtual void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
     void priori() override;
-    void update() override;
+    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) override;
+
+    KalmanData getState() override;
+    void setState(KalmanState state) override;
 
     void setQ(float dt, float sd);
     void setF(float dt);
-
-    KalmanData getState() override;
-    void setState(KalmanData state) override;
 
     Eigen::Matrix<float, 3, 1> bodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> x_k);
 
