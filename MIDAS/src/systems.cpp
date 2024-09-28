@@ -154,7 +154,16 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
 
-        THREAD_SLEEP(1);
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        if (current_state == FSMState(STATE_IDLE)) {
+            TelemetryCommand command;
+            if (arg->tlm.receive(&command, 1000)) {
+                // handle command
+                Serial.println(command.callsign);
+            }
+        } else {
+            THREAD_SLEEP(1);
+        }
     }
 }
 

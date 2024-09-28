@@ -4,6 +4,7 @@
 #include "rocket_state.h"
 #include "errors.h"
 #include "led.h"
+#include "telemetry_received.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_telemetry.h"
@@ -25,6 +26,7 @@ public:
     ErrorCode __attribute__((warn_unused_result)) init();
 
     void transmit(RocketData& rocket_data, LEDController& led);
+    bool receive(TelemetryCommand *write, int wait_milliseconds);
 private:
     TelemetryPacket makePacket(RocketData& data);
 

@@ -19,7 +19,7 @@ public:
 
     int8_t getRecentRssi();
     void setFrequency(float frequency);
-
+    
     /**
      * @brief This function transmits data from the struct provided as
      * the parameter (data collected from sensor suite) to the
@@ -60,18 +60,33 @@ public:
      * @return bool indicating a successful read and write to buffer
     */
     template<typename T>
-    bool read(T* write) {
+    bool read(T* command, int wait_milliseconds) {
         static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to receive is too large");
         uint8_t len = sizeof(T);
-        if (rf95.available() && rf95.recv((uint8_t*) write, &len)) {
-            return len == sizeof(T);
-        } else {
-            return false;
+
+        // set receive mode
+        rf95.setModeRx();
+
+        // busy wait for interrupt signalling
+        for(int i = 1; i < wait_milliseconds; i++){
+            THREAD_SLEEP(1);
+            if(digitalRead(rf95._interruptPin)){
+                break;
+            }
         }
+
+        rf95.handleInterrupt();
+        if (rf95.available() && rf95.recv((uint8_t*) command, &len)) {
+            if (sizeof(T) == len) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 
 private:
     RH_RF95 rf95;
-
     bool led_state;
 };
