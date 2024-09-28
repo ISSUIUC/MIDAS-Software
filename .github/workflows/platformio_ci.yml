@@ -31,7 +31,6 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: firmware-files
-        path: MIDAS/.pio
-# |
-#   MIDAS/.pio/build/**/*firmware*
-#   MIDAS/.pio/build/**/*bootloader*
+        path: |
+          MIDAS/.pio/build/**/*firmware*
+          MIDAS/.pio/build/**/*bootloader*
