@@ -32,7 +32,5 @@ jobs:
       with:
         name: firmware-files
         path: |
-          MIDAS/.pio/build/mcu_main_sustainer/**
-          MIDAS/.pio/build/mcu_main_booster/**
-          MIDAS/.pio/build/mcu_hilsim_sustainer/**
-          MIDAS/.pio/build/mcu_hilsim_booster/**
+          MIDAS/.pio/build/**/*firmware*
+          MIDAS/.pio/build/**/*bootloader*
