@@ -8,6 +8,33 @@
 #include <Eigen/Eigen>
 #include "sensor_data.h"
 
+
+#define NUM_STATES 9
+#define NUM_SENSOR_INPUTS 4
+#define ALTITUDE_BUFFER_SIZE 10
+
+typedef struct KalmanState {
+    float state_est_pos_x;
+    float state_est_vel_x;
+    float state_est_accel_x;
+    float state_est_pos_y;
+    float state_est_vel_y;
+    float state_est_accel_y;
+    float state_est_pos_z;
+    float state_est_vel_z;
+    float state_est_accel_z;
+
+    float state_est_r_pos_x;
+    float state_est_r_vel_x;
+    float state_est_r_accel_x;
+    float state_est_r_pos_y;
+    float state_est_r_vel_y;
+    float state_est_r_accel_y;
+    float state_est_r_pos_z;
+    float state_est_r_vel_z;
+    float state_est_r_accel_z;
+} KalmanState;
+
 template <int _NumStates, int _NumInputs>
 class KalmanFilter
 {
@@ -42,10 +69,10 @@ public:
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
 
-    virtual void initialize() = 0;
-    virtual void priori() = 0;
-    virtual void update() = 0;
+    virtual void void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
+    virtual void priori();
+    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation);
 
-    virtual KalmanData getState() = 0;
-    virtual void setState(KalmanData state) = 0;
+    virtual KalmanData getState();
+    virtual void setState(KalmanState state);
 };

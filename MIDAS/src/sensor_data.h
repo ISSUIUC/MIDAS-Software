@@ -181,6 +181,15 @@ struct Orientation {
     float pitch = 0;
     float roll = 0;
 
+    //For yessir.cpp
+    euler_t Orientation::getEuler() const {
+        euler_t euler;
+        euler.yaw = this->yaw;
+        euler.pitch = this->pitch;
+        euler.roll = this->roll;
+        return euler;
+    }
+
     Velocity orientation_velocity;
     Acceleration orientation_acceleration;
 
