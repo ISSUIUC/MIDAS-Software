@@ -30,9 +30,9 @@ jobs:
     - name: Artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: compiled-code
-        path: 
-        - MIDAS/.pio/build/mcu_main_sustainer
-        - MIDAS/.pio/build/mcu_main_booster
-        - MIDAS/.pio/build/mcu_hilsim_sustainer
-        - MIDAS/.pio/build/mcu_hilsim_sustainer
+        name: firmware-files
+        path: |
+          MIDAS/.pio/build/mcu_main_sustainer
+          MIDAS/.pio/build/mcu_main_booster
+          MIDAS/.pio/build/mcu_hilsim_sustainer
+          MIDAS/.pio/build/mcu_hilsim_sustainer
