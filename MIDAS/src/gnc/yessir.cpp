@@ -1,5 +1,5 @@
 #include "yessir.h"
-#include "src/finite-state-machines/fsm_states.h"
+#include "finite-state-machines/fsm_states.h"
 
 
 Yessir::Yessir() : KalmanFilter() {
@@ -25,13 +25,13 @@ Yessir::Yessir() : KalmanFilter() {
  *
  */
 void Yessir::initialize(RocketSystems* args) {
-    Orientation orientation = arg->rocket_data.orientation.getRecentUnsync();
+    Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
     
     float sum = 0;
     
     for (int i = 0; i < 30; i++) {
-        Barometer initial_barom_buf = arg->rocket_data.barometer.getRecent();
-        LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
+        Barometer barometer = args->rocket_data.barometer.getRecent();
+        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
         Acceleration accelerations = {
             .ax = initial_accelerometer.ax,
             .ay = initial_accelerometer.ay,
@@ -47,7 +47,7 @@ void Yessir::initialize(RocketSystems* args) {
         init_accel(1, 0) += accelerations.ay;
         init_accel(2, 0) += -accelerations.ax;
         //chMtxUnlock(&highG.mutex);
-        chThdSleepMilliseconds(100);
+        //chThdSleepMilliseconds(100);
     }
 
     init_accel(0, 0) /= 30;
@@ -262,17 +262,18 @@ void Yessir::priori() {
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
-void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) {
+void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
     // Ask correct state
-    if (current_state == FSMState::STATE_FIRST_BOOST) { 
+    if (FSM_state == FSMState::STATE_FIRST_BOOST) { 
         float sum = 0;
         float data[10];
         alt_buffer.readSlice(data, 0, 10);
         for (float i : data) {
             sum += i;
         }
+        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         setState((KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
-    } else if (current_state >= FSMState::STATE_APOGEE) {
+    } else if (FSM_state >= FSMState::STATE_APOGEE) {
         H(1, 2) = 0;
     }
 
@@ -324,17 +325,15 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
 
     //timestamp = chVTGetSystemTime();
     //chMtxUnlock(&mutex);
-
-    Position kalman_state_position = {{kalman_state.state_est_pos_x},{kalman_state.state_est_pos_y},{kalman_state.state_est_pos_z}};
-    Velocity kalman_state_velocity = {{kalman_state.state_est_vel_x},{kalman_state.state_est_vel_y},{kalman_state.state_est_vel_z}};
-    Acceleration kalman_state_acceleration = {{kalman_state.state_est_accel_x},{kalman_state.state_est_accel_y},{kalman_state.state_est_accel_z}};
+    Position kalman_state_position = {kalman_state.state_est_pos_x,kalman_state.state_est_pos_y,kalman_state.state_est_pos_z};
+    Velocity kalman_state_velocity = {kalman_state.state_est_vel_x,kalman_state.state_est_vel_y,kalman_state.state_est_vel_z};
+    Acceleration kalman_state_acceleration = {kalman_state.state_est_accel_x,kalman_state.state_est_accel_y,kalman_state.state_est_accel_z};
     state.position = kalman_state_position;
     state.velocity = kalman_state_velocity;
     state.acceleration = kalman_state_acceleration;
-    state.altitude = kalman_apo;
+    //state.altitude = kalman_apo;
     //kalman_data.timeStamp_state = timestamp;
-
-    //dataLogger.pushKalmanFifo(kalman_data); Do I need this?
+    //dataLogger.pushKalmanFifo(kalman_data);
 }
 
 /**
@@ -345,14 +344,14 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  * @param &barometer Data of the current barometer
  * @param acceleration Current acceleration
  * @param &orientation Current orientation
- * @param current_state Current FSMstate
+ * @param current_state Current FSM_state
  */
-void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState current_state) {
-    if (current_state >= FSMState::STATE_IDLE) {
+void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
+    if (FSM_state >= FSMState::STATE_IDLE) {
         setF(float(dt) / 1000);
         setQ(float(dt) / 1000, sd);
         priori();
-        update(barometer, acceleration, orientation, current_state);
+        update(barometer, acceleration, orientation, FSM_state);
     }
     
 }
@@ -377,7 +376,7 @@ Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<fl
 /**
  * @brief Getter for state X
  *
- * @return the current state, see sensor_data.h for kalman_data
+ * @return the current state, see sensor_data.h for KalmanData
  */
 KalmanData Yessir::getState() {
     return state;

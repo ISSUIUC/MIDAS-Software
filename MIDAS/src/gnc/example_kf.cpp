@@ -20,7 +20,15 @@ KalmanData ExampleKalmanFilter::getState() { return KalmanData(); }
 
 void ExampleKalmanFilter::setState(KalmanState state)
 {
-    this->state = state;
+    this->state.position.px = state.state_est_pos_x;
+    this->state.position.py = state.state_est_pos_y;
+    this->state.position.pz = state.state_est_pos_z;
+    this->state.acceleration.ax = state.state_est_accel_x;
+    this->state.acceleration.ay = state.state_est_accel_y;
+    this->state.acceleration.az = state.state_est_accel_z;
+    this->state.velocity.vx =state.state_est_vel_x;
+    this->state.velocity.vy =state.state_est_vel_y;
+    this->state.velocity.vz =state.state_est_vel_z;
 }
 
 ExampleKalmanFilter example_kf;

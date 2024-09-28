@@ -23,6 +23,7 @@ public:
 
 private:
     KalmanData state;
+    KalmanState kalman_state;
 };
 
 extern ExampleKalmanFilter example_kf;
