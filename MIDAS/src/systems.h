@@ -14,6 +14,7 @@
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
 #elif defined(HILSIM)
+#include "TCAL9539.h"
 #include "hilsim/sensors.h"
 #else
 #include "hardware/sensors.h"

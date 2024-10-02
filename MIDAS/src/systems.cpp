@@ -185,7 +185,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
-
 #undef INIT_SYSTEM
 
 

@@ -2,6 +2,7 @@
 #include <pb_decode.h>
 #include <pb_encode.h>
 
+#include <systems.h>
 #include "global_packet.h"
 
 HILSIMPacket global_packet = HILSIMPacket_init_zero;

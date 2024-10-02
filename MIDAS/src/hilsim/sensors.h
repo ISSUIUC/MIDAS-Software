@@ -4,16 +4,6 @@
 #include "sensor_data.h"
 #include "hardware/pins.h"
 
-
-struct GpioAddress {
-    GpioAddress(int gpio_id, int pin_id) : gpio_id(gpio_id), pin_offset(pin_id) {}
-    uint8_t gpio_id; //id of the expander
-    uint8_t gpio_address; //i2c address of expander
-    uint8_t port_idx; //0 = bottom 8 bits, 1 = top 8 bits
-    uint8_t pin_offset; //[0,7] bit in port, 8 * port_idx + pin_offset = pin idx;
-    bool is_valid; //whether the address is valid
-};
-
 /**
  * @struct LowG interface
  */
