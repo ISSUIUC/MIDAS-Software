@@ -5,6 +5,11 @@ on:
     branches:
       - action  # Replace 'main' with your branch if different
   workflow_dispatch:  # This keeps the option to trigger manually
+    inputs:
+      PLATFORMIO_PROJECT_DIR:
+        description: 'Specify the PlatformIO project directory'
+        required: true
+        default: 'src'
 
 jobs:
   build:
@@ -35,4 +40,10 @@ jobs:
       run: |
         cd MIDAS
         pio platform install teensy
-        pio run -e mcu_main
+        pio run -e ${{ github.event.inputs.PLATFORMIO_PROJECT_DIR }} true
+    - name: Artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: firmware-files
+        path: |
+          MIDAS/.pio/build/**
