@@ -23,15 +23,10 @@ jobs:
       run: |
         cd MIDAS
         pio platform install teensy
-        pio run -e mcu_main_booster || true
-        pio run -e mcu_main_sustainer || true
-        pio run -e mcu_hilsim_sustainer || true
-        pio run -e mcu_hilsim_booster || true
-        pio run -e mcu_silsim_sustainer || true
-        pio run -e mcu_silsim_booster || true
+        pio run -e mcu_main_booster -e mcu_main_sustainer -e mcu_hilsim_sustainer -e mcu_hilsim_booster -e mcu_silsim_sustainer -e mcu_silsim_booster || true
     - name: Artifacts
       uses: actions/upload-artifact@v4
       with:
         name: firmware-files
         path: |
-          MIDAS/.pio/build/
+          MIDAS/.pio/build/**
