@@ -13,6 +13,18 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
     - name: Set up Python
       uses: actions/setup-python@v2
     - name: Install PlatformIO
@@ -23,10 +35,4 @@ jobs:
       run: |
         cd MIDAS
         pio platform install teensy
-        pio run -e mcu_main_booster -e mcu_main_sustainer -e mcu_hilsim_sustainer -e mcu_hilsim_booster -e mcu_silsim_sustainer -e mcu_silsim_booster || true
-    - name: Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: firmware-files
-        path: |
-          MIDAS/.pio/build/**
+        pio run -e mcu_main
