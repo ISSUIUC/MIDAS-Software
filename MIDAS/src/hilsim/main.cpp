@@ -49,6 +49,7 @@ DECLARE_THREAD(hilsim, void*arg) {
         Serial.write(buffer, output_stream.bytes_written);
         Serial.flush();
         n++;
+        
         THREAD_SLEEP(10);
     }
 }
