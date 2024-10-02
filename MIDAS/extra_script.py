@@ -5,10 +5,6 @@ from pathlib import Path
 
 assert sys.version_info >= (3, 5)
 
-Import("env")
-
-env.Replace(PROGNAME="firmware_%s" % build_tag)
-
 log_format_text = (Path("src") / "log_format.h").read_text()
 sensor_data_text = (Path("src") / "sensor_data.h").read_text(errors="replace")
 
