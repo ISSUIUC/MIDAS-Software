@@ -34,5 +34,4 @@ jobs:
       with:
         name: firmware-files
         path: |
-          MIDAS/.pio/build/**/*firmware*
-          MIDAS/.pio/build/**/*bootloader*
+          MIDAS/.pio/build
