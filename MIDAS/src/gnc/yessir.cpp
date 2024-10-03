@@ -24,6 +24,7 @@ Yessir::Yessir() : KalmanFilter() {
  * be kept consistent (do not mix GPS altitude and barometric).
  *
  */
+
 void Yessir::initialize(RocketSystems* args) {
     Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
     
@@ -47,7 +48,7 @@ void Yessir::initialize(RocketSystems* args) {
         init_accel(1, 0) += accelerations.ay;
         init_accel(2, 0) += -accelerations.ax;
         //chMtxUnlock(&highG.mutex);
-        //chThdSleepMilliseconds(100);
+        THREAD_SLEEP(100);
     }
 
     init_accel(0, 0) /= 30;
