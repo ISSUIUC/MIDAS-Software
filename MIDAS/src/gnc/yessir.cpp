@@ -271,8 +271,8 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
         for (float i : data) {
             sum += i;
         }
-        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-        setState((KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
+        setState(kalman_state);
     } else if (FSM_state >= FSMState::STATE_APOGEE) {
         H(1, 2) = 0;
     }
@@ -461,13 +461,5 @@ void Yessir::setF(float dt) {
         F_mat(3 * i + 2, 3 * i + 2) = 1;
     }
 }
-
-/**
- * @brief Sets the apogee estimate
- *
- * @param estimate Apogee estimate
- */
-//Ask about this
-void Yessir::updateApogee(float estimate) { kalman_apo = estimate; }
 
 Yessir yessir;

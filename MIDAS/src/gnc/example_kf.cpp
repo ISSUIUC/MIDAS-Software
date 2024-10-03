@@ -1,4 +1,4 @@
-#include "example_kf.h"
+/*#include "example_kf.h"
 
 ExampleKalmanFilter::ExampleKalmanFilter() : KalmanFilter() {}
 
@@ -31,4 +31,4 @@ void ExampleKalmanFilter::setState(KalmanState state)
     this->state.velocity.vz =state.state_est_vel_z;
 }
 
-ExampleKalmanFilter example_kf;
+ExampleKalmanFilter example_kf;*/

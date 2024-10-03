@@ -1,9 +1,9 @@
-#pragma once
+/*#pragma once
 
 #include "kalman_filter.h"
 
 // makes a kalman filter with 9 state variables and 3 sensor inputs
-class ExampleKalmanFilter : public KalmanFilter<9, 3>
+class ExampleKalmanFilter : public KalmanFilter<9, 4>
 {
 public:
     ExampleKalmanFilter();
@@ -26,4 +26,4 @@ private:
     KalmanState kalman_state;
 };
 
-extern ExampleKalmanFilter example_kf;
+extern ExampleKalmanFilter example_kf;*/
