@@ -9,7 +9,6 @@ class Yessir : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 public:
     Yessir();
     void initialize(RocketSystems* args) override; 
-    //void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration) override; //Works
     void priori() override; 
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
 

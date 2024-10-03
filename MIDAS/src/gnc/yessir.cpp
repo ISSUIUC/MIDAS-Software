@@ -1,7 +1,6 @@
 #include "yessir.h"
 #include "finite-state-machines/fsm_states.h"
 
-
 Yessir::Yessir() : KalmanFilter() {
     state = KalmanData();
 }
@@ -127,120 +126,6 @@ void Yessir::initialize(RocketSystems* args) {
     B(2, 0) = -1;
 }
 
-
-/**
- * @brief Sets altitude by averaging 30 barometer measurements taken 100 ms
- * apart
- *
- * The following for loop takes a series of barometer measurements on start
- * up and takes the average of them in order to initialize the kalman filter
- * to the correct initial barometric altitude. This is done so that the
- * kalman filter takes minimal time to converge to an accurate state
- * estimate. This process is significantly faster than allowing the state as
- * letting the filter to converge to the correct state can take up to 3 min.
- * This specific process was used because the barometric altitude will
- * change depending on the weather and thus, the initial state estimate
- * cannot be hard coded. A GPS altitude may be used instead but due to GPS
- * losses during high speed/high altitude flight, it is inadvisable with the
- * current hardware to use this as a solution. Reference frames should also
- * be kept consistent (do not mix GPS altitude and barometric).
- *
- *
-void Yessir::initialize(Orientation &orientation, Barometer &barometer, Acceleration &acceleration) {
-    // TODO: The altitude initialization is the same code as
-    //   setLaunchPadElevation() in AC. Maybe use the same one?
-    float sum = 0;
-    
-    for (int i = 0; i < 30; i++) {
-        // TODO This mutex lock is almost certainly not necessary
-        //chMtxLock(&barometer.mutex);
-        sum += barometer.altitude;
-        //chMtxUnlock(&barometer.mutex);
-
-        //chMtxLock(&highG.mutex);
-        init_accel(0, 0) += acceleration.az;
-        init_accel(1, 0) += acceleration.ay;
-        init_accel(2, 0) += -acceleration.ax;
-        // chMtxUnlock(&highG.mutex); // anything starting with ch is chibios specific
-        //chThdSleepMilliseconds(100);
-    }
-
-    init_accel(0, 0) /= 30;
-    init_accel(1, 0) /= 30;
-    init_accel(2, 0) /= 30;
-
-    //chMtxLock(&orientation.mutex);
-    euler_t euler = orientation.getEuler();
-    //chMtxUnlock(&orientation.mutex);
-    euler.yaw = -euler.yaw;
-    world_accel = BodyToGlobal(euler, init_accel);
-
-    // set x_k
-    x_k(0, 0) = sum / 30;
-    // x_k(0,0) = 1401;
-    x_k(3, 0) = 0;
-    x_k(6, 0) = 0;
-
-    // set F
-    for (int i = 0; i < 3; i++) {
-        F_mat(3 * i, 3 * i + 1) = s_dt;
-        F_mat(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;
-        F_mat(3 * i + 1, 3 * i + 2) = s_dt;
-
-        F_mat(3 * i, 3 * i) = 1;
-        F_mat(3 * i + 1, 3 * i + 1) = 1;
-        F_mat(3 * i + 2, 3 * i + 2) = 1;
-    }
-
-    Q(0, 0) = pow(s_dt, 5) / 20;
-    Q(0, 1) = pow(s_dt, 4) / 8;
-    Q(0, 2) = pow(s_dt, 3) / 6;
-    Q(1, 1) = pow(s_dt, 3) / 8;
-    Q(1, 2) = pow(s_dt, 2) / 2;
-    Q(2, 2) = s_dt;
-    Q(1, 0) = Q(0, 1);
-    Q(2, 0) = Q(0, 2);
-    Q(2, 1) = Q(1, 2);
-
-    Q(3, 3) = pow(s_dt, 5) / 20;
-    Q(3, 4) = pow(s_dt, 4) / 8;
-    Q(3, 5) = pow(s_dt, 3) / 6;
-    Q(4, 4) = pow(s_dt, 3) / 8;
-    Q(4, 5) = pow(s_dt, 2) / 2;
-    Q(5, 5) = s_dt;
-    Q(4, 3) = Q(3, 4);
-    Q(5, 3) = Q(3, 5);
-    Q(5, 4) = Q(4, 5);
-
-    Q(6, 6) = pow(s_dt, 5) / 20;
-    Q(6, 7) = pow(s_dt, 4) / 8;
-    Q(6, 8) = pow(s_dt, 3) / 6;
-    Q(7, 7) = pow(s_dt, 3) / 8;
-    Q(7, 8) = pow(s_dt, 2) / 2;
-    Q(8, 8) = s_dt;
-    Q(7, 6) = Q(6, 7);
-    Q(8, 6) = Q(6, 8);
-    Q(8, 7) = Q(7, 8);
-
-    // set H
-    H(0, 0) = 1;
-    H(1, 2) = 1;
-    H(2, 5) = 1;
-    H(3, 8) = 1;
-
-    float spectral_density = 13.0;
-    Q = Q * spectral_density;
-
-    // set R
-    R(0, 0) = 2.0;
-    R(1, 1) = 1.9;
-    R(2, 2) = 10;
-    R(3, 3) = 10;
-
-    // set B (don't care about what's in B since we have no control input)
-    B(2, 0) = -1;
-}*/
-
 /**
  * @brief Estimates current state of the rocket without current sensor data
  *
@@ -354,7 +239,6 @@ void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceler
         priori();
         update(barometer, acceleration, orientation, FSM_state);
     }
-    
 }
 
 /**
@@ -366,7 +250,6 @@ void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceler
  */
 Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
     Eigen::Matrix3f roll, pitch, yaw;
-
     roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
     pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
     yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
@@ -419,7 +302,7 @@ void Yessir::setQ(float dt, float sd) {
     Q(1, 0) = Q(0, 1);
     Q(2, 0) = Q(0, 2);
     Q(2, 1) = Q(1, 2);
-
+    // Arthur Was Here :)
     Q(3, 3) = pow(dt, 5) / 20;
     Q(3, 4) = pow(dt, 4) / 8;
     Q(3, 5) = pow(dt, 3) / 6;
@@ -452,7 +335,7 @@ void Yessir::setQ(float dt, float sd) {
  * by how the states change over time.
  */
 void Yessir::setF(float dt) {
-        for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 3; i++) {
         F_mat(3 * i, 3 * i + 1) = s_dt;
         F_mat(3 * i, 3 * i + 2) = (dt * s_dt) / 2;
         F_mat(3 * i + 1, 3 * i + 2) = s_dt;

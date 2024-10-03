@@ -59,12 +59,29 @@ public:
 
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
-
+    
     virtual void initialize(RocketSystems* args);
-    //virtual void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
     virtual void priori();
     virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state);
 
     virtual KalmanData getState();
     virtual void setState(KalmanState state);
 };
+
+template<int n, int m>
+void KalmanFilter<n, m>::initialize(RocketSystems* args){}
+
+template<int n, int m>
+void KalmanFilter<n, m>::priori(){}
+
+template<int n, int m>
+void KalmanFilter<n, m>::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state){}
+
+template<int n, int m>
+KalmanData KalmanFilter<n, m>::getState(){
+    KalmanData state = KalmanData();
+    return state;
+}
+
+template<int n, int m>
+void KalmanFilter<n, m>::setState(KalmanState state){}
