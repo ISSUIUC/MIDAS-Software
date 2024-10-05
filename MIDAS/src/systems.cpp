@@ -29,6 +29,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "logger");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(1);
     }
@@ -45,6 +46,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "barometer");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(6);
     }
@@ -67,6 +69,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "accelerometers");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(2);
     }
@@ -85,6 +88,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "orientation");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(100);
     }
@@ -101,6 +105,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "magnetometer");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
     }
@@ -135,6 +140,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "i2c");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(10);
     }
@@ -163,6 +169,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "fsm");
+        arg->rocket_data.processTime.update(new_processTime);
         
         THREAD_SLEEP(50);
     }
@@ -178,6 +185,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt = dt;
         strcpy(new_processTime.ProcessName, "buzzer");
+        arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(10);
     }
@@ -209,6 +217,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt;
         strcpy(new_processTime.ProcessName, "Kalman Filter");
+        arg->rocket_data.processTime.update(new_processTime);
         
 
         THREAD_SLEEP(50);
@@ -225,6 +234,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         ProcessTime new_processTime;
         new_processTime.dt;
         strcpy(new_processTime.ProcessName, "telemetry");
+        arg->rocket_data.processTime.update(new_processTime);
         
 
         THREAD_SLEEP(1);
