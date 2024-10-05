@@ -230,6 +230,19 @@ struct PyroState {
     PyroChannel channels[4];
 };
 
+enum class ProcessName : char {
+    TELEMETRY = 1,
+    ORIENTATION = 2,
+    KALMAN = 3,
+    BUZZER = 4,
+    FSM = 5,
+    I2C = 6,
+    MAGNETOMETER = 7,
+    ACCELEROMETERS = 8,
+    BAROMETER = 9,
+    LOGGER = 10
+};
+
 /**
  * @struct ProcessTime
  * 
@@ -237,7 +250,7 @@ struct PyroState {
 */
 struct ProcessTime
 {
-    char ProcessName[32];
+    ProcessName name;
     float dt;
 };
 

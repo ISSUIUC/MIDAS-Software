@@ -28,7 +28,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "logger");
+        new_processTime.name = ProcessName::LOGGER;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(1);
@@ -45,7 +45,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "barometer");
+        new_processTime.name = ProcessName::BAROMETER;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(6);
@@ -68,7 +68,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "accelerometers");
+        new_processTime.name = ProcessName::ACCELEROMETERS;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(2);
@@ -87,7 +87,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "orientation");
+        new_processTime.name = ProcessName::ORIENTATION;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(100);
@@ -104,7 +104,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "magnetometer");
+        new_processTime.name = ProcessName::MAGNETOMETER;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
@@ -139,7 +139,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "i2c");
+        new_processTime.name = ProcessName::I2C;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(10);
@@ -168,7 +168,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "fsm");
+        new_processTime.name = ProcessName::FSM;
         arg->rocket_data.processTime.update(new_processTime);
         
         THREAD_SLEEP(50);
@@ -184,7 +184,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt = dt;
-        strcpy(new_processTime.ProcessName, "buzzer");
+        new_processTime.name = ProcessName::BUZZER;
         arg->rocket_data.processTime.update(new_processTime);
 
         THREAD_SLEEP(10);
@@ -216,7 +216,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt;
-        strcpy(new_processTime.ProcessName, "Kalman Filter");
+        new_processTime.name = ProcessName::KALMAN;
         arg->rocket_data.processTime.update(new_processTime);
         
 
@@ -233,7 +233,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
         ProcessTime new_processTime;
         new_processTime.dt;
-        strcpy(new_processTime.ProcessName, "telemetry");
+        new_processTime.name = ProcessName::TELEMETRY;
         arg->rocket_data.processTime.update(new_processTime);
         
 
