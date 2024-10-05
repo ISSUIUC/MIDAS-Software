@@ -168,18 +168,15 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     Eigen::Matrix<float, 9, 9> identity = Eigen::Matrix<float, 9, 9>::Identity();
     K = (P_priori * H.transpose()) * temp;
 
-    // TODO These mutex locks are almost certainly not necessary
     // Sensor Measurements
     Eigen::Matrix<float, 3, 1> accel = Eigen::Matrix<float, 3, 1>::Zero();
-    //chMtxLock(&highG.mutex);
+    
     accel(0, 0) = acceleration.az - 0.045;
     accel(1, 0) = acceleration.ay - 0.065;
     accel(2, 0) = -acceleration.ax - 0.06;
-    //chMtxUnlock(&highG.mutex);
-    //chMtxLock(&orientation.mutex);
+
     euler_t angles = orientation.getEuler();
     // euler_t angles = (euler_t){0, 0, 0};
-    //chMtxUnlock(&orientation.mutex);
     angles.yaw = -angles.yaw;
 
     Eigen::Matrix<float, 3, 1> acc = BodyToGlobal(angles, accel);
@@ -189,14 +186,13 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     y_k(2, 0) = (acc(1)) * 9.81;
     y_k(3, 0) = (acc(2)) * 9.81;
 
-    //chMtxLock(&barometer.mutex);
     y_k(0, 0) = barometer.altitude;
     alt_buffer.push(barometer.altitude);
-    //chMtxUnlock(&barometer.mutex);
+
 
     // # Posteriori Update
     x_k = x_priori + K * (y_k - (H * x_priori));
-    P_k = (identity - K * H) * P_priori;
+    P_k = (identity - K * H) * P_priori * (identity - K * H).transpose() + K * R * K.transpose();
 
     //chMtxLock(&mutex);
     kalman_state.state_est_pos_x = x_k(0, 0);
@@ -278,9 +274,9 @@ void Yessir::setState(KalmanState state) {
     this->state.acceleration.ax = state.state_est_accel_x;
     this->state.acceleration.ay = state.state_est_accel_y;
     this->state.acceleration.az = state.state_est_accel_z;
-    this->state.velocity.vx =state.state_est_vel_x;
-    this->state.velocity.vy =state.state_est_vel_y;
-    this->state.velocity.vz =state.state_est_vel_z;
+    this->state.velocity.vx = state.state_est_vel_x;
+    this->state.velocity.vy = state.state_est_vel_y;
+    this->state.velocity.vz = state.state_est_vel_z;
 }
 
 /**
