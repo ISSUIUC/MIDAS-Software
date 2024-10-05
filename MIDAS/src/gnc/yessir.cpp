@@ -192,9 +192,10 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
 
     // # Posteriori Update
     x_k = x_priori + K * (y_k - (H * x_priori));
-    P_k = (identity - K * H) * P_priori * (identity - K * H).transpose() + K * R * K.transpose();
-
-    //chMtxLock(&mutex);
+    P_k = (identity - K * H) * P_priori;
+    // Joseph (Expanded) Form
+    // P_k = (identity - K * H) * P_priori * (identity - K * H).transpose() + K * R * K.transpose(); 
+    
     kalman_state.state_est_pos_x = x_k(0, 0);
     kalman_state.state_est_vel_x = x_k(1, 0);
     kalman_state.state_est_accel_x = x_k(2, 0);
@@ -205,8 +206,6 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     kalman_state.state_est_vel_z = x_k(7, 0);
     kalman_state.state_est_accel_z = x_k(8, 0);
 
-    //timestamp = chVTGetSystemTime();
-    //chMtxUnlock(&mutex);
     Position kalman_state_position = {kalman_state.state_est_pos_x,kalman_state.state_est_pos_y,kalman_state.state_est_pos_z};
     Velocity kalman_state_velocity = {kalman_state.state_est_vel_x,kalman_state.state_est_vel_y,kalman_state.state_est_vel_z};
     Acceleration kalman_state_acceleration = {kalman_state.state_est_accel_x,kalman_state.state_est_accel_y,kalman_state.state_est_accel_z};
