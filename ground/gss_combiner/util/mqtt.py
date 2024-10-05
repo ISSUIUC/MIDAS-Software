@@ -110,7 +110,6 @@ class TelemetryThread(threading.Thread):
                     if(len(pkt) == 0):
                         continue # Ignore empty data
                     try:
-                        
                         packet_in = json.loads(pkt)
                     
                         # self.__log.console_log(str(packet_in))
@@ -156,7 +155,7 @@ class TelemetryThread(threading.Thread):
                         continue
 
                     # Process and queue the packet
-                    processed = TelemetryThread.process_packet(packet_in)
+                    processed = self.process_packet(packet_in)
 
                     for combiner in self.__combiners:
                         combiner.enqueue_packet(processed)
