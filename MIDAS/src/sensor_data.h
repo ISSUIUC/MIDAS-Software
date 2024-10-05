@@ -230,7 +230,7 @@ struct PyroState {
     PyroChannel channels[4];
 };
 
-enum class ProcessName : char {
+enum class ProcessName {
     TELEMETRY = 1,
     ORIENTATION = 2,
     KALMAN = 3,

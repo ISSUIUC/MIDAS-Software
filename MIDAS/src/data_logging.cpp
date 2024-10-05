@@ -89,6 +89,7 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
     log_from_sensor_data(sink, data.pyro);
+    log_from_sensor_data(sink, data.processTime);
 }
 
 #ifndef SILSIM
