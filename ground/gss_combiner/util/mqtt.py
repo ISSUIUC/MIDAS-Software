@@ -111,11 +111,17 @@ class TelemetryThread(threading.Thread):
                         continue # Ignore empty data
                     try:
                         packet_in = json.loads(pkt)
-                    
+                        
                         # self.__log.console_log(str(packet_in))
                         if type(packet_in) == int:
                             self.__log.console_log("Read int? Discarding")
                             continue
+                        if type(packet_in) == float:
+                            self.__log.console_log("Read float? Discarding")
+                            continue
+
+                        if type(packet_in) != dict:
+                            print("Read non dict?" + str(pkt) + " type " + str(type(packet_in)))
 
                         # print(packet_in)
                         if not self.__rf_set:
@@ -171,9 +177,11 @@ class TelemetryThread(threading.Thread):
                     self.__log.success()
                     
             except Exception as e:
-                print(f"[Telem {self.__comport.name}] Ran into an uncaught exception.. continuing gracefully.") # Always print these.
-                self.__log.console_log(f"Error dump:", traceback.format_exc(e))
-
+                try:
+                    print(f"[Telem {self.__comport.name}] Ran into an uncaught exception.. continuing gracefully.") # Always print these.
+                    self.__log.console_log(f"Error dump:", traceback.format_exc(e))
+                except Exception as e:
+                    print("Exception while handling excpetion!")
 
 class MQTTThread(threading.Thread):
     """A thread to handle all MQTT communication for the GSS combiner service."""
