@@ -2,7 +2,11 @@
 
 #include "kalman_filter.h"
 #include "sensor_data.h"
-#include "FifoBuffer.h"
+#include "Buffer.h"
+
+#define NUM_STATES 9
+#define NUM_SENSOR_INPUTS 4
+#define ALTITUDE_BUFFER_SIZE 10
 
 class Yessir : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 {
@@ -30,7 +34,7 @@ private:
 
     Eigen::Matrix<float, 3, 1> init_accel = Eigen::Matrix<float, 3, 1>::Zero();
     Eigen::Matrix<float, 3, 1> world_accel;
-    FifoBuffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
+    Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
     KalmanData state;
 };
 

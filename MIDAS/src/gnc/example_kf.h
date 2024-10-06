@@ -1,4 +1,4 @@
-/*#pragma once
+#pragma once
 
 #include "kalman_filter.h"
 
@@ -26,4 +26,4 @@ private:
     KalmanState kalman_state;
 };
 
-extern ExampleKalmanFilter example_kf;*/
+extern ExampleKalmanFilter example_kf;

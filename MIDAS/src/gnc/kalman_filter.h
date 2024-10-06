@@ -10,11 +10,7 @@
 #include "systems.h"
 
 
-#define NUM_STATES 9
-#define NUM_SENSOR_INPUTS 4
-#define ALTITUDE_BUFFER_SIZE 10
-
-typedef struct KalmanState {
+struct KalmanState {
     float state_est_pos_x;
     float state_est_vel_x;
     float state_est_accel_x;
@@ -24,7 +20,7 @@ typedef struct KalmanState {
     float state_est_pos_z;
     float state_est_vel_z;
     float state_est_accel_z;
-} KalmanState;
+};
 
 template <int _NumStates, int _NumInputs>
 class KalmanFilter
@@ -60,28 +56,10 @@ public:
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
     
-    virtual void initialize(RocketSystems* args);
-    virtual void priori();
-    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state);
+    virtual void initialize(RocketSystems* args) = 0;
+    virtual void priori() = 0;
+    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) = 0;
 
-    virtual KalmanData getState();
-    virtual void setState(KalmanState state);
+    virtual KalmanData getState() = 0;
+    virtual void setState(KalmanState state) = 0;
 };
-
-template<int n, int m>
-void KalmanFilter<n, m>::initialize(RocketSystems* args){}
-
-template<int n, int m>
-void KalmanFilter<n, m>::priori(){}
-
-template<int n, int m>
-void KalmanFilter<n, m>::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state){}
-
-template<int n, int m>
-KalmanData KalmanFilter<n, m>::getState(){
-    KalmanData state = KalmanData();
-    return state;
-}
-
-template<int n, int m>
-void KalmanFilter<n, m>::setState(KalmanState state){}

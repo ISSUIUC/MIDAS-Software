@@ -37,16 +37,11 @@ void Yessir::initialize(RocketSystems* args) {
             .ay = initial_accelerometer.ay,
             .az = initial_accelerometer.az
         };
-        // TODO This mutex lock is almost certainly not necessary
-        //chMtxLock(&barometer.mutex);
         sum += barometer.altitude;
-        //chMtxUnlock(&barometer.mutex);
 
-        //chMtxLock(&highG.mutex);
         init_accel(0, 0) += accelerations.az;
         init_accel(1, 0) += accelerations.ay;
         init_accel(2, 0) += -accelerations.ax;
-        //chMtxUnlock(&highG.mutex);
         THREAD_SLEEP(100);
     }
 
@@ -54,15 +49,12 @@ void Yessir::initialize(RocketSystems* args) {
     init_accel(1, 0) /= 30;
     init_accel(2, 0) /= 30;
 
-    //chMtxLock(&orientation.mutex);
     euler_t euler = orientation.getEuler();
-    //chMtxUnlock(&orientation.mutex);
     euler.yaw = -euler.yaw;
     world_accel = BodyToGlobal(euler, init_accel);
 
     // set x_k
     x_k(0, 0) = sum / 30;
-    // x_k(0,0) = 1401;
     x_k(3, 0) = 0;
     x_k(6, 0) = 0;
 
@@ -113,8 +105,7 @@ void Yessir::initialize(RocketSystems* args) {
     H(2, 5) = 1;
     H(3, 8) = 1;
 
-    float spectral_density = 13.0;
-    Q = Q * spectral_density;
+    Q = Q * spectral_density_;
 
     // set R
     R(0, 0) = 2.0;
@@ -149,8 +140,7 @@ void Yessir::priori() {
  *
  */
 void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
-    // Ask correct state
-    if (FSM_state == FSMState::STATE_FIRST_BOOST) { 
+    if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
         float sum = 0;
         float data[10];
         alt_buffer.readSlice(data, 0, 10);
@@ -163,10 +153,10 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
         H(1, 2) = 0;
     }
 
-    Eigen::Matrix<float, 4, 4> temp = Eigen::Matrix<float, 4, 4>::Zero();
-    temp = (((H * P_priori * H.transpose()) + R)).inverse();
+    Eigen::Matrix<float, 4, 4> S_k = Eigen::Matrix<float, 4, 4>::Zero();
+    S_k = (((H * P_priori * H.transpose()) + R)).inverse();
     Eigen::Matrix<float, 9, 9> identity = Eigen::Matrix<float, 9, 9>::Identity();
-    K = (P_priori * H.transpose()) * temp;
+    K = (P_priori * H.transpose()) * S_k;
 
     // Sensor Measurements
     Eigen::Matrix<float, 3, 1> accel = Eigen::Matrix<float, 3, 1>::Zero();
@@ -176,13 +166,11 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     accel(2, 0) = -acceleration.ax - 0.06;
 
     euler_t angles = orientation.getEuler();
-    // euler_t angles = (euler_t){0, 0, 0};
     angles.yaw = -angles.yaw;
 
     Eigen::Matrix<float, 3, 1> acc = BodyToGlobal(angles, accel);
 
     y_k(1, 0) = (acc(0)) * 9.81 - 9.81;
-    // Serial.println(y_k(1, 0));
     y_k(2, 0) = (acc(1)) * 9.81;
     y_k(3, 0) = (acc(2)) * 9.81;
 
@@ -206,15 +194,9 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     kalman_state.state_est_vel_z = x_k(7, 0);
     kalman_state.state_est_accel_z = x_k(8, 0);
 
-    Position kalman_state_position = {kalman_state.state_est_pos_x,kalman_state.state_est_pos_y,kalman_state.state_est_pos_z};
-    Velocity kalman_state_velocity = {kalman_state.state_est_vel_x,kalman_state.state_est_vel_y,kalman_state.state_est_vel_z};
-    Acceleration kalman_state_acceleration = {kalman_state.state_est_accel_x,kalman_state.state_est_accel_y,kalman_state.state_est_accel_z};
-    state.position = kalman_state_position;
-    state.velocity = kalman_state_velocity;
-    state.acceleration = kalman_state_acceleration;
-    //state.altitude = kalman_apo;
-    //kalman_data.timeStamp_state = timestamp;
-    //dataLogger.pushKalmanFifo(kalman_data);
+    state.position = (Position){kalman_state.state_est_pos_x,kalman_state.state_est_pos_y,kalman_state.state_est_pos_z};
+    state.velocity = (Velocity){kalman_state.state_est_vel_x,kalman_state.state_est_vel_y,kalman_state.state_est_vel_z};
+    state.acceleration = (Acceleration){kalman_state.state_est_accel_x,kalman_state.state_est_accel_y,kalman_state.state_est_accel_z};
 }
 
 /**
@@ -229,7 +211,7 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  */
 void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
-        setF(float(dt) / 1000);
+        setF(dt / 1000);
         setQ(float(dt) / 1000, sd);
         priori();
         update(barometer, acceleration, orientation, FSM_state);
@@ -297,7 +279,6 @@ void Yessir::setQ(float dt, float sd) {
     Q(1, 0) = Q(0, 1);
     Q(2, 0) = Q(0, 2);
     Q(2, 1) = Q(1, 2);
-    // Arthur Was Here :)
     Q(3, 3) = pow(dt, 5) / 20;
     Q(3, 4) = pow(dt, 4) / 8;
     Q(3, 5) = pow(dt, 3) / 6;
