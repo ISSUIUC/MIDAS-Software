@@ -136,7 +136,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
         Orientation current_orientation = arg->rocket_data.orientation.getRecent();
-        LowGData current_accelerometer = arg->rocket_data.low_g.getRecent();
+        HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
