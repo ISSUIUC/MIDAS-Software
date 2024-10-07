@@ -129,9 +129,13 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     // Barometer initial_barom_buf = arg->rocket_data.barometer.getRecent();
     // LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
     //yessir.initialize(initial_orientation, initial_barom_buf, initial_accelerations);
-    yessir.initialize(arg);
-    TickType_t last = xTaskGetTickCount();
-
+    TickType_t last;
+    while (FSMState::STATE_IDLE == arg->rocket_data.fsm_state.getRecent()) {
+        yessir.initialize(arg);
+        last = xTaskGetTickCount();
+        THREAD_SLEEP(300);
+    }
+    
     while (true) {
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
