@@ -10,6 +10,7 @@
 #include "led.h"
 #include "telemetry.h"
 #include "finite-state-machines/fsm.h"
+#include "telemetry_received.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"

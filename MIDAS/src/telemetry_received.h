@@ -16,6 +16,7 @@ struct TelemetryCommand {
         char callsign[8];
         float freq;
         bool do_abort;
+        bool do_KF_reset;
     };
     std::array<char, 6> verify = {{'A', 'Y', 'B', 'E', 'R', 'K'}};
 };
