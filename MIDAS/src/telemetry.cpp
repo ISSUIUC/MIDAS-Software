@@ -1,6 +1,7 @@
 #include <cmath>
 
 #include "telemetry.h"
+#include "telemetry_received.h"
 
 
 /**
@@ -57,6 +58,10 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     TelemetryPacket packet = makePacket(rocket_data);
     led.toggle(LED::BLUE);
     backend.send(packet);
+}
+
+bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {    
+    return backend.read(command, wait_milliseconds);
 }
 
 /**
