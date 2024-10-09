@@ -175,7 +175,7 @@ struct FullTelemetryData {
     char callsign[8];
 };
 
-enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
+enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY, RESET_KF };
 // Commands transmitted from ground station to rocket
 struct telemetry_command {
     CommandType command;
@@ -184,6 +184,7 @@ struct telemetry_command {
         char callsign[8];
         float freq;
         bool do_abort;
+        bool do_KF_reset;
     };
     std::array<char, 6> verify = {{'A', 'Y', 'B', 'E', 'R', 'K'}};
 };
@@ -401,6 +402,13 @@ void SerialInput(const char* key, const char* value) {
         return;
     } else if (strcmp(key, "FLAP") == 0) {
         command.command = CommandType::TEST_FLAP;
+    } else if (strcmp(key, "RESET_KF") == 0) {
+        command.command = CommandType::RESET_KF;
+        command.do_KF_reset = true;
+        Serial.println(json_command_success);
+        Serial.println(R"({"type": "reset_KF_success")");
+        Serial.println("}");
+        return;
     } else {
         SerialError();
         return;
@@ -517,6 +525,9 @@ void loop() {
                         set_freq_local_bug_fix(cmd.command.freq);
                         Serial.print(R"({"type": "freq_success", "frequency":)");
                         Serial.print(cmd.command.freq);
+                        Serial.println("}");
+                    } else if (cmd.command.command == CommandType::RESET_KF) {
+                        Serial.println(R"({"type": "reset_KF_success")");
                         Serial.println("}");
                     }
                     cmd_queue.pop();
