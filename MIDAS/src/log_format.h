@@ -20,6 +20,7 @@ enum ReadingDiscriminant {
     ID_FSM = 10,
     ID_KALMAN = 11,
     ID_PYRO = 12,
+    ID_PROCESSTIME = 13,
 };
 
 
@@ -51,5 +52,6 @@ struct LoggedReading {
         KalmanData kalman;
         FSMState fsm;
         PyroState pyro;
+        ProcessTime processtime;
     } data;
 };

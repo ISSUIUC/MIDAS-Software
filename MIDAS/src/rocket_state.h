@@ -176,6 +176,7 @@ public:
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
+    SensorData<ProcessTime> processTime;
 
     Latency log_latency;
 };

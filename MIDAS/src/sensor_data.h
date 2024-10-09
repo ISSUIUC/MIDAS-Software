@@ -238,3 +238,28 @@ struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
 };
+
+enum class ProcessName {
+    TELEMETRY = 1,
+    ORIENTATION = 2,
+    KALMAN = 3,
+    BUZZER = 4,
+    FSM = 5,
+    I2C = 6,
+    MAGNETOMETER = 7,
+    ACCELEROMETERS = 8,
+    BAROMETER = 9,
+    LOGGER = 10
+};
+
+/**
+ * @struct ProcessTime
+ * 
+ * @brief The process time of the processes in the thread
+*/
+struct ProcessTime
+{
+    ProcessName name;
+    float dt;
+};
+
