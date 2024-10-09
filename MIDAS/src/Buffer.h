@@ -89,7 +89,7 @@ public:
     // TODO make this function return a std::array?
     size_t readSlice(T write_to[], size_t start, size_t len) {
         size_t i = 0;
-        size_t idx = head() + start;
+        size_t idx = oldest_idx() + start;
         while (i < len) {
             write_to[i++] = buffer[idx++];
             if (idx == BUFFER_SIZE) {
@@ -124,18 +124,6 @@ private:
             return BUFFER_SIZE - 1;
         } else {
             return tail_idx - 1;
-        }
-    }
-    /**
-     * @brief Returns the head index. Do not use if count == 0, and always lock before using.
-     *
-     * @return the index of the oldest element you can read from
-     */
-    size_t head() {
-        if (tail_idx < count) {
-            return tail_idx + BUFFER_SIZE - count;
-        } else {
-            return tail_idx - count;
         }
     }
 

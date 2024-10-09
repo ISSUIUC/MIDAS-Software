@@ -212,7 +212,7 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
 void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
         setF(dt / 1000);
-        setQ(float(dt) / 1000, sd);
+        setQ(dt / 1000, sd);
         priori();
         update(barometer, acceleration, orientation, FSM_state);
     }
