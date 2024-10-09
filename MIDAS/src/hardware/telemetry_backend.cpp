@@ -50,9 +50,17 @@ ErrorCode TelemetryBackend::init() {
     // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf =
     // 128chips/symbol, CRC on
 
-    if (!rf95.setFrequency(RF95_FREQ)) {
+    if (!rf95.setFrequency(RF95_FREQ)) { //float
         return ErrorCode::RadioSetFrequencyFailed;
     }
+<<<<<<< Updated upstream
+=======
+    
+    rf95.setSignalBandwidth(125000); //ints
+    rf95.setCodingRate4(8);
+    rf95.setSpreadingFactor(10);
+    rf95.setPayloadCRC(true); //bool
+>>>>>>> Stashed changes
 
     /*
      * The default transmitter power is 13dBm, using PA_BOOST.
