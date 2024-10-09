@@ -159,6 +159,10 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 1000)) {
                 // handle command
+                if (command.command == CommandType::RESET_KF && command.do_KF_reset) {
+                    yessir.initialize();
+                    Serial.println("Reset KF");
+                }
                 Serial.println(command.callsign);
             }
         } else {
