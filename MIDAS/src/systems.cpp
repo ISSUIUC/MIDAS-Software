@@ -1,4 +1,4 @@
-#include "systems.h"
+    #include "systems.h"
 
 #include "hal.h"
 #include "gnc/yessir.h"
@@ -157,7 +157,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         if (current_state == FSMState(STATE_IDLE)) {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 1000)) {
+            if (arg->tlm.receive(&command, 2000)) {
                 // handle command
                 if (command.command == CommandType::RESET_KF && command.do_KF_reset) {
                     yessir.initialize();

@@ -71,11 +71,11 @@ public:
         for(int i = 1; i < wait_milliseconds; i++){
             THREAD_SLEEP(1);
             if(digitalRead(rf95._interruptPin)){
+                rf95.handleInterrupt();
                 break;
             }
         }
 
-        rf95.handleInterrupt();
         if (rf95.available() && rf95.recv((uint8_t*) command, &len)) {
             if (sizeof(T) == len) {
                 return true;

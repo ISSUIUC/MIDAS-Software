@@ -39,7 +39,7 @@
 // #define LED 13 // Blinks on receipt
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 433.0
+#define RF95_FREQ 425.15
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -408,7 +408,6 @@ void SerialInput(const char* key, const char* value) {
         Serial.println(json_command_success);
         Serial.println(R"({"type": "reset_KF_success")");
         Serial.println("}");
-        return;
     } else {
         SerialError();
         return;
@@ -421,7 +420,7 @@ void SerialInput(const char* key, const char* value) {
 
 void process_command_queue() {
     if (cmd_queue.empty()) return;
-
+    Serial.println("SENSEND");
     TelemetryCommandQueueElement cmd = cmd_queue.front();
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
     rf95.waitPacketSent();
@@ -453,6 +452,11 @@ void setup() {
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(RF95_FREQ);
     Serial.println("}");
+
+    rf95.setSignalBandwidth(125000);
+    rf95.setCodingRate4(8);
+    rf95.setSpreadingFactor(10);
+    rf95.setPayloadCRC(true);
 
     // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf =
     // 128chips/symbol, CRC on
@@ -518,27 +522,24 @@ void loop() {
             memcpy(&packet, buf, sizeof(packet));
             EnqueuePacket(packet, current_freq);
 
-            if (!cmd_queue.empty()) {
-                auto& cmd = cmd_queue.front();
-                if (cmd.command.id == packet.response_ID) {
-                    if (cmd.command.command == CommandType::SET_FREQ) {
-                        set_freq_local_bug_fix(cmd.command.freq);
-                        Serial.print(R"({"type": "freq_success", "frequency":)");
-                        Serial.print(cmd.command.freq);
-                        Serial.println("}");
-                    } else if (cmd.command.command == CommandType::RESET_KF) {
-                        Serial.println(R"({"type": "reset_KF_success")");
-                        Serial.println("}");
-                    }
-                    cmd_queue.pop();
-                } else {
-                    cmd.retry_count++;
-                    if (cmd.retry_count >= max_command_retries) {
-                        cmd_queue.pop();
-                        Serial.println(json_send_failure);
-                    }
-                }
-            }
+            // if (!cmd_queue.empty()) {
+            //     auto& cmd = cmd_queue.front();
+            //     if (cmd.command.id == packet.response_ID) {
+            //         if (cmd.command.command == CommandType::SET_FREQ) {
+            //             set_freq_local_bug_fix(cmd.command.freq);
+            //             Serial.print(R"({"type": "freq_success", "frequency":)");
+            //             Serial.print(cmd.command.freq);
+            //             Serial.println("}");
+            //         }
+            //         cmd_queue.pop();
+            //     } else {
+            //         cmd.retry_count++;
+            //         if (cmd.retry_count >= max_command_retries) {
+            //             cmd_queue.pop();
+            //             Serial.println(json_send_failure);
+            //         }
+            //     }
+            // }
 
             process_command_queue();
 
