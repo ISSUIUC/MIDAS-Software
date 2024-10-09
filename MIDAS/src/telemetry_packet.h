@@ -11,7 +11,7 @@
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
-    uint16_t alt;
+    uint16_t alt; //15 bit meters, 1 bit last command confirm
     uint16_t baro_alt;
     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
     uint16_t highg_ay; //14 bit signed ax [-16,16) 2 bit tilt angle

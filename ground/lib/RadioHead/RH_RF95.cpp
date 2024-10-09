@@ -100,8 +100,6 @@ bool RH_RF95::setupInterruptHandler()
 {
     //were using polling so no interrupts should be setup
     pinMode(_interruptPin, INPUT);
-    return true;
-
 
     // For some subclasses (eg RH_ABZ)  we dont want to set up interrupt
     int interruptNumber = NOT_AN_INTERRUPT;
@@ -142,8 +140,6 @@ bool RH_RF95::setupInterruptHandler()
 		return false; // Too many devices, not enough interrupt vectors
 	}
 	_deviceForInterrupt[_myInterruptIndex] = this;
-	Serial.println("RH_RF95::setupInterruptHandler _myInterruptIndex: ");
-    Serial.println(_myInterruptIndex);
 
 	if (_myInterruptIndex == 0)
 	    attachInterrupt(interruptNumber, isr0, RISING);

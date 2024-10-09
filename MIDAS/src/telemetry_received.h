@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 
-enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY , RESET_KF };
+enum class CommandType: uint8_t { RESET_KF };
 // Commands transmitted from ground station to rocket
 
 /**
@@ -11,11 +11,10 @@ enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY , RESET
 */
 struct TelemetryCommand {
     CommandType command;
-    int id;
-    union {
-        char callsign[8];
-        float freq;
-        bool do_abort;
-    };
-    std::array<char, 6> verify = {{'A', 'Y', 'B', 'E', 'R', 'K'}};
+    std::array<char, 3> verify = {{'B', 'R', 'K'}};
+
+    bool valid() {
+        return verify == std::array<char, 3>{{'B','R','K'}};
+    }
 };
+

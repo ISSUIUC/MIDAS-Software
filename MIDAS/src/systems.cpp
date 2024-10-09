@@ -157,9 +157,17 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         if (current_state == FSMState(STATE_IDLE)) {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 1000)) {
-                // handle command
-                Serial.println(command.callsign);
+            if (arg->tlm.receive(&command, 2000)) {
+                if(command.valid()) {
+                    arg->tlm.acknowledgeReceived();
+                    switch(command.command) {
+                        case CommandType::RESET_KF:
+                            break;
+                        default:
+                            break; 
+                    }
+                }
+                
             }
         } else {
             THREAD_SLEEP(1);
