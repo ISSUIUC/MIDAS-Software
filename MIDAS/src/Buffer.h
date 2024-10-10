@@ -77,6 +77,27 @@ public:
         }
         return arr;
     }
+
+        /**
+     * @brief Reads a range of items into a passed array, which can be larger than the actual count of items.
+     *
+     * @param write_to An array of at least n items to write to
+     * @param start The index to start reading from (inclusive)
+     * @param length the number of items to read
+     * @return How many items were actually read
+     */
+    // TODO make this function return a std::array?
+    size_t readSlice(T write_to[], size_t start, size_t len) {
+        size_t i = 0;
+        size_t idx = oldest_idx() + start;
+        while (i < len) {
+            write_to[i++] = buffer[idx++];
+            if (idx == BUFFER_SIZE) {
+                idx = 0;
+            }
+        }
+        return i;
+    }
     
 
 private:
