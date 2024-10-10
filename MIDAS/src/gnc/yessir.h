@@ -25,6 +25,7 @@ public:
 
     void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
    
+    bool should_reinit = false;
 
 private:
     float s_dt = 0.05f;

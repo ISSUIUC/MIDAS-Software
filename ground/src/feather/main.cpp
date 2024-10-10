@@ -194,7 +194,6 @@ void loop() {
 
             Serial.println("Received packet");
             memcpy(&packet, buf, sizeof(packet));
-            Serial.println(packet.alt);
 
             if(bool(packet.alt & 0x1) != last_ack_bit) {
                 last_ack_bit = !last_ack_bit;

@@ -133,6 +133,12 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     TickType_t last = xTaskGetTickCount();
     
     while (true) {
+        if(yessir.should_reinit){
+            yessir.initialize(arg);
+            TickType_t last = xTaskGetTickCount();
+            yessir.should_reinit = false;
+        }
+
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
         Orientation current_orientation = arg->rocket_data.orientation.getRecent();
@@ -168,6 +174,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                     arg->tlm.acknowledgeReceived();
                     switch(command.command) {
                         case CommandType::RESET_KF:
+                            yessir.should_reinit = true;
                             break;
                         default:
                             break; 
