@@ -59,6 +59,14 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
+bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
+    return backend.read(command, wait_milliseconds);
+}
+
+void Telemetry::acknowledgeReceived() {
+    received_count ++;
+}
+
 /**
  * @brief creates the packet to send through the telemetry system
  * 
@@ -78,8 +86,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
-    packet.alt = (int16_t) gps.altitude;
-    // Convert range of value so that we can also account for negative altitudes
+    packet.alt = (((int16_t) gps.altitude) & 0xfffe) | (received_count & 0x0001);    // Convert range of value so that we can also account for negative altitudes
     packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
   
     auto [ax,ay,az] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 63));
