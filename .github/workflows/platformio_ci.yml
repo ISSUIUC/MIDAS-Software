@@ -1,5 +1,5 @@
 name: PlatformIOCI
-
+permissions: write-all
 on:
   push:
     branches:
