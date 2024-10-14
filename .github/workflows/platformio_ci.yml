@@ -1,6 +1,4 @@
 name: PlatformIOCI
-permissions:
-  contents: write
 on:
   push:
     branches:
@@ -14,7 +12,8 @@ on:
 
 jobs:
   build:
-
+    permissions:
+      contents: write-all
     runs-on: ubuntu-latest
 
     steps:
