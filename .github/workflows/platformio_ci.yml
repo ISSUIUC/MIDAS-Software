@@ -7,12 +7,13 @@ on:
         required: true
         default: 'mcu_main_sustainer'
 
+permissions:
+  contents: write
+  actions: write
+  checks: write
+
 jobs:
   build:
-    permissions:
-      contents: write
-      actions: write
-      checks: write
     runs-on: ubuntu-latest
 
     steps:
