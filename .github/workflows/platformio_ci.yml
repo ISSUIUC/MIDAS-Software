@@ -1,8 +1,5 @@
 name: PlatformIOCI
 on:
-  push:
-    branches:
-      - action  # Replace 'main' with your branch if different
   workflow_dispatch:  # This keeps the option to trigger manually
     inputs:
       PLATFORMIO_PROJECT_DIR:
