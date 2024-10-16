@@ -7,16 +7,15 @@ on:
         required: true
         default: 'mcu_main_sustainer'
 
-permissions:
-  contents: write
-  actions: write
-  checks: write
-
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
+      permissions:
+        contents: write
+        actions: write
+        checks: write
     - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
