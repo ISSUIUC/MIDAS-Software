@@ -1,22 +1,30 @@
-name: PlatformIOCI
+name: PlatformIO CI
+
 on:
+  push:
+    branches:
+      - action  # Replace 'main' with your branch if different
   workflow_dispatch:  # This keeps the option to trigger manually
-    inputs:
-      PLATFORMIO_PROJECT_DIR:
-        description: 'Specify the PlatformIO project directory'
-        required: true
-        default: 'mcu_main_sustainer'
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      permissions:
-        contents: write
-        actions: write
-        checks: write
     - uses: actions/checkout@v2
+    - name: Cache pip
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+    - name: Cache PlatformIO
+      uses: actions/cache@v2
+      with:
+        path: ~/.platformio
+        key: ${{ runner.os }}-${{ hashFiles('**/lockfiles') }}
     - name: Set up Python
       uses: actions/setup-python@v2
     - name: Install PlatformIO
@@ -27,9 +35,4 @@ jobs:
       run: |
         cd MIDAS
         pio platform install teensy
-        pio run -e ${{ github.event.inputs.PLATFORMIO_PROJECT_DIR }} || true
-    - name: Artifacts
-      uses: actions/upload-artifact@v4
-      with:
-        name: firmware-files
-        path: .
+        pio run -e mcu_main
