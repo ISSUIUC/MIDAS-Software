@@ -11,11 +11,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write
+      actions: write
+      checks: write
+
     steps:
-      permissions:
-        contents: write
-        actions: write
-        checks: write
     - uses: actions/checkout@v2
     - name: Set up Python
       uses: actions/setup-python@v2
