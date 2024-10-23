@@ -46,18 +46,15 @@ typedef uint32_t systime_t;
 RH_RF95 rf95(RFM95_CS, RFM95_INT);
 // RH_RF95 rf95(RFM95_CS, RFM95_INT);
 
-SerialParser serial_parser(SerialInput, SerialError);
-
 void setup() {
     while (!Serial)
         ;
     Serial.begin(9600);
     if (!rf95.init()) {
-        Serial.println(json_init_failure);
         while (1);
     }
     pinMode(LED_BUILTIN, OUTPUT);
-    Serial.println(json_init_success);
+    rf95.setFrequency(428);
     rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(10);
     rf95.setPayloadCRC(true);
@@ -69,33 +66,13 @@ void setup() {
 }
 
 void loop() {
-    
-    if (rf95.available()) {
-        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        TelemetryPacket packet;
-        uint8_t len = sizeof(buf);
+    uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+    uint8_t len = sizeof(buf);
 
-        if (rf95.recv(buf, &len)) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(50);
-            digitalWrite(LED_BUILTIN, LOW);
-            // Serial.println("Received packet");
-            // Serial.println(len);
-            memcpy(&packet, buf, sizeof(packet));
-            EnqueuePacket(packet, current_freq);
-            if (!cmd_queue.empty()) {
-                auto& cmd = cmd_queue.front();
-                    cmd.retry_count++;
-                    if (cmd.retry_count >= max_command_retries) {
-                        cmd_queue.pop();
-                        Serial.println(json_send_failure);
-                    }
-            }
-
-            process_command_queue();
-
-        } else {
-            Serial.println(json_receive_failure);
-        }
-    }
+    digitalWrite(LED_BUILTIN, HIGH);
+    delay(50);
+    digitalWrite(LED_BUILTIN, LOW);
+    rf95.send(buf, 4); 
+    rf95.waitPacketSent();
+    Serial.println("sent!");
 }
