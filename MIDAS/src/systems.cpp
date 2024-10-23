@@ -174,6 +174,18 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                     switch(command.command) {
                         case CommandType::RESET_KF:
                             yessir.should_reinit = true;
+                            Serial.println("Reset KF");
+                            break;
+                        case CommandType::SET_FREQ:
+                            
+                            arg->tlm.setFrequency(command.new_freq);
+                            Serial.println(command.new_freq);
+                            break;
+                        case CommandType::EN_PYRO:
+                            Serial.println("Enable Pyro");
+                            break;
+                        case CommandType::DIS_PYRO:
+                            Serial.println("Disable Pyro");
                             break;
                         default:
                             break; 

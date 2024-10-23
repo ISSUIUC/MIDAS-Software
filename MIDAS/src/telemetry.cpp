@@ -67,6 +67,10 @@ void Telemetry::acknowledgeReceived() {
     received_count ++;
 }
 
+ void Telemetry::setFrequency(float frequency) {
+    backend.setFrequency(frequency);
+ }
+
 /**
  * @brief creates the packet to send through the telemetry system
  * 

@@ -29,7 +29,7 @@
 #define RFM95_INT 3
 
 // Change to 434.0 or other frequency, must match RX's freq!
-double RF95_FREQ_MHZ = 425.15;
+float rf95_freq_MHZ = 425.15;
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -74,13 +74,12 @@ enum class CommandType: uint8_t { RESET_KF, SET_FREQ, EN_PYRO, DIS_PYRO };
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
-    union ModifiedValue {
-        double new_freq;
+    union {
+        float new_freq;
     };
-    ModifiedValue changed{};
     std::array<char, 3> verify = {{'B', 'R', 'K'}};
 };
-static_assert(sizeof(TelemetryCommand) == 4);
+static_assert(sizeof(TelemetryCommand) == 12);
 
 struct TelemetryCommandQueueElement {
     TelemetryCommand command;
@@ -100,7 +99,7 @@ constexpr const char* json_receive_failure = R"({"type": "receive_error", "error
 constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
 constexpr int max_command_retries = 5;
 
-float current_freq = RF95_FREQ_MHZ;
+float prev_freq = rf95_freq_MHZ;
 
 void printFloat(float f, int precision = 5) {
     if (isinf(f) || isnan(f)) {
@@ -124,7 +123,7 @@ void SerialInput(const char* key, const char* value) {
         command.command = CommandType::RESET_KF;
     } else if (strcmp(key, "SET_FREQ") == 0) {
         command.command = CommandType::SET_FREQ;
-        command.changed.new_freq = atof(value);
+        command.new_freq = atof(value);
     } else if (strcmp(key, "EN_PYRO") == 0) {
         command.command = CommandType::EN_PYRO;
     } else if (strcmp(key, "DIS_PYRO") == 0) {
@@ -151,7 +150,17 @@ void process_command_queue() {
     cmd.retry_count --;
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
     rf95.waitPacketSent();
+    if (cmd.command.command == CommandType::SET_FREQ) {
+        prev_freq = rf95_freq_MHZ;
+        rf95_freq_MHZ = cmd.command.new_freq;
+        rf95.setFrequency(rf95_freq_MHZ);
+        Serial.println(rf95_freq_MHZ);
+    }
     if(cmd.retry_count <= 0) {
+        if (cmd.command.command == CommandType::SET_FREQ) {
+            rf95_freq_MHZ = prev_freq;
+            rf95.setFrequency(rf95_freq_MHZ);
+        }
         Serial.printf(json_send_failure);
         cmd_queue.pop();
     }
@@ -174,14 +183,14 @@ void setup() {
     Serial.println(json_init_success);
 
     // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
-    if (!rf95.setFrequency(RF95_FREQ_MHZ)) {
+    if (!rf95.setFrequency(rf95_freq_MHZ)) {
         Serial.println(json_set_frequency_failure);
         while (1)
             ;
     }
 
     Serial.print(R"({"type": "freq_success", "frequency":)");
-    Serial.print(RF95_FREQ_MHZ);
+    Serial.print(rf95_freq_MHZ);
     Serial.println("}");
 
     rf95.setSignalBandwidth(125000);
