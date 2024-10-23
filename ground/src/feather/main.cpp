@@ -29,7 +29,7 @@
 #define RFM95_INT 3
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#define RF95_FREQ 425.15
+double RF95_FREQ_MHZ = 425.15;
 
 #define DEFAULT_CMD 0
 #define MAX_CMD_LEN 10
@@ -70,10 +70,14 @@ struct TelemetryPacket {
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
 };
 
-enum class CommandType: uint8_t { RESET_KF };
+enum class CommandType: uint8_t { RESET_KF, SET_FREQ, EN_PYRO, DIS_PYRO };
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
+    union ModifiedValue {
+        double new_freq;
+    };
+    ModifiedValue changed{};
     std::array<char, 3> verify = {{'B', 'R', 'K'}};
 };
 static_assert(sizeof(TelemetryCommand) == 4);
@@ -96,7 +100,7 @@ constexpr const char* json_receive_failure = R"({"type": "receive_error", "error
 constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
 constexpr int max_command_retries = 5;
 
-float current_freq = RF95_FREQ;
+float current_freq = RF95_FREQ_MHZ;
 
 void printFloat(float f, int precision = 5) {
     if (isinf(f) || isnan(f)) {
@@ -118,6 +122,13 @@ void SerialInput(const char* key, const char* value) {
     TelemetryCommand command{};
     if (strcmp(key, "RESET_KF") == 0) {
         command.command = CommandType::RESET_KF;
+    } else if (strcmp(key, "SET_FREQ") == 0) {
+        command.command = CommandType::SET_FREQ;
+        command.changed.new_freq = atof(value);
+    } else if (strcmp(key, "EN_PYRO") == 0) {
+        command.command = CommandType::EN_PYRO;
+    } else if (strcmp(key, "DIS_PYRO") == 0) {
+        command.command = CommandType::DIS_PYRO;
     } else {
         SerialError();
         return;
@@ -163,14 +174,14 @@ void setup() {
     Serial.println(json_init_success);
 
     // Defaults after init are 434.0MHz, modulation GFSK_Rb250Fd250, +13dbM
-    if (!rf95.setFrequency(RF95_FREQ)) {
+    if (!rf95.setFrequency(RF95_FREQ_MHZ)) {
         Serial.println(json_set_frequency_failure);
         while (1)
             ;
     }
 
     Serial.print(R"({"type": "freq_success", "frequency":)");
-    Serial.print(RF95_FREQ);
+    Serial.print(RF95_FREQ_MHZ);
     Serial.println("}");
 
     rf95.setSignalBandwidth(125000);
