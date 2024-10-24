@@ -48,6 +48,7 @@
 
 
 
+
 /*
  * Constant for strtol base param
  */
@@ -99,6 +100,10 @@ GNSS_StatusTypeDef TeseoLIV3F::I2CUpdate()
          {
             GNSS_PARSER_ParseMsg(&data, (eNMEAMsg)m, buffer);
          }
+      } else{
+         //process profiling
+         //LogMessage error;
+         //error.message = 'GNSS PARSER ERROR';
       }
       strncpy(i2ch.inputString, i2ch.inputString2, sizeof(i2ch.inputString));
       memset(i2ch.inputString2, 0, sizeof(i2ch.inputString2));
@@ -127,6 +132,8 @@ GNSS_StatusTypeDef TeseoLIV3F::UARTUpdate()
          {
             GNSS_PARSER_ParseMsg(&data, (eNMEAMsg)m, buffer);
          }
+      } else{
+         //process profiling
       }
       memset(uarth.inputString, 0, sizeof(uarth.inputString));
       uarth.stringComplete = false;

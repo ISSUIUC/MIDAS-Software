@@ -1,7 +1,7 @@
 #include "data_logging.h"
 #include "log_format.h"
 #include "log_checksum.h"
-
+#include <queue> 
 /**
  * @brief Forward decleration of the ID recieving function
 */
@@ -11,6 +11,10 @@ constexpr ReadingDiscriminant get_discriminant();
 /**
  * @brief macro to associate a certain sensor with a specific number ID
 */
+
+//std::queue<char[32]> logQueue;  // data logging for process profiling
+
+
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
 ASSOCIATE(LowGData, ID_LOWG)
@@ -26,6 +30,7 @@ ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
 ASSOCIATE(PyroState, ID_PYRO)
 ASSOCIATE(ProcessTime, ID_PROCESSTIME);
+//ASSOCIATE(LogMessages, ID_LOGMESSAGE)
 
 /**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
@@ -90,6 +95,7 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.kalman);
     log_from_sensor_data(sink, data.pyro);
     log_from_sensor_data(sink, data.processTime);
+    //log_from_sensor_data(sink, data.logMessages);
 }
 
 #ifndef SILSIM

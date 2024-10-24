@@ -180,7 +180,7 @@ bool Adafruit_BNO08x::begin_SPI(uint8_t cs_pin, uint8_t int_pin,
   _HAL.getTimeUs = hal_getTimeUs;
 
   return _init(sensor_id);
-}
+}//process profiling orientation
 
 /*!  @brief Initializer for post i2c/spi init
  *   @param sensor_id Optional unique ID for the sensor set

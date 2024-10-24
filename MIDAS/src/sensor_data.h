@@ -254,3 +254,8 @@ struct ProcessTime
     float dt;
 };
 
+struct LogMessages
+{
+    char message[64];
+};
+

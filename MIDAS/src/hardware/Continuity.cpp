@@ -12,7 +12,7 @@
 */
 ErrorCode ContinuitySensor::init() {
     ADS7138Init();              // Ask ADS to init the pins, we still need to get the device to actually read
-
+    //process profiling
     return ErrorCode::NoError;
 }
 

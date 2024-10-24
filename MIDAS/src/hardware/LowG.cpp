@@ -16,7 +16,8 @@ ErrorCode LowGSensor::init() {
     // todo set low pass filter frequency to 250hx
     sensor.enableMeasurement();
     return error;
-}
+    //process profiling
+}   
 
 /**
  * @brief Reads and returns the data from the sensor

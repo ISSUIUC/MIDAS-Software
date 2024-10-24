@@ -132,7 +132,7 @@ public:
       Wire.endTransmission(false);
       delay(2000);
       return GNSS_OK;
-   }
+   }//process profiling
 
    /**
     * @brief       Update the internal data structures of the sensor using the appropriate communication method

@@ -136,6 +136,7 @@ namespace PL {
         SPI.begin();
         pinMode(csPin, OUTPUT);
         digitalWrite(csPin, HIGH);
+        //process profiling acceleration lowG
     }
 
 //==============================================================================

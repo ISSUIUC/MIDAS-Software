@@ -55,7 +55,7 @@ ErrorCode Pyro::init() {
 //    } else {
     return ErrorCode::NoError;   // GPIO Driver always claimes it errored even when it doesn't.
 //    }
-}
+}//process profiling
 
 #ifdef IS_SUSTAINER
 

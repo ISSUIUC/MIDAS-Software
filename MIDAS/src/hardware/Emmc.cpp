@@ -37,6 +37,6 @@ ErrorCode EMMCSink::init(){
     if (!file) {
         return ErrorCode::EmmcCouldNotOpenFile;
     }
-    
+    //process profiling
     return ErrorCode::NoError;
 }

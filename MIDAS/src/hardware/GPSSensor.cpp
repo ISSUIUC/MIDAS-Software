@@ -16,7 +16,7 @@ TeseoLIV3F teseo(&Wire, GPS_RESET, GPS_ENABLE);     // singleton for the teseo g
  */
 ErrorCode GPSSensor::init() {
     teseo.init();       // always returns ok for some reason
-
+    //process profiling
     return ErrorCode::NoError;
 }
 

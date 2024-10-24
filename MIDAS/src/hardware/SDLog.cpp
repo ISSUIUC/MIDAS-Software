@@ -30,7 +30,7 @@ ErrorCode SDSink::init() {
     }
 
     return ErrorCode::NoError;
-}
+}//process profiling
 
 /**
  * @brief Writes a byte buffer to the SD card

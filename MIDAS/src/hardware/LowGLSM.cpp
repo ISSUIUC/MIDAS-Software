@@ -13,6 +13,7 @@ ErrorCode LowGLSMSensor::init() {
         return ErrorCode::GyroCouldNotBeInitialized;
     }
     return ErrorCode::NoError;
+    //process profiling
 }
 
 /**

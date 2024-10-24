@@ -617,7 +617,7 @@ bool QwiicKX134::beginSPI(uint8_t csPin, uint32_t spiPortSpeed,
         return true;
     else
         return false;
-}
+}//process profiling acceleration highG
 
 // Grabs raw accel data and passes it to the following function to be
 // converted.

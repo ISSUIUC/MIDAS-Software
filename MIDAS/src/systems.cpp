@@ -9,6 +9,18 @@
 #error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
 #endif
 
+#define DEBUG
+
+#ifdef DEBUG
+  #define MEASURE_LOOP_TIME(startTime, processName, arg) \
+      ProcessTime new_processTime; \
+      new_processTime.dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime);; \
+      new_processTime.name = processName; \
+      arg->rocket_data.processTime.update(new_processTime); 
+#else
+  #define MEASURE_LOOP_TIME(startTime, processName, arg) \             // No-op in release mode
+#endif 
+
 
 /**
  * @brief These are all the functions that will run in each task
@@ -24,12 +36,8 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         log_data(arg->log_sink, arg->rocket_data);
 
         arg->rocket_data.log_latency.tick();
-
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::LOGGER;
-        arg->rocket_data.processTime.update(new_processTime);
+        
+        MEASURE_LOOP_TIME(startTime, ProcessName::LOGGER, arg);
 
         THREAD_SLEEP(1);
     }
@@ -42,11 +50,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         Barometer reading = arg->sensors.barometer.read();
         arg->rocket_data.barometer.update(reading);
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::BAROMETER;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::BAROMETER, arg);
 
         THREAD_SLEEP(6);
     }
@@ -65,11 +69,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::ACCELEROMETERS;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::ACCELEROMETERS, arg);
 
         THREAD_SLEEP(2);
     }
@@ -84,11 +84,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
             arg->rocket_data.orientation.update(reading);
         }
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::ORIENTATION;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::ORIENTATION, arg);
 
         THREAD_SLEEP(100);
     }
@@ -101,11 +97,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::MAGNETOMETER;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::MAGNETOMETER, arg);
 
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
     }
@@ -136,11 +128,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         arg->led.update();
         i += 1;
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::I2C;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::I2C, arg);
 
         THREAD_SLEEP(10);
     }
@@ -165,11 +153,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             already_played_freebird = true;
         }
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::FSM;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::FSM, arg);
         
         THREAD_SLEEP(50);
     }
@@ -181,11 +165,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 
         arg->buzzer.tick();
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt = dt;
-        new_processTime.name = ProcessName::BUZZER;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::BUZZER, arg);
 
         THREAD_SLEEP(10);
     }
@@ -213,11 +193,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         arg->rocket_data.kalman.update(current_state);
         last = xTaskGetTickCount();
 
-        dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt;
-        new_processTime.name = ProcessName::KALMAN;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::KALMAN, arg);
         
 
         THREAD_SLEEP(50);
@@ -230,11 +206,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         arg->tlm.transmit(arg->rocket_data, arg->led);
 
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - startTime) / 1000.0f;
-        ProcessTime new_processTime;
-        new_processTime.dt;
-        new_processTime.name = ProcessName::TELEMETRY;
-        arg->rocket_data.processTime.update(new_processTime);
+        MEASURE_LOOP_TIME(startTime, ProcessName::TELEMETRY, arg);
         
 
         THREAD_SLEEP(1);

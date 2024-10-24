@@ -66,6 +66,8 @@ bool ADS7138Init(){
   AdcRegReadResult reg = adc_reg_read(ADC_ADDR, ADC_SYSTEM_STATUS);
   if(reg.error != AdcError::NoError){
     return false;
+  } else{
+    //process profiling continuity sensor initialize error
   }
   return reg.value != 0;
 }

@@ -188,7 +188,7 @@ void RH_RF95::handleInterrupt()
     // our ISR will be reinvoked to handle that case)
     // kevinh: turn this off until root cause is known, because it can cause missed interrupts!
     // spiWrite(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
-    spiWrite(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags
+    spiWrite(RH_RF95_REG_12_IRQ_FLAGS, 0xff); // Clear all IRQ flags 
 
     // error if:
     // timeout

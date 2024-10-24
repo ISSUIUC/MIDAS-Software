@@ -20,6 +20,7 @@ ErrorCode HighGSensor::init() {
 
     KX.setRange(3);
     return ErrorCode::NoError;
+    //process profiling
 }
 
 /**

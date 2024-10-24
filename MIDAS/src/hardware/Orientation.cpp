@@ -23,7 +23,7 @@ ErrorCode OrientationSensor::init() {
         return ErrorCode::CannotInitBNO;
     }
     return ErrorCode::NoError;
-}
+}//process profiling
 
 /**
  * @brief Turns a quaternion into its corresponding Euler 3D vector representation

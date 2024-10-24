@@ -66,9 +66,9 @@ int LSM6DS3Class::begin()
 
   // Set the ODR config register to ODR/4
   writeRegister(LSM6DS3_CTRL8_XL, 0x09);
-
+  //process profiling acceleration initialized
   return 1;
-}
+}//process profiling lowglsm
 
 void LSM6DS3Class::end()
 {

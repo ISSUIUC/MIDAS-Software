@@ -77,7 +77,7 @@ void MS5611::init() {
         C[reg] = readProm(reg);
     }
     SPI.endTransaction();
-}
+}//process profiling barometer initialized
 
 int MS5611::read(uint8_t bits) {
     // VARIABLES NAMES BASED ON DATASHEET  <- Nice!
