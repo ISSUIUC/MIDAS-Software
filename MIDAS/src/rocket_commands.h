@@ -1,49 +1,19 @@
 #pragma once
 
-// header for fsm governing state transitions and in-flight event control
 
-#include <numeric>
+//these will change the settings in telemetry_backend
+struct btRadioSettings { 
+    float freq;
+    int signalBandwidth;
+    int codingRate4;
+    int spreadingFactor;
+    bool payloadCRC;
 
-#include "FreeRTOSConfig.h"
-#include "fsm_states.h"
-
-#include "thresholds.h"
-#include "sensor_data.h"
-#include "Buffer.h"
-#include "rocket_state.h"
-
-
-struct StateEstimate {
-    double altitude;
-    double acceleration;
-    double jerk;
-    double vertical_speed;
-
-    explicit StateEstimate(RocketData& state);
 };
 
-
-class FSM {
-public:
-    FSM() = default;
-
-    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate);
-
-private:
-    double launch_time;
-    double burnout_time;
-    double sustainer_ignition_time;
-    double second_boost_time;
-    double coast_time;
-    double drogue_time;
-    double apogee_time;
-    double main_time;
-    double landed_time;
-    double first_separation_time;
-
-
-//putting in thresholds, storing as variables instead of #DEFINE
-    // Transition to FIRST_BOOST if acceleration is greater than this
+//struct for thresholds
+struct secondStageThresholds{
+     // Transition to FIRST_BOOST if acceleration is greater than this
     double sustainer_idle_to_first_boost_acceleration_threshold;
 
     // Return state to IDLE if not boosting for this amount of time (ms)
@@ -96,4 +66,20 @@ private:
 
     // Stores a small jerk value
     double sustainer_main_jerk_threshold;
+};
+
+struct rocketCommands {
+
+    int type;
+    union{
+        btRadioSettings settings;
+        secondStageThresholds thresholds;
+    } data;
+
+    
+
+
+
+
+
 };

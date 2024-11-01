@@ -35,44 +35,40 @@ RocketSystems systems { .log_sink = sinks };
 
 void setup() {
   Serial.begin(115200);
-  Serial.println("Starting BLE work!");\
+  Serial.println("Starting BLE work!");
 
   BLEmyCharacteristicCallbacks pmyCallback = BLEmyCharacteristicCallbacks();
 
-  
-
-<<<<<<< Updated upstream
     //begin sensor SPI bus
 
-    Serial.println("Starting SPI...");
-    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
-    //begin I2C bus
-    Serial.println("Starting I2C...");
-    Wire.begin(I2C_SDA, I2C_SCL);
+    // Serial.println("Starting SPI...");
+    // SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
+    // //begin I2C bus
+    // Serial.println("Starting I2C...");
+    // Wire.begin(I2C_SDA, I2C_SCL);
 
-    pinMode(MS5611_CS, OUTPUT);
-    pinMode(LSM6DS3_CS, OUTPUT);
-    pinMode(KX134_CS, OUTPUT);
-    pinMode(ADXL355_CS, OUTPUT);
-    pinMode(LIS3MDL_CS, OUTPUT);
-    pinMode(BNO086_CS, OUTPUT);
-    pinMode(CAN_CS, OUTPUT);
-    pinMode(RFM96_CS, OUTPUT);
+    // pinMode(MS5611_CS, OUTPUT);
+    // pinMode(LSM6DS3_CS, OUTPUT);
+    // pinMode(KX134_CS, OUTPUT);
+    // pinMode(ADXL355_CS, OUTPUT);
+    // pinMode(LIS3MDL_CS, OUTPUT);
+    // pinMode(BNO086_CS, OUTPUT);
+    // pinMode(CAN_CS, OUTPUT);
+    // pinMode(RFM96_CS, OUTPUT);
 
-    digitalWrite(MS5611_CS, HIGH);
-    digitalWrite(LSM6DS3_CS, HIGH);
-    digitalWrite(KX134_CS, HIGH);
-    digitalWrite(ADXL355_CS, HIGH);
-    digitalWrite(LIS3MDL_CS, HIGH);
-    digitalWrite(BNO086_CS, HIGH);
-    digitalWrite(CAN_CS, HIGH);
-    digitalWrite(RFM96_CS, HIGH);
+    // digitalWrite(MS5611_CS, HIGH);
+    // digitalWrite(LSM6DS3_CS, HIGH);
+    // digitalWrite(KX134_CS, HIGH);
+    // digitalWrite(ADXL355_CS, HIGH);
+    // digitalWrite(LIS3MDL_CS, HIGH);
+    // digitalWrite(BNO086_CS, HIGH);
+    // digitalWrite(CAN_CS, HIGH);
+    // digitalWrite(RFM96_CS, HIGH);
 
-    gpioPinMode(LED_BLUE, OUTPUT);
-    gpioPinMode(LED_GREEN, OUTPUT);
-    gpioPinMode(LED_ORANGE, OUTPUT);
-    gpioPinMode(LED_RED, OUTPUT);
-=======
+    // gpioPinMode(LED_BLUE, OUTPUT);
+    // gpioPinMode(LED_GREEN, OUTPUT);
+    // gpioPinMode(LED_ORANGE, OUTPUT);
+    // gpioPinMode(LED_RED, OUTPUT);
 
   BLEDevice::init("MyESP32");
   BLEServer *pServer = BLEDevice::createServer();
@@ -95,12 +91,9 @@ void setup() {
   BLEDevice::startAdvertising();
   Serial.println("Characteristic defined! Now you can read it in your phone!");
 
->>>>>>> Stashed changes
 
 
-<<<<<<< Updated upstream
-    begin_systems(&systems);
-=======
+    // begin_systems(&systems);
 
 //     //begin serial port
 //     Serial.begin(9600);
@@ -145,7 +138,6 @@ void setup() {
 
 //     //init and start threads
 //     begin_systems(&systems);
->>>>>>> Stashed changes
 }
 
 void loop() {

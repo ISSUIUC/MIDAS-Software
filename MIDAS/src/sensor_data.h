@@ -156,3 +156,5 @@ struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
 };
+
+
