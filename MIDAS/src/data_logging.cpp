@@ -30,7 +30,7 @@ ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
 ASSOCIATE(PyroState, ID_PYRO)
 ASSOCIATE(ProcessTime, ID_PROCESSTIME);
-ASSOCIATE(LogMessages, ID_LOGMESSAGE)
+ASSOCIATE(LogMessages, ID_LOGMESSAGES)
 
 /**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
