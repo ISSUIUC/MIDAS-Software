@@ -1,5 +1,4 @@
 .pio
 .vscode
-/src/log_checksum.h
 **/.DS_Store
 *.launch
