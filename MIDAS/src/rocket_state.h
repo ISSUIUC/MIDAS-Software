@@ -177,7 +177,7 @@ public:
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
     SensorData<ProcessTime> processTime;
-    //SensorData<LogMessages> logMessages;
+    SensorData<LogMessages> logMessages;
 
     Latency log_latency;
 };

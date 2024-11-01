@@ -30,7 +30,7 @@ ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
 ASSOCIATE(PyroState, ID_PYRO)
 ASSOCIATE(ProcessTime, ID_PROCESSTIME);
-//ASSOCIATE(LogMessages, ID_LOGMESSAGE)
+ASSOCIATE(LogMessages, ID_LOGMESSAGE)
 
 /**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
@@ -95,7 +95,7 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.kalman);
     log_from_sensor_data(sink, data.pyro);
     log_from_sensor_data(sink, data.processTime);
-    //log_from_sensor_data(sink, data.logMessages);
+    log_from_sensor_data(sink, data.logMessages);
 }
 
 #ifndef SILSIM

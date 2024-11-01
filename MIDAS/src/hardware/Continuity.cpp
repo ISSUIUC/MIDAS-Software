@@ -1,9 +1,12 @@
 #include "sensors.h"
 #include "ads7138-q1.h"
 #include <hal.h>
+#include <queue>
+
 
 #define PYRO_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for pyro batt voltage, check hardware schematic
 #define CONT_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for continuity voltage, check hardware schematic
+extern std::queue<std::string> logQueue; 
 
 /**
  * @brief Initializes ADC, returns NoError
@@ -12,7 +15,7 @@
 */
 ErrorCode ContinuitySensor::init() {
     ADS7138Init();              // Ask ADS to init the pins, we still need to get the device to actually read
-    //process profiling
+    logQueue.push("BarometerInitialized");//process profiling
     return ErrorCode::NoError;
 }
 

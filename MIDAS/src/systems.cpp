@@ -1,5 +1,7 @@
 #include "systems.h"
 
+#include <queue> 
+
 #include "hal.h"
 #include "gnc/yessir.h"
 
@@ -21,6 +23,7 @@
   #define MEASURE_LOOP_TIME(startTime, processName, arg) \             // No-op in release mode
 #endif 
 
+std::queue<std::string> logQueue;
 
 /**
  * @brief These are all the functions that will run in each task
@@ -40,6 +43,18 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         MEASURE_LOOP_TIME(startTime, ProcessName::LOGGER, arg);
 
         THREAD_SLEEP(1);
+    }
+}
+
+DECLARE_THREAD(messages, RocketSystems* arg){
+    while(true){
+        if(!logQueue.empty()){
+            LogMessages newMessage;
+            std::strncpy(newMessage.message, logQueue.front().c_str(), sizeof(newMessage.message) - 1);
+            newMessage.message[sizeof(newMessage.message) - 1] = '\0';
+            arg->rocket_data.logMessages.update(newMessage);
+            THREAD_SLEEP(20);
+        }
     }
 }
 

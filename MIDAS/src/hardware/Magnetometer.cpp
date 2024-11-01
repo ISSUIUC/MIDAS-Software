@@ -3,7 +3,7 @@
 #include "sensors.h"
 #include "hal.h"
 
-//extern std::queue<char[32]> logQueue; // global variable queue for logging the important status of the sensor.
+extern std::queue<std::string> logQueue; // global variable queue for logging the important status of the sensor.
 
 Adafruit_LIS3MDL LIS3MDL;           // global static instance of the sensor
 
@@ -15,9 +15,9 @@ ErrorCode MagnetometerSensor::init() {
     LIS3MDL.setDataRate(LIS3MDL_DATARATE_155_HZ);
     LIS3MDL.setRange(LIS3MDL_RANGE_4_GAUSS);  
                     // Earth's magnetic field is 1/2 gauss, can detect high current
-    //char message[32];
-    //snprintf(message, sizeof(message), "Magnetometer init w/ mode:%d rate:%d range:%d", LIS3MDL_CONTINUOUSMODE, static_cast<int>(LIS3MDL_DATARATE_155_HZ), LIS3MDL_RANGE_4_GAUSS);
-    //logQueue.push(message);
+    char message[64];
+    snprintf(message, sizeof(message), "MagnetometerInitizedW/Mode:%dRate:%dRange:%d", LIS3MDL_CONTINUOUSMODE, static_cast<int>(LIS3MDL_DATARATE_155_HZ), LIS3MDL_RANGE_4_GAUSS);
+    logQueue.push(message);
     return ErrorCode::NoError;
 }//process profiling
 
@@ -31,3 +31,9 @@ Magnetometer MagnetometerSensor::read() {
     Magnetometer reading{mx, my, mz};
     return reading;
 }
+
+//void addMessageQueue(String m){
+  //  char message[64];
+    //snprintf(message, sizeof(message), m);
+    //logQueue.push(message);
+//}

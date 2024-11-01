@@ -1,7 +1,9 @@
 #include "sensors.h"
 #include <MS5611.h>
+#include <queue> 
 
 MS5611 MS(MS5611_CS);       //singleton object for the MS sensor
+extern std::queue<std::string> logQueue; 
 
 /**
  * @brief Initializes barometer, returns NoError
@@ -11,6 +13,7 @@ MS5611 MS(MS5611_CS);       //singleton object for the MS sensor
 ErrorCode BarometerSensor::init() {
     MS.init();
     //process profiling
+    logQueue.push("BarometerInitialized");
     return ErrorCode::NoError;
 }
 
