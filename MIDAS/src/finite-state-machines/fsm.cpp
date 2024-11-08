@@ -1,10 +1,9 @@
 #include <cmath>
-
 #include "fsm.h"
 #include "thresholds.h"
-
+#include <rocket_commands.h>
 // helper functions
-
+ 
 template<typename T, size_t count>
 double sensor_average(BufferedSensorData<T, count>& sensor, double (* get_item)(T&)) {
     auto arr = sensor.template getBufferRecent<count>();
@@ -20,7 +19,6 @@ double sensor_derivative(BufferedSensorData<T, count>& sensor, double (* get_ite
     auto arr = sensor.template getBufferRecent<count>();
     auto times = sensor.template getTimesRecent<count>();
     size_t i = 0;
-
     double first_average = 0.0;
     double first_average_time = 0.0;
     for (; i < count / 2; i++) {
@@ -60,7 +58,6 @@ StateEstimate::StateEstimate(RocketData& state) {
 
 #ifdef IS_SUSTAINER
 
-//added secondStageThresholds arg to pass in struct 
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, const secondStageThresholds& thresholds) {
     //get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -218,7 +215,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, const seco
 #else
 
 // this is similar to the previous function but contains less states
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
+FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, const secondStageThresholds& thresholds) {
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {

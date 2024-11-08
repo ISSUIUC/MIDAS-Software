@@ -1,5 +1,4 @@
 #include "systems.h"
-
 #include "hal.h"
 #include "gnc/yessir.h"
 
@@ -123,7 +122,9 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+        //inserted temporary thresholds here
+        secondStageThresholds thresholds;
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, thresholds);
 
         arg->rocket_data.fsm_state.update(next_state);
 
