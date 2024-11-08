@@ -70,16 +70,9 @@ struct secondStageThresholds{
 
 struct rocketCommands {
 
-    int type;
     union{
         btRadioSettings settings;
         secondStageThresholds thresholds;
     } data;
-
-    
-
-
-
-
 
 };
