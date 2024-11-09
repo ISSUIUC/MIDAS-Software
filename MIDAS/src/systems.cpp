@@ -123,6 +123,10 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         StateEstimate state_estimate(arg->rocket_data);
 
         //inserted temporary thresholds here
+        rocketCommands rktCmdStruct;
+        if (arg->rocket_data.BluetoothCommands.receive(&rktCmdStruct)) {
+
+        }
         secondStageThresholds thresholds;
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate, thresholds);
 
