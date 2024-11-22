@@ -85,4 +85,6 @@ struct GPSSensor {
 struct Pyro {
     ErrorCode init();
     PyroState tick(FSMState fsm_state, Orientation orientation);
+    void global_arm();
+    void global_disarm();
 };

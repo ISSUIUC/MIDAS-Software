@@ -98,3 +98,5 @@ ErrorCode BuzzerController::init() {
 Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
     /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight
 };
+
+Sound warn_tone[]

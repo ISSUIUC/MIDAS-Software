@@ -57,6 +57,18 @@ ErrorCode Pyro::init() {
 //    }
 }
 
+void Pyro::global_arm() {
+    new_pyro_state.is_global_armed = true;
+    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
+}
+
+void Pyro::global_disarm() {
+    new_pyro_state.is_global_armed = false;
+    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, LOW);
+    if (gpioDigitalState(PYRO_GLOBAL_ARM_PIN) == HIGH) {
+        // Warn or panic or something like that idk
+    }
+}
 #ifdef IS_SUSTAINER
 
 /**
@@ -67,11 +79,18 @@ ErrorCode Pyro::init() {
 PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
 
+    if (fsm_state == FSMState::STATE_SAFE) {
+        global_disarm();
+        // Turn off everything
+        return;
+    }
     // If the state is IDLE or any state after that, we arm the global arm pin
-    new_pyro_state.is_global_armed = true;
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
 
     switch (fsm_state) {
+        case FSMState::STATE_IDLE:
+        case FSMState::STATE_PYRO_TEST:
+            global_arm();
+            break;
         case FSMState::STATE_SUSTAINER_IGNITION:
             // Fire "Pyro A" to ignite sustainer
             // Additionally, check if orientation allows for firing
@@ -118,8 +137,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
     PyroState new_pyro_state = PyroState();
 
     // If the state is IDLE or any state after that, we arm the global arm pin
-    new_pyro_state.is_global_armed = true;
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
+
 
     switch (fsm_state) {
         case FSMState::STATE_FIRST_SEPARATION:

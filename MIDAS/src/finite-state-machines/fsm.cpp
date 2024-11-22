@@ -254,12 +254,16 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {
+        case FSMState::STATE_SAFE:
+            break;
+        case FSMState::STATE_PYRO_TEST:
+            // Fire the pyros or something here
+            break;
         case FSMState::STATE_IDLE:
             if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
                 state = FSMState::STATE_FIRST_BOOST;
             }
-
             break;
 
         case FSMState::STATE_FIRST_BOOST:
