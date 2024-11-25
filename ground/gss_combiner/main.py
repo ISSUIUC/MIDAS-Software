@@ -301,6 +301,10 @@ if __name__ == "__main__":
         if (is_verbose or not is_visual):
             continue
 
+        sustainer_commands, booster_commands = broadcast_thread.get_telem_cmds()
+
+        # handle commands 
+        
         # Only print occasionally to not flood standard print
         if(datetime.datetime.now().timestamp() - last_print_db > 0):
             last_print_db = datetime.datetime.now().timestamp() + print_delay
