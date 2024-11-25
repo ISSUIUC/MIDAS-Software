@@ -3,6 +3,7 @@
 #include "sensors.h"
 #include "pins.h"
 
+#include "TCAL9539.h"
 #include <rocket_state.h>
 
 

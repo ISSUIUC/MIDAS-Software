@@ -56,4 +56,3 @@ bool TCAL9539Init();
 GpioError gpioPinMode(GpioAddress pin, int mode);
 GpioError gpioDigitalWrite(GpioAddress pin, int mode);
 GpioReadResult gpioDigitalRead(GpioAddress pin);
-int gpioDigitalState(GpioAddress pin);
