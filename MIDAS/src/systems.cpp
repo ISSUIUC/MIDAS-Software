@@ -78,7 +78,8 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.gps.update(reading);
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
+            CommandFlags telem_commands = arg->rocket_data.command_flags;
+            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
             Continuity reading2 = arg->sensors.continuity.read();
@@ -102,8 +103,9 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
+        CommandFlags telemetry_commands = arg->rocket_data.command_flags;
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
 
         arg->rocket_data.fsm_state.update(next_state);
 
@@ -133,10 +135,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     TickType_t last = xTaskGetTickCount();
     
     while (true) {
-        if(yessir.should_reinit){
+        if(arg->rocket_data.command_flags.should_reset_kf){
             yessir.initialize(arg);
             TickType_t last = xTaskGetTickCount();
-            yessir.should_reinit = false;
+            arg->rocket_data.command_flags.should_reset_kf = false;
         }
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
@@ -166,18 +168,51 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
         
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        if (current_state == FSMState(STATE_IDLE)) {
+        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST)) {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 2000)) {
                 if(command.valid()) {
                     arg->tlm.acknowledgeReceived();
+                    
+                    // maybe we should move this somewhere else but it can stay here for now
                     switch(command.command) {
                         case CommandType::RESET_KF:
-                            yessir.should_reinit = true;
+                            arg->rocket_data.command_flags.should_reset_kf = true;
+                            break;
+                        case CommandType::SWITCH_TO_SAFE:
+                            arg->rocket_data.command_flags.should_transition_safe = true;
+                            break;
+                        case CommandType::SWITCH_TO_PYRO_TEST:
+                            arg->rocket_data.command_flags.should_transition_pyro_test = true;
+                            break;
+                        case CommandType::SWITCH_TO_IDLE:
+                            arg->rocket_data.command_flags.should_transition_idle = true;
+                            break;
+                        case CommandType::FIRE_PYRO_A:
+                            arg->rocket_data.command_flags.should_fire_pyro_a = true;
+                            break;
+                        case CommandType::FIRE_PYRO_B:
+                            arg->rocket_data.command_flags.should_fire_pyro_b = true;
+                            break;
+                        case CommandType::FIRE_PYRO_C:
+                            arg->rocket_data.command_flags.should_fire_pyro_c = true;
+                            break;
+                        case CommandType::FIRE_PYRO_D:
+                            arg->rocket_data.command_flags.should_fire_pyro_d = true;
                             break;
                         default:
-                            break; 
+                            break; // how
                     }
+                    // switch(command.command) {
+                    //     // case CommandType::RESET_KF:
+                    //     //     // yessir.should_reinit = true;
+                    //     //     break;
+                    //     case CommandType::SWITCH_TO_SAFE:
+                    //         break;
+                    //     case CommandType::
+                    //     default:
+                    //         break; 
+                    // }
                 }
 
             }

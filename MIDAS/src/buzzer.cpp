@@ -92,6 +92,9 @@ ErrorCode BuzzerController::init() {
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 
+#define WARN_TONE_PITCH Sound{880, 125}
+#define WARN_TONE_BLANK Sound{0, 125}
+
 /**
  * @brief free bird solo song, to be played on startup/ second stage iginition
 */
@@ -99,4 +102,7 @@ Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
     /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight
 };
 
-Sound warn_tone[]
+/**
+ * @brief Warn tone, to be played in "unsafe" non-flight states (STATE_IDLE, STATE_PYRO_TEST)
+ */
+Sound warn_tone[WARN_TONE_LENGTH] = {WARN_TONE_PITCH, WARN_TONE_BLANK};

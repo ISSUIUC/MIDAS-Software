@@ -3,6 +3,8 @@
 #include "errors.h"
 #include "sensor_data.h"
 #include "hardware/pins.h"
+#include "TCAL9539.h"
+#include "rocket_state.h"
 
 /**
  * @struct LowG interface
@@ -84,7 +86,15 @@ struct GPSSensor {
  */
 struct Pyro {
     ErrorCode init();
-    PyroState tick(FSMState fsm_state, Orientation orientation);
-    void global_arm();
-    void global_disarm();
+    PyroState tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands);
+
+    void enable_pyro_safety(); // Sets pyro_start_firing_time and has_fired_pyros.
+    void disable_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros.
+    
+    private:
+    void disarm_all_channels(PyroState& prev_state);
+    void fire_pyro(int channel_idx, GpioAddress arm_pin, GpioAddress fire_pin);
+
+    double safety_pyro_start_firing_time;    // Time when pyros have fired "this cycle" (pyro test) -- Used to only fire pyros for a time then transition to SAFE 
+    bool safety_has_fired_pyros_this_cycle;  // If pyros have fired "this cycle" (pyro test) -- Allows only firing 1 pyro per cycle.
 };

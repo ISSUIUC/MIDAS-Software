@@ -84,12 +84,66 @@ StateEstimate::StateEstimate(RocketData& state) {
  * 
  * @return New FSM State
 */
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
+FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& telem_commands) {
     //get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {
+
+        case FSMState::STATE_SAFE:
+            // Deconflict if multiple commands are processed
+            if(telem_commands.should_transition_safe) {
+                telem_commands.should_transition_pyro_test = false;
+                telem_commands.should_transition_idle = false;
+                telem_commands.should_transition_safe = false;
+                break;
+            }
+
+            // Only switch to STATE_PYRO_TEST if triggered wirelessly
+            if(telem_commands.should_transition_pyro_test) {
+                state = FSMState::STATE_PYRO_TEST;
+                pyro_test_entry_time = current_time;
+                telem_commands.should_transition_pyro_test = false;
+            }
+
+            // Only switch to STATE_IDLE if triggered wirelessly.
+            if(telem_commands.should_transition_idle) {
+                state = FSMState::STATE_IDLE;
+                telem_commands.should_transition_idle = false;
+            }
+
+            break;
+        case FSMState::STATE_PYRO_TEST:
+
+            // Force transtion to safe if requested + clear all transition flags.
+            if(telem_commands.should_transition_safe) {
+                state = FSMState::STATE_SAFE;
+                telem_commands.should_transition_pyro_test = false;
+                telem_commands.should_transition_idle = false;
+                telem_commands.should_transition_safe = false;
+                break;
+            }
+
+            // Switch back to STATE_SAFE after a certain amount of time passes 
+            if((current_time - pyro_test_entry_time) < safety_pyro_test_disarm_time) {
+                state = FSMState::STATE_SAFE;
+            }
+
+            // Switch back to STATE_SAFE if a pyro is fired immediately
+
+            break;
+
         case FSMState::STATE_IDLE:
+
+            // Force transtion to safe if requested + clear all transition flags.
+            if(telem_commands.should_transition_safe) {
+                state = FSMState::STATE_SAFE;
+                telem_commands.should_transition_pyro_test = false;
+                telem_commands.should_transition_idle = false;
+                telem_commands.should_transition_safe = false;
+                break;
+            }
+
             // once a significant amount of acceleration is detected change states
             if (state_estimate.acceleration > sustainer_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
@@ -250,14 +304,31 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
  * 
  * @return New FSM State
 */
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
+FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags telem_commands) {
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {
         case FSMState::STATE_SAFE:
+            // Only switch to STATE_PYRO_TEST if triggered wirelessly
+            if(false /* Telem trigger condition here for PYRO_TEST */) {
+                state = FSMState::STATE_PYRO_TEST;
+                pyro_test_entry_time = current_time;
+            }
+
+            // Only switch to STATE_IDLE if triggered wirelessly.
+            if(false /* Telem trigger condition here for IDLE */) {
+                state = FSMState::STATE_IDLE;
+            }
+
             break;
         case FSMState::STATE_PYRO_TEST:
-            // Fire the pyros or something here
+            // Switch back to STATE_SAFE after a certain amount of time passes 
+            if((current_time - pyro_test_entry_time) < safety_pyro_test_disarm_time) {
+                state = FSMState::STATE_SAFE;
+            }
+
+            // Switch back to STATE_SAFE if a pyro is fired immediately
+
             break;
         case FSMState::STATE_IDLE:
             if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
