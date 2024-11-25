@@ -87,6 +87,10 @@ void Pyro::set_pyro_safety() {
     safety_has_fired_pyros_this_cycle = true;
 }
 
+void Pyro::reset_pyro_safety() {
+    safety_has_fired_pyros_this_cycle = false;
+}
+
 #ifdef IS_SUSTAINER
 
 /**
