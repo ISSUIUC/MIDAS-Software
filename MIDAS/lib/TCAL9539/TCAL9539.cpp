@@ -119,8 +119,3 @@ GpioError gpioPinMode(GpioAddress addr, int mode){
 
     return GpioError::NoError;
 }
-
-int gpioDigitalState(GpioAddress pin) {
-    uint8_t current_state = pin_state[addr.gpio_id][addr.port_idx];
-    return (current_state & (1 << addr.pin_offset)) ? HIGH : LOW;
-}
