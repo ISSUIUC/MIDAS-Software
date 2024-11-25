@@ -82,6 +82,11 @@ void Pyro::disarm_all_channels(PyroState& prev_state) {
     }
 }
 
+void Pyro::set_pyro_safety() {
+    safety_pyro_start_firing_time = pdTICKS_TO_MS(xTaskGetTickCount());
+    safety_has_fired_pyros_this_cycle = true;
+}
+
 #ifdef IS_SUSTAINER
 
 /**
@@ -103,6 +108,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
 
     switch (fsm_state) {
         case FSMState::STATE_IDLE:
+            reset_pyro_safety(); // Ensure that pyros can be fired when we transition away from this state
             break;
         case FSMState::STATE_PYRO_TEST:
 
@@ -123,9 +129,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
                 new_pyro_state.channels[0].is_firing = true;
                 gpioDigitalWrite(PYROA_ARM_PIN, HIGH);
                 gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
-
-                safety_pyro_start_firing_time = current_time;
-                safety_has_fired_pyros_this_cycle = true;
+                set_pyro_safety();
             }
 
             if(telem_commands.should_fire_pyro_b) {
@@ -135,8 +139,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
                 gpioDigitalWrite(PYROB_ARM_PIN, HIGH);
                 gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
 
-                safety_pyro_start_firing_time = current_time;
-                safety_has_fired_pyros_this_cycle = true;
+                set_pyro_safety();
             }
 
             if(telem_commands.should_fire_pyro_c) {
@@ -146,8 +149,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
                 gpioDigitalWrite(PYROC_ARM_PIN, HIGH);
                 gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
 
-                safety_pyro_start_firing_time = current_time;
-                safety_has_fired_pyros_this_cycle = true;
+                set_pyro_safety();
             }
 
             if(telem_commands.should_fire_pyro_d) {
@@ -157,8 +159,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
                 gpioDigitalWrite(PYROD_ARM_PIN, HIGH);
                 gpioDigitalWrite(PYROD_FIRE_PIN, HIGH);
 
-                safety_pyro_start_firing_time = current_time;
-                safety_has_fired_pyros_this_cycle = true;
+                set_pyro_safety();
             }
             
 
