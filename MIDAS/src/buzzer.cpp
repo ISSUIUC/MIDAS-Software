@@ -24,6 +24,13 @@ void BuzzerController::tick() {
 }
 
 /**
+ * @brief Returns whether the buzzer is currently playing a tune
+ */
+bool BuzzerController::is_playing() {
+    return (current_tune_ != nullptr);
+}
+
+/**
  * @brief ticks the bizzer, plays next note/ starts new song if applicable
 */
 void BuzzerController::tick_sounds() {

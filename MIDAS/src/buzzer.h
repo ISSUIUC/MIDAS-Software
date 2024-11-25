@@ -37,6 +37,7 @@ public:
     ErrorCode init();
     void tick();
     void play_tune(Sound* tune, uint32_t length);
+    bool is_playing();
 };
 
 #define FREE_BIRD_LENGTH 11

@@ -100,14 +100,30 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     bool already_played_freebird = false;
+    double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
         CommandFlags telemetry_commands = arg->rocket_data.command_flags;
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
 
         arg->rocket_data.fsm_state.update(next_state);
+
+        if (current_state == FSMState::STATE_SAFE) {
+            if((current_time - last_time_led_flash) > 250) {
+                // Flashes green LED at 4Hz while in SAFE mode.
+                last_time_led_flash = current_time;
+                arg->led.toggle(LED::GREEN);
+            }
+        } else {
+            arg->led.set(LED::GREEN, LOW);
+        }
+
+        if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing()) {
+            arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
+        }
 
         if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
