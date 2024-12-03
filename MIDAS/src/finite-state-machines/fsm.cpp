@@ -304,7 +304,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
  * 
  * @return New FSM State
 */
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags telem_commands) {
+FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& telem_commands) {
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {
