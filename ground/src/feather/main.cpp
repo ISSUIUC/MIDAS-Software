@@ -70,7 +70,7 @@ struct TelemetryPacket {
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
 };
 
-enum class CommandType: uint8_t { RESET_KF, SET_FREQ, EN_PYRO, DIS_PYRO };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D };
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
@@ -119,19 +119,21 @@ void SerialInput(const char* key, const char* value) {
     }
 
     TelemetryCommand command{};
-    if (strcmp(key, "RESET_KF") == 0) {
-        command.command = CommandType::RESET_KF;
-    } else if (strcmp(key, "SET_FREQ") == 0) {
-        command.command = CommandType::SET_FREQ;
-        command.new_freq = atof(value);
-    } else if (strcmp(key, "EN_PYRO") == 0) {
-        command.command = CommandType::EN_PYRO;
-    } else if (strcmp(key, "DIS_PYRO") == 0) {
-        command.command = CommandType::DIS_PYRO;
-    } else {
-        SerialError();
-        return;
-    }
+    // if (strcmp(key, "RESET_KF") == 0) {
+    //     command.command = CommandType::RESET_KF;
+    // } else if (strcmp(key, "SET_FREQ") == 0) {
+    //     command.command = CommandType::SET_FREQ;
+    //     command.new_freq = atof(value);
+    // } else if (strcmp(key, "EN_PYRO") == 0) {
+    //     command.command = CommandType::EN_PYRO;
+    // } else if (strcmp(key, "DIS_PYRO") == 0) {
+    //     command.command = CommandType::DIS_PYRO;
+    // } else {
+    //     SerialError();
+    //     return;
+    // }
+
+    command.command = CommandType::SWITCH_TO_PYRO_TEST;
     Serial.println(json_command_success);
     // Send the command until acknowledge or 5 attempts
     cmd_queue.push({command, 5});
@@ -150,20 +152,20 @@ void process_command_queue() {
     cmd.retry_count --;
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
     rf95.waitPacketSent();
-    if (cmd.command.command == CommandType::SET_FREQ) {
-        prev_freq = rf95_freq_MHZ;
-        rf95_freq_MHZ = cmd.command.new_freq;
-        rf95.setFrequency(rf95_freq_MHZ);
-        Serial.println(rf95_freq_MHZ);
-    }
-    if(cmd.retry_count <= 0) {
-        if (cmd.command.command == CommandType::SET_FREQ) {
-            rf95_freq_MHZ = prev_freq;
-            rf95.setFrequency(rf95_freq_MHZ);
-        }
-        Serial.printf(json_send_failure);
-        cmd_queue.pop();
-    }
+    // if (cmd.command.command == CommandType::SET_FREQ) {
+    //     prev_freq = rf95_freq_MHZ;
+    //     rf95_freq_MHZ = cmd.command.new_freq;
+    //     rf95.setFrequency(rf95_freq_MHZ);
+    //     Serial.println(rf95_freq_MHZ);
+    // }
+    // if(cmd.retry_count <= 0) {
+    //     if (cmd.command.command == CommandType::SET_FREQ) {
+    //         rf95_freq_MHZ = prev_freq;
+    //         rf95.setFrequency(rf95_freq_MHZ);
+    //     }
+    //     Serial.printf(json_send_failure);
+    //     cmd_queue.pop();
+    // }
 }
 
 SerialParser serial_parser(SerialInput, SerialError);
