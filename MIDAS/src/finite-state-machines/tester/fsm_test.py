@@ -2,6 +2,7 @@ import argparse
 import pathlib
 import pandas as pd
 import fsm
+import math
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=pathlib.Path)
@@ -11,9 +12,11 @@ args = parser.parse_args()
 sustainer_fsm = fsm.SustainerFSM()
 
 df = pd.read_csv(args.filename)
+packet = fsm.StateEstimate()
+
+
 
 for i, line in df.iterrows():
-    packet = fsm.StateEstimate()
     packet['acceleration'] = float(line['acceleration'])
     packet['altitude'] = float(line['height'])
     packet['current_time'] = float(line['time'])
@@ -28,4 +31,3 @@ for i, line in df.iterrows():
 
     if transition_reason != "":
         print("\t".join([line['state_name'], fsm.FSM_STATE_TO_STRING[state], transition_reason]))
-    # input()
