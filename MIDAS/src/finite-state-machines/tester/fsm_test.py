@@ -4,17 +4,20 @@ import pandas as pd
 import fsm
 import math
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=pathlib.Path)
+parser.add_argument("-s", "--stage", help="boost/sus", default="sus")
 
 args = parser.parse_args()
 
-sustainer_fsm = fsm.SustainerFSM()
+state_machine = fsm.SustainerFSM()
+
+if args.stage == "boost":
+    state_machine = fsm.BoosterFsm()
 
 df = pd.read_csv(args.filename)
 packet = fsm.StateEstimate()
-
-
 
 for i, line in df.iterrows():
     packet['acceleration'] = float(line['acceleration'])
@@ -27,7 +30,7 @@ for i, line in df.iterrows():
 
     packet['vertical_speed'] = float(line['speed'])
 
-    state, transition_reason = sustainer_fsm.tick_fsm(packet)
+    state, transition_reason = state_machine.tick_fsm(packet)
 
     if transition_reason != "":
         print("\t".join([line['state_name'], fsm.FSM_STATE_TO_STRING[state], transition_reason]))
