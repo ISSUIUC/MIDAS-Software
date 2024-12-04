@@ -120,7 +120,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
                 // If a fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
                 // then, transition to SAFE.
                 if((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
-                    telem_commands.should_transition_idle = true;
+                    telem_commands.should_transition_safe = true;
                     disarm_all_channels(new_pyro_state);
                 }
                 break;

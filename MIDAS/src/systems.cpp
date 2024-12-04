@@ -78,7 +78,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.gps.update(reading);
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            CommandFlags telem_commands = arg->rocket_data.command_flags;
+            CommandFlags& telem_commands = arg->rocket_data.command_flags;
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
@@ -104,7 +104,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
-        CommandFlags telemetry_commands = arg->rocket_data.command_flags;
+        CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);

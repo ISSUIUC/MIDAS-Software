@@ -37,6 +37,9 @@ enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST,
 */
 struct TelemetryCommand {
     CommandType command;
+    union {
+        float new_freq;
+    };
     std::array<char, 3> verify = {{'B', 'R', 'K'}};
 
     bool valid() {

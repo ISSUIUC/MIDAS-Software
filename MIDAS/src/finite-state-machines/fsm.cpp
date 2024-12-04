@@ -91,7 +91,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
     switch (state) {
 
         case FSMState::STATE_SAFE:
-            // Deconflict if multiple commands are processed
+            // Deconflict if multip commands are processed
             if(telem_commands.should_transition_safe) {
                 telem_commands.should_transition_pyro_test = false;
                 telem_commands.should_transition_idle = false;
@@ -125,7 +125,8 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             }
 
             // Switch back to STATE_SAFE after a certain amount of time passes 
-            if((current_time - pyro_test_entry_time) < safety_pyro_test_disarm_time) {
+            if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
+                telem_commands.should_transition_pyro_test = false;
                 state = FSMState::STATE_SAFE;
             }
 
@@ -323,7 +324,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
         case FSMState::STATE_PYRO_TEST:
             // Switch back to STATE_SAFE after a certain amount of time passes 
-            if((current_time - pyro_test_entry_time) < safety_pyro_test_disarm_time) {
+            if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
                 state = FSMState::STATE_SAFE;
             }
 
