@@ -99,7 +99,7 @@ ErrorCode BuzzerController::init() {
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 
-#define WARN_TONE_PITCH Sound{1000, 125} // 2730 is the resonant frequency of the buzzer, thus it will be loudest here.
+#define WARN_TONE_PITCH Sound{2730, 125} // 2730 is the resonant frequency of the buzzer, thus it will be loudest here.
 #define WARN_TONE_BLANK Sound{0, 125}
 
 /**
