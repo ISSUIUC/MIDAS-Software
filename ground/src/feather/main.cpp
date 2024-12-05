@@ -133,7 +133,30 @@ void SerialInput(const char* key, const char* value) {
     //     return;
     // }
 
-    command.command = CommandType::SWITCH_TO_PYRO_TEST;
+    if (strcmp(key, "RESET_KF") == 0) {
+        command.command = CommandType::RESET_KF;
+    } else if (strcmp(key, "SAFE") == 0) {
+        command.command = CommandType::SWITCH_TO_SAFE;
+    } else if (strcmp(key, "IDLE") == 0) {
+        command.command = CommandType::SWITCH_TO_IDLE;
+    } else if (strcmp(key, "PT") == 0) {
+        command.command = CommandType::SWITCH_TO_PYRO_TEST;
+    } else if (strcmp(key, "PA") == 0) {
+        command.command = CommandType::FIRE_PYRO_A;
+    } else if (strcmp(key, "PB") == 0) {
+        command.command = CommandType::FIRE_PYRO_B;
+    } else if (strcmp(key, "PC") == 0) {
+        command.command = CommandType::FIRE_PYRO_C;
+    } else if (strcmp(key, "PD") == 0) {
+        command.command = CommandType::FIRE_PYRO_D;
+    } else {
+        // SerialError();
+        Serial.println("bad command");
+        return;
+        // return;
+    }
+
+    
     Serial.println(json_command_success);
     // Send the command until acknowledge or 5 attempts
     cmd_queue.push({command, 5});
