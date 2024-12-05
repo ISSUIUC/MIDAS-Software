@@ -26,7 +26,7 @@ class SerialParser {
                     error();
                 } else {
                     char* seperator_loc = (char*)memchr(input_buffer, seperator, write_head);
-                    if (seperator_loc == nullptr) {
+                    if (seperator_loc == nullptr && 0) {
                         error();
                     } else {
                         // set null terminators after the key and value so that
