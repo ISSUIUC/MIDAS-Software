@@ -309,35 +309,66 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {
-        case FSMState::STATE_SAFE:
+         case FSMState::STATE_SAFE:
+            // Deconflict if multip commands are processed
+            if(telem_commands.should_transition_safe) {
+                telem_commands.should_transition_pyro_test = false;
+                telem_commands.should_transition_idle = false;
+                telem_commands.should_transition_safe = false;
+                break;
+            }
+
             // Only switch to STATE_PYRO_TEST if triggered wirelessly
-            if(false /* Telem trigger condition here for PYRO_TEST */) {
+            if(telem_commands.should_transition_pyro_test) {
                 state = FSMState::STATE_PYRO_TEST;
                 pyro_test_entry_time = current_time;
+                telem_commands.should_transition_pyro_test = false;
             }
 
             // Only switch to STATE_IDLE if triggered wirelessly.
-            if(false /* Telem trigger condition here for IDLE */) {
+            if(telem_commands.should_transition_idle) {
                 state = FSMState::STATE_IDLE;
+                telem_commands.should_transition_idle = false;
             }
 
             break;
         case FSMState::STATE_PYRO_TEST:
+
+            // Force transtion to safe if requested + clear all transition flags.
+            if(telem_commands.should_transition_safe) {
+                state = FSMState::STATE_SAFE;
+                telem_commands.should_transition_pyro_test = false;
+                telem_commands.should_transition_idle = false;
+                telem_commands.should_transition_safe = false;
+                break;
+            }
+
             // Switch back to STATE_SAFE after a certain amount of time passes 
             if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
+                telem_commands.should_transition_pyro_test = false;
                 state = FSMState::STATE_SAFE;
             }
 
             // Switch back to STATE_SAFE if a pyro is fired immediately
-
             break;
+
         case FSMState::STATE_IDLE:
+            // Force transtion to safe if requested + clear all transition flags.
+            if(telem_commands.should_transition_safe) {
+                state = FSMState::STATE_SAFE;
+                telem_commands.should_transition_pyro_test = false;
+                telem_commands.should_transition_idle = false;
+                telem_commands.should_transition_safe = false;
+                break;
+            }
+
+            // once a significant amount of acceleration is detected change states
             if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
                 state = FSMState::STATE_FIRST_BOOST;
             }
-            break;
 
+            break;
         case FSMState::STATE_FIRST_BOOST:
             if ((state_estimate.acceleration < booster_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < booster_idle_to_first_boost_time_threshold)) {
                 state = FSMState::STATE_IDLE;

@@ -79,6 +79,9 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
             CommandFlags& telem_commands = arg->rocket_data.command_flags;
+
+            // Serial.printf("Fire pyro A: %d\n", telem_commands.should_fire_pyro_a);
+
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
@@ -205,16 +208,24 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                             arg->rocket_data.command_flags.should_transition_idle = true;
                             break;
                         case CommandType::FIRE_PYRO_A:
-                            arg->rocket_data.command_flags.should_fire_pyro_a = true;
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_a = true;
+                            }
                             break;
                         case CommandType::FIRE_PYRO_B:
-                            arg->rocket_data.command_flags.should_fire_pyro_b = true;
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_b = true;
+                            }
                             break;
                         case CommandType::FIRE_PYRO_C:
-                            arg->rocket_data.command_flags.should_fire_pyro_c = true;
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_c = true;
+                            }
                             break;
                         case CommandType::FIRE_PYRO_D:
-                            arg->rocket_data.command_flags.should_fire_pyro_d = true;
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_d = true;
+                            }
                             break;
                         default:
                             break; // how
