@@ -3,7 +3,7 @@
 #include <rocket_commands.h>
 
 class BLEmyCharacteristicCallbacks : public BLECharacteristicCallbacks{
-
+public:
     BLEmyCharacteristicCallbacks(RocketSystems& systems) : refSystems(systems) {
         
     }
@@ -49,20 +49,29 @@ class BLEmyCharacteristicCallbacks : public BLECharacteristicCallbacks{
         // while(true){
             //ASK WHAT THRESHOLD
             // memcpy(&thresholds, param->write.value, sizeof(thresholds));
+            Serial.println("Writing values");
             int thresholdCode = param->write.value[0]; //first byte is threshold, ex) 0x01
             double newValue = 0;
             // Serial.flush();
-
             /*Notes from 11/9/24*/
             // NOTE: write in little endian (msb is at the end, not the front) (so 01 (for which case) then in backwards per two characters (in hex) we write the double value we want (IEEE floating point))
-
             //SEE systems.cpp to see how thresholds transferred
                 //change switch statement, instead of updating every threshold here, we can do a switch statement inside fsm.cpp to update the certain threshold we want
-
-
             switch (thresholdCode) {
                 case 0x01:
                     Serial.println("sustainer_idle_to_first_boost_acceleration_threshold: ");
+
+                    if (param->write.len < 1 || param->write.value == nullptr) {
+                        Serial.println("Invalid write data");
+                        return;
+                    }
+
+                    if (param->write.len < sizeof(double) + 1) {
+                        Serial.println("Error: Insufficient data length");
+                        return;
+                    }
+
+                    
                     memcpy(&newValue, param->write.value + 1, sizeof(double));
                     thresholds.sustainer_idle_to_first_boost_acceleration_threshold = newValue;
                     // Serial.println(param->write.len);
@@ -70,12 +79,10 @@ class BLEmyCharacteristicCallbacks : public BLECharacteristicCallbacks{
                     //     Serial.println((int)param->write.value[i+1]);
                     // }
                     Serial.println(thresholds.sustainer_idle_to_first_boost_acceleration_threshold);
-                    
                     rocketCommands rktStruct;
                     rktStruct.data.thresholds = thresholds;
                     refSystems.rocket_data.BluetoothCommands.send(rktStruct);
                     break;
-
                 case 0x02:
                     Serial.print("sustainer_idle_to_first_boost_time_threshold: ");
                     Serial.println(thresholds.sustainer_idle_to_first_boost_time_threshold);
@@ -148,11 +155,7 @@ class BLEmyCharacteristicCallbacks : public BLECharacteristicCallbacks{
                     Serial.println("Unknown threshold code");
                     break;
             // }
-
             //WHAT VALUE IN THRESHOLD
-
-
-
         }
         
     }
