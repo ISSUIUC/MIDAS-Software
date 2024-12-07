@@ -23,6 +23,8 @@ struct KalmanState {    // class that keeps track of pos, vel, accel in xyz coor
 };
 
 template <int _NumStates, int _NumInputs>
+// i understand states representing x,y,z pos,vel,accel
+// numInputs are, well, inputs, but what inputs they usually are is unclear, maybe made clear in later parts
 class KalmanFilter
 {
 protected:

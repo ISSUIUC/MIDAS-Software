@@ -4,17 +4,18 @@
 #include "sensor_data.h"
 #include "Buffer.h"
 
-#define NUM_STATES 9
-#define NUM_SENSOR_INPUTS 4
-#define ALTITUDE_BUFFER_SIZE 10
+#define NUM_STATES 9 //x,y,z pos, vel, accel
+#define NUM_SENSOR_INPUTS 4 // not sure what inputs are from sensors, maybe its baro, accel, orientation, and fsmState?
+#define ALTITUDE_BUFFER_SIZE 10 // amount of collected sensor data it will hold on to at a time, this is make sure its collected data is "current"
 
 class Yessir : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 {
 public:
     Yessir();
-    void initialize(RocketSystems* args) override; 
-    void priori() override; 
+    void initialize(RocketSystems* args) override; // prepares rocketsystem info to be used in calc
+    void priori() override; // implements prediction step of filter
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
+    // updates using the given info above to refine state estimate
 
     void setQ(float dt, float sd);
     void setF(float dt); 
