@@ -26,49 +26,64 @@ Yessir::Yessir() : KalmanFilter() {
 
 void Yessir::initialize(RocketSystems* args) {
     Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
+    // gets most recent orientation data, doesn't care if it is being modified at the time of fetching it
     
-    float sum = 0;
+    float sum = 0; // this one is used for baro altitude?????/
     
     for (int i = 0; i < 30; i++) {
-        Barometer barometer = args->rocket_data.barometer.getRecent();
-        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
-        Acceleration accelerations = {
-            .ax = initial_accelerometer.ax,
+        Barometer barometer = args->rocket_data.barometer.getRecent(); // gets recent barometer data, waits to be settled before fetching
+        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent(); //gets recent lowg accel data (prob a matrix?)
+        Acceleration accelerations = { // accelerometer data put into xyz planes
+            .ax = initial_accelerometer.ax, 
             .ay = initial_accelerometer.ay,
             .az = initial_accelerometer.az
         };
-        sum += barometer.altitude;
+        sum += barometer.altitude; // altitude added to sum
 
-        init_accel(0, 0) += accelerations.az;
-        init_accel(1, 0) += accelerations.ay;
+        init_accel(0, 0) += accelerations.az; 
+        init_accel(1, 0) += accelerations.ay; // matrix elements appended with accelerometer data
         init_accel(2, 0) += -accelerations.ax;
         THREAD_SLEEP(100);
+        // pauses execution for 100ms before working with data again
     }
 
-    init_accel(0, 0) /= 30;
-    init_accel(1, 0) /= 30;
-    init_accel(2, 0) /= 30;
+    init_accel(0, 0) /= 30; // remember the original loop went to thirty iterations
+    init_accel(1, 0) /= 30; // this gets average accel for that instance from the
+    init_accel(2, 0) /= 30; // 30 values added to it
 
-    euler_t euler = orientation.getEuler();
-    euler.yaw = -euler.yaw;
+    euler_t euler = orientation.getEuler(); // gets euler angles (row, pitch, yaw)
+    euler.yaw = -euler.yaw; // not exactly sure, but probably a calculation thing
     world_accel = BodyToGlobal(euler, init_accel);
+    // takes acceleration values in init_accel in xyz and based on the row,pitch,yaw angles, it converts to aa worldview accel from ground
 
     // set x_k
-    x_k(0, 0) = sum / 30;
-    x_k(3, 0) = 0;
-    x_k(6, 0) = 0;
+    x_k(0, 0) = sum / 30; // average altitude, refer to loop
+    x_k(3, 0) = 0; // velocity
+    x_k(6, 0) = 0; // accel, both start at 0 for are calculations to start
 
-    // set F
-    for (int i = 0; i < 3; i++) {
-        F_mat(3 * i, 3 * i + 1) = s_dt;
-        F_mat(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;
-        F_mat(3 * i + 1, 3 * i + 2) = s_dt;
+    // set F (state transition matrix)
+    for (int i = 0; i < 3; i++) {                                           
+        F_mat(3 * i, 3 * i + 1) = s_dt;                                     
+        F_mat(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;                        
+        F_mat(3 * i + 1, 3 * i + 2) = s_dt;                                 
 
-        F_mat(3 * i, 3 * i) = 1;
+        F_mat(3 * i, 3 * i) = 1;    // puts one across the diagonals
         F_mat(3 * i + 1, 3 * i + 1) = 1;
         F_mat(3 * i + 2, 3 * i + 2) = 1;
-    }
 
+        /* for visual purposes to understand, here is the completed matrix in terms of variables (for simplicity, da = dt^2/2)
+        [[  1, dt, da,  0,  0,  0,  0,  0,  0],
+         [  0,  1, dt, da,  0,  0,  0,  0,  0],
+         [  0,  0,  1, dt, da,  0,  0,  0,  0],
+         [  0,  0,  0,  1, dt, da,  0,  0,  0],
+         [  0,  0,  0,  0,  1, dt, da,  0,  0],
+         [  0,  0,  0,  0,  0,  1, dt, da,  0],
+         [  0,  0,  0,  0,  0,  0,  1, dt, da],
+         [  0,  0,  0,  0,  0,  0,  0,  1, dt],
+         [  0,  0,  0,  0,  0,  0,  0,  0,  1]]
+        */
+    }
+    // Process Noise Covariance Matrix
     Q(0, 0) = pow(s_dt, 5) / 20;
     Q(0, 1) = pow(s_dt, 4) / 8;
     Q(0, 2) = pow(s_dt, 3) / 6;
