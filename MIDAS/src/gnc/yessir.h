@@ -17,26 +17,44 @@ public:
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
     // updates using the given info above to refine state estimate
 
-    void setQ(float dt, float sd);
-    void setF(float dt); 
+    void setQ(float dt, float sd); // sets process noise covar. matrix, (dt = time step, sd = standard deviation of process noise)
+    void setF(float dt); // sets state transition matrix, dt 
     Eigen::Matrix<float, 3, 1> BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> x_k);
+    // transitions body vectors in respect to a global frame like earths surface
+    // this takes roll, pitch, yaw ([3,1] vector) in body frame and returns it into global frame
 
-    KalmanData getState() override;
-    void setState(KalmanState state) override;
+    KalmanData getState() override; //gets current state of rocket
+    void setState(KalmanState state) override; // updates/reinitializes kalman filter state, just to make sure its current
 
     void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
-   
-    bool should_reinit = false;
-private:
-    float s_dt = 0.05f;
-    float spectral_density_ = 13.0f;
-    float kalman_apo = 0;
-    KalmanState kalman_state;
+    /*  tick function updates prediction step and corrects state using sensor inputs by integrating the
+        sensor measurements and system dynamics to refine state estimate
+        dt = time step (change in time)
+        sd = standard deviation
+        baro -> gives altitude data
+        accel -> gives accel data (usually used with baro inputs to update)
+        orient -> probably uses angular positions to see how it is oriented and help account for system altitudes
+        state -> represents current finite state machine of rocket and make sure it is correctly 
+        updating based on phase (launch, coast, descent, etc.)
 
-    Eigen::Matrix<float, 3, 1> init_accel = Eigen::Matrix<float, 3, 1>::Zero();
-    Eigen::Matrix<float, 3, 1> world_accel;
-    Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
-    KalmanData state;
+        ...
+        just noticed that it defines all this when i hover the function lol but yeah this does the KF calculations
+    
+    */
+   
+    bool should_reinit = false; // makes sure to not restart system after calculating data (self-explanatory)
+private:
+    float s_dt = 0.05f; // 50ms time step
+    float spectral_density_ = 13.0f; // spectral density is how much "weight" the process noise has (how noisy model is) 
+    float kalman_apo = 0; //aposteriori error? not really sure at this point
+    KalmanState kalman_state; // stores current state of KF
+
+    Eigen::Matrix<float, 3, 1> init_accel = Eigen::Matrix<float, 3, 1>::Zero(); // matrix of zeros for acceleration (xyz)
+    Eigen::Matrix<float, 3, 1> world_accel; // initializes matrix for accel in world frame
+    Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer; // buffer, it stores a set amount of data before letting oldest go to stay current
+    KalmanData state; //initializes state variable that tracks, well state
 };
 
 extern Yessir yessir;
+// says that varaible is defined elsewhere (yessir.cpp) but just that
+ 
