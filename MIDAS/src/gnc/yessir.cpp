@@ -240,6 +240,8 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  * @param acceleration Current acceleration
  * @param &orientation Current orientation
  * @param current_state Current FSM_state
+ * 
+ * you ahve to be kidding me.......
  */
 void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
