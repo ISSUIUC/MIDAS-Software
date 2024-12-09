@@ -172,17 +172,23 @@ void Yessir::priori() {
  *
  */
 void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
-    if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
-        float sum = 0;
-        float data[10];
-        alt_buffer.readSlice(data, 0, 10);
+// processes sensor data to adjust kf states
+    if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { // boost phase of rocket
+    // reads latest 10 altitude measurements from alt_buffer
+    // find their average to initialize filter state
+    // sets KF state vector with the avg altitude and 0 for other components to compute
+        float sum = 0; // used for altitude, starts at 0
+        float data[10]; // declares array of size 10
+        alt_buffer.readSlice(data, 0, 10); // copies data from alt_buffer into data
         for (float i : data) {
-            sum += i;
+            sum += i; // for each altitude reading in data, it adds to sum
         }
-        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
-        setState(kalman_state);
-    } else if (FSM_state >= FSMState::STATE_APOGEE) {
-        H(1, 2) = 0;
+        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0}; 
+        // initializes with avg altitude
+        setState(kalman_state); // updates filter internal state vector with new values we just got
+    } else if (FSM_state >= FSMState::STATE_APOGEE) { // if phase after apogee
+        H(1, 2) = 0; // this removes mapping between vel measurement and vel state
+        // after apogee, velocity is not reliable to depend on for the rocket's state
     }
 
     Eigen::Matrix<float, 4, 4> S_k = Eigen::Matrix<float, 4, 4>::Zero();
@@ -245,11 +251,12 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  */
 void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
-        setF(dt / 1000);
-        setQ(dt / 1000, sd);
-        priori();
-        update(barometer, acceleration, orientation, FSM_state);
+        setF(dt / 1000); // converts to milliseconds by dividing by 1000
+        setQ(dt / 1000, sd); // uncertainty -> sd
+        priori(); // does prediction step of kalman filter, estimating next state based on current factors
+        update(barometer, acceleration, orientation, FSM_state); //
     }
+    // this is from header file, looks like it doesn't do the actual calculation but sets it up
 }
 
 /**
