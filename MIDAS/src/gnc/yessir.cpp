@@ -114,22 +114,39 @@ void Yessir::initialize(RocketSystems* args) {
     Q(8, 6) = Q(6, 8);
     Q(8, 7) = Q(7, 8);
 
-    // set H
-    H(0, 0) = 1;
-    H(1, 2) = 1;
-    H(2, 5) = 1;
-    H(3, 8) = 1;
+    /* same 9x9 matrix here for visuals
+    [[ Qxx, Qxv, Qxa,   0,   0,   0,   0,   0,   0] Qxx = uncertainty in position itself                                    = s^5/20
+     [ Qvx, Qvv, Qva,   0,   0,   0,   0,   0,   0] Qxv = how much velocity uncertainty will affect position uncertainty    = s^4/8
+     [ Qax, Qav, Qaa,   0,   0,   0,   0,   0,   0] Qxa = how much accel uncertainty will affect position uncertainty       = s^3/6
+     [   0,   0,   0, Qxx, Qxv, Qxa,   0,   0,   0] ------------------------------------------------------------------- 
+     [   0,   0,   0, Qvx, Qvv, Qva,   0,   0,   0] Qvx = how much position uncertainty will affect velocity uncertainty    = s^4/8
+     [   0,   0,   0, Qax, Qav, Qaa,   0,   0,   0] Qvv = uncertainty in velocity itself                                    = s^3/3
+     [   0,   0,   0,   0,   0,   0, Qxx, Qxv, Qxa] Qva = how much accel uncertainty will affect velocity uncertainty       = s^2/2
+     [   0,   0,   0,   0,   0,   0, Qvx, Qvv, Qva] -------------------------------------------------------------------
+     [   0,   0,   0,   0,   0,   0, Qax, Qav, Qaa] Qax = how much position uncertainty will affect accel uncertainty       = s^3/6
+                                                    Qav = how much velocity uncertainty will affect accel uncertainty       = s^2/2
+                                                    Qaa = uncertainty in accel itself                                       = s
 
-    Q = Q * spectral_density_;
+    values deal with integrals from pos vel accel equations, aint doin allat math but yeah thats why theres numbers like s^5/20
+    */
 
-    // set R
-    R(0, 0) = 2.0;
-    R(1, 1) = 1.9;
-    R(2, 2) = 10;
-    R(3, 3) = 10;
+    // set H (Observation Matrix) -> vector of measurements = (observation matrix)*vector + measurement noise
+    H(0, 0) = 1; // [ 1, 0, 0, 0, 0, 0, 0, 0, 0]
+    H(1, 2) = 1; // [ 0, 0, 1, 0, 0, 0, 0, 0, 0]
+    H(2, 5) = 1; // [ 0, 0, 0, 0, 0, 1, 0, 0, 0]
+    H(3, 8) = 1; // [ 0, 0, 0, 0, 0, 0, 0, 0, 1]
+
+    Q = Q * spectral_density_; // mentioned before, header file says its 13.0
+    // Q matrix is in unit variance, spectral density scales it
+
+    // set R: Measurement Noise Covariance (lower = more reliable measurements)
+    R(0, 0) = 2.0; // variance for barometric sensor
+    R(1, 1) = 1.9; // variance for accelerometer
+    R(2, 2) = 10; // variance of gyroscope
+    R(3, 3) = 10; // varaince for state measurement
 
     // set B (don't care about what's in B since we have no control input)
-    B(2, 0) = -1;
+    B(2, 0) = -1; // placeholder
 }
 
 /**
