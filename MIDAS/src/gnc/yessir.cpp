@@ -159,8 +159,9 @@ void Yessir::initialize(RocketSystems* args) {
 void Yessir::priori() {
      // x_priori = (F @ x_k) + ((B @ u).T) #* For some reason doesnt work when B
     // or u is = 0
-    x_priori = (F_mat * x_k);
+    x_priori = (F_mat * x_k); // predicted state estimate matrix
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
+    // predicted covariance matrix
 }
 
 /**
@@ -191,22 +192,28 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
         // after apogee, velocity is not reliable to depend on for the rocket's state
     }
 
-    Eigen::Matrix<float, 4, 4> S_k = Eigen::Matrix<float, 4, 4>::Zero();
+    Eigen::Matrix<float, 4, 4> S_k = Eigen::Matrix<float, 4, 4>::Zero(); 
+    // S_k is the Innovation Covariance Matrix, represents uncertainty in the predicted measurement
+    // it combines uncertainty from predicted state (P_priori) and the measurement noise (R)
     S_k = (((H * P_priori * H.transpose()) + R)).inverse();
-    Eigen::Matrix<float, 9, 9> identity = Eigen::Matrix<float, 9, 9>::Identity();
+    // H = measurement matrix
+    // R = measurement noise covariance
+    Eigen::Matrix<float, 9, 9> identity = Eigen::Matrix<float, 9, 9>::Identity(); // identity matrix lol
     K = (P_priori * H.transpose()) * S_k;
+    // Kalman gain matrix
 
     // Sensor Measurements
     Eigen::Matrix<float, 3, 1> accel = Eigen::Matrix<float, 3, 1>::Zero();
-    
-    accel(0, 0) = acceleration.az - 0.045;
-    accel(1, 0) = acceleration.ay - 0.065;
+    // accel matrix
+    accel(0, 0) = acceleration.az - 0.045; // constant offsets to account for
+    accel(1, 0) = acceleration.ay - 0.065; // sensor biases or calibration adjustments
     accel(2, 0) = -acceleration.ax - 0.06;
 
-    euler_t angles = orientation.getEuler();
-    angles.yaw = -angles.yaw;
+    euler_t angles = orientation.getEuler(); // gyroscope data
+    angles.yaw = -angles.yaw; // not exactly sure why
 
     Eigen::Matrix<float, 3, 1> acc = BodyToGlobal(angles, accel);
+    // changes accel to earth view using gyroscope angle positions
 
     y_k(1, 0) = (acc(0)) * 9.81 - 9.81;
     y_k(2, 0) = (acc(1)) * 9.81;
