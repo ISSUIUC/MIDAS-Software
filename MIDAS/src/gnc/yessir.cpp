@@ -263,7 +263,7 @@ void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceler
         priori(); // does prediction step of kalman filter, estimating next state based on current factors
         update(barometer, acceleration, orientation, FSM_state); //
     }
-    // this is from header file, looks like it doesn't do the actual calculation but sets it up
+    // runs the acutal KF calculations after FSM is past idle
 }
 
 /**
@@ -274,11 +274,14 @@ void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceler
  * @return Eigen::Matrix<float, 3, 1> Rotated vector in the global frame
  */
 Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
+    // gets the acutal angles from the gyroscope and puts the body frame rotations into a global view
     Eigen::Matrix3f roll, pitch, yaw;
     roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
     pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
     yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
     return yaw * pitch * body_vect;
+    // why is roll not multiplied in this? should it not be row * yaw * pitch * body_vect?
+    // probably a question for shishir
 }
 
 
@@ -289,6 +292,7 @@ Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<fl
  */
 KalmanData Yessir::getState() {
     return state;
+    // gets state, pretty straightforward
 }
 
 /**
@@ -306,6 +310,7 @@ void Yessir::setState(KalmanState state) {
     this->state.velocity.vx = state.state_est_vel_x;
     this->state.velocity.vy = state.state_est_vel_y;
     this->state.velocity.vz = state.state_est_vel_z;
+    // updates the state with the newly fetched states
 }
 
 /**
