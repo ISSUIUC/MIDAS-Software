@@ -190,7 +190,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST)) {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 2000)) {
+            if (arg->tlm.receive(&command, 500)) {
                 if(command.valid()) {
                     arg->tlm.acknowledgeReceived();
                     
