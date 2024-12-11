@@ -353,6 +353,9 @@ void Yessir::setQ(float dt, float sd) {
     Q(8, 7) = Q(7, 8);
 
     Q *= sd;
+
+    // going to bet this is the new Q matrix after the state has changed and is
+    // multiplied by spectral density
 }
 
 /**
@@ -373,6 +376,8 @@ void Yessir::setF(float dt) {
         F_mat(3 * i + 1, 3 * i + 1) = 1;
         F_mat(3 * i + 2, 3 * i + 2) = 1;
     }
+    // same as above but with F matrix
 }
 
 Yessir yessir;
+// initializes yessir with yessir object
