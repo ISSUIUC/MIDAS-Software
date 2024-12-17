@@ -309,6 +309,10 @@ if __name__ == "__main__":
         for command in sustainer_commands:
 
             telem_threads_sustainer[0].send_command(command)
+
+        for command in booster_commands:
+            
+            telem_threads_booster[0].send_command(command)
         
         # Only print occasionally to not flood standard print
         if(datetime.datetime.now().timestamp() - last_print_db > 0):
