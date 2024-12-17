@@ -105,7 +105,7 @@ class TelemetryThread(threading.Thread):
                 if(len(self.__external_commands) > 0):
                     for cmd in self.__external_commands:
                         self.__log.console_log(f"Sending command '{cmd}'")
-                        self.__send_comport(str(cmd) + " \n")
+                        self.__send_comport(str(cmd))
                     self.__external_commands = []
 
                 if(len(packets) == 0):
