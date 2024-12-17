@@ -94,6 +94,7 @@ constexpr const char* json_buffer_full_error = R"({"type": "command_error", "err
 
 constexpr const char* json_init_failure = R"({"type": "init_error", "error": "failed to initilize LORA"})";
 constexpr const char* json_init_success = R"({"type": "init_success"})";
+constexpr const char* packet_recv_success = R"({"type": "packet_recv_success"})";
 constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
 constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
 constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
@@ -220,7 +221,7 @@ void setup() {
 
     rf95.setSignalBandwidth(125000);
     rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
+    rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
     rf95.setTxPower(23, false);
 }
@@ -237,7 +238,7 @@ void loop() {
                 return;
             }
 
-            Serial.println("Received packet");
+            Serial.println(packet_recv_success);
             memcpy(&packet, buf, sizeof(packet));
 
             if(bool(packet.alt & 0x1) != last_ack_bit) {
