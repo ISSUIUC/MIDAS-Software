@@ -34,7 +34,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     constexpr float altChgThreshold = 200; // meters
     constexpr float presChgThreshold = 500; // milibars
     constexpr float tempChgThreshold = 10; // degrees C
-    constexpr unsigned int maxConsecutiveRejects = 5;
+    constexpr unsigned int maxConsecutiveRejects = 3;
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
