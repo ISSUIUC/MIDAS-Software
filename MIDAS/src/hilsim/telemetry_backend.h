@@ -21,7 +21,7 @@ public:
     }
 
     template<typename T>
-    bool read(T* write, int wait_milliseconds) {
+    bool read(T* write) {
         return false;
     }
 
