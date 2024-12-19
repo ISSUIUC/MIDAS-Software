@@ -3,6 +3,9 @@
 #include <cstdlib>
 #include <array>
 
+// there are better ways to do this (for instance renaming BUFFER_SIZE below. the teseo_liv3f driver overlaps this.)
+#undef BUFFER_SIZE
+
 /**
  * @class Buffer
  * 

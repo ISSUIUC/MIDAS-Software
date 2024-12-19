@@ -37,7 +37,10 @@ public:
     ErrorCode init();
     void tick();
     void play_tune(Sound* tune, uint32_t length);
+    bool is_playing();
 };
 
 #define FREE_BIRD_LENGTH 11
+#define WARN_TONE_LENGTH 1
 extern Sound free_bird[FREE_BIRD_LENGTH];
+extern Sound warn_tone[WARN_TONE_LENGTH];

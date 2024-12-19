@@ -36,6 +36,15 @@ void LEDController::toggle(LED led) {
 }
 
 /**
+ * @brief Sets  a specific LED's state
+*/
+void LEDController::set(LED led, int state) {
+    int id = static_cast<int>(led);
+    targets[id] = state;
+}
+
+
+/**
  * @brief updates the LEDS to represent the current state the rocket is in
 */
 void LEDController::update() {

@@ -29,4 +29,5 @@ public:
     void update();
 
     void toggle(LED led);
+    void set(LED led, int state);
 };
