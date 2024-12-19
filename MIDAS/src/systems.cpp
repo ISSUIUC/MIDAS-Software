@@ -31,9 +31,9 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     // Reject single rogue barometer readings that are very different from the immediately prior reading
     // Will only reject a certain number of readings in a row
     Barometer prev_reading;
-    constexpr float altChgThreshold = 200; // meters?
+    constexpr float altChgThreshold = 200; // meters
     constexpr float presChgThreshold = 500; // milibars
-    constexpr float tempChgThreshold = 10; // degrees C?
+    constexpr float tempChgThreshold = 10; // degrees C
     constexpr unsigned int maxConsecutiveRejects = 5;
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true) {
