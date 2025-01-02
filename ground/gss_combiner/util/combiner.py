@@ -4,6 +4,7 @@
 from datetime import datetime, timezone
 from collections import deque
 import copy
+import time
 
 import util.mqtt as mqtt
 import util.logger
@@ -105,8 +106,21 @@ class TelemetryCombiner():
 
     def enqueue_packet(self, packet):
         """Add a packet to this telemetry combiner to be checked and sent"""
-        self.__packets_in.append(packet)
+
+        # Add packet metadata
+        packet_new = {
+            "data": packet,
+            "metadata": {
+                "raw_stream": self.get_mqtt_data_topic(),
+                "time_published": time.time()
+            }
+        }
+
+        self.__packets_in.append(packet_new)
+
+        
         filter = self.filter()
+        
         self.__duplicate.insert(filter)
         for mqtt_src in self.__mqtt_threads:
             mqtt_src.publish(filter, self.get_mqtt_data_topic())
@@ -140,19 +154,23 @@ class TelemetryCombiner():
         queue = copy.copy(self.__packets_in)
         self.__packets_in = deque()
         for packet in queue:
+
+            
             
             # Check if packet passes filter
-            self.__log.console_log("Packet states: flt: (" + str(self.__filter.test(packet)) + ") dup: (" + str(self.__duplicate.check(packet)) + ")")
-            if not (packet['unix'] in seen_timestamps) and self.__filter.test(packet) and self.__duplicate.check(packet):
+            self.__log.console_log("Packet states: flt: (" + str(self.__filter.test(packet['data'])) + ") dup: (" + str(self.__duplicate.check(packet['data'])) + ")")
+            if not (packet['data']['unix'] in seen_timestamps) and self.__filter.test(packet['data']) and self.__duplicate.check(packet['data']):
                 # Do use this packet
+
                 
-                if self.__ts_latest > packet['unix']:
-                    self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['unix']}")
+                
+                if self.__ts_latest > packet['data']['unix']:
+                    self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['data']['unix']}")
 
-                if (packet['unix'] > cur_latest):
-                    cur_latest = packet['unix']
+                if (packet['data']['unix'] > cur_latest):
+                    cur_latest = packet['data']['unix']
 
-                seen_timestamps.add(packet['unix'])
+                seen_timestamps.add(packet['data']['unix'])
                 packet_release.append(packet)
                 
                 self.__log.success()

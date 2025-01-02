@@ -178,7 +178,6 @@ class TelemetryThread(threading.Thread):
                     for combiner in self.__combiners:
                         combiner.enqueue_packet(processed)
 
-
                     # Log all packets and send it to the all-data stream
                     proc_json = json.dumps(processed)
                     proc_string = proc_json.encode('utf-8')
@@ -187,6 +186,8 @@ class TelemetryThread(threading.Thread):
                     self.__log.console_log(f"Processed packet @ {processed['unix']} --> '{self.__topic}'")
                     self.__log.waiting_delta(-1)
                     self.__log.success()
+
+                    
                     
             except Exception as e:
                 try:
@@ -204,7 +205,7 @@ class MQTTThread(threading.Thread):
         self.__mqttclient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
         self.__log.console_log("Connecting to broker @ " + str(self.__uri))
-        self.__mqttclient.connect(self.__uri)
+        self.__mqttclient.connect(self.__uri, port=1884)
         self.__log.console_log("Subscribing to control streams...")
 
         self.__booster_cmds = []

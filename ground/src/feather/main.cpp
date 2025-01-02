@@ -37,7 +37,7 @@ float RF95_FREQ = 420;
 float SUSTAINER_FREQ = 426.15;
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 425.15;
+float rf95_freq_MHZ = 426.15;
 
 float current_freq = 0;
 
@@ -75,33 +75,33 @@ float convert_range(T val, float range) {
     return val * range / (float)numeric_range;
 }
 
-// struct TelemetryPacket {
-//     int32_t lat;
-//     int32_t lon;
-//     uint16_t alt; //15 bit meters, 1 bit last command confirm
-//     uint16_t baro_alt;
-//     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
-//     uint16_t highg_ay;  //14 bit signed ax [-16,16) 2 bit tilt angle
-//     uint16_t highg_az;  //14 bit signed ax [-16,16) 2 bit tilt angle
-//     uint8_t batt_volt;
-//     uint8_t fsm_satcount;
-//     float RSSI = 0.0;
-// };
-
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
     uint16_t alt; //15 bit meters, 1 bit last command confirm
     uint16_t baro_alt;
     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint16_t highg_ay; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint16_t highg_az; //14 bit signed ax [-16,16) 2 bit tilt angle
+    uint16_t highg_ay;  //14 bit signed ax [-16,16) 2 bit tilt angle
+    uint16_t highg_az;  //14 bit signed ax [-16,16) 2 bit tilt angle
     uint8_t batt_volt;
-    // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
-    //
-    // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
-    uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+    uint8_t fsm_satcount;
+    float RSSI = 0.0;
 };
+
+// struct TelemetryPacket {
+//     int32_t lat;
+//     int32_t lon;
+//     uint16_t alt; //15 bit meters, 1 bit last command confirm
+//     uint16_t baro_alt;
+//     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
+//     uint16_t highg_ay; //14 bit signed ax [-16,16) 2 bit tilt angle
+//     uint16_t highg_az; //14 bit signed ax [-16,16) 2 bit tilt angle
+//     uint8_t batt_volt;
+//     // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
+//     //
+//     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
+//     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+// };
 
 struct FullTelemetryData {
     systime_t timestamp;  //[0, 2^32]
