@@ -27,12 +27,12 @@ import threading
 import datetime
 import json
 import configparser
+import argparse
 
 import util.mqtt as mqtt
 import util.combiner as combiner
 import util.logger as logger
 import util.print_util
-
 
 uri_target = ""
 cfg = configparser.ConfigParser()
@@ -51,121 +51,53 @@ def threads_ready(threads: list[mqtt.TelemetryThread]):
     return True
 
 def parse_params(arguments):
-    """Parse parameters passed into this script and return them as a flat tuple."""
+    arg_parser = argparse.ArgumentParser(
+        prog='GSS Combiner',
+        description="A system to take telemetry from different sources and pass it onto a MQTT broker for ground station visualization"
+    )
 
-    def is_tl_arg(argument):
-        """Helper function for determining whether a cli argument is a top-level argument or not.
-        Returns true if the argument is a top-level argument."""
-        return argument.startswith("--") or argument.startswith("-")
+    arg_parser.add_argument("--booster", type=str, help="Selects which COM ports should be interpreted as a data stream from the booster stage")
+    arg_parser.add_argument("--sustainer", type=str, help="Selects which COM ports should be interpreted as a data stream from the sustainer stage")
+    arg_parser.add_argument("--relay", type=str, help="Selects which COM ports should be interpreted as a data stream from the telemetry relay")
+    arg_parser.add_argument("-l", "--local", action="store_true", help="Streams all data to 'localhost' for testing. (Same as --ip localhost)")
+    arg_parser.add_argument("-n", "--no-log", action="store_true", help="Will not log data to logfiles for this run")
+    arg_parser.add_argument("-v", "--verbose", action="store_true", help="Prints all telemetry events to console")
+    arg_parser.add_argument("-nv", "--no-vis", action="store_true", help="Shows a visual display of all systems")
+    arg_parser.add_argument("-i", "--ip", type=str, help="Connects to a specific IP. (Overrides --local)")
+    arg_parser.add_argument("-c", "--config", type=str, help="Uses an argument config defined in config.ini. Added on top of existing params.")
+    arg_parser.add_argument("--no-rf", action="store_true", help="Does not overwrite feather frequencies on startup")
 
-    num_params = len(arguments)
-    arg_ptr = 1 # Skip ./main.py arg
+    args = arg_parser.parse_args(arguments)
 
     booster_sources = []
     sustainer_sources = []
     relay_sources = []
-    is_local = False
-    should_log = True
 
-    has_booster = False
-    has_sustainer = False
-    has_relay = False
-    is_verbose = False
-    is_visual = True
+    if args.booster is not None:
+        booster_sources = args.booster.split(",")
 
-    use_ip = None
-    use_config = None
-    overwrite_rf = True
+    if args.sustainer is not None:
+        sustainer_sources = args.sustainer.split(",")
 
-    while (arg_ptr < num_params):
-        arg = arguments[arg_ptr]
-        if(not is_tl_arg(arg)):
-            raise ValueError("Invalid argument: " + str(arg))
-        
-        # Handle booster/sustainer logic
-        if (arg == "--booster"):
-            if (has_booster):
-                raise ValueError("Argument '--booster' is unique (You have defined booster sources twice.)")
-            has_booster = True
+    if args.relay is not None:
+        relay_sources = args.relay.split(",")
 
-            next_arg = arguments[arg_ptr + 1]
-            if(is_tl_arg(next_arg)):
-                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
-            booster_sources = next_arg.split(',')
-            arg_ptr += 2
-            continue
+    is_local = args.local
+    should_log = not args.no_log
 
-        if (arg == "--sustainer"):
-            if (has_sustainer):
-                raise ValueError("Argument '--sustainer' is unique (You have defined sustainer sources twice.)")
-            has_sustainer = True
+    is_verbose = args.verbose
+    is_visual = not args.no_vis
 
-            next_arg = arguments[arg_ptr + 1]
-            if(is_tl_arg(next_arg)):
-                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
-            sustainer_sources = next_arg.split(',')
-            arg_ptr += 2
-            continue
-
-        if (arg == "--relay"):
-            if (has_relay):
-                raise ValueError("Argument '--relay' is unique (You have defined relay sources twice.)")
-            has_relay = True
-
-            next_arg = arguments[arg_ptr + 1]
-            if(is_tl_arg(next_arg)):
-                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
-            relay_sources = next_arg.split(',')
-            arg_ptr += 2
-            continue
-
-        # Handle misc arguments
-        if (arg == "--ip" or arg == "-i"):
-            next_arg = arguments[arg_ptr + 1]
-            if(is_tl_arg(next_arg)):
-                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
-            use_ip = next_arg
-            arg_ptr += 2
-            continue
-
-        if (arg == "--config" or arg == "-c"):
-            next_arg = arguments[arg_ptr + 1]
-            if(is_tl_arg(next_arg)):
-                raise ValueError("You must pass values to argument " + str(arg) + f"  (got {next_arg})")
-            use_config = next_arg
-            arg_ptr += 2
-            continue
-
-        if (arg == "--local" or arg == "-l"):
-            is_local = True
-
-        if (arg == "--no-log" or arg == "-n"):
-            should_log = False
-
-        if (arg == "--no-rf"):
-            overwrite_rf = False
-
-        if (arg == "--help" or arg == "-h"):
-            print(util.print_util.HELP_OUTPUT)
-            exit(0)
-
-        if (arg == "--verbose" or arg == "-v"):
-            is_verbose = True
-
-        if (arg == "--no-vis" or arg == "-nv"):
-            is_visual = False
-
-        arg_ptr += 1
-
-
+    use_ip = args.ip
+    use_config = args.config
+    overwrite_rf = not args.no_rf
     
     return booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, use_ip, overwrite_rf, use_config
 
 if __name__ == "__main__":
     SCRIPT_START_TIME = datetime.datetime.now().timestamp()
     threads = []
-
-    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv)
+    booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv[1:])
 
     if(use_config is not None):
         # If a config is specified, re-interpret parameters once using the config.
@@ -177,7 +109,7 @@ if __name__ == "__main__":
 
         print("Using config ", use_config)
         print("Using command", " ".join(sys.argv + CFG_ARGS) + "\n")
-        booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv + CFG_ARGS)
+        booster_sources, sustainer_sources, relay_sources, is_local, should_log, is_verbose, is_visual, ip_override, overwrite_rf, use_config = parse_params(sys.argv[1:] + CFG_ARGS)
     
     # Ensure that the user is notified if they do not specify any data sources.
     if len(booster_sources)==0 and len(sustainer_sources)==0 and len(relay_sources)==0:
@@ -195,9 +127,9 @@ if __name__ == "__main__":
     print("Using booster sources: ", booster_sources)
     print("Using relay sources: ", relay_sources, "\n\n")
 
-    telem_threads_booster = []
-    telem_threads_sustainer = []
-    telem_threads_relay = []
+    telem_threads_booster: list[mqtt.TelemetryThread] = []
+    telem_threads_sustainer: list[mqtt.TelemetryThread] = []
+    telem_threads_relay: list[mqtt.TelemetryThread] = []
 
     # Initialize primary MQTT thread
     broadcast_thread = mqtt.MQTTThread(uri_target, log.create_stream(logger.LoggerType.MQTT, "main", "mqtt"))    
@@ -265,7 +197,7 @@ if __name__ == "__main__":
         thd.start()
 
     broadcast_thread.start()
-    threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer
+    threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer + telem_threads_relay
     assert_alive(threads) # Ensure all threads initialized successfully
 
     # Set up visualization variables

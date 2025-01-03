@@ -20,7 +20,7 @@ class LoggerStream():
     """Class to encapsulate logging at different levels for the GSS combiner system"""
     def __init__(self, options: LoggerOptions, type: LoggerType, name: str, meta_category:str) -> None:
         self.__title = type.value + " " + name
-        self.__filename = "./outputs/" + str(int(datetime.datetime.now().timestamp())) + "_" + type.value + name + "_raw_output.txt"
+        self.__filename = "./outputs/" + str(int(datetime.datetime.now().timestamp())) + "_" + type.value + "_" + name + "_raw_output.txt"
         Path("./outputs/").mkdir(parents=True, exist_ok=True)
         self.__lstype = type
         self.__meta_cat = meta_category
@@ -105,7 +105,7 @@ class Logger():
         
     def create_stream(self, stream_type: LoggerType, stream_name: str, stream_meta: str) -> LoggerStream:
         stream = LoggerStream(self.__options, stream_type, stream_name, stream_meta)
-        self.__streams[stream_type + stream_name] = stream
+        self.__streams[stream_type.value + stream_name] = stream
         return stream
     
     def streams(self):

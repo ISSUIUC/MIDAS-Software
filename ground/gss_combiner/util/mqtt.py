@@ -47,7 +47,9 @@ class TelemetryThread(threading.Thread):
         try:
             self.__send_comport("FREQ:" + str(frequency) + "\n")
             self.__rf_freq = frequency
+
             self.__rf_set = False
+
             self.__last_rf_command_sent = datetime.now().timestamp()
         except Exception as e:
             print("Unable to send FREQ command: ", e, "Continuing with no FREQ change.")
@@ -93,9 +95,8 @@ class TelemetryThread(threading.Thread):
             try:
 
                 if not self.__rf_set and datetime.now().timestamp() - self.__last_rf_command_sent >= self.__rf_command_period:
-                    # Send a new frequency command if the last one went unacknowledged.
-                    self.__send_comport("FREQ:" + self.__rf_freq + "\n")
-                    self.__last_rf_command_sent = datetime.now().timestamp()
+                    # Send a new frequency command if the last one went unacknowledged, but do not 
+                    self.write_frequency(self.__rf_freq, False)
                     
 
                 # Read all from the comport
