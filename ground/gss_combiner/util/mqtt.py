@@ -13,15 +13,14 @@ import util.logger
 
 class TelemetryThread(threading.Thread):
     """A thread class handling all communications between COM ports to which telemetry devices are connected."""
-    def __init__(self, com_port, mqtt_uri, all_data_topic, log_stream: util.logger.LoggerStream) -> None:
+    def __init__(self, com_port, log_stream: util.logger.LoggerStream) -> None:
         super(TelemetryThread, self).__init__(daemon=True)
         self.__log = log_stream
-        self.__topic = all_data_topic
         self.__log.console_log(f"Opening {com_port}")
+
         self.__comport: serial.Serial = serial.Serial(com_port, baudrate=4800, write_timeout=1)
-        self.__uri = mqtt_uri
         self.__comport.reset_input_buffer()
-        self.__mqttclient = None
+
         self.__log.console_log(f"Telemetry thread created.")
         self.__combiners = []
 
@@ -41,7 +40,7 @@ class TelemetryThread(threading.Thread):
         # Append timestamps :)
         return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time), 'src': self.__comport.name}
     
-    def write_frequency(self, frequency:float):
+    def write_frequency(self, frequency: float):
         """Send a FREQ command to the associated telemetry device to change frequencies, then wait for a response."""
         self.__log.console_log("Writing frequency command (FREQ:" + str(frequency) + ")")
         try:
@@ -83,22 +82,16 @@ class TelemetryThread(threading.Thread):
         self.__external_commands.append(command)
         
     def run(self) -> None:
-        # Initialize MQTT
-        self.__mqttclient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        self.__log.console_log(f"Connecting to MQTT @ {self.__uri}")
-        self.__mqttclient.connect(self.__uri)
         self.__log.console_log(f"Telemetry thread ready.")
 
         while True:
             # Wrap all in a try-except to catch errors.
 
             try:
-
                 if not self.__rf_set and datetime.now().timestamp() - self.__last_rf_command_sent >= self.__rf_command_period:
-                    # Send a new frequency command if the last one went unacknowledged, but do not 
-                    self.write_frequency(self.__rf_freq, False)
+                    # Send a new frequency command if the last one went unacknowledged
+                    self.write_frequency(self.__rf_freq)
                     
-
                 # Read all from the comport
                 packets = self.__read_comport()
 
@@ -116,6 +109,7 @@ class TelemetryThread(threading.Thread):
                 # Process raw to packet
                 self.__log.console_log(f"Processing {len(packets) - 1} packets..")
                 self.__log.set_waiting(len(packets) - 1)
+
                 for pkt_r in packets:
                     pkt = pkt_r.rstrip() # Strip whitespace characters
                     if(len(pkt) == 0):
@@ -140,7 +134,7 @@ class TelemetryThread(threading.Thread):
                             if packet_in['type'] == "freq_success":
 
                                 if float(packet_in['frequency']) == float(self.__rf_freq):
-                                    self.__log.console_log_always("Frequency set: Listening on " + str(self.__rf_freq))
+                                    self.__log.console_log("Frequency set: Listening on " + str(self.__rf_freq))
                                     self.__rf_set = True
                                 else:
                                     self.__log.console_log("Recieved incorrect frequency!")
@@ -150,15 +144,8 @@ class TelemetryThread(threading.Thread):
                             else:
                                 self.__log.console_log("Recieved packet from wrong stream.. Discarding due to freq change.")
                                 continue
-
-                        if packet_in['type'] == "heartbeat":
-                            # Send heartbeat to common stream
-                            heartbeat_only = {"battery_voltage": packet_in['value']['battery_voltage'], 'rssi': packet_in['value']['RSSI']}
-                            raw_in = {"source": "gss_combiner", "action": "heartbeat", "time": datetime.now().timestamp(), "data": heartbeat_only}
-                            proc_string = json.dumps(raw_in).encode('utf-8')
-                            self.__mqttclient.publish("Common", proc_string)
-                            self.__log.success()
-                            continue
+                        
+                        # No more logging heartbeats
 
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
@@ -179,12 +166,10 @@ class TelemetryThread(threading.Thread):
                     for combiner in self.__combiners:
                         combiner.enqueue_packet(processed)
 
-                    # Log all packets and send it to the all-data stream
+                    # Log all packets
                     proc_json = json.dumps(processed)
-                    proc_string = proc_json.encode('utf-8')
-                    self.__mqttclient.publish(self.__topic, proc_string)
                     self.__log.file_log(proc_json)
-                    self.__log.console_log(f"Processed packet @ {processed['unix']} --> '{self.__topic}'")
+                    self.__log.console_log(f"Processed packet @ {processed['unix']}")
                     self.__log.waiting_delta(-1)
                     self.__log.success()
 
@@ -203,7 +188,7 @@ class MQTTThread(threading.Thread):
         super(MQTTThread, self).__init__(daemon=True)
         self.__log = log_stream
         self.__uri = server_uri
-        self.__mqttclient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.__mqttclient: mqtt.Client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
         self.__log.console_log("Connecting to broker @ " + str(self.__uri))
         self.__mqttclient.connect(self.__uri, port=1884)
@@ -213,6 +198,7 @@ class MQTTThread(threading.Thread):
         self.__sustainer_cmds = []
 
         def on_message(client, userdata, msg): 
+            """Callback function that will be called every time the clinet receives a message from the broker (something is added to the topic, commands to be sent)"""
             payload_str = msg.payload.decode()
 
             try:

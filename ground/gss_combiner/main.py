@@ -59,14 +59,16 @@ def parse_params(arguments):
     arg_parser.add_argument("--booster", type=str, help="Selects which COM ports should be interpreted as a data stream from the booster stage")
     arg_parser.add_argument("--sustainer", type=str, help="Selects which COM ports should be interpreted as a data stream from the sustainer stage")
     arg_parser.add_argument("--relay", type=str, help="Selects which COM ports should be interpreted as a data stream from the telemetry relay")
-    arg_parser.add_argument("-l", "--local", action="store_true", help="Streams all data to 'localhost' for testing. (Same as --ip localhost)")
     arg_parser.add_argument("-n", "--no-log", action="store_true", help="Will not log data to logfiles for this run")
     arg_parser.add_argument("-v", "--verbose", action="store_true", help="Prints all telemetry events to console")
     arg_parser.add_argument("-nv", "--no-vis", action="store_true", help="Shows a visual display of all systems")
-    arg_parser.add_argument("-i", "--ip", type=str, help="Connects to a specific IP. (Overrides --local)")
     arg_parser.add_argument("-c", "--config", type=str, help="Uses an argument config defined in config.ini. Added on top of existing params.")
     arg_parser.add_argument("--no-rf", action="store_true", help="Does not overwrite feather frequencies on startup")
-
+    
+    group = arg_parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("-l", "--local", action="store_true", help="Streams all data to 'localhost' for testing. (Same as --ip localhost)")
+    group.add_argument("-i", "--ip", type=str, help="Connects to a specific IP. (Overrides --local)")
+    
     args = arg_parser.parse_args(arguments)
 
     booster_sources = []
@@ -131,6 +133,8 @@ if __name__ == "__main__":
     telem_threads_sustainer: list[mqtt.TelemetryThread] = []
     telem_threads_relay: list[mqtt.TelemetryThread] = []
 
+    all_telemetry_threads = telem_threads_booster + telem_threads_sustainer + telem_threads_relay
+
     # Initialize primary MQTT thread
     broadcast_thread = mqtt.MQTTThread(uri_target, log.create_stream(logger.LoggerType.MQTT, "main", "mqtt"))    
 
@@ -162,7 +166,7 @@ if __name__ == "__main__":
 
     # Set up booster telemetry threads
     for port in booster_sources:
-        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port, "booster_telem"))
+        new_thread = mqtt.TelemetryThread(port, log.create_stream(logger.LoggerType.TELEM, port, "booster_telem"))
         new_thread.add_combiner(combiner_booster)
         if overwrite_rf:
             new_thread.write_frequency(FREQ_BOOSTER)
@@ -170,7 +174,7 @@ if __name__ == "__main__":
 
     # Set up sustainer telemetry threads
     for port in sustainer_sources:
-        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port, "sustainer_telem"))
+        new_thread = mqtt.TelemetryThread(port, log.create_stream(logger.LoggerType.TELEM, port, "sustainer_telem"))
         new_thread.add_combiner(combiner_sustainer)
         if overwrite_rf:
             new_thread.write_frequency(FREQ_SUSTAINER)
@@ -178,7 +182,7 @@ if __name__ == "__main__":
 
     # Set up telemetry threads for drone relay
     for port in relay_sources:
-        new_thread = mqtt.TelemetryThread(port, uri_target, "FlightData-All", log.create_stream(logger.LoggerType.TELEM, port, "relay_telem"))
+        new_thread = mqtt.TelemetryThread(port, log.create_stream(logger.LoggerType.TELEM, port, "relay_telem"))
         new_thread.add_combiner(combiner_booster)
         new_thread.add_combiner(combiner_sustainer)
         if overwrite_rf:
@@ -197,12 +201,12 @@ if __name__ == "__main__":
         thd.start()
 
     broadcast_thread.start()
-    threads = [broadcast_thread] + telem_threads_booster + telem_threads_sustainer + telem_threads_relay
+    threads = [broadcast_thread] + all_telemetry_threads
     assert_alive(threads) # Ensure all threads initialized successfully
 
     # Set up visualization variables
     print_delay = 0.5
-    last_print_db = datetime.datetime.now().timestamp() + print_delay
+    last_print_db = datetime.datetime.now().timestamp()
 
     # Wait for telem threads to be ready
     init_time_warned = False
@@ -230,9 +234,6 @@ if __name__ == "__main__":
 
         assert_alive(threads)
 
-        if (is_verbose or not is_visual):
-            continue
-
         sustainer_commands, booster_commands = broadcast_thread.get_telem_cmds()
 
         # handle commands 
@@ -246,9 +247,12 @@ if __name__ == "__main__":
             
             telem_threads_booster[0].send_command(command)
         
+        if (not is_verbose or not is_visual):
+            continue
+
         # Only print occasionally to not flood standard print
-        if(datetime.datetime.now().timestamp() - last_print_db > 0):
-            last_print_db = datetime.datetime.now().timestamp() + print_delay
+        if(datetime.datetime.now().timestamp() - last_print_db > print_delay):
+            last_print_db = datetime.datetime.now().timestamp()
 
             # Print status
             status_text = ""
