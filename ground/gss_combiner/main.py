@@ -65,9 +65,8 @@ def parse_params(arguments):
     arg_parser.add_argument("-c", "--config", type=str, help="Uses an argument config defined in config.ini. Added on top of existing params.")
     arg_parser.add_argument("--no-rf", action="store_true", help="Does not overwrite feather frequencies on startup")
     
-    group = arg_parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-l", "--local", action="store_true", help="Streams all data to 'localhost' for testing. (Same as --ip localhost)")
-    group.add_argument("-i", "--ip", type=str, help="Connects to a specific IP. (Overrides --local)")
+    arg_parser.add_argument("-l", "--local", action="store_true", help="Streams all data to 'localhost' for testing. (Same as --ip localhost)")
+    arg_parser.add_argument("-i", "--ip", type=str, help="Connects to a specific IP. (Overrides --local)")
     
     args = arg_parser.parse_args(arguments)
 
@@ -271,4 +270,4 @@ if __name__ == "__main__":
 
             # Send status
             send_data = {"source": "gss_combiner", "action": "none", "time": datetime.datetime.now().timestamp(), "data": raw_data}
-            broadcast_thread.publish_common(json.dumps(send_data))
+            broadcast_thread.publish_common(send_data)

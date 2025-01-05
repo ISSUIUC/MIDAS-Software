@@ -149,10 +149,7 @@ class TelemetryThread(threading.Thread):
 
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
-                        else:
-                            # print()
-                            # print(packet_in)
-                            continue
+
                     except json.decoder.JSONDecodeError as json_err:
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")
                         self.__log.console_log(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
@@ -267,10 +264,5 @@ class MQTTThread(threading.Thread):
             pass
     
     def publish_common(self, data: str):
-        """Publish arbitrary data to the `Common` topic"""
-        try:
-            self.__mqttclient.publish("Common", data)
-            self.__log.success()
-        except Exception as e:
-            print(f"Unable to publish to 'Common' : ", str(e)) # Always print
-            self.__log.fail()
+        """Publish one arbitrary packet to the `Common` topic"""
+        self.publish([data], "Common")

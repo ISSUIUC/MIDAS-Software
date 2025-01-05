@@ -195,4 +195,3 @@ class TelemetryCombiner():
         self.__ts_latest = cur_latest
         self.__log.file_log(str(packet_release))
         return packet_release, used
-    

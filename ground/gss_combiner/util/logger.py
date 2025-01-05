@@ -18,14 +18,17 @@ class LoggerType(str, Enum):
 
 class LoggerStream():
     """Class to encapsulate logging at different levels for the GSS combiner system"""
-    def __init__(self, options: LoggerOptions, type: LoggerType, name: str, meta_category:str) -> None:
+    def __init__(self, options: LoggerOptions, type: LoggerType, name: str, meta_category: str) -> None:
         self.__title = type.value + " " + name
         self.__filename = "./outputs/" + str(int(datetime.datetime.now().timestamp())) + "_" + type.value + "_" + name + "_raw_output.txt"
         Path("./outputs/").mkdir(parents=True, exist_ok=True)
         self.__lstype = type
         self.__meta_cat = meta_category
+        
         self.__opts = options
+
         self.__file = None
+
         self.__failures = 0
         self.__success = 0
         self.__waiting = 0
@@ -98,7 +101,7 @@ class LoggerStream():
         return self.__waiting
 
 class Logger():
-    """Semi-singleton class for all logger streams in GSS 1.1"""
+    """Class to hold all LoggerStreams in one unified place in GSS 1.1"""
     def __init__(self, options: LoggerOptions) -> None:
         self.__options = options
         self.__streams = {}
