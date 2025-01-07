@@ -38,9 +38,9 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
-        bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold ||
-                        std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
-                        std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
+        bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
+                        //std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
+                        //std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
         // TODO: Log when we receive a rejection!
         if (is_rogue && rejects++ < maxConsecutiveRejects)
             arg->rocket_data.barometer.update(prev_reading); // Reuse old reading, reject new reading
