@@ -179,18 +179,41 @@ Orientation OrientationSensor::read()
 
         Quaternion delta;
         Quaternion inverse;
-        //get inverse of original
+        Quaternion curr;
+        double norm_initial = std::sqrt(initial_quaternion.w * initial_quaternion.w + initial_quaternion.x * initial_quaternion.x + initial_quaternion.y * initial_quaternion.y + initial_quaternion.z * initial_quaternion.z);
+        double norm_current = std::sqrt(quat.w * quat.w + quat.x * quat.x + quat.y * quat.y + quat.z * quat.z);
+
+        // get inverse of original
         inverse.w = initial_quaternion.w;
         inverse.x = -initial_quaternion.x;
         inverse.y = -initial_quaternion.y;
         inverse.z = -initial_quaternion.z;
-        //multiply current by inverse, need to fix initial condition where the initial quat = current quat
-        delta.w w = quat.w * initial_quaternion.w - quat.x * initial_quaternion.x - quat.y * initial_quaternion.y - quat.z * initial_quaternion.z;
-        delta.x = quat.w * initial_quaternion.x + quat.x * initial_quaternion.w + quat.y * initial_quaternion.z - quat.z * initial_quaternion.y;
-        delta.y = quat.w * initial_quaternion.y - quat.x * initial_quaternion.z + quat.y * initial_quaternion.w + quat.z * initial_quaternion.x;
-        delta.z = quat.w *initial_quaternion.z + quat.x *initial_quaternion.y - quat.y *initial_quaternion.x + quat.z *initial_quaternion.w;
-        //get z-axis rotation by converting delta quaternion to euler angles
-        values = quaternionToEuler(delta.w,delta.x,delta,y,delta.z);
+
+        // normalize
+        if (norm_current > 0.0)
+        {
+            curr.w /= norm_current;
+            curr.x /= norm_current;
+            curr.y /= norm_current;
+            curr.z /= norm_current;
+        }
+
+        if (norm_initial > 0.0)
+        {
+            inverse.w /= norm_initial;
+            inverse.x /= norm_initial;
+            inverse.y /= norm_initial;
+            inverse.z /= norm_initial;
+        }
+
+        // multiply current by inverse, need to fix initial condition where the initial quat = current quat
+        delta.w = curr.w * inverse.w - curr.x * inverse.x - curr.y * inverse.y - curr.z * inverse.z;
+        delta.x = curr.w * inverse.x + curr.x * inverse.w + curr.y * inverse.z - curr.z * inverse.y;
+        delta.y = curr.w * inverse.y - curr.x * inverse.z + curr.y * inverse.w + curr.z * inverse.x;
+        delta.z = curr.w * inverse.z + curr.x * inverse.y - curr.y * inverse.x + curr.z * inverse.w;
+
+        // get z-axis rotation by converting delta quaternion to euler angles
+        values = quaternionToEuler(delta.w, delta.x, delta.y, delta.z);
 
         sensor_reading.tilt = values.yaw;
 
