@@ -2,6 +2,8 @@
 #include <Arduino.h>
 #include <ads7138-q1.h>
 
+#include "pins.h"
+
 #define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
 
 /**
@@ -18,8 +20,8 @@ ErrorCode VoltageSensor::init() {
  * 
  * @return The scaled voltage given by the voltage sensor
 */
-Voltage VoltageSensor::read() {
-    Voltage v_battery;
+VoltageData VoltageSensor::read() {
+    VoltageData v_battery;
     v_battery.voltage = adcAnalogRead(ADCAddress{VOLTAGE_PIN}).value * 3.3f / 4095.0f / VOLTAGE_DIVIDER;
 //    Serial.print("Raw voltage reading: ");
 //    Serial.print(v_battery.voltage);

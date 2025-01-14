@@ -1,12 +1,16 @@
 #include <Wire.h>
 #include <SPI.h>
+
+#include "buzzer_backend.h"
+#include "led_backend.h"
+#include "pyro_backend.h"
+#include "sensors.h"
 #include "TCAL9539.h"
 
 #include "systems.h"
 #include "hardware/pins.h"
-#include "hardware/Emmc.h"
 #include "hardware/SDLog.h"
-#include "sensor_data.h"
+#include "telemetry_backend.h"
 
 /**
  * Sets the config file and then starts all the threads using the config.
@@ -18,7 +22,40 @@ MultipleLogSink<SDSink> sinks;
 #else
 MultipleLogSink<> sinks;
 #endif
-RocketSystems systems { .log_sink = sinks };
+
+LowGSensor low_g_sensor;
+LowGLSMSensor low_g_lsm_sensor;
+HighGSensor high_g_sensor;
+BarometerSensor barometer_sensor;
+ContinuitySensor continuity_sensor;
+VoltageSensor voltage_sensor;
+OrientationSensor orientation_sensor;
+MagnetometerSensor magnetometer_sensor;
+GPSSensor gps_sensor;
+TelemetryBackend telemetry_backend;
+BuzzerBackend buzzer_backend;
+LedBackend led_backend;
+PyroBackend pyro_backend;
+
+Sensors sensors {
+    .low_g = low_g_sensor,
+    .low_g_lsm = low_g_lsm_sensor,
+    .high_g = high_g_sensor,
+    .barometer = barometer_sensor,
+    .continuity = continuity_sensor,
+    .voltage = voltage_sensor,
+    .orientation = orientation_sensor,
+    .magnetometer = magnetometer_sensor,
+    .gps = gps_sensor,
+    .sink = sinks,
+    .telemetry = telemetry_backend,
+    .buzzer = buzzer_backend,
+    .led = led_backend,
+    .pyro = pyro_backend
+};
+
+RocketSystems rocket(sensors);
+
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
 */
@@ -66,7 +103,7 @@ void setup() {
     delay(200);
 
     //init and start threads
-    begin_systems(&systems);
+    rocket.begin();
 }
 
 void loop() {

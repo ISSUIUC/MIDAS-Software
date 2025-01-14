@@ -1,7 +1,7 @@
 #include <Adafruit_LIS3MDL.h>
 
 #include "sensors.h"
-#include "hal.h"
+#include "pins.h"
 
 Adafruit_LIS3MDL LIS3MDL;           // global static instance of the sensor
 
@@ -15,13 +15,13 @@ ErrorCode MagnetometerSensor::init() {
     return ErrorCode::NoError;
 }
 
-Magnetometer MagnetometerSensor::read() {
+MagnetometerData MagnetometerSensor::read() {
     // read from aforementioned global instance of sensor
     LIS3MDL.read();
 
     float mx = LIS3MDL.x_gauss;
     float my = LIS3MDL.y_gauss;
     float mz = LIS3MDL.z_gauss;
-    Magnetometer reading{mx, my, mz};
+    MagnetometerData reading{mx, my, mz};
     return reading;
 }

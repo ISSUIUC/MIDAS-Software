@@ -16,6 +16,7 @@
  * Magilan Sendhil
  */
 
+#include <FreeRTOS.h>
 #include <RHHardwareSPI.h>
 
 #include "hardware/telemetry_backend.h"
@@ -32,9 +33,7 @@
 /**
  * @brief Default constructor for the telemetry system
 */
-TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
-    led_state = false;
-}
+TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) { }
 
 /**
  * @brief Initializes the telemetry system
@@ -92,4 +91,41 @@ int8_t TelemetryBackend::getRecentRssi() {
 */
 void TelemetryBackend::setFrequency(float freq) {
     rf95.setFrequency(freq);
+}
+
+void TelemetryBackend::send_bytes(const uint8_t* data, size_t length) {
+    //TODO assert(length <= RH_RF95_MAX_MESSAGE_LEN, "The data type to send is too large");
+    rf95.send(data, length);
+    for(int i = 1;; i++){
+        THREAD_SLEEP(1);
+        if(digitalRead(rf95._interruptPin)){
+            break;
+        }
+        if(i % 1024 == 0){
+            Serial.println("long telem wait");
+        }
+    }
+    rf95.handleInterrupt();
+}
+
+bool TelemetryBackend::recv_bytes(uint8_t* data, size_t length, int wait_milliseconds) {
+    //TODO assert(length <= RH_RF95_MAX_MESSAGE_LEN, "The data type to receive is too large");
+    uint8_t len = length;
+
+    // set receive mode
+    rf95.setModeRx();
+
+    // busy wait for interrupt signalling
+    for(int i = 1; i < wait_milliseconds; i++){
+        THREAD_SLEEP(1);
+        if(digitalRead(rf95._interruptPin)){
+            rf95.handleInterrupt();
+            break;
+        }
+    }
+
+    if (rf95.available() && rf95.recv(data, &len)) {
+        return length == len;
+    }
+    return false;
 }

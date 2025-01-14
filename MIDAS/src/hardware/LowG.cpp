@@ -1,3 +1,4 @@
+#include "pins.h"
 #include "sensors.h"
 #include "PL_ADXL355.h"
 
@@ -23,8 +24,7 @@ ErrorCode LowGSensor::init() {
  * 
  * @return a LowGData packet with current acceleration in all three axes
 */
-LowGData LowGSensor::read()
-{
+LowGData LowGSensor::read() {
     auto data = sensor.getAccelerations();
 
     return { data.x, data.y, data.z };

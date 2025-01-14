@@ -1,3 +1,4 @@
+#include "pins.h"
 #include "sensors.h"
 #include "SparkFun_Qwiic_KX13X.h"
 

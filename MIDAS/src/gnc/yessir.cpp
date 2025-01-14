@@ -1,4 +1,6 @@
 #include "yessir.h"
+
+#include "hardware_interface.h"
 #include "finite-state-machines/fsm_states.h"
 
 Yessir::Yessir() : KalmanFilter() {
@@ -24,14 +26,14 @@ Yessir::Yessir() : KalmanFilter() {
  *
  */
 
-void Yessir::initialize(RocketSystems* args) {
-    Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
+void Yessir::initialize(RocketData& args) {
+    OrientationData orientation = args.orientation.getRecentUnsync();
     
     float sum = 0;
     
     for (int i = 0; i < 30; i++) {
-        Barometer barometer = args->rocket_data.barometer.getRecent();
-        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
+        BarometerData barometer = args.barometer.getRecent();
+        LowGData initial_accelerometer = args.low_g.getRecent();
         Acceleration accelerations = {
             .ax = initial_accelerometer.ax,
             .ay = initial_accelerometer.ay,
@@ -42,7 +44,7 @@ void Yessir::initialize(RocketSystems* args) {
         init_accel(0, 0) += accelerations.az;
         init_accel(1, 0) += accelerations.ay;
         init_accel(2, 0) += -accelerations.ax;
-        THREAD_SLEEP(100);
+        THREAD_SLEEP(100); // TODO wtf
     }
 
     init_accel(0, 0) /= 30;
@@ -139,7 +141,7 @@ void Yessir::priori() {
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
-void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
+void Yessir::update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState FSM_state) {
     if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
         float sum = 0;
         float data[10];
@@ -209,7 +211,7 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  * @param &orientation Current orientation
  * @param current_state Current FSM_state
  */
-void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
+void Yessir::tick(float dt, float sd, BarometerData &barometer, Acceleration acceleration, OrientationData &orientation, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
         setF(dt / 1000);
         setQ(dt / 1000, sd);

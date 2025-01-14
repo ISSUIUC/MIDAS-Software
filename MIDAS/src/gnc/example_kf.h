@@ -3,15 +3,14 @@
 #include "kalman_filter.h"
 
 // makes a kalman filter with 9 state variables and 3 sensor inputs
-class ExampleKalmanFilter : public KalmanFilter<9, 4>
-{
+class ExampleKalmanFilter final: public KalmanFilter<9, 4> {
 public:
     ExampleKalmanFilter();
 
-    void initialize(RocketSystems* args) override;
+    void initialize(RocketData& args) override;
     //virtual void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
     void priori() override;
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) override;
+    void update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState current_state) override;
 
     KalmanData getState() override;
     void setState(KalmanState state) override;

@@ -3,13 +3,11 @@
 #include <fstream>
 
 #include "errors.h"
-#include "hal.h"
-
 
 class TelemetryBackend {
 public:
     explicit TelemetryBackend(const char* file_name);
-    ErrorCode __attribute__((warn_unused_result)) init();
+    ErrorCode init();
 
     int8_t getRecentRssi();
     void setFrequency(float frequency);

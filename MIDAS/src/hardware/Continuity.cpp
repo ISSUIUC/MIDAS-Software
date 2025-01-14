@@ -1,6 +1,7 @@
 #include "sensors.h"
 #include "ads7138-q1.h"
-#include <hal.h>
+
+#include "pins.h"
 
 #define PYRO_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for pyro batt voltage, check hardware schematic
 #define CONT_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for continuity voltage, check hardware schematic
@@ -21,8 +22,8 @@ ErrorCode ContinuitySensor::init() {
  * 
  * @return Continuity data packet
 */
-Continuity ContinuitySensor::read() {
-    Continuity continuity;
+ContinuityData ContinuitySensor::read() {
+    ContinuityData continuity;
     //ADC reference voltage is 3.3, returns 12 bit value
     continuity.sense_pyro = adcAnalogRead(ADCAddress{SENSE_PYRO}).value * 3.3f / 4096.f / PYRO_VOLTAGE_DIVIDER;
     continuity.pins[0] = adcAnalogRead(ADCAddress{SENSE_MOTOR}).value * 3.3f / 4096.f / CONT_VOLTAGE_DIVIDER;

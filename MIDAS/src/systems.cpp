@@ -1,14 +1,56 @@
 #include "systems.h"
-
-#include "hal.h"
+#include "data_logging.h"
+#include "finite-state-machines/fsm.h"
 #include "gnc/yessir.h"
 
-#if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
-#error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
-#elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
-#error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
-#endif
+/**
+ * The size of a thread stack, in bytes.
+ */
+#define STACK_SIZE 8192
 
+/**
+ * The ESP32 has two physical cores, which will each be dedicated to one group of threads.
+ * The SENSOR_CORE runs the threads which write to the sensor_data struct (mostly sensor polling threads).
+ */
+#define SENSOR_CORE ((BaseType_t) 0)
+
+/**
+ * The ESP32 has two physical cores, which will each be dedicated to one group of threads.
+ * The DATA_CORE runs the GPS thread, as well as the threads which read from the sensor_data struct (e.g. SD logging).
+ */
+#define DATA_CORE ((BaseType_t) 1)
+
+/**
+ * Macro for declaring a thread. Creates a function with the name suffixed with `_thread`, annotated with [[noreturn]].
+ *
+ * @param name The name of the task.
+ * @param param The single parameter to input into the thread.
+ */
+#define DECLARE_THREAD(name, param) [[noreturn]] void name##_thread(param)
+
+/**
+ * Macro for creating and starting a thread declared with `DECLARE_THREAD`. This is a statement and has no return value.
+ * Never put this in a scope that will end before the thread should.
+ *
+ * @param name Name of the thread.
+ * @param core Core for the task to be pinned to, either `SENSOR_CORE` or `DATA_CORE`.
+ * @param arg Argument passed in to the `param` argument of `DECLARE_THREAD`.
+ * @param prio Priority of the thread.
+ */
+#define START_THREAD(name, core, arg, prio) StaticTask_t name##_task;                \
+                                      static unsigned char name##_stack[STACK_SIZE];            \
+                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + prio, name##_stack, &name##_task, core)
+/*
+ * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
+ *  - Function to be run by the thread, this contains a `while(true)` loop
+ *  - Name of thread
+ *  - Size of the stack for each thread in words (1 word = 4 bytes)
+ *  - Arguments to be passed into the function, this will generally eb the config file
+ *  - Priority of the task, in allmost all cases, this will be the idle priority plus one
+ *  - The actual stack memory to use
+ *  - A handle to reference the task with
+ *  - The core to pin the task to
+ */
 
 /**
  * @brief These are all the functions that will run in each task
@@ -17,9 +59,9 @@
  * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
 DECLARE_THREAD(logger, RocketSystems* arg) {
-    log_begin(arg->log_sink);
+    log_begin(arg->sensors.sink);
     while (true) {
-        log_data(arg->log_sink, arg->rocket_data);
+        log_data(arg->sensors.sink, arg->rocket_data);
 
         arg->rocket_data.log_latency.tick();
 
@@ -30,14 +72,14 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     // Reject single rogue barometer readings that are very different from the immediately prior reading
     // Will only reject a certain number of readings in a row
-    Barometer prev_reading;
+    BarometerData prev_reading;
     constexpr float altChgThreshold = 200; // meters
     constexpr float presChgThreshold = 500; // milibars
     constexpr float tempChgThreshold = 10; // degrees C
     constexpr unsigned int maxConsecutiveRejects = 3;
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true) {
-        Barometer reading = arg->sensors.barometer.read();
+        BarometerData reading = arg->sensors.barometer.read();
         bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
                         //std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
                         //std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
@@ -59,7 +101,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);
 #endif
-        LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
+        LowGLSMData lowglsm = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
@@ -69,7 +111,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
 
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
-        Orientation reading = arg->sensors.orientation.read();
+        OrientationData reading = arg->sensors.orientation.read();
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
         }
@@ -80,7 +122,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
-        Magnetometer reading = arg->sensors.magnetometer.read();
+        MagnetometerData reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
     }
@@ -92,17 +134,17 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
     while (true) {
         if (i % 10 == 0) {
-            GPS reading = arg->sensors.gps.read();
+            GPSData reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
+            PyroState new_pyro_state = arg->pyro.tick_pyro(current_state, arg->rocket_data.orientation.getRecentUnsync());;
             arg->rocket_data.pyro.update(new_pyro_state);
 
-            Continuity reading2 = arg->sensors.continuity.read();
+            ContinuityData reading2 = arg->sensors.continuity.read();
             arg->rocket_data.continuity.update(reading2);
 
-            Voltage reading3 = arg->sensors.voltage.read();
+            VoltageData reading3 = arg->sensors.voltage.read();
             arg->rocket_data.voltage.update(reading3);
         }
 
@@ -147,18 +189,17 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     // Barometer initial_barom_buf = arg->rocket_data.barometer.getRecent();
     // LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
     //yessir.initialize(initial_orientation, initial_barom_buf, initial_accelerations);
-    yessir.initialize(arg);
-    TickType_t last = xTaskGetTickCount();
+    TickType_t last = 0;
     
     while (true) {
-        if(yessir.should_reinit){
-            yessir.initialize(arg);
-            TickType_t last = xTaskGetTickCount();
+        if (yessir.should_reinit) {
+            yessir.initialize(arg->rocket_data);
+            last = xTaskGetTickCount();
             yessir.should_reinit = false;
         }
         // add the tick update function
-        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
-        Orientation current_orientation = arg->rocket_data.orientation.getRecent();
+        BarometerData current_barom_buf = arg->rocket_data.barometer.getRecent();
+        OrientationData current_orientation = arg->rocket_data.orientation.getRecent();
         HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
         Acceleration current_accelerations = {
@@ -182,9 +223,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
-        
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        if (current_state == FSMState(STATE_IDLE)) {
+
+        if (arg->rocket_data.fsm_state.getRecentUnsync() == STATE_IDLE) {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 2000)) {
                 if(command.valid()) {
@@ -211,42 +251,49 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  * @brief Initializes all systems in order, returning early if a system's initialization process errors out.
  *        Turns on the Orange LED while initialization is running.
  */
-ErrorCode init_systems(RocketSystems& systems) {
-    gpioDigitalWrite(LED_ORANGE, HIGH);
+ErrorCode RocketSystems::init_systems() {
+    INIT_SYSTEM(led);
+    sensors.led.set(LED::ORANGE, true);
+
+    INIT_SYSTEM(sensors.sink);
+    INIT_SYSTEM(sensors.high_g);
+    INIT_SYSTEM(sensors.low_g_lsm);
+    INIT_SYSTEM(sensors.barometer);
+    INIT_SYSTEM(sensors.magnetometer);
+    INIT_SYSTEM(sensors.continuity);
+    INIT_SYSTEM(sensors.voltage);
+    INIT_SYSTEM(pyro);
+    INIT_SYSTEM(buzzer);
+    INIT_SYSTEM(tlm);
+    INIT_SYSTEM(sensors.gps);
+
 #ifdef IS_SUSTAINER
-    INIT_SYSTEM(systems.sensors.low_g);
-    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(sensors.low_g);
+    INIT_SYSTEM(sensors.orientation);
 #endif
-    INIT_SYSTEM(systems.log_sink);
-    INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
-    INIT_SYSTEM(systems.sensors.barometer);
-    INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
-    INIT_SYSTEM(systems.led);
-    INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.tlm);
-    INIT_SYSTEM(systems.sensors.gps);
-    gpioDigitalWrite(LED_ORANGE, LOW);
+
+    sensors.led.set(LED::ORANGE, false);
     return NoError;
 }
 #undef INIT_SYSTEM
 
 
+RocketSystems::RocketSystems(const Sensors& sensors) : sensors(sensors), buzzer(sensors.buzzer), led(sensors.led),
+                                                tlm(sensors.telemetry), pyro(sensors.pyro) {
+}
+
 /**
  * @brief Initializes the systems, and then creates and starts the thread for each system.
  *        If initialization fails, then this enters an infinite loop.
  */
-[[noreturn]] void begin_systems(RocketSystems* config) {
+[[noreturn]] void RocketSystems::begin() {
     Serial.println("Starting Systems...");
-    ErrorCode init_error_code = init_systems(*config);
+    ErrorCode init_error_code = init_systems();
     if (init_error_code != NoError) {
         // todo some message probably
         while (true) {
             Serial.print("Had Error: ");
-            Serial.print((int) init_error_code);
+            Serial.print(init_error_code);
             Serial.print("\n");
             Serial.flush();
             update_error_LED(init_error_code);
@@ -254,25 +301,25 @@ ErrorCode init_systems(RocketSystems& systems) {
     }
 
 #ifdef IS_SUSTAINER
-    START_THREAD(orientation, SENSOR_CORE, config, 10);
+    START_THREAD(orientation, SENSOR_CORE, this, 10);
 #endif
 
-    START_THREAD(logger, DATA_CORE, config, 15);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
-    START_THREAD(barometer, SENSOR_CORE, config, 12);
-    START_THREAD(i2c, SENSOR_CORE, config, 9);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(kalman, SENSOR_CORE, config, 7);
-    START_THREAD(fsm, SENSOR_CORE, config, 8);
-    START_THREAD(buzzer, SENSOR_CORE, config, 6);
-    START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    START_THREAD(logger, DATA_CORE, this, 15);
+    START_THREAD(accelerometers, SENSOR_CORE, this, 13);
+    START_THREAD(barometer, SENSOR_CORE, this, 12);
+    START_THREAD(i2c, SENSOR_CORE, this, 9);
+    START_THREAD(magnetometer, SENSOR_CORE, this, 11);
+    START_THREAD(kalman, SENSOR_CORE, this, 7);
+    START_THREAD(fsm, SENSOR_CORE, this, 8);
+    START_THREAD(buzzer, SENSOR_CORE, this, 6);
+    START_THREAD(telemetry, SENSOR_CORE, this, 15);
 
-    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
     while (true) {
         THREAD_SLEEP(1000);
         Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
+        Serial.print(rocket_data.log_latency.getLatency());
         Serial.println(")");
     }
 }

@@ -3,10 +3,6 @@
 #include <cmath>
 #include <cstdint>
 
-#include "finite-state-machines/fsm_states.h"
-
-//#define CONTINUITY_PIN_COUNT 5
-
 /**
  * @brief
  * This header provides all the implementation for the data that comes from all of the sensors/
@@ -34,8 +30,8 @@ struct Velocity {
     float vy = 0;
     float vz = 0;
 
-    float get_speed() {
-        return sqrt(vx * vx + vy * vy + vz * vz);
+    float get_speed() const {
+        return sqrtf(vx * vx + vy * vy + vz * vz);
     }
 };
 
@@ -45,8 +41,8 @@ struct Acceleration {
     float az = 0;
 
     // Get G-Force applied on the rocket
-    float get_magnitude() {
-        return sqrt(ax * ax + ay * ay + az * az);
+    float get_magnitude() const {
+        return sqrtf(ax * ax + ay * ay + az * az);
     }
 };
 
@@ -76,7 +72,7 @@ struct LowGData {
     float az = 0;
 
     LowGData() = default;
-    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
+    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
 /**
@@ -94,11 +90,11 @@ struct HighGData {
 };
 
 /**
- * @struct LowGLSM
+ * @struct LowGLSMData
  * 
  * @brief data from the Low G LSM sensor
 */
-struct LowGLSM {
+struct LowGLSMData {
     float gx = 0;
     float gy = 0;
     float gz = 0;
@@ -108,44 +104,44 @@ struct LowGLSM {
 };
 
 /**
- * @struct Barometer
+ * @struct BarometerData
  * 
  * @brief data from the barometer
 */
-struct Barometer {
+struct BarometerData {
     float temperature = 0; // Temperature in Celcius
     float pressure = 0; // Pressure in millibars
     float altitude = 0; // Altitude in meters (above sea level?)
 
-    Barometer() = default;
-    Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
+    BarometerData() = default;
+    BarometerData(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
 /**
- * @struct Continuity
+ * @struct ContinuityData
  * 
  * @brief data about pyro continuity
 */
-struct Continuity {
+struct ContinuityData {
     float sense_pyro;
     float pins[4];
 };
 
 /**
- * @struct Voltage
+ * @struct VoltageData
  * 
  * @brief data about battery voltage
 */
-struct Voltage {
+struct VoltageData {
     float voltage = 0;
 };
 
 /**
- * @struct GPS
+ * @struct GPSData
  * 
  * @brief data from the GPS
 */
-struct GPS {
+struct GPSData {
     int32_t latitude = 0;
     int32_t longitude = 0;
     float altitude = 0;
@@ -155,40 +151,31 @@ struct GPS {
     // This isn't included in the telem packet because this is
     // solely for the SD logger. We do not need to know what time it is
     // when we are recieving telem packets.
-    uint32_t time;
+    uint32_t time = 0;
 };
 
 /**
- * @struct Magnetometer
+ * @struct MagnetometerData
  * 
  * @brief data from the magnetometer
 */
-struct Magnetometer {
-    float mx;
-    float my;
-    float mz;
+struct MagnetometerData {
+    float mx = 0.0;
+    float my = 0.0;
+    float mz = 0.0;
 };
 
 /**
- * @struct Orientation
+ * @struct OrientationData
  * 
  * @brief data from the BNO
 */
-struct Orientation {
+struct OrientationData {
     bool has_data = false;
 
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-
-    //For yessir.cpp
-    euler_t getEuler() const {
-        euler_t euler;
-        euler.yaw = this->yaw;
-        euler.pitch = this->pitch;
-        euler.roll = this->roll;
-        return euler;
-    }
 
     Velocity orientation_velocity;
     Acceleration orientation_acceleration;
@@ -197,13 +184,17 @@ struct Orientation {
 
     float gx = 0, gy = 0, gz = 0;
 
-    Magnetometer magnetometer;
+    MagnetometerData magnetometer;
 
     float temperature = 0;
     float pressure = 0;
 
     float tilt = 0;
 
+    //For yessir.cpp
+    euler_t getEuler() const {
+        return { .yaw = yaw, .pitch = pitch, .roll = roll };
+    }
 };
 
 /**
@@ -216,7 +207,7 @@ struct KalmanData {
     Velocity velocity;
     Acceleration acceleration;
 
-    float altitude;
+    float altitude = 0.0;
 };
 
 /**

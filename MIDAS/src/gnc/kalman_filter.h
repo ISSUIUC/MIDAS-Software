@@ -6,9 +6,7 @@
 #undef B1
 
 #include <Eigen/Eigen>
-#include "sensor_data.h"
-#include "systems.h"
-
+#include "rocket_state.h"
 
 struct KalmanState {
     float state_est_pos_x;
@@ -23,9 +21,10 @@ struct KalmanState {
 };
 
 template <int _NumStates, int _NumInputs>
-class KalmanFilter
-{
+class KalmanFilter {
 protected:
+    ~KalmanFilter() = default;
+
     Eigen::Matrix<float, _NumStates, 1> x_k;
     Eigen::Matrix<float, _NumStates, _NumStates> F_mat;
     Eigen::Matrix<float, _NumInputs, _NumStates> H;
@@ -56,9 +55,9 @@ public:
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
     
-    virtual void initialize(RocketSystems* args) = 0;
+    virtual void initialize(RocketData& args) = 0;
     virtual void priori() = 0;
-    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) = 0;
+    virtual void update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState current_state) = 0;
 
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanState state) = 0;

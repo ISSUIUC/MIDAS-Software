@@ -1,7 +1,8 @@
 #pragma once
 
 #include <cstdint>
-#include "hal.h"
+#include <hardware_interface.h>
+
 #include "errors.h"
 
 /**
@@ -10,7 +11,6 @@
  * @brief contains information for a single note to play on the buzzer
 */
 struct Sound {
-public:
     uint32_t frequency;
     uint8_t duration_ms;
 };
@@ -22,6 +22,8 @@ public:
 */
 struct BuzzerController {
 private:
+    IBuzzerBackend& backend;
+
     Sound* current_tune_ = nullptr;
     uint32_t index_ = 0;
     uint32_t length_ = 0;
@@ -32,7 +34,7 @@ private:
     void tick_sounds();
 
 public:
-    BuzzerController() = default;
+    explicit BuzzerController(IBuzzerBackend& backend);
 
     ErrorCode init();
     void tick();

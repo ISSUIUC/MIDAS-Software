@@ -8,13 +8,12 @@
 #define NUM_SENSOR_INPUTS 4
 #define ALTITUDE_BUFFER_SIZE 10
 
-class Yessir : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
-{
+class Yessir final: public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS> {
 public:
     Yessir();
-    void initialize(RocketSystems* args) override; 
+    void initialize(RocketData& args) override;
     void priori() override; 
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
+    void update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState state) override;
 
     void setQ(float dt, float sd);
     void setF(float dt); 
@@ -23,9 +22,9 @@ public:
     KalmanData getState() override;
     void setState(KalmanState state) override;
 
-    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
+    void tick(float dt, float sd, BarometerData &barometer, Acceleration acceleration, OrientationData &orientation, FSMState state);
    
-    bool should_reinit = false;
+    bool should_reinit = true;
 private:
     float s_dt = 0.05f;
     float spectral_density_ = 13.0f;

@@ -1,14 +1,11 @@
 #include "buzzer.h"
 
-#define BUZZER_PIN (48)
-#define BUZZER_CHANNEL (1)
-
 /**
  * @brief starts playing a new song
  * 
  * @param tune Song to be played
  * @param length Length of song to be played
-*/
+ */
 void BuzzerController::play_tune(Sound* tune, uint32_t length) {
     current_tune_ = tune;
     index_ = 0;
@@ -18,14 +15,14 @@ void BuzzerController::play_tune(Sound* tune, uint32_t length) {
 
 /**
  * @brief public interface to tick the buzzer
-*/
+ */
 void BuzzerController::tick() {
     tick_sounds();
 }
 
 /**
  * @brief ticks the bizzer, plays next note/ starts new song if applicable
-*/
+ */
 void BuzzerController::tick_sounds() {
     if (current_tune_ == nullptr) {
         return;
@@ -37,7 +34,7 @@ void BuzzerController::tick_sounds() {
 
     if (new_tune_started) {
         Sound& next_sound = current_tune_[index_];
-        ledcWriteTone(BUZZER_CHANNEL, next_sound.frequency);
+        backend.play_tone(next_sound.frequency);
 
         when_sound_started_ = current_time;
         new_tune_started = false;
@@ -48,32 +45,31 @@ void BuzzerController::tick_sounds() {
             index_ = 0;
             length_ = 0;
 
-            ledcWriteTone(BUZZER_CHANNEL, 0);
+            backend.play_tone(0);
         } else {
             Sound& next_sound = current_tune_[index_];
-            ledcWriteTone(BUZZER_CHANNEL, next_sound.frequency);
+            backend.play_tone(next_sound.frequency);
 
             when_sound_started_ = current_time;
         }
     }
 }
+BuzzerController::BuzzerController(IBuzzerBackend& backend) : backend(backend) { }
 
 /**
  * @brief Initializes buzzer
  * 
  * @return Error code
-*/
+ */
 ErrorCode BuzzerController::init() {
     // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I do question the knowledge of github
-    pinMode(BUZZER_PIN, OUTPUT);
-    digitalWrite(BUZZER_PIN, LOW);
-    ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
+    backend.init();
     return NoError;
 }
 
 /**
  * @brief notes to use for creating a song, along with a tempo
-*/
+ */
 #define MS_PER_4BEAT 6000
 
 #define rest Sound{0, 10}

@@ -1,6 +1,8 @@
 #include "sensors.h"
 #include <MS5611.h>
 
+#include "pins.h"
+
 MS5611 MS(MS5611_CS);       //singleton object for the MS sensor
 
 /**
@@ -19,7 +21,7 @@ ErrorCode BarometerSensor::init() {
  * 
  * @return Barometer data packet
 */
-Barometer BarometerSensor::read() {
+BarometerData BarometerSensor::read() {
     MS.read(12);
 
     /*
@@ -30,5 +32,5 @@ Barometer BarometerSensor::read() {
     float temperature = static_cast<float>(MS.getTemperature() * 0.01); // Celcius
     float altitude = static_cast<float>(-log(pressure * 0.000987) * (temperature + 273.15) * 29.254);
     
-    return Barometer(temperature, pressure, altitude);
+    return BarometerData(temperature, pressure, altitude);
 }

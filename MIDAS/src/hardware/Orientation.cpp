@@ -1,5 +1,6 @@
 #include "sensors.h"
 #include "Adafruit_BNO08x.h"
+#include "pins.h"
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
@@ -81,7 +82,7 @@ Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, bool degrees
  * 
  * @return An orientation packet with orientation, acceleration, gyroscope, and magenetometer for all axes, along with temperature and pressure
 */
-Orientation OrientationSensor::read() {
+OrientationData OrientationSensor::read() {
     // read from aforementioned global instance of sensor
     sh2_SensorValue_t event;
     Vec3 euler;
@@ -95,7 +96,7 @@ Orientation OrientationSensor::read() {
                 break;
         }
 
-        Orientation sensor_reading;
+        OrientationData sensor_reading;
         sensor_reading.has_data = true;
 
         sensor_reading.yaw = -euler.y;
@@ -123,7 +124,7 @@ Orientation OrientationSensor::read() {
         }
 
         // calculate tilt from initial orientation
-        Orientation deviation;
+        OrientationData deviation;
         deviation.yaw = min(abs(sensor_reading.yaw - initial_orientation.yaw), 2 * 3.14F - abs(sensor_reading.yaw - initial_orientation.yaw));
         deviation.pitch = min(abs(sensor_reading.pitch - initial_orientation.pitch), 2 * 3.14F - abs(sensor_reading.pitch - initial_orientation.pitch));
 

@@ -2,6 +2,11 @@
 
 #include "telemetry.h"
 
+#include <tuple>
+
+inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
@@ -43,7 +48,7 @@ std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg,
 /**
  * @brief move constructor for the telemetry backend
 */
-Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
+Telemetry::Telemetry(ITelemetryBackend& backend) : backend(backend) { }
 
 /**
  * @brief transmit telemetry data through LoRa
@@ -73,16 +78,15 @@ void Telemetry::acknowledgeReceived() {
  * @param data the data to serialize into a packet
 */
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
-
     TelemetryPacket packet { };
-    GPS gps = data.gps.getRecentUnsync();
-    Voltage voltage = data.voltage.getRecentUnsync();
-    Barometer barometer = data.barometer.getRecentUnsync();
+    GPSData gps = data.gps.getRecentUnsync();
+    VoltageData voltage = data.voltage.getRecentUnsync();
+    BarometerData barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    Continuity continuity = data.continuity.getRecentUnsync();
+    ContinuityData continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
-    Orientation orientation = data.orientation.getRecentUnsync();
+    OrientationData orientation = data.orientation.getRecentUnsync();
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;

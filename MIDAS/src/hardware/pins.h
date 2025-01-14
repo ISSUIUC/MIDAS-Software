@@ -81,3 +81,7 @@
 #define LED_GREEN  GpioAddress(2, 014)
 #define LED_ORANGE GpioAddress(2, 015)
 #define LED_RED    GpioAddress(2, 016)
+
+// Buzzer
+#define BUZZER_PIN 48
+#define BUZZER_CHANNEL 1

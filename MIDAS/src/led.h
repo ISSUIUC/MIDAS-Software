@@ -1,7 +1,8 @@
 #pragma once
 
-#include "hal.h"
 #include "errors.h"
+
+class ILedBackend;
 
 /**
  * @enum LED
@@ -21,12 +22,16 @@ enum class LED {
  * @brief wraps functionality for LEDs
 */
 class LEDController {
-    int states[4];
-    int targets[4];
-
 public:
+    explicit LEDController(ILedBackend& backend);
+
     ErrorCode init();
     void update();
-
     void toggle(LED led);
+
+private:
+    ILedBackend& backend;
+
+    int states[4] = {};
+    bool targets[4] = {};
 };

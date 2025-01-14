@@ -1,4 +1,8 @@
 #include "data_logging.h"
+
+#include <FS.h>
+#include <finite-state-machines/fsm_states.h>
+
 #include "log_format.h"
 #include "log_checksum.h"
 
@@ -14,14 +18,14 @@ constexpr ReadingDiscriminant get_discriminant();
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
 ASSOCIATE(LowGData, ID_LOWG)
-ASSOCIATE(LowGLSM, ID_LOWGLSM)
+ASSOCIATE(LowGLSMData, ID_LOWGLSM)
 ASSOCIATE(HighGData, ID_HIGHG)
-ASSOCIATE(Barometer, ID_BAROMETER)
-ASSOCIATE(Continuity, ID_CONTINUITY)
-ASSOCIATE(Voltage, ID_VOLTAGE)
-ASSOCIATE(GPS, ID_GPS)
-ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
-ASSOCIATE(Orientation, ID_ORIENTATION)
+ASSOCIATE(BarometerData, ID_BAROMETER)
+ASSOCIATE(ContinuityData, ID_CONTINUITY)
+ASSOCIATE(VoltageData, ID_VOLTAGE)
+ASSOCIATE(GPSData, ID_GPS)
+ASSOCIATE(MagnetometerData, ID_MAGNETOMETER)
+ASSOCIATE(OrientationData, ID_ORIENTATION)
 ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
 ASSOCIATE(PyroState, ID_PYRO)
@@ -33,7 +37,7 @@ ASSOCIATE(PyroState, ID_PYRO)
  * @param reading the data to read
 */
 template<typename T>
-void log_reading(LogSink& sink, Reading<T>& reading) {
+void log_reading(ILogSink& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
     sink.write((uint8_t*) &discriminant, sizeof(ReadingDiscriminant));
     sink.write((uint8_t*) &reading.timestamp_ms, sizeof(uint32_t));
@@ -49,7 +53,7 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
  * @return the number of packets written to the LogSink
 */
 template<typename T>
-uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
+uint32_t log_from_sensor_data(ILogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
     uint32_t read = 0;
     while (read < 20 && sensor_data.getQueued(&reading)) {
@@ -64,7 +68,7 @@ uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
  * 
  * @param sink the LogSink to initialize
 */
-void log_begin(LogSink& sink) {
+void log_begin(ILogSink& sink) {
     uint32_t checksum = LOG_CHECKSUM;
     sink.write((uint8_t*) &checksum, 4);
 }
@@ -75,7 +79,7 @@ void log_begin(LogSink& sink) {
  * @param sink the LogSink to write data to
  * @param data the rocket which holds all the sensor data to write
 */
-void log_data(LogSink& sink, RocketData& data) {
+void log_data(ILogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.low_g);
     log_from_sensor_data(sink, data.low_g_lsm);
     log_from_sensor_data(sink, data.high_g);
@@ -91,64 +95,4 @@ void log_data(LogSink& sink, RocketData& data) {
 }
 
 #ifndef SILSIM
-#define MAX_FILES 999
-
-/**
- * @brief names a new file for a log sink depending on the files currently on said LogSink
- * 
- * @param fileName buffer to write the file name to
- * @param fileExtensionParam the file extension required for the file
- * @param fs the FileSystem to check files off of
- * 
- * @return buffer contianing string of file name
-*/
-char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
-    char fileExtension[strlen(fileExtensionParam) + 1];
-    strcpy(fileExtension, fileExtensionParam);
-
-    char inputName[256] = {0};
-    strcpy(inputName, "/");
-    strcat(inputName, fileName);
-    strcat(inputName, fileExtension);
-
-    // checks to see if file already exists and adds 1 to filename if it does.
-    bool exists = fs.exists(inputName);
-
-    if (exists) {
-        bool fileExists = false;
-        int i = 1;
-        while (!fileExists) {
-            if (i > MAX_FILES) {
-                // max number of files reached. Don't want to overflow
-                // fileName[]. Will write new data to already existing
-                // data999.csv
-                strcpy(inputName, "/");
-                strcat(inputName, fileName);
-                strcat(inputName, "999");
-                strcat(inputName, fileExtension);
-                break;
-            }
-
-            // converts int i to char[]
-            char iStr[16] = {0};
-            itoa(i, iStr, 10);
-
-            // writes "(sensor)_data(number).csv to fileNameTemp"
-            strcpy(inputName, "/");
-            strcat(inputName, fileName);
-            strcat(inputName, iStr);
-            strcat(inputName, fileExtension);
-
-            if (!fs.exists(inputName)) {
-                fileExists = true;
-            }
-
-            i++;
-        }
-    }
-
-    strcpy(fileName, inputName);
-
-    return fileName;
-}
 #endif
