@@ -278,7 +278,7 @@ ErrorCode RocketSystems::init_systems() {
 #undef INIT_SYSTEM
 
 
-RocketSystems::RocketSystems(const Sensors& sensors) : sensors(sensors), buzzer(sensors.buzzer), led(sensors.led),
+RocketSystems::RocketSystems(Sensors sensors) : sensors(sensors), buzzer(sensors.buzzer), led(sensors.led),
                                                 tlm(sensors.telemetry), pyro(sensors.pyro) {
 }
 
@@ -296,7 +296,7 @@ RocketSystems::RocketSystems(const Sensors& sensors) : sensors(sensors), buzzer(
             Serial.print(init_error_code);
             Serial.print("\n");
             Serial.flush();
-            update_error_LED(init_error_code);
+            update_error_LED(sensors.led, init_error_code);
         }
     }
 

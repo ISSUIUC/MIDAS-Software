@@ -1,37 +1,46 @@
 #include "silsim/emulated_sensors.h"
 #include <cmath>
 
+BarometerSensor::BarometerSensor(SimulatedRocket** sim) : rocket(sim) { }
 
 ErrorCode BarometerSensor::init() {
     return ErrorCode::NoError;
 }
 
-Barometer BarometerSensor::read() {
-    return { 273.15, 0, (float) rocket->height };
+BarometerData BarometerSensor::read() {
+    return { 273.15, 0, (float) (*rocket)->height };
 }
+
+LowGSensor::LowGSensor(SimulatedRocket** sim) : rocket(sim) { }
+
+LowGLSMSensor::LowGLSMSensor(SimulatedRocket** sim) : rocket(sim) { }
 
 ErrorCode LowGLSMSensor::init() {
     return ErrorCode::NoError;
 }
 
-LowGLSM LowGLSMSensor::read() {
+LowGLSMData LowGLSMSensor::read() {
     return { .gx = 0, .gy = 0, .gz = 0, .ax = 0, .ay = 0, .az =0 };
 }
+
+ContinuitySensor::ContinuitySensor(SimulatedRocket** sim) { }
 
 ErrorCode ContinuitySensor::init() {
     return ErrorCode::NoError;
 }
 
-Continuity ContinuitySensor::read() {
+ContinuityData ContinuitySensor::read() {
     return { };
 }
+
+HighGSensor::HighGSensor(SimulatedRocket** sim) : rocket(sim) { }
 
 ErrorCode HighGSensor::init() {
     return ErrorCode::NoError;
 }
 
 HighGData HighGSensor::read() {
-    return { 0, 0, (float) rocket->acceleration };
+    return { 0, 0, (float) (*rocket)->acceleration };
 }
 
 ErrorCode LowGSensor::init() {
@@ -39,22 +48,24 @@ ErrorCode LowGSensor::init() {
 }
 
 LowGData LowGSensor::read() {
-    return { 0, 0, (float) rocket->acceleration };
+    return { 0, 0, (float) (*rocket)->acceleration };
 }
+
+OrientationSensor::OrientationSensor(SimulatedRocket** sim) : rocket(sim) { }
 
 ErrorCode OrientationSensor::init() {
     return ErrorCode::NoError;
 }
 
-Orientation OrientationSensor::read() {
+OrientationData OrientationSensor::read() {
     return {
             .has_data = true,
             .yaw = 0,
             .pitch = 0,
             .roll = 0,
-            .orientation_velocity = { .vx = 0, .vy = 0, .vz = (float) rocket->velocity },
+            .orientation_velocity = { .vx = 0, .vy = 0, .vz = (float) (*rocket)->velocity },
             .orientation_acceleration = { .ax = 0, .ay = 0, .az = 0 },
-            .linear_acceleration = { .ax = 0, .ay = 0, .az = (float) rocket->acceleration },
+            .linear_acceleration = { .ax = 0, .ay = 0, .az = (float) (*rocket)->acceleration },
             .gx = 0,
             .gy = 0,
             .gz = 0,  // todo I don't know what the g's are
@@ -63,11 +74,13 @@ Orientation OrientationSensor::read() {
     };
 }
 
+VoltageSensor::VoltageSensor(SimulatedRocket** sim) : rocket(sim) { }
+
 ErrorCode VoltageSensor::init() {
     return ErrorCode::NoError;
 }
 
-Voltage VoltageSensor::read() {
+VoltageData VoltageSensor::read() {
     return { .voltage = 9 };
 }
 
@@ -75,14 +88,28 @@ ErrorCode MagnetometerSensor::init() {
     return ErrorCode::NoError;
 }
 
-Magnetometer MagnetometerSensor::read() {
+MagnetometerSensor::MagnetometerSensor(SimulatedRocket** sim) : rocket(sim) { }
+
+MagnetometerData MagnetometerSensor::read() {
     return { .mx = 0, .my = 0, .mz = 0 };
 }
+
+GPSSensor::GPSSensor(SimulatedRocket** sim) : rocket(sim) { }
 
 ErrorCode GPSSensor::init() {
     return ErrorCode::NoError;
 }
 
-GPS GPSSensor::read() {
+GPSData GPSSensor::read() {
     return { };
+}
+
+ErrorCode PyroBackend::init() {
+    return NoError;
+}
+void PyroBackend::arm_all() {
+
+}
+void PyroBackend::fire_channel(int channel) {
+
 }

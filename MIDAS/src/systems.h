@@ -20,14 +20,14 @@
  * @brief holds all information about the rocket, sensors, and controllers
  */
 struct RocketSystems {
-    const Sensors& sensors;
+    Sensors sensors;
     RocketData rocket_data;
     BuzzerController buzzer;
     LEDController led;
     Telemetry tlm;
     PyroController pyro;
 
-    explicit RocketSystems(const Sensors& sensors);
+    explicit RocketSystems(Sensors hardware);
     [[noreturn]] void begin();
 
 private:

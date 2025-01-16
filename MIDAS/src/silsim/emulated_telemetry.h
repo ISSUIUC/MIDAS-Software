@@ -1,26 +1,22 @@
 #pragma once
 
 #include <fstream>
+#include <hardware_interface.h>
 
 #include "errors.h"
 
-class TelemetryBackend {
+class TelemetryBackend final: public ITelemetryBackend {
 public:
     explicit TelemetryBackend(const char* file_name);
-    ErrorCode init();
+    ErrorCode init() override;
 
-    int8_t getRecentRssi();
-    void setFrequency(float frequency);
+    int8_t getRecentRssi() override;
+    void setFrequency(float frequency) override;
 
-    template<typename T>
-    void send(const T& data) {
-        output_file.write((const char*) &data, sizeof(T));
-    }
+protected:
+    void send_bytes(const uint8_t* data, size_t length) override;
 
-    template<typename T>
-    bool read(T* write) {
-        return false;
-    }
+    bool recv_bytes(uint8_t* data, size_t length, int wait_milliseconds) override;
 
 private:
     std::ofstream output_file;

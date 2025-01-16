@@ -9,6 +9,7 @@
 #include "silsim/arduino_emulation.h"
 
 #define LOW (0x0)
+#define HIGH (0x1)
 #define OUTPUT (0x3)
 
 #define tskIDLE_PRIORITY (128)
@@ -56,6 +57,8 @@ private:
 typedef SemaphoreHandle_s* SemaphoreHandle_t;
 typedef size_t TickType_t;
 
+#define portMAX_DELAY ((TickType_t) -1)
+
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t* buffer);
 bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout);
 bool xSemaphoreGive(SemaphoreHandle_t semaphore);
@@ -71,7 +74,7 @@ public:
         return this;
     }
 
-    void push(void* item) {
+    bool push(void* item) {
         std::memcpy(&buffer[tail_idx * item_size], item, item_size);
         tail_idx++;
         if (tail_idx == max_count) {
@@ -85,6 +88,7 @@ public:
         } else {
             count++;
         }
+        return true;
     }
 
     bool pop(void* item) {
@@ -114,6 +118,8 @@ typedef StaticQueue_t* QueueHandle_t;
 #define xQueueCreateStatic(length, item_size, buffer, queue) ((queue)->initialize(length, item_size, buffer))
 #define xQueueSendToBack(queue, value_ptr, timeout) ((queue)->push(value_ptr))
 #define xQueueReceive(queue, store_ptr, timeout) ((queue)->pop(store_ptr))
+
+#define errQUEUE_FULL (false)
 
 void vTaskDelay(int32_t time);
 void vTaskDelete(void* something_probably);

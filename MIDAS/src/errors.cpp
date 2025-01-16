@@ -1,5 +1,4 @@
 #include "errors.h"
-#include "TCAL9539.h"
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
@@ -23,101 +22,92 @@
  * BLUE, GREEN, ORANGE, RED => Default, somehow the function was called with a different error, should never happen
  */
 
-#ifndef SILSIM
-#include <TCAL9539.h>
-#include "hardware/pins.h"
+#include <hardware_interface.h>
+
+#include "led.h"
 
 /**
  * @brief writes LEDS to indicate errors as described above
- * 
- * @param error Error Code to indicate
-*/
-void update_error_LED(ErrorCode error) {
+ */
+void update_error_LED(ILedBackend& led, ErrorCode error) {
     switch (error) {
         case LowGCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, false);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, false);
             break;
         case SDBeginFailed:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, false);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, false);
             break;
         case LowGRangeCouldNotBeSet:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, false);
+            led.set(LED::GREEN, false);
+            led.set(LED::ORANGE, true);
+            led.set(LED::RED, false);
             break;
         case LowGODRLPFCouldNotBeSet:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            led.set(LED::BLUE, false);
+            led.set(LED::GREEN, false);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, true);
             break;
         case HighGCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, false);
             break;   
         case HighGCouldNotUpdateDataRate:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, false);
+            led.set(LED::ORANGE, true);
+            led.set(LED::RED, false);
             break;
         case MagnetometerCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, false);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, true);
             break;
         case GyroCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, false);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, true);
+            led.set(LED::RED, false);
             break; 
         case GPSCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            led.set(LED::BLUE, false);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, true);
             break; 
         case ContinuityCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, HIGH);
+            led.set(LED::BLUE, false);
+            led.set(LED::GREEN, false);
+            led.set(LED::ORANGE, true);
+            led.set(LED::RED, true);
             break; 
         case CannotConnectBNO:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, true);
+            led.set(LED::RED, false);
             break; 
         case CannotInitBNO:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, false);
+            led.set(LED::RED, true);
             break; 
         default:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, HIGH);
+            led.set(LED::BLUE, true);
+            led.set(LED::GREEN, true);
+            led.set(LED::ORANGE, true);
+            led.set(LED::RED, true);
             break;
     }
 }
-#else
-
-void update_error_LED(ErrorCode error) {
-
-};
-
-#endif

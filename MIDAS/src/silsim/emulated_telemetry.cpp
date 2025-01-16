@@ -16,3 +16,11 @@ int8_t TelemetryBackend::getRecentRssi() {
 void TelemetryBackend::setFrequency(float frequency) {
     (void) frequency;
 }
+
+void TelemetryBackend::send_bytes(const uint8_t* data, size_t length) {
+    output_file.write((const char*) data, length);
+}
+
+bool TelemetryBackend::recv_bytes(uint8_t* data, size_t length, int wait_milliseconds) {
+    return false;
+}

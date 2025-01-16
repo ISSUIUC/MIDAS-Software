@@ -28,4 +28,5 @@ enum ErrorCode {
     SDCouldNotOpenFile = 20,
 };
 
-void update_error_LED(ErrorCode error);
+class ILedBackend;
+void update_error_LED(ILedBackend& backend, ErrorCode error);

@@ -1,8 +1,5 @@
 #include "data_logging.h"
 
-#include <FS.h>
-#include <finite-state-machines/fsm_states.h>
-
 #include "log_format.h"
 #include "log_checksum.h"
 
