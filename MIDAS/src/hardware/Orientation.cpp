@@ -1,6 +1,7 @@
 #include "sensors.h"
 #include "Adafruit_BNO08x.h"
-
+#include "sensor_data.h"
+#include <cmath>
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
@@ -94,7 +95,7 @@ std::tuple<float, float, float> euler_to_vector(float pitch, float yaw)
     float z = sin(pitch);
     return {x, y, z};
 }
-// why isn't roll included?
+
 float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
 {
     auto [x1, y1, z1] = euler_to_vector(pitch1, yaw1);
@@ -180,8 +181,8 @@ Orientation OrientationSensor::read()
         Quaternion delta;
         Quaternion inverse;
         Quaternion curr;
-        double norm_initial = std::sqrt(initial_quaternion.w * initial_quaternion.w + initial_quaternion.x * initial_quaternion.x + initial_quaternion.y * initial_quaternion.y + initial_quaternion.z * initial_quaternion.z);
-        double norm_current = std::sqrt(quat.w * quat.w + quat.x * quat.x + quat.y * quat.y + quat.z * quat.z);
+        double norm_initial = sqrt(initial_quaternion.w * initial_quaternion.w + initial_quaternion.x * initial_quaternion.x + initial_quaternion.y * initial_quaternion.y + initial_quaternion.z * initial_quaternion.z);
+        double norm_current = sqrt(quat.w * quat.w + quat.x * quat.x + quat.y * quat.y + quat.z * quat.z);
 
         // get inverse of original
         inverse.w = initial_quaternion.w;
@@ -213,7 +214,7 @@ Orientation OrientationSensor::read()
         delta.z = curr.w * inverse.z + curr.x * inverse.y - curr.y * inverse.x + curr.z * inverse.w;
 
         // get z-axis rotation by converting delta quaternion to euler angles
-        values = quaternionToEuler(delta.w, delta.x, delta.y, delta.z);
+        Vec3 values = quaternionToEuler(delta.w, delta.x, delta.y, delta.z,false);
 
         sensor_reading.tilt = values.yaw;
 
