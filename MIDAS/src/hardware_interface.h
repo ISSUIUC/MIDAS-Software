@@ -86,7 +86,8 @@ private:
 */
 class ITelemetryBackend {
 protected:
-    ~ITelemetryBackend() = default;
+    ITelemetryBackend() = default;
+    virtual ~ITelemetryBackend() = default;
 
     virtual void send_bytes(const uint8_t* data, size_t length) = 0;
     virtual bool recv_bytes(uint8_t* data, size_t length, int wait_milliseconds) = 0;
@@ -94,8 +95,8 @@ protected:
 public:
     virtual ErrorCode init() = 0;
 
-    virtual int8_t getRecentRssi();
-    virtual void setFrequency(float frequency);
+    virtual int8_t getRecentRssi() = 0;
+    virtual void setFrequency(float frequency) = 0;
 
     /**
      * @brief This function transmits data from the struct provided as
