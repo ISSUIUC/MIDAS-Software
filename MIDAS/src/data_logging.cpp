@@ -51,7 +51,7 @@ void log_reading(ILogSink& sink, Reading<T>& reading) {
 */
 template<typename T>
 uint32_t log_from_sensor_data(ILogSink& sink, SensorData<T>& sensor_data) {
-    Reading<T> reading;
+    Reading<T> reading = {};
     uint32_t read = 0;
     while (read < 20 && sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);

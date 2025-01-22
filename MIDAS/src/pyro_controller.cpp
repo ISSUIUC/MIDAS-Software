@@ -67,6 +67,8 @@ PyroState PyroController::tick_pyro(FSMState fsm_state, OrientationData orientat
         default: break;
     }
 #else
+    (void) orientation;
+
     switch (fsm_state) {
         case FSMState::STATE_FIRST_SEPARATION: {
             // Fire "Pyro D" when separating stage 1

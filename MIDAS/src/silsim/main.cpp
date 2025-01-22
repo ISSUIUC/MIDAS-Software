@@ -45,7 +45,7 @@ int main() {
     Simulation sim({ .density_of_air = 0.001, .gravity = 9.81 }, std::vector { together_sim, stage1_sim, stage2_sim });
 
     RocketSystems* stage1_systems = create_and_start(&stage1_sim, "stage1_sink.launch", "stage1_tlm_sink.bin");
-    RocketSystems* stage2_systems = create_and_start(&stage2_sim, "stage2_sink.launch", "stage2_tlm_sink.bin");
+    /* RocketSystems* stage2_systems = */ create_and_start(&stage2_sim, "stage2_sink.launch", "stage2_tlm_sink.bin");
 
     sim.ignite_rocket(together_sim);
 

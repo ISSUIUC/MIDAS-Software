@@ -77,15 +77,13 @@ void Telemetry::acknowledgeReceived() {
  * 
  * @param data the data to serialize into a packet
 */
-TelemetryPacket Telemetry::makePacket(RocketData& data) {
+TelemetryPacket Telemetry::makePacket(RocketData& data) const {
     TelemetryPacket packet { };
     GPSData gps = data.gps.getRecentUnsync();
     VoltageData voltage = data.voltage.getRecentUnsync();
     BarometerData barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    ContinuityData continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
-    PyroState pyro = data.pyro.getRecentUnsync();
     OrientationData orientation = data.orientation.getRecentUnsync();
 
     packet.lat = gps.latitude;

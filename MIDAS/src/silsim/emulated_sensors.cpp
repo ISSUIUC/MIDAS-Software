@@ -23,7 +23,9 @@ LowGLSMData LowGLSMSensor::read() {
     return { .gx = 0, .gy = 0, .gz = 0, .ax = 0, .ay = 0, .az =0 };
 }
 
-ContinuitySensor::ContinuitySensor(SimulatedRocket** sim) { }
+ContinuitySensor::ContinuitySensor(SimulatedRocket** sim) {
+    (void) sim;
+}
 
 ErrorCode ContinuitySensor::init() {
     return ErrorCode::NoError;
@@ -107,9 +109,11 @@ GPSData GPSSensor::read() {
 ErrorCode PyroBackend::init() {
     return NoError;
 }
+
 void PyroBackend::arm_all() {
 
 }
-void PyroBackend::fire_channel(int channel) {
 
+void PyroBackend::fire_channel(int channel) {
+    (void) channel;
 }

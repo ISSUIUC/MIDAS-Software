@@ -70,9 +70,6 @@ struct LowGData {
     float ax = 0;
     float ay = 0;
     float az = 0;
-
-    LowGData() = default;
-    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
 /**
@@ -84,9 +81,6 @@ struct HighGData {
     float ax = 0;
     float ay = 0;
     float az = 0;
-
-    HighGData() = default;
-    HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
 /**
@@ -112,9 +106,6 @@ struct BarometerData {
     float temperature = 0; // Temperature in Celcius
     float pressure = 0; // Pressure in millibars
     float altitude = 0; // Altitude in meters (above sea level?)
-
-    BarometerData() = default;
-    BarometerData(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
 /**
@@ -123,8 +114,8 @@ struct BarometerData {
  * @brief data about pyro continuity
 */
 struct ContinuityData {
-    float sense_pyro;
-    float pins[4];
+    float sense_pyro = 0.0;
+    float pins[4] = { 0.0, 0.0, 0.0, 0.0 };
 };
 
 /**

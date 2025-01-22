@@ -30,8 +30,8 @@ class EMMCSink : public ILogSink {
 public:
     EMMCSink() = default;
 
-    ErrorCode init();
-    void write(const uint8_t* data, size_t size);
+    ErrorCode init() override;
+    void write(const uint8_t* data, size_t size) override;
 private:
     File file;
     size_t unflushed_bytes = 0;

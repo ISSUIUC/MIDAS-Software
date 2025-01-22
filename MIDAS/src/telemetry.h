@@ -23,5 +23,5 @@ public:
 private:
     ITelemetryBackend& backend;
     int received_count = 0;
-    TelemetryPacket makePacket(RocketData& data);
+    TelemetryPacket makePacket(RocketData& data) const;
 };

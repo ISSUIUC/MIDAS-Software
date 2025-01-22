@@ -102,14 +102,17 @@ void createThread(const char* name, void fn(void*), size_t stack, void* arg, Bas
 
 void xTaskCreateStaticPinnedToCore(TaskFunction_t thread_fn, const char* name, size_t stack_size, void* argument,
                                    int priority, unsigned char* stack, StaticTask_t* task_handle, BaseType_t core) {
+    (void) priority, (void) stack, (void) task_handle;
     createThread(name, thread_fn, stack_size, argument, core);
 }
 
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t* buffer) {
+    (void) buffer;
     return new SemaphoreHandle_s();
 }
 
 bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout) {
+    (void) timeout;
     semaphore->lock();
     return true;
 }
@@ -124,7 +127,7 @@ void begin_silsim() {
 }
 
 void vTaskDelete(void* something_probably) {
-
+    (void) something_probably;
 }
 
 void vTaskDelay(int32_t time) {
@@ -142,5 +145,10 @@ void ledcAttachPin(uint8_t pin, uint8_t channel) {
     channels[channel] = pin;
 }
 
-void pinMode(uint8_t pin, uint8_t mode) { }
-void digitalWrite(uint8_t pin, uint8_t value) { }
+void pinMode(uint8_t pin, uint8_t mode) {
+    (void) pin, (void) mode;
+}
+
+void digitalWrite(uint8_t pin, uint8_t value) {
+    (void) pin, (void) value;
+}

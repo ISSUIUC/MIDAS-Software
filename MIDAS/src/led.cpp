@@ -17,11 +17,7 @@ ErrorCode LEDController::init() {
 */
 void LEDController::toggle(LED led) {
     int id = static_cast<int>(led);
-    if (targets[id] == false) {
-        targets[id] = true;
-    } else {
-        targets[id] = false;
-    }
+    targets[id] = !targets[id];
 }
 
 /**

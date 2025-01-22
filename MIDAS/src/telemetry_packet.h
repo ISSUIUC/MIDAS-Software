@@ -39,7 +39,7 @@ struct TelemetryCommand {
     CommandType command;
     std::array<char, 3> verify = {{'B', 'R', 'K'}};
 
-    bool valid() {
+    bool valid() const {
         return verify == std::array<char, 3>{{'B','R','K'}};
     }
 };

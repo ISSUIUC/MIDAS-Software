@@ -23,3 +23,24 @@ file = f"""\
 
 with Path("src/log_checksum.h").open("w") as checksum_file:
     checksum_file.write(file)
+
+def extra_http_configuration(env, node):
+    path = node.get_path().removeprefix(env["PROJECT_BUILD_DIR"]).replace("\\", "/").removeprefix("/" + env["PIOENV"])
+
+    if path.startswith("/Framework"):
+        return env.Object(
+            node,
+            CCFLAGS=env["CCFLAGS"] + ["-w"]
+        )
+    elif path.startswith("/src/"):
+        return env.Object(
+            node,
+            CCFLAGS=env["CCFLAGS"] + ["-Wall", "-Wextra", "-Wno-unused-function"]
+        )
+    else:
+        return env.Object(
+            node,
+            CCFLAGS=env["CCFLAGS"] + "-Wno-cpp"
+        )
+
+env.AddBuildMiddleware(extra_http_configuration)

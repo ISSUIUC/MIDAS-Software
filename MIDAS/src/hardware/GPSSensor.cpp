@@ -55,7 +55,7 @@ GPSData GPSSensor::read() {
 
     lat_int *= (gpgga_message.xyz.ns == 'N') ? 1 : -1;
     lon_int *= (gpgga_message.xyz.ew == 'E') ? 1 : -1;
-    float alt = gpgga_message.xyz.alt;
+    float alt = (float) gpgga_message.xyz.alt;
     float v = gprmc_message.speed;
     uint16_t sat_count = gpgga_message.sats;
 

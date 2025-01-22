@@ -25,5 +25,6 @@ void TelemetryBackend::send_bytes(const uint8_t* data, size_t length) {
 }
 
 bool TelemetryBackend::recv_bytes(uint8_t* data, size_t length, int wait_milliseconds) {
+    (void) data, (void) length, (void) wait_milliseconds;
     return false;
 }

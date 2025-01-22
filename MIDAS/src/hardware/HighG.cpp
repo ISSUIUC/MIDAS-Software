@@ -30,5 +30,5 @@ ErrorCode HighGSensor::init() {
 */
 HighGData HighGSensor::read() {
     auto data = KX.getAccelData();
-    return HighGData(data.xData, data.yData, data.zData);
+    return { .ax = data.xData, .ay = data.yData, .az = data.zData };
 }

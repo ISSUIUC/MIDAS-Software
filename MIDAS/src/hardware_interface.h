@@ -52,7 +52,9 @@ public:
         return ErrorCode::NoError;
     }
 
-    void write(const uint8_t* data, size_t size) override {}
+    void write(const uint8_t* data, size_t size) override {
+        (void) data, (void) size;
+    }
 };
 
 template<typename Sink, typename... Sinks>

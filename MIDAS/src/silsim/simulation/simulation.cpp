@@ -40,7 +40,7 @@ void Simulation::deactivate_rocket(SimulatedRocket* rocket) {
 }
 
 Simulation::Simulation(SimulationParameters params, std::vector<SimulatedRocket*> rockets)
-    : simulation_parameters(params), rockets(std::move(rockets)), current_time(0.0) {
+    : current_time(0.0), simulation_parameters(params), rockets(std::move(rockets)) {
 
 }
 
@@ -60,7 +60,7 @@ void SimulatedRocket::step(SimulationParameters& sim_parameters, double current_
     height += velocity * dt;
 }
 
-SimulatedRocket::SimulatedRocket(bool is_active, RocketParameters parameters) : is_active(is_active), parameters(parameters) { }
+SimulatedRocket::SimulatedRocket(bool is_active, RocketParameters parameters) : parameters(parameters), is_active(is_active) { }
 
 void SimulatedRocket::copy_state_from(SimulatedRocket* other) {
     acceleration = other->velocity;

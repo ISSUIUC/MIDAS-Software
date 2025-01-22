@@ -29,4 +29,4 @@ enum ErrorCode {
 };
 
 class ILedBackend;
-void update_error_LED(ILedBackend& backend, ErrorCode error);
+void update_error_LED(ILedBackend& led, ErrorCode error);

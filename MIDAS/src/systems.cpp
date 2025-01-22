@@ -39,7 +39,7 @@
  */
 #define START_THREAD(name, core, arg, prio) StaticTask_t name##_task;                \
                                       static unsigned char name##_stack[STACK_SIZE];            \
-                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + prio, name##_stack, &name##_task, core)
+                                      xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + (prio), name##_stack, &name##_task, core)
 /*
  * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
  *  - Function to be run by the thread, this contains a `while(true)` loop
@@ -138,7 +138,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.gps.update(reading);
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            PyroState new_pyro_state = arg->pyro.tick_pyro(current_state, arg->rocket_data.orientation.getRecentUnsync());;
+            PyroState new_pyro_state = arg->pyro.tick_pyro(current_state, arg->rocket_data.orientation.getRecentUnsync());
             arg->rocket_data.pyro.update(new_pyro_state);
 
             ContinuityData reading2 = arg->sensors.continuity.read();
@@ -277,8 +277,8 @@ ErrorCode RocketSystems::init_systems() {
 #undef INIT_SYSTEM
 
 
-RocketSystems::RocketSystems(Sensors sensors) : sensors(sensors), buzzer(sensors.buzzer), led(sensors.led),
-                                                tlm(sensors.telemetry), pyro(sensors.pyro) {
+RocketSystems::RocketSystems(Sensors hardware) : sensors(hardware), buzzer(hardware.buzzer), led(hardware.led),
+                                                 tlm(hardware.telemetry), pyro(hardware.pyro) {
 }
 
 /**

@@ -89,13 +89,17 @@ struct GPSSensor final: ISensor<GPSData> {
 
 
 struct LedBackend final: ILedBackend {
-    void set(LED led, bool on) override { }
+    void set(LED led, bool on) override {
+        (void) led, (void) on;
+    }
 };
 
 struct BuzzerBackend final: IBuzzerBackend {
     void init() override { }
 
-    void play_tone(uint32_t frequency) override { }
+    void play_tone(uint32_t frequency) override {
+        (void) frequency;
+    }
 };
 
 struct PyroBackend final: IPyroBackend {
