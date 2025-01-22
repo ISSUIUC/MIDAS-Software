@@ -3,8 +3,11 @@
 #include <Wire.h>
 #include <SPI.h>
 #include <HardwareSerial.h>
+#include <ACAN2517FD.h>
+#include <ACAN2517FDSettings.h>
 
 #include "hardware/pins.h"
+#include "systems.h"
 
 /**
  * Sets the config file and then starts all the threads using the config.
@@ -24,13 +27,62 @@ void setup() {
 
     delay(200);
 
-    // //begin sensor SPI bus
-    // Serial.println("Starting SPI...");
-    // SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
+    //begin sensor SPI bus
+    Serial.println("Starting SPI...");
+    SPI.begin(CAN_SPI_SCK, CAN_SPI_MISO, CAN_SPI_MOSI);
 
-    // //begin I2C bus
-    // Serial.println("Starting I2C...");
-    // Wire.begin(I2C_SDA, I2C_SCL);
+    //begin I2C bus
+        // Serial.println("Starting I2C...");
+        // Wire.begin(I2C_SDA, I2C_SCL);
+    Serial.println("Starting Battery Sense I2C...");
+    Wire.begin(BATTSENSE_SDA, BATTSENSE_SCL);
+
+    //begin UART
+    Serial.println("Starting UART...");
+    HardwareSerial CAM_1_UART(1);
+    CAM_1_UART.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
+    HardwareSerial CAM_2_UART(2);
+    CAM_2_UART.begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
+
+    //begin Camera Control
+    Serial.println("Starting Camera Control...");
+    pinMode(CAM1_ON_OFF, OUTPUT);
+    digitalWrite(CAM1_ON_OFF, LOW);
+    pinMode(CAM2_ON_OFF, OUTPUT);
+    digitalWrite(CAM2_ON_OFF, LOW);
+    pinMode(VTX_ON_OFF, OUTPUT);
+    digitalWrite(VTX_ON_OFF, LOW);
+    pinMode(VIDEO_SELECT, OUTPUT);
+    digitalWrite(VIDEO_SELECT, LOW);
+
+    //begin CAN
+    Serial.println("Starting CAN...");
+    pinMode(CAN_NINT, INPUT);
+    pinMode(CAN_NINT1, INPUT);
+    pinMode(CAN_SLNT, OUTPUT);
+    pinMode(CAN_FAULT, INPUT);
+    pinMode(CAN_NCS, OUTPUT);
+    digitalWrite(CAN_NCS, LOW);  //selected
+    digitalWrite(CAN_SLNT, LOW);
+
+    ACAN2517FD CAN (CAN_NCS, SPI, CAN_NINT);
+    ACAN2517FDSettings can_settings (ACAN2517FDSettings::OSC_40MHz, 125*1000, ACAN2517FDSettings::DATA_BITRATE_x1  );
+    can_settings.mRequestedMode = ACAN2517FDSettings::Normal20B;
+
+    //Move to errors.cpp
+    const uint32_t errorCode = CAN.begin (can_settings, [] { can.isr () ; }) ;
+      if (0 == errorCode) {
+        Serial.println ("Can ok") ;
+      }else{
+        Serial.print ("Error Can: 0x") ;
+        Serial.println (errorCode, HEX) ;
+      }
+
+    pinMode(BATTSENSE_ALERT, INPUT);
+    //pinMode(BUZZER, OUTPUT);
+
+
+
 
     // //set all chip selects high (deselected)
     // pinMode(MS5611_CS, OUTPUT);
@@ -39,7 +91,6 @@ void setup() {
     // pinMode(ADXL355_CS, OUTPUT);
     // pinMode(LIS3MDL_CS, OUTPUT);
     // pinMode(BNO086_CS, OUTPUT);
-    // pinMode(CAN_CS, OUTPUT);
     // pinMode(RFM96_CS, OUTPUT);
     // digitalWrite(MS5611_CS, HIGH);
     // digitalWrite(LSM6DS3_CS, HIGH);
@@ -50,16 +101,16 @@ void setup() {
     // digitalWrite(CAN_CS, HIGH);
     // digitalWrite(RFM96_CS, HIGH);
 
-    // //configure output leds
-    // gpioPinMode(LED_BLUE, OUTPUT);
-    // gpioPinMode(LED_GREEN, OUTPUT);
-    // gpioPinMode(LED_ORANGE, OUTPUT);
-    // gpioPinMode(LED_RED, OUTPUT);
+    //configure output leds
+    gpioPinMode(LED_BLUE, OUTPUT);
+    gpioPinMode(LED_GREEN, OUTPUT);
+    gpioPinMode(LED_ORANGE, OUTPUT);
+    gpioPinMode(LED_RED, OUTPUT);
 
-    // delay(200);
+    delay(200);
 
-    // //init and start threads
-    // begin_systems(&systems);
+    //init and start threads
+    begin_systems(&systems);
 }
 
 void loop() {
@@ -67,10 +118,6 @@ void loop() {
 }
 
 // #define LED_TEST
-// // #define REGULATOR_TEST
-
-// #define BLUE_LED_PIN 37
-// #define REGULATOR_PIN 9
 
 // void setup() {
 //   // put your setup code here, to run once:
@@ -83,21 +130,12 @@ void loop() {
 //     // Serial.println("Set LED pinmode");
 //   #endif
 
-//   #ifdef REGULATOR_TEST
-//     pinMode(REGULATOR_PIN, OUTPUT); // Set 9V regulator to output
-//     Serial.println("Set Regulator pinmode");
-//   #endif
 
 //   // Serial.println("cam board test setup complete\n");
 // }
 
 // void loop() {
 //   // put your main code here, to run repeatedly:
-
-//   #ifdef REGULATOR_TEST
-//     Serial.println("Regulator set high");
-//     digitalWrite(REGULATOR_PIN, HIGH);
-//   #endif
 
 //   #ifdef LED_TEST
 //     // Flash blue LED at 1hz (ish)

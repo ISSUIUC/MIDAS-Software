@@ -18,13 +18,13 @@
  * The ESP32 has two physical cores, which will each be dedicated to one group of threads.
  * The SENSOR_CORE runs the threads which write to the sensor_data struct (mostly sensor polling threads).
  */
-#define SENSOR_CORE ((BaseType_t) 0)
+#define MAIN_CORE ((BaseType_t) 0)
 
 /**
  * The ESP32 has two physical cores, which will each be dedicated to one group of threads.
  * The DATA_CORE runs the GPS thread, as well as the threads which read from the sensor_data struct (e.g. SD logging).
  */
-#define DATA_CORE ((BaseType_t) 1)
+//#define DATA_CORE ((BaseType_t) 1)
 
 /**
  * Macro for declaring a thread. Creates a function with the name suffixed with `_thread`, annotated with [[noreturn]].

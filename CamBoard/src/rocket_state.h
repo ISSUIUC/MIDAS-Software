@@ -164,18 +164,24 @@ public:
  */
 struct RocketData {
 public:
-    SensorData<KalmanData> kalman;
-    SensorData<LowGData> low_g;
-    BufferedSensorData<HighGData, 8> high_g;
-    BufferedSensorData<Barometer, 8> barometer;
-    SensorData<LowGLSM> low_g_lsm;
-    SensorData<Continuity> continuity;
-    SensorData<PyroState> pyro;
-    SensorData<FSMState> fsm_state;
-    SensorData<GPS> gps;
-    SensorData<Magnetometer> magnetometer;
-    SensorData<Orientation> orientation;
-    SensorData<Voltage> voltage;
+    // SensorData<KalmanData> kalman;
+    // SensorData<LowGData> low_g;
+    // BufferedSensorData<HighGData, 8> high_g;
+    // BufferedSensorData<Barometer, 8> barometer;
+    // SensorData<LowGLSM> low_g_lsm;
+    // SensorData<Continuity> continuity;
+    // SensorData<PyroState> pyro;
+    // SensorData<FSMState> fsm_state;
+    // SensorData<GPS> gps;
+    // SensorData<Magnetometer> magnetometer;
+    // SensorData<Orientation> orientation;
+    // SensorData<Voltage> voltage;
 
-    Latency log_latency;
+    // Latency log_latency;
+
+    SensorData<FSMState> fsm_state;
+    SensorData<VoltageSense> voltage_sense;
+    SensorData<MIDASCommands> commands;      //should this be an interrupt instead?
+
+    
 };

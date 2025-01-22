@@ -1,6 +1,6 @@
 #include "buzzer.h"
 
-#define BUZZER_PIN (48)
+#define BUZZER_PIN (35)
 #define BUZZER_CHANNEL (1)
 
 /**
@@ -64,7 +64,7 @@ void BuzzerController::tick_sounds() {
  * @return Error code
 */
 ErrorCode BuzzerController::init() {
-    // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I do question the knowledge of github
+    // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I to question the knowledge of github
     pinMode(BUZZER_PIN, OUTPUT);
     digitalWrite(BUZZER_PIN, LOW);
     ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
