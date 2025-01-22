@@ -3,6 +3,9 @@
 
 TelemetryBackend::TelemetryBackend(const char* file_name) {
     output_file.open(file_name, std::ios::out | std::ios::binary | std::ios::trunc);
+    if (output_file.fail()) {
+        std::cerr << "Could not open telemetry backend" << std::endl;
+    }
 }
 
 ErrorCode __attribute__((warn_unused_result)) TelemetryBackend::init() {

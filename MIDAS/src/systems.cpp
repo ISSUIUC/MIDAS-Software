@@ -239,9 +239,8 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                 }
 
             }
-        } else {
-            THREAD_SLEEP(1);
         }
+        THREAD_SLEEP(1);
     }
 }
 
