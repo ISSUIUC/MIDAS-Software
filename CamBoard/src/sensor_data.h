@@ -14,8 +14,6 @@
  * rocket_state struct, and each will be tagged with a timestamp.
 */
 
-struct VoltageSense {}
-
 // /**
 //  * @brief First 4 structs are base vector, pos, vel, and accel data to be used elsewhere
 // */
@@ -133,14 +131,22 @@ struct VoltageSense {}
 //     float pins[4];
 // };
 
-// /**
-//  * @struct Voltage
-//  * 
-//  * @brief data about battery voltage
-// */
-// struct Voltage {
-//     float voltage = 0;
-// };
+/**
+ * @struct Voltage
+ * 
+ * @brief data about battery voltage
+*/
+struct VoltageSense {
+    int power = 0;
+    int current = 0;
+    int temp = 0;
+    int voltage = 0;
+};
+
+
+struct MIDASCommands {
+    CANFDMessage command;
+};
 
 // /**
 //  * @struct GPS

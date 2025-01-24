@@ -3,12 +3,14 @@
 #include <array>
 
 #include "sensor_data.h"
+#include "hardware/sensors.h"
 #include "hal.h"
 #include "Buffer.h"
 //#include "data_logging.h"
 #include "buzzer.h"
 #include "led.h"
 //#include "telemetry.h"
+#include <ACAN2517FD.h>
 #include "finite-state-machines/fsm.h"
 
 // #if defined(SILSIM)
@@ -32,6 +34,7 @@ struct Sensors {
     // BarometerSensor barometer;
     // ContinuitySensor continuity;
     VoltageSensor voltage;
+    CAN can;
     // OrientationSensor orientation;
     // MagnetometerSensor magnetometer;
     // Pyro pyro;

@@ -65,19 +65,6 @@ void setup() {
     digitalWrite(CAN_NCS, LOW);  //selected
     digitalWrite(CAN_SLNT, LOW);
 
-    ACAN2517FD CAN (CAN_NCS, SPI, CAN_NINT);
-    ACAN2517FDSettings can_settings (ACAN2517FDSettings::OSC_40MHz, 125*1000, ACAN2517FDSettings::DATA_BITRATE_x1  );
-    can_settings.mRequestedMode = ACAN2517FDSettings::Normal20B;
-
-    //Move to errors.cpp
-    const uint32_t errorCode = CAN.begin (can_settings, [] { can.isr () ; }) ;
-      if (0 == errorCode) {
-        Serial.println ("Can ok") ;
-      }else{
-        Serial.print ("Error Can: 0x") ;
-        Serial.println (errorCode, HEX) ;
-      }
-
     pinMode(BATTSENSE_ALERT, INPUT);
     //pinMode(BUZZER, OUTPUT);
 
@@ -102,10 +89,10 @@ void setup() {
     // digitalWrite(RFM96_CS, HIGH);
 
     //configure output leds
-    gpioPinMode(LED_BLUE, OUTPUT);
-    gpioPinMode(LED_GREEN, OUTPUT);
-    gpioPinMode(LED_ORANGE, OUTPUT);
-    gpioPinMode(LED_RED, OUTPUT);
+    pinMode(LED_BLUE, OUTPUT);
+    pinMode(LED_GREEN, OUTPUT);
+    pinMode(LED_ORANGE, OUTPUT);
+    pinMode(LED_RED, OUTPUT);
 
     delay(200);
 

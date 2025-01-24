@@ -84,8 +84,21 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             // Continuity reading2 = arg->sensors.continuity.read();
             // arg->rocket_data.continuity.update(reading2);
 
-            Voltage reading3 = arg->sensors.voltage.read();
-            arg->rocket_data.voltage.update(reading3);
+            VoltageSense reading3 = arg->sensors.voltage.read();
+            arg->rocket_data.voltage_sense.update(reading3);
+
+            int power = read_reg(0x8, 3);
+            int current = read_reg(0x7, 2);
+            int temp = read_reg(0x6, 2);
+            int voltage = read_reg(0x5, 2);
+            Serial.print("Voltage ");
+            Serial.println(voltage * 3.125 / 1000.0);
+            Serial.print("Temp ");
+            Serial.println(temp * 125 / 1000.0);
+            Serial.print("Current ");
+            Serial.println(current * 1.2 / 1000.0);
+            Serial.print("Power ");
+            Serial.println(power * 240 / 1000000.0);
         }
 
         arg->led.update();
@@ -93,6 +106,22 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
         THREAD_SLEEP(10);
     }
+}
+
+int read_reg(int reg, int bytes) {
+    Wire.beginTransmission(0x40);
+    Wire.write(reg);
+    if(Wire.endTransmission()){
+        Serial.println("I2C Error");
+    }
+    Wire.requestFrom(0x40, bytes);
+    int val = 0;
+    for(int i = 0; i < bytes; i++){
+        int v = Wire.read();
+        if(v == -1) Serial.println("I2C Read Error");
+        val = (val << 8) | v;
+    }
+    return val;
 }
 
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
@@ -120,6 +149,22 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
         arg->buzzer.tick();
 
+        THREAD_SLEEP(10);
+    }
+}
+
+DECLARE_THREAD(can, RocketSystems* arg) {
+    while (true) {
+        CANFDMessage message;
+        if (arg->sensors.can.recieve(message)) {
+            arg->rocket_data.commands.update(MIDASCommands(message));
+        }
+        THREAD_SLEEP(5);
+    }
+}
+
+DECLARE_THREAD(camera, RocketSystems* arg) {
+    while (true) {
         THREAD_SLEEP(10);
     }
 }
@@ -206,6 +251,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     // INIT_SYSTEM(systems.sensors.magnetometer);
     // INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.can);
     // INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
@@ -248,6 +294,8 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(fsm, MAIN_CORE, config, 8);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     //START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    START_THREAD(can, MAIN_CORE, config, 15);
+    START_THREAD(camera, MAIN_CORE, config, 10);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
