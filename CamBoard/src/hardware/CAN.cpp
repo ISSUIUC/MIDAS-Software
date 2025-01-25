@@ -1,6 +1,7 @@
 #include <ACAN2517FD.h>
 #include <ACAN2517FDSettings.h>
 #include "sensors.h"
+#include "CAN.h"
 
 
 ACAN2517FD can (CAN_NCS, SPI, CAN_NINT);

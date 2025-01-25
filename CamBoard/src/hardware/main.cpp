@@ -12,9 +12,7 @@
 /**
  * Sets the config file and then starts all the threads using the config.
  */
-
-
-// RocketSystems systems { .log_sink = sinks };
+RocketSystems systems;
 // /**
 //  * @brief Sets up pinmodes for all sensors and starts threads
 // */
@@ -38,11 +36,11 @@ void setup() {
     Wire.begin(BATTSENSE_SDA, BATTSENSE_SCL);
 
     //begin UART
-    Serial.println("Starting UART...");
-    HardwareSerial CAM_1_UART(1);
-    CAM_1_UART.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
-    HardwareSerial CAM_2_UART(2);
-    CAM_2_UART.begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
+    // Serial.println("Starting UART...");
+    // HardwareSerial CAM_1_UART(1);
+    // CAM_1_UART.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
+    // HardwareSerial CAM_2_UART(2);
+    // CAM_2_UART.begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
 
     //begin Camera Control
     Serial.println("Starting Camera Control...");
@@ -67,26 +65,6 @@ void setup() {
 
     pinMode(BATTSENSE_ALERT, INPUT);
     //pinMode(BUZZER, OUTPUT);
-
-
-
-
-    // //set all chip selects high (deselected)
-    // pinMode(MS5611_CS, OUTPUT);
-    // pinMode(LSM6DS3_CS, OUTPUT);
-    // pinMode(KX134_CS, OUTPUT);
-    // pinMode(ADXL355_CS, OUTPUT);
-    // pinMode(LIS3MDL_CS, OUTPUT);
-    // pinMode(BNO086_CS, OUTPUT);
-    // pinMode(RFM96_CS, OUTPUT);
-    // digitalWrite(MS5611_CS, HIGH);
-    // digitalWrite(LSM6DS3_CS, HIGH);
-    // digitalWrite(KX134_CS, HIGH);
-    // digitalWrite(ADXL355_CS, HIGH);
-    // digitalWrite(LIS3MDL_CS, HIGH);
-    // digitalWrite(BNO086_CS, HIGH);
-    // digitalWrite(CAN_CS, HIGH);
-    // digitalWrite(RFM96_CS, HIGH);
 
     //configure output leds
     pinMode(LED_BLUE, OUTPUT);
