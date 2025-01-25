@@ -1,7 +1,6 @@
 #include <cmath>
 
 #include "fsm.h"
-#include "thresholds.h"
 #include "hardware/camera.cpp"
 
 

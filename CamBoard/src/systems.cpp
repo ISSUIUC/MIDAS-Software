@@ -69,7 +69,7 @@ DECLARE_THREAD(can, RocketSystems* arg) {
     while (true) {
         CANFDMessage message;
         if (arg->can.recieve(message)) {
-            arg->rocket_data.commands.update(MIDASCommands(message));
+            arg->rocket_data.commands.update(MIDASCommands({message}));
         }
         THREAD_SLEEP(5);
     }

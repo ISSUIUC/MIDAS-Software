@@ -4,6 +4,9 @@
 #include <cstdint>
 
 #include "finite-state-machines/fsm_states.h"
+#include <ACAN2517FD.h>
+#include <ACAN2517FDSettings.h>
+#include <CANFDMessage.h>
 
 //#define CONTINUITY_PIN_COUNT 5
 

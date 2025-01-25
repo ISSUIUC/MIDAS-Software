@@ -1,6 +1,3 @@
-#include <ACAN2517FD.h>
-#include <ACAN2517FDSettings.h>
-#include "sensors.h"
 #include "CAN.h"
 
 
@@ -22,8 +19,8 @@ ErrorCode CAN::init() {
 }
 
 
-MIDASCommands CAN::read() {
-}
+// MIDASCommands CAN::read() {
+// }
 
 
 bool CAN::recieve(CANFDMessage message) {

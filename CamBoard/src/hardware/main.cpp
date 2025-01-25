@@ -12,7 +12,7 @@
 /**
  * Sets the config file and then starts all the threads using the config.
  */
-RocketSystems systems;
+RocketSystems systems{};
 // /**
 //  * @brief Sets up pinmodes for all sensors and starts threads
 // */
