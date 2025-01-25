@@ -8,20 +8,21 @@
 #include "sensor_data.h"
 #include "Buffer.h"
 #include "rocket_state.h"
+#include "systems.h"
 
 /**
  * @struct StateEstimate
  * 
  * @brief Holds current altitude, acceleration, jerk, and speed values based off of averages and derivatives.
 */
-struct StateEstimate {
-    double altitude;
-    double acceleration;
-    double jerk;
-    double vertical_speed;
+// struct StateEstimate {
+//     double altitude;
+//     double acceleration;
+//     double jerk;
+//     double vertical_speed;
 
-    explicit StateEstimate(RocketData& state);
-};
+//     explicit StateEstimate(RocketData& state);
+// };
 
 /**
  * @class FSM
@@ -32,17 +33,18 @@ class FSM {
 public:
     FSM() = default;
 
-    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate);
+//    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate);
+    FSMState tick_fsm(FSMState &curr_state, RocketSystems* arg);
 
-private:
-    double launch_time;
-    double burnout_time;
-    double sustainer_ignition_time;
-    double second_boost_time;
-    double coast_time;
-    double drogue_time;
-    double apogee_time;
-    double main_time;
-    double landed_time;
-    double first_separation_time;
+// private:
+//     double launch_time;
+//     double burnout_time;
+//     double sustainer_ignition_time;
+//     double second_boost_time;
+//     double coast_time;
+//     double drogue_time;
+//     double apogee_time;
+//     double main_time;
+//     double landed_time;
+//     double first_separation_time;
 };

@@ -130,9 +130,9 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     bool already_played_freebird = false;
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        StateEstimate state_estimate(arg->rocket_data);
+        //StateEstimate state_estimate(arg->rocket_data);
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+        FSMState next_state = fsm.tick_fsm(current_state, arg);
 
         arg->rocket_data.fsm_state.update(next_state);
 
@@ -163,11 +163,11 @@ DECLARE_THREAD(can, RocketSystems* arg) {
     }
 }
 
-DECLARE_THREAD(camera, RocketSystems* arg) {
-    while (true) {
-        THREAD_SLEEP(10);
-    }
-}
+// DECLARE_THREAD(camera, RocketSystems* arg) {
+//     while (true) {
+//         THREAD_SLEEP(10);
+//     }
+// }
 
 // DECLARE_THREAD(kalman, RocketSystems* arg) {
 //     // Orientation initial_orientation = arg->rocket_data.orientation.getRecent();
@@ -295,7 +295,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     //START_THREAD(telemetry, SENSOR_CORE, config, 15);
     START_THREAD(can, MAIN_CORE, config, 15);
-    START_THREAD(camera, MAIN_CORE, config, 10);
+    //START_THREAD(camera, MAIN_CORE, config, 10);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 

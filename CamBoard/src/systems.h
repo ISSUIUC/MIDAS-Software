@@ -53,6 +53,8 @@ struct RocketSystems {
     BuzzerController buzzer;
     LEDController led;
     //Telemetry tlm;
+    HardwareSerial cam1;
+    HardwareSerial cam2;
 };
 
 [[noreturn]] void begin_systems(RocketSystems* config);
