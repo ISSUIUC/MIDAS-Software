@@ -20,8 +20,10 @@ public:
     void transmit(RocketData& rocket_data, LEDController& led);
     bool receive(TelemetryCommand* command, int wait_milliseconds);
     void acknowledgeReceived();
+
 private:
     ITelemetryBackend& backend;
     int received_count = 0;
+
     TelemetryPacket makePacket(RocketData& data) const;
 };

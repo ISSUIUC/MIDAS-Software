@@ -24,6 +24,11 @@ file = f"""\
 with Path("src/log_checksum.h").open("w") as checksum_file:
     checksum_file.write(file)
 
+env.Replace(
+    AR="xtensa-esp32s3-elf-gcc-ar",
+    RANLIB="xtensa-esp32s3-elf-gcc-ranlib"
+)
+
 def extra_http_configuration(env, node):
     path = node.get_path().removeprefix(env["PROJECT_BUILD_DIR"]).replace("\\", "/").removeprefix("/" + env["PIOENV"])
 

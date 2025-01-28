@@ -41,12 +41,12 @@
                                       static unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + (prio), name##_stack, &name##_task, core)
 /*
- * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
- *  - Function to be run by the thread, this contains a `while(true)` loop
+ * Parameters for xTaskCreateStaticPinnedToCore are as follows (in parameter order):
+ *  - Function to be run by the thread; should not return to caller
  *  - Name of thread
  *  - Size of the stack for each thread in words (1 word = 4 bytes)
  *  - Arguments to be passed into the function, this will generally eb the config file
- *  - Priority of the task, in allmost all cases, this will be the idle priority plus one
+ *  - Priority of the task, in almost all cases, this will be the idle priority plus one
  *  - The actual stack memory to use
  *  - A handle to reference the task with
  *  - The core to pin the task to
@@ -74,7 +74,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     // Will only reject a certain number of readings in a row
     BarometerData prev_reading;
     constexpr float altChgThreshold = 200; // meters
-    constexpr float presChgThreshold = 500; // milibars
+    constexpr float presChgThreshold = 500; // millibars
     constexpr float tempChgThreshold = 10; // degrees C
     constexpr unsigned int maxConsecutiveRejects = 3;
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
@@ -158,7 +158,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
-    bool already_played_freebird = false;
+    bool has_played = false;
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
@@ -167,9 +167,9 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 
         arg->rocket_data.fsm_state.update(next_state);
 
-        if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
-            arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
-            already_played_freebird = true;
+        if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !has_played) {
+            arg->buzzer.start_playing_tune(free_bird, FREE_BIRD_LENGTH);
+            has_played = true;
         }
 
         THREAD_SLEEP(50);
@@ -313,7 +313,7 @@ RocketSystems::RocketSystems(Sensors hardware) : sensors(hardware), buzzer(hardw
     START_THREAD(buzzer, SENSOR_CORE, this, 6);
     START_THREAD(telemetry, SENSOR_CORE, this, 15);
 
-    buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    buzzer.start_playing_tune(free_bird, FREE_BIRD_LENGTH);
 
     while (true) {
         THREAD_SLEEP(1000);

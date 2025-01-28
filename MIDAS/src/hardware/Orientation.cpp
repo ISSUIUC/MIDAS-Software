@@ -132,6 +132,7 @@ OrientationData OrientationSensor::read() {
         sensor_reading.tilt = sqrtf(powf(deviation.yaw, 2) + powf(deviation.pitch, 2));
 
         return sensor_reading;
+    } else {
+        return { .has_data = false };
     }
-    return { .has_data = false };
 }

@@ -1,12 +1,6 @@
 #pragma once
 
-#ifdef SILSIM
-#include "silsim/emulation.h"
-#else
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <task.h>
-#endif
+#include "hardware_interface.h"
 
 /**
  * @brief The default maximum length for a Queue.
@@ -21,15 +15,14 @@
  */
 template<typename T, uint64_t length = QUEUE_LENGTH>
 class Queue {
-// private:
-public:
-    // todo probably have the Queue Store the timestamps too
+private:
+    // todo probably have the Queue store the timestamps too
     uint8_t queue_area[sizeof(StaticQueue_t) + 64];
-    uint8_t buffer[sizeof(T) * length]{};
-    QueueHandle_t queue{};
+    uint8_t buffer[sizeof(T) * length];
+    QueueHandle_t queue;
 
 public:
-    Queue() {
+    Queue() : queue_area(), buffer() {
         queue = xQueueCreateStatic(length, sizeof(T), buffer, (StaticQueue_t*) &queue_area[32]);
         // configASSERT(mutex_handle);
     }
@@ -42,9 +35,9 @@ public:
      * @param value The value to put in the queue.
      */
     void send(T value) {
-        if(xQueueSendToBack(queue, &value, 0) == errQUEUE_FULL){
-            // Serial.print("FULL QUEUE");
-            // Serial.println(pcTaskGetName(nullptr));
+        if(xQueueSendToBack(queue, &value, 0) == errQUEUE_FULL) {
+//             Serial.print("FULL QUEUE");
+//             Serial.println(pcTaskGetName(nullptr));
         }
     }
 

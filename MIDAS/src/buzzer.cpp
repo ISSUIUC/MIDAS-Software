@@ -6,7 +6,7 @@
  * @param tune Song to be played
  * @param length Length of song to be played
  */
-void BuzzerController::play_tune(Sound* tune, uint32_t length) {
+void BuzzerController::start_playing_tune(Sound* tune, uint32_t length) {
     current_tune_ = tune;
     index_ = 0;
     length_ = length;
@@ -62,7 +62,7 @@ BuzzerController::BuzzerController(IBuzzerBackend& backend) : backend(backend) {
  * @return Error code
  */
 ErrorCode BuzzerController::init() {
-    // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I do question the knowledge of github
+    // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I to question the knowledge of GitHub
     backend.init();
     return NoError;
 }

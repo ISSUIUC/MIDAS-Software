@@ -1,15 +1,17 @@
 #pragma once
+
 // the only thing #ifdef SILSIM we need, theoretically
 #ifdef SILSIM
 #include "silsim/emulation.h"
 #else
 #include <Arduino.h>
 #include "FreeRTOSConfig.h"
+#include <semphr.h>
+#include <task.h>
 #endif
 
 #include "errors.h"
 #include "sensor_data.h"
-#include "led.h"
 
 /**
  * @brief Delays the running thread.
@@ -137,6 +139,18 @@ protected:
 public:
     virtual void init() = 0;
     virtual void play_tone(uint32_t frequency) = 0;
+};
+
+/**
+ * @enum LED
+ *
+ * @brief represents the different LEDS
+ */
+enum class LED {
+    BLUE = 0,
+    RED = 1,
+    ORANGE = 2,
+    GREEN = 3
 };
 
 class ILedBackend {

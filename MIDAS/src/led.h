@@ -1,26 +1,12 @@
 #pragma once
 
-#include "errors.h"
-
-class ILedBackend;
-
-/**
- * @enum LED
- * 
- * @brief represents the different LEDS
-*/
-enum class LED {
-    BLUE = 0,
-    RED = 1,
-    ORANGE = 2,
-    GREEN = 3
-};
+#include "hardware_interface.h"
 
 /**
  * @class LEDController
  * 
  * @brief wraps functionality for LEDs
-*/
+ */
 class LEDController {
 public:
     explicit LEDController(ILedBackend& backend);

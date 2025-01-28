@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "hardware_interface.h"
 #include "rocket_state.h"
 #include "buzzer.h"

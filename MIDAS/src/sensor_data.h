@@ -30,7 +30,7 @@ struct Velocity {
     float vy = 0;
     float vz = 0;
 
-    float get_speed() const {
+    float speed() const {
         return sqrtf(vx * vx + vy * vy + vz * vz);
     }
 };
@@ -41,7 +41,7 @@ struct Acceleration {
     float az = 0;
 
     // Get G-Force applied on the rocket
-    float get_magnitude() const {
+    float magnitude() const {
         return sqrtf(ax * ax + ay * ay + az * az);
     }
 };
@@ -103,7 +103,7 @@ struct LowGLSMData {
  * @brief data from the barometer
 */
 struct BarometerData {
-    float temperature = 0; // Temperature in Celcius
+    float temperature = 0; // Temperature in Celsius
     float pressure = 0; // Pressure in millibars
     float altitude = 0; // Altitude in meters (above sea level?)
 };
@@ -138,10 +138,10 @@ struct GPSData {
     float altitude = 0;
     float speed = 0;
     uint16_t satellite_count = 0;
-    // Unix timestamp since 1970
+    // Unix timestamp (seconds since the epoch)
     // This isn't included in the telem packet because this is
     // solely for the SD logger. We do not need to know what time it is
-    // when we are recieving telem packets.
+    // when we are receiving telem packets.
     uint32_t time = 0;
 };
 
