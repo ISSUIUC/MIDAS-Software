@@ -23,7 +23,7 @@ struct TelemetryPacket {
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
-    uint16_t kf_x; // 16 bit meters
+    uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
 }  __attribute__((packed));
 

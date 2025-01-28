@@ -40,7 +40,7 @@ std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData con
     uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
     uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
     uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
-    uint16_t q = (tilt >> 6) & 0x15;
+    uint16_t q = (tilt >> 6) & 15;
 
     return {x,y,z,q};
 }
@@ -102,22 +102,16 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
     
     const float max_volts = 12;
-    #define a(i) ((uint16_t) (continuity.pins[i] / max_volts * 127))
-    #define b(i) ((a(i) & 0x7F) << (i * 7))
-    #define c(i) do { packet.pyro |= b(i); } while(0)
-    c(0);
-    c(1);
-    c(2);
-    c(3);
-    #undef a
-    #undef b
-    #undef c
+    packet.pyro |= ((((uint16_t) (continuity.pins[0] / max_volts * 127)) & 0x7F) << (0 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[1] / max_volts * 127)) & 0x7F) << (1 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[2] / max_volts * 127)) & 0x7F) << (2 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[3] / max_volts * 127)) & 0x7F) << (3 * 7));
     packet.pyro |= tilt_extra << 28;
 
     static_assert(FSMState::FSM_STATE_COUNT < 16);
     uint8_t sat_count = gps.satellite_count < 8 ? gps.satellite_count : 7;
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
-    packet.kf_x = kalman.position.px;
+    packet.kf_vx = kalman.velocity.vx;
 
     #ifdef IS_SUSTAINER
     packet.fsm_callsign_satcount |= (1 << 7);

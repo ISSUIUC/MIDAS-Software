@@ -33,7 +33,7 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 425.15;
+float RF95_FREQ = 426.15;
 float SUSTAINER_FREQ = 426.15;
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
@@ -87,7 +87,7 @@ struct TelemetryPacket {
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
-    uint16_t kf_x; // 16 bit meters
+    uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
     float RSSI = 0.0;
 }  __attribute__((packed));
@@ -109,6 +109,7 @@ struct FullTelemetryData {
     float sat_count;
     float pyros[4];
     bool is_sustainer;
+    uint16_t kf_vx
 };
 
 
@@ -358,10 +359,10 @@ void setup() {
     }
     current_freq = SUSTAINER_FREQ;
     #endif
-    rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
+    rf95.setCodingRate4(6);
+    rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
-    rf95.setSignalBandwidth(125000);
+    rf95.setSignalBandwidth(250000);
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(current_freq);
     Serial.println("}");
