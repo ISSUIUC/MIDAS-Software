@@ -150,17 +150,23 @@ Orientation OrientationSensor::read()
             break;
         }
         
-        filtered_euler.x = alpha * (filtered_euler.x + event.un.gyroscope.x * deltaTime) + (1 - alpha) * euler.x;
-        filtered_euler.y = alpha * (filtered_euler.y + event.un.gyroscope.y * deltaTime) + (1 - alpha) * euler.y;
+        filtered_euler.x = alpha * (filtered_euler.x + event.un.gyroscope.y * deltaTime) + (1 - alpha) * euler.x;
+        filtered_euler.y = alpha * (filtered_euler.y + event.un.gyroscope.x * deltaTime) + (1 - alpha) * euler.y;
         filtered_euler.z = alpha * (filtered_euler.z + event.un.gyroscope.z * deltaTime) + (1 - alpha) * euler.z;
+        
 
         Orientation sensor_reading;
         sensor_reading.has_data = true;
-        
+        /*
         sensor_reading.yaw = -filtered_euler.y;
         sensor_reading.pitch = filtered_euler.x;
         sensor_reading.roll = filtered_euler.z;
-        
+        */
+
+        sensor_reading.yaw = -euler.y;
+        sensor_reading.pitch = euler.x;
+        sensor_reading.roll = euler.z;
+
         sensor_reading.linear_acceleration.ax = -event.un.accelerometer.y;
         sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;
         sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
@@ -206,10 +212,10 @@ Orientation OrientationSensor::read()
         // normalize
         if (norm_current > 0.0)
         {
-            curr.w /= norm_current;
-            curr.x /= norm_current;
-            curr.y /= norm_current;
-            curr.z /= norm_current;
+            curr.w = quat.w /norm_current;
+            curr.x = quat.x /norm_current;
+            curr.y =  quat.y/ norm_current;
+            curr.z = quat.z/ norm_current;
         }
 
         if (norm_initial > 0.0)
@@ -229,7 +235,24 @@ Orientation OrientationSensor::read()
         // get z-axis rotation by converting delta quaternion to euler angles
         Vec3 values = quaternionToEuler(delta.w, delta.x, delta.y, delta.z,false);
 
-        sensor_reading.tilt = values.y;
+        sensor_reading.tilt = values.z;
+        //Serial.println("---------");
+        //Serial.println(sensor_reading.tilt);
+        // Serial.print("Raw Euler - X: ");
+        // Serial.print(euler.x, 2);
+        // Serial.print(", Y: ");
+        // Serial.print(-euler.y, 2);
+        // Serial.print(", Z: ");
+        // Serial.print(euler.z, 2);
+        // Serial.print(" | Filtered Euler - X: ");
+        // Serial.print(filtered_euler.x, 2);
+        // Serial.print(", Y: ");
+        // Serial.print(filtered_euler.y, 2);
+        // Serial.print(", Z: ");
+        // Serial.println(filtered_euler.z, 2);
+
+        // Simulate a delay to match the report interval
+        //delay(REPORT_INTERVAL_US / 1000);
 
         return sensor_reading;
     }
