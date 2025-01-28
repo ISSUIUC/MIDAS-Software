@@ -10,7 +10,6 @@
 #include "led.h"
 #include "hardware/camera.h"
 #include "hardware/CAN.h"
-#include "hardware/voltage.cpp"
 #include <ACAN2517FD.h>
 #include "finite-state-machines/fsm.h"
 
@@ -29,7 +28,7 @@ struct Sensors {
  * @brief holds all information about the rocket, sensors, and controllers
 */
 struct RocketSystems {
-    Sensors sensors;
+    //Sensors sensors;        //not used
     RocketData rocket_data;
     BuzzerController buzzer;
     LEDController led;

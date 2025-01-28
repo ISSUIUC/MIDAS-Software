@@ -6,9 +6,9 @@
 
 ErrorCode Cameras::init() {
     Serial.println("Starting UART...");
-    HardwareSerial cam1(1);
+    //HardwareSerial cam1(1);
     cam1.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
-    HardwareSerial cam2(2);
+    //HardwareSerial cam2(2);
     cam2.begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
    
     return ErrorCode::NoError; // Change this

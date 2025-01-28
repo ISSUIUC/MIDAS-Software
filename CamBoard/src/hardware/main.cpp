@@ -12,11 +12,12 @@
 /**
  * Sets the config file and then starts all the threads using the config.
  */
-RocketSystems systems{};
+HardwareSerial cam1(1);
+HardwareSerial cam2(2);
+RocketSystems systems{RocketData{}, BuzzerController{}, LEDController{}, Cameras{cam1, cam2}, CAN{}};
 // /**
 //  * @brief Sets up pinmodes for all sensors and starts threads
 // */
-
 void setup() {
     //begin serial port
     Serial.begin(9600);
@@ -24,6 +25,7 @@ void setup() {
 //    while (!Serial);
 
     delay(200);
+
 
     //begin sensor SPI bus
     Serial.println("Starting SPI...");

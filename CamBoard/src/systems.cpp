@@ -1,4 +1,5 @@
 #include "systems.h"
+#include "hardware/voltage.h"
 
 #include "hal.h"
 
@@ -90,7 +91,7 @@ DECLARE_THREAD(can, RocketSystems* arg) {
 ErrorCode init_systems(RocketSystems& systems) {
     digitalWrite(LED_ORANGE, HIGH);
 
-    INIT_SYSTEM(systems.sensors.voltage);
+    //INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.can);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);

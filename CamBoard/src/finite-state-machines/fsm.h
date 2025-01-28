@@ -9,6 +9,7 @@
 #include "rocket_state.h"
 #include "systems.h"
 
+struct RocketSystems;
 /**
  * @class FSM
  * 

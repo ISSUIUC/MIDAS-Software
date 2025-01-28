@@ -1,7 +1,7 @@
 #include <cmath>
 
 #include "fsm.h"
-#include "hardware/camera.cpp"
+#include "hardware/camera.h"
 
 
 /**
