@@ -32,7 +32,7 @@ while True:
         print(data)
 
         ser.write(tag.to_bytes(4, byteorder='little'))   
-        ser.write(size.to_bytes(4, byteorder='little'))   
+        # ser.write(size.to_bytes(4, byteorder='little'))   
         ser.write(data)
     else:
         raise ValueError(f"Unknown tag: {tag}")
