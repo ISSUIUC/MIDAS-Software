@@ -1,46 +1,31 @@
 #include "sensors.h"
-#include "Adxl355.h"
-#include "pins.h"
+#include "PL_ADXL355.h"
 
-// #include sensor library
+PL::ADXL355 sensor(ADXL355_CS);         //singleton object for the adxl
 
-// global static instance of the sensor
-
-Adxl355 sensor(ADXL355_CS);
-
+/**
+ * @brief Initializes the low G sensor
+ * 
+ * @return Error Code
+*/
 ErrorCode LowGSensor::init() {
     ErrorCode error = ErrorCode::NoError;
-    sensor.initSPI(SPI);
-    sensor.start();
-    delay(100);
-
-    if (sensor.isDeviceRecognized()) {
-        // On boot, defaults to 2G range and Output Data Rate: 4000Hz and Low Pass Filter: 1000Hz
-        // Change to 2G range and Output Data Rate: 1000Hz and Low Pass Filter: 250Hz
-        sensor.initializeSensor(Adxl355::RANGE_VALUES::RANGE_2G, Adxl355::ODR_LPF::ODR_1000_AND_250);
-
-        // Swap check if the sensor is changed from different values
-        if (Adxl355::RANGE_VALUES::RANGE_2G != sensor.getRange()) {
-            error = ErrorCode::LowGRangeCouldNotBeSet;
-        }
-
-        if (Adxl355::ODR_LPF::ODR_4000_AND_1000 != sensor.getOdrLpf()) {
-            error = ErrorCode::LowGODRLPFCouldNotBeSet;
-        }
-    } else {
-        error = ErrorCode::LowGCouldNotBeInitialized;
-    }
-
-    sensor.calibrateSensor(1);
-
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
+    sensor.begin();
+    sensor.setRange(PL::ADXL355_Range::range2g);
+    sensor.setOutputDataRate(PL::ADXL355_OutputDataRate::odr1000);
+    // todo set low pass filter frequency to 250hx
+    sensor.enableMeasurement();
     return error;
 }
 
-LowGData LowGSensor::read() {
-    // read from aforementioned global instance of sensor
-    auto data = sensor.getAccel();
+/**
+ * @brief Reads and returns the data from the sensor
+ * 
+ * @return a LowGData packet with current acceleration in all three axes
+*/
+LowGData LowGSensor::read()
+{
+    auto data = sensor.getAccelerations();
 
-    return LowGData(data.x, data.y, data.z);
+    return { data.x, data.y, data.z };
 }

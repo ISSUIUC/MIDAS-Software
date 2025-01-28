@@ -1,19 +1,21 @@
 #pragma once
 
-#include "finite-state-machines/fsm_states.h"
-
 #include <cmath>
 #include <cstdint>
 
-#define CONTINUITY_PIN_COUNT 4
+#include "finite-state-machines/fsm_states.h"
+
+//#define CONTINUITY_PIN_COUNT 5
+
 /**
+ * @brief
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
  * rocket_state struct, and each will be tagged with a timestamp.
 */
 
 /**
- * First 4 structs are base vector, pos, vel, and accel data to be used elsewhere
+ * @brief First 4 structs are base vector, pos, vel, and accel data to be used elsewhere
 */
 struct Vec3 {
     float x = 0;
@@ -48,6 +50,11 @@ struct Acceleration {
     }
 };
 
+/**
+ * @struct euler_t
+ * 
+ * @brief euler representation of rotation
+*/
 struct euler_t {
     float yaw;
     float pitch;
@@ -55,7 +62,13 @@ struct euler_t {
 };
 
 /**
- * Structs starting here represent specific sensors and the respective data
+ * @brief Structs starting here represent specific sensors and the respective data
+*/
+
+/**
+ * @struct LowGData
+ * 
+ * @brief data from the LowG sensor
 */
 struct LowGData {
     float ax = 0;
@@ -66,6 +79,11 @@ struct LowGData {
     LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
 };
 
+/**
+ * @struct HighGData
+ * 
+ * @brief data from the HighG sensor
+*/
 struct HighGData {
     float ax = 0;
     float ay = 0;
@@ -75,6 +93,11 @@ struct HighGData {
     HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
 };
 
+/**
+ * @struct LowGLSM
+ * 
+ * @brief data from the Low G LSM sensor
+*/
 struct LowGLSM {
     float gx = 0;
     float gy = 0;
@@ -84,41 +107,88 @@ struct LowGLSM {
     float az = 0;
 };
 
+/**
+ * @struct Barometer
+ * 
+ * @brief data from the barometer
+*/
 struct Barometer {
-    float temperature = 0;
-    float pressure = 0;
-    float altitude = 0;
+    float temperature = 0; // Temperature in Celcius
+    float pressure = 0; // Pressure in millibars
+    float altitude = 0; // Altitude in meters (above sea level?)
 
     Barometer() = default;
     Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
+/**
+ * @struct Continuity
+ * 
+ * @brief data about pyro continuity
+*/
 struct Continuity {
-    bool pins[CONTINUITY_PIN_COUNT];
+    float sense_pyro;
+    float pins[4];
 };
 
+/**
+ * @struct Voltage
+ * 
+ * @brief data about battery voltage
+*/
 struct Voltage {
     float voltage = 0;
 };
 
+/**
+ * @struct GPS
+ * 
+ * @brief data from the GPS
+*/
 struct GPS {
-    float latitude = 0;
-    float longitude = 0;
+    int32_t latitude = 0;
+    int32_t longitude = 0;
     float altitude = 0;
     float speed = 0;
     uint16_t satellite_count = 0;
+    // Unix timestamp since 1970
+    // This isn't included in the telem packet because this is
+    // solely for the SD logger. We do not need to know what time it is
+    // when we are recieving telem packets.
+    uint32_t time;
 };
 
+/**
+ * @struct Magnetometer
+ * 
+ * @brief data from the magnetometer
+*/
 struct Magnetometer {
     float mx;
     float my;
     float mz;
 };
 
+/**
+ * @struct Orientation
+ * 
+ * @brief data from the BNO
+*/
 struct Orientation {
+    bool has_data = false;
+
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
+
+    //For yessir.cpp
+    euler_t getEuler() const {
+        euler_t euler;
+        euler.yaw = this->yaw;
+        euler.pitch = this->pitch;
+        euler.roll = this->roll;
+        return euler;
+    }
 
     Velocity orientation_velocity;
     Acceleration orientation_acceleration;
@@ -130,10 +200,17 @@ struct Orientation {
     Magnetometer magnetometer;
 
     float temperature = 0;
-    float pressure = 0; 
+    float pressure = 0;
+
+    float tilt = 0;
 
 };
 
+/**
+ * @struct KalmanData
+ * 
+ * @brief data from the Kalman thread
+*/
 struct KalmanData {
     Position position;
     Velocity velocity;
@@ -142,34 +219,22 @@ struct KalmanData {
     float altitude;
 };
 
-
+/**
+ * @struct PyroChannel
+ * 
+ * @brief data about a specific pyro channel
+*/
 struct PyroChannel {
     bool is_armed = false;
     bool is_firing = false;
 };
 
-/** piro team defense forter 2
-⠂⠄⡂⡐⠠⠠⠠⠄⠄⠄⣀⡠⡤⡤⣆⢦⣄
-⠈⡀⠄⠄⠂⠁⠄⠁⡠⡪⡢⡫⡎⡧⡳⣝⣷⣧
-⠐⢀⠐⠈⠄⠄⢠⠎⢜⢸⢸⢜⡪⣪⢪⢲⢹⢽⡳⡄
-⡈⠠⢀⢡⠋⠉⠫⢶⡨⡪⣊⣦⠗⠚⠺⢾⣎⡧⣏⠇
-⠐⠄⢂⠧⠄⠄⠄⣽⢪⠚⡞⠄⠄⠄⠄⠄⠙⡾⡸⡕
-⠈⡀⠸⣱⠄⠄⢀⠞⡜⡹⡇⠄⠄⠄⠄⠄⠄⡯⡪⡝⠄
-⠂⡠⢁⡪⣂⢠⠪⠁⣇⢣⢣⣀⠄⠄⠐⣀⡼⡑⡜⠆
-⡼⢡⠢⡠⠄⠄⠄⡌⡆⣇⡅⠍⠛⠛⢛⠍⡔⢅⠣⠥⠤⣄
-⡝⡐⢕⢌⠄⠈⠠⠵⣹⣙⠎⡕⢅⢊⠢⡱⡸⢈⠢⠁⢸⣿
-⡯⠐⢅⠢⡂⠄⡘⣈⢂⢢⢑⠌⡢⠡⣫⡮⡨⠠⠁⠂⣸⣿
-⠱⢅⠨⠐⠠⠊⠎⠞⢵⡳⣥⡈⠢⡁⠢⠐⠄⠄⢀⣾⣿⣿
-⠄⡁⠄⢀⡸⢪⠲⠵⣄⠍⢪⢞⡐⠌⠈⠄⠄⢀⣾⡿⣿⡿
-⠄⠂⣴⣿⡐⢡⠑⡸⢠⠫⡀⠕⠁⢀⡠⣔⣮⡿⡯⣟⣿⢿
-⣠⣾⡿⠟⢁⢠⢐⣁⡂⣈⢴⠄⢘⣾⡺⡯⡫⣏⢯⡳⡝⡇
-⣿⣿⠁⠁⠄⢀⠆⣞⢿⣷⢱⠄⡜⡮⡳⡹⡸⡪⣱⡪⡪⠄
+/**
+ * @struct PyroState
+ * 
+ * @brief data regarding all pyro channels
 */
 struct PyroState {
     bool is_global_armed = false;
     PyroChannel channels[4];
-};
-
-struct FSMState {
-    FSM_state curr_state = STATE_IDLE;
 };

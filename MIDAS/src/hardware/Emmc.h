@@ -8,6 +8,11 @@
 #include "errors.h"
 #include "rocket_state.h"
 
+/**
+ * @class EMMCSink
+ * 
+ * @brief Class that wraps the emmc functions
+*/
 class EMMCSink : public LogSink {
 public:
     EMMCSink() = default;
@@ -16,4 +21,5 @@ public:
     void write(const uint8_t* data, size_t size);
 private:
     File file;
+    size_t unflushed_bytes = 0;
 };

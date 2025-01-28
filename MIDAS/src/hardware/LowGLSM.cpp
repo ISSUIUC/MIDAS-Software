@@ -1,27 +1,29 @@
 #include "sensors.h"
+#include <Arduino_LSM6DS3.h>
 
-// #include sensor library
-#include <SparkFunLSM6DS3.h>
-// global static instance of the sensor
-LSM6DS3 LSM(SPI_MODE, LSM6DS3_CS);
+LSM6DS3Class LSM(SPI, LSM6DS3_CS, 46);      // global static instance of the sensor
 
+/**
+ * @brief Initializes the low G LSM sensor
+ * 
+ * @return Error Code
+*/
 ErrorCode LowGLSMSensor::init() {
-    // do whatever steps to initialize the sensor
-    // if it errors, return the relevant error code
     if (!LSM.begin()) {
         return ErrorCode::GyroCouldNotBeInitialized;
     }
     return ErrorCode::NoError;
 }
 
+/**
+ * @brief Reads and returns the data from the sensor
+ * 
+ * @return a LowGLSM packet with current acceleration and gyro in all three axes
+*/
 LowGLSM LowGLSMSensor::read() {
     // read from aforementioned global instance of sensor
     LowGLSM result;
-    result.gx = LSM.readFloatGyroX();
-    result.gy = LSM.readFloatGyroY(),
-    result.gz = LSM.readFloatGyroZ();
-    result.ax = LSM.readFloatAccelX();
-    result.ay = LSM.readFloatAccelY();
-    result.az = LSM.readFloatAccelZ();
+    LSM.readAcceleration(result.ax, result.ay, result.az);
+    LSM.readGyroscope(result.gx, result.gy, result.gz);
     return result;
 }

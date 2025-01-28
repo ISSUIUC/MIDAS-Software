@@ -214,9 +214,10 @@ GNSS_StatusTypeDef TeseoLIV3F::I2CRead(uint16_t RegisterAddr, uint8_t* pBuffer, 
    {
       pBuffer[i] = dev_i2c->read();
       i++;
+      if(i >= NumByteToRead){
+         i = NumByteToRead - 1;
+      }
    }
-
-
    return (GNSS_StatusTypeDef) status;
 }
 
@@ -625,7 +626,6 @@ ParseStatus_t TeseoLIV3F::NMEA_ParseGPRMC(GPRMC_Info_t *pGPRMCInfo, uint8_t NMEA
 
    if(NMEA != NULL)
    {
-
       /* clear the app[][] buffer */
       for (int8_t i = 0; i < MAX_MSG_LEN; i++)
       {
@@ -1869,7 +1869,7 @@ int32_t TeseoLIV3F::NMEA_CheckAGPSMsg(const char header[])
    return is_passmsg;
 }
 
-void TeseoLIV3F::NMEA_Copy_Data(GPGGA_Info_t *pInfo, GPGGA_Info_t GPGGAInfo)
+void TeseoLIV3F::NMEA_Copy_Data(GPGGA_Info_t *pInfo, const GPGGA_Info_t& GPGGAInfo)
 {
    pInfo->acc          = GPGGAInfo.acc;
    pInfo->geoid.height = GPGGAInfo.geoid.height;
@@ -1912,5 +1912,3 @@ uint32_t TeseoLIV3F::char2int(uint8_t c)
 
    return ret;
 }
-
-

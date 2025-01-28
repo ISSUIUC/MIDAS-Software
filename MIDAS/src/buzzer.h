@@ -4,13 +4,22 @@
 #include "hal.h"
 #include "errors.h"
 
-
+/**
+ * @struct Sound
+ * 
+ * @brief contains information for a single note to play on the buzzer
+*/
 struct Sound {
 public:
     uint32_t frequency;
     uint8_t duration_ms;
 };
 
+/**
+ * @struct BuzzerController
+ * 
+ * @brief wraps the buzzer functionality
+*/
 struct BuzzerController {
 private:
     Sound* current_tune_ = nullptr;
@@ -29,3 +38,6 @@ public:
     void tick();
     void play_tune(Sound* tune, uint32_t length);
 };
+
+#define FREE_BIRD_LENGTH 11
+extern Sound free_bird[FREE_BIRD_LENGTH];

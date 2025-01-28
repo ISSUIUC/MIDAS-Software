@@ -1,0 +1,19 @@
+{
+    "type": "data",
+    "value": {
+        "barometer_altitude": 0,
+        "altitude": 0,
+        "latitude": 0,
+        "longitude": 0,
+        "highG_ax": 0.31641,
+        "highG_ay": 0.09766,
+        "highG_az": 1.02734,
+        "battery_voltage": 1,
+        "FSM_state": 0,
+        "tilt_angle": 0,
+        "frequency": 400,
+        "RSSI": 0,
+        "sat_count": 0,
+        "is_sustainer": 0
+    }
+}

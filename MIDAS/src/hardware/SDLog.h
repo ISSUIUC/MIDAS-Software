@@ -6,12 +6,20 @@
 #include "sensors.h"
 #include "data_logging.h"
 
-class FileSink : public LogSink {
+/**
+ * @class SDSink
+ * 
+ * @brief Class that wraps the SD card functions
+*/
+class SDSink : public LogSink {
 public:
-    FileSink() = default;
+    bool failed = false;
+
+    SDSink() = default;
 
     ErrorCode init() override;
     void write(const uint8_t* data, size_t size) override;
 private:
     File file;
+    size_t unflushed_bytes = 0;
 };

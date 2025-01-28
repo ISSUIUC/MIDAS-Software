@@ -3,7 +3,9 @@
 #include "sensor_data.h"
 
 /**
- * 0 is not used to make it easier to spot bugs
+ * @enum ReadingDiscriminant
+ * 
+ * @brief ID for each sensor, 0 is not used to make it easier to spot bugs
  */
 enum ReadingDiscriminant {
     ID_LOWG = 1,
@@ -15,17 +17,24 @@ enum ReadingDiscriminant {
     ID_MAGNETOMETER = 7,
     ID_ORIENTATION = 8,
     ID_LOWGLSM = 9,
+    ID_FSM = 10,
+    ID_KALMAN = 11,
+    ID_PYRO = 12,
 };
 
 
-/*
+/**
+ * @struct LoggerReading
+ * 
+ * @brief representation of data that will be logged
+ * 
+ * @note 
  * This struct isn't actually logged as-is, because if we did we'd waste extra space since
  * unions are the size of their largest member. This is just a reference struct.
  *
  * Instead, we use 4 bytes for the discriminant, 4 bytes for the timestamp, and then write the
  * actual data. No padding between inside these items or between readings.
  */
-
 struct LoggedReading {
     ReadingDiscriminant discriminant;
     uint32_t timestamp_ms;
@@ -39,5 +48,8 @@ struct LoggedReading {
         Magnetometer magnetometer;
         Orientation orientation;
         LowGLSM lowg_lsm;
+        KalmanData kalman;
+        FSMState fsm;
+        PyroState pyro;
     } data;
 };
