@@ -26,8 +26,9 @@ void writeStructSizesToJson() {
     jsonStream << "  \"7\": " << sizeof(Magnetometer) << ",\n";
     jsonStream << "  \"8\": " << sizeof(Orientation) << ",\n";
     jsonStream << "  \"11\": " << sizeof(KalmanData) << ",\n";
-    //jsonStream << "  \"PyroChannel\": " << sizeof(PyroChannel) << ",\n";
     jsonStream << "  \"12\": " << sizeof(PyroState) << "\n";
+        //jsonStream << "  \"PyroChannel\": " << sizeof(PyroChannel) << ",\n";
+
 
     // End the JSON object
     jsonStream << "}";
