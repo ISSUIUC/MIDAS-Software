@@ -359,7 +359,7 @@ void setup() {
     }
     current_freq = SUSTAINER_FREQ;
     #endif
-    rf95.setCodingRate4(6);
+    rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
     rf95.setSignalBandwidth(250000);

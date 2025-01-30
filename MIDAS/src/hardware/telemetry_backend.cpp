@@ -62,7 +62,7 @@ ErrorCode TelemetryBackend::init() {
         return ErrorCode::RadioSetFrequencyFailed;
     }
     rf95.setSignalBandwidth(250000);
-    rf95.setCodingRate4(6);
+    rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
     /*
