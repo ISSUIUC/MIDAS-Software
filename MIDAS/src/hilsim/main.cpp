@@ -16,7 +16,7 @@ DECLARE_THREAD(hilsim, void*arg) {
     // Debug kamaji output to verify if we're reading the correct packets
     while (Serial.read() != 33);
     char magic[] = {69, 110, 117, 109, 99, 108, 97, 119, 0};
-    Serial.println(magic);
+    Serial.println(checksum);
     Serial.println(__TIME__);
     Serial.println(__DATE__);
     Serial.flush();

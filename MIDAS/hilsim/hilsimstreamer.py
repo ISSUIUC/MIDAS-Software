@@ -14,8 +14,7 @@ print(''.join(format(x, '02x') for x in test_list))
 while True:
     tag = file.read(4)
     if not tag:
-        break  
-    
+        break 
     
     tag = int.from_bytes(tag, byteorder='little')
     

@@ -19,7 +19,6 @@ MultipleLogSink<SDSink> sinks;
 MultipleLogSink<> sinks;
 #endif
 RocketSystems systems { .log_sink = sinks };
-#define STRUCT_SIZE(st) Serial.print("Struct suze of " #st " is"); Serial.println(sizeof(st));
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
 */
@@ -27,11 +26,10 @@ RocketSystems systems { .log_sink = sinks };
 void setup() {
     //begin serial port
     Serial.begin(9600);
-    STRUCT_SIZE();
 
 //    while (!Serial);
 
- /*   delay(200);
+    delay(200);
 
     //begin sensor SPI bus
     Serial.println("Starting SPI...");
@@ -68,7 +66,7 @@ void setup() {
     delay(200);
 
     //init and start threads
-    begin_systems(&systems);*/
+    begin_systems(&systems);
 }
 
 void loop() {

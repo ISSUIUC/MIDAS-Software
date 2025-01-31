@@ -1,7 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>  
-#include "sensor_data.h"
+#include "../sensor_data.h"
 
 void writeStructSizesToJson() {
     // Create an ostringstream to build the JSON string

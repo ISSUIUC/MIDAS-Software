@@ -21,3 +21,6 @@ the VSCode extension, these commands won't work until you install platformio
 manually.
 
 To run SILSIM from the command line, use `pio run -e mcu_silsim`.
+
+### HILSIM
+To start a basic hilsim run, 
