@@ -10,9 +10,11 @@
 #include "log_checksum.h"
 #include "global_packet.h"
 
+#include "SDLog.h"
+
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
 
-MultipleLogSink<> sink;
+MultipleLogSink<SDSink> sink;
 RocketSystems systems{.log_sink = sink};
 
 DECLARE_THREAD(hilsim, void*arg) {
@@ -130,7 +132,6 @@ void setup(){
     Serial.print('\n');
     Serial.flush();
 
-    
     //begin sensor SPI bus
     // Serial.println("Starting SPI...");
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);

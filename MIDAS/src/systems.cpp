@@ -315,6 +315,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
     INIT_SYSTEM(systems.sensors.gps);
+    THREAD_SLEEP(1000);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }

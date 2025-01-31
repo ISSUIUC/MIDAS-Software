@@ -5,7 +5,7 @@
 #include "systems.h"
 #include "hardware/pins.h"
 #include "hardware/Emmc.h"
-#include "hardware/SDLog.h"
+#include "SDLog.h"
 #include "sensor_data.h"
 
 /**
