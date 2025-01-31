@@ -202,7 +202,6 @@ void RH_RF95::handleInterrupt()
     else if (_mode == RHModeRx && irq_flags & RH_RF95_RX_DONE)
     {
 	// Packet received, no CRC error
-	Serial.println("R");
 	// Have received a packet
 	uint8_t len = spiRead(RH_RF95_REG_13_RX_NB_BYTES);
 
@@ -282,10 +281,12 @@ void RH_INTERRUPT_ATTR RH_RF95::isr2()
 void RH_RF95::validateRxBuf()
 {
     Serial.println(_bufLen);
-    for(int i = 0; i < 16; i++){
-        Serial.print(_buf[i]);
+    for(int i = 0; i < _bufLen; i++){
+        Serial.print((char) _buf[i]);
     }
     Serial.println();
+    _rxGood++;
+	_rxBufValid = true;
     if (_bufLen < 4)
 	return; // Too short to be a real message
     // Extract the 4 headers
@@ -332,9 +333,9 @@ bool RH_RF95::recv(uint8_t* buf, uint8_t* len)
     {
 	ATOMIC_BLOCK_START;
 	// Skip the 4 headers that are at the beginning of the rxBuf
-	if (*len > _bufLen-RH_RF95_HEADER_LEN)
-	    *len = _bufLen-RH_RF95_HEADER_LEN;
-	memcpy(buf, _buf+RH_RF95_HEADER_LEN, *len);
+	if (*len > _bufLen)
+	    *len = _bufLen;
+	memcpy(buf, _buf, *len);
 	ATOMIC_BLOCK_END;
     }
     clearRxBuf(); // This message accepted and cleared

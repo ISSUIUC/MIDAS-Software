@@ -373,24 +373,23 @@ void loop() {
         uint8_t len = sizeof(buf);
 
         if (rf95.recv(buf, &len)) {
-            Serial.println("recv");
-            // digitalWrite(LED_BUILTIN, HIGH);
-            // delay(50);
-            // digitalWrite(LED_BUILTIN, LOW);
-            // // Serial.println("Received packet");
-            // // Serial.println(len);
-            // memcpy(&packet, buf, sizeof(packet));
-            // EnqueuePacket(packet, current_freq);
-            // if (!cmd_queue.empty()) {
-            //     auto& cmd = cmd_queue.front();
-            //         cmd.retry_count++;
-            //         if (cmd.retry_count >= max_command_retries) {
-            //             cmd_queue.pop();
-            //             Serial.println(json_send_failure);
-            //         }
-            // }
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(50);
+            digitalWrite(LED_BUILTIN, LOW);
+            // Serial.println("Received packet");
+            // Serial.println(len);
+            memcpy(&packet, buf, sizeof(packet));
+            EnqueuePacket(packet, current_freq);
+            if (!cmd_queue.empty()) {
+                auto& cmd = cmd_queue.front();
+                    cmd.retry_count++;
+                    if (cmd.retry_count >= max_command_retries) {
+                        cmd_queue.pop();
+                        Serial.println(json_send_failure);
+                    }
+            }
 
-            // process_command_queue();
+            process_command_queue();
 
         } else {
             Serial.println(json_receive_failure);
