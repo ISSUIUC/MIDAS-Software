@@ -1,39 +1,71 @@
 import serial
+import serial.tools
+import serial.tools.list_ports
+import time
+import json
 
-ser = serial.Serial(
-    port='COM4',         
-    baudrate=9600,       
-    timeout=1            
-)
+device = None
+# Look for midas comport
+for comport in serial.tools.list_ports.comports():
+    if comport.vid == 0x303a:
+        # This is an espressif device
+        print(comport.name, "is an Espressif device")
+        device = comport
+        break
 
-file = open(r"C:\Users\sharm\Downloads\data10.launch", "rb")
-SIZES = { 1: 12, 2: 12, 3: 12, 4: 20, 5: 4, 6: 20, 7: 12, 8: 84, 9: 24, 10: 4, 11: 40, 12: 9 }
+if not device:
+    print("MIDAS is not connected!")
+    exit()
+file = open(r"data271.launch", "rb")
+
+# Read the json file
+SIZES = { int(k): v for k, v in json.load(open("../struct_sizes.json", 'r')).items() }
+print(SIZES)
 
 test_list=file.read(4)
-print(''.join(format(x, '02x') for x in test_list))
+print("Checksum", hex(int.from_bytes(test_list, byteorder='little')))
+ser = serial.Serial(
+    port=comport.name,         
+    baudrate=115200,       
+    timeout=None       
+)
+print(ser.write('!'.encode('ascii')))
+print("Magic", ser.read_until('\n'.encode('ascii'))) # Should be our magic
+print("Checksum", hex(int(ser.read_until('\n'.encode('ascii'))))) # Should be our magic
+counter = 0
+
+start_time = time.perf_counter()
 while True:
     tag = file.read(4)
     if not tag:
         break 
     
     tag = int.from_bytes(tag, byteorder='little')
-    
-    
-    timestamp = file.read(4)  
+    timestamp = file.read(4)
 
-    print(int.from_bytes(timestamp, byteorder='little'))
-    print(tag)
+    # print(tag, int.from_bytes(timestamp, byteorder='little'))
+
     if tag in SIZES:
         size = SIZES[tag]
-        print(size)
+        # print(size)
         
         data = file.read(size)
-        print(data)
+        # print(data)
 
-        ser.write(tag.to_bytes(4, byteorder='little'))   
-        # ser.write(size.to_bytes(4, byteorder='little'))   
+        ser.write(tag.to_bytes(1, byteorder='little'))   
+        # ser.write(size.to_bytes(4, byteorder='little'))
         ser.write(data)
+        content = ser.read_until('\n'.encode('ascii'))
+        data = bytes.decode(content, encoding="ascii")
+        if len(content) != 0:
+            # print(content)
+            if ("Error") in (data):
+                print((content))
+            # print(counter, file.tell(), content)
     else:
         raise ValueError(f"Unknown tag: {tag}")
+    counter += 1
 
 ser.close()
+end_time = time.perf_counter()
+print("Done in ", end_time - start_time)

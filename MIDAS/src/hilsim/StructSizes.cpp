@@ -18,13 +18,14 @@ void writeStructSizesToJson() {
     jsonStream << "  \"euler_t\": " << sizeof(euler_t) << ",\n";*/
     jsonStream << "  \"1\": " << sizeof(LowGData) << ",\n";
     jsonStream << "  \"2\": " << sizeof(HighGData) << ",\n";
-    jsonStream << "  \"9\": " << sizeof(LowGLSM) << ",\n";
     jsonStream << "  \"3\": " << sizeof(Barometer) << ",\n";
     jsonStream << "  \"4\": " << sizeof(Continuity) << ",\n";
     jsonStream << "  \"5\": " << sizeof(Voltage) << ",\n";
     jsonStream << "  \"6\": " << sizeof(GPS) << ",\n";
     jsonStream << "  \"7\": " << sizeof(Magnetometer) << ",\n";
     jsonStream << "  \"8\": " << sizeof(Orientation) << ",\n";
+    jsonStream << "  \"9\": " << sizeof(LowGLSM) << ",\n";
+    jsonStream << "  \"10\": " << sizeof(FSMState) << ",\n";
     jsonStream << "  \"11\": " << sizeof(KalmanData) << ",\n";
     jsonStream << "  \"12\": " << sizeof(PyroState) << "\n";
         //jsonStream << "  \"PyroChannel\": " << sizeof(PyroChannel) << ",\n";
