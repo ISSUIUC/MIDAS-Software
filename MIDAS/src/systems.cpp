@@ -190,7 +190,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     // LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
     //yessir.initialize(initial_orientation, initial_barom_buf, initial_accelerations);
     TickType_t last = 0;
-    
+
     while (true) {
         if (yessir.should_reinit) {
             yessir.initialize(arg->rocket_data);
@@ -234,7 +234,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                             yessir.should_reinit = true;
                             break;
                         default:
-                            break; 
+                            break;
                     }
                 }
 

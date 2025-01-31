@@ -8,83 +8,68 @@
 #include "silsim/simulation/simulation.h"
 
 
-struct LowGSensor final: ISensor<LowGData> {
+template<class T>
+struct EmulatedSensor : ISensor<T> {
+protected:
+    RocketState& state;
+
+public:
+    explicit EmulatedSensor(RocketState& state) : state(state) { };
+};
+
+
+struct LowGSensor final: EmulatedSensor<LowGData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     LowGData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit LowGSensor(SimulatedRocket** sim);
 };
 
-struct LowGLSMSensor final: ISensor<LowGLSMData> {
+struct LowGLSMSensor final: EmulatedSensor<LowGLSMData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     LowGLSMData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit LowGLSMSensor(SimulatedRocket** sim);
 };
 
-struct HighGSensor final: ISensor<HighGData> {
+struct HighGSensor final: EmulatedSensor<HighGData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     HighGData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit HighGSensor(SimulatedRocket** sim);
 };
 
-struct BarometerSensor final: ISensor<BarometerData> {
+struct BarometerSensor final: EmulatedSensor<BarometerData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     BarometerData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit BarometerSensor(SimulatedRocket** sim);
 };
 
-struct ContinuitySensor final: ISensor<ContinuityData> {
+struct ContinuitySensor final: EmulatedSensor<ContinuityData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     ContinuityData read() override;
-
-    explicit ContinuitySensor(SimulatedRocket** sim);
 };
 
-struct VoltageSensor final: ISensor<VoltageData> {
+struct VoltageSensor final: EmulatedSensor<VoltageData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     VoltageData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit VoltageSensor(SimulatedRocket** sim);
 };
 
-struct MagnetometerSensor final: ISensor<MagnetometerData> {
+struct MagnetometerSensor final: EmulatedSensor<MagnetometerData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     MagnetometerData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit MagnetometerSensor(SimulatedRocket** sim);
 };
 
-struct OrientationSensor final: ISensor<OrientationData> {
+struct OrientationSensor final: EmulatedSensor<OrientationData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     OrientationData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit OrientationSensor(SimulatedRocket** sim);
 };
 
-struct GPSSensor final: ISensor<GPSData> {
+struct GPSSensor final: EmulatedSensor<GPSData> {
+    using EmulatedSensor::EmulatedSensor;
     ErrorCode init() override;
     GPSData read() override;
-
-    SimulatedRocket** rocket;
-
-    explicit GPSSensor(SimulatedRocket** sim);
 };
 
 
@@ -106,6 +91,5 @@ struct PyroBackend final: IPyroBackend {
     ErrorCode init() override;
 
     void arm_all() override;
-
     void fire_channel(int channel) override;
 };
