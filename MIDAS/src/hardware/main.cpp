@@ -1,74 +1,52 @@
+// SPDX-FileCopyrightText: 2023 Carter Nelson for Adafruit Industries
+//
+// SPDX-License-Identifier: MIT
+// --------------------------------------
+// i2c_scanner
+//
+// Modified from https://playground.arduino.cc/Main/I2cScanner/
+// --------------------------------------
+#include<Arduino.h>
 #include <Wire.h>
-#include <SPI.h>
-#include "TCAL9539.h"
 
-#include "systems.h"
-#include "hardware/pins.h"
-#include "hardware/Emmc.h"
-#include "hardware/SDLog.h"
-#include "sensor_data.h"
-
-/**
- * Sets the config file and then starts all the threads using the config.
- */
-
-#ifdef IS_SUSTAINER
-// MultipleLogSink<EMMCSink> sinks;
-MultipleLogSink<SDSink> sinks;
-#else
-MultipleLogSink<> sinks;
-#endif
-RocketSystems systems { .log_sink = sinks };
-/**
- * @brief Sets up pinmodes for all sensors and starts threads
-*/
+// Set I2C bus to use: Wire, Wire1, etc.
+#define WIRE Wire
 
 void setup() {
-    //begin serial port
+    WIRE.begin(6,5);
+
     Serial.begin(9600);
+}
 
-//    while (!Serial);
+int read_reg(int reg, int bytes) {
+    Wire.beginTransmission(0x40);
+    Wire.write(reg);
+    if(Wire.endTransmission()){
+        Serial.println("I2C Error");
+    }
 
-    delay(200);
-
-    //begin sensor SPI bus
-    Serial.println("Starting SPI...");
-    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
-
-    //begin I2C bus
-    Serial.println("Starting I2C...");
-    Wire.begin(I2C_SDA, I2C_SCL);
-
-    //set all chip selects high (deselected)
-    pinMode(MS5611_CS, OUTPUT);
-    pinMode(LSM6DS3_CS, OUTPUT);
-    pinMode(KX134_CS, OUTPUT);
-    pinMode(ADXL355_CS, OUTPUT);
-    pinMode(LIS3MDL_CS, OUTPUT);
-    pinMode(BNO086_CS, OUTPUT);
-    pinMode(CAN_CS, OUTPUT);
-    pinMode(RFM96_CS, OUTPUT);
-    digitalWrite(MS5611_CS, HIGH);
-    digitalWrite(LSM6DS3_CS, HIGH);
-    digitalWrite(KX134_CS, HIGH);
-    digitalWrite(ADXL355_CS, HIGH);
-    digitalWrite(LIS3MDL_CS, HIGH);
-    digitalWrite(BNO086_CS, HIGH);
-    digitalWrite(CAN_CS, HIGH);
-    digitalWrite(RFM96_CS, HIGH);
-
-    //configure output leds
-    gpioPinMode(LED_BLUE, OUTPUT);
-    gpioPinMode(LED_GREEN, OUTPUT);
-    gpioPinMode(LED_ORANGE, OUTPUT);
-    gpioPinMode(LED_RED, OUTPUT);
-
-    delay(200);
-
-    //init and start threads
-    begin_systems(&systems);
+    Wire.requestFrom(0x40, bytes);
+    int val = 0;
+    for(int i = 0; i < bytes; i++){
+        int v = Wire.read();
+        if(v == -1) Serial.println("I2C Read Error");
+        val = (val << 8) | v;
+    }
+    return val;
 }
 
 void loop() {
-
+    int power = read_reg(0x8, 3);
+    int current = read_reg(0x7, 2);
+    int temp = read_reg(0x6, 2);
+    int voltage = read_reg(0x5, 2);
+    Serial.print("Voltage ");
+    Serial.println(voltage * 3.125 / 1000.0);
+    Serial.print("Temp ");
+    Serial.println(temp * 125 / 1000.0);
+    Serial.print("Current ");
+    Serial.println(current * 1.2 / 1000.0);
+    Serial.print("Power ");
+    Serial.println(power * 240 / 1000000.0);
+    delay(1000);
 }

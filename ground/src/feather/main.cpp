@@ -33,10 +33,10 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 420;
-float SUSTAINER_FREQ = 426.15;
-float BOOSTER_FREQ = 425.15;
-float GROUND_FREQ = 420;
+float RF95_FREQ = 430;
+float SUSTAINER_FREQ = 430;
+float BOOSTER_FREQ = 430;
+float GROUND_FREQ = 430;
 
 float current_freq = 0;
 
@@ -342,9 +342,10 @@ void setup() {
     current_freq = SUSTAINER_FREQ;
     #endif
     rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
+    rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
     rf95.setSignalBandwidth(125000);
+    rf95.setPreambleLength(8);
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(current_freq);
     Serial.println("}");
@@ -366,28 +367,30 @@ void loop() {
     
     PrintDequeue();
     if (rf95.available()) {
+        Serial.println("available");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         TelemetryPacket packet;
         uint8_t len = sizeof(buf);
 
         if (rf95.recv(buf, &len)) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(50);
-            digitalWrite(LED_BUILTIN, LOW);
-            // Serial.println("Received packet");
-            // Serial.println(len);
-            memcpy(&packet, buf, sizeof(packet));
-            EnqueuePacket(packet, current_freq);
-            if (!cmd_queue.empty()) {
-                auto& cmd = cmd_queue.front();
-                    cmd.retry_count++;
-                    if (cmd.retry_count >= max_command_retries) {
-                        cmd_queue.pop();
-                        Serial.println(json_send_failure);
-                    }
-            }
+            Serial.println("recv");
+            // digitalWrite(LED_BUILTIN, HIGH);
+            // delay(50);
+            // digitalWrite(LED_BUILTIN, LOW);
+            // // Serial.println("Received packet");
+            // // Serial.println(len);
+            // memcpy(&packet, buf, sizeof(packet));
+            // EnqueuePacket(packet, current_freq);
+            // if (!cmd_queue.empty()) {
+            //     auto& cmd = cmd_queue.front();
+            //         cmd.retry_count++;
+            //         if (cmd.retry_count >= max_command_retries) {
+            //             cmd_queue.pop();
+            //             Serial.println(json_send_failure);
+            //         }
+            // }
 
-            process_command_queue();
+            // process_command_queue();
 
         } else {
             Serial.println(json_receive_failure);

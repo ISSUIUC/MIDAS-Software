@@ -160,7 +160,6 @@ bool RH_RF95::setupInterruptHandler()
 void RH_RF95::handleInterrupt()
 {
     RH_MUTEX_LOCK(lock); // Multithreading support
-    
     // we need the RF95 IRQ to be level triggered, or we ……have slim chance of missing events
     // https://github.com/geeksville/Meshtastic-esp32/commit/78470ed3f59f5c84fbd1325bcff1fd95b2b20183
 
@@ -203,7 +202,7 @@ void RH_RF95::handleInterrupt()
     else if (_mode == RHModeRx && irq_flags & RH_RF95_RX_DONE)
     {
 	// Packet received, no CRC error
-//	Serial.println("R");
+	Serial.println("R");
 	// Have received a packet
 	uint8_t len = spiRead(RH_RF95_REG_13_RX_NB_BYTES);
 
@@ -231,6 +230,7 @@ void RH_RF95::handleInterrupt()
 	    _lastRssi -= 164;
 	    
 	// We have received a message.
+    Serial.println("validate");
 	validateRxBuf(); 
 	if (_rxBufValid)
 	    setModeIdle(); // Got one 
@@ -281,6 +281,11 @@ void RH_INTERRUPT_ATTR RH_RF95::isr2()
 // Check whether the latest received message is complete and uncorrupted
 void RH_RF95::validateRxBuf()
 {
+    Serial.println(_bufLen);
+    for(int i = 0; i < 16; i++){
+        Serial.print(_buf[i]);
+    }
+    Serial.println();
     if (_bufLen < 4)
 	return; // Too short to be a real message
     // Extract the 4 headers
@@ -490,7 +495,7 @@ void RH_RF95::setTxPower(int8_t power, bool useRFO)
 // Sets registers from a canned modem configuration structure
 void RH_RF95::setModemRegisters(const ModemConfig* config)
 {
-    spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d);
+    spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d & 0x01);
     spiWrite(RH_RF95_REG_1E_MODEM_CONFIG2,       config->reg_1e);
     spiWrite(RH_RF95_REG_26_MODEM_CONFIG3,       config->reg_26);
 }
