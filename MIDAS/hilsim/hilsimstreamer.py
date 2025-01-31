@@ -32,6 +32,7 @@ ser = serial.Serial(
 print(ser.write('!'.encode('ascii')))
 print("Magic", ser.read_until('\n'.encode('ascii'))) # Should be our magic
 print("Checksum", hex(int(ser.read_until('\n'.encode('ascii'))))) # Should be our magic
+print("Garbage", ((ser.read_until('\n'.encode('ascii')))))
 counter = 0
 
 start_time = time.perf_counter()
@@ -61,10 +62,12 @@ while True:
             # print(content)
             if ("Error") in (data):
                 print((content))
-            # print(counter, file.tell(), content)
+            print(counter, file.tell(), content)
     else:
         raise ValueError(f"Unknown tag: {tag}")
     counter += 1
+    if counter % 5000 == 0:
+        print(counter)
 
 ser.close()
 end_time = time.perf_counter()

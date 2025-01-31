@@ -51,7 +51,7 @@ public:
      */
     T read() {
         if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
+            Serial.println("Aw shucks read");
             Serial.flush();
         }
         xSemaphoreTake(mutex_handle, portMAX_DELAY);
@@ -77,7 +77,7 @@ public:
     */
     void read2(T* ptr) {
         if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
+            Serial.println("Aw shucks read2");
             Serial.flush();
         }
         xSemaphoreTake(mutex_handle, portMAX_DELAY);
@@ -93,7 +93,7 @@ public:
      */
     void write(T value) {
         if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
+            Serial.println("Aw shucks write");
             Serial.flush();
         }
 
