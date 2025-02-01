@@ -90,7 +90,7 @@ struct TelemetryPacket {
     uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
     float RSSI = 0.0;
-}  __attribute__((packed));
+};
 
 struct FullTelemetryData {
     systime_t timestamp;  //[0, 2^32]
