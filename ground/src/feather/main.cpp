@@ -342,9 +342,10 @@ void setup() {
     current_freq = SUSTAINER_FREQ;
     #endif
     rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
+    rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
     rf95.setSignalBandwidth(125000);
+    rf95.setPreambleLength(8);
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(current_freq);
     Serial.println("}");
@@ -493,6 +494,3 @@ void loop() {
     serial_parser.read();
 }
 #endif
-
-
-
