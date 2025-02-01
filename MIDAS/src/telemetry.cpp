@@ -109,7 +109,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.pyro |= tilt_extra << 28;
 
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint8_t sat_count = gps.satellite_count < 8 ? gps.satellite_count : 7;
+    uint8_t sat_count = gps.fix_type;
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
     packet.kf_vx = kalman.velocity.vx;
 

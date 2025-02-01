@@ -33,8 +33,6 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-
-
 float RF95_FREQ = 426.15;
 float SUSTAINER_FREQ = 426.15;
 

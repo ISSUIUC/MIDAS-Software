@@ -60,9 +60,15 @@
 #define SENSE_AUX 07
 
 // Telemetry pins
-#define E22_CS 9
 #define RFM96_INT 7 // DEPRECTED NO LONGER USE
-#define E22_RESET 12
+
+// E22
+#define E22_CS 5
+#define E22_DI01 4
+#define E22_DI03 3
+#define E22_BUSY 6
+#define E22_RXEN 7
+#define E22_RESET 8
 
 // LEDs
 #define LED_BLUE   GpioAddress(2, 014)

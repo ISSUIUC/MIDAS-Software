@@ -3,6 +3,8 @@
 #include "hal.h"
 #include "gnc/yessir.h"
 
+#include <TCAL9539.h>
+
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
 #elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
@@ -95,7 +97,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
     while (true) {
         if (i % 10 == 0) {
-            if (args->sensors.gps.valid()) {
+            if (arg->sensors.gps.valid()) {
                 GPS reading = arg->sensors.gps.read();
                 arg->rocket_data.gps.update(reading);
             } // Otherwise it's just dead :skull:
@@ -217,6 +219,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
         
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+<<<<<<< HEAD
 
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
@@ -278,9 +281,24 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                     //         break; 
                     // }
                 }
+=======
+        // if (current_state == FSMState(STATE_IDLE)) {
+        //     TelemetryCommand command;
+        //     if (arg->tlm.receive(&command, 2000)) {
+        //         if(command.valid()) {
+        //             arg->tlm.acknowledgeReceived();
+        //             switch(command.command) {
+        //                 case CommandType::RESET_KF:
+        //                     yessir.should_reinit = true;
+        //                     break;
+        //                 default:
+        //                     break; 
+        //             }
+        //         }
+>>>>>>> f41298b (telemetry)
 
-            }
-        }
+        //     }
+        // }
         THREAD_SLEEP(1);
         // Serial.println("Telemetry");
     }
