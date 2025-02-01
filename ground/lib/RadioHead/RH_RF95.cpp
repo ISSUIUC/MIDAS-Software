@@ -316,7 +316,7 @@ bool RH_RF95::recv(uint8_t* buf, uint8_t* len)
     if (buf && len)
     {
 	ATOMIC_BLOCK_START;
-	// Skip the 4 headers that are at the beginning of the rxBuf
+    // Cap buffer length and return the length
 	if (*len > _bufLen)
 	    *len = _bufLen;
 	memcpy(buf, _buf, *len);
@@ -480,6 +480,7 @@ void RH_RF95::setTxPower(int8_t power, bool useRFO)
 // Sets registers from a canned modem configuration structure
 void RH_RF95::setModemRegisters(const ModemConfig* config)
 {
+    // Enable implicit header which is the 1st bit in the register
     spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d & 0x01);
     spiWrite(RH_RF95_REG_1E_MODEM_CONFIG2,       config->reg_1e);
     spiWrite(RH_RF95_REG_26_MODEM_CONFIG3,       config->reg_26);
