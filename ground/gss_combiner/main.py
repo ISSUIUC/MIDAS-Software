@@ -6,6 +6,7 @@
 # Aaditya Voruganti (2026)
 # Zyun Lam (2027)
 # Michael Karpov (2027)
+# Surag Nuthulapaty (2027)
 
 # USAGE:
 # py ./main.py [options]
@@ -246,7 +247,7 @@ if __name__ == "__main__":
             
             telem_threads_booster[0].send_command(command)
         
-        if (not is_verbose or not is_visual):
+        if (is_verbose or not is_visual):
             continue
 
         # Only print occasionally to not flood standard print

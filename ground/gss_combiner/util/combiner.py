@@ -51,9 +51,10 @@ class TelemetryCombiner():
 
             def check(self, packet) -> bool:
                 """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` based on the current UniquePacket (Tests for duplicates)"""
+                print(">>>>", packet['value'])
                 try:
-                    incoming = copy.copy(packet['data'])
-                    existing = copy.copy(self.__packet['data'])
+                    incoming = copy.copy(packet['value'])
+                    existing = copy.copy(self.__packet['value'])
 
                     incoming['RSSI'] = 0 # This will compare everything but RSSI, filter out identical packets with different RSSIs.
                     existing['RSSI'] = 0
@@ -166,7 +167,7 @@ class TelemetryCombiner():
         for packet in queue:
 
             packet_test = self.__filter.test(packet['data'])
-            dubplicate_test = self.__duplicate.check(packet['data'])
+            dubplicate_test = True # self.__duplicate.check(packet['data'])
             
             # Check if packet passes filter
             self.__log.console_log("Packet states: flt: (" + str(packet_test) + ") dup: (" + str(dubplicate_test) + ")")
