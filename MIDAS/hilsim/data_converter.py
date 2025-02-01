@@ -43,7 +43,7 @@ def discriminant_to_field_names(disc):
         case ReadingDiscriminant.ID_KALMAN:
             return ["kalman_pos_x", "kalman_pos_y", "kalman_pos_z", "kalman_vel_x", "kalman_vel_y", "kalman_vel_z", "kalman_accel_x", "kalman_accel_y", "kalman_accel_z", "baro_alt"]
         case ReadingDiscriminant.ID_PYRO:
-            return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+            return [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
 def line_to_bytes(line):
     all_packets = []
@@ -53,7 +53,7 @@ def line_to_bytes(line):
         
         current_packet.append(disc.value.to_bytes(4, 'little'))
 
-        current_packet.append(struct.pack('f', float(line['time'])))
+        current_packet.append(int(float(line['time']) * 1000).to_bytes(4, 'little'))
 
         for col in cols_to_save:
             if col is None:
@@ -89,12 +89,10 @@ with open(in_file, 'r') as f:
         all_rows.append(line_to_bytes(row))
         a += 1
 
-        if a > 0:
-            break
-
 
 
 num = 0xf3626b6a
+buf = 0x00
 
 with open(out_file, 'wb') as f:
     f.write(num.to_bytes(4, 'little'))
@@ -102,4 +100,5 @@ with open(out_file, 'wb') as f:
         for packet in row:
             for data in packet:
                 f.write(data)
-    
+
+    # f.write(buf.to_bytes(2, 'little'))
