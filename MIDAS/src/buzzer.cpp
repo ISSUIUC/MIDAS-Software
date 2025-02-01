@@ -102,6 +102,9 @@ ErrorCode BuzzerController::init() {
 #define WARN_TONE_PITCH Sound{2730, 125} // 2730 is the resonant frequency of the buzzer, thus it will be loudest here.
 #define WARN_TONE_BLANK Sound{0, 125}
 
+#define LAND_TONE_PITCH Sound{2730, 250}
+#define LAND_TONE_WAIT Sound{0, 250}
+
 /**
  * @brief free bird solo song, to be played on startup/ second stage iginition
 */
@@ -113,3 +116,8 @@ Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
  * @brief Warn tone, to be played in "unsafe" non-flight states (STATE_IDLE, STATE_PYRO_TEST)
  */
 Sound warn_tone[WARN_TONE_LENGTH] = {WARN_TONE_PITCH};
+
+/**
+ * @brief Land state tone, played whenever the board is in the "LANDED" state to provide a audio indicator to recovery parties
+ */
+Sound land_tone[LAND_TONE_LENGTH] = {WARN_TONE_PITCH, WARN_TONE_PITCH, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT};

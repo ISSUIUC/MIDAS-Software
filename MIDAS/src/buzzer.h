@@ -42,5 +42,8 @@ public:
 
 #define FREE_BIRD_LENGTH 11
 #define WARN_TONE_LENGTH 1
+#define LAND_TONE_LENGTH 11
+
 extern Sound free_bird[FREE_BIRD_LENGTH];
 extern Sound warn_tone[WARN_TONE_LENGTH];
+extern Sound land_tone[LAND_TONE_LENGTH];
