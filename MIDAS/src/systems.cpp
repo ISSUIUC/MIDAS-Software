@@ -56,8 +56,8 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
 #ifdef IS_SUSTAINER
-        LowGData lowg = arg->sensors.low_g.read();
-        arg->rocket_data.low_g.update(lowg);
+        // LowGData lowg = arg->sensors.low_g.read();
+        // arg->rocket_data.low_g.update(lowg);
 #endif
         LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(lowglsm);
@@ -73,7 +73,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
         }
-
+        Serial.println("orient");
         THREAD_SLEEP(100);
     }
 }
@@ -83,6 +83,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
+        Serial.println("mag");
     }
 }
 
@@ -107,6 +108,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
             Voltage reading3 = arg->sensors.voltage.read();
             arg->rocket_data.voltage.update(reading3);
+            Serial.println("i2c");
         }
 
         arg->led.update();
@@ -154,7 +156,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
-
+        Serial.println("fsm");
         THREAD_SLEEP(50);
     }
 }
@@ -199,7 +201,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         arg->rocket_data.kalman.update(current_state);
 
         last = xTaskGetTickCount();
-
+        Serial.println("Kalman");
         THREAD_SLEEP(50);
     }
 }
@@ -274,9 +276,9 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                 }
 
             }
-        } else {
-            THREAD_SLEEP(1);
         }
+        THREAD_SLEEP(1);
+        Serial.println("Telemetry");
     }
 }
 

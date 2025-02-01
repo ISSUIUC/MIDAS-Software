@@ -41,6 +41,7 @@
 class Adafruit_BNO08x {
 public:
   Adafruit_BNO08x(GpioAddress reset_pin);
+  Adafruit_BNO08x(int reset_pin);
   ~Adafruit_BNO08x();
 
   bool begin_I2C(uint8_t i2c_addr = BNO08x_I2CADDR_DEFAULT,
