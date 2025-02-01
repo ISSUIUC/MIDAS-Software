@@ -18,6 +18,20 @@ class ReadingDiscriminant(enum.Enum):
     ID_KALMAN = 11
     ID_PYRO = 12
 
+"""
+This function takes a sensor's discriminant (which is basically an ID)
+and returns all the data that needs to be saved
+
+That data can take 4 forms:
+
+string column name: name of a column in the given csv
+None: a field that does not matter/ is not in the csv
+1: a boolean that needs to be padded to 4 bytes
+0: a 1 byte value that does not need to be padded
+
+These cases are very specific to the current csv/ MIDAS configuration,
+but can be changed for different configurations
+"""
 def discriminant_to_field_names(disc):
     match disc:
         case ReadingDiscriminant.ID_LOWG:
@@ -45,23 +59,33 @@ def discriminant_to_field_names(disc):
         case ReadingDiscriminant.ID_PYRO:
             return [0, 0, 0, 0, 0, 0, 0, 0, 0]
 
+"""
+Takes a csv line and returns a list of each of the sensor packets
+that will be written as bytes
+"""
 def line_to_bytes(line):
     all_packets = []
     for disc in ReadingDiscriminant:
         current_packet = []
         cols_to_save = discriminant_to_field_names(disc)
         
+        # Write the discriminant
         current_packet.append(disc.value.to_bytes(4, 'little'))
 
+        # Write the timestamp as an integer
         current_packet.append(int(float(line['time']) * 1000).to_bytes(4, 'little'))
 
         for col in cols_to_save:
+            # Writes a 4 byte float
             if col is None:
                 current_packet.append(struct.pack('f', 0))
+            # Writes a boolean 1 with 4 bytes padding
             elif col == 1:
                 current_packet.append(col.to_bytes(4, "little"))
+            # Writes a boolean 0 with no padding
             elif col == 0:
                 current_packet.append(col.to_bytes(1, "little"))
+            # Writes the value of the column as a float
             else:
                 current_packet.append(struct.pack('f', float(line[col])))
 
@@ -84,10 +108,8 @@ all_rows = []
 
 with open(in_file, 'r') as f:
     csv_reader = csv.DictReader(f)
-    a = 0
     for row in csv_reader:
         all_rows.append(line_to_bytes(row))
-        a += 1
 
 
 
@@ -100,5 +122,3 @@ with open(out_file, 'wb') as f:
         for packet in row:
             for data in packet:
                 f.write(data)
-
-    # f.write(buf.to_bytes(2, 'little'))
