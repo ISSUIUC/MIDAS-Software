@@ -367,7 +367,6 @@ void loop() {
     
     PrintDequeue();
     if (rf95.available()) {
-        Serial.println("available");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         TelemetryPacket packet;
         uint8_t len = sizeof(buf);

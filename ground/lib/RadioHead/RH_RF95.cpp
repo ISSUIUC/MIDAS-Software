@@ -229,7 +229,7 @@ void RH_RF95::handleInterrupt()
 	    _lastRssi -= 164;
 	    
 	// We have received a message.
-    Serial.println("validate");
+    // Serial.println("validate");
 	validateRxBuf(); 
 	if (_rxBufValid)
 	    setModeIdle(); // Got one 
@@ -280,27 +280,11 @@ void RH_INTERRUPT_ATTR RH_RF95::isr2()
 // Check whether the latest received message is complete and uncorrupted
 void RH_RF95::validateRxBuf()
 {
-    Serial.println(_bufLen);
-    for(int i = 0; i < _bufLen; i++){
-        Serial.print((char) _buf[i]);
-    }
-    Serial.println();
-    _rxGood++;
-	_rxBufValid = true;
     if (_bufLen < 4)
 	return; // Too short to be a real message
     // Extract the 4 headers
-    _rxHeaderTo    = _buf[0];
-    _rxHeaderFrom  = _buf[1];
-    _rxHeaderId    = _buf[2];
-    _rxHeaderFlags = _buf[3];
-    if (_promiscuous ||
-	_rxHeaderTo == _thisAddress ||
-	_rxHeaderTo == RH_BROADCAST_ADDRESS)
-    {
 	_rxGood++;
 	_rxBufValid = true;
-    }
 }
 
 bool RH_RF95::available()
