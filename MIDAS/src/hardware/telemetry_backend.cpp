@@ -56,14 +56,11 @@ namespace {
 // Lora callbacks
 void OnTxDone(void)
 {
-    Serial.println("Tx done!");
 	tx_done = true;
-    Radio.Rx(RX_TIMEOUT_VALUE);
 }
 
 void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 {
-
     memcpy(lora_payload, payload, size);
     rx_done = false;
 }
@@ -71,17 +68,14 @@ void OnRxDone(uint8_t *payload, uint16_t size, int16_t rssi, int8_t snr)
 void OnTxTimeout(void)
 {
     rx_done = true;
-    Radio.Rx(RX_TIMEOUT_VALUE);
 }
 
 void OnRxTimeout(void)
 {
-    Radio.Rx(RX_TIMEOUT_VALUE);
 }
 
 void OnRxError(void)
 {
-	Serial.println("RX ERR!");
 }
 
 void OnCadDone(bool cadResult)
@@ -121,8 +115,7 @@ ErrorCode TelemetryBackend::init() {
 	uint32_t err_code = lora_hardware_init(hwConfig);
 	if (err_code != 0)
 	{
-		Serial.printf("lora_hardware_init failed - %d\n", err_code);
-		while(1) {};
+		return ErrorCode::RadioInitFailed;
 	}
 	Serial.println("Lora hardware init successful");
 	
@@ -152,7 +145,7 @@ ErrorCode TelemetryBackend::init() {
 					  LORA_CODINGRATE, 0, LORA_PREAMBLE_LENGTH,
 					  LORA_SYMBOL_TIMEOUT, LORA_FIX_LENGTH_PAYLOAD_ON,
 					  0, true, 0, 0, LORA_IQ_INVERSION_ON, true);
-    Radio.Rx(RX_TIMEOUT_VALUE);
+
     return ErrorCode::NoError;
 }
 
