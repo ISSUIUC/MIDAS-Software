@@ -52,6 +52,11 @@ public:
             } else if (i % 1024 == 0) {
                 Serial.println("Slow tx!");
             }
+            // Sometimes there is a desync between tx done and the actual transmit
+            // So we just break so that we don't lose too much telemetry.
+            if (i % 1024 * 2 == 0) {
+                break;
+            }
             delay(1);
         }
 
