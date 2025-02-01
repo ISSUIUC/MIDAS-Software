@@ -32,6 +32,8 @@ print(device.device)
 if not device:
     print("MIDAS is not connected!")
     exit()
+
+# make this a command line argument
 file = open(r"data43.launch", "rb")
 
 # Read the json file
@@ -88,8 +90,10 @@ while True:
         if content != prev:
             prev = content
             print(counter, file.tell(), int.from_bytes(content))
+        
+        previous_pyro_array = [timestamp, int.from_bytes(content), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read())]
 
-        write_to_csv("pyro_data.csv", [timestamp, int.from_bytes(content), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read())])
+        write_to_csv("pyro_data.csv", previous_pyro_array)
     else:
         raise ValueError(f"Unknown tag: {tag}")
     counter += 1
