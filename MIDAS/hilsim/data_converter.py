@@ -41,7 +41,7 @@ def discriminant_to_field_names(disc):
         case ReadingDiscriminant.ID_FSM:
             return [None]
         case ReadingDiscriminant.ID_KALMAN:
-            return ["kalman_pos_x", "kalman_pos_y", "kalman_pos_z", "kalman_vel_x", "kalman_vel_y", "kalman_vel_z", "kalman_accel_x", "kalman_accel_y", "kalman_accel_z"]
+            return ["kalman_pos_x", "kalman_pos_y", "kalman_pos_z", "kalman_vel_x", "kalman_vel_y", "kalman_vel_z", "kalman_accel_x", "kalman_accel_y", "kalman_accel_z", "baro_alt"]
         case ReadingDiscriminant.ID_PYRO:
             return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 
@@ -84,9 +84,15 @@ all_rows = []
 
 with open(in_file, 'r') as f:
     csv_reader = csv.DictReader(f)
-
+    a = 0
     for row in csv_reader:
         all_rows.append(line_to_bytes(row))
+        a += 1
+
+        if a > 0:
+            break
+
+
 
 num = 0xf3626b6a
 
