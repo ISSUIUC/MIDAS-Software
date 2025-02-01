@@ -286,6 +286,8 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
         // Serial.println("Read line");
         // Print fsm state
         Serial.write(arg->rocket_data.fsm_state.getRecentUnsync());
+        PyroState data = arg->rocket_data.pyro.getRecentUnsync();
+        Serial.write((char*) &data, sizeof(PyroState));
         Serial.flush();
     }
 }

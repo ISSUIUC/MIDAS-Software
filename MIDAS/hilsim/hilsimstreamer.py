@@ -34,9 +34,12 @@ print("Magic", ser.read_until('\n'.encode('ascii'))) # Should be our magic
 print("Checksum", hex(int(ser.read_until('\n'.encode('ascii'))))) # Should be our magic
 print("Garbage", ser.read_until('\n'.encode('ascii')))
 print("Garbage", ser.read_until('\n'.encode('ascii')))
+print("Garbage", ser.read_until('\n'.encode('ascii')))
+print("Garbage", ser.read_until('\n'.encode('ascii')))
+print("Garbage", ser.read_until('\n'.encode('ascii')))
+
 counter = 0
 
-input()
 
 start_time = time.perf_counter()
 prev = None
@@ -47,7 +50,7 @@ while True:
     
     tag = int.from_bytes(tag, byteorder='little')
     timestamp = file.read(4)
-
+    timestamp = int.from_bytes(timestamp, byteorder='little')
     # print(tag, int.from_bytes(timestamp, byteorder='little'))
 
     if tag in SIZES:
@@ -69,11 +72,11 @@ while True:
         if content != prev:
             prev = content
             print(counter, file.tell(), int.from_bytes(content))
+
+        ser.read()
     else:
         raise ValueError(f"Unknown tag: {tag}")
     counter += 1
-    if counter % 5000 == 0:
-        print(counter)
 
 ser.close()
 end_time = time.perf_counter()
