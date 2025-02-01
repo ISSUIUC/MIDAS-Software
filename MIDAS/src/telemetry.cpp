@@ -20,6 +20,14 @@ T inv_convert_range(float val, float range) {
     return std::max(std::min((float)std::numeric_limits<T>::max(), converted), (float)std::numeric_limits<T>::min());
 }
 
+/**
+ * @brief packs highg and tilt infomation into 3, 2 byte integers
+ * 
+ * @param highg highg data to store
+ * @param tilt tilt information to store
+ * 
+ * @return tuple with packed data
+*/
 std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint8_t tilt) {
     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
@@ -32,10 +40,17 @@ std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg,
     return {x,y,z};
 }
 
-
+/**
+ * @brief move constructor for the telemetry backend
+*/
 Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
 
-
+/**
+ * @brief transmit telemetry data through LoRa
+ * 
+ * @param rocket_data rocket_data to transmit
+ * @param led led state to transmit
+*/
 void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     static_assert(sizeof(TelemetryPacket) == 20);
 
@@ -44,7 +59,21 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
+bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
+    return backend.read(command, wait_milliseconds);
+}
+
+void Telemetry::acknowledgeReceived() {
+    received_count ++;
+}
+
+/**
+ * @brief creates the packet to send through the telemetry system
+ * 
+ * @param data the data to serialize into a packet
+*/
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
+
     TelemetryPacket packet { };
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
@@ -53,23 +82,34 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Continuity continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
+    Orientation orientation = data.orientation.getRecentUnsync();
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
-    packet.alt = uint16_t(gps.altitude);
-    packet.baro_alt = uint16_t(barometer.altitude);
-    auto [ax,ay,az] = pack_highg_tilt(highg, 33);
+    packet.alt = (((int16_t) gps.altitude) & 0xfffe) | (received_count & 0x0001);    // Convert range of value so that we can also account for negative altitudes
+    packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
+  
+    auto [ax,ay,az] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 63));
     packet.highg_ax = ax;
     packet.highg_ay = ay;
     packet.highg_az = az;
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint8_t sat_count = gps.satellite_count < 16 ? gps.satellite_count : 15;
-    packet.fsm_satcount = ((uint8_t)fsm) | (sat_count << 4);
+    uint8_t sat_count = gps.satellite_count < 8 ? gps.satellite_count : 7;
+    packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
+
+    #ifdef IS_SUSTAINER
+    packet.fsm_callsign_satcount |= (1 << 7);
+    #endif
 
     return packet;
 }
 
+/**
+ * @brief initializes the Telemetry system
+ * 
+ * @return Error Code
+*/
 ErrorCode __attribute__((warn_unused_result)) Telemetry::init() {
     return backend.init();
 }

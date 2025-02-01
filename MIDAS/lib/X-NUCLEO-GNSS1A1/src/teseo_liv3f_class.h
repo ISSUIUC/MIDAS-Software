@@ -96,8 +96,6 @@ public:
 
    TeseoLIV3F(TwoWire *i2c, GpioAddress reset, int enablePin) : dev_i2c(i2c), pinReset(reset), pinEn(enablePin)
    {
-      gpioPinMode(pinReset, OUTPUT);
-
       //pinMode(pinEn, OUTPUT);
       useI2C = 1;
       i2ch.stringComplete = false;
@@ -112,6 +110,7 @@ public:
     */
    GNSS_StatusTypeDef init()
    {
+      gpioPinMode(pinReset, OUTPUT);
       gpioDigitalWrite(pinReset, LOW);
       delay(250);
       gpioDigitalWrite(pinReset, HIGH);
@@ -556,7 +555,7 @@ protected:
     * @param  GPGGAInfo Instance of a GPGGA_Info_t object pointer where the GPGGA_Info_t stored into pInfo have to be copied
     * @retval None
     */
-   void NMEA_Copy_Data(GPGGA_Info_t *pInfo, GPGGA_Info_t GPGGAInfo);
+   void NMEA_Copy_Data(GPGGA_Info_t *pInfo, const GPGGA_Info_t& GPGGAInfo);
 
    /**
     * @brief  This function converts a character to unsigned integer

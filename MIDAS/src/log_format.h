@@ -3,7 +3,9 @@
 #include "sensor_data.h"
 
 /**
- * 0 is not used to make it easier to spot bugs
+ * @enum ReadingDiscriminant
+ * 
+ * @brief ID for each sensor, 0 is not used to make it easier to spot bugs
  */
 enum ReadingDiscriminant {
     ID_LOWG = 1,
@@ -22,6 +24,11 @@ enum ReadingDiscriminant {
 
 
 /**
+ * @struct LoggerReading
+ * 
+ * @brief representation of data that will be logged
+ * 
+ * @note 
  * This struct isn't actually logged as-is, because if we did we'd waste extra space since
  * unions are the size of their largest member. This is just a reference struct.
  *

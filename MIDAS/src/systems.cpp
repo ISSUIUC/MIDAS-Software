@@ -11,13 +11,11 @@
 
 
 /**
- * These are all the functions that will run in each task
+ * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
- * 
- * @param name the name of the thread, replace with the actual name
- * @param arg the config file for the rocket
+ *
+ * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
-
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
     while (true) {
@@ -29,17 +27,31 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
 DECLARE_THREAD(barometer, RocketSystems* arg) {
+    // Reject single rogue barometer readings that are very different from the immediately prior reading
+    // Will only reject a certain number of readings in a row
+    Barometer prev_reading;
+    constexpr float altChgThreshold = 200; // meters
+    constexpr float presChgThreshold = 500; // milibars
+    constexpr float tempChgThreshold = 10; // degrees C
+    constexpr unsigned int maxConsecutiveRejects = 3;
+    unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
-        arg->rocket_data.barometer.update(reading);
+        bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
+                        //std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
+                        //std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
+        // TODO: Log when we receive a rejection!
+        if (is_rogue && rejects++ < maxConsecutiveRejects)
+            arg->rocket_data.barometer.update(prev_reading); // Reuse old reading, reject new reading
+        else {
+            rejects = 0;
+            arg->rocket_data.barometer.update(reading);
+            prev_reading = reading; // Only update prev_reading with accepted readings
+        }
         THREAD_SLEEP(6);
     }
 }
-
 
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
@@ -55,9 +67,6 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         Orientation reading = arg->sensors.orientation.read();
@@ -69,9 +78,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         Magnetometer reading = arg->sensors.magnetometer.read();
@@ -80,9 +86,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
+// Ever device which communicates over i2c is on this thread to avoid interference
 DECLARE_THREAD(i2c, RocketSystems* arg) {
     int i = 0;
 
@@ -90,10 +94,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         if (i % 10 == 0) {
             GPS reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
-        }
 
-#ifdef IS_SUSTAINER
-        if (i % 10 == 0) {
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
             arg->rocket_data.pyro.update(new_pyro_state);
@@ -105,7 +106,6 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.voltage.update(reading3);
         }
 
-#endif
         arg->led.update();
         i += 1;
 
@@ -113,11 +113,9 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
+// This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
-    FSM fsm {};
+    FSM fsm{};
     bool already_played_freebird = false;
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
@@ -136,9 +134,6 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
 DECLARE_THREAD(buzzer, RocketSystems* arg) {
     while (true) {
         arg->buzzer.tick();
@@ -147,17 +142,25 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    yessir.initialize();
+    // Orientation initial_orientation = arg->rocket_data.orientation.getRecent();
+    // Barometer initial_barom_buf = arg->rocket_data.barometer.getRecent();
+    // LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
+    //yessir.initialize(initial_orientation, initial_barom_buf, initial_accelerations);
+    yessir.initialize(arg);
     TickType_t last = xTaskGetTickCount();
-
+    
     while (true) {
+        if(yessir.should_reinit){
+            yessir.initialize(arg);
+            TickType_t last = xTaskGetTickCount();
+            yessir.should_reinit = false;
+        }
         // add the tick update function
-        Barometer current_barom_buf = arg->rocket_data.barometer.getRecentUnsync();
-        LowGData current_accelerometer = arg->rocket_data.low_g.getRecentUnsync();
+        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
+        Orientation current_orientation = arg->rocket_data.orientation.getRecent();
+        HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
+        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
             .ay = current_accelerometer.ay,
@@ -165,7 +168,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
 
-        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations);
+        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
         KalmanData current_state = yessir.getState();
 
         arg->rocket_data.kalman.update(current_state);
@@ -176,34 +179,52 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
-/**
- * See \ref data_logger_thread
- */
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
+        
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        if (current_state == FSMState(STATE_IDLE)) {
+            TelemetryCommand command;
+            if (arg->tlm.receive(&command, 2000)) {
+                if(command.valid()) {
+                    arg->tlm.acknowledgeReceived();
+                    switch(command.command) {
+                        case CommandType::RESET_KF:
+                            yessir.should_reinit = true;
+                            break;
+                        default:
+                            break; 
+                    }
+                }
 
-        THREAD_SLEEP(1);
+            }
+        } else {
+            THREAD_SLEEP(1);
+        }
     }
 }
 
-
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
+
+/**
+ * @brief Initializes all systems in order, returning early if a system's initialization process errors out.
+ *        Turns on the Orange LED while initialization is running.
+ */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
 #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-    // these are ignored anyways
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
 #endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
@@ -213,10 +234,11 @@ ErrorCode init_systems(RocketSystems& systems) {
 }
 #undef INIT_SYSTEM
 
+
 /**
- * Creates all threads for each sensor, FSM, Kalman algorithm, and data logging member
- * Starts thread scheduler to actually start doing jobs
-*/
+ * @brief Initializes the systems, and then creates and starts the thread for each system.
+ *        If initialization fails, then this enters an infinite loop.
+ */
 [[noreturn]] void begin_systems(RocketSystems* config) {
     Serial.println("Starting Systems...");
     ErrorCode init_error_code = init_systems(*config);
@@ -246,7 +268,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
-    
+
     while (true) {
         THREAD_SLEEP(1000);
         Serial.print("Running (Log Latency: ");

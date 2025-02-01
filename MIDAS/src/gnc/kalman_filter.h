@@ -7,6 +7,20 @@
 
 #include <Eigen/Eigen>
 #include "sensor_data.h"
+#include "systems.h"
+
+
+struct KalmanState {
+    float state_est_pos_x;
+    float state_est_vel_x;
+    float state_est_accel_x;
+    float state_est_pos_y;
+    float state_est_vel_y;
+    float state_est_accel_y;
+    float state_est_pos_z;
+    float state_est_vel_z;
+    float state_est_accel_z;
+};
 
 template <int _NumStates, int _NumInputs>
 class KalmanFilter
@@ -41,14 +55,11 @@ public:
 
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
-
-    virtual void initialize() = 0;
+    
+    virtual void initialize(RocketSystems* args) = 0;
     virtual void priori() = 0;
-    virtual void update() = 0;
-
-    virtual void setQ(float dt, float sd) = 0;
-    virtual void setF(float dt) = 0;
+    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) = 0;
 
     virtual KalmanData getState() = 0;
-    virtual void setState(KalmanData state) = 0;
+    virtual void setState(KalmanState state) = 0;
 };

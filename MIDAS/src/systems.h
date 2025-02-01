@@ -14,10 +14,17 @@
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
 #elif defined(HILSIM)
+#include "TCAL9539.h"
+#include "hilsim/sensors.h"
 #else
 #include "hardware/sensors.h"
 #endif
 
+/**
+ * @struct Sensors
+ * 
+ * @brief holds all interfaces for all sensors on MIDAS
+*/
 struct Sensors {
     LowGSensor low_g;
     LowGLSMSensor low_g_lsm;
@@ -31,6 +38,11 @@ struct Sensors {
     GPSSensor gps;
 };
 
+/**
+ * @struct RocketData
+ * 
+ * @brief holds all information about the rocket, sensors, and controllers
+*/
 struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
