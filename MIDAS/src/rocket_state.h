@@ -1,10 +1,12 @@
 #pragma once
 
 #include <array>
+#include <finite-state-machines/fsm_states.h>
 
 #include "sensor_data.h"
-#include "hal.h"
 #include "Buffer.h"
+#include "Mutex.h"
+#include "Queue.h"
 
 /** 
  * @brief The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
@@ -42,6 +44,8 @@ private:
     Queue<Reading<S>> queue;
 
 public:
+    virtual ~SensorData() = default;
+
     SensorData() : current(S()) { }
 
     /**
@@ -52,7 +56,7 @@ public:
     virtual void update(S data) {
         current.write(data);
         queue.send((Reading<S>) { .timestamp_ms = pdTICKS_TO_MS(xTaskGetTickCount()), .data = data });
-    };
+    }
 
     /**
      * @brief gets most recent data, will wait and acquire lock
@@ -61,7 +65,7 @@ public:
     */
     S getRecent() {
         return current.read();
-    };
+    }
 
     /**
      * @brief gets most recent data, will not acquire lock
@@ -84,7 +88,7 @@ public:
     */
     bool getQueued(Reading<S>* out) {
         return queue.receive(out);
-    };
+    }
 };
 
 /**
@@ -96,7 +100,7 @@ public:
  * @tparam count size of buffer
 */
 template<typename S, size_t count>
-struct BufferedSensorData : public SensorData<S> {
+struct BufferedSensorData final: SensorData<S> {
 private:
     Buffer<S, count> buffer;
     Buffer<TickType_t, count> data_time;
@@ -108,20 +112,20 @@ public:
         SensorData<S>::update(data);
         buffer.push(data);
         data_time.push(xTaskGetTickCount());
-    };
+    }
 
     // wrapper function to get easy access to buffer data
     template<size_t arr_count>
     std::array<S, arr_count> getBufferRecent() {
         std::array<S, arr_count> arr = buffer. template read_recent<arr_count>();
         return arr;
-    };
+    }
 
     template<size_t arr_count>
     std::array<TickType_t, arr_count> getTimesRecent() {
         std::array<TickType_t, arr_count> arr = data_time. template read_recent<arr_count>();
         return arr;
-    };
+    }
 };
 
 /**
@@ -163,19 +167,18 @@ public:
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
 struct RocketData {
-public:
     SensorData<KalmanData> kalman;
     SensorData<LowGData> low_g;
     BufferedSensorData<HighGData, 8> high_g;
-    BufferedSensorData<Barometer, 8> barometer;
-    SensorData<LowGLSM> low_g_lsm;
-    SensorData<Continuity> continuity;
+    BufferedSensorData<BarometerData, 8> barometer;
+    SensorData<LowGLSMData> low_g_lsm;
+    SensorData<ContinuityData> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
-    SensorData<GPS> gps;
-    SensorData<Magnetometer> magnetometer;
-    SensorData<Orientation> orientation;
-    SensorData<Voltage> voltage;
+    SensorData<GPSData> gps;
+    SensorData<MagnetometerData> magnetometer;
+    SensorData<OrientationData> orientation;
+    SensorData<VoltageData> voltage;
 
     Latency log_latency;
 };

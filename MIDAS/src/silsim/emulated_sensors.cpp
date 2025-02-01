@@ -1,20 +1,19 @@
 #include "silsim/emulated_sensors.h"
 #include <cmath>
 
-
 ErrorCode BarometerSensor::init() {
     return ErrorCode::NoError;
 }
 
-Barometer BarometerSensor::read() {
-    return { 273.15, 0, (float) rocket->height };
+BarometerData BarometerSensor::read() {
+    return { 273.15, 0, (float) state.height };
 }
 
 ErrorCode LowGLSMSensor::init() {
     return ErrorCode::NoError;
 }
 
-LowGLSM LowGLSMSensor::read() {
+LowGLSMData LowGLSMSensor::read() {
     return { .gx = 0, .gy = 0, .gz = 0, .ax = 0, .ay = 0, .az =0 };
 }
 
@@ -22,7 +21,7 @@ ErrorCode ContinuitySensor::init() {
     return ErrorCode::NoError;
 }
 
-Continuity ContinuitySensor::read() {
+ContinuityData ContinuitySensor::read() {
     return { };
 }
 
@@ -31,7 +30,7 @@ ErrorCode HighGSensor::init() {
 }
 
 HighGData HighGSensor::read() {
-    return { 0, 0, (float) rocket->acceleration };
+    return { 0, 0, (float) state.acceleration };
 }
 
 ErrorCode LowGSensor::init() {
@@ -39,27 +38,27 @@ ErrorCode LowGSensor::init() {
 }
 
 LowGData LowGSensor::read() {
-    return { 0, 0, (float) rocket->acceleration };
+    return { 0, 0, (float) state.acceleration };
 }
 
 ErrorCode OrientationSensor::init() {
     return ErrorCode::NoError;
 }
 
-Orientation OrientationSensor::read() {
+OrientationData OrientationSensor::read() {
     return {
-            .has_data = true,
-            .yaw = 0,
-            .pitch = 0,
-            .roll = 0,
-            .orientation_velocity = { .vx = 0, .vy = 0, .vz = (float) rocket->velocity },
-            .orientation_acceleration = { .ax = 0, .ay = 0, .az = 0 },
-            .linear_acceleration = { .ax = 0, .ay = 0, .az = (float) rocket->acceleration },
-            .gx = 0,
-            .gy = 0,
-            .gz = 0,  // todo I don't know what the g's are
-            .magnetometer = { .mx = 0, .my = 0, .mz = 0},
-            .temperature = 273.15,
+        .has_data = true,
+        .yaw = 0,
+        .pitch = 0,
+        .roll = 0,
+        .orientation_velocity = { .vx = 0, .vy = 0, .vz = (float) state.velocity },
+        .orientation_acceleration = { .ax = 0, .ay = 0, .az = 0 },
+        .linear_acceleration = { .ax = 0, .ay = 0, .az = (float) state.acceleration },
+        .gx = 0,
+        .gy = 0,
+        .gz = 0,  // todo I don't know what the g's are
+        .magnetometer = { .mx = 0, .my = 0, .mz = 0},
+        .temperature = 273.15,
     };
 }
 
@@ -67,7 +66,7 @@ ErrorCode VoltageSensor::init() {
     return ErrorCode::NoError;
 }
 
-Voltage VoltageSensor::read() {
+VoltageData VoltageSensor::read() {
     return { .voltage = 9 };
 }
 
@@ -75,7 +74,7 @@ ErrorCode MagnetometerSensor::init() {
     return ErrorCode::NoError;
 }
 
-Magnetometer MagnetometerSensor::read() {
+MagnetometerData MagnetometerSensor::read() {
     return { .mx = 0, .my = 0, .mz = 0 };
 }
 
@@ -83,6 +82,18 @@ ErrorCode GPSSensor::init() {
     return ErrorCode::NoError;
 }
 
-GPS GPSSensor::read() {
+GPSData GPSSensor::read() {
     return { };
+}
+
+ErrorCode PyroBackend::init() {
+    return NoError;
+}
+
+void PyroBackend::arm_all() {
+
+}
+
+void PyroBackend::fire_channel(int channel) {
+    (void) channel;
 }

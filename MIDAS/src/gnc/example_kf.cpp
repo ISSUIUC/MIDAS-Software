@@ -2,7 +2,7 @@
 
 ExampleKalmanFilter::ExampleKalmanFilter() : KalmanFilter() {}
 
-void ExampleKalmanFilter::initialize(RocketSystems* args) {}
+void ExampleKalmanFilter::initialize(RocketData& args) {}
 
 
 void ExampleKalmanFilter::priori() {
@@ -10,7 +10,7 @@ void ExampleKalmanFilter::priori() {
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
-void ExampleKalmanFilter::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_stat) {}
+void ExampleKalmanFilter::update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState current_stat) {}
 
 void ExampleKalmanFilter::setQ(float dt, float sd) {}
 

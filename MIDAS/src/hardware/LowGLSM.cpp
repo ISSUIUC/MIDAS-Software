@@ -1,6 +1,8 @@
 #include "sensors.h"
 #include <Arduino_LSM6DS3.h>
 
+#include "pins.h"
+
 LSM6DS3Class LSM(SPI, LSM6DS3_CS, 46);      // global static instance of the sensor
 
 /**
@@ -20,9 +22,9 @@ ErrorCode LowGLSMSensor::init() {
  * 
  * @return a LowGLSM packet with current acceleration and gyro in all three axes
 */
-LowGLSM LowGLSMSensor::read() {
+LowGLSMData LowGLSMSensor::read() {
     // read from aforementioned global instance of sensor
-    LowGLSM result;
+    LowGLSMData result;
     LSM.readAcceleration(result.ax, result.ay, result.az);
     LSM.readGyroscope(result.gx, result.gy, result.gz);
     return result;

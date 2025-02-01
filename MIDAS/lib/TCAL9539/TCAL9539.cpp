@@ -25,7 +25,7 @@ bool TCAL9539Init(){
             Serial.println("Failed at endTransmission");
             return false;
         }
-        int ct = WIRE.requestFrom(addr, 1);
+        int ct = WIRE.requestFrom(addr, (uint8_t) 1);
         if(ct != 1){
             Serial.println("Failed at requestFrom");
             return false;
@@ -78,7 +78,7 @@ GpioReadResult gpioDigitalRead(GpioAddress addr){
     if(!WIRE.endTransmission(true)){
         return GpioReadResult{.value=LOW,.error=GpioError::I2CError};
     }
-    int ct = WIRE.requestFrom(addr.gpio_address, 1);
+    int ct = WIRE.requestFrom(addr.gpio_address, (uint8_t) 1);
     if(ct != 1){
         return GpioReadResult{.value=LOW,.error=GpioError::I2CError};
     }

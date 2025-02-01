@@ -1,5 +1,6 @@
 #include "sensors.h"
 #include "Adafruit_BNO08x.h"
+#include "pins.h"
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
@@ -43,9 +44,9 @@ Vec3 quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees) {
     float sqk = sq(qk);
 
     Vec3 euler;
-    euler.x = atan2(2.0 * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));        // roll
-    euler.y = asin(-2.0 * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));       // yaw
-    euler.z = -1 * atan2(2.0 * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));  // pitch
+    euler.x = atan2f(2.0f * (qi * qj + qk * qr), (sqi - sqj - sqk + sqr));        // roll
+    euler.y = asinf(-2.0f * (qi * qk - qj * qr) / (sqi + sqj + sqk + sqr));       // yaw
+    euler.z = -1.0f * atan2f(2.0f * (qj * qk + qi * qr), (-sqi - sqj + sqk + sqr));  // pitch
     return euler;
 }
 
@@ -81,7 +82,7 @@ Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t* rotational_vector, bool degrees
  * 
  * @return An orientation packet with orientation, acceleration, gyroscope, and magenetometer for all axes, along with temperature and pressure
 */
-Orientation OrientationSensor::read() {
+OrientationData OrientationSensor::read() {
     // read from aforementioned global instance of sensor
     sh2_SensorValue_t event;
     Vec3 euler;
@@ -89,13 +90,14 @@ Orientation OrientationSensor::read() {
         switch (event.sensorId) {
             case SH2_ARVR_STABILIZED_RV:
                 euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
+                break;
             case SH2_GYRO_INTEGRATED_RV:
                 // faster (more noise?)
                 euler = quaternionToEulerGI(&event.un.gyroIntegratedRV, true);
                 break;
         }
 
-        Orientation sensor_reading;
+        OrientationData sensor_reading;
         sensor_reading.has_data = true;
 
         sensor_reading.yaw = -euler.y;
@@ -123,13 +125,14 @@ Orientation OrientationSensor::read() {
         }
 
         // calculate tilt from initial orientation
-        Orientation deviation;
+        OrientationData deviation;
         deviation.yaw = min(abs(sensor_reading.yaw - initial_orientation.yaw), 2 * 3.14F - abs(sensor_reading.yaw - initial_orientation.yaw));
         deviation.pitch = min(abs(sensor_reading.pitch - initial_orientation.pitch), 2 * 3.14F - abs(sensor_reading.pitch - initial_orientation.pitch));
 
-        sensor_reading.tilt = sqrt(pow(deviation.yaw, 2) + pow(deviation.pitch, 2));
+        sensor_reading.tilt = sqrtf(powf(deviation.yaw, 2) + powf(deviation.pitch, 2));
 
         return sensor_reading;
+    } else {
+        return { .has_data = false };
     }
-    return { .has_data = false };
 }

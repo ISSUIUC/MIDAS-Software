@@ -4,11 +4,12 @@
 #include <cstdint>
 #include <queue>
 #include <cstring>
+#include <iostream>
 
 #include "silsim/fiber.h"
-#include "silsim/arduino_emulation.h"
 
 #define LOW (0x0)
+#define HIGH (0x1)
 #define OUTPUT (0x3)
 
 #define tskIDLE_PRIORITY (128)
@@ -17,11 +18,12 @@
 #define pdTICKS_TO_MS(ticks) (ticks)
 #define xTaskGetTickCount() (millis())
 
+uint32_t millis();
+
 void threadYield();
 void threadSleep(int32_t time_ms);
 void delay(unsigned long ms);
 void emu_busy_wait(size_t ms);
-void silsimStepTime();
 
 uint32_t ledcWriteTone(uint8_t channel, uint32_t frequency);
 void ledcAttachPin(uint8_t pin, uint8_t channel);
@@ -34,6 +36,24 @@ typedef int BaseType_t;
 typedef void (*TaskFunction_t)(void*);
 
 void xTaskCreateStaticPinnedToCore(TaskFunction_t thread_fn, const char* name, size_t stack_size, void* argument, int priority, unsigned char* stack, StaticTask_t* task_handle, BaseType_t core);
+
+struct SerialPatch {
+    template <typename T>
+    void print(T t) {
+        std::cout << t;
+    }
+
+    template <typename T>
+    void println(T t) {
+        std::cout << t << '\n';
+    }
+
+    void begin(int baudrate);
+    void flush();
+};
+
+extern SerialPatch Serial;
+
 
 typedef int StaticSemaphore_t;
 
@@ -56,6 +76,8 @@ private:
 typedef SemaphoreHandle_s* SemaphoreHandle_t;
 typedef size_t TickType_t;
 
+#define portMAX_DELAY ((TickType_t) -1)
+
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t* buffer);
 bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout);
 bool xSemaphoreGive(SemaphoreHandle_t semaphore);
@@ -71,7 +93,7 @@ public:
         return this;
     }
 
-    void push(void* item) {
+    bool push(void* item) {
         std::memcpy(&buffer[tail_idx * item_size], item, item_size);
         tail_idx++;
         if (tail_idx == max_count) {
@@ -85,6 +107,7 @@ public:
         } else {
             count++;
         }
+        return true;
     }
 
     bool pop(void* item) {
@@ -115,7 +138,11 @@ typedef StaticQueue_t* QueueHandle_t;
 #define xQueueSendToBack(queue, value_ptr, timeout) ((queue)->push(value_ptr))
 #define xQueueReceive(queue, store_ptr, timeout) ((queue)->pop(store_ptr))
 
+#define errQUEUE_FULL (false)
+
 void vTaskDelay(int32_t time);
 void vTaskDelete(void* something_probably);
 
 void begin_silsim();
+void silsim_step_time(uint32_t ms, uint32_t ticks_per_ms);
+double silsim_current_time();

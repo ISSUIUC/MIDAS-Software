@@ -37,7 +37,7 @@ inline bool is_leapyear(int year) {
  * 
  * @return GPS data packet
  */
-GPS GPSSensor::read() {
+GPSData GPSSensor::read() {
     teseo.update();
     GPGGA_Info_t gpgga_message = teseo.getGPGGAData();
     GPRMC_Info_t gprmc_message = teseo.getGPRMCData();
@@ -55,7 +55,7 @@ GPS GPSSensor::read() {
 
     lat_int *= (gpgga_message.xyz.ns == 'N') ? 1 : -1;
     lon_int *= (gpgga_message.xyz.ew == 'E') ? 1 : -1;
-    float alt = gpgga_message.xyz.alt;
+    float alt = (float) gpgga_message.xyz.alt;
     float v = gprmc_message.speed;
     uint16_t sat_count = gpgga_message.sats;
 
@@ -74,5 +74,5 @@ GPS GPSSensor::read() {
     time += time_of_day;
     time += (int) ((30 + gprmc_message.date % 100) / 4) * 86400;
 
-    return GPS{lat_int, lon_int, alt, v, sat_count, time};
+    return GPSData{lat_int, lon_int, alt, v, sat_count, time};
 }

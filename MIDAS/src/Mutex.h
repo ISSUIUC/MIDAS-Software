@@ -1,10 +1,6 @@
-#ifdef SILSIM
-#include "silsim/emulation.h"
-#else
-#include <FreeRTOS.h>
-#include <semphr.h>
-#include <task.h>
-#endif
+#pragma once
+
+#include "hardware_interface.h"
 
 #define MUTEX_TIMEOUT pdMS_TO_TICKS(100)
 
@@ -15,13 +11,13 @@
  * @tparam T The type of the value to hold. Should have copy semantics.
  */
 template<typename T>
-struct Mutex {
+class Mutex {
 private:
 //    StaticSemaphore_t mutex_buffer;
-    uint8_t mutex_buffer[sizeof(StaticSemaphore_t) + 64]{};
-    SemaphoreHandle_t mutex_handle{};
+    uint8_t mutex_buffer[sizeof(StaticSemaphore_t) + 64];
+    SemaphoreHandle_t mutex_handle;
     T data;
-    SemaphoreHandle_t check{};
+    SemaphoreHandle_t check;
 
 public:
     Mutex() = delete;
@@ -37,11 +33,7 @@ public:
         mutex_handle = xSemaphoreCreateMutexStatic((StaticSemaphore_t*) &mutex_buffer);
         check = mutex_handle;
         data = value;
-
-//        xSemaphoreGive(mutex_handle);
-//        memset(mutex_buffer, 0xAD, 32);
-//        memset(&mutex_buffer[sizeof(StaticSemaphore_t) + 32], 0xAD, 32);
-//         configASSERT(mutex_handle);
+//        configASSERT(mutex_handle);
     }
 
     /**
@@ -50,10 +42,10 @@ public:
      * @return The value in the mutex.
      */
     T read() {
-        if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
-            Serial.flush();
-        }
+        // if (!mutex_handle || mutex_handle != check) {
+        //     Serial.println("Aw shucks");
+        //     Serial.flush();
+        // }
         xSemaphoreTake(mutex_handle, portMAX_DELAY);
 //        while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         T ret = data;
@@ -66,7 +58,7 @@ public:
      *
      * @return The value in the mutex.
      */
-    T read_unsync() {
+    T read_unsync() const {
         return data;
     }
 
@@ -75,11 +67,11 @@ public:
      * 
      * @param ptr buffer to store data in
     */
-    void read2(T* ptr) {
-        if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
-            Serial.flush();
-        }
+    void read_into(T* ptr) {
+        // if (!mutex_handle || mutex_handle != check) {
+        //     Serial.println("Aw shucks");
+        //     Serial.flush();
+        // }
         xSemaphoreTake(mutex_handle, portMAX_DELAY);
 //        while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         *ptr = data;
@@ -92,10 +84,10 @@ public:
      * @param value What to update the mutex to.
      */
     void write(T value) {
-        if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
-            Serial.flush();
-        }
+        // if (!mutex_handle || mutex_handle != check) {
+        //     Serial.println("Aw shucks");
+        //     Serial.flush();
+        // }
 
         while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         data = value;

@@ -1,88 +1,52 @@
 #pragma once
 
-#include "errors.h"
-#include "sensor_data.h"
-#include "hardware/pins.h"
+#include <hardware_interface.h>
+#include <finite-state-machines/fsm_states.h>
 
-/**
- * @struct LowG interface
- */
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
+struct LowGSensor final: ISensor<LowGData> {
+    ErrorCode init() override;
+    LowGData read() override;
 };
 
-/**
- * @struct HighG interface
- */
-struct HighGSensor {
-    ErrorCode init();
-    HighGData read();
+struct HighGSensor final: ISensor<HighGData> {
+    ErrorCode init() override;
+    HighGData read() override;
 };
 
-/**
- * @struct Magnetometer interface
- */
-struct MagnetometerSensor {
-    ErrorCode init();
-    Magnetometer read();
+struct MagnetometerSensor final: ISensor<MagnetometerData> {
+    ErrorCode init() override;
+    MagnetometerData read() override;
 };
 
-/**
- * @struct Barometer interface
- */
-struct BarometerSensor {
-    ErrorCode init();
-    Barometer read();
+struct BarometerSensor final: ISensor<BarometerData> {
+    ErrorCode init() override;
+    BarometerData read() override;
 };
 
-/**
- * @struct LowGLSM interface
- */
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
+struct LowGLSMSensor final: ISensor<LowGLSMData> {
+    ErrorCode init() override;
+    LowGLSMData read() override;
 };
 
-/**
- * @struct Continuity interface
- */
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
+struct ContinuitySensor final: ISensor<ContinuityData> {
+    ErrorCode init() override;
+    ContinuityData read() override;
 };
 
-/**
- * @struct Voltage interface
- */
-struct VoltageSensor {
-    ErrorCode init();
-    Voltage read();
+struct VoltageSensor final: ISensor<VoltageData> {
+    ErrorCode init() override;
+    VoltageData read() override;
 };
 
-/**
- * @struct BNO interface
- */
-struct OrientationSensor {
-    Orientation initial_orientation;
+struct OrientationSensor final: ISensor<OrientationData> {
+    OrientationData initial_orientation;
     uint8_t initial_flag;
-    ErrorCode init();
-    Orientation read();
+    ErrorCode init() override;
+    OrientationData read() override;
 };
 
-/**
- * @struct GPS interface
- */
-struct GPSSensor {
-    ErrorCode init();
-    GPS read();
+struct GPSSensor final: ISensor<GPSData> {
+    ErrorCode init() override;
+    GPSData read() override;
     bool is_leap = false;
-};
-
-/**
- * @struct Pyro interface
- */
-struct Pyro {
-    ErrorCode init();
-    PyroState tick(FSMState fsm_state, Orientation orientation);
 };
