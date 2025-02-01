@@ -95,8 +95,10 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
     while (true) {
         if (i % 10 == 0) {
-            GPS reading = arg->sensors.gps.read();
-            arg->rocket_data.gps.update(reading);
+            if (args->sensors.gps.valid()) {
+                GPS reading = arg->sensors.gps.read();
+                arg->rocket_data.gps.update(reading);
+            } // Otherwise it's just dead :skull:
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
