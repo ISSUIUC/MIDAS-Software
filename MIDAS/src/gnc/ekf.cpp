@@ -115,6 +115,77 @@ void Yessir::initialize(RocketSystems* args) {
 
     // set B (don't care about what's in B since we have no control input)
     B(2, 0) = -1;
+
+    //once FSM > 9, after its LANDED
+    std::map<double, double> moonburner_data = {
+        {0.083, 1333.469},
+        {0.13, 1368.376},
+        {0.249, 1361.395},
+        {0.308, 1380.012},
+        {0.403, 1359.068},
+        {0.675, 1184.53},
+        {1.018, 1072.826},
+        {1.456, 996.029},
+        {1.977, 958.794},
+        {2.995, 914.578},
+        {3.99, 856.399},
+        {4.985, 781.929},
+        {5.494, 730.732},
+        {5.991, 679.534},
+        {7.258, 542.231},
+        {7.862, 463.107},
+        {8.015, 456.125},
+        {8.998, 330.458},
+        {9.993, 207.118},
+        {10.514, 137.303},
+        {11.496, 34.908},
+        {11.994, 0.0}
+    };
+
+    //before FSM = 9 
+    std::map<double, double> O5500X_data = {
+        {0.009, 20.408},
+        {0.044, 7112.245},
+        {0.063, 6734.694},
+        {0.078, 6897.959},
+        {0.094, 6612.245},
+        {0.109, 6765.306},
+        {0.125, 6540.816},
+        {0.147, 6581.633},
+        {0.194, 6520.408},
+        {0.35, 6795.918},
+        {0.428, 7091.837},
+        {0.563, 7285.714},
+        {0.694, 7408.163},
+        {0.988, 7581.633},
+        {1.266, 7622.449},
+        {1.491, 7724.49},
+        {1.581, 7653.061},
+        {1.641, 7540.816},
+        {1.684, 7500.0},
+        {1.716, 7336.735},
+        {1.784, 7224.49},
+        {1.938, 6785.714},
+        {2.138, 6326.531},
+        {2.491, 5897.959},
+        {2.6, 5704.082},
+        {2.919, 3540.816},
+        {3.022, 3408.163},
+        {3.138, 2887.755},
+        {3.3, 2234.694},
+        {3.388, 1673.469},
+        {3.441, 1489.796},
+        {3.544, 1418.367},
+        {3.609, 1295.918},
+        {3.688, 816.327},
+        {3.778, 653.061},
+        {3.819, 581.633},
+        {3.853, 489.796},
+        {3.897, 285.714},
+        {3.981, 20.408},
+        {3.997, 0.0}
+    };
+
 }
 
 /**
@@ -133,18 +204,82 @@ Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<fl
     return yaw * pitch * roll * body_vect;
 }
 
-void Yessir::priori() {
+void Yessir::priori(float dt, float m, float r, float h) {
+    dt = dt / 1000;
     Eigen::Matrix<float, 9, 9> xdot = Eigen::Matrix<float, 9, 9>::Zero();
-    xdot(0, 1) = x_k(1, 0);
 
     Orientation orientation = args->rocket_data.orientation.getRecent();
 
     euler_t angles = orientation.getEuler();
+    Eigen::Matrix<float, 3,1> gravity = Eigen::Matrix<float, 3,1>::Zero();
+    gravity(2, 0) = -9.81;
+    world_accel = BodyToGlobal(angles, init_accel) + gravity;
 
-    world_accel = BodyToGlobal(angles, init_accel) ;
+    float w_x = world_accel(0, 0) * dt;
+    float w_y = world_accel(1, 0) * dt;
+    float w_z = world_accel(2, 0) * dt;
+
+    float J_x = 1/2 * m * r**2
+    float J_y = 1/3 * m * h**2 + 1/4 * m * r**2
+    float J_z = J_y;
+
+    float Fax = 0;
+    float Fay = 0;
+    float Faz = 0;
+
+//  Fax = -0.5*rho*(vel_mag**2)*float(Ca)*(np.pi*r**2)
+
+    Fg_body = R.inverse() * gravity; 
     
+    Fgx = Fg_body[0];
+    Fgy = Fg_body[1];
+    Fgz = Fg_body[2];    
+    T = getThrust();
+
+    xdot << vel_x,
+            (Fax + Ftx + Fgx) / m - (w_y * vel_z - w_z * vel_y),
+            1.0,
+
+            vel_y,
+            (Fay + Fty + Fgy) / m - (w_z * vel_x - w_x * vel_y),
+            1.0,
+
+            vel_z,
+            (Faz + Ftz + Fgz) / m - (w_x * vel_y - w_y * vel_x),
+            1.0;
+
+    for (int i = 0; i < 3; i++) {
+        xdot(3 * i, 3 * i + 1) = xdot();
+        xdot(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;
+        xdot(3 * i + 1, 3 * i + 2) = s_dt;
+
+        F_mat(3 * i, 3 * i) = 1;
+        F_mat(3 * i + 1, 3 * i + 1) = 1;
+        F_mat(3 * i + 2, 3 * i + 2) = 1;
+    }
+
     x_priori = (F_mat * x_k);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
+}
+
+Eigen::Matrix<float, 3, 1> Yessir:getThrust(euler_t angles, FSMState FSM_state) {
+    Eigen::Matrix<float, 3,1> T;
+    
+    // interpolate thrust values (weighted avg)
+
+    if(FSM > 9) {
+        thrust(0, 0) = 0;
+        thrust(1, 0) = 0;
+        thrust(2, 0) = 0;
+    } else if (FSM <= 9) {
+        thrust(0, 0) = T * cos(angles.pitch) * sin(angles.roll);
+        thrust(1, 0) = T * sin(angles.pitch);
+        thrust(2, 0) = T * cos(angles.pitch) * cos(angles.roll);
+    } 
+
+    // return 3x1 thrust vector
+
+    return T;
 }
 
 /**
