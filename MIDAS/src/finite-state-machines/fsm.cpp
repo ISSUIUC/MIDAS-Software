@@ -2,15 +2,11 @@
 #include <cstdlib>
 #include <iostream>
 #include <fstream>
-#include <yaml-cpp/yaml.h>
 
+#include <ArduinoJson.h>
 #include "fsm.h"
-// #include "thresholds.h"
 
-// ------------------------------------------------------------------------
-// 1) Define static variables for each threshold that was previously a macro
-//    These names match exactly the ones in your original code.
-// ------------------------------------------------------------------------
+
 static double sustainer_idle_to_first_boost_acceleration_threshold;
 static double sustainer_idle_to_first_boost_time_threshold;
 static double sustainer_ignition_to_second_boost_acceleration_threshold;
@@ -50,77 +46,87 @@ static double booster_first_separation_jerk_threshold;
 static double booster_drogue_jerk_threshold;
 static double booster_main_jerk_threshold;
 
-// ------------------------------------------------------------------------
-// 2) Use a static boolean to ensure the YAML is only loaded once
-// ------------------------------------------------------------------------
-static bool yamlLoaded = false;
+#include <SPIFFS.h> 
 
-// ------------------------------------------------------------------------
-// 3) Load thresholds from YAML
-//    This function will parse the YAML file and populate the static variables.
-// ------------------------------------------------------------------------
-static void loadYamlThresholds() {
-    if (yamlLoaded) {
-        return; // Already loaded, skip
+static bool jsonLoaded = false;
+
+static void loadJsonThresholds() {
+    if (jsonLoaded) {
+        return;  
     }
 
-    try {
-        YAML::Node config = YAML::LoadFile("sg1-4.yaml");
-
-        // Load second stage thresholds
-        auto s = config["second_stage_thresholds"];
-        sustainer_idle_to_first_boost_acceleration_threshold      = s["idle_to_first_boost"]["acceleration_threshold"].as<double>();
-        sustainer_idle_to_first_boost_time_threshold             = s["idle_to_first_boost"]["time_threshold"].as<double>();
-        sustainer_ignition_to_second_boost_acceleration_threshold = s["ignition_to_second_boost"]["acceleration_threshold"].as<double>();
-        sustainer_ignition_to_second_boost_time_threshold         = s["ignition_to_second_boost"]["time_threshold"].as<double>();
-        sustainer_second_boost_to_coast_time_threshold            = s["second_boost_to_coast"]["time_threshold"].as<double>();
-        sustainer_coast_detection_acceleration_threshold          = s["coast_detection"]["acceleration_threshold"].as<double>();
-        sustainer_coast_to_apogee_vertical_speed_threshold         = s["coast_to_apogee"]["vertical_speed_threshold"].as<double>();
-        sustainer_apogee_backto_coast_vertical_speed_threshold     = s["apogee"]["backto_coast_vertical_speed_threshold"].as<double>();
-        sustainer_apogee_check_threshold                           = s["apogee"]["check_threshold"].as<double>();
-        sustainer_apogee_timer_threshold                           = s["apogee"]["timer_threshold"].as<double>();
-        sustainer_drogue_timer_threshold                           = s["drogue"]["timer_threshold"].as<double>();
-        sustainer_main_to_main_deploy_timer_threshold              = s["main"]["to_main_deploy_timer_threshold"].as<double>();
-        sustainer_main_deploy_altitude_threshold                   = s["main"]["deploy_altitude_threshold"].as<double>();
-        sustainer_ignition_to_coast_timer_threshold                = s["ignition"]["to_coast_timer_threshold"].as<double>();
-        sustainer_landed_timer_threshold                           = s["landed"]["timer_threshold"].as<double>();
-        sustainer_landed_vertical_speed_threshold                  = s["landed"]["vertical_speed_threshold"].as<double>();
-        sustainer_first_boost_to_burnout_time_threshold            = s["first_boost"]["to_burnout_time_threshold"].as<double>();
-        sustainer_drogue_jerk_threshold                            = s["drogue_jerk_threshold"].as<double>();
-        sustainer_main_jerk_threshold                              = s["main_jerk_threshold"].as<double>();
-
-        // Load first stage thresholds
-        auto b = config["first_stage_thresholds"];
-        booster_idle_to_first_boost_acceleration_threshold    = b["idle_to_first_boost"]["acceleration_threshold"].as<double>();
-        booster_idle_to_first_boost_time_threshold            = b["idle_to_first_boost"]["time_threshold"].as<double>();
-        booster_first_seperation_time_threshold               = b["first_separation"]["time_threshold"].as<double>();
-        booster_coast_detection_acceleration_threshold        = b["coast_detection"]["acceleration_threshold"].as<double>();
-        booster_coast_to_apogee_vertical_speed_threshold       = b["coast_to_apogee"]["vertical_speed_threshold"].as<double>();
-        booster_apogee_check_threshold                         = b["apogee"]["check_threshold"].as<double>();
-        booster_apogee_timer_threshold                         = b["apogee"]["timer_threshold"].as<double>();
-        booster_drogue_timer_threshold                         = b["drogue"]["timer_threshold"].as<double>();
-        booster_main_to_main_deploy_timer_threshold            = b["main"]["to_main_deploy_timer_threshold"].as<double>();
-        booster_main_deploy_altitude_threshold                 = b["main"]["deploy_altitude_threshold"].as<double>();
-        booster_ignition_to_second_boost_time_threshold         = b["ignition"]["to_second_boost_time_threshold"].as<double>();
-        booster_ignition_to_coast_timer_threshold              = b["ignition"]["to_coast_timer_threshold"].as<double>();
-        booster_landed_timer_threshold                         = b["landed"]["timer_threshold"].as<double>();
-        booster_first_boost_to_burnout_time_threshold           = b["first_boost"]["to_burnout_time_threshold"].as<double>();
-        booster_landed_vertical_speed_threshold                = b["landed"]["vertical_speed_threshold"].as<double>();
-        booster_first_separation_jerk_threshold                = b["first_separation_jerk_threshold"].as<double>();
-        booster_drogue_jerk_threshold                          = b["drogue_jerk_threshold"].as<double>();
-        booster_main_jerk_threshold                            = b["main_jerk_threshold"].as<double>();
-
-        yamlLoaded = true;
+    if (!SPIFFS.begin(true)) { 
+        Serial.println("⚠️ SPIFFS mount failed! Ensure SPIFFS is enabled.");
+        return;
     }
-    catch (const std::exception &e) {
-        std::cerr << "Error loading thresholds from YAML: " << e.what() << std::endl;
-        std::abort();
+
+    File file = SPIFFS.open("/sg1-4.json", "r");
+    if (!file) {
+        Serial.println("❌ Error: Could not open /sg1-4.json");
+        return;
     }
+
+    // Create a JSON document (adjust size as needed)
+    StaticJsonDocument<2048> doc;
+    
+    // Deserialize JSON
+    DeserializationError error = deserializeJson(doc, file);
+    file.close();  // Close file after parsing
+
+    if (error) {
+        Serial.print("❌ JSON parsing failed: ");
+        Serial.println(error.f_str());
+        return;
+    }
+
+    // Load second stage thresholds
+    JsonObject s = doc["second_stage_thresholds"];
+    sustainer_idle_to_first_boost_acceleration_threshold      = s["idle_to_first_boost"]["acceleration_threshold"] | 3;
+    sustainer_idle_to_first_boost_time_threshold             = s["idle_to_first_boost"]["time_threshold"] | 1000;
+    sustainer_ignition_to_second_boost_acceleration_threshold = s["ignition_to_second_boost"]["acceleration_threshold"] | 3;
+    sustainer_ignition_to_second_boost_time_threshold         = s["ignition_to_second_boost"]["time_threshold"] | 1000;
+    sustainer_second_boost_to_coast_time_threshold            = s["second_boost_to_coast"]["time_threshold"] | 1000;
+    sustainer_coast_detection_acceleration_threshold          = s["coast_detection"]["acceleration_threshold"] | 0.2;
+    sustainer_coast_to_apogee_vertical_speed_threshold        = s["coast_to_apogee"]["vertical_speed_threshold"] | 15;
+    sustainer_apogee_backto_coast_vertical_speed_threshold    = s["apogee"]["backto_coast_vertical_speed_threshold"] | 10;
+    sustainer_apogee_check_threshold                          = s["apogee"]["check_threshold"] | 1000;
+    sustainer_apogee_timer_threshold                          = s["apogee"]["timer_threshold"] | 1000;
+    sustainer_drogue_timer_threshold                          = s["drogue"]["timer_threshold"] | 3000;
+    sustainer_main_to_main_deploy_timer_threshold             = s["main"]["to_main_deploy_timer_threshold"] | 3000;
+    sustainer_main_deploy_altitude_threshold                  = s["main"]["deploy_altitude_threshold"] | 3000;
+    sustainer_ignition_to_coast_timer_threshold               = s["ignition"]["to_coast_timer_threshold"] | 5000;
+    sustainer_landed_timer_threshold                          = s["landed"]["timer_threshold"] | 5000;
+    sustainer_landed_vertical_speed_threshold                 = s["landed"]["vertical_speed_threshold"] | 20;
+    sustainer_first_boost_to_burnout_time_threshold           = s["first_boost"]["to_burnout_time_threshold"] | 1000;
+    sustainer_drogue_jerk_threshold                           = s["drogue_jerk_threshold"] | 200;
+    sustainer_main_jerk_threshold                             = s["main_jerk_threshold"] | 300;
+
+    // Load first stage thresholds
+    JsonObject b = doc["first_stage_thresholds"];
+    booster_idle_to_first_boost_acceleration_threshold    = b["idle_to_first_boost"]["acceleration_threshold"] | 3;
+    booster_idle_to_first_boost_time_threshold            = b["idle_to_first_boost"]["time_threshold"] | 1000;
+    booster_first_seperation_time_threshold               = b["first_separation"]["time_threshold"] | 3000;
+    booster_coast_detection_acceleration_threshold        = b["coast_detection"]["acceleration_threshold"] | 0.2;
+    booster_coast_to_apogee_vertical_speed_threshold       = b["coast_to_apogee"]["vertical_speed_threshold"] | 20;
+    booster_apogee_check_threshold                         = b["apogee"]["check_threshold"] | 1000;
+    booster_apogee_timer_threshold                         = b["apogee"]["timer_threshold"] | 1000;
+    booster_drogue_timer_threshold                         = b["drogue"]["timer_threshold"] | 3000;
+    booster_main_to_main_deploy_timer_threshold            = b["main"]["to_main_deploy_timer_threshold"] | 3000;
+    booster_main_deploy_altitude_threshold                 = b["main"]["deploy_altitude_threshold"] | 3000;
+    booster_ignition_to_second_boost_time_threshold        = b["ignition"]["to_second_boost_time_threshold"] | 1000;
+    booster_ignition_to_coast_timer_threshold              = b["ignition"]["to_coast_timer_threshold"] | 5000;
+    booster_landed_timer_threshold                         = b["landed"]["timer_threshold"] | 5000;
+    booster_first_boost_to_burnout_time_threshold          = b["first_boost"]["to_burnout_time_threshold"] | 1000;
+    booster_landed_vertical_speed_threshold                = b["landed"]["vertical_speed_threshold"] | 20;
+    booster_first_separation_jerk_threshold                = b["first_separation_jerk_threshold"] | 300;
+    booster_drogue_jerk_threshold                          = b["drogue_jerk_threshold"] | 200;
+    booster_main_jerk_threshold                            = b["main_jerk_threshold"] | 300;
+
+    jsonLoaded = true;
+    Serial.println("✅ JSON Thresholds Loaded Successfully!");
 }
 
-// ------------------------------------------------------------------------
-// Helper functions from your code
-// ------------------------------------------------------------------------
+
 template<typename T, size_t count>
 double sensor_average(BufferedSensorData<T, count>& sensor, double (* get_item)(T&)) {
     auto arr = sensor.template getBufferRecent<count>();
@@ -158,9 +164,7 @@ double sensor_derivative(BufferedSensorData<T, count>& sensor, double (* get_ite
     return (second_average - first_average) / (second_average_time - first_average_time);
 }
 
-// ------------------------------------------------------------------------
-// StateEstimate constructor from your code
-// ------------------------------------------------------------------------
+
 StateEstimate::StateEstimate(RocketData& state) {
     acceleration = sensor_average<HighGData, 8>(state.high_g, [](HighGData& data) {
         return (double) data.ax;
@@ -176,13 +180,11 @@ StateEstimate::StateEstimate(RocketData& state) {
     });
 }
 
-// ------------------------------------------------------------------------
-// The FSM code rewritten to load from YAML but keep variable names unchanged
-// ------------------------------------------------------------------------
+
 #ifdef IS_SUSTAINER
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     // 1) Ensure thresholds are loaded
-    loadYamlThresholds();
+    loadJsonThresholds();
 
     // 2) get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -314,7 +316,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     // 1) Ensure thresholds are loaded
-    loadYamlThresholds();
+    loadJsonThresholds();
 
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 

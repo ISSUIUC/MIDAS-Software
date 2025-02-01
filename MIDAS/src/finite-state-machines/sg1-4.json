@@ -1,0 +1,86 @@
+{
+  "second_stage_thresholds": {
+    "idle_to_first_boost": {
+      "acceleration_threshold": 3,
+      "time_threshold": 1000
+    },
+    "ignition_to_second_boost": {
+      "acceleration_threshold": 3,
+      "time_threshold": 1000
+    },
+    "second_boost_to_coast": {
+      "time_threshold": 1000
+    },
+    "coast_detection": {
+      "acceleration_threshold": 0.2
+    },
+    "coast_to_apogee": {
+      "vertical_speed_threshold": 15
+    },
+    "apogee": {
+      "backto_coast_vertical_speed_threshold": 10,
+      "check_threshold": 1000,
+      "timer_threshold": 1000
+    },
+    "drogue": {
+      "timer_threshold": 3000
+    },
+    "main": {
+      "to_main_deploy_timer_threshold": 3000,
+      "deploy_altitude_threshold": 3000
+    },
+    "ignition": {
+      "to_second_boost_time_threshold": 1000,
+      "to_coast_timer_threshold": 5000
+    },
+    "landed": {
+      "timer_threshold": 5000,
+      "vertical_speed_threshold": 20
+    },
+    "first_boost": {
+      "to_burnout_time_threshold": 1000
+    },
+    "drogue_jerk_threshold": 200,
+    "main_jerk_threshold": 300
+  },
+  "first_stage_thresholds": {
+    "idle_to_first_boost": {
+      "acceleration_threshold": 3,
+      "time_threshold": 1000
+    },
+    "first_separation": {
+      "time_threshold": 3000
+    },
+    "coast_detection": {
+      "acceleration_threshold": 0.2
+    },
+    "coast_to_apogee": {
+      "vertical_speed_threshold": 20
+    },
+    "apogee": {
+      "check_threshold": 1000,
+      "timer_threshold": 1000
+    },
+    "drogue": {
+      "timer_threshold": 3000
+    },
+    "main": {
+      "to_main_deploy_timer_threshold": 3000,
+      "deploy_altitude_threshold": 3000
+    },
+    "ignition": {
+      "to_second_boost_time_threshold": 1000,
+      "to_coast_timer_threshold": 5000
+    },
+    "landed": {
+      "timer_threshold": 5000,
+      "vertical_speed_threshold": 20
+    },
+    "first_boost": {
+      "to_burnout_time_threshold": 1000
+    },
+    "first_separation_jerk_threshold": 300,
+    "drogue_jerk_threshold": 200,
+    "main_jerk_threshold": 300
+  }
+}
