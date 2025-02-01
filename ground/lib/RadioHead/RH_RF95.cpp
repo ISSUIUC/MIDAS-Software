@@ -160,7 +160,6 @@ bool RH_RF95::setupInterruptHandler()
 void RH_RF95::handleInterrupt()
 {
     RH_MUTEX_LOCK(lock); // Multithreading support
-    
     // we need the RF95 IRQ to be level triggered, or we ……have slim chance of missing events
     // https://github.com/geeksville/Meshtastic-esp32/commit/78470ed3f59f5c84fbd1325bcff1fd95b2b20183
 
@@ -203,7 +202,6 @@ void RH_RF95::handleInterrupt()
     else if (_mode == RHModeRx && irq_flags & RH_RF95_RX_DONE)
     {
 	// Packet received, no CRC error
-//	Serial.println("R");
 	// Have received a packet
 	uint8_t len = spiRead(RH_RF95_REG_13_RX_NB_BYTES);
 
@@ -231,6 +229,7 @@ void RH_RF95::handleInterrupt()
 	    _lastRssi -= 164;
 	    
 	// We have received a message.
+    // Serial.println("validate");
 	validateRxBuf(); 
 	if (_rxBufValid)
 	    setModeIdle(); // Got one 
@@ -284,17 +283,8 @@ void RH_RF95::validateRxBuf()
     if (_bufLen < 4)
 	return; // Too short to be a real message
     // Extract the 4 headers
-    _rxHeaderTo    = _buf[0];
-    _rxHeaderFrom  = _buf[1];
-    _rxHeaderId    = _buf[2];
-    _rxHeaderFlags = _buf[3];
-    if (_promiscuous ||
-	_rxHeaderTo == _thisAddress ||
-	_rxHeaderTo == RH_BROADCAST_ADDRESS)
-    {
 	_rxGood++;
 	_rxBufValid = true;
-    }
 }
 
 bool RH_RF95::available()
@@ -326,10 +316,10 @@ bool RH_RF95::recv(uint8_t* buf, uint8_t* len)
     if (buf && len)
     {
 	ATOMIC_BLOCK_START;
-	// Skip the 4 headers that are at the beginning of the rxBuf
-	if (*len > _bufLen-RH_RF95_HEADER_LEN)
-	    *len = _bufLen-RH_RF95_HEADER_LEN;
-	memcpy(buf, _buf+RH_RF95_HEADER_LEN, *len);
+    // Cap buffer length and return the length
+	if (*len > _bufLen)
+	    *len = _bufLen;
+	memcpy(buf, _buf, *len);
 	ATOMIC_BLOCK_END;
     }
     clearRxBuf(); // This message accepted and cleared
@@ -490,7 +480,8 @@ void RH_RF95::setTxPower(int8_t power, bool useRFO)
 // Sets registers from a canned modem configuration structure
 void RH_RF95::setModemRegisters(const ModemConfig* config)
 {
-    spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d);
+    // Enable implicit header which is the 1st bit in the register
+    spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d & 0x01);
     spiWrite(RH_RF95_REG_1E_MODEM_CONFIG2,       config->reg_1e);
     spiWrite(RH_RF95_REG_26_MODEM_CONFIG3,       config->reg_26);
 }
@@ -717,4 +708,3 @@ uint8_t RH_RF95::getDeviceVersion()
     _deviceVersion = spiRead(RH_RF95_REG_42_VERSION);
     return _deviceVersion;
 }
-
