@@ -45,9 +45,16 @@ public:
 //        Serial.println("Sending bytes");
         tx_done = false;
         Radio.Send((uint8_t*) &data, sizeof(T));
-        Serial.println("Starting tx again");
-        delay(100);
-        Serial.println("Done tx!");
+
+        for(int i = 1;; i++){
+            if (tx_done) {
+                break;
+            } else if (i % 1024 == 0) {
+                Serial.println("Slow tx!");
+            }
+            delay(1);
+        }
+
     }
 
     /**

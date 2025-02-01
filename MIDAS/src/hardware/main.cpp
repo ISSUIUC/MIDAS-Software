@@ -27,7 +27,7 @@ void setup() {
     //begin serial port
     Serial.begin(9600);
 
-//    while (!Serial);
+   while (!Serial);
 
     delay(200);
 
@@ -40,22 +40,24 @@ void setup() {
     Wire.begin(I2C_SDA, I2C_SCL);
 
     //set all chip selects high (deselected)
-    pinMode(MS5611_CS, OUTPUT);
     pinMode(LSM6DS3_CS, OUTPUT);
-    pinMode(KX134_CS, OUTPUT);
-    pinMode(ADXL355_CS, OUTPUT);
-    pinMode(LIS3MDL_CS, OUTPUT);
-    pinMode(BNO086_CS, OUTPUT);
-    pinMode(CAN_CS, OUTPUT);
+	pinMode(KX134_CS, OUTPUT);
+	pinMode(ADXL355_CS, OUTPUT);
+	pinMode(LIS3MDL_CS, OUTPUT);
+	pinMode(BNO086_CS, OUTPUT);
+	pinMode(BNO086_RESET, OUTPUT);
+	pinMode(CAN_CS, OUTPUT);
+	pinMode(E22_CS, OUTPUT);
+	pinMode(MS5611_CS, OUTPUT);
 
-    digitalWrite(MS5611_CS, HIGH);
-    digitalWrite(LSM6DS3_CS, HIGH);
-    digitalWrite(KX134_CS, HIGH);
-    digitalWrite(ADXL355_CS, HIGH);
-    digitalWrite(LIS3MDL_CS, HIGH);
-    digitalWrite(BNO086_CS, HIGH);
-    digitalWrite(CAN_CS, HIGH);
-
+	digitalWrite(MS5611_CS, HIGH);
+	digitalWrite(LSM6DS3_CS, HIGH);
+	digitalWrite(KX134_CS, HIGH);
+	digitalWrite(ADXL355_CS, HIGH);
+	digitalWrite(LIS3MDL_CS, HIGH);
+	digitalWrite(BNO086_CS, HIGH);
+	digitalWrite(CAN_CS, HIGH);
+	digitalWrite(E22_CS, HIGH);
     //configure output leds
     gpioPinMode(LED_BLUE, OUTPUT);
     gpioPinMode(LED_GREEN, OUTPUT);

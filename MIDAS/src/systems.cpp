@@ -51,7 +51,12 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
             arg->rocket_data.barometer.update(reading);
             prev_reading = reading; // Only update prev_reading with accepted readings
         }
-        // Serial.println("Barometer");
+        // Serial.print("Barometer ");
+        // Serial.print(reading.altitude);
+        // Serial.print(" ");
+        // Serial.print(reading.pressure);
+        // Serial.print(" ");
+        // Serial.println(reading.temperature);
         THREAD_SLEEP(6);
     }
 }
@@ -66,6 +71,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
+        // Serial.print("Highg ");
+        // Serial.print(lowglsm.ax);
+        // Serial.print(" ");
+        // Serial.print(lowglsm.ay);
+        // Serial.print(" ");
+        // Serial.println(lowglsm.az);
         // Serial.println("Stuff");
         THREAD_SLEEP(2);
     }
@@ -87,7 +98,12 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
-        // Serial.println("mag");
+        Serial.print("mag ");
+        Serial.print(reading.mx);
+        Serial.print(" ");
+        Serial.print(reading.my);
+        Serial.print(" ");
+        Serial.println(reading.mz);
     }
 }
 
@@ -108,9 +124,14 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
+<<<<<<< HEAD
             Continuity reading2 = arg->sensors.continuity.read();
             // Serial.printf("Pyro A: %f\n", reading2.pins[0]);
             arg->rocket_data.continuity.update(reading2);
+=======
+            // Continuity reading2 = arg->sensors.continuity.read();
+            // arg->rocket_data.continuity.update(reading2);
+>>>>>>> 2932dd3 (systems)
 
             Voltage reading3 = arg->sensors.voltage.read();
             arg->rocket_data.voltage.update(reading3);
@@ -219,7 +240,6 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
         
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-<<<<<<< HEAD
 
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
@@ -281,21 +301,6 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                     //         break; 
                     // }
                 }
-=======
-        // if (current_state == FSMState(STATE_IDLE)) {
-        //     TelemetryCommand command;
-        //     if (arg->tlm.receive(&command, 2000)) {
-        //         if(command.valid()) {
-        //             arg->tlm.acknowledgeReceived();
-        //             switch(command.command) {
-        //                 case CommandType::RESET_KF:
-        //                     yessir.should_reinit = true;
-        //                     break;
-        //                 default:
-        //                     break; 
-        //             }
-        //         }
->>>>>>> f41298b (telemetry)
 
         //     }
         // }
@@ -316,18 +321,18 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
 #endif
-    INIT_SYSTEM(systems.log_sink);
-    INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
-    INIT_SYSTEM(systems.sensors.barometer);
+    // INIT_SYSTEM(systems.log_sink);
+    // INIT_SYSTEM(systems.sensors.high_g);
+    // INIT_SYSTEM(systems.sensors.low_g_lsm);
+    // INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
-    INIT_SYSTEM(systems.led);
-    INIT_SYSTEM(systems.buzzer);
+    // INIT_SYSTEM(systems.sensors.continuity);
+    // INIT_SYSTEM(systems.sensors.voltage);
+    // INIT_SYSTEM(systems.sensors.pyro);
+    // INIT_SYSTEM(systems.led);
+    // INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
-    INIT_SYSTEM(systems.sensors.gps);
+    // INIT_SYSTEM(systems.sensors.gps);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
@@ -356,14 +361,14 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(orientation, SENSOR_CORE, config, 10);
 #endif
 
-    START_THREAD(logger, DATA_CORE, config, 15);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
-    START_THREAD(barometer, SENSOR_CORE, config, 12);
-    START_THREAD(i2c, SENSOR_CORE, config, 9);
+    // START_THREAD(logger, DATA_CORE, config, 15);
+    // START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    // START_THREAD(barometer, SENSOR_CORE, config, 12);
+    // START_THREAD(i2c, SENSOR_CORE, config, 9);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(kalman, SENSOR_CORE, config, 7);
-    START_THREAD(fsm, SENSOR_CORE, config, 8);
-    START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    // START_THREAD(kalman, SENSOR_CORE, config, 7);
+    // START_THREAD(fsm, SENSOR_CORE, config, 8);
+    // START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
