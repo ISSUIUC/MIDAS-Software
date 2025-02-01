@@ -105,6 +105,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
@@ -127,6 +128,10 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
 
         if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing()) {
             arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
+        }
+
+        if (current_state == FSMState::STATE_LANDED && !arg->buzzer.is_playing()) {
+            arg->buzzer.play_tune(land_tone, LAND_TONE_LENGTH);
         }
 
         if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {

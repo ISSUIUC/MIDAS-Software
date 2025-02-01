@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
 #include "finite-state-machines/fsm_states.h"
 
@@ -167,6 +168,17 @@ struct Magnetometer {
     float mx;
     float my;
     float mz;
+};
+
+struct Quaternion {
+    float w, x, y, z;
+
+    static float dot(const Quaternion& q1, const Quaternion& q2) {
+        return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
+    }
+
+
+
 };
 
 /**
