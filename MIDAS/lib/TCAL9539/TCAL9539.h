@@ -53,6 +53,14 @@ struct GpioReadResult {
 };
 
 bool TCAL9539Init();
-GpioError gpioPinMode(GpioAddress pin, int mode);
-GpioError gpioDigitalWrite(GpioAddress pin, int mode);
-GpioReadResult gpioDigitalRead(GpioAddress pin);
+
+/**
+ * wirenum: decides which wire to use on the GPIO
+ * pin: which pin to write or read signal from
+ * mode: the mode of the pin
+ */
+GpioError gpioPinMode(GpioAddress pin, int mode, int wirenum = 0);
+
+GpioError gpioDigitalWrite(GpioAddress pin, int mode, int wirenum = 0);
+
+GpioReadResult gpioDigitalRead(GpioAddress pin, int wirenum = 0);
