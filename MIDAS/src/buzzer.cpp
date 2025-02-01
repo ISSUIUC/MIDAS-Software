@@ -1,6 +1,6 @@
 #include "buzzer.h"
 
-#define BUZZER_PIN (48)
+#define BUZZER_PIN (17)
 #define BUZZER_CHANNEL (1)
 
 /**

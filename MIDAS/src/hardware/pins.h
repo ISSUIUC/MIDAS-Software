@@ -69,7 +69,14 @@
 #define E22_RESET 12
 
 // LEDs
-#define LED_BLUE   GpioAddress(2, 013)
-#define LED_GREEN  GpioAddress(2, 014)
-#define LED_ORANGE GpioAddress(2, 015)
-#define LED_RED    GpioAddress(2, 016)
+#define LED_BLUE   GpioAddress(2, 014)
+#define LED_GREEN  GpioAddress(2, 015)
+#define LED_ORANGE GpioAddress(2, 016)
+#define LED_RED    GpioAddress(2, 017)
+
+#define FLASH_CMD 14
+#define FLASH_CLK 18
+#define FLASH_DAT0 13
+#define FLASH_DAT1 12
+#define FLASH_DAT2 15
+#define FLASH_DAT3 16

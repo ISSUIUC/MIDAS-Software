@@ -11,7 +11,7 @@ Adafruit_BNO08x imu(BNO086_RESET);
  * @return Error Code
 */
 ErrorCode OrientationSensor::init() {
-    gpioPinMode(BNO086_RESET, OUTPUT);
+    pinMode(BNO086_RESET, OUTPUT);
     delay(100);
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code

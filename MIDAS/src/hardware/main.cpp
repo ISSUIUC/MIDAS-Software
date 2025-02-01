@@ -47,7 +47,7 @@ void setup() {
     pinMode(LIS3MDL_CS, OUTPUT);
     pinMode(BNO086_CS, OUTPUT);
     pinMode(CAN_CS, OUTPUT);
-    pinMode(RFM96_CS, OUTPUT);
+
     digitalWrite(MS5611_CS, HIGH);
     digitalWrite(LSM6DS3_CS, HIGH);
     digitalWrite(KX134_CS, HIGH);
@@ -55,7 +55,6 @@ void setup() {
     digitalWrite(LIS3MDL_CS, HIGH);
     digitalWrite(BNO086_CS, HIGH);
     digitalWrite(CAN_CS, HIGH);
-    digitalWrite(RFM96_CS, HIGH);
 
     //configure output leds
     gpioPinMode(LED_BLUE, OUTPUT);
