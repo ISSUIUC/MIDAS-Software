@@ -27,7 +27,8 @@
     },
     "main": {
       "to_main_deploy_timer_threshold": 3000,
-      "deploy_altitude_threshold": 3000
+      "__comment": "This is the altitude at which the main parachute will deploy in meters above sea level as it adds the altitude of the rocket to the altitude of the launch pad",
+      "deploy_altitude_threshold": 1006 
     },
     "ignition": {
       "to_second_boost_time_threshold": 1000,
@@ -35,7 +36,7 @@
     },
     "landed": {
       "timer_threshold": 5000,
-      "vertical_speed_threshold": 20
+      "vertical_speed_threshold": 3
     },
     "first_boost": {
       "to_burnout_time_threshold": 1000
@@ -74,7 +75,7 @@
     },
     "landed": {
       "timer_threshold": 5000,
-      "vertical_speed_threshold": 20
+      "vertical_speed_threshold": 5
     },
     "first_boost": {
       "to_burnout_time_threshold": 1000
