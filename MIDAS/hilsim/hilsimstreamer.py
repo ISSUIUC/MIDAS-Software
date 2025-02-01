@@ -16,7 +16,7 @@ for comport in serial.tools.list_ports.comports():
 if not device:
     print("MIDAS is not connected!")
     exit()
-file = open(r"data271.launch", "rb")
+file = open(r"data43.launch", "rb")
 
 # Read the json file
 SIZES = { int(k): v for k, v in json.load(open("../struct_sizes.json", 'r')).items() }
@@ -32,10 +32,14 @@ ser = serial.Serial(
 print(ser.write('!'.encode('ascii')))
 print("Magic", ser.read_until('\n'.encode('ascii'))) # Should be our magic
 print("Checksum", hex(int(ser.read_until('\n'.encode('ascii'))))) # Should be our magic
-print("Garbage", ((ser.read_until('\n'.encode('ascii')))))
+print("Garbage", ser.read_until('\n'.encode('ascii')))
+print("Garbage", ser.read_until('\n'.encode('ascii')))
 counter = 0
 
+input()
+
 start_time = time.perf_counter()
+prev = None
 while True:
     tag = file.read(4)
     if not tag:
@@ -56,13 +60,15 @@ while True:
         ser.write(tag.to_bytes(1, byteorder='little'))   
         # ser.write(size.to_bytes(4, byteorder='little'))
         ser.write(data)
-        content = ser.read_until('\n'.encode('ascii'))
-        data = bytes.decode(content, encoding="ascii")
-        if len(content) != 0:
-            # print(content)
-            if ("Error") in (data):
-                print((content))
-            print(counter, file.tell(), content)
+        content = (ser.read())
+        # data = bytes.decode(content, encoding="ascii")
+        # if len(content) != 0:
+        #     # print(content)
+        #     if ("Error") in (data):
+        #         print((content))
+        if content != prev:
+            prev = content
+            print(counter, file.tell(), int.from_bytes(content))
     else:
         raise ValueError(f"Unknown tag: {tag}")
     counter += 1
