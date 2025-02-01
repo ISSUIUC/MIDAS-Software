@@ -1,7 +1,6 @@
 #include <cmath>
 
 #include "fsm.h"
-#include "sg1-4.h"
 
 // helper functions
 
