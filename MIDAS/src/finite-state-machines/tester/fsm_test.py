@@ -5,6 +5,15 @@ import fsm
 import math
 import matplotlib.pyplot as plt
 
+# ACCEL_STRING = "acceleration"
+# TIME_STRING = "time"
+# HEIGHT_STRING = "height"
+# SPEED_STRING = "speed"
+
+ACCEL_STRING = "accel_x"
+TIME_STRING = "time"
+HEIGHT_STRING = "pos_x"
+SPEED_STRING = "vel_x"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=pathlib.Path)
@@ -23,15 +32,15 @@ packet = fsm.StateEstimate()
 state_rows = []
 
 for i, line in df.iterrows():
-    packet['acceleration'] = float(line['accel_x'])
-    packet['altitude'] = float(line['pos_x'])
-    packet['current_time'] = float(line['time'])
+    packet['acceleration'] = float(line[ACCEL_STRING])
+    packet['altitude'] = float(line[HEIGHT_STRING])
+    packet['current_time'] = float(line[TIME_STRING])
     packet['jerk'] = 0
 
-    if i > 0 and line['time'] - df['time'][i - 1] != 0:
-        packet['jerk'] = float((line['accel_x'] - df['accel_x'][i - 1]) / (line['time'] - df['time'][i - 1]))
+    if i > 0 and line[TIME_STRING] - df[TIME_STRING][i - 1] != 0:
+        packet['jerk'] = float((line[ACCEL_STRING] - df[ACCEL_STRING][i - 1]) / (line[TIME_STRING] - df[TIME_STRING][i - 1]))
 
-    packet['vertical_speed'] = float(line['vel_x'])
+    packet['vertical_speed'] = float(line[SPEED_STRING])
 
     state, transition_reason = state_machine.tick_fsm(packet)
 
@@ -51,10 +60,10 @@ plt.yticks(ynums, yticks)
 plt.xlabel("Time (s)")
 plt.plot(df["time"], state_rows)
 
-plt.vlines(60, 0, top_state, label="Booster Ignition", colors="r", linestyles='--')
-plt.vlines(64, 0, top_state, label="Booster Burnout", colors="b", linestyles='--')
-plt.vlines(65, 0, top_state, label="Sustainer Ignition", colors="g", linestyles='--')
-plt.vlines(70, 0, top_state, label="Sustainer Burnout", colors="c", linestyles='--')
+# plt.vlines(60, 0, top_state, label="Booster Ignition", colors="r", linestyles='--')
+# plt.vlines(64, 0, top_state, label="Booster Burnout", colors="b", linestyles='--')
+# plt.vlines(65, 0, top_state, label="Sustainer Ignition", colors="g", linestyles='--')
+# plt.vlines(70, 0, top_state, label="Sustainer Burnout", colors="c", linestyles='--')
 
 
 plt.legend()
