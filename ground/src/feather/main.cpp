@@ -182,7 +182,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.highG_ax = convert_range<int16_t>(ax, 32);
     data.highG_ay = convert_range<int16_t>(ay, 32);
     data.highG_az = convert_range<int16_t>(az, 32);
-    data.tilt_angle = tilt / 1023. * 314; //convert_range(tilt, 180); // [-90, 90]
+    data.tilt_angle = tilt / 1023. * 180; // Returns tilt angle in range [0, 180]
     data.battery_voltage = convert_range(packet.batt_volt, 16);
     data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
     data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
