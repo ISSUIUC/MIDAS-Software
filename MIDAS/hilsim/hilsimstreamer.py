@@ -4,6 +4,20 @@ import serial.tools.list_ports
 import time
 import json
 
+import csv
+import os
+
+def write_to_csv(filename, data):
+    file_exists = os.path.exists(filename)
+
+    with open(filename, 'a', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+
+        if not file_exists:
+            writer.writerow(['Timestamp', 'fsmstate', 'global_armed', 'a_armed', 'a_firing', 'b_armed', 'b_firing', 'c_armed', 'c_firing', 'd_armed', 'd_firing'])
+
+        writer.writerow(data)
+
 device = None
 # Look for midas comport
 for comport in serial.tools.list_ports.comports():
@@ -12,6 +26,8 @@ for comport in serial.tools.list_ports.comports():
         print(comport.name, "is an Espressif device")
         device = comport
         break
+
+print(device.device)
 
 if not device:
     print("MIDAS is not connected!")
@@ -25,7 +41,7 @@ print(SIZES)
 test_list=file.read(4)
 print("Checksum", hex(int.from_bytes(test_list, byteorder='little')))
 ser = serial.Serial(
-    port=comport.name,         
+    port=comport.device,         
     baudrate=115200,       
     timeout=None       
 )
@@ -73,7 +89,7 @@ while True:
             prev = content
             print(counter, file.tell(), int.from_bytes(content))
 
-        ser.read()
+        write_to_csv("pyro_data.csv", [timestamp, int.from_bytes(content), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read())])
     else:
         raise ValueError(f"Unknown tag: {tag}")
     counter += 1
