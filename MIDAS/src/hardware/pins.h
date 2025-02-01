@@ -46,6 +46,8 @@
 #define GPS_RESET GpioAddress(2, 017)
 #define GPS_ENABLE 0
 
+//take the pins that are in base 8 and update it to the right base - this is not done yet.
+
 // pyro pins
 #define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 05)
 #define PYROA_FIRE_PIN GpioAddress(0, 04)
