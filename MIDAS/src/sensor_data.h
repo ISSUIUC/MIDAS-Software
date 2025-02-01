@@ -127,7 +127,6 @@ struct Barometer {
  * @brief data about pyro continuity
 */
 struct Continuity {
-    float sense_pyro;
     float pins[4];
 };
 

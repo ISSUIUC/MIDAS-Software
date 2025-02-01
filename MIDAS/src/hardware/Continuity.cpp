@@ -24,7 +24,6 @@ ErrorCode ContinuitySensor::init() {
 Continuity ContinuitySensor::read() {
     Continuity continuity;
     //ADC reference voltage is 3.3, returns 12 bit value
-    continuity.sense_pyro = adcAnalogRead(ADCAddress{SENSE_PYRO}).value * 3.3f / 4096.f / PYRO_VOLTAGE_DIVIDER;
     continuity.pins[0] = adcAnalogRead(ADCAddress{SENSE_MOTOR}).value * 3.3f / 4096.f / CONT_VOLTAGE_DIVIDER;
     continuity.pins[1] = adcAnalogRead(ADCAddress{SENSE_MAIN}).value * 3.3f / 4096.f / CONT_VOLTAGE_DIVIDER;
     continuity.pins[2] = adcAnalogRead(ADCAddress{SENSE_APOGEE}).value * 3.3f / 4096.f / CONT_VOLTAGE_DIVIDER;
