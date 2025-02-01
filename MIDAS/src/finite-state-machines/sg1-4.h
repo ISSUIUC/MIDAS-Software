@@ -38,7 +38,7 @@
 #define sustainer_main_to_main_deploy_timer_threshold 3000
 
 // Height required to deploy the main parachutes
-#define sustainer_main_deploy_altitude_threshold 3000
+#define sustainer_main_deploy_altitude_threshold 1006
 
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define sustainer_ignition_to_second_boost_time_threshold 1000
@@ -53,7 +53,7 @@
 #define sustainer_first_boost_to_burnout_time_threshold 1000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold
-#define sustainer_landed_vertical_speed_threshold 20
+#define sustainer_landed_vertical_speed_threshold 3
 
 // Stores a small jerk value
 #define sustainer_drogue_jerk_threshold 200
@@ -108,7 +108,7 @@
 #define booster_first_boost_to_burnout_time_threshold 1000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold
-#define booster_landed_vertical_speed_threshold 20
+#define booster_landed_vertical_speed_threshold 4
 
 // Stores a small jerk value
 #define booster_first_separation_jerk_threshold 300
