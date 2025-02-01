@@ -253,10 +253,11 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("frequency", packet.freq);
     printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count);
-    printJSONField("is_sustainer", packet.is_sustainer, false);
-    printJSONField("pyro_a", packet.pyros[0], false);
-    printJSONField("pyro_b", packet.pyros[1], false);
-    printJSONField("pyro_c", packet.pyros[2], false);
+    printJSONField("kf_velocity", packet.kf_vx);
+    printJSONField("is_sustainer", packet.is_sustainer);
+    printJSONField("pyro_a", packet.pyros[0]);
+    printJSONField("pyro_b", packet.pyros[1]);
+    printJSONField("pyro_c", packet.pyros[2]);
     printJSONField("pyro_d", packet.pyros[3], false);
     Serial.println("}}");
 }
