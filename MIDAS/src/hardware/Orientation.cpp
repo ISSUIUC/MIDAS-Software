@@ -1,7 +1,10 @@
+#include <Eigen/Eigen>
 #include "sensors.h"
 #include "Adafruit_BNO08x.h"
 #include "sensor_data.h"
 #include <cmath>
+
+
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
@@ -29,12 +32,6 @@ ErrorCode OrientationSensor::init()
         return ErrorCode::CannotInitBNO;
     }
     return ErrorCode::NoError;
-}
-
-float angle_between_quaternions(const Quaternion &q1, const Quaternion &q2)
-{
-    float dot_product = Quaternion::dot(q1, q2);
-    return 2.0f * std::acos(std::fabs(dot_product));
 }
 
 /**
@@ -90,26 +87,31 @@ Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t *rotational_vector, bool degrees
                              degrees);
 }
 
-std::tuple<float, float, float> euler_to_vector(float pitch, float yaw)
-{
-    float x = cos(pitch) * cos(yaw);
-    float y = cos(pitch) * sin(yaw);
-    float z = sin(pitch);
-    return {x, y, z};
-}
+Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec) {
+    float roll = rpy_vec.x;
+    float pitch = rpy_vec.y;
+    float yaw = rpy_vec.z;
 
-float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
-{
-    auto [x1, y1, z1] = euler_to_vector(pitch1, yaw1);
-    auto [x2, y2, z2] = euler_to_vector(pitch2, yaw2);
+    Eigen::Matrix3f Rx {
+        {1, 0, 0},
+        {0, cos(roll), sin(roll)},
+        {0, sin(roll), cos(roll)}
+    };
 
-    float mag1 = sqrt(x1 * x1 + y1 * y1 + z1 * z1);
-    float mag2 = sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+    Eigen::Matrix3f Ry {
+        {cos(pitch), 0, sin(pitch)},
+        {0, 1, 0},
+        {-sin(pitch), 0, cos(pitch)}
+    };
 
-    float dot_product = x1 * x2 + y1 * y2 + z1 * z2;
+    Eigen::Matrix3f Rz {
+        {cos(yaw), -sin(yaw), 0},
+        {sin(yaw), cos(yaw), 0},
+        {0, 0, 1}
+    };
 
-    return std::acos(dot_product / (mag1 * mag2));
-}
+    return Rx * Ry * Rz;
+} 
 
 /**
  * @brief Reads and returns the data from the sensor
@@ -189,71 +191,26 @@ Orientation OrientationSensor::read()
             initial_flag = 1;
         }
 
-        // calculate tilt from initial orientation
-        // Orientation deviation;
-        // deviation.yaw = min(abs(sensor_reading.yaw - initial_orientation.yaw), 2 * 3.14F - abs(sensor_reading.yaw - initial_orientation.yaw));
-        // deviation.pitch = min(abs(sensor_reading.pitch - initial_orientation.pitch), 2 * 3.14F - abs(sensor_reading.pitch - initial_orientation.pitch));
-        // sensor_reading.tilt = sqrt(pow(deviation.yaw, 2) + pow(deviation.pitch, 2));
+        Vec3 rotated_data {-euler.z, -euler.y, euler.x}; // roll, pitch, yaw
 
-        // sensor_reading.tilt = angular_difference(sensor_reading.pitch, sensor_reading.yaw, initial_orientation.pitch, initial_orientation.yaw);
+        // The guess & check method!
+        // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
 
-        Quaternion delta;
-        Quaternion inverse;
-        Quaternion curr;
-        double norm_initial = sqrt(initial_quaternion.w * initial_quaternion.w + initial_quaternion.x * initial_quaternion.x + initial_quaternion.y * initial_quaternion.y + initial_quaternion.z * initial_quaternion.z);
-        double norm_current = sqrt(quat.w * quat.w + quat.x * quat.x + quat.y * quat.y + quat.z * quat.z);
+        Eigen::Matrix3f rot_matrix = generate_rotation_matrix(rotated_data);
+        Eigen::Vector3f cur_ivec = {0, 0, 1};
+        Eigen::Vector3f cur_vec = cur_ivec * rot_matrix;
+        Eigen::Vector3f reference_vector = {1, 0, 0};
 
-        // get inverse of original
-        inverse.w = initial_quaternion.w;
-        inverse.x = -initial_quaternion.x;
-        inverse.y = -initial_quaternion.y;
-        inverse.z = -initial_quaternion.z;
+        float dot = cur_vec.dot(reference_vector);
+        float cur_mag = cur_vec.norm();
+        float ref_mag = reference_vector.norm();
 
-        // normalize
-        if (norm_current > 0.0)
-        {
-            curr.w = quat.w /norm_current;
-            curr.x = quat.x /norm_current;
-            curr.y =  quat.y/ norm_current;
-            curr.z = quat.z/ norm_current;
-        }
+        float angle = acos(dot/(cur_mag*ref_mag));
 
-        if (norm_initial > 0.0)
-        {
-            inverse.w /= norm_initial;
-            inverse.x /= norm_initial;
-            inverse.y /= norm_initial;
-            inverse.z /= norm_initial;
-        }
-
-        // multiply current by inverse, need to fix initial condition where the initial quat = current quat
-        delta.w = curr.w * inverse.w - curr.x * inverse.x - curr.y * inverse.y - curr.z * inverse.z;
-        delta.x = curr.w * inverse.x + curr.x * inverse.w + curr.y * inverse.z - curr.z * inverse.y;
-        delta.y = curr.w * inverse.y - curr.x * inverse.z + curr.y * inverse.w + curr.z * inverse.x;
-        delta.z = curr.w * inverse.z + curr.x * inverse.y - curr.y * inverse.x + curr.z * inverse.w;
-
-        // get z-axis rotation by converting delta quaternion to euler angles
-        Vec3 values = quaternionToEuler(delta.w, delta.x, delta.y, delta.z,false);
-
-        sensor_reading.tilt = values.z;
-        //Serial.println("---------");
-        //Serial.println(sensor_reading.tilt);
-        // Serial.print("Raw Euler - X: ");
-        // Serial.print(euler.x, 2);
-        // Serial.print(", Y: ");
-        // Serial.print(-euler.y, 2);
-        // Serial.print(", Z: ");
-        // Serial.print(euler.z, 2);
-        // Serial.print(" | Filtered Euler - X: ");
-        // Serial.print(filtered_euler.x, 2);
-        // Serial.print(", Y: ");
-        // Serial.print(filtered_euler.y, 2);
-        // Serial.print(", Z: ");
-        // Serial.println(filtered_euler.z, 2);
-
-        // Simulate a delay to match the report interval
-        //delay(REPORT_INTERVAL_US / 1000);
-
+        sensor_reading.tilt = angle;
+        Serial.print("TILT: ");
+        Serial.println(angle);
+        
         return sensor_reading;
     }
     return {.has_data = false};
