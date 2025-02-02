@@ -382,16 +382,44 @@ void ChangeFrequency(float freq) {
 }
 
 void loop() {
+    
+    PrintDequeue();
     if (rf95.available()) {
-        Serial.println("Packet received!");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+        TelemetryPacket packet;
         uint8_t len = sizeof(buf);
+
         if (rf95.recv(buf, &len)) {
-            Serial.print("Received: ");
-            Serial.println((char*)buf);
-            delay(2000);
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(50);
+            digitalWrite(LED_BUILTIN, LOW);
+            // Serial.println("Received packet");
+            // Serial.println(len);
+            memcpy(&packet, buf, sizeof(packet));
+            EnqueuePacket(packet, current_freq);
+            if (!cmd_queue.empty()) {
+                auto& cmd = cmd_queue.front();
+                    cmd.retry_count++;
+                    if (cmd.retry_count >= max_command_retries) {
+                        cmd_queue.pop();
+                        Serial.println(json_send_failure);
+                    }
+            }
+
+            process_command_queue();
+
         } else {
-            Serial.println("Receive failed");
+            Serial.println(json_receive_failure);
+        }
+    }
+    serial_parser.read();
+    if (Serial.available()) {
+        String input = Serial.readStringUntil('\n');
+        if (input.startsWith("FREQ:")) {
+            float freq = input.substring(5).toFloat(); // Extract frequency value
+            set_freq_local_bug_fix(freq);
+            RF95_FREQ = freq;
+            current_freq = freq;
         }
     }
 }
