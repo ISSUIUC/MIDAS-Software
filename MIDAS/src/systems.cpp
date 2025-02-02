@@ -1,7 +1,7 @@
 #include "systems.h"
 
 #include "hal.h"
-#include "gnc/yessir.h"
+#include "gnc/ekf.h"
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -143,14 +143,14 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    yessir.initialize(arg);
+    ekf.initialize(arg);
     TickType_t last = xTaskGetTickCount();
     
     while (true) {
-        if(yessir.should_reinit){
-            yessir.initialize(arg);
+        if(ekf.should_reinit){
+            ekf.initialize(arg);
             TickType_t last = xTaskGetTickCount();
-            yessir.should_reinit = false;
+            ekf.should_reinit = false;
         }
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
@@ -164,8 +164,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
-        KalmanData current_state = yessir.getState();
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
+        KalmanData current_state = ekf.getState();
 
         arg->rocket_data.kalman.update(current_state);
 
@@ -187,7 +187,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                     arg->tlm.acknowledgeReceived();
                     switch(command.command) {
                         case CommandType::RESET_KF:
-                            yessir.should_reinit = true;
+                            ekf.should_reinit = true;
                             break;
                         default:
                             break; 

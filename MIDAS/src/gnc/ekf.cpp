@@ -483,6 +483,8 @@ Eigen::Matrix<float, 3, 1> EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float
     return yaw * pitch * roll * body_vect;
 }
 
+void EKF::priori(){};
+
 Eigen::Matrix<float, 3, 1> EKF::GlobalToBody(euler_t angles, const Eigen::Matrix<float, 3, 1> world_vector) {
     //pysim code
     // roll = np.array([[1, 0, 0], [0, np.cos(roll), -np.sin(roll)], [0, np.sin(roll), np.cos(roll)]])
@@ -541,4 +543,5 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz) {
     std::tie(Ca, Cn, Cp) = aerodynamicData[mach];
     
 }
-    
+
+EKF ekf;
