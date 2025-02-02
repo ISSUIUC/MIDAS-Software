@@ -96,13 +96,13 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.gps.update(reading);
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-
             CommandFlags& telem_commands = arg->rocket_data.command_flags;
 
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
             Continuity reading2 = arg->sensors.continuity.read();
+            // Serial.printf("Pyro A: %f\n", reading2.pins[0]);
             arg->rocket_data.continuity.update(reading2);
 
             Voltage reading3 = arg->sensors.voltage.read();

@@ -130,7 +130,6 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 state = FSMState::STATE_SAFE;
             }
 
-
             break;
 
         case FSMState::STATE_IDLE:
@@ -181,6 +180,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_SUSTAINER_IGNITION:
+            // This state probably does not need a pyro lockout, since we have a back-transition from STATE_SECOND_BOOST
             // another time transition into coast after a certain amount of time
             if ((current_time - sustainer_ignition_time) > sustainer_ignition_to_coast_timer_threshold) {
                 coast_time = current_time;
@@ -240,7 +240,12 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_DROGUE_DEPLOY:
             // if detected a sharp change in jerk then go to next state
-            if (abs(state_estimate.jerk) < sustainer_drogue_jerk_threshold) {
+            // Drogue deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
+            if((current_time - drogue_time) < sustainer_pyro_firing_time_minimum) {
+                break;
+            }
+
+            if (abs(state_estimate.jerk) > sustainer_drogue_jerk_threshold) {
                 state = FSMState::STATE_DROGUE;
                 break;
             }
@@ -261,9 +266,15 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_MAIN_DEPLOY:
+            // Main deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
+            if((current_time - drogue_time) < sustainer_pyro_firing_time_minimum) {
+                break;
+            }
+
             // if detected a sharp change in jerk then go to the next state
-            if (abs(state_estimate.jerk) < sustainer_main_jerk_threshold) {
+            if (abs(state_estimate.jerk) > sustainer_main_jerk_threshold) {
                 state = FSMState::STATE_MAIN;
+                main_deployed_time = current_time;
                 break;
             }
 
@@ -275,13 +286,18 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_MAIN:
             // if slowed down enough then go on to the next state
-            if (abs(state_estimate.vertical_speed) <= sustainer_landed_vertical_speed_threshold) {
+            if ((abs(state_estimate.vertical_speed) <= sustainer_landed_vertical_speed_threshold) && (current_time - main_deployed_time) > sustainer_main_to_landed_lockout) {
                 landed_time = current_time;
                 state = FSMState::STATE_LANDED;
             }
             break;
 
         case FSMState::STATE_LANDED:
+
+            if((current_time - landed_time) > sustainer_landed_time_lockout) {
+                break;
+            }
+
             // if the slow speed was too brief then return to previous state
             if ((abs(state_estimate.vertical_speed) > sustainer_landed_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
                 state = FSMState::STATE_MAIN;
@@ -423,7 +439,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_DROGUE_DEPLOY:
-            if (abs(state_estimate.jerk) < booster_drogue_jerk_threshold) {
+
+            // Drogue deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
+            if((current_time - drogue_time) < booster_pyro_firing_time_minimum) {
+                break;
+            }
+
+            if (abs(state_estimate.jerk) > booster_drogue_jerk_threshold) {
                 state = FSMState::STATE_DROGUE;
                 break;
             }
@@ -441,8 +463,15 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_MAIN_DEPLOY:
-            if (abs(state_estimate.jerk) < booster_main_jerk_threshold) {
+
+            // Main deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
+            if((current_time - main_time) < booster_pyro_firing_time_minimum) {
+                break;
+            }
+
+            if (abs(state_estimate.jerk) > booster_main_jerk_threshold) {
                 state = FSMState::STATE_MAIN;
+                main_deployed_time = current_time;
                 break;
             }
 
@@ -452,13 +481,18 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_MAIN:
-            if (abs(state_estimate.vertical_speed) <= booster_landed_vertical_speed_threshold) {
+            if (abs(state_estimate.vertical_speed) <= booster_landed_vertical_speed_threshold && (current_time - main_deployed_time) > booster_main_to_landed_lockout) {
                 landed_time = current_time;
                 state = FSMState::STATE_LANDED;
             }
             break;
 
         case FSMState::STATE_LANDED:
+
+            if((current_time - landed_time) > booster_landed_time_lockout) {
+                break;
+            }
+
             if ((abs(state_estimate.vertical_speed) > booster_landed_vertical_speed_threshold) && ((current_time - landed_time) > booster_landed_timer_threshold)) {
                 state = FSMState::STATE_MAIN;
             }

@@ -36,6 +36,7 @@
 
 float RF95_FREQ = 426.15;
 float SUSTAINER_FREQ = 426.15;
+
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
 float rf95_freq_MHZ = 434.00;
@@ -406,44 +407,16 @@ void ChangeFrequency(float freq) {
 }
 
 void loop() {
-    
-    PrintDequeue();
     if (rf95.available()) {
+        Serial.println("Packet received!");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        TelemetryPacket packet;
         uint8_t len = sizeof(buf);
-
         if (rf95.recv(buf, &len)) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(50);
-            digitalWrite(LED_BUILTIN, LOW);
-            // Serial.println("Received packet");
-            // Serial.println(len);
-            memcpy(&packet, buf, sizeof(packet));
-            EnqueuePacket(packet, current_freq);
-            if (!cmd_queue.empty()) {
-                auto& cmd = cmd_queue.front();
-                    cmd.retry_count++;
-                    if (cmd.retry_count >= max_command_retries) {
-                        cmd_queue.pop();
-                        Serial.println(json_send_failure);
-                    }
-            }
-
-            process_command_queue();
-
+            Serial.print("Received: ");
+            Serial.println((char*)buf);
+            delay(2000);
         } else {
-            Serial.println(json_receive_failure);
-        }
-    }
-    serial_parser.read();
-    if (Serial.available()) {
-        String input = Serial.readStringUntil('\n');
-        if (input.startsWith("FREQ:")) {
-            float freq = input.substring(5).toFloat(); // Extract frequency value
-            set_freq_local_bug_fix(freq);
-            RF95_FREQ = freq;
-            current_freq = freq;
+            Serial.println("Receive failed");
         }
     }
 }

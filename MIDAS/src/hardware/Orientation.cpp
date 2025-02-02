@@ -4,7 +4,6 @@
 #include "sensor_data.h"
 #include <cmath>
 
-
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
@@ -32,6 +31,12 @@ ErrorCode OrientationSensor::init()
         return ErrorCode::CannotInitBNO;
     }
     return ErrorCode::NoError;
+}
+
+float angle_between_quaternions(const Quaternion &q1, const Quaternion &q2)
+{
+    float dot_product = Quaternion::dot(q1, q2);
+    return 2.0f * std::acos(std::fabs(dot_product));
 }
 
 /**
@@ -85,6 +90,27 @@ Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t *rotational_vector, bool degrees
 {
     return quaternionToEuler(rotational_vector->real, rotational_vector->i, rotational_vector->j, rotational_vector->k,
                              degrees);
+}
+
+std::tuple<float, float, float> euler_to_vector(float pitch, float yaw)
+{
+    float x = cos(pitch) * cos(yaw);
+    float y = cos(pitch) * sin(yaw);
+    float z = sin(pitch);
+    return {x, y, z};
+}
+
+float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
+{
+    auto [x1, y1, z1] = euler_to_vector(pitch1, yaw1);
+    auto [x2, y2, z2] = euler_to_vector(pitch2, yaw2);
+
+    float mag1 = sqrt(x1 * x1 + y1 * y1 + z1 * z1);
+    float mag2 = sqrt(x2 * x2 + y2 * y2 + z2 * z2);
+
+    float dot_product = x1 * x2 + y1 * y2 + z1 * z2;
+
+    return std::acos(dot_product / (mag1 * mag2));
 }
 
 /**
@@ -156,6 +182,11 @@ Orientation OrientationSensor::read()
         
         Orientation sensor_reading;
         sensor_reading.has_data = true;
+        /*
+        sensor_reading.yaw = -filtered_euler.y;
+        sensor_reading.pitch = filtered_euler.x;
+        sensor_reading.roll = filtered_euler.z;
+        */
 
         sensor_reading.yaw = -euler.y;
         sensor_reading.pitch = euler.x;
@@ -179,6 +210,7 @@ Orientation OrientationSensor::read()
         if (initial_flag == 0)
         {
             initial_orientation = sensor_reading;
+            initial_quaternion = quat;
             initial_flag = 1;
         }
 

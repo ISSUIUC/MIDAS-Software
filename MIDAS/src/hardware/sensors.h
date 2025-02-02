@@ -67,6 +67,7 @@ struct VoltageSensor {
  */
 struct OrientationSensor {
     Orientation initial_orientation;
+    Quaternion initial_quaternion;
     uint8_t initial_flag;
 
     float prev_x = 0;
