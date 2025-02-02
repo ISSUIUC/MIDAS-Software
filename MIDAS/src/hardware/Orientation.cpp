@@ -125,7 +125,7 @@ Orientation OrientationSensor::read()
     Vec3 euler;
     Quaternion quat;
 
-    static Vec3 filtered_euler = {0, 0, 0};
+    Vec3 filtered_euler = {0, 0, 0};
     const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
     unsigned long currentTime = millis();
     deltaTime = (currentTime - lastTime) / 1000.0;
@@ -152,13 +152,13 @@ Orientation OrientationSensor::read()
             break;
         }
         
-        filtered_euler.x = alpha * (euler.x * deltaTime) + (1 - alpha) * prev_x;
-        filtered_euler.y = alpha * (euler.y * deltaTime) + (1 - alpha) * prev_y;
-        filtered_euler.z = alpha * (euler.z * deltaTime) + (1 - alpha) * prev_z;
+        // filtered_euler.x = alpha * (euler.x) + (1 - alpha) * prev_x;
+        // filtered_euler.y = alpha * (euler.y) + (1 - alpha) * prev_y;
+        // filtered_euler.z = alpha * (euler.z ) + (1 - alpha) * prev_z;
 
-        prev_x = euler.x;
-        prev_y = euler.y;
-        prev_z = euler.z;
+        // prev_x = euler.x;
+        // prev_y = euler.y;
+        // prev_z = euler.z;
         
         Orientation sensor_reading;
         sensor_reading.has_data = true;
@@ -207,11 +207,14 @@ Orientation OrientationSensor::read()
         if(cur_mag != 0 && ref_mag != 0) {
             sensor_reading.tilt = acos(dot/(cur_mag*ref_mag));
         }
-        
 
+        const float alpha = 0.2;
+        // Arthur's Comp Filter
+        float filtered_tilt = alpha * sensor_reading.tilt + (1-alpha) * prev_tilt;
+        prev_tilt = filtered_tilt;
 
-        Serial.print("TILT: ");
-        Serial.println(sensor_reading.tilt * (180/3.14f));
+        // Serial.print("TILT: ");
+        // Serial.println(filtered_tilt * (180/3.14f));
         
         return sensor_reading;
     }
