@@ -181,10 +181,6 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    // Orientation initial_orientation = arg->rocket_data.orientation.getRecent();
-    // Barometer initial_barom_buf = arg->rocket_data.barometer.getRecent();
-    // LowGData initial_accelerometer = arg->rocket_data.low_g.getRecent();
-    //yessir.initialize(initial_orientation, initial_barom_buf, initial_accelerations);
     yessir.initialize(arg);
     TickType_t last = xTaskGetTickCount();
     
@@ -205,7 +201,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .az = current_accelerometer.az
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-
+        float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
         yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
         KalmanData current_state = yessir.getState();
 

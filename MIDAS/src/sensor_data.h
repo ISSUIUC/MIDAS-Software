@@ -201,7 +201,13 @@ struct Orientation {
         return euler;
     }
 
+
     Velocity orientation_velocity;
+
+    Velocity getVelocity() const {
+        return orientation_velocity;
+    }
+
     Acceleration orientation_acceleration;
 
     Acceleration linear_acceleration;
