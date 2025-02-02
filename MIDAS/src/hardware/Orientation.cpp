@@ -94,7 +94,7 @@ Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec) {
 
     Eigen::Matrix3f Rx {
         {1, 0, 0},
-        {0, cos(roll), sin(roll)},
+        {0, cos(roll), -sin(roll)},
         {0, sin(roll), cos(roll)}
     };
 
@@ -126,7 +126,7 @@ Orientation OrientationSensor::read()
     Quaternion quat;
 
     static Vec3 filtered_euler = {0, 0, 0};
-    const float alpha = 0.98;
+    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
     unsigned long currentTime = millis();
     deltaTime = (currentTime - lastTime) / 1000.0;
     lastTime = currentTime;
@@ -152,18 +152,16 @@ Orientation OrientationSensor::read()
             break;
         }
         
-        filtered_euler.x = alpha * (filtered_euler.x + event.un.gyroscope.y * deltaTime) + (1 - alpha) * euler.x;
-        filtered_euler.y = alpha * (filtered_euler.y + event.un.gyroscope.x * deltaTime) + (1 - alpha) * euler.y;
-        filtered_euler.z = alpha * (filtered_euler.z + event.un.gyroscope.z * deltaTime) + (1 - alpha) * euler.z;
-        
+        filtered_euler.x = alpha * (euler.x * deltaTime) + (1 - alpha) * prev_x;
+        filtered_euler.y = alpha * (euler.y * deltaTime) + (1 - alpha) * prev_y;
+        filtered_euler.z = alpha * (euler.z * deltaTime) + (1 - alpha) * prev_z;
 
+        prev_x = euler.x;
+        prev_y = euler.y;
+        prev_z = euler.z;
+        
         Orientation sensor_reading;
         sensor_reading.has_data = true;
-        /*
-        sensor_reading.yaw = -filtered_euler.y;
-        sensor_reading.pitch = filtered_euler.x;
-        sensor_reading.roll = filtered_euler.z;
-        */
 
         sensor_reading.yaw = -euler.y;
         sensor_reading.pitch = euler.x;
@@ -197,19 +195,23 @@ Orientation OrientationSensor::read()
         // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
 
         Eigen::Matrix3f rot_matrix = generate_rotation_matrix(rotated_data);
-        Eigen::Vector3f cur_ivec = {0, 0, 1};
-        Eigen::Vector3f cur_vec = cur_ivec * rot_matrix;
-        Eigen::Vector3f reference_vector = {1, 0, 0};
+        Eigen::Matrix<float, 1, 3> cur_ivec = {1, 0, 0};
+        Eigen::Matrix<float, 1, 3> cur_vec = cur_ivec * rot_matrix;
+        Eigen::Matrix<float, 1, 3> reference_vector = {0, 0, -1};
 
         float dot = cur_vec.dot(reference_vector);
         float cur_mag = cur_vec.norm();
         float ref_mag = reference_vector.norm();
 
-        float angle = acos(dot/(cur_mag*ref_mag));
+        sensor_reading.tilt = 0;
+        if(cur_mag != 0 && ref_mag != 0) {
+            sensor_reading.tilt = acos(dot/(cur_mag*ref_mag));
+        }
+        
 
-        sensor_reading.tilt = angle;
+
         Serial.print("TILT: ");
-        Serial.println(angle);
+        Serial.println(sensor_reading.tilt * (180/3.14f));
         
         return sensor_reading;
     }
