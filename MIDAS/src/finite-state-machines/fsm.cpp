@@ -1,6 +1,8 @@
 #include <cmath>
 
 #include "fsm.h"
+#include "sg1-4.h"
+
 
 // helper functions
 
@@ -66,7 +68,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
     switch (state) {
         case FSMState::STATE_IDLE:
             // once a significant amount of acceleration is detected change states
-            if (state_estimate.acceleration > sustainer_idle_to_first_boost_acceleration_threshold) {
+            if (state_estimate.acceleration > SustainerThresholds::Idle::to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
                 state = FSMState::STATE_FIRST_BOOST;
             }
@@ -75,13 +77,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_FIRST_BOOST:
             // if acceleration spike was too brief then go back to idle
-            if ((state_estimate.acceleration < sustainer_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < sustainer_idle_to_first_boost_time_threshold)) {
+            if ((state_estimate.acceleration < SustainerThresholds::Idle::to_first_boost_acceleration_threshold) && ((current_time - launch_time) < SustainerThresholds::Idle::to_first_boost_time_threshold)) {
                 state = FSMState::STATE_IDLE;
                 break;
             }
 
-            // once acceleartion decreases to a the threshold go on the next state
-            if (state_estimate.acceleration < sustainer_coast_detection_acceleration_threshold) {
+            // once acceleration decreases to a the threshold go on the next state
+            if (state_estimate.acceleration < SustainerThresholds::Coast::detection_acceleration_threshold) {
                 burnout_time = current_time;
                 state = FSMState::STATE_BURNOUT;
             }
@@ -89,13 +91,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_BURNOUT:
             // if low acceleration is too brief than go on to the previous state
-            if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_first_boost_to_burnout_time_threshold)) {
+            if ((state_estimate.acceleration >= SustainerThresholds::Coast::detection_acceleration_threshold) && ((current_time - burnout_time) < SustainerThresholds::Burnout::to_first_boost_time_threshold)) {
                 state = FSMState::STATE_FIRST_BOOST;
                 break;
             }
 
             // if in burnout for long enough then go on to the next state (time transition)
-            if ((current_time - burnout_time) > sustainer_first_boost_to_burnout_time_threshold) {
+            if ((current_time - burnout_time) > SustainerThresholds::Burnout::to_first_boost_time_threshold) {
                 sustainer_ignition_time = current_time;
                 state = FSMState::STATE_SUSTAINER_IGNITION;
             }
@@ -103,14 +105,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_SUSTAINER_IGNITION:
             // another time transition into coast after a certain amount of time
-            if ((current_time - sustainer_ignition_time) > sustainer_ignition_to_coast_timer_threshold) {
+            if ((current_time - sustainer_ignition_time) > SustainerThresholds::Ignition::to_coast_timer_threshold) {
                 coast_time = current_time;
                 state = FSMState::STATE_COAST;
                 break;
             }
 
             // once a high enough acceleration is detected then go to next state
-            if (state_estimate.acceleration > sustainer_ignition_to_second_boost_acceleration_threshold) {
+            if (state_estimate.acceleration > SustainerThresholds::Ignition::to_second_boost_acceleration_threshold) {
                 second_boost_time = current_time;
                 state = FSMState::STATE_SECOND_BOOST;
             }
@@ -118,14 +120,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_SECOND_BOOST:
-            // if high accleration is too brief then return to previous state
-            if ((state_estimate.acceleration < sustainer_ignition_to_second_boost_acceleration_threshold) && ((current_time - second_boost_time) < sustainer_ignition_to_second_boost_time_threshold)) {
+            // if high acceleration is too brief then return to previous state
+            if ((state_estimate.acceleration < SustainerThresholds::Ignition::to_second_boost_acceleration_threshold) && ((current_time - second_boost_time) < SustainerThresholds::Ignition::to_second_boost_time_threshold)) {
                 state = FSMState::STATE_SUSTAINER_IGNITION;
                 break;
             }
 
             // if low acceleration detected go to next state
-            if (state_estimate.acceleration < sustainer_coast_detection_acceleration_threshold) {
+            if (state_estimate.acceleration < SustainerThresholds::Coast::detection_acceleration_threshold) {
                 coast_time = current_time;
                 state = FSMState::STATE_COAST;
             }
@@ -133,13 +135,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_COAST:
             // if the low acceleration detected was too brief then return to previous state
-            if ((state_estimate.acceleration > sustainer_coast_detection_acceleration_threshold) && ((current_time - coast_time) < sustainer_second_boost_to_coast_time_threshold)) {
+            if ((state_estimate.acceleration > SustainerThresholds::Coast::detection_acceleration_threshold) && ((current_time - coast_time) < SustainerThresholds::SecondBoost::to_coast_time_threshold)) {
                 state = FSMState::STATE_SECOND_BOOST;
                 break;
             }
 
             // if speed slows down enough then go on to the next stage
-            if (state_estimate.vertical_speed <= sustainer_coast_to_apogee_vertical_speed_threshold) {
+            if (state_estimate.vertical_speed <= SustainerThresholds::Coast::to_apogee_vertical_speed_threshold) {
                 apogee_time = current_time;
                 state = FSMState::STATE_APOGEE;
             }
@@ -147,13 +149,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_APOGEE:
             // if the slow speed was too brief then return to previous state
-            if ((state_estimate.vertical_speed) > sustainer_apogee_backto_coast_vertical_speed_threshold && ((current_time - apogee_time) < sustainer_apogee_check_threshold)) {
+            if ((state_estimate.vertical_speed) > SustainerThresholds::Apogee::backto_coast_vertical_speed_threshold && ((current_time - apogee_time) < SustainerThresholds::Apogee::check_threshold)) {
                 state = FSMState::STATE_COAST;
                 break;
             }
 
             // transition to next state after a certain amount of time
-            if ((current_time - apogee_time) > sustainer_apogee_timer_threshold) {
+            if ((current_time - apogee_time) > SustainerThresholds::Apogee::timer_threshold) {
                 drogue_time = current_time;
                 state = FSMState::STATE_DROGUE_DEPLOY;
             }
@@ -161,13 +163,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_DROGUE_DEPLOY:
             // if detected a sharp change in jerk then go to next state
-            if (abs(state_estimate.jerk) < sustainer_drogue_jerk_threshold) {
+            if (abs(state_estimate.jerk) < SustainerThresholds::Drogue::jerk_threshold) {
                 state = FSMState::STATE_DROGUE;
                 break;
             }
 
-            // if no transtion after a certain amount of time then just move on to next state
-            if ((current_time - drogue_time) > sustainer_drogue_timer_threshold) {
+            // if no transition after a certain amount of time then just move on to next state
+            if ((current_time - drogue_time) > SustainerThresholds::Drogue::timer_threshold) {
                 state = FSMState::STATE_DROGUE;
             }
 
@@ -175,7 +177,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_DROGUE:
             // if altitude low enough then next state
-            if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold) {
+            if (state_estimate.altitude <= SustainerThresholds::Main::deploy_altitude_threshold) {
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }
@@ -183,20 +185,20 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_MAIN_DEPLOY:
             // if detected a sharp change in jerk then go to the next state
-            if (abs(state_estimate.jerk) < sustainer_main_jerk_threshold) {
+            if (abs(state_estimate.jerk) < SustainerThresholds::Main::jerk_threshold) {
                 state = FSMState::STATE_MAIN;
                 break;
             }
 
-            // if no transtion after a certain amount of time then just move on to next state
-            if ((current_time - main_time) > sustainer_main_to_main_deploy_timer_threshold) {
+            // if no transition after a certain amount of time then just move on to next state
+            if ((current_time - main_time) > SustainerThresholds::Main::to_main_deploy_timer_threshold) {
                 state = FSMState::STATE_MAIN;
             }
             break;
 
         case FSMState::STATE_MAIN:
             // if slowed down enough then go on to the next state
-            if (abs(state_estimate.vertical_speed) <= sustainer_landed_vertical_speed_threshold) {
+            if (abs(state_estimate.vertical_speed) <= SustainerThresholds::Landed::vertical_speed_threshold) {
                 landed_time = current_time;
                 state = FSMState::STATE_LANDED;
             }
@@ -204,7 +206,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
         case FSMState::STATE_LANDED:
             // if the slow speed was too brief then return to previous state
-            if ((abs(state_estimate.vertical_speed) > sustainer_landed_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
+            if ((abs(state_estimate.vertical_speed) > SustainerThresholds::Landed::vertical_speed_threshold) && ((current_time - landed_time) > SustainerThresholds::Landed::timer_threshold)) {
                 state = FSMState::STATE_MAIN;
             }
             break;
@@ -221,7 +223,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
 
     switch (state) {
         case FSMState::STATE_IDLE:
-            if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
+            if (state_estimate.acceleration > BoosterThresholds::Idle::to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
                 state = FSMState::STATE_FIRST_BOOST;
             }
@@ -229,11 +231,11 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_FIRST_BOOST:
-            if ((state_estimate.acceleration < booster_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < booster_idle_to_first_boost_time_threshold)) {
+            if ((state_estimate.acceleration < BoosterThresholds::Idle::to_first_boost_acceleration_threshold) && ((current_time - launch_time) < BoosterThresholds::Idle::to_first_boost_time_threshold)) {
                 state = FSMState::STATE_IDLE;
                 break;
             }
-            if (state_estimate.acceleration < booster_coast_detection_acceleration_threshold) {
+            if (state_estimate.acceleration < BoosterThresholds::Coast::detection_acceleration_threshold) {
                 burnout_time = current_time;
                 state = FSMState::STATE_BURNOUT;
             }
@@ -241,86 +243,86 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate) {
             break;
 
         case FSMState::STATE_BURNOUT:
-            if ((state_estimate.acceleration >= booster_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < booster_first_boost_to_burnout_time_threshold)) {
+            if ((state_estimate.acceleration >= BoosterThresholds::Coast::detection_acceleration_threshold) && ((current_time - burnout_time) < BoosterThresholds::Burnout::to_first_boost_time_threshold)) {
                 state = FSMState::STATE_FIRST_BOOST;
                 break;
             }
 
-            if ((current_time - burnout_time) > booster_first_boost_to_burnout_time_threshold) {
+            if ((current_time - burnout_time) > BoosterThresholds::Burnout::to_first_boost_time_threshold) {
                 first_separation_time = current_time;
                 state = FSMState::STATE_FIRST_SEPARATION;
             }
             break;
 
         case FSMState::STATE_FIRST_SEPARATION:
-            if (abs(state_estimate.jerk) < booster_first_separation_jerk_threshold) {
+            if (abs(state_estimate.jerk) < BoosterThresholds::FirstSeparation::jerk_threshold) {
                 state = FSMState::STATE_COAST;
                 break;
             }
 
-            if ((current_time - first_separation_time) > booster_first_seperation_time_threshold) {
+            if ((current_time - first_separation_time) > BoosterThresholds::FirstSeparation::time_threshold) {
                 state = FSMState::STATE_COAST;
             }
 
             break;
 
         case FSMState::STATE_COAST:
-            if (state_estimate.vertical_speed <= booster_coast_to_apogee_vertical_speed_threshold) {
+            if (state_estimate.vertical_speed <= BoosterThresholds::Coast::to_apogee_vertical_speed_threshold) {
                 apogee_time = current_time;
                 state = FSMState::STATE_APOGEE;
             }
             break;
 
         case FSMState::STATE_APOGEE:
-            if (state_estimate.vertical_speed > booster_coast_to_apogee_vertical_speed_threshold && ((current_time - apogee_time) < booster_apogee_check_threshold)) {
+            if (state_estimate.vertical_speed > BoosterThresholds::Coast::to_apogee_vertical_speed_threshold && ((current_time - apogee_time) < BoosterThresholds::Apogee::check_threshold)) {
                 state = FSMState::STATE_COAST;
                 break;
             }
 
-            if ((current_time - apogee_time) > booster_apogee_timer_threshold) {
+            if ((current_time - apogee_time) > BoosterThresholds::Apogee::timer_threshold) {
                 drogue_time = current_time;
                 state = FSMState::STATE_DROGUE_DEPLOY;
             }
             break;
 
         case FSMState::STATE_DROGUE_DEPLOY:
-            if (abs(state_estimate.jerk) < booster_drogue_jerk_threshold) {
+            if (abs(state_estimate.jerk) < BoosterThresholds::Drogue::jerk_threshold) {
                 state = FSMState::STATE_DROGUE;
                 break;
             }
-            if ((current_time - drogue_time) > booster_drogue_timer_threshold) {
+            if ((current_time - drogue_time) > BoosterThresholds::Drogue::timer_threshold) {
                 state = FSMState::STATE_DROGUE;
             }
 
             break;
 
         case FSMState::STATE_DROGUE:
-            if (state_estimate.altitude <= booster_main_deploy_altitude_threshold) {
+            if (state_estimate.altitude <= BoosterThresholds::Main::deploy_altitude_threshold) {
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }
             break;
 
         case FSMState::STATE_MAIN_DEPLOY:
-            if (abs(state_estimate.jerk) < booster_main_jerk_threshold) {
+            if (abs(state_estimate.jerk) < BoosterThresholds::Main::jerk_threshold) {
                 state = FSMState::STATE_MAIN;
                 break;
             }
 
-            if ((current_time - main_time) > booster_main_to_main_deploy_timer_threshold) {
+            if ((current_time - main_time) > BoosterThresholds::Main::to_main_deploy_timer_threshold) {
                 state = FSMState::STATE_MAIN;
             }
             break;
 
         case FSMState::STATE_MAIN:
-            if (abs(state_estimate.vertical_speed) <= booster_landed_vertical_speed_threshold) {
+            if (abs(state_estimate.vertical_speed) <= BoosterThresholds::Landed::vertical_speed_threshold) {
                 landed_time = current_time;
                 state = FSMState::STATE_LANDED;
             }
             break;
 
         case FSMState::STATE_LANDED:
-            if ((abs(state_estimate.vertical_speed) > booster_landed_vertical_speed_threshold) && ((current_time - landed_time) > booster_landed_timer_threshold)) {
+            if ((abs(state_estimate.vertical_speed) > BoosterThresholds::Landed::vertical_speed_threshold) && ((current_time - landed_time) > BoosterThresholds::Landed::timer_threshold)) {
                 state = FSMState::STATE_MAIN;
             }
             break;
