@@ -87,6 +87,9 @@ Vec3 quaternionToEulerGI(sh2_GyroIntegratedRV_t *rotational_vector, bool degrees
                              degrees);
 }
 
+/**
+ * @brief Generates a rotation matrix that transforms a vector by the rotations described in rpy_vec {roll, pitch, yaw} (in that order!)
+ */
 Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec) {
     float roll = rpy_vec.x;
     float pitch = rpy_vec.y;

@@ -130,7 +130,6 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 state = FSMState::STATE_SAFE;
             }
 
-            // Switch back to STATE_SAFE if a pyro is fired immediately
 
             break;
 
@@ -349,7 +348,6 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 state = FSMState::STATE_SAFE;
             }
 
-            // Switch back to STATE_SAFE if a pyro is fired immediately
             break;
 
         case FSMState::STATE_IDLE:
