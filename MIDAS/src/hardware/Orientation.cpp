@@ -210,7 +210,6 @@ Orientation OrientationSensor::read()
         if (initial_flag == 0)
         {
             initial_orientation = sensor_reading;
-            initial_quaternion = quat;
             initial_flag = 1;
         }
       
