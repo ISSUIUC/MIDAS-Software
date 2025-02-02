@@ -126,7 +126,6 @@ Orientation OrientationSensor::read()
     // read from aforementioned global instance of sensor
     sh2_SensorValue_t event;
     Vec3 euler;
-    Quaternion quat;
 
     Vec3 filtered_euler = {0, 0, 0};
     const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
@@ -140,18 +139,10 @@ Orientation OrientationSensor::read()
         {
         case SH2_ARVR_STABILIZED_RV:
             euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
-            quat.w = event.un.arvrStabilizedRV.real;
-            quat.x = event.un.arvrStabilizedRV.i;
-            quat.y = event.un.arvrStabilizedRV.j;
-            quat.z = event.un.arvrStabilizedRV.k;
             break;
         case SH2_GYRO_INTEGRATED_RV:
             // faster (more noise?)
             euler = quaternionToEulerGI(&event.un.gyroIntegratedRV, true);
-            quat.w = event.un.gyroIntegratedRV.real;
-            quat.x = event.un.gyroIntegratedRV.i;
-            quat.y = event.un.gyroIntegratedRV.j;
-            quat.z = event.un.gyroIntegratedRV.k;
             break;
         }
         
@@ -188,7 +179,6 @@ Orientation OrientationSensor::read()
         if (initial_flag == 0)
         {
             initial_orientation = sensor_reading;
-            initial_quaternion = quat;
             initial_flag = 1;
         }
 
