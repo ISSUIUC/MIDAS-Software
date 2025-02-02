@@ -167,7 +167,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_BURNOUT:
             // if low acceleration is too brief than go on to the previous state
-            if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_first_boost_to_burnout_time_threshold)) {
+            if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_coast_time)) {
                 state = FSMState::STATE_FIRST_BOOST;
                 break;
             }
