@@ -1,7 +1,7 @@
 #include "systems.h"
 
 #include "hal.h"
-#include "gnc/yessir.h"
+#include "gnc/ekf.h"
 
 #include <TCAL9539.h>
 
@@ -181,12 +181,12 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    yessir.initialize(arg);
+    ekf.initialize(arg);
     TickType_t last = xTaskGetTickCount();
     
     while (true) {
         if(arg->rocket_data.command_flags.should_reset_kf){
-            yessir.initialize(arg);
+            ekf.initialize(arg);
             TickType_t last = xTaskGetTickCount();
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
@@ -202,8 +202,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
-        KalmanData current_state = yessir.getState();
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
+        KalmanData current_state = ekf.getState();
 
         arg->rocket_data.kalman.update(current_state);
 
