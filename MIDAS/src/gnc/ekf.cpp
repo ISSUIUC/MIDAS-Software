@@ -1,8 +1,9 @@
 #include "ekf.h"
 #include "finite-state-machines/fsm_states.h"
 
-Yessir::Yessir() : KalmanFilter() {
+EKF::EKF() : KalmanFilter() {
     state = KalmanData();
+    initializeAerodynamicData();
 }
 
 /**
@@ -24,9 +25,86 @@ Yessir::Yessir() : KalmanFilter() {
  *
  */
 
-void Yessir::initialize(RocketSystems* args) {
+const float pi = 3.14159268;
+const float rho = 1.225;
+const float r = 0.03935;//meters
+const float height_full = 2.34; //height of rocket Full Stage - 2.34 m 
+const float height_sustainer = 1.34;
+const float mass_full = 7.57; //kg Sustainer + Booster
+const float mass_sustainer = 4.08; //kg Sustainer
+// Moonburner motor
+const std::map<float, float> moonburner_data = {
+    {0.083, 1333.469},
+    {0.13, 1368.376},
+    {0.249, 1361.395},
+    {0.308, 1380.012},
+    {0.403, 1359.068},
+    {0.675, 1184.53},
+    {1.018, 1072.826},
+    {1.456, 996.029},
+    {1.977, 958.794},
+    {2.995, 914.578},
+    {3.99, 856.399},
+    {4.985, 781.929},
+    {5.494, 730.732},
+    {5.991, 679.534},
+    {7.258, 542.231},
+    {7.862, 463.107},
+    {8.015, 456.125},
+    {8.998, 330.458},
+    {9.993, 207.118},
+    {10.514, 137.303},
+    {11.496, 34.908},
+    {11.994, 0.0}
+};
+
+// Booster motor
+std::map<float, float> O5500X_data = {
+    {0.009, 20.408},
+    {0.044, 7112.245},
+    {0.063, 6734.694},
+    {0.078, 6897.959},
+    {0.094, 6612.245},
+    {0.109, 6765.306},
+    {0.125, 6540.816},
+    {0.147, 6581.633},
+    {0.194, 6520.408},
+    {0.35, 6795.918},
+    {0.428, 7091.837},
+    {0.563, 7285.714},
+    {0.694, 7408.163},
+    {0.988, 7581.633},
+    {1.266, 7622.449},
+    {1.491, 7724.49},
+    {1.581, 7653.061},
+    {1.641, 7540.816},
+    {1.684, 7500.0},
+    {1.716, 7336.735},
+    {1.784, 7224.49},
+    {1.938, 6785.714},
+    {2.138, 6326.531},
+    {2.491, 5897.959},
+    {2.6, 5704.082},
+    {2.919, 3540.816},
+    {3.022, 3408.163},
+    {3.138, 2887.755},
+    {3.3, 2234.694},
+    {3.388, 1673.469},
+    {3.441, 1489.796},
+    {3.544, 1418.367},
+    {3.609, 1295.918},
+    {3.688, 816.327},
+    {3.778, 653.061},
+    {3.819, 581.633},
+    {3.853, 489.796},
+    {3.897, 285.714},
+    {3.981, 20.408},
+    {3.997, 0.0}
+};
+
+
+void EKF::initialize(RocketSystems* args) {
     Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
-    
     float sum = 0;
     
     for (int i = 0; i < 30; i++) {
@@ -58,16 +136,7 @@ void Yessir::initialize(RocketSystems* args) {
     x_k(3, 0) = 0;
     x_k(6, 0) = 0;
 
-    // set F
-    for (int i = 0; i < 3; i++) {
-        F_mat(3 * i, 3 * i + 1) = s_dt;
-        F_mat(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;
-        F_mat(3 * i + 1, 3 * i + 2) = s_dt;
-
-        F_mat(3 * i, 3 * i) = 1;
-        F_mat(3 * i + 1, 3 * i + 1) = 1;
-        F_mat(3 * i + 2, 3 * i + 2) = 1;
-    }
+    F_mat.setZero();  // Initialize with zeros
 
     Q(0, 0) = pow(s_dt, 5) / 20;
     Q(0, 1) = pow(s_dt, 4) / 8;
@@ -116,76 +185,6 @@ void Yessir::initialize(RocketSystems* args) {
     // set B (don't care about what's in B since we have no control input)
     B(2, 0) = -1;
 
-    //once FSM > 9, after its LANDED
-    std::map<double, double> moonburner_data = {
-        {0.083, 1333.469},
-        {0.13, 1368.376},
-        {0.249, 1361.395},
-        {0.308, 1380.012},
-        {0.403, 1359.068},
-        {0.675, 1184.53},
-        {1.018, 1072.826},
-        {1.456, 996.029},
-        {1.977, 958.794},
-        {2.995, 914.578},
-        {3.99, 856.399},
-        {4.985, 781.929},
-        {5.494, 730.732},
-        {5.991, 679.534},
-        {7.258, 542.231},
-        {7.862, 463.107},
-        {8.015, 456.125},
-        {8.998, 330.458},
-        {9.993, 207.118},
-        {10.514, 137.303},
-        {11.496, 34.908},
-        {11.994, 0.0}
-    };
-
-    //before FSM = 9 
-    std::map<double, double> O5500X_data = {
-        {0.009, 20.408},
-        {0.044, 7112.245},
-        {0.063, 6734.694},
-        {0.078, 6897.959},
-        {0.094, 6612.245},
-        {0.109, 6765.306},
-        {0.125, 6540.816},
-        {0.147, 6581.633},
-        {0.194, 6520.408},
-        {0.35, 6795.918},
-        {0.428, 7091.837},
-        {0.563, 7285.714},
-        {0.694, 7408.163},
-        {0.988, 7581.633},
-        {1.266, 7622.449},
-        {1.491, 7724.49},
-        {1.581, 7653.061},
-        {1.641, 7540.816},
-        {1.684, 7500.0},
-        {1.716, 7336.735},
-        {1.784, 7224.49},
-        {1.938, 6785.714},
-        {2.138, 6326.531},
-        {2.491, 5897.959},
-        {2.6, 5704.082},
-        {2.919, 3540.816},
-        {3.022, 3408.163},
-        {3.138, 2887.755},
-        {3.3, 2234.694},
-        {3.388, 1673.469},
-        {3.441, 1489.796},
-        {3.544, 1418.367},
-        {3.609, 1295.918},
-        {3.688, 816.327},
-        {3.778, 653.061},
-        {3.819, 581.633},
-        {3.853, 489.796},
-        {3.897, 285.714},
-        {3.981, 20.408},
-        {3.997, 0.0}
-    };
-
 }
 
 /**
@@ -196,7 +195,7 @@ void Yessir::initialize(RocketSystems* args) {
  * it extrapolates the state at time n+1 based on the state at time n.
  */
 
-Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
+Eigen::Matrix<float, 3, 1> EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
     Eigen::Matrix3f roll, pitch, yaw;
     roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
     pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
@@ -204,82 +203,100 @@ Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<fl
     return yaw * pitch * roll * body_vect;
 }
 
-void Yessir::priori(float dt, float m, float r, float h) {
-    dt = dt / 1000;
+void EKF::priori(float dt, Orientation &orientation, FSMState fsm) {
     Eigen::Matrix<float, 9, 9> xdot = Eigen::Matrix<float, 9, 9>::Zero();
 
-    Orientation orientation = args->rocket_data.orientation.getRecent();
-
+    Velocity omega = orientation.getVelocity();
     euler_t angles = orientation.getEuler();
-    Eigen::Matrix<float, 3,1> gravity = Eigen::Matrix<float, 3,1>::Zero();
-    gravity(2, 0) = -9.81;
-    world_accel = BodyToGlobal(angles, init_accel) + gravity;
-
-    float w_x = world_accel(0, 0) * dt;
-    float w_y = world_accel(1, 0) * dt;
-    float w_z = world_accel(2, 0) * dt;
-
-    float J_x = 1/2 * m * r**2
-    float J_y = 1/3 * m * h**2 + 1/4 * m * r**2
+    Eigen::Matrix<float, 3, 1> gravity = Eigen::Matrix<float, 3,1>::Zero();
+    gravity(0, 0) = -9.81;
+    Eigen::Matrix<float, 3, 1> ang_pos = BodyToGlobal(angles, init_accel) + gravity;
+    
+    float m = mass_sustainer;
+    float h = height_sustainer;
+    if (fsm < FSMState::STATE_BURNOUT) { 
+        m = mass_full;   
+        h= height_full;
+    }
+    float w_x = omega.vx;
+    float w_y = omega.vy;
+    float w_z = omega.vz;
+    
+    float J_x = 0.5 *  m * r * r;
+    float J_y = (1/3) * m * h * h + 0.25 * m * r * r;
     float J_z = J_y;
+   
+    float vel_mag_squared = x_k(1,0)*x_k(1,0) + x_k(4,0)*x_k(4,0) + x_k(7,0)*x_k(7,0);
 
-    float Fax = 0;
+    float Fax = -0.5*rho*(vel_mag_squared)*float(Ca)*(pi*r*r);
     float Fay = 0;
     float Faz = 0;
 
-//  Fax = -0.5*rho*(vel_mag**2)*float(Ca)*(np.pi*r**2)
+    Eigen::Matrix<float, 3, 1> Fg_body = R.inverse() * gravity; 
+    float Fgx = Fg_body(0,0); float Fgy = Fg_body(1,0); float Fgz = Fg_body(2,0);  
 
-    Fg_body = R.inverse() * gravity; 
+    Eigen::Matrix<float, 3, 1> T = EKF::getThrust(stage_timestamp, ang_pos, fsm);
+    float Ftx = T(0, 0); float Fty = T(1, 0); float Ftz = T(2, 0);
+
+
     
-    Fgx = Fg_body[0];
-    Fgy = Fg_body[1];
-    Fgz = Fg_body[2];    
-    T = getThrust();
-
-    xdot << vel_x,
-            (Fax + Ftx + Fgx) / m - (w_y * vel_z - w_z * vel_y),
+    xdot << x_k(1,0),
+            (Fax + Ftx + Fgx) / m - (w_y * x_k(7,0) - w_z * x_k(4,0)),
             1.0,
 
-            vel_y,
-            (Fay + Fty + Fgy) / m - (w_z * vel_x - w_x * vel_y),
+            x_k(4,0),
+            (Fay + Fty + Fgy) / m - (w_z * x_k(1, 0) - w_x * x_k(7,0)), // this might not be right
             1.0,
 
-            vel_z,
-            (Faz + Ftz + Fgz) / m - (w_x * vel_y - w_y * vel_x),
+            x_k(7,0),
+            (Faz + Ftz + Fgz) / m - (w_x * x_k(4,0) - w_y * x_k(1,0)),
             1.0;
 
-    for (int i = 0; i < 3; i++) {
-        xdot(3 * i, 3 * i + 1) = xdot();
-        xdot(3 * i, 3 * i + 2) = (s_dt * s_dt) / 2;
-        xdot(3 * i + 1, 3 * i + 2) = s_dt;
-
-        F_mat(3 * i, 3 * i) = 1;
-        F_mat(3 * i + 1, 3 * i + 1) = 1;
-        F_mat(3 * i + 2, 3 * i + 2) = 1;
-    }
-
-    x_priori = (F_mat * x_k);
+    x_priori = (xdot * dt) + x_k;
+    EKF::set_F(dt, Ca, Cn, rho, w_x, w_y, w_z);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
-Eigen::Matrix<float, 3, 1> Yessir:getThrust(euler_t angles, FSMState FSM_state) {
-    Eigen::Matrix<float, 3,1> T;
-    
-    // interpolate thrust values (weighted avg)
 
-    if(FSM > 9) {
+float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x) {
+    return y0 + ((x - x0) * (y1 - y0) / (x1 - x0));
+}
+
+    
+Eigen::Matrix<float, 3, 1> EKF::getThrust(float timestamp, Eigen::Matrix<float, 3, 1> angles, FSMState FSM_state) {
+    Eigen::Matrix<float, 3,1> thrust = Eigen::Matrix<float, 3,1>::Zero();
+    if (FSM_state < FSMState::STATE_BURNOUT) {
+        // interpolate from O5500X_data
+        auto it = O5500X_data.lower_bound(time);
+        
+        if (it == moonburner_data.begin() || it == moonburner_data.end()) {
+            std::cout << "Timestep " << t << " is out of bounds for interpolation." << std::endl;
+        } else {
+            float x1 = it->first;
+            float y1 = it->second;
+            --it;
+            float x0 = it->first;
+            float y0 = it->second;
+
+            float interpolatedValue = linearInterpolation(x0, y0, x1, y1, t);
+            std::cout << "Interpolated value at timestep " << t << " is " << interpolatedValue << std::endl;
+        }
+    }   
+    else {
+        // interpolate from moonburner_data
+        
+    }
+
         thrust(0, 0) = 0;
         thrust(1, 0) = 0;
         thrust(2, 0) = 0;
-    } else if (FSM <= 9) {
-        thrust(0, 0) = T * cos(angles.pitch) * sin(angles.roll);
-        thrust(1, 0) = T * sin(angles.pitch);
-        thrust(2, 0) = T * cos(angles.pitch) * cos(angles.roll);
+    } else if (FSM_state <= 9) {
+        thrust(0, 0) = thrust(0,0) * cos(angles(1,0)) * sin(angles(0,0));
+        thrust(1, 0) = thrust(1,0) * sin(angles(1,0));
+        thrust(2, 0) = thrust(2,0) * cos(angles(1,0)) * cos(angles(0,0));
     } 
-
-    // return 3x1 thrust vector
-
-    return T;
+    
+    return thrust;
 }
 
 /**
@@ -290,7 +307,7 @@ Eigen::Matrix<float, 3, 1> Yessir:getThrust(euler_t angles, FSMState FSM_state) 
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
-void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
+void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
     if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
         float sum = 0;
         float data[10];
@@ -360,14 +377,46 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  * @param &orientation Current orientation
  * @param current_state Current FSM_state
  */
-void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
+void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
+        if (FSM_state != last_fsm) {
+            stage_timestamp = 0;
+        }
+        stage_timestamp += dt;
         setF(dt / 1000);
         setQ(dt / 1000, sd);
-        priori();
+        priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
+        FSMState last_fsm = FSM_state;
     }
 }
+//LookUpMap
+
+void EKF::initializeAerodynamicData() {
+    std::ifstream file("LookUp.csv");
+    std::string line;
+    
+    // Skip the header line
+    std::getline(file, line);
+    
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string token;
+        std::vector<double> row;
+        
+        while (std::getline(iss, token, ',')) {
+            row.push_back(std::stod(token));
+        }
+        
+        if (row.size() >= 5) {
+            double mach = std::round(row[0] / 0.04) * 0.04;
+            aerodynamicData[mach] = std::make_tuple(row[2], row[3], row[4]);
+        }
+    }
+}
+
+
+
 
 /**
  * @brief Converts a vector in the body frame to the global frame
@@ -376,7 +425,7 @@ void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceler
  * @param body_vect Vector for rotation in the body frame
  * @return Eigen::Matrix<float, 3, 1> Rotated vector in the global frame
  */
-Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
+Eigen::Matrix<float, 3, 1> EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
     Eigen::Matrix3f roll, pitch, yaw;
     roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
     pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
@@ -390,7 +439,7 @@ Eigen::Matrix<float, 3, 1> Yessir::BodyToGlobal(euler_t angles, Eigen::Matrix<fl
  *
  * @return the current state, see sensor_data.h for KalmanData
  */
-KalmanData Yessir::getState() {
+KalmanData EKF::getState() {
     return state;
 }
 
@@ -399,7 +448,7 @@ KalmanData Yessir::getState() {
  *
  * @param state Wanted state vector
  */
-void Yessir::setState(KalmanState state) {
+void EKF::setState(KalmanState state) {
     this->state.position.px = state.state_est_pos_x;
     this->state.position.py = state.state_est_pos_y;
     this->state.position.pz = state.state_est_pos_z;
@@ -420,7 +469,7 @@ void Yessir::setState(KalmanState state) {
  * The Q matrix is the covariance matrix for the process noise and is
  * updated based on the time taken per cycle of the Kalman Filter Thread.
  */
-void Yessir::setQ(float dt, float sd) {
+void EKF::setQ(float dt, float sd) {
     Q(0, 0) = pow(dt, 5) / 20;
     Q(0, 1) = pow(dt, 4) / 8;
     Q(0, 2) = pow(dt, 3) / 6;
@@ -461,16 +510,28 @@ void Yessir::setQ(float dt, float sd) {
  * The F matrix is the state transition matrix and is defined
  * by how the states change over time.
  */
-void Yessir::setF(float dt) {
-    for (int i = 0; i < 3; i++) {
-        F_mat(3 * i, 3 * i + 1) = s_dt;
-        F_mat(3 * i, 3 * i + 2) = (dt * s_dt) / 2;
-        F_mat(3 * i + 1, 3 * i + 2) = s_dt;
+void EKF::setF(float dt, float Ca, float Cn, float wx, float wy, float wz) {
+    Eigen::Matrix<float, 3, 1> w = Eigen::Matrix<float, 3, 1>::Zero();
+    w(0, 0) = wx;
+    w(1, 0) = wy;
+    w(2, 0) = wz;
+    F_mat(0,1) = 1;
+    F_mat(3,4) = 1;
+    F_mat(6,7) = 1;
 
-        F_mat(3 * i, 3 * i) = 1;
-        F_mat(3 * i + 1, 3 * i + 1) = 1;
-        F_mat(3 * i + 2, 3 * i + 2) = 1;
-    }
-}
+    F_mat(1,1) = -pi * Ca * r * r * rho * x_k(1,0) / m;
+    F_mat(1,4) = -pi * Ca * r * r * rho * x_k(4,0) / m + w(2,0);
+    F_mat(1,7) = -pi * Ca * r * r * rho * x_k(7,0) / m - w(1,0);
 
-Yessir yessir;
+    F_mat(4,1) = pi * Cn * r * r * rho * x_k(1,0) / m - w(2,0);
+    F_mat(4,4) = pi * Cn * r * r * rho * x_k(2,0) / m + w(0,0);
+    F_mat(4,7) = pi * Cn * r * r * rho * x_k(3,0) / m;
+
+    F_mat(7,1) = pi * Cn * r * r * rho * x_k(1,0) / m + w(1,0);
+    F_mat(7,4) = pi * Cn * r * r * rho * x_k(2,0) / m - w(0,0);
+    F_mat(7,7) = pi * Cn * r * r * rho * x_k(3,0) / m;
+
+    float velocity_magnitude = pow(x_k(1,0)*x_k(1,0) + x_k(4,0)*x_k(4,0) + x_k(7,0)*x_k(7,0), 0.5);
+    float mach = velocity_magnitude / 343.0;
+    mach = std::round(mach / 0.04) * 0.04;
+    
