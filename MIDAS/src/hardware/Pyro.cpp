@@ -4,6 +4,11 @@
 #include "pins.h"
 
 #include "TCAL9539.h"
+#include <rocket_state.h>
+
+
+// Fire the pyros for this time during PYRO_TEST (ms)
+#define PYRO_TEST_FIRE_TIME 1000
 
 #define MAXIMUM_TILT_ANGLE (M_PI/9)    // 20 degrees
 
@@ -57,6 +62,35 @@ ErrorCode Pyro::init() {
 //    }
 }
 
+void Pyro::disarm_all_channels(PyroState& prev_state) {
+    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, LOW);
+    gpioDigitalWrite(PYROA_ARM_PIN, LOW);
+    gpioDigitalWrite(PYROA_FIRE_PIN, LOW);
+    gpioDigitalWrite(PYROB_ARM_PIN, LOW);
+    gpioDigitalWrite(PYROB_FIRE_PIN, LOW);
+    gpioDigitalWrite(PYROC_ARM_PIN, LOW);
+    gpioDigitalWrite(PYROC_FIRE_PIN, LOW);
+    gpioDigitalWrite(PYROD_ARM_PIN, LOW);
+    gpioDigitalWrite(PYROD_FIRE_PIN, LOW);
+
+    prev_state.is_global_armed = false;
+    
+    for(size_t i = 0; i < 4; ++i) {
+        // Update each channel's state sequentially
+        prev_state.channels[i].is_armed = false;
+        prev_state.channels[i].is_firing = false;
+    }
+}
+
+void Pyro::set_pyro_safety() {
+    safety_pyro_start_firing_time = pdTICKS_TO_MS(xTaskGetTickCount());
+    safety_has_fired_pyros_this_cycle = true;
+}
+
+void Pyro::reset_pyro_safety() {
+    safety_has_fired_pyros_this_cycle = false;
+}
+
 #ifdef IS_SUSTAINER
 
 /**
@@ -64,14 +98,81 @@ ErrorCode Pyro::init() {
  * 
  * @return A pyro struct indicating which pyro channels are armed and/or firing.
  */
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
+PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands) {
     PyroState new_pyro_state = PyroState();
+    double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-    // If the state is IDLE or any state after that, we arm the global arm pin
+    if (fsm_state == FSMState::STATE_SAFE) {
+        disarm_all_channels(new_pyro_state);
+        return new_pyro_state;
+    }
+    // If the state is not SAFE, we arm the global arm pin
     new_pyro_state.is_global_armed = true;
     gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
 
     switch (fsm_state) {
+        case FSMState::STATE_IDLE:
+            reset_pyro_safety(); // Ensure that pyros can be fired when we transition away from this state
+            break;
+        case FSMState::STATE_PYRO_TEST:
+
+            if(safety_has_fired_pyros_this_cycle) {
+                // If a fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
+                // then, transition to SAFE.
+                if((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
+                    telem_commands.should_transition_safe = true;
+                    disarm_all_channels(new_pyro_state);
+                    telem_commands.should_fire_pyro_a = false;
+                    telem_commands.should_fire_pyro_b = false;
+                    telem_commands.should_fire_pyro_c = false;
+                    telem_commands.should_fire_pyro_d = false;
+
+                    reset_pyro_safety();
+                }
+                break;
+            }
+
+            // Respond to telem commands to fire igniters
+            if(telem_commands.should_fire_pyro_a) {
+                // Fire pyro channel "A"
+                new_pyro_state.channels[0].is_armed = true;
+                new_pyro_state.channels[0].is_firing = true;
+                gpioDigitalWrite(PYROA_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
+                set_pyro_safety();
+            }
+
+            if(telem_commands.should_fire_pyro_b) {
+                // Fire pyro channel "B"
+                new_pyro_state.channels[1].is_armed = true;
+                new_pyro_state.channels[1].is_firing = true;
+                gpioDigitalWrite(PYROB_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
+
+                set_pyro_safety();
+            }
+
+            if(telem_commands.should_fire_pyro_c) {
+                // Fire pyro channel "C"
+                new_pyro_state.channels[2].is_armed = true;
+                new_pyro_state.channels[2].is_firing = true;
+                gpioDigitalWrite(PYROC_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
+
+                set_pyro_safety();
+            }
+
+            if(telem_commands.should_fire_pyro_d) {
+                // Fire pyro channel "D"
+                new_pyro_state.channels[3].is_armed = true;
+                new_pyro_state.channels[3].is_firing = true;
+                gpioDigitalWrite(PYROD_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROD_FIRE_PIN, HIGH);
+
+                set_pyro_safety();
+            }
+            
+            break;
         case FSMState::STATE_SUSTAINER_IGNITION:
             // Fire "Pyro A" to ignite sustainer
             // Additionally, check if orientation allows for firing
@@ -114,14 +215,76 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
  * 
  * @return A new pyro struct, with data depending on whether or not each pyro channel should be firing.
 */
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
+PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands) {
     PyroState new_pyro_state = PyroState();
+    double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     // If the state is IDLE or any state after that, we arm the global arm pin
-    new_pyro_state.is_global_armed = true;
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
+
 
     switch (fsm_state) {
+        case FSMState::STATE_IDLE:
+            reset_pyro_safety(); // Ensure that pyros can be fired when we transition away from this state
+            break;
+        case FSMState::STATE_PYRO_TEST:
+
+            if(safety_has_fired_pyros_this_cycle) {
+                // If a fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
+                // then, transition to SAFE.
+                if((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
+                    telem_commands.should_transition_safe = true;
+                    disarm_all_channels(new_pyro_state);
+                    telem_commands.should_fire_pyro_a = false;
+                    telem_commands.should_fire_pyro_b = false;
+                    telem_commands.should_fire_pyro_c = false;
+                    telem_commands.should_fire_pyro_d = false;
+
+                    reset_pyro_safety();
+                }
+                break;
+            }
+
+            // Respond to telem commands to fire igniters
+            if(telem_commands.should_fire_pyro_a) {
+                // Fire pyro channel "A"
+                new_pyro_state.channels[0].is_armed = true;
+                new_pyro_state.channels[0].is_firing = true;
+                gpioDigitalWrite(PYROA_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
+                set_pyro_safety();
+            }
+
+            if(telem_commands.should_fire_pyro_b) {
+                // Fire pyro channel "B"
+                new_pyro_state.channels[1].is_armed = true;
+                new_pyro_state.channels[1].is_firing = true;
+                gpioDigitalWrite(PYROB_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
+
+                set_pyro_safety();
+            }
+
+            if(telem_commands.should_fire_pyro_c) {
+                // Fire pyro channel "C"
+                new_pyro_state.channels[2].is_armed = true;
+                new_pyro_state.channels[2].is_firing = true;
+                gpioDigitalWrite(PYROC_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
+
+                set_pyro_safety();
+            }
+
+            if(telem_commands.should_fire_pyro_d) {
+                // Fire pyro channel "D"
+                new_pyro_state.channels[3].is_armed = true;
+                new_pyro_state.channels[3].is_firing = true;
+                gpioDigitalWrite(PYROD_ARM_PIN, HIGH);
+                gpioDigitalWrite(PYROD_FIRE_PIN, HIGH);
+
+                set_pyro_safety();
+            }
+            
+            break;
         case FSMState::STATE_FIRST_SEPARATION:
             // Fire "Pyro D" when separating stage 1
             new_pyro_state.channels[3].is_armed = true;

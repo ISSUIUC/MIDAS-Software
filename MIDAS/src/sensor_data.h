@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
 #include "finite-state-machines/fsm_states.h"
 
@@ -180,7 +181,6 @@ struct Orientation {
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-
     //For yessir.cpp
     euler_t getEuler() const {
         euler_t euler;

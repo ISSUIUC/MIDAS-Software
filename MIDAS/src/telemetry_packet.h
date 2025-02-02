@@ -29,7 +29,7 @@ struct TelemetryPacket {
 
 
 // Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D };
 
 /**
  * @struct TelemetryCommand
@@ -38,6 +38,9 @@ enum class CommandType: uint8_t { RESET_KF };
 */
 struct TelemetryCommand {
     CommandType command;
+    union {
+        float new_freq;
+    };
     std::array<char, 3> verify = {{'B', 'R', 'K'}};
 
     bool valid() {

@@ -1,6 +1,13 @@
 #pragma once
 
 // ----------------------------------
+// SAFETY THRESHOLDS
+// ----------------------------------
+
+// Transition back to STATE_SAFE if this much time has passed without firing a pyro (ms)
+#define safety_pyro_test_disarm_time 10000
+
+// ----------------------------------
 // SECOND STAGE THRESHOLDS
 // ----------------------------------
 
