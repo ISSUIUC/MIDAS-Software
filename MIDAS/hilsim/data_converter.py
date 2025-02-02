@@ -87,7 +87,10 @@ def line_to_bytes(line):
                 current_packet.append(col.to_bytes(1, "little"))
             # Writes the value of the column as a float
             else:
-                current_packet.append(struct.pack('f', float(line[col])))
+                if col == "ang_pos_y":
+                    current_packet.append(struct.pack('f', -float(line[col])))
+                else:
+                    current_packet.append(struct.pack('f', float(line[col])))
 
         all_packets.append(current_packet)
     
