@@ -17,25 +17,25 @@ bool TCAL9539Init(){
     TwoWire* wireone = &Wire1;
 
     for(uint8_t addr : addrs){
-        // Serial.print("Testing ");
-        // Serial.println(addr);
+        Serial.print("Testing ");
+        Serial.println(addr);
 
         //wirezero
         wirezero->beginTransmission(addr);
         wirezero->write(REG_OUTPUT0);
         if(!wirezero->endTransmission()){
-            // Serial.println("Failed at endTransmission");
+            Serial.println("Failed at endTransmission");
             return false;
         }
         int ct = wirezero->requestFrom(addr, 1);
         if(ct != 1){
-            // Serial.println("Failed at requestFrom");
+            Serial.println("Failed at requestFrom");
             return false;
         }
         int v = wirezero->read();
         //REG_OUTPUT0 is set all ones on power up
         if(v != 0xff){
-            // Serial.println("Failed at REG_OUTPUT0");
+            Serial.println("Failed at REG_OUTPUT0");
             return false;
         }
 
@@ -43,30 +43,31 @@ bool TCAL9539Init(){
         wireone->beginTransmission(addr);
         wireone->write(REG_OUTPUT0);
         if(!wireone->endTransmission()){
-            // Serial.println("Failed at endTransmission");
+            Serial.println("Failed at endTransmission");
             return false;
         }
         ct = wireone->requestFrom(addr, 1);
         if(ct != 1){
-            // Serial.println("Failed at requestFrom");
+            Serial.println("Failed at requestFrom");
             return false;
         }
         v = wireone->read();
         //REG_OUTPUT0 is set all ones on power up
         if(v != 0xff){
-            // Serial.println("Failed at REG_OUTPUT0");
+            Serial.println("Failed at REG_OUTPUT0");
             return false;
         }
     }
     return true;
 }
 
-static uint8_t pin_state[3][2] = {{0xff,0xff},{0xff,0xff},{0xff,0xff}};
-static uint8_t pin_config[3][2] = {{0xff,0xff},{0xff,0xff},{0xff,0xff}};
+static uint8_t pin_state[2][3][2] = {{{0xff,0xff},{0xff,0xff},{0xff,0xff}}, {{0xff,0xff},{0xff,0xff},{0xff,0xff}}};
+static uint8_t pin_config[2][3][2] = {{{0xff,0xff},{0xff,0xff},{0xff,0xff}}, {{0xff,0xff},{0xff,0xff},{0xff,0xff}}};
 
 GpioError gpioDigitalWrite(GpioAddress addr, int mode, int whichwire){
     TwoWire* wire;
     if (whichwire == 0) {
+        Serial.println("Wire");
         wire = &Wire;
     } else {
         wire = &Wire1;
@@ -76,7 +77,7 @@ GpioError gpioDigitalWrite(GpioAddress addr, int mode, int whichwire){
         return GpioError::InvalidPinError;
     }
 
-    uint8_t current_state = pin_state[addr.gpio_id][addr.port_idx];
+    uint8_t current_state = pin_state[whichwire][addr.gpio_id][addr.port_idx];
     if(mode == HIGH){
         current_state |= (1 << addr.pin_offset);
     } else if(mode == LOW){
@@ -85,14 +86,20 @@ GpioError gpioDigitalWrite(GpioAddress addr, int mode, int whichwire){
         return GpioError::InvalidModeError;
     }
 
+    Serial.print("Writing to ");
+    Serial.println(addr.gpio_address, 16);
     wire->beginTransmission(addr.gpio_address);
     wire->write(REG_OUTPUT0 + addr.port_idx);
     wire->write(current_state);
-    pin_state[addr.gpio_id][addr.port_idx] = current_state;
-    if(!wire->endTransmission(true)){
+    pin_state[whichwire][addr.gpio_id][addr.port_idx] = current_state;
+    int err = 0;
+    err = wire->endTransmission(true);
+    if(err != 0){
+        Serial.print("I2C Error! ");
+        Serial.println(err);
         return GpioError::I2CError;
     }
-
+    Serial.println("Writing");
     return GpioError::NoError;
 }
 
@@ -134,7 +141,7 @@ GpioError gpioPinMode(GpioAddress addr, int mode, int whichwire){
         return GpioError::NoError;
     }
 
-    uint8_t current_state = pin_config[addr.gpio_id][addr.port_idx];
+    uint8_t current_state = pin_config[whichwire][addr.gpio_id][addr.port_idx];
 
     if(mode == INPUT){
         current_state |= (1 << addr.pin_offset);
@@ -151,11 +158,14 @@ GpioError gpioPinMode(GpioAddress addr, int mode, int whichwire){
 
     //wirezero
     wire->beginTransmission(addr.gpio_address);
+    Serial.print("Transmitting ");
+    Serial.println(addr.gpio_address);
     wire->write(REG_CONFIG0 + addr.port_idx);
     wire->write(current_state);
-    pin_config[addr.gpio_id][addr.port_idx] = current_state;
+    pin_config[whichwire][addr.gpio_id][addr.port_idx] = current_state;
 
     if(!wire->endTransmission(true)){
+        Serial.println("Failed to set gpio pinmode");
         return GpioError::I2CError;
     }
     return GpioError::NoError;

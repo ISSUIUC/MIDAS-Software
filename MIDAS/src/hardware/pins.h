@@ -37,6 +37,9 @@
 #define I2C_SDA 10
 #define I2C_SCL 9
 
+#define PYRO_SDA 41
+#define PYRO_SCL 42
+
 // CAN pins
 #define CAN_CS 2
 #define RFM96W_CS 5
@@ -49,15 +52,15 @@
 //take the pins that are in base 8 and update it to the right base - this is not done yet.
 
 // pyro pins
-#define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 06)
+#define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 05)
 #define PYROA_ARM_PIN GpioAddress(0, 016)
-#define PYROA_FIRE_PIN GpioAddress(0, 05)
+#define PYROA_FIRE_PIN GpioAddress(0, 04)
 #define PYROB_ARM_PIN GpioAddress(0, 014)
-#define PYROB_FIRE_PIN GpioAddress(0, 04)
+#define PYROB_FIRE_PIN GpioAddress(0, 03)
 #define PYROC_ARM_PIN GpioAddress(0, 010)
-#define PYROC_FIRE_PIN GpioAddress(0, 02)
-#define PYROD_ARM_PIN GpioAddress(0, 012)
-#define PYROD_FIRE_PIN GpioAddress(0, 01)
+#define PYROC_FIRE_PIN GpioAddress(0, 01)
+#define PYROD_ARM_PIN GpioAddress(0, 0)
+#define PYROD_FIRE_PIN GpioAddress(0, 00)
 
 // Continuity Pins
 #define SENSE_APOGEE 010
