@@ -96,7 +96,7 @@ ErrorCode TelemetryBackend::init() {
     digitalWrite(E22_RESET, HIGH);
     delay(5);
 
-    hwConfig.CHIP_TYPE = SX1262_CHIP;		  // Example uses an eByte E22 module with an SX1262
+    hwConfig.CHIP_TYPE = SX1268_CHIP;		  // Example uses an eByte E22 module with an SX1262
 	hwConfig.PIN_LORA_RESET = E22_RESET; // LORA RESET
 	hwConfig.PIN_LORA_NSS = E22_CS;	  // LORA SPI CS
 	hwConfig.PIN_LORA_SCLK = SPI_SCK;	  // LORA SPI CLK

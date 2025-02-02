@@ -42,12 +42,11 @@ public:
         gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
-        Serial.println("Sending bytes");
         tx_done = false;
         Radio.Send((uint8_t*) &data, sizeof(T));
 
         for(int i = 1;; i++){
-            if (tx_done) {
+            if (tx_done || digitalRead(E22_BUSY) == LOW) {
                 break;
             } else if (i % 1024 == 0) {
                 Serial.println("Slow tx!");
