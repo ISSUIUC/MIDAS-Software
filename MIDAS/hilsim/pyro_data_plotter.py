@@ -15,7 +15,7 @@ for index, row in df.iterrows():
         df.loc[df.index[index]]["global_armed"] != df.loc[df.index[index-1]]["global_armed"]
         ):
 
-        plt.axvline(x = df.loc[df.index[index]]["Timestamp"], color = 'b')
+        plt.axvline(x = df.loc[df.index[index]]["Timestamp"], color = 'red')
         
 
 plt.plot(df['Timestamp'], df['fsmstate'])

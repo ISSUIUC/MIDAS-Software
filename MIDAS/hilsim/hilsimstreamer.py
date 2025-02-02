@@ -52,9 +52,9 @@ print("Magic", ser.read_until('\n'.encode('ascii'))) # Should be our magic
 print("Checksum", hex(int(ser.read_until('\n'.encode('ascii'))))) # Should be our magic
 print("Garbage", ser.read_until('\n'.encode('ascii')))
 print("Garbage", ser.read_until('\n'.encode('ascii')))
-print("Garbage", ser.read_until('\n'.encode('ascii')))
-print("Garbage", ser.read_until('\n'.encode('ascii')))
-print("Garbage", ser.read_until('\n'.encode('ascii')))
+#print("Garbage", ser.read_until('\n'.encode('ascii')))
+#print("Garbage", ser.read_until('\n'.encode('ascii')))
+#print("Garbage", ser.read_until('\n'.encode('ascii')))
 
 counter = 0
 
@@ -90,7 +90,7 @@ while True:
         if content != prev:
             prev = content
             print(counter, file.tell(), int.from_bytes(content))
-        
+     
         previous_pyro_array = [timestamp, int.from_bytes(content), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read()), int.from_bytes(ser.read())]
 
         write_to_csv("pyro_data.csv", previous_pyro_array)
