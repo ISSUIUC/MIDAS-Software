@@ -253,7 +253,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm) {
             1.0;
 
     x_priori = (xdot * dt) + x_k;
-    EKF::set_F(dt, Ca, Cn, rho, w_x, w_y, w_z);
+    setF(dt, fsm, w_x, w_y, w_z);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
@@ -388,8 +388,8 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
             stage_timestamp = 0;
         }
         stage_timestamp += dt;
-        setF(dt / 1000);
-        setQ(dt / 1000, sd);
+        setF(dt, FSM_state, orientation.roll, orientation.pitch, orientation.yaw);
+        setQ(dt, sd);
         priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
         FSMState last_fsm = FSM_state;
@@ -515,7 +515,7 @@ void EKF::setQ(float dt, float sd) {
  * The F matrix is the state transition matrix and is defined
  * by how the states change over time.
  */
-void EKF::setF(float dt, float Ca, float Cn, float wx, float wy, float wz) {
+void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz) {
     Eigen::Matrix<float, 3, 1> w = Eigen::Matrix<float, 3, 1>::Zero();
     w(0, 0) = wx;
     w(1, 0) = wy;
@@ -523,6 +523,13 @@ void EKF::setF(float dt, float Ca, float Cn, float wx, float wy, float wz) {
     F_mat(0,1) = 1;
     F_mat(3,4) = 1;
     F_mat(6,7) = 1;
+
+    float m = mass_sustainer;
+    float h = height_sustainer;
+    if (fsm < FSMState::STATE_BURNOUT) { 
+        m = mass_full;   
+        h= height_full;
+    }
 
     F_mat(1,1) = -pi * Ca * r * r * rho * x_k(1,0) / m;
     F_mat(1,4) = -pi * Ca * r * r * rho * x_k(4,0) / m + w(2,0);
@@ -539,4 +546,7 @@ void EKF::setF(float dt, float Ca, float Cn, float wx, float wy, float wz) {
     float velocity_magnitude = pow(x_k(1,0)*x_k(1,0) + x_k(4,0)*x_k(4,0) + x_k(7,0)*x_k(7,0), 0.5);
     float mach = velocity_magnitude / 343.0;
     mach = std::round(mach / 0.04) * 0.04;
+    std::tie(Ca, Cn, Cp) = aerodynamicData[mach];
+    
+}
     
