@@ -265,37 +265,42 @@ float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x) 
     
 Eigen::Matrix<float, 3, 1> EKF::getThrust(float timestamp, Eigen::Matrix<float, 3, 1> angles, FSMState FSM_state) {
     Eigen::Matrix<float, 3,1> thrust = Eigen::Matrix<float, 3,1>::Zero();
-    if (FSM_state < FSMState::STATE_BURNOUT) {
-        // interpolate from O5500X_data
-        auto it = O5500X_data.lower_bound(time);
-        
-        if (it == moonburner_data.begin() || it == moonburner_data.end()) {
-            std::cout << "Timestep " << t << " is out of bounds for interpolation." << std::endl;
-        } else {
-            float x1 = it->first;
-            float y1 = it->second;
-            --it;
-            float x0 = it->first;
-            float y0 = it->second;
-
-            float interpolatedValue = linearInterpolation(x0, y0, x1, y1, t);
-            std::cout << "Interpolated value at timestep " << t << " is " << interpolatedValue << std::endl;
+    if (FSM_state >= STATE_FIRST_BOOST){
+        float interpolatedValue = 0;
+        if (FSM_state < FSMState::STATE_BURNOUT ) {
+            // interpolate from O5500X_data
+            if(timestamp >=0.009){
+                auto it = O5500X_data.lower_bound(timestamp);
+                if (it != O5500X_data.end()) {
+                    float x0 = it->first;
+                    float y0 = it->second;
+                    ++it;
+                    float x1 = it->first;
+                    float y1 = it->second;
+                    interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp); 
+                }
+            }
+        }   
+        else {
+            // interpolate from moonburner_data
+            if(timestamp >=0.083){
+                auto it = moonburner_data.lower_bound(timestamp);
+                if (it != moonburner_data.end()) {
+                    float x0 = it->first;
+                    float y0 = it->second;
+                    ++it;
+                    float x1 = it->first;
+                    float y1 = it->second;
+                    interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp);
+                }
+            }
         }
-    }   
-    else {
-        // interpolate from moonburner_data
-        
-    }
 
-        thrust(0, 0) = 0;
-        thrust(1, 0) = 0;
-        thrust(2, 0) = 0;
-    } else if (FSM_state <= 9) {
+        
         thrust(0, 0) = thrust(0,0) * cos(angles(1,0)) * sin(angles(0,0));
         thrust(1, 0) = thrust(1,0) * sin(angles(1,0));
         thrust(2, 0) = thrust(2,0) * cos(angles(1,0)) * cos(angles(0,0));
-    } 
-    
+    }
     return thrust;
 }
 
