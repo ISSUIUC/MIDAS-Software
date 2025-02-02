@@ -187,24 +187,9 @@ void EKF::initialize(RocketSystems* args) {
 
 }
 
-/**
- * @brief Estimates current state of the rocket without current sensor data
- *
- * The priori step of the Kalman filter is used to estimate the current state
- * of the rocket without knowledge of the current sensor data. In other words,
- * it extrapolates the state at time n+1 based on the state at time n.
- */
-
-Eigen::Matrix<float, 3, 1> EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
-    Eigen::Matrix3f roll, pitch, yaw;
-    roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
-    pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
-    yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
-    return yaw * pitch * roll * body_vect;
-}
 
 void EKF::priori(float dt, Orientation &orientation, FSMState fsm) {
-    Eigen::Matrix<float, 9, 9> xdot = Eigen::Matrix<float, 9, 9>::Zero();
+    Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
 
     Velocity omega = orientation.getVelocity();
     euler_t angles = orientation.getEuler();
@@ -232,12 +217,11 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm) {
     float Fay = 0;
     float Faz = 0;
 
-    Eigen::Matrix<float, 3, 1> Fg_body = R.inverse() * gravity; 
+    Eigen::Matrix<float, 3, 1> Fg_body = GlobalToBody(angles, gravity); 
     float Fgx = Fg_body(0,0); float Fgy = Fg_body(1,0); float Fgz = Fg_body(2,0);  
 
-    Eigen::Matrix<float, 3, 1> T = EKF::getThrust(stage_timestamp, ang_pos, fsm);
+    Eigen::Matrix<float, 3, 1> T = EKF::getThrust(stage_timestamp, angles, fsm);
     float Ftx = T(0, 0); float Fty = T(1, 0); float Ftz = T(2, 0);
-
 
     
     xdot << x_k(1,0),
@@ -263,10 +247,9 @@ float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x) 
 }
 
     
-Eigen::Matrix<float, 3, 1> EKF::getThrust(float timestamp, Eigen::Matrix<float, 3, 1> angles, FSMState FSM_state) {
-    Eigen::Matrix<float, 3,1> thrust = Eigen::Matrix<float, 3,1>::Zero();
+Eigen::Matrix<float, 3, 1> EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state) {
+    float interpolatedValue = 0;
     if (FSM_state >= STATE_FIRST_BOOST){
-        float interpolatedValue = 0;
         if (FSM_state < FSMState::STATE_BURNOUT ) {
             // interpolate from O5500X_data
             if(timestamp >=0.009){
@@ -295,13 +278,10 @@ Eigen::Matrix<float, 3, 1> EKF::getThrust(float timestamp, Eigen::Matrix<float, 
                 }
             }
         }
-
-        
-        thrust(0, 0) = thrust(0,0) * cos(angles(1,0)) * sin(angles(0,0));
-        thrust(1, 0) = thrust(1,0) * sin(angles(1,0));
-        thrust(2, 0) = thrust(2,0) * cos(angles(1,0)) * cos(angles(0,0));
     }
-    return thrust;
+    Eigen::Matrix<float, 3,1> interpolatedVector;
+    interpolatedVector(0,0) = interpolatedValue;
+    return BodyToGlobal(angles, interpolatedVector);
 }
 
 /**
@@ -420,25 +400,6 @@ void EKF::initializeAerodynamicData() {
     }
 }
 
-
-
-
-/**
- * @brief Converts a vector in the body frame to the global frame
- *
- * @param angles Roll, pitch, yaw angles
- * @param body_vect Vector for rotation in the body frame
- * @return Eigen::Matrix<float, 3, 1> Rotated vector in the global frame
- */
-Eigen::Matrix<float, 3, 1> EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
-    Eigen::Matrix3f roll, pitch, yaw;
-    roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
-    pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
-    yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
-    return yaw * pitch * roll * body_vect;
-}
-
-
 /**
  * @brief Getter for state X
  *
@@ -508,6 +469,37 @@ void EKF::setQ(float dt, float sd) {
 }
 
 /**
+ * @brief Converts a vector in the body frame to the global frame
+ *
+ * @param angles Roll, pitch, yaw angles
+ * @param body_vect Vector for rotation in the body frame
+ * @return Eigen::Matrix<float, 3, 1> Rotated vector in the global frame
+ */
+Eigen::Matrix<float, 3, 1> EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> body_vect) {
+    Eigen::Matrix3f roll, pitch, yaw;
+    roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
+    pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
+    yaw << cos(angles.yaw), -sin(angles.yaw), 0., sin(angles.yaw), cos(angles.yaw), 0., 0., 0., 1.;
+    return yaw * pitch * roll * body_vect;
+}
+
+Eigen::Matrix<float, 3, 1> EKF::GlobalToBody(euler_t angles, const Eigen::Matrix<float, 3, 1> world_vector) {
+    //pysim code
+    // roll = np.array([[1, 0, 0], [0, np.cos(roll), -np.sin(roll)], [0, np.sin(roll), np.cos(roll)]])
+    // pitch = np.array([[np.cos(pitch), 0, np.sin(pitch)], [0, 1, 0], [-np.sin(pitch), 0, np.cos(pitch)]])
+    // yaw = np.array([[np.cos(yaw), -np.sin(yaw), 0], [np.sin(yaw), np.cos(yaw), 0], [0, 0, 1]])
+    // return (yaw @ pitch @ roll).T @ world_vector
+    Eigen::Matrix3f roll;
+    roll << 1, 0, 0, 0, cos(angles.roll), -sin(angles.roll), 0, sin(angles.roll), cos(angles.roll);
+    Eigen::Matrix3f pitch;
+    pitch << cos(angles.pitch), 0, sin(angles.pitch), 0, 1, 0,-sin(angles.pitch), 0, cos(angles.pitch);
+    Eigen::Matrix3f yaw;
+    yaw << cos(angles.yaw), -sin(angles.yaw), 0, sin(angles.yaw), cos(angles.yaw), 0, 0, 0, 1;
+    Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
+    return rotation_matrix.transpose() * world_vector;
+}
+
+/**
  * @brief Sets the F matrix given time step.
  *
  * @param dt Time step calculated by the Kalman Filter Thread
@@ -522,7 +514,7 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz) {
     w(2, 0) = wz;
     F_mat(0,1) = 1;
     F_mat(3,4) = 1;
-    F_mat(6,7) = 1;
+    F_mat(6,7) = 1; 
 
     float m = mass_sustainer;
     float h = height_sustainer;
