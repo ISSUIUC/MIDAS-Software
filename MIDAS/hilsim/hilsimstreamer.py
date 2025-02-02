@@ -18,6 +18,19 @@ def write_to_csv(filename, data):
 
         writer.writerow(data)
 
+def serial_hash(data : bytes) -> int:
+    sumproduct = 0
+    for i in range(0,len(data)):
+        if(i%2==0):
+            sumproduct += data[i]%13 # change to be less stupid
+        else: 
+            sumproduct *= data[i]%13 # change to be less stupid
+    hash = sumproduct%251 #ok
+    return hash
+#print("hash" + str(serial_hash((5).to_bytes())))
+
+
+
 device = None
 # Look for midas comport
 for comport in serial.tools.list_ports.comports():
@@ -75,12 +88,15 @@ while True:
         size = SIZES[tag]
         # print(size)
         
-        data = file.read(size)
+        data = file.read(size) # Reading from the flight data
         # print(data)
-
-        ser.write(tag.to_bytes(1, byteorder='little'))   
+        # Checksum calc
+        ser.write(tag.to_bytes(1, byteorder='little'))  # Writing the tag to MIDAS
         # ser.write(size.to_bytes(4, byteorder='little'))
-        ser.write(data)
+        ser.write(data) # Writing data to MIDAS
+
+        crc = serial_hash(data);
+        ser.write(crc) # Writing to checksum to midas
         content = (ser.read())
         # data = bytes.decode(content, encoding="ascii")
         # if len(content) != 0:

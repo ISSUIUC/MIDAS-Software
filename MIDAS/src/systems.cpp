@@ -187,6 +187,32 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 }
 
 #ifdef HILSIM
+
+int serial_hash(byte data[], int length) {
+   int sumproduct = 0;
+   for(int i = 0; i<length; i++){
+    if(i%2==0) {
+        sumproduct += data[i]%13;
+    } else {
+        sumproduct *= data[i]%13;
+    }
+   }
+    int hash = sumproduct%251;
+    return hash;
+}
+
+template <class T>
+bool read_data(T& sensor_packet) {
+    uint8_t data[sizeof(T)];
+    Serial.readBytes(reinterpret_cast<char*>(data), sizeof(T));
+    uint8_t checksum = Serial.read();
+    // Calculate checksum
+    uint8_t c_checksum = serial_hash(data, sizeof(T));
+    if (checksum == c_checksum) {
+        memcpy(&sensor_packet, data, sizeof(T));
+    }
+    return (checksum == c_checksum);
+}
 DECLARE_THREAD(hilsim, RocketSystems* arg) {
     int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
@@ -194,72 +220,71 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
     while (true) {
         while (!Serial.available()) { taskYIELD(); }
         int tag = Serial.read();
-
         if (tag == 1) {
             // LowGData: ax, ay, az
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.low_g.lowg)), sizeof(LowGData));
-            // arg->rocket_data.low_g.update(lowgdata);
-            // Serial.print("LowG");
+
+            read_data<LowGData>(arg->sensors.low_g.lowg);
         }
         else if (tag == 2) {
             // HighGData: ax, ay, az
-            HighGData highgdata;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.high_g.highg)), sizeof(HighGData));
+            read_data<HighGData>(arg->sensors.high_g.highg);
+            //HighGData highgdata;
             // arg->rocket_data.high_g.update(highgdata);
             // Serial.print("HighG");
         }
         else if (tag == 9) {
             // LowGLSM: gx, gy, gz, ax, ay, az
-            LowGLSM lowglsm;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.low_g_lsm.lowglsm)), sizeof(LowGLSM));
+            read_data<LowGLSM>(arg->sensors.low_g_lsm.lowglsm);
+            //LowGLSM lowglsm;
             // arg->rocket_data.low_g_lsm.update(lowglsm);
             // Serial.print("LowGLSM");
         }
         else if (tag == 3) {
             // Barometer: temperature, pressure, altitude
-            Barometer barometer;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.barometer.barometer)), sizeof(Barometer));
+            read_data<Barometer>(arg->sensors.barometer.barometer);
+            //Barometer barometer;
             // arg->rocket_data.barometer.update(barometer);
             // Serial.print("BArometer");
         }
         else if (tag == 4) {
             // Continuity: sense_pyro and pin continuity data
-            Continuity continuity;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.continuity.continuity)), sizeof(Continuity));
+            read_data<Continuity>(arg->sensors.continuity.continuity);
+            //Continuity continuity;
             // arg->rocket_data.continuity.update(continuity);
             // Serial.print("Continuity");
         }
         else if (tag == 5) {
             // Voltage: single float value
-            Voltage voltage;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.voltage.voltage)), sizeof(Voltage));
+            read_data<Voltage>(arg->sensors.voltage.voltage);
+            //Voltage voltage;
             // arg->rocket_data.voltage.update(voltage);
             // Serial.print("Voltage");
         }
         else if (tag == 6) {
             // GPS: latitude, longitude, altitude, speed, satellite_count, timestamp
-            GPS gps;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.gps.gps)), sizeof(GPS));
+            read_data<GPS>(arg->sensors.gps.gps);
+            //GPS gps;
             // arg->rocket_data.gps.update(gps);
             // Serial.print("GPS");
         }
         else if (tag == 7) {
             // Magnetometer: mx, my, mz
-            Magnetometer magnetometer;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.magnetometer.mag)), sizeof(Magnetometer));
+            read_data<Magnetometer>(arg->sensors.magnetometer.mag);
+            //Magnetometer magnetometer;
             // arg->rocket_data.magnetometer.update(magnetometer);
             // Serial.print("Magnetometer");
         }
         else if (tag == 8) {
             // Orientation: yaw, pitch, roll, etc.
-            Orientation orientation;
-            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.orientation.orient)), sizeof(Orientation));
+            read_data<Orientation>(arg->sensors.orientation.orient);
+            //Orientation orientation;
             // arg->rocket_data.orientation.update(orientation);
             // Serial.print("Orientation");
         }
         else if (tag == 10) {
             FSMState fsm_state;
             Serial.readBytes(reinterpret_cast<char*>(&(fsm_state)), sizeof(FSMState));
+            Serial.read();
             // Serial.print("FSM state");
             // We should ignore fsm state lol
         }
