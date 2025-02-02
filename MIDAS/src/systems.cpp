@@ -97,12 +97,12 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
-        // Serial.print("mag ");
-        // Serial.print(reading.mx);
-        // Serial.print(" ");
-        // Serial.print(reading.my);
-        // Serial.print(" ");
-        // Serial.println(reading.mz);
+        Serial.print("mag ");
+        Serial.print(reading.mx);
+        Serial.print(" ");
+        Serial.print(reading.my);
+        Serial.print(" ");
+        Serial.println(reading.mz);
     }
 }
 
