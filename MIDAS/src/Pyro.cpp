@@ -1,7 +1,11 @@
 #include <cmath>
 
-#include "sensors.h"
-#include "pins.h"
+#ifdef HILSIM
+#include "hilsim/sensors.h"
+#else
+#include "hardware/sensors.h"
+#endif
+#include "hardware/pins.h"
 
 #include "TCAL9539.h"
 

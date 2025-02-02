@@ -1,63 +1,71 @@
 #include <Arduino.h>
-#include <pb_decode.h>
-#include <pb_encode.h>
+
+#include <Wire.h>
+#include <SPI.h>
 
 #include <systems.h>
+#include <hal.h>
+
+#include "sensor_data.h"
+#include "log_checksum.h"
 #include "global_packet.h"
+
+#include "SDLog.h"
 
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
 
-MultipleLogSink<> sink;
+MultipleLogSink<SDSink> sink;
 RocketSystems systems{.log_sink = sink};
 
-DECLARE_THREAD(hilsim, void*arg) {
-    uint8_t buffer[HILSIMPacket_size];
-    int n = 0;
-    // Debug kamaji output to verify if we're reading the correct packets
-    while (Serial.read() != 33);
+void setup(){
+    Serial.begin(115200);
+    while (!Serial);
+    while (!Serial.available()) {}
+    while (Serial.read() != 33) ;
     char magic[] = {69, 110, 117, 109, 99, 108, 97, 119, 0};
-    Serial.println(magic);
-    Serial.println(__TIME__);
-    Serial.println(__DATE__);
+    Serial.print(magic);
+    Serial.print('\n');
+    Serial.print(LOG_CHECKSUM);
+    Serial.print('\n');
     Serial.flush();
 
-    while (true) {
-        while (!Serial.available());
-        uint8_t a = Serial.read();
-        uint8_t b = Serial.read();
-        uint16_t length = (uint16_t) b + (((uint16_t) a) << 8);
-        // Parse the two bytes as integers
+    //begin sensor SPI bus
+    // Serial.println("Starting SPI...");
+    SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
 
-        size_t hilsim_packet_size = Serial.readBytes(buffer, length);
-        // Serial.print(length);
-        // Serial.print(" ");
-        // Serial.printf("%d %d ", a, b);
-        HILSIMPacket packet = HILSIMPacket_init_zero;
-        pb_istream_t stream = pb_istream_from_buffer(buffer, hilsim_packet_size);
-        bool status = pb_decode(&stream, HILSIMPacket_fields, &packet);
-        if (!status) {
-            THREAD_SLEEP(10);
-            continue;
-        }
-        global_packet = packet;
-        RocketState rocket_state = RocketState_init_zero;
-        rocket_state.rocket_state = (int) (100 * sin((double)n / 360));
-        uint8_t buffer2[RocketState_size];
-        pb_ostream_t output_stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-        status = pb_encode(&output_stream, RocketState_fields, &rocket_state);
-        Serial.write(output_stream.bytes_written);
-        Serial.write(buffer, output_stream.bytes_written);
-        Serial.flush();
-        n++;
-        
-        THREAD_SLEEP(10);
-    }
-}
+    //begin I2C bus
+    // Serial.println("Starting I2C...");
+    Wire.begin(I2C_SDA, I2C_SCL);
 
-void setup() {
-    Serial.begin(9600);
-    while (!Serial);
-    hilsim_thread(nullptr);
+    //set all chip selects high (deselected)
+    pinMode(MS5611_CS, OUTPUT);
+    pinMode(LSM6DS3_CS, OUTPUT);
+    pinMode(KX134_CS, OUTPUT);
+    pinMode(ADXL355_CS, OUTPUT);
+    pinMode(LIS3MDL_CS, OUTPUT);
+    pinMode(BNO086_CS, OUTPUT);
+    pinMode(CAN_CS, OUTPUT);
+    pinMode(RFM96_CS, OUTPUT);
+    digitalWrite(MS5611_CS, HIGH);
+    digitalWrite(LSM6DS3_CS, HIGH);
+    digitalWrite(KX134_CS, HIGH);
+    digitalWrite(ADXL355_CS, HIGH);
+    digitalWrite(LIS3MDL_CS, HIGH);
+    digitalWrite(BNO086_CS, HIGH);
+    digitalWrite(CAN_CS, HIGH);
+    digitalWrite(RFM96_CS, HIGH);
+
+    //configure output leds
+    gpioPinMode(LED_BLUE, OUTPUT);
+    gpioPinMode(LED_GREEN, OUTPUT);
+    gpioPinMode(LED_ORANGE, OUTPUT);
+    gpioPinMode(LED_RED, OUTPUT);
+
+    delay(200);
+
+    //init and start threads
+    begin_systems(&systems);
+
 }
 
 void loop(){}

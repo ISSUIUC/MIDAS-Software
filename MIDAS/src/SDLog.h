@@ -3,7 +3,11 @@
 #include <FS.h>
 
 #include <SD.h>
-#include "sensors.h"
+#ifdef HILSIM
+#include "hilsim/sensors.h"
+#else
+#include "hardware/sensors.h"
+#endif
 #include "data_logging.h"
 
 /**

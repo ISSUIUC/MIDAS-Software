@@ -199,11 +199,117 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
                 }
 
             }
-        } else {
-            THREAD_SLEEP(1);
         }
+        THREAD_SLEEP(1);
     }
 }
+
+#ifdef HILSIM
+DECLARE_THREAD(hilsim, RocketSystems* arg) {
+    int n = 0;
+    // Debug kamaji output to verify if we're reading the correct packets
+
+    while (true) {
+        while (!Serial.available()) { taskYIELD(); }
+        int tag = Serial.read();
+
+        if (tag == 1) {
+            // LowGData: ax, ay, az
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.low_g.lowg)), sizeof(LowGData));
+            // arg->rocket_data.low_g.update(lowgdata);
+            // Serial.print("LowG");
+        }
+        else if (tag == 2) {
+            // HighGData: ax, ay, az
+            HighGData highgdata;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.high_g.highg)), sizeof(HighGData));
+            // arg->rocket_data.high_g.update(highgdata);
+            // Serial.print("HighG");
+        }
+        else if (tag == 9) {
+            // LowGLSM: gx, gy, gz, ax, ay, az
+            LowGLSM lowglsm;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.low_g_lsm.lowglsm)), sizeof(LowGLSM));
+            // arg->rocket_data.low_g_lsm.update(lowglsm);
+            // Serial.print("LowGLSM");
+        }
+        else if (tag == 3) {
+            // Barometer: temperature, pressure, altitude
+            Barometer barometer;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.barometer.barometer)), sizeof(Barometer));
+            // arg->rocket_data.barometer.update(barometer);
+            // Serial.print("BArometer");
+        }
+        else if (tag == 4) {
+            // Continuity: sense_pyro and pin continuity data
+            Continuity continuity;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.continuity.continuity)), sizeof(Continuity));
+            // arg->rocket_data.continuity.update(continuity);
+            // Serial.print("Continuity");
+        }
+        else if (tag == 5) {
+            // Voltage: single float value
+            Voltage voltage;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.voltage.voltage)), sizeof(Voltage));
+            // arg->rocket_data.voltage.update(voltage);
+            // Serial.print("Voltage");
+        }
+        else if (tag == 6) {
+            // GPS: latitude, longitude, altitude, speed, satellite_count, timestamp
+            GPS gps;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.gps.gps)), sizeof(GPS));
+            // arg->rocket_data.gps.update(gps);
+            // Serial.print("GPS");
+        }
+        else if (tag == 7) {
+            // Magnetometer: mx, my, mz
+            Magnetometer magnetometer;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.magnetometer.mag)), sizeof(Magnetometer));
+            // arg->rocket_data.magnetometer.update(magnetometer);
+            // Serial.print("Magnetometer");
+        }
+        else if (tag == 8) {
+            // Orientation: yaw, pitch, roll, etc.
+            Orientation orientation;
+            Serial.readBytes(reinterpret_cast<char*>(&(arg->sensors.orientation.orient)), sizeof(Orientation));
+            // arg->rocket_data.orientation.update(orientation);
+            // Serial.print("Orientation");
+        }
+        else if (tag == 10) {
+            FSMState fsm_state;
+            Serial.readBytes(reinterpret_cast<char*>(&(fsm_state)), sizeof(FSMState));
+            // Serial.print("FSM state");
+            // We should ignore fsm state lol
+        }
+        else if (tag == 11) {
+            // KalmanData: position, velocity, acceleration, altitude
+            KalmanData kalman_data;
+            Serial.readBytes(reinterpret_cast<char*>(&(kalman_data)), sizeof(KalmanData));
+            // arg->rocket_data.kalman_data.update(kalman_data);
+
+            // Serial.print("kf data"); // We also ignore kf data
+        }
+        else if (tag == 12) {
+            // PyroState: global armed state and channel data
+            PyroState pyro_state;
+            Serial.readBytes(reinterpret_cast<char*>(&(pyro_state)), sizeof(PyroState));
+            // arg->rocket_data.pyro_state.update(pyro_state);
+        }
+        else {
+            // Unknown tag, handle error
+            // Serial.print("Error: Unknown tag received!");
+            // Serial.print(tag);
+        }
+    
+        // Serial.println("Read line");
+        // Print fsm state
+        Serial.write(arg->rocket_data.fsm_state.getRecentUnsync());
+        PyroState data = arg->rocket_data.pyro.getRecentUnsync();
+        Serial.write((char*) &data, sizeof(PyroState));
+        Serial.flush();
+    }
+}
+#endif
 
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 
@@ -229,6 +335,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.buzzer);
     INIT_SYSTEM(systems.tlm);
     INIT_SYSTEM(systems.sensors.gps);
+    THREAD_SLEEP(1000);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
@@ -240,7 +347,7 @@ ErrorCode init_systems(RocketSystems& systems) {
  *        If initialization fails, then this enters an infinite loop.
  */
 [[noreturn]] void begin_systems(RocketSystems* config) {
-    Serial.println("Starting Systems...");
+    // Serial.println("Starting Systems...");
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError) {
         // todo some message probably
@@ -266,14 +373,12 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
-
+    START_THREAD(hilsim, DATA_CORE, config, 15);
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+
 
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
     }
 }
 

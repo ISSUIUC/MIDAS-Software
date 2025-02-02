@@ -2,87 +2,63 @@
 
 #include "errors.h"
 #include "sensor_data.h"
-#include "hardware/pins.h"
 
-/**
- * @struct LowG interface
- */
 struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    LowGData read() { return lowg; }
+    LowGData lowg;
 };
 
-/**
- * @struct HighG interface
- */
 struct HighGSensor {
-    ErrorCode init();
-    HighGData read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    HighGData read() { return highg; }
+    HighGData highg;
 };
 
-/**
- * @struct Magnetometer interface
- */
 struct MagnetometerSensor {
-    ErrorCode init();
-    Magnetometer read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    Magnetometer read() { return mag; }
+    Magnetometer mag;
 };
 
-/**
- * @struct Barometer interface
- */
 struct BarometerSensor {
-    ErrorCode init();
-    Barometer read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    Barometer read() { return barometer; }
+    Barometer barometer;
 };
 
-/**
- * @struct LowGLSM interface
- */
 struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    LowGLSM read() { return lowglsm; }
+    LowGLSM lowglsm;
 };
 
-/**
- * @struct Continuity interface
- */
 struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    Continuity read() { return continuity; }
+    Continuity continuity;
 };
 
-/**
- * @struct Voltage interface
- */
 struct VoltageSensor {
-    ErrorCode init();
-    Voltage read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    Voltage read() { return voltage; }
+    Voltage voltage;
 };
 
-/**
- * @struct BNO interface
- */
 struct OrientationSensor {
-    Orientation initial_orientation;
-    uint8_t initial_flag;
-    ErrorCode init();
-    Orientation read();
+    ErrorCode init() { return ErrorCode::NoError; }
+    Orientation read() { return orient; }
+    Orientation orient;
 };
 
-/**
- * @struct GPS interface
- */
 struct GPSSensor {
-    ErrorCode init();
-    GPS read();
-    bool is_leap = false;
+    ErrorCode init() { return ErrorCode::NoError; }
+    GPS read() { return gps; }
+    GPS gps;
 };
 
-/**
- * @struct Pyro interface
- */
 struct Pyro {
     ErrorCode init();
     PyroState tick(FSMState fsm_state, Orientation orientation);
+    // We will have to set this separately
 };

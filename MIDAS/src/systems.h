@@ -16,6 +16,7 @@
 #elif defined(HILSIM)
 #include "TCAL9539.h"
 #include "hilsim/sensors.h"
+#include "hilsim/pins.h"
 #else
 #include "hardware/sensors.h"
 #endif

@@ -2,6 +2,7 @@
 #include <SPI.h>
 #include <SD_MMC.h>
 
+#include "hardware/pins.h"
 #include "SDLog.h"
 
 /**
