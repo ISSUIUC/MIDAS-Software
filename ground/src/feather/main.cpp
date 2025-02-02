@@ -34,6 +34,7 @@
 // #define LED 13 // Blinks on receipt
 
 
+
 float RF95_FREQ = 426.15;
 float SUSTAINER_FREQ = 426.15;
 
@@ -385,6 +386,7 @@ void setup() {
     // #endif
     rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(8);
+
     rf95.setPayloadCRC(true);
 
     rf95.setSignalBandwidth(250000);
@@ -438,7 +440,6 @@ void loop() {
 //     uint8_t battery = static_cast<uint8_t>((batteryVoltage/5.0)*255);
 //     return battery;
 // }
-
 
 // void loop() {
     

@@ -173,7 +173,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             }
 
             // if in burnout for long enough then go on to the next state (time transition)
-            if ((current_time - burnout_time) > sustainer_first_boost_to_burnout_time_threshold) {
+            if ((current_time - burnout_time) > sustainer_coast_time) {
                 sustainer_ignition_time = current_time;
                 state = FSMState::STATE_SUSTAINER_IGNITION;
             }

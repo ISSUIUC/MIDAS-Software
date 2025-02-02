@@ -213,7 +213,7 @@ Orientation OrientationSensor::read()
             initial_quaternion = quat;
             initial_flag = 1;
         }
-
+      
         Vec3 rotated_data {-euler.z, -euler.y, euler.x}; // roll, pitch, yaw
 
         // The guess & check method!
