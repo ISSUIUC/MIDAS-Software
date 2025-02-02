@@ -114,9 +114,9 @@ struct LowGLSM {
  * @brief data from the barometer
 */
 struct Barometer {
-    float temperature = 0;
-    float pressure = 0;
-    float altitude = 0;
+    float temperature = 0; // Temperature in Celcius
+    float pressure = 0; // Pressure in millibars
+    float altitude = 0; // Altitude in meters (above sea level?)
 
     Barometer() = default;
     Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
@@ -192,7 +192,6 @@ struct Orientation {
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-
     //For yessir.cpp
     euler_t getEuler() const {
         euler_t euler;

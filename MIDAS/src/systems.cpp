@@ -28,9 +28,27 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(barometer, RocketSystems* arg) {
+    // Reject single rogue barometer readings that are very different from the immediately prior reading
+    // Will only reject a certain number of readings in a row
+    Barometer prev_reading;
+    constexpr float altChgThreshold = 200; // meters
+    constexpr float presChgThreshold = 500; // milibars
+    constexpr float tempChgThreshold = 10; // degrees C
+    constexpr unsigned int maxConsecutiveRejects = 3;
+    unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true) {
         Barometer reading = arg->sensors.barometer.read();
-        arg->rocket_data.barometer.update(reading);
+        bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
+                        //std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
+                        //std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
+        // TODO: Log when we receive a rejection!
+        if (is_rogue && rejects++ < maxConsecutiveRejects)
+            arg->rocket_data.barometer.update(prev_reading); // Reuse old reading, reject new reading
+        else {
+            rejects = 0;
+            arg->rocket_data.barometer.update(reading);
+            prev_reading = reading; // Only update prev_reading with accepted readings
+        }
         THREAD_SLEEP(6);
     }
 }
@@ -79,8 +97,6 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
             CommandFlags& telem_commands = arg->rocket_data.command_flags;
-
-            // Serial.printf("Fire pyro A: %d\n", telem_commands.should_fire_pyro_a);
 
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
@@ -321,9 +337,9 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
     }
 }
 

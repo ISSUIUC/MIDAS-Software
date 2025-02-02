@@ -1,7 +1,9 @@
+#include <Eigen/Eigen>
 #include "sensors.h"
 #include "Adafruit_BNO08x.h"
 #include "sensor_data.h"
 #include <cmath>
+
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
@@ -112,6 +114,35 @@ float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
 }
 
 /**
+ * @brief Generates a rotation matrix that transforms a vector by the rotations described in rpy_vec {roll, pitch, yaw} (in that order!)
+ */
+Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec) {
+    float roll = rpy_vec.x;
+    float pitch = rpy_vec.y;
+    float yaw = rpy_vec.z;
+
+    Eigen::Matrix3f Rx {
+        {1, 0, 0},
+        {0, cos(roll), -sin(roll)},
+        {0, sin(roll), cos(roll)}
+    };
+
+    Eigen::Matrix3f Ry {
+        {cos(pitch), 0, sin(pitch)},
+        {0, 1, 0},
+        {-sin(pitch), 0, cos(pitch)}
+    };
+
+    Eigen::Matrix3f Rz {
+        {cos(yaw), -sin(yaw), 0},
+        {sin(yaw), cos(yaw), 0},
+        {0, 0, 1}
+    };
+
+    return Rx * Ry * Rz;
+} 
+
+/**
  * @brief Reads and returns the data from the sensor
  *
  * @return An orientation packet with orientation, acceleration, gyroscope, and magenetometer for all axes, along with temperature and pressure
@@ -121,10 +152,9 @@ Orientation OrientationSensor::read()
     // read from aforementioned global instance of sensor
     sh2_SensorValue_t event;
     Vec3 euler;
-    Quaternion quat;
 
-    static Vec3 filtered_euler = {0, 0, 0};
-    const float alpha = 0.98;
+    Vec3 filtered_euler = {0, 0, 0};
+    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
     unsigned long currentTime = millis();
     deltaTime = (currentTime - lastTime) / 1000.0;
     lastTime = currentTime;
@@ -135,26 +165,21 @@ Orientation OrientationSensor::read()
         {
         case SH2_ARVR_STABILIZED_RV:
             euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
-            quat.w = event.un.arvrStabilizedRV.real;
-            quat.x = event.un.arvrStabilizedRV.i;
-            quat.y = event.un.arvrStabilizedRV.j;
-            quat.z = event.un.arvrStabilizedRV.k;
             break;
         case SH2_GYRO_INTEGRATED_RV:
             // faster (more noise?)
             euler = quaternionToEulerGI(&event.un.gyroIntegratedRV, true);
-            quat.w = event.un.gyroIntegratedRV.real;
-            quat.x = event.un.gyroIntegratedRV.i;
-            quat.y = event.un.gyroIntegratedRV.j;
-            quat.z = event.un.gyroIntegratedRV.k;
             break;
         }
         
-        filtered_euler.x = alpha * (filtered_euler.x + event.un.gyroscope.y * deltaTime) + (1 - alpha) * euler.x;
-        filtered_euler.y = alpha * (filtered_euler.y + event.un.gyroscope.x * deltaTime) + (1 - alpha) * euler.y;
-        filtered_euler.z = alpha * (filtered_euler.z + event.un.gyroscope.z * deltaTime) + (1 - alpha) * euler.z;
-        
+        // filtered_euler.x = alpha * (euler.x) + (1 - alpha) * prev_x;
+        // filtered_euler.y = alpha * (euler.y) + (1 - alpha) * prev_y;
+        // filtered_euler.z = alpha * (euler.z ) + (1 - alpha) * prev_z;
 
+        // prev_x = euler.x;
+        // prev_y = euler.y;
+        // prev_z = euler.z;
+        
         Orientation sensor_reading;
         sensor_reading.has_data = true;
         /*
@@ -188,72 +213,34 @@ Orientation OrientationSensor::read()
             initial_quaternion = quat;
             initial_flag = 1;
         }
+      
+        Vec3 rotated_data {-euler.z, -euler.y, euler.x}; // roll, pitch, yaw
 
-        // calculate tilt from initial orientation
-        // Orientation deviation;
-        // deviation.yaw = min(abs(sensor_reading.yaw - initial_orientation.yaw), 2 * 3.14F - abs(sensor_reading.yaw - initial_orientation.yaw));
-        // deviation.pitch = min(abs(sensor_reading.pitch - initial_orientation.pitch), 2 * 3.14F - abs(sensor_reading.pitch - initial_orientation.pitch));
-        // sensor_reading.tilt = sqrt(pow(deviation.yaw, 2) + pow(deviation.pitch, 2));
+        // The guess & check method!
+        // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
 
-        // sensor_reading.tilt = angular_difference(sensor_reading.pitch, sensor_reading.yaw, initial_orientation.pitch, initial_orientation.yaw);
+        Eigen::Matrix3f rot_matrix = generate_rotation_matrix(rotated_data);
+        Eigen::Matrix<float, 1, 3> cur_ivec = {1, 0, 0};
+        Eigen::Matrix<float, 1, 3> cur_vec = cur_ivec * rot_matrix;
+        Eigen::Matrix<float, 1, 3> reference_vector = {0, 0, -1};
 
-        Quaternion delta;
-        Quaternion inverse;
-        Quaternion curr;
-        double norm_initial = sqrt(initial_quaternion.w * initial_quaternion.w + initial_quaternion.x * initial_quaternion.x + initial_quaternion.y * initial_quaternion.y + initial_quaternion.z * initial_quaternion.z);
-        double norm_current = sqrt(quat.w * quat.w + quat.x * quat.x + quat.y * quat.y + quat.z * quat.z);
+        float dot = cur_vec.dot(reference_vector);
+        float cur_mag = cur_vec.norm();
+        float ref_mag = reference_vector.norm();
 
-        // get inverse of original
-        inverse.w = initial_quaternion.w;
-        inverse.x = -initial_quaternion.x;
-        inverse.y = -initial_quaternion.y;
-        inverse.z = -initial_quaternion.z;
-
-        // normalize
-        if (norm_current > 0.0)
-        {
-            curr.w = quat.w /norm_current;
-            curr.x = quat.x /norm_current;
-            curr.y =  quat.y/ norm_current;
-            curr.z = quat.z/ norm_current;
+        sensor_reading.tilt = 0;
+        if(cur_mag != 0 && ref_mag != 0) {
+            sensor_reading.tilt = acos(dot/(cur_mag*ref_mag));
         }
 
-        if (norm_initial > 0.0)
-        {
-            inverse.w /= norm_initial;
-            inverse.x /= norm_initial;
-            inverse.y /= norm_initial;
-            inverse.z /= norm_initial;
-        }
+        const float alpha = 0.2;
+        // Arthur's Comp Filter
+        float filtered_tilt = alpha * sensor_reading.tilt + (1-alpha) * prev_tilt;
+        prev_tilt = filtered_tilt;
 
-        // multiply current by inverse, need to fix initial condition where the initial quat = current quat
-        delta.w = curr.w * inverse.w - curr.x * inverse.x - curr.y * inverse.y - curr.z * inverse.z;
-        delta.x = curr.w * inverse.x + curr.x * inverse.w + curr.y * inverse.z - curr.z * inverse.y;
-        delta.y = curr.w * inverse.y - curr.x * inverse.z + curr.y * inverse.w + curr.z * inverse.x;
-        delta.z = curr.w * inverse.z + curr.x * inverse.y - curr.y * inverse.x + curr.z * inverse.w;
-
-        // get z-axis rotation by converting delta quaternion to euler angles
-        Vec3 values = quaternionToEuler(delta.w, delta.x, delta.y, delta.z,false);
-
-        sensor_reading.tilt = values.z;
-        //Serial.println("---------");
-        //Serial.println(sensor_reading.tilt);
-        // Serial.print("Raw Euler - X: ");
-        // Serial.print(euler.x, 2);
-        // Serial.print(", Y: ");
-        // Serial.print(-euler.y, 2);
-        // Serial.print(", Z: ");
-        // Serial.print(euler.z, 2);
-        // Serial.print(" | Filtered Euler - X: ");
-        // Serial.print(filtered_euler.x, 2);
-        // Serial.print(", Y: ");
-        // Serial.print(filtered_euler.y, 2);
-        // Serial.print(", Z: ");
-        // Serial.println(filtered_euler.z, 2);
-
-        // Simulate a delay to match the report interval
-        //delay(REPORT_INTERVAL_US / 1000);
-
+        // Serial.print("TILT: ");
+        // Serial.println(filtered_tilt * (180/3.14f));
+        
         return sensor_reading;
     }
     return {.has_data = false};
