@@ -13,10 +13,10 @@
  * @return New FSM State
 */
 FSMState FSM::tick_fsm(FSMState& state, RocketSystems* arg) {
-
     switch (state) {
         case FSMState::STATE_IDLE:
             if (arg->rocket_data.commands.getRecent().command.data[0] == (uint8_t) 0) {
+                Serial.println("Swapping to STATE_ON");
                 state = FSMState::STATE_ON;
                 camera_on_off(arg->cameras.cam1);
                 camera_on_off(arg->cameras.cam2);
@@ -28,6 +28,7 @@ FSMState FSM::tick_fsm(FSMState& state, RocketSystems* arg) {
         case FSMState::STATE_ON:
             if (arg->rocket_data.commands.getRecent().command.data[0] == (uint8_t) 1) {
                 state = FSMState::STATE_RECORDING_ASCENT;
+                digitalWrite(VIDEO_SELECT, LOW);
             }
             break;
 
