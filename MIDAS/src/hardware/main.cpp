@@ -78,7 +78,7 @@ void setup() {
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL);
     Wire1.begin(PYRO_SDA, PYRO_SCL);
-    i2cscanner();
+
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
 	pinMode(KX134_CS, OUTPUT);
@@ -104,9 +104,14 @@ void setup() {
     gpioPinMode(LED_ORANGE, OUTPUT);
     gpioPinMode(LED_RED, OUTPUT);
 
+    gpioPinMode(PYROA_FIRE_PIN, OUTPUT, 1);
+    gpioPinMode(PYROB_FIRE_PIN, OUTPUT, 1);
+    gpioPinMode(PYROC_FIRE_PIN, OUTPUT, 1);
+    gpioPinMode(PYROD_FIRE_PIN, OUTPUT, 1);
+    gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT, 1);
+
     delay(200);
-    gpioDigitalWrite(LED_RED, HIGH);
-    delay(20000);
+
     //init and start threads
     begin_systems(&systems);
 }
