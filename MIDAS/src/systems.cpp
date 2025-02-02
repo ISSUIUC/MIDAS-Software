@@ -72,12 +72,21 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
+<<<<<<< HEAD
         // Serial.print("lowg ");
         // Serial.print(lowglsm.ax);
         // Serial.print(" ");
         // Serial.print(lowglsm.ay);
         // Serial.print(" ");
         // Serial.println(lowglsm.az);
+=======
+        Serial.print("Highg ");
+        Serial.print(highg.ax);
+        Serial.print(" ");
+        Serial.print(highg.ay);
+        Serial.print(" ");
+        Serial.println(highg.az);
+>>>>>>> c8f8f5c (lora driver half fix)
         THREAD_SLEEP(2);
     }
 }
