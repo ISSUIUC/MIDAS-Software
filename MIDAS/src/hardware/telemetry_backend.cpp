@@ -61,9 +61,9 @@ ErrorCode TelemetryBackend::init() {
     if (!rf95.setFrequency(RF95_FREQ)) {
         return ErrorCode::RadioSetFrequencyFailed;
     }
-    rf95.setSignalBandwidth(125000);
+    rf95.setSignalBandwidth(250000);
     rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
+    rf95.setSpreadingFactor(8);
     rf95.setPayloadCRC(true);
     /*
      * The default transmitter power is 13dBm, using PA_BOOST.

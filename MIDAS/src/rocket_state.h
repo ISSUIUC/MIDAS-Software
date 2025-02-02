@@ -154,6 +154,21 @@ public:
 };
 
 /**
+ * @struct CommandFlags
+ * 
+ * @brief Stores the status of commands from telemetry as boolean flags, commands are set whenever the corresponding telemetry command comes in.
+ */
+struct CommandFlags {
+    bool should_reset_kf = false;               // CommandType::RESET_KF
+    bool should_transition_safe = false;        // CommandType::SWITCH_TO_SAFE
+    bool should_transition_idle = false;        // CommandType::SWITCH_TO_IDLE
+    bool should_transition_pyro_test = false;   // CommandType::SWITCH_TO_PYRO_TEST
+    bool should_fire_pyro_a = false;            // CommandType::FIRE_PYRO_A
+    bool should_fire_pyro_b = false;            // CommandType::FIRE_PYRO_B
+    bool should_fire_pyro_c = false;            // CommandType::FIRE_PYRO_C
+    bool should_fire_pyro_d = false;            // CommandType::FIRE_PYRO_D
+};
+/**
  * @struct RocketData
  * 
  * @brief The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
@@ -176,6 +191,9 @@ public:
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
+    
+    CommandFlags command_flags;
+    
 
     Latency log_latency;
 };

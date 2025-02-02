@@ -33,10 +33,14 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 420;
+
+
+float RF95_FREQ = 426.15;
 float SUSTAINER_FREQ = 426.15;
+
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
+float rf95_freq_MHZ = 434.00;
 
 float current_freq = 0;
 
@@ -65,25 +69,51 @@ constexpr const char* json_receive_failure = R"({"type": "receive_error", "error
 constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
 constexpr int max_command_retries = 5;
 
+bool last_ack_bit = false;
+
 
 template <typename T>
 float convert_range(T val, float range) {
     size_t numeric_range = (int64_t)std::numeric_limits<T>::max() - (int64_t)std::numeric_limits<T>::min() + 1;
-    return static_cast<float>(val) * range / (float)numeric_range;
+    return val * range / (float)numeric_range;
 }
 
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
-    int16_t alt;
-    int16_t baro_alt;
+
+    uint16_t alt; //15 bit meters, 1 bit last command confirm
+    uint16_t baro_alt;
     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint16_t highg_ay;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
-    uint16_t highg_az;  //1bit sign 13 bit unsigned [0,16) 2 bit tilt angle
+    uint16_t highg_ay;  //14 bit signed ax [-16,16) 2 bit tilt angle
+    uint16_t highg_az;  //14 bit signed ax [-16,16) 2 bit tilt angle
+
     uint8_t batt_volt;
-    uint8_t fsm_satcount;
+    
+    // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
+    //
+    // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
+    
+    uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+    uint16_t kf_vx; // 16 bit meters/second
+    uint32_t pyro; // 7 bit continuity 4 bit tilt
     float RSSI = 0.0;
 };
+
+// struct TelemetryPacket {
+//     int32_t lat;
+//     int32_t lon;
+//     uint16_t alt; //15 bit meters, 1 bit last command confirm
+//     uint16_t baro_alt;
+//     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
+//     uint16_t highg_ay; //14 bit signed ax [-16,16) 2 bit tilt angle
+//     uint16_t highg_az; //14 bit signed ax [-16,16) 2 bit tilt angle
+//     uint8_t batt_volt;
+//     // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
+//     //
+//     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
+//     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+// };
 
 struct FullTelemetryData {
     systime_t timestamp;  //[0, 2^32]
@@ -100,34 +130,32 @@ struct FullTelemetryData {
     float freq;
     float rssi;
     float sat_count;
+    float pyros[4];
     bool is_sustainer;
+    uint16_t kf_vx
 };
 
 
 
-enum class CommandType { SET_FREQ, SET_CALLSIGN, ABORT, TEST_FLAP, EMPTY };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, EMPTY };
 // Commands transmitted from ground station to rocket
-struct telemetry_command {
+struct TelemetryCommand {
     CommandType command;
-    int id;
     union {
         char callsign[8];
         float freq;
         bool do_abort;
     };
-    std::array<char, 6> verify = {{'A', 'Y', 'B', 'E', 'R', 'K'}};
+    std::array<char, 3> verify = {{'B', 'R', 'K'}};
 };
 
 struct TelemetryCommandQueueElement {
-    telemetry_command command;
+    TelemetryCommand command;
     int retry_count;
 };
 
 std::queue<TelemetryCommandQueueElement> cmd_queue;
 std::queue<FullTelemetryData> print_queue;
-
-
-
 
 void printFloat(float f, int precision = 5) {
     if (isinf(f) || isnan(f)) {
@@ -166,20 +194,25 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.longitude = ConvertGPS(packet.lon);
     data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
     int tilt = decodeLastTwoBits(packet.highg_ax, packet.highg_ay, packet.highg_az);
+    tilt |= (packet.pyro >> 28 & (0xF)) << 6;
     int16_t ax = packet.highg_ax & 0xfffc;
     int16_t ay = packet.highg_ay & 0xfffc;
     int16_t az = packet.highg_az & 0xfffc;
     data.highG_ax = convert_range<int16_t>(ax, 32);
     data.highG_ay = convert_range<int16_t>(ay, 32);
     data.highG_az = convert_range<int16_t>(az, 32);
-    data.tilt_angle = tilt; //convert_range(tilt, 180); // [-90, 90]
+    data.tilt_angle = tilt / 1023. * 180; // Returns tilt angle in range [0, 180]
     data.battery_voltage = convert_range(packet.batt_volt, 16);
-    data.sat_count = packet.fsm_satcount >> 4 & 0b0111;
-    data.is_sustainer = (packet.fsm_satcount >> 7);
-    data.FSM_State = packet.fsm_satcount & 0b1111;
+    data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
+    data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
+    data.FSM_State = packet.fsm_callsign_satcount & 0b1111;
+    data.pyros[0] = ((float) ((packet.pyro >> 0) & (0x7F)) / 127.) * 12.;
+    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
+    data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
+    data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
 
     // kinda hacky but it will work
-    if (packet.fsm_satcount == static_cast<uint8_t>(-1)) {
+    if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
     }
 
@@ -239,7 +272,12 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("frequency", packet.freq);
     printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count);
-    printJSONField("is_sustainer", packet.is_sustainer, false);
+    printJSONField("kf_velocity", packet.kf_vx);
+    printJSONField("is_sustainer", packet.is_sustainer);
+    printJSONField("pyro_a", packet.pyros[0]);
+    printJSONField("pyro_b", packet.pyros[1]);
+    printJSONField("pyro_c", packet.pyros[2]);
+    printJSONField("pyro_d", packet.pyros[3], false);
     Serial.println("}}");
 }
 
@@ -255,7 +293,7 @@ void PrintDequeue() {
 void SerialError() { Serial.println(json_command_parse_error); }
 
 void set_freq_local_bug_fix(float freq) {
-    telemetry_command t;
+    TelemetryCommand t;
     t.command = CommandType::EMPTY;
     rf95.send((uint8_t*)&t, 0);
     Serial.println(sizeof(t));
@@ -272,43 +310,50 @@ void SerialInput(const char* key, const char* value) {
         Serial.println(json_buffer_full_error);
         return;
     }
-    telemetry_command command{};
-    if (strcmp(key, "ABORT") == 0) {
-        command.command = CommandType::ABORT;
-        command.do_abort = true;
-    } else if (strcmp(key, "FREQ") == 0) {
-        command.command = CommandType::SET_FREQ;
-        float v = atof(value);
-        command.freq = min(max(v, 390), 445);
-    } else if (strcmp(key, "CALLSIGN") == 0) {
-        command.command = CommandType::SET_CALLSIGN;
-        memset(command.callsign, ' ', sizeof(command.callsign));
-        memcpy(command.callsign, value, min(strlen(value), sizeof(command.callsign)));
-    } else if (strcmp(key, "FLOC") == 0) {
-        float v = atof(value);
-        v = min(max(v, 390), 445);
-        set_freq_local_bug_fix(v);
-        Serial.println(json_command_success);
-        Serial.print(R"({"type": "freq_success", "frequency":)");
-        Serial.print(v);
-        Serial.println("}");
-        return;
-    } else if (strcmp(key, "FLAP") == 0) {
-        command.command = CommandType::TEST_FLAP;
+
+    TelemetryCommand command{};
+
+    if (strcmp(key, "RESET_KF") == 0) {
+        command.command = CommandType::RESET_KF;
+    } else if (strcmp(key, "SAFE") == 0) {
+        command.command = CommandType::SWITCH_TO_SAFE;
+    } else if (strcmp(key, "IDLE") == 0) {
+        command.command = CommandType::SWITCH_TO_IDLE;
+    } else if (strcmp(key, "PT") == 0) {
+        command.command = CommandType::SWITCH_TO_PYRO_TEST;
+    } else if (strcmp(key, "PA") == 0) {
+        command.command = CommandType::FIRE_PYRO_A;
+    } else if (strcmp(key, "PB") == 0) {
+        command.command = CommandType::FIRE_PYRO_B;
+    } else if (strcmp(key, "PC") == 0) {
+        command.command = CommandType::FIRE_PYRO_C;
+    } else if (strcmp(key, "PD") == 0) {
+        command.command = CommandType::FIRE_PYRO_D;
     } else {
-        SerialError();
+        Serial.println("bad command");
         return;
     }
+
+
     Serial.println(json_command_success);
-    command_ID++;
-    command.id = command_ID;
-    cmd_queue.push({command, 0});
+    // Send the command until acknowledge or 5 attempts
+    cmd_queue.push({command, 5});
+}
+
+void handle_acknowledge() {
+    if (!cmd_queue.empty()) {
+        cmd_queue.pop();
+    }
 }
 
 void process_command_queue() {
     if (cmd_queue.empty()) return;
-    TelemetryCommandQueueElement cmd = cmd_queue.front();
+    TelemetryCommandQueueElement& cmd = cmd_queue.front();
+    cmd.retry_count --;
+
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
+
+    Serial.printf("The command is: %d\n", cmd.command);
     rf95.waitPacketSent();
 }
 
@@ -324,31 +369,34 @@ void setup() {
     }
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.println(json_init_success);
-    #ifdef IS_GROUND
-    if (!rf95.setFrequency(RF95_FREQ)) {
+    if (!rf95.setFrequency(rf95_freq_MHZ)) {
         Serial.println(json_set_frequency_failure);
         while (1);
     }
     
-    current_freq = RF95_FREQ;
-    #endif
-    #ifdef IS_DRONE
-    if (!rf95.setFrequency(SUSTAINER_FREQ)) {
-        Serial.println(json_set_frequency_failure);
+    current_freq = rf95_freq_MHZ;
+    // #ifdef IS_DRONE
+    // if (!rf95.setFrequency(SUSTAINER_FREQ)) {
+    //     Serial.println(json_set_frequency_failure);
         
-        while (1);
+    //     while (1);
 
-    }
-    current_freq = SUSTAINER_FREQ;
-    #endif
+    // }
+    // current_freq = SUSTAINER_FREQ;
+    // #endif
     rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
+    rf95.setSpreadingFactor(8);
+
     rf95.setPayloadCRC(true);
-    rf95.setSignalBandwidth(125000);
+
+    rf95.setSignalBandwidth(250000);
+    rf95.setPreambleLength(8);
+
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(current_freq);
     Serial.println("}");
     rf95.setTxPower(23, false);
+
 }
 
 void ChangeFrequency(float freq) {
@@ -360,139 +408,102 @@ void ChangeFrequency(float freq) {
     Serial.println("}");
 }
 
-#ifdef IS_GROUND
-
 void loop() {
-    
-    PrintDequeue();
     if (rf95.available()) {
+        Serial.println("Packet received!");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        TelemetryPacket packet;
         uint8_t len = sizeof(buf);
-
         if (rf95.recv(buf, &len)) {
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(50);
-            digitalWrite(LED_BUILTIN, LOW);
-            // Serial.println("Received packet");
-            // Serial.println(len);
-            memcpy(&packet, buf, sizeof(packet));
-            EnqueuePacket(packet, current_freq);
-            if (!cmd_queue.empty()) {
-                auto& cmd = cmd_queue.front();
-                    cmd.retry_count++;
-                    if (cmd.retry_count >= max_command_retries) {
-                        cmd_queue.pop();
-                        Serial.println(json_send_failure);
-                    }
-            }
-
-            process_command_queue();
-
+            Serial.print("Received: ");
+            Serial.println((char*)buf);
+            delay(2000);
         } else {
-            Serial.println(json_receive_failure);
-        }
-    }
-    serial_parser.read();
-    if (Serial.available()) {
-        String input = Serial.readStringUntil('\n');
-        if (input.startsWith("FREQ:")) {
-            float freq = input.substring(5).toFloat(); // Extract frequency value
-            set_freq_local_bug_fix(freq);
-            RF95_FREQ = freq;
-            current_freq = freq;
+            Serial.println("Receive failed");
         }
     }
 }
-#endif
 
+// #ifdef IS_DRONE
+// unsigned long prev_time = 0;
+// unsigned long heartbeat_time = 0;
 
+// uint8_t readBatteryVoltage() {
+//     int batteryADC = analogRead(9);
+//     float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0; //5.0Vmax
+//     if (batteryVoltage > 5.0) {
+//         batteryVoltage = 5.0;
+//     }
+//     if (batteryVoltage < 0.0) {
+//         batteryVoltage = 0.0;
+//     }
 
-#ifdef IS_DRONE
-unsigned long prev_time = 0;
-unsigned long heartbeat_time = 0;
+//     uint8_t battery = static_cast<uint8_t>((batteryVoltage/5.0)*255);
+//     return battery;
+// }
 
-uint8_t readBatteryVoltage() {
-    int batteryADC = analogRead(9);
-    float batteryVoltage = (batteryADC * 3.3 * 2) / 1024.0; //5.0Vmax
-    if (batteryVoltage > 5.0) {
-        batteryVoltage = 5.0;
-    }
-    if (batteryVoltage < 0.0) {
-        batteryVoltage = 0.0;
-    }
-
-    uint8_t battery = static_cast<uint8_t>((batteryVoltage/5.0)*255);
-    return battery;
-}
-
-
-void loop() {
+// void loop() {
     
-    PrintDequeue();
-    unsigned long current_time = millis();
-    if (current_time - prev_time > 2000) {
-        if(current_freq == SUSTAINER_FREQ) {
-            ChangeFrequency(BOOSTER_FREQ);
-            current_freq = BOOSTER_FREQ;
-            Serial.println("Sustainer timeout, Switching to booster freq");
-        } else {
-            ChangeFrequency(SUSTAINER_FREQ);
-            current_freq = SUSTAINER_FREQ;
-            Serial.println("Booster timeout, Switching to sustainer freq");
-        }
-        prev_time = millis();
-    }
-    if(millis() - heartbeat_time > 2000) {
-        Serial.println("Heartbeat");
-        TelemetryPacket packet;
-        rf95.setFrequency(GROUND_FREQ);
-        packet.batt_volt = readBatteryVoltage();
-        packet.fsm_satcount = -1;
-        rf95.send((uint8_t*)&packet, sizeof(packet)); 
-        rf95.waitPacketSent();
-        rf95.setFrequency(current_freq);
-        heartbeat_time = millis();
-    }
-    if (rf95.available()) {
-        TelemetryPacket packet;
-        uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
-        uint8_t len = sizeof(buf);
+//     PrintDequeue();
+//     unsigned long current_time = millis();
+//     if (current_time - prev_time > 2000) {
+//         if(current_freq == SUSTAINER_FREQ) {
+//             ChangeFrequency(BOOSTER_FREQ);
+//             current_freq = BOOSTER_FREQ;
+//             Serial.println("Sustainer timeout, Switching to booster freq");
+//         } else {
+//             ChangeFrequency(SUSTAINER_FREQ);
+//             current_freq = SUSTAINER_FREQ;
+//             Serial.println("Booster timeout, Switching to sustainer freq");
+//         }
+//         prev_time = millis();
+//     }
+//     if(millis() - heartbeat_time > 2000) {
+//         Serial.println("Heartbeat");
+//         TelemetryPacket packet;
+//         rf95.setFrequency(GROUND_FREQ);
+//         packet.batt_volt = readBatteryVoltage();
+//         packet.fsm_satcount = -1;
+//         rf95.send((uint8_t*)&packet, sizeof(packet)); 
+//         rf95.waitPacketSent();
+//         rf95.setFrequency(current_freq);
+//         heartbeat_time = millis();
+//     }
+//     if (rf95.available()) {
+//         TelemetryPacket packet;
+//         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+//         uint8_t len = sizeof(buf);
 
-        if (rf95.recv(buf, &len)) {
-            Serial.print("Recieved ");
-            Serial.print(len);
-            Serial.print(" bytes on ");
-            Serial.println(current_freq);
+//         if (rf95.recv(buf, &len)) {
+//             Serial.print("Recieved ");
+//             Serial.print(len);
+//             Serial.print(" bytes on ");
+//             Serial.println(current_freq);
             
 
-            digitalWrite(LED_BUILTIN, HIGH);
-            delay(50);
-            digitalWrite(LED_BUILTIN, LOW);
-            memcpy(&packet, buf, sizeof(packet));
-            packet.RSSI = rf95.lastRssi();
-            EnqueuePacket(packet, current_freq);
-            set_freq_local_bug_fix(GROUND_FREQ);
-            rf95.send((uint8_t*)&packet, sizeof(packet)); 
+//             digitalWrite(LED_BUILTIN, HIGH);
+//             delay(50);
+//             digitalWrite(LED_BUILTIN, LOW);
+//             memcpy(&packet, buf, sizeof(packet));
+//             packet.RSSI = rf95.lastRssi();
+//             EnqueuePacket(packet, current_freq);
+//             set_freq_local_bug_fix(GROUND_FREQ);
+//             rf95.send((uint8_t*)&packet, sizeof(packet)); 
 
-            if(current_freq == SUSTAINER_FREQ) {
-                set_freq_local_bug_fix(BOOSTER_FREQ);
-                current_freq = BOOSTER_FREQ;
-                Serial.println("Switching to booster freq");
-            } else {
-                set_freq_local_bug_fix(SUSTAINER_FREQ);
-                current_freq = SUSTAINER_FREQ;
-                Serial.println("Switching to sust69ainer freq");
-            }
-            prev_time = millis();
-            // Serial.print(current_time);
-        } else {
-            Serial.println(json_receive_failure);
-        }
-    }
-    serial_parser.read();
-}
-#endif
-
-
-
+//             if(current_freq == SUSTAINER_FREQ) {
+//                 set_freq_local_bug_fix(BOOSTER_FREQ);
+//                 current_freq = BOOSTER_FREQ;
+//                 Serial.println("Switching to booster freq");
+//             } else {
+//                 set_freq_local_bug_fix(SUSTAINER_FREQ);
+//                 current_freq = SUSTAINER_FREQ;
+//                 Serial.println("Switching to sust69ainer freq");
+//             }
+//             prev_time = millis();
+//             // Serial.print(current_time);
+//         } else {
+//             Serial.println(json_receive_failure);
+//         }
+//     }
+//     serial_parser.read();
+// }
+// #endif

@@ -96,10 +96,13 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             arg->rocket_data.gps.update(reading);
 
             FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
+            CommandFlags& telem_commands = arg->rocket_data.command_flags;
+
+            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
             Continuity reading2 = arg->sensors.continuity.read();
+            // Serial.printf("Pyro A: %f\n", reading2.pins[0]);
             arg->rocket_data.continuity.update(reading2);
 
             Voltage reading3 = arg->sensors.voltage.read();
@@ -117,13 +120,35 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     bool already_played_freebird = false;
+    double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
+        CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
 
         arg->rocket_data.fsm_state.update(next_state);
+
+        if (current_state == FSMState::STATE_SAFE) {
+            if((current_time - last_time_led_flash) > 250) {
+                // Flashes green LED at 4Hz while in SAFE mode.
+                last_time_led_flash = current_time;
+                arg->led.toggle(LED::GREEN);
+            }
+        } else {
+            arg->led.set(LED::GREEN, LOW);
+        }
+
+        if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing()) {
+            arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
+        }
+
+        if (current_state == FSMState::STATE_LANDED && !arg->buzzer.is_playing()) {
+            arg->buzzer.play_tune(land_tone, LAND_TONE_LENGTH);
+        }
 
         if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
@@ -151,10 +176,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     TickType_t last = xTaskGetTickCount();
     
     while (true) {
-        if(yessir.should_reinit){
+        if(arg->rocket_data.command_flags.should_reset_kf){
             yessir.initialize(arg);
             TickType_t last = xTaskGetTickCount();
-            yessir.should_reinit = false;
+            arg->rocket_data.command_flags.should_reset_kf = false;
         }
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
@@ -184,18 +209,59 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
         
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        if (current_state == FSMState(STATE_IDLE)) {
+        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST)) {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 2000)) {
+            if (arg->tlm.receive(&command, 500)) {
                 if(command.valid()) {
                     arg->tlm.acknowledgeReceived();
+                    
+                    // maybe we should move this somewhere else but it can stay here for now
                     switch(command.command) {
                         case CommandType::RESET_KF:
-                            yessir.should_reinit = true;
+                            arg->rocket_data.command_flags.should_reset_kf = true;
+                            break;
+                        case CommandType::SWITCH_TO_SAFE:
+                            arg->rocket_data.command_flags.should_transition_safe = true;
+                            break;
+                        case CommandType::SWITCH_TO_PYRO_TEST:
+                            arg->rocket_data.command_flags.should_transition_pyro_test = true;
+                            break;
+                        case CommandType::SWITCH_TO_IDLE:
+                            arg->rocket_data.command_flags.should_transition_idle = true;
+                            break;
+                        case CommandType::FIRE_PYRO_A:
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_a = true;
+                            }
+                            break;
+                        case CommandType::FIRE_PYRO_B:
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_b = true;
+                            }
+                            break;
+                        case CommandType::FIRE_PYRO_C:
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_c = true;
+                            }
+                            break;
+                        case CommandType::FIRE_PYRO_D:
+                            if (current_state == FSMState::STATE_PYRO_TEST) {
+                                arg->rocket_data.command_flags.should_fire_pyro_d = true;
+                            }
                             break;
                         default:
-                            break; 
+                            break; // how
                     }
+                    // switch(command.command) {
+                    //     // case CommandType::RESET_KF:
+                    //     //     // yessir.should_reinit = true;
+                    //     //     break;
+                    //     case CommandType::SWITCH_TO_SAFE:
+                    //         break;
+                    //     case CommandType::
+                    //     default:
+                    //         break; 
+                    // }
                 }
 
             }
@@ -271,9 +337,9 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
     }
 }
 
