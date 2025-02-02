@@ -71,12 +71,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        // Serial.print("Highg ");
-        // Serial.print(highg.ax);
-        // Serial.print(" ");
-        // Serial.print(highg.ay);
-        // Serial.print(" ");
-        // Serial.println(highg.az);
+        Serial.print("Highg ");
+        Serial.print(highg.ax);
+        Serial.print(" ");
+        Serial.print(highg.ay);
+        Serial.print(" ");
+        Serial.println(highg.az);
         THREAD_SLEEP(2);
     }
 }
@@ -267,12 +267,13 @@ ErrorCode init_systems(RocketSystems& systems) {
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError) {
         // todo some message probably
+        Serial.print("Had Error: ");
+        Serial.print((int) init_error_code);
+        Serial.print("\n");
+        Serial.flush();
+        update_error_LED(init_error_code);
         while (true) {
-            Serial.print("Had Error: ");
-            Serial.print((int) init_error_code);
-            Serial.print("\n");
-            Serial.flush();
-            update_error_LED(init_error_code);
+
         }
     }
 

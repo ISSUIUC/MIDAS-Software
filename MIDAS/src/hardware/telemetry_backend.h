@@ -42,7 +42,7 @@ public:
         gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
-//        Serial.println("Sending bytes");
+        Serial.println("Sending bytes");
         tx_done = false;
         Radio.Send((uint8_t*) &data, sizeof(T));
 

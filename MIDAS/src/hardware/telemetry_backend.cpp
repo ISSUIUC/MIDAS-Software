@@ -28,7 +28,6 @@
 
 static RadioEvents_t RadioEvents;
 
-#define RF_FREQUENCY 430000000  // Hz (430 MHz)
 #define TX_OUTPUT_POWER 22		// dBm
 #define LORA_BANDWIDTH 0		// [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
 #define LORA_SPREADING_FACTOR 8// [SF7..SF12]
