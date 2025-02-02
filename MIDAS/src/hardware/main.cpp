@@ -8,6 +8,45 @@
 #include "hardware/SDLog.h"
 #include "sensor_data.h"
 
+
+void i2cscanner() {
+    byte error, address;
+    int nDevices;
+ 
+  Serial.println("Scanning...");
+ 
+  nDevices = 0;
+  for(address = 1; address < 127; address++ )
+  {
+    // The i2c_scanner uses the return value of
+    // the Write.endTransmisstion to see if
+    // a device did acknowledge to the address.
+    Wire.beginTransmission(address);
+    error = Wire.endTransmission();
+ 
+    if (error == 0)
+    {
+      Serial.print("I2C device found at address 0x");
+      if (address<16)
+        Serial.print("0");
+      Serial.print(address,HEX);
+      Serial.println("  !");
+ 
+      nDevices++;
+    }
+    else if (error==4)
+    {
+      Serial.print("Unknown error at address 0x");
+      if (address<16)
+        Serial.print("0");
+      Serial.println(address,HEX);
+    }    
+  }
+  if (nDevices == 0)
+    Serial.println("No I2C devices found\n");
+  else
+    Serial.println("done\n");
+}
 /**
  * Sets the config file and then starts all the threads using the config.
  */
@@ -38,7 +77,8 @@ void setup() {
     //begin I2C bus
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL);
-
+    Wire1.begin(PYRO_SDA, PYRO_SCL);
+    i2cscanner();
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
 	pinMode(KX134_CS, OUTPUT);
@@ -65,7 +105,8 @@ void setup() {
     gpioPinMode(LED_RED, OUTPUT);
 
     delay(200);
-
+    gpioDigitalWrite(LED_RED, HIGH);
+    delay(20000);
     //init and start threads
     begin_systems(&systems);
 }

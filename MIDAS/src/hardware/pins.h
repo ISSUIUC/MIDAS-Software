@@ -37,6 +37,9 @@
 #define I2C_SDA 10
 #define I2C_SCL 9
 
+#define PYRO_SDA 41
+#define PYRO_SCL 42
+
 // CAN pins
 #define CAN_CS 2
 #define RFM96W_CS 5

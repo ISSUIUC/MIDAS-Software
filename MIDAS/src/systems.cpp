@@ -71,12 +71,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        Serial.print("Highg ");
-        Serial.print(highg.ax);
-        Serial.print(" ");
-        Serial.print(highg.ay);
-        Serial.print(" ");
-        Serial.println(highg.az);
+        // Serial.print("Highg ");
+        // Serial.print(highg.ax);
+        // Serial.print(" ");
+        // Serial.print(highg.ay);
+        // Serial.print(" ");
+        // Serial.println(highg.az);
         THREAD_SLEEP(2);
     }
 }
