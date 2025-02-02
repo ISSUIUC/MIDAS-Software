@@ -70,7 +70,7 @@ void setup() {
 
     delay(200);
 
-    //begin sensor SPI bus
+    // begin sensor SPI bus
     Serial.println("Starting SPI...");
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
 
