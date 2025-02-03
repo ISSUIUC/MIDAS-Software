@@ -7,7 +7,7 @@
 #define CONT_VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))       //voltage divider for continuity voltage, check hardware schematic
 
 // Reads the given register from the pyro power monitor
-int read_reg(int reg, int bytes) {
+int read_pwr_monitor_register(int reg, int bytes) {
     Wire1.beginTransmission(0x41); // I2C Address 0x41 is pyro pwr monitor
     Wire1.write(reg);
     if(Wire1.endTransmission()){
@@ -62,23 +62,26 @@ Continuity ContinuitySensor::read() {
     //ADC reference voltage is 3.3, returns 12 bit value
 
     // MIDAS 2.1 rev A ADC sense fix:
-    int16_t current = read_reg(0x7, 2);
-    int voltage = read_reg(0x5, 2);
+    int16_t current = read_pwr_monitor_register(0x7, 2);
+    int voltage = read_pwr_monitor_register(0x5, 2);
 
     float voltage_normalized = voltage * 3.125 / 1000.0; // V
 
     float continuous_channels = 0.0;
-    if(voltage_normalized > 1) {
-        float current_normalized = current * 1.2 / 1000.0;
+    float absolute_current = 0.0;
+    float expected_current = 0.0;
 
-        float expected_current = (voltage_normalized - 0.2) / 470.0; // Account for diode voltage drop
-        continuous_channels = current_normalized / expected_current;
+    if(voltage_normalized > 1) {
+        absolute_current = current * 1.2 / 1000.0;
+
+        expected_current = (voltage_normalized - 0.2) / 470.0; // Account for diode voltage drop
+        continuous_channels = absolute_current / expected_current;
     }
 
     // We don't have the granularity to determine individual voltages, so all of them will give the # of continuous channels
-    continuity.pins[0] = continuous_channels;
-    continuity.pins[1] = continuous_channels;
-    continuity.pins[2] = continuous_channels;
-    continuity.pins[3] = continuous_channels;
+    continuity.pins[0] = continuous_channels; // Number of continuous channels on the pyro bus
+    continuity.pins[1] = absolute_current;    // The absolute current running through the pyro bus
+    continuity.pins[2] = expected_current;    // Calculated expected current based on current pyro bus voltage
+    continuity.pins[3] = voltage_normalized;  // Pyro bus voltage
     return continuity;
 }
