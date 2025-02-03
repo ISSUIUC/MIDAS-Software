@@ -34,8 +34,6 @@ public:
 
     FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& telem_commands);
 
-    double get_launch_time();
-
 private:
     double launch_time;
     double burnout_time;
