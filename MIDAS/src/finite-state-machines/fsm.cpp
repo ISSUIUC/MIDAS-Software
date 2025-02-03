@@ -502,3 +502,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
     return state;
 }
 #endif
+
+double FSM::get_launch_time() {
+    return launch_time;
+}

@@ -205,11 +205,20 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
+    double launch_time = 0;
+
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
         
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST)) {
+
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+
+        if (current_state == FSMState::STATE_IDLE) {
+            launch_time = current_time;
+        }
+
+        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 500)) {
                 if(command.valid()) {
