@@ -124,14 +124,9 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
             arg->rocket_data.pyro.update(new_pyro_state);
 
-<<<<<<< HEAD
             Continuity reading2 = arg->sensors.continuity.read();
             // Serial.printf("Pyro A: %f\n", reading2.pins[0]);
             arg->rocket_data.continuity.update(reading2);
-=======
-            // Continuity reading2 = arg->sensors.continuity.read();
-            // arg->rocket_data.continuity.update(reading2);
->>>>>>> 2932dd3 (systems)
 
             Voltage reading3 = arg->sensors.voltage.read();
             arg->rocket_data.voltage.update(reading3);
