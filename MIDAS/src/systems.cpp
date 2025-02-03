@@ -71,12 +71,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        Serial.print("Highg ");
-        Serial.print(highg.ax);
-        Serial.print(" ");
-        Serial.print(highg.ay);
-        Serial.print(" ");
-        Serial.println(highg.az);
+        // Serial.print("Highg ");
+        // Serial.print(highg.ax);
+        // Serial.print(" ");
+        // Serial.print(highg.ay);
+        // Serial.print(" ");
+        // Serial.println(highg.az);
         THREAD_SLEEP(2);
     }
 }
@@ -121,8 +121,8 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
             arg->rocket_data.pyro.update(new_pyro_state);
 
-            // Continuity reading2 = arg->sensors.continuity.read();
-            // arg->rocket_data.continuity.update(reading2);
+            Continuity reading2 = arg->sensors.continuity.read();
+            arg->rocket_data.continuity.update(reading2);
 
             Voltage reading3 = arg->sensors.voltage.read();
             arg->rocket_data.voltage.update(reading3);
