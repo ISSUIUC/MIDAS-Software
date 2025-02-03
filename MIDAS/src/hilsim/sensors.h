@@ -2,58 +2,60 @@
 
 #include "errors.h"
 #include "sensor_data.h"
-
+#include "pins.h"
 struct LowGSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    LowGData read() { return lowg; }
+    ErrorCode init();
+    LowGData read();
     LowGData lowg;
 };
 
 struct HighGSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    HighGData read() { return highg; }
+    ErrorCode init();
+    HighGData read();
     HighGData highg;
 };
 
 struct MagnetometerSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    Magnetometer read() { return mag; }
+    ErrorCode init();
+    Magnetometer read();
     Magnetometer mag;
 };
 
 struct BarometerSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    Barometer read() { return barometer; }
+    ErrorCode init();
+    Barometer read();
     Barometer barometer;
 };
 
 struct LowGLSMSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    LowGLSM read() { return lowglsm; }
+    ErrorCode init();
+    LowGLSM read();
     LowGLSM lowglsm;
 };
 
 struct ContinuitySensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    Continuity read() { return continuity; }
+    ErrorCode init();
+    Continuity read();
     Continuity continuity;
 };
 
 struct VoltageSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    Voltage read() { return voltage; }
+    ErrorCode init();
+    Voltage read() ;
     Voltage voltage;
 };
 
 struct OrientationSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    Orientation read() { return orient; }
+    ErrorCode init();
+    Orientation read();
+    Orientation initial_orientation;
+    uint8_t initial_flag;
     Orientation orient;
 };
 
 struct GPSSensor {
-    ErrorCode init() { return ErrorCode::NoError; }
-    GPS read() { return gps; }
+    ErrorCode init();
+    GPS read();
     GPS gps;
 };
 

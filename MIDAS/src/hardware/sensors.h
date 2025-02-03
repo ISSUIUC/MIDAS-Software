@@ -1,6 +1,6 @@
 #pragma once
 
-#include "errors.h"
+#include "../errors.h"
 #include "sensor_data.h"
 #include "hardware/pins.h"
 

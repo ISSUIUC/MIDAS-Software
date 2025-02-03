@@ -8,11 +8,8 @@
 
 #include "sensor_data.h"
 #include "log_checksum.h"
-#include "global_packet.h"
 
 #include "SDLog.h"
-
-HILSIMPacket global_packet = HILSIMPacket_init_zero;
 
 MultipleLogSink<SDSink> sink;
 RocketSystems systems{.log_sink = sink};
