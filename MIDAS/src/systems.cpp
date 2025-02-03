@@ -314,6 +314,7 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
         PyroState data = arg->rocket_data.pyro.getRecentUnsync();
         Serial.write((char*) &data, sizeof(PyroState));
         Serial.flush();
+        THREAD_SLEEP(1);
     }
 }
 #endif
