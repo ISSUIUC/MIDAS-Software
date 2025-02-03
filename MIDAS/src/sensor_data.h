@@ -231,21 +231,18 @@ struct KalmanData {
 };
 
 /**
- * @struct PyroChannel
- * 
- * @brief data about a specific pyro channel
-*/
-struct PyroChannel {
-    bool is_armed = false;
-    bool is_firing = false;
-};
-
-/**
  * @struct PyroState
  * 
  * @brief data regarding all pyro channels
 */
 struct PyroState {
     bool is_global_armed = false;
-    PyroChannel channels[4];
+    bool channel_firing[4];
+    /**
+     * By convention, the pyro states are as follows:
+     * [0] PYRO A / APOGEE
+     * [1] PYRO B / MAIN
+     * [2] PYRO C / MOTOR
+     * [3] PYRO D / AUX
+     */
 };
