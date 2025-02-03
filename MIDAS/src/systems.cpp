@@ -11,6 +11,7 @@
 #error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
 #endif
 
+#define ENABLE_TELEM
 
 /**
  * @brief These are all the functions that will run in each task
@@ -71,12 +72,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-        Serial.print("Highg ");
-        Serial.print(highg.ax);
-        Serial.print(" ");
-        Serial.print(highg.ay);
-        Serial.print(" ");
-        Serial.println(highg.az);
+        // Serial.print("lowg ");
+        // Serial.print(lowglsm.ax);
+        // Serial.print(" ");
+        // Serial.print(lowglsm.ay);
+        // Serial.print(" ");
+        // Serial.println(lowglsm.az);
         THREAD_SLEEP(2);
     }
 }
@@ -330,7 +331,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.tlm);
+    #ifdef ENABLE_TELEM
+        INIT_SYSTEM(systems.tlm);
+    #endif
     INIT_SYSTEM(systems.sensors.gps);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
@@ -369,7 +372,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    #endif
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
