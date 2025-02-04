@@ -232,6 +232,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 
 void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
 // maybe we should move this somewhere else but it can stay here for now
+Serial.println((int) command.command);
     switch(command.command) {
         case CommandType::RESET_KF:
             arg->rocket_data.command_flags.should_reset_kf = true;
@@ -241,6 +242,7 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
             break;
         case CommandType::SWITCH_TO_PYRO_TEST:
             arg->rocket_data.command_flags.should_transition_pyro_test = true;
+            Serial.println("Changing to pyro test");
             break;
         case CommandType::SWITCH_TO_IDLE:
             arg->rocket_data.command_flags.should_transition_idle = true;
@@ -274,7 +276,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
     while (true) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
-        
+
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
 
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -285,9 +287,16 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 500) && command.valid()) {
-                arg->tlm.acknowledgeReceived();
-                handle_tlm_command(command, arg, current_state);
+            if (arg->tlm.receive(&command, 2000) == 0) {
+                Serial.print(command.verify[0]);
+                Serial.print(command.verify[1]);
+                Serial.print(command.verify[2]);
+                Serial.println("rec command");
+                if (command.valid()) {
+                    Serial.println("Valid command");
+                    arg->tlm.acknowledgeReceived();
+                    handle_tlm_command(command, arg, current_state);
+                }
             }
         }
         THREAD_SLEEP(1);

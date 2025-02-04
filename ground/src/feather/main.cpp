@@ -65,7 +65,7 @@ constexpr const char* json_init_success = R"({"type": "init_success"})";
 constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
 constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
 constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
-constexpr int max_command_retries = 5;
+constexpr int max_command_retries = 20;
 
 bool last_ack_bit = false;
 
@@ -131,6 +131,7 @@ struct FullTelemetryData {
     float pyros[4];
     bool is_sustainer;
     uint16_t kf_vx;
+    bool kf_reset;
 };
 
 
@@ -185,8 +186,6 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     int64_t start_printing = millis();
 
     FullTelemetryData data;
-    data.timestamp = start_printing;
-
     data.altitude = static_cast<float>(packet.alt);
     data.latitude = ConvertGPS(packet.lat);
     data.longitude = ConvertGPS(packet.lon);
@@ -208,7 +207,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
     data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
-
+    data.kf_reset = packet.alt & 1 == 1;
     // kinda hacky but it will work
     if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
@@ -275,6 +274,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("pyro_a", packet.pyros[0]);
     printJSONField("pyro_b", packet.pyros[1]);
     printJSONField("pyro_c", packet.pyros[2]);
+    printJSONField("kf_reset", packet.kf_reset);
     printJSONField("pyro_d", packet.pyros[3], false);
     Serial.println("}}");
 }
@@ -351,7 +351,6 @@ void process_command_queue() {
 
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
 
-    Serial.printf("The command is: %d\n", cmd.command);
     rf95.waitPacketSent();
 }
 
@@ -405,6 +404,12 @@ void ChangeFrequency(float freq) {
     Serial.print(freq);
     Serial.println("}");
 }
+
+// void loop() {
+//     rf95.send((uint8_t *) "greet thomas", strlen("hello thomas") + 1);
+//     delay(1000);
+//     rf95.handleInterrupt();
+// }
 
 void loop() {
     PrintDequeue();

@@ -41,7 +41,7 @@ struct TelemetryCommand {
     union {
         float new_freq;
     };
-    std::array<char, 3> verify = {{'B', 'R', 'K'}};
+    std::array<char, 3> verify;
 
     bool valid() {
         return verify == std::array<char, 3>{{'B','R','K'}};

@@ -52,12 +52,11 @@ public:
      * @return bool indicating a successful read and write to buffer
     */
     template<typename T>
-    bool read(T* write, int wait_milliseconds) {
+    int read(T* write, int wait_milliseconds) {
         static_assert(sizeof(T) <= 0xFF, "The data type to receive is too large");
         uint8_t len = sizeof(T);
         // set receive mode
-
-        return false;
+        return lora.recv((uint8_t*) write, len, wait_milliseconds);
     }
 
 private:

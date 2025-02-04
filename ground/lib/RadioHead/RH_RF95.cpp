@@ -340,14 +340,9 @@ bool RH_RF95::send(const uint8_t* data, uint8_t len)
 
     // Position at the beginning of the FIFO
     spiWrite(RH_RF95_REG_0D_FIFO_ADDR_PTR, 0);
-    // The headers
-    spiWrite(RH_RF95_REG_00_FIFO, _txHeaderTo);
-    spiWrite(RH_RF95_REG_00_FIFO, _txHeaderFrom);
-    spiWrite(RH_RF95_REG_00_FIFO, _txHeaderId);
-    spiWrite(RH_RF95_REG_00_FIFO, _txHeaderFlags);
     // The message data
     spiBurstWrite(RH_RF95_REG_00_FIFO, data, len);
-    spiWrite(RH_RF95_REG_22_PAYLOAD_LENGTH, len + RH_RF95_HEADER_LEN);
+    spiWrite(RH_RF95_REG_22_PAYLOAD_LENGTH, len);
     
     RH_MUTEX_LOCK(lock); // Multithreading support
     setModeTx(); // Start the transmitter
@@ -481,7 +476,7 @@ void RH_RF95::setTxPower(int8_t power, bool useRFO)
 void RH_RF95::setModemRegisters(const ModemConfig* config)
 {
     // Enable implicit header which is the 1st bit in the register
-    spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d & 0x01);
+    spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d);
     spiWrite(RH_RF95_REG_1E_MODEM_CONFIG2,       config->reg_1e);
     spiWrite(RH_RF95_REG_26_MODEM_CONFIG3,       config->reg_26);
 }

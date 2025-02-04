@@ -208,7 +208,7 @@ public:
 	void set_modulation_params(uint8_t spreading_factor, RadioLoRaBandwidths_t bandwidth, RadioLoRaCodingRates_t cr, bool low_data_rate);
 	void set_tx_power(int8_t dbm);
 	bool send(uint8_t* data, size_t len);
-	bool recv(uint8_t* data, size_t len, size_t timeout_ms);
+	int recv(uint8_t* data, size_t len, size_t timeout_ms);
 
 private:
 	void wait_on_busy();
@@ -235,5 +235,9 @@ private:
 	uint8_t pin_dio1;
 	uint8_t pin_rxen;
 	uint8_t pin_reset;
+	int prev_rssi;
+	int prev_snr;
+	int prev_signal_rssi;
+	int prev_rx_error;
 	SPISettings spiSettings = SPISettings(2000000, MSBFIRST, SPI_MODE0);
 };

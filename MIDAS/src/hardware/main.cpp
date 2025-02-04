@@ -64,6 +64,7 @@ RocketSystems systems { .log_sink = sinks };
 
 void setup() {
     //begin serial port
+    while (!Serial);
     Serial.begin(9600);
 
     delay(200);
