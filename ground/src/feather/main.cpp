@@ -38,7 +38,7 @@ float SUSTAINER_FREQ = 426.15;
 
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 434.00;
+float rf95_freq_MHZ = 426.15;
 
 float current_freq = 0;
 
@@ -95,7 +95,7 @@ struct TelemetryPacket {
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
     uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
-    float RSSI = 0.0;
+    float RSSI;
 };
 
 // struct TelemetryPacket {
@@ -130,7 +130,7 @@ struct FullTelemetryData {
     float sat_count;
     float pyros[4];
     bool is_sustainer;
-    uint16_t kf_vx
+    uint16_t kf_vx;
 };
 
 
@@ -213,7 +213,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
     }
-
+    data.kf_vx = packet.kf_vx;
     data.freq = RF95_FREQ;
     if(packet.RSSI == 0.0) {
         data.rssi = packet.RSSI;
@@ -407,16 +407,43 @@ void ChangeFrequency(float freq) {
 }
 
 void loop() {
+    PrintDequeue();
     if (rf95.available()) {
-        Serial.println("Packet received!");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+        TelemetryPacket packet;
         uint8_t len = sizeof(buf);
+
         if (rf95.recv(buf, &len)) {
-            Serial.print("Received: ");
-            Serial.println((char*)buf);
-            delay(2000);
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(50);
+            digitalWrite(LED_BUILTIN, LOW);
+            // Serial.println("Received packet");
+            // Serial.println(len);
+            memcpy(&packet, buf, sizeof(packet));
+            EnqueuePacket(packet, current_freq);
+            if (!cmd_queue.empty()) {
+                auto& cmd = cmd_queue.front();
+                    cmd.retry_count++;
+                    if (cmd.retry_count >= max_command_retries) {
+                        cmd_queue.pop();
+                        Serial.println(json_send_failure);
+                    }
+            }
+
+            process_command_queue();
+
         } else {
-            Serial.println("Receive failed");
+            Serial.println(json_receive_failure);
+        }
+    }
+    serial_parser.read();
+    if (Serial.available()) {
+        String input = Serial.readStringUntil('\n');
+        if (input.startsWith("FREQ:")) {
+            float freq = input.substring(5).toFloat(); // Extract frequency value
+            set_freq_local_bug_fix(freq);
+            RF95_FREQ = freq;
+            current_freq = freq;
         }
     }
 }

@@ -25,7 +25,7 @@ struct TelemetryPacket {
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
     uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
-}  __attribute__((packed));
+};
 
 
 // Commands transmitted from ground station to rocket

@@ -1,5 +1,7 @@
 #include"E22.h"
 
+#define DBG_PRINT(x) Serial.println(x);
+
 void SX1268::wait_on_busy(){
 	int timeout = 1000;
 	while (digitalRead(pin_busy) == HIGH)
@@ -15,6 +17,7 @@ void SX1268::wait_on_busy(){
 }
 
 void SX1268::write_command(RadioCommands_t command, uint8_t* buffer, size_t size) {
+    DBG_PRINT("write command start");
     wait_on_busy();
 
     digitalWrite(pin_cs, LOW);
@@ -25,11 +28,12 @@ void SX1268::write_command(RadioCommands_t command, uint8_t* buffer, size_t size
     }
     spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-
+    DBG_PRINT("write command end");
     wait_on_busy();
 }
 
 void SX1268::read_command(RadioCommands_t command, uint8_t* buffer, size_t size) {
+    DBG_PRINT("read command start");
     wait_on_busy();
 
     digitalWrite(pin_cs, LOW);
@@ -41,11 +45,12 @@ void SX1268::read_command(RadioCommands_t command, uint8_t* buffer, size_t size)
     }
     spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-
+    DBG_PRINT("read command end");
     wait_on_busy();
 }
 
-void SX1268::write_buffer(uint8_t offest, uint8_t* buffer, size_t size) {
+void SX1268::write_buffer(uint8_t offest, const uint8_t* buffer, size_t size) {
+    DBG_PRINT("write buffer start");
     wait_on_busy();
 
     digitalWrite(pin_cs, LOW);
@@ -57,11 +62,12 @@ void SX1268::write_buffer(uint8_t offest, uint8_t* buffer, size_t size) {
     }
     spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-
+    DBG_PRINT("write buffer end");
     wait_on_busy();
 }
 
 void SX1268::write_registers(uint16_t address, uint8_t* buffer, size_t size) {
+    DBG_PRINT("write register start");
     wait_on_busy();
 
     digitalWrite(pin_cs, LOW);
@@ -76,11 +82,30 @@ void SX1268::write_registers(uint16_t address, uint8_t* buffer, size_t size) {
 
     spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
+    DBG_PRINT("write buffer end");
+    wait_on_busy();
+}
 
+void SX1268::read_buffer(uint8_t offset, uint8_t* buffer, size_t size) {
+    DBG_PRINT("read buffer start");
+    wait_on_busy();
+
+    digitalWrite(pin_cs, LOW);
+    spi.beginTransaction(spiSettings);
+    spi.transfer(RADIO_READ_BUFFER);
+    spi.transfer(offset);
+    for(size_t i = 0; i < size; i++){
+        buffer[i] = spi.transfer(0x0);
+    }
+
+    spi.endTransaction();
+    digitalWrite(pin_cs, HIGH);
+    DBG_PRINT("write buffer end");
     wait_on_busy();
 }
 
 void SX1268::read_registers(uint16_t address, uint8_t* buffer, size_t size) {
+    DBG_PRINT("read registers start");
     wait_on_busy();
 
     digitalWrite(pin_cs, LOW);
@@ -94,7 +119,7 @@ void SX1268::read_registers(uint16_t address, uint8_t* buffer, size_t size) {
     }
     spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-
+    DBG_PRINT("read registers end");
     wait_on_busy();
 }
 
@@ -134,7 +159,8 @@ void SX1268::calibrate_image(uint32_t freq)
 void SX1268::set_frequency(uint32_t frequency) {
     uint8_t buf[4];
 	uint32_t freq = 0;
-
+    Serial.print("Setting frequency to ");
+    Serial.println(frequency);
     calibrate_image(frequency);
 	freq = (uint32_t)((double)frequency / (double)FREQ_STEP);
 	buf[0] = (uint8_t)((freq >> 24) & 0xFF);
@@ -154,6 +180,7 @@ void SX1268::setup(){
     digitalWrite(pin_reset, LOW);
     delay(10);
     digitalWrite(pin_reset, HIGH);
+    DBG_PRINT("setup start");
     wait_on_busy();
     set_standby();
     set_lora();
@@ -260,7 +287,7 @@ void SX1268::clear_irq() {
 bool SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
     if(len > 255) return false;
     set_standby();
-    set_packet_params(10, LORA_PACKET_FIXED_LENGTH, len, LORA_CRC_OFF, LORA_IQ_NORMAL);
+    set_packet_params(10, LORA_PACKET_EXPLICIT, len, LORA_CRC_ON, LORA_IQ_NORMAL);
     set_dio_irq_params(
         IRQ_CRC_ERROR | IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
         IRQ_CRC_ERROR | IRQ_RX_DONE | IRQ_RX_TX_TIMEOUT,
@@ -317,8 +344,9 @@ bool SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
 bool SX1268::send(uint8_t* data, size_t len) {
     if(len > 255) return false;   
     set_standby();
+    set_base_address(0x00, 0x00);
     set_packet(data, len);
-    set_packet_params(10, LORA_PACKET_FIXED_LENGTH, len, LORA_CRC_OFF, LORA_IQ_NORMAL);
+    set_packet_params(10, LORA_PACKET_EXPLICIT, len, LORA_CRC_ON, LORA_IQ_NORMAL);
     set_dio_irq_params(
         IRQ_TX_DONE | IRQ_RX_TX_TIMEOUT,
         IRQ_TX_DONE | IRQ_RX_TX_TIMEOUT,
@@ -330,7 +358,7 @@ bool SX1268::send(uint8_t* data, size_t len) {
     for(int i = 0; i < 1000; i++){
         if(digitalRead(pin_dio1)) break;
         delay(1);
-        if(i == 999) {
+        if(i > 999) {
             Serial.println("TX TIMEOUT");
             return false;
         }

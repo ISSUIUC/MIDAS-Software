@@ -48,7 +48,7 @@ void BuzzerController::tick_sounds() {
 
         when_sound_started_ = current_time;
         new_tune_started = false;
-    } else if (current_time - when_sound_started_ >= current_sound.duration_ms) {
+    } else if (current_time - when_sound_started_ >= current_sound.duration_ms * 0.5) {
         index_++;
         if (index_ >= length_) {
             current_tune_ = nullptr;

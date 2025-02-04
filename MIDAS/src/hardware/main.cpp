@@ -66,8 +66,6 @@ void setup() {
     //begin serial port
     Serial.begin(9600);
 
-   while (!Serial);
-
     delay(200);
 
     // begin sensor SPI bus

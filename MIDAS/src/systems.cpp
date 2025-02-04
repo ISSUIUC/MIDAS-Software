@@ -73,12 +73,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
 
-        Serial.print("Highg ");
-        Serial.print(highg.ax);
-        Serial.print(" ");
-        Serial.print(highg.ay);
-        Serial.print(" ");
-        Serial.println(highg.az);
+        // Serial.print("Highg ");
+        // Serial.print(highg.ax);
+        // Serial.print(" ");
+        // Serial.print(highg.ay);
+        // Serial.print(" ");
+        // Serial.println(highg.az);
 
         THREAD_SLEEP(2);
     }
@@ -100,12 +100,12 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
-        Serial.print("mag ");
-        Serial.print(reading.mx);
-        Serial.print(" ");
-        Serial.print(reading.my);
-        Serial.print(" ");
-        Serial.println(reading.mz);
+        // Serial.print("mag ");
+        // Serial.print(reading.mx);
+        // Serial.print(" ");
+        // Serial.print(reading.my);
+        // Serial.print(" ");
+        // Serial.println(reading.mz);
     }
 }
 
@@ -230,6 +230,45 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     }
 }
 
+void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
+// maybe we should move this somewhere else but it can stay here for now
+    switch(command.command) {
+        case CommandType::RESET_KF:
+            arg->rocket_data.command_flags.should_reset_kf = true;
+            break;
+        case CommandType::SWITCH_TO_SAFE:
+            arg->rocket_data.command_flags.should_transition_safe = true;
+            break;
+        case CommandType::SWITCH_TO_PYRO_TEST:
+            arg->rocket_data.command_flags.should_transition_pyro_test = true;
+            break;
+        case CommandType::SWITCH_TO_IDLE:
+            arg->rocket_data.command_flags.should_transition_idle = true;
+            break;
+        case CommandType::FIRE_PYRO_A:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_a = true;
+            }
+            break;
+        case CommandType::FIRE_PYRO_B:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_b = true;
+            }
+            break;
+        case CommandType::FIRE_PYRO_C:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_c = true;
+            }
+            break;
+        case CommandType::FIRE_PYRO_D:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_d = true;
+            }
+            break;
+        default:
+            break; // how
+    }
+}
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
 
@@ -246,61 +285,11 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 500)) {
-                if(command.valid()) {
-                    arg->tlm.acknowledgeReceived();
-                    
-                    // maybe we should move this somewhere else but it can stay here for now
-                    switch(command.command) {
-                        case CommandType::RESET_KF:
-                            arg->rocket_data.command_flags.should_reset_kf = true;
-                            break;
-                        case CommandType::SWITCH_TO_SAFE:
-                            arg->rocket_data.command_flags.should_transition_safe = true;
-                            break;
-                        case CommandType::SWITCH_TO_PYRO_TEST:
-                            arg->rocket_data.command_flags.should_transition_pyro_test = true;
-                            break;
-                        case CommandType::SWITCH_TO_IDLE:
-                            arg->rocket_data.command_flags.should_transition_idle = true;
-                            break;
-                        case CommandType::FIRE_PYRO_A:
-                            if (current_state == FSMState::STATE_PYRO_TEST) {
-                                arg->rocket_data.command_flags.should_fire_pyro_a = true;
-                            }
-                            break;
-                        case CommandType::FIRE_PYRO_B:
-                            if (current_state == FSMState::STATE_PYRO_TEST) {
-                                arg->rocket_data.command_flags.should_fire_pyro_b = true;
-                            }
-                            break;
-                        case CommandType::FIRE_PYRO_C:
-                            if (current_state == FSMState::STATE_PYRO_TEST) {
-                                arg->rocket_data.command_flags.should_fire_pyro_c = true;
-                            }
-                            break;
-                        case CommandType::FIRE_PYRO_D:
-                            if (current_state == FSMState::STATE_PYRO_TEST) {
-                                arg->rocket_data.command_flags.should_fire_pyro_d = true;
-                            }
-                            break;
-                        default:
-                            break; // how
-                    }
-                    // switch(command.command) {
-                    //     // case CommandType::RESET_KF:
-                    //     //     // yessir.should_reinit = true;
-                    //     //     break;
-                    //     case CommandType::SWITCH_TO_SAFE:
-                    //         break;
-                    //     case CommandType::
-                    //     default:
-                    //         break; 
-                    // }
-                }
-
-        //     }
-        // }
+            if (arg->tlm.receive(&command, 500) && command.valid()) {
+                arg->tlm.acknowledgeReceived();
+                handle_tlm_command(command, arg, current_state);
+            }
+        }
         THREAD_SLEEP(1);
         // Serial.println("Telemetry");
     }

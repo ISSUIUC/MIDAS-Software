@@ -214,7 +214,8 @@ private:
 	void wait_on_busy();
 	void write_command(RadioCommands_t command, uint8_t* buffer, size_t size);
 	void read_command(RadioCommands_t command, uint8_t* buffer, size_t size);
-	void write_buffer(uint8_t offset, uint8_t* buffer, size_t size);
+	void write_buffer(uint8_t offset, const uint8_t* buffer, size_t size);
+	void read_buffer(uint8_t offset, uint8_t* buffer, size_t size);
 	void write_registers(uint16_t address, uint8_t* buffer, size_t size);
 	void read_registers(uint16_t address, uint8_t* buffer, size_t size);
 	void calibrate_image(uint32_t freq);

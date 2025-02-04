@@ -1,16 +1,12 @@
 #pragma once
 
-#include <RH_RF95.h>
-
 #include "errors.h"
 #include "hal.h"
 #include "pins.h"
 #include <TCAL9539.h>
-#include <SX126x-Arduino.h>
 
-extern uint8_t lora_payload[255];
-extern bool tx_done;
-extern bool rx_done;
+#include "E22.h"
+
 /**
  * @class TelemetryBackend
  * 
@@ -42,22 +38,9 @@ public:
         gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
-        tx_done = false;
-        Radio.Send((uint8_t*) &data, sizeof(T));
+        lora.send((uint8_t*) &data, sizeof(T));
 
-        for(int i = 1;; i++){
-            if (tx_done || digitalRead(E22_BUSY) == LOW) {
-                break;
-            } else if (i % 1024 == 0) {
-                Serial.println("Slow tx!");
-            }
-            // Sometimes there is a desync between tx done and the actual transmit
-            // So we just break so that we don't lose too much telemetry.
-            if (i % 1024 * 2 == 0) {
-                break;
-            }
-            delay(1);
-        }
+        THREAD_SLEEP(100);
 
     }
 
@@ -72,23 +55,12 @@ public:
     bool read(T* write, int wait_milliseconds) {
         static_assert(sizeof(T) <= 0xFF, "The data type to receive is too large");
         uint8_t len = sizeof(T);
-        rx_done = false;
         // set receive mode
-        Radio.Rx(wait_milliseconds);
-
-        // busy wait for interrupt signalling
-        for(int i = 1; i < wait_milliseconds; i++){
-            THREAD_SLEEP(1);
-            if(rx_done){
-                break;
-            }
-        }
-        memcpy(write, lora_payload, len);
 
         return false;
     }
 
 private:
-    hw_config hwConfig;
+    SX1268 lora;
     bool led_state;
 };

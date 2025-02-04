@@ -283,8 +283,8 @@ void RH_RF95::validateRxBuf()
     if (_bufLen < 4)
 	return; // Too short to be a real message
     // Extract the 4 headers
-	_rxGood++;
 	_rxBufValid = true;
+	_rxGood++;
 }
 
 bool RH_RF95::available()
