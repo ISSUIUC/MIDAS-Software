@@ -9,13 +9,13 @@ Import("env")
 
 def find_python():
     if sys.platform == "win32":
-        which_name = "where"
+        which_name = ["where"]
     else:
-        which_name = "which"
+        which_name = ["which", "-a"]
 
     for python_stem in ["python", "python3"]:
         try:
-            pythons = subprocess.run([which_name, python_stem], check=True, capture_output=True).stdout.decode("utf-8")
+            pythons = subprocess.run([*which_name, python_stem], check=True, capture_output=True).stdout.decode("utf-8")
         except:
             continue
         for python_name in pythons.splitlines():
