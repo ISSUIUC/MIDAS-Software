@@ -112,6 +112,11 @@ void setup() {
 
     delay(200);
 
+    if (!TCAL9539Init(GPIO_RESET_PIN)) {
+			Serial.println("Failed to initialize TCAL9539!");
+			// while(1){ };
+		}
+
     //init and start threads
     begin_systems(&systems);
 }

@@ -33,6 +33,8 @@ bool can_fire_igniter(Orientation orientation) {
  *        have to do anything special and will always return NoError.
  */
 ErrorCode Pyro::init() {
+    
+
     bool has_failed_gpio_init = false;
 
     // global arm

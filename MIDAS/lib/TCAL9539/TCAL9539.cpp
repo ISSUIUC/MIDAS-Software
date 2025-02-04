@@ -10,7 +10,14 @@ static constexpr uint8_t POLARITY_INVERSION1 = 0x5;
 static constexpr uint8_t REG_CONFIG0 = 0x6;
 static constexpr uint8_t REG_CONFIG1 = 0x7;
 
-bool TCAL9539Init(){
+bool TCAL9539Init(int reset_pin){
+    pinMode(reset_pin, OUTPUT);
+    digitalWrite(reset_pin, HIGH);
+    delay(1);
+    digitalWrite(reset_pin, LOW);
+    delay(1);
+    digitalWrite(reset_pin, HIGH);
+
     uint8_t addrs[] = {GPIO0_ADDRESS, GPIO1_ADDRESS, GPIO2_ADDRESS};
     
     TwoWire* wirezero = &Wire;
