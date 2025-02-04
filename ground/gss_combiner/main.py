@@ -34,6 +34,7 @@ import util.mqtt as mqtt
 import util.combiner as combiner
 import util.logger as logger
 import util.print_util
+from serial.tools import list_ports
 
 uri_target = ""
 cfg = configparser.ConfigParser()
@@ -60,6 +61,11 @@ def parse_params(arguments):
     arg_parser.add_argument("--booster", type=str, help="Selects which COM ports should be interpreted as a data stream from the booster stage")
     arg_parser.add_argument("--sustainer", type=str, help="Selects which COM ports should be interpreted as a data stream from the sustainer stage")
     arg_parser.add_argument("--relay", type=str, help="Selects which COM ports should be interpreted as a data stream from the telemetry relay")
+    
+    arg_parser.add_argument("--nboosters", type=int, help="Specifies the number of boosters")
+    arg_parser.add_argument("--nsustainers", type=int, help="Specifies the number of sustainers")
+    arg_parser.add_argument("--nrelays", type=int, help="Specifies the number of relays")
+
     arg_parser.add_argument("-n", "--no-log", action="store_true", help="Will not log data to logfiles for this run")
     arg_parser.add_argument("-v", "--verbose", action="store_true", help="Prints all telemetry events to console")
     arg_parser.add_argument("-nv", "--no-vis", action="store_true", help="Shows a visual display of all systems")
@@ -83,6 +89,18 @@ def parse_params(arguments):
 
     if args.relay is not None:
         relay_sources = args.relay.split(",")
+
+    if args.nboosters is not None:
+        for i in range(0, args.nboosters):
+            booster_sources.append(str(list_ports.comports()[i]).split(' ')[0])
+
+    if args.nsustainers is not None:
+        for i in range(args.nboosters, args.nsustainers + args.nboosters):
+            sustainer_sources.append(str(list_ports.comports()[i]).split(' ')[0])
+
+    if args.nrelays is not None:
+        for i in range(args.nsustainers + args.nboosters, args.nrelays + args.nsustainers + args.nboosters):
+            relay_sources.append(str(list_ports.comports()[i]).split(' ')[0])
 
     is_local = args.local
     should_log = not args.no_log
