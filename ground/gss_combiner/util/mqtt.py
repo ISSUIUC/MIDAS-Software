@@ -195,7 +195,7 @@ class MQTTThread(threading.Thread):
         self.__sustainer_cmds = []
 
         def on_message(client, userdata, msg): 
-            """Callback function that will be called every time the clinet receives a message from the broker (something is added to the topic, commands to be sent)"""
+            """Callback function that will be called every time the client receives a message from the broker (something is added to the topic, commands to be sent)"""
             payload_str = msg.payload.decode()
 
             try:

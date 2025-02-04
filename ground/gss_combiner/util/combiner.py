@@ -123,7 +123,7 @@ class TelemetryCombiner():
 
         self.__packets_in.append(packet_new)
 
-        
+      
         filter, used = self.filter()
         
         if used:
@@ -173,8 +173,6 @@ class TelemetryCombiner():
             self.__log.console_log("Packet states: flt: (" + str(packet_test) + ") dup: (" + str(dubplicate_test) + ")")
             if not (packet['data']['unix'] in seen_timestamps) and packet_test and dubplicate_test:
                 # Use this packet
-
-                
                 
                 if self.__ts_latest > packet['data']['unix']:
                     self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['data']['unix']}")

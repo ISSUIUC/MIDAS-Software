@@ -54,15 +54,11 @@
 #define SD_D0 6
 
 // pyro pins
-#define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 07)
-#define PYROA_ARM_PIN GpioAddress(0, 016)
-#define PYROA_FIRE_PIN GpioAddress(0, 017)
-#define PYROB_ARM_PIN GpioAddress(0, 014)
-#define PYROB_FIRE_PIN GpioAddress(0, 015)
-#define PYROC_ARM_PIN GpioAddress(0, 010)
-#define PYROC_FIRE_PIN GpioAddress(0, 011)
-#define PYROD_ARM_PIN GpioAddress(0, 012)
-#define PYROD_FIRE_PIN GpioAddress(0, 013)
+#define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 05)
+#define PYROA_FIRE_PIN GpioAddress(0, 04)
+#define PYROB_FIRE_PIN GpioAddress(0, 03)
+#define PYROC_FIRE_PIN GpioAddress(0, 01)
+#define PYROD_FIRE_PIN GpioAddress(0, 00)
 
 // Continuity Pins
 #define SENSE_PYRO 1

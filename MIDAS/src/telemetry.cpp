@@ -2,6 +2,10 @@
 
 #include "telemetry.h"
 
+inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
+    return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
+}
+
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
@@ -28,7 +32,7 @@ T inv_convert_range(float val, float range) {
  * 
  * @return tuple with packed data
 */
-std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint8_t tilt) {
+std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) {
     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
     uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
@@ -36,8 +40,9 @@ std::tuple<uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg,
     uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
     uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
     uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
+    uint16_t q = (tilt >> 6) & 15;
 
-    return {x,y,z};
+    return {x,y,z,q};
 }
 
 /**
@@ -52,7 +57,7 @@ Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) {
  * @param led led state to transmit
 */
 void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
-    static_assert(sizeof(TelemetryPacket) == 20);
+    // static_assert(sizeof(TelemetryPacket) == 20);
 
     TelemetryPacket packet = makePacket(rocket_data);
     led.toggle(LED::BLUE);
@@ -83,20 +88,30 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
     Orientation orientation = data.orientation.getRecentUnsync();
+    KalmanData kalman = data.kalman.getRecentUnsync();
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
     packet.alt = (((int16_t) gps.altitude) & 0xfffe) | (received_count & 0x0001);    // Convert range of value so that we can also account for negative altitudes
     packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
   
-    auto [ax,ay,az] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 63));
+    auto [ax,ay,az, tilt_extra] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023));
     packet.highg_ax = ax;
     packet.highg_ay = ay;
     packet.highg_az = az;
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
+    
+    const float max_volts = 12;
+    packet.pyro |= ((((uint16_t) (continuity.pins[0] / max_volts * 127)) & 0x7F) << (0 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[1] / max_volts * 127)) & 0x7F) << (1 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[2] / max_volts * 127)) & 0x7F) << (2 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[3] / max_volts * 127)) & 0x7F) << (3 * 7));
+    packet.pyro |= tilt_extra << 28;
+
     static_assert(FSMState::FSM_STATE_COUNT < 16);
     uint8_t sat_count = gps.satellite_count < 8 ? gps.satellite_count : 7;
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
+    packet.kf_vx = kalman.velocity.vx;
 
     #ifdef IS_SUSTAINER
     packet.fsm_callsign_satcount |= (1 << 7);

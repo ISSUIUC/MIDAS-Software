@@ -43,6 +43,7 @@ private:
     double drogue_time;
     double apogee_time;
     double main_time;
+    double main_deployed_time;
     double landed_time;
     double first_separation_time;
     double pyro_test_entry_time;

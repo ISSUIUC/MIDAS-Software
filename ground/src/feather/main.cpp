@@ -79,13 +79,22 @@ float convert_range(T val, float range) {
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
+
     uint16_t alt; //15 bit meters, 1 bit last command confirm
     uint16_t baro_alt;
     uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
     uint16_t highg_ay;  //14 bit signed ax [-16,16) 2 bit tilt angle
     uint16_t highg_az;  //14 bit signed ax [-16,16) 2 bit tilt angle
+
     uint8_t batt_volt;
-    uint8_t fsm_satcount;
+    
+    // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
+    //
+    // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
+    
+    uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+    uint16_t kf_vx; // 16 bit meters/second
+    uint32_t pyro; // 7 bit continuity 4 bit tilt
     float RSSI = 0.0;
 };
 
@@ -119,7 +128,9 @@ struct FullTelemetryData {
     float freq;
     float rssi;
     float sat_count;
+    float pyros[4];
     bool is_sustainer;
+    uint16_t kf_vx
 };
 
 
@@ -181,20 +192,25 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.longitude = ConvertGPS(packet.lon);
     data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
     int tilt = decodeLastTwoBits(packet.highg_ax, packet.highg_ay, packet.highg_az);
+    tilt |= (packet.pyro >> 28 & (0xF)) << 6;
     int16_t ax = packet.highg_ax & 0xfffc;
     int16_t ay = packet.highg_ay & 0xfffc;
     int16_t az = packet.highg_az & 0xfffc;
     data.highG_ax = convert_range<int16_t>(ax, 32);
     data.highG_ay = convert_range<int16_t>(ay, 32);
     data.highG_az = convert_range<int16_t>(az, 32);
-    data.tilt_angle = tilt; //convert_range(tilt, 180); // [-90, 90]
+    data.tilt_angle = tilt / 1023. * 180; // Returns tilt angle in range [0, 180]
     data.battery_voltage = convert_range(packet.batt_volt, 16);
-    data.sat_count = packet.fsm_satcount >> 4 & 0b0111;
-    data.is_sustainer = (packet.fsm_satcount >> 7);
-    data.FSM_State = packet.fsm_satcount & 0b1111;
+    data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
+    data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
+    data.FSM_State = packet.fsm_callsign_satcount & 0b1111;
+    data.pyros[0] = ((float) ((packet.pyro >> 0) & (0x7F)) / 127.) * 12.;
+    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
+    data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
+    data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
 
     // kinda hacky but it will work
-    if (packet.fsm_satcount == static_cast<uint8_t>(-1)) {
+    if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
     }
 
@@ -254,7 +270,12 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("frequency", packet.freq);
     printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count);
-    printJSONField("is_sustainer", packet.is_sustainer, false);
+    printJSONField("kf_velocity", packet.kf_vx);
+    printJSONField("is_sustainer", packet.is_sustainer);
+    printJSONField("pyro_a", packet.pyros[0]);
+    printJSONField("pyro_b", packet.pyros[1]);
+    printJSONField("pyro_c", packet.pyros[2]);
+    printJSONField("pyro_d", packet.pyros[3], false);
     Serial.println("}}");
 }
 
@@ -363,9 +384,12 @@ void setup() {
     // #endif
     rf95.setCodingRate4(8);
     rf95.setSpreadingFactor(8);
-    rf95.setPayloadCRC(false);
-    rf95.setSignalBandwidth(125000);
+
+    rf95.setPayloadCRC(true);
+
+    rf95.setSignalBandwidth(250000);
     rf95.setPreambleLength(8);
+
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(current_freq);
     Serial.println("}");
@@ -414,7 +438,6 @@ void loop() {
 //     uint8_t battery = static_cast<uint8_t>((batteryVoltage/5.0)*255);
 //     return battery;
 // }
-
 
 // void loop() {
     
@@ -482,6 +505,3 @@ void loop() {
 //     serial_parser.read();
 // }
 // #endif
-
-
-

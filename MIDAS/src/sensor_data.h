@@ -114,9 +114,9 @@ struct LowGLSM {
  * @brief data from the barometer
 */
 struct Barometer {
-    float temperature = 0;
-    float pressure = 0;
-    float altitude = 0;
+    float temperature = 0; // Temperature in Celcius
+    float pressure = 0; // Pressure in millibars
+    float altitude = 0; // Altitude in meters (above sea level?)
 
     Barometer() = default;
     Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
@@ -192,7 +192,6 @@ struct Orientation {
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-
     //For yessir.cpp
     euler_t getEuler() const {
         euler_t euler;
@@ -232,21 +231,18 @@ struct KalmanData {
 };
 
 /**
- * @struct PyroChannel
- * 
- * @brief data about a specific pyro channel
-*/
-struct PyroChannel {
-    bool is_armed = false;
-    bool is_firing = false;
-};
-
-/**
  * @struct PyroState
  * 
  * @brief data regarding all pyro channels
 */
 struct PyroState {
     bool is_global_armed = false;
-    PyroChannel channels[4];
+    bool channel_firing[4];
+    /**
+     * By convention, the pyro states are as follows:
+     * [0] PYRO A / APOGEE
+     * [1] PYRO B / MAIN
+     * [2] PYRO C / MOTOR
+     * [3] PYRO D / AUX
+     */
 };
