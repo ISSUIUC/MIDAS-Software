@@ -1,6 +1,6 @@
 #include "data_logging.h"
 #include "log_format.h"
-#include "log_checksum.h"
+#include "log_header.h"
 
 /**
  * @brief Forward decleration of the ID recieving function
@@ -65,8 +65,7 @@ uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
  * @param sink the LogSink to initialize
 */
 void log_begin(LogSink& sink) {
-    uint32_t checksum = LOG_CHECKSUM;
-    sink.write((uint8_t*) &checksum, 4);
+    sink.write(LOG_FORMAT_HEADER, LOG_FORMAT_HEADER_LENGTH);
 }
 
 /**
