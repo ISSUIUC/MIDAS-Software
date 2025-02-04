@@ -20,9 +20,9 @@ public:
 
     void setQ(float dt, float sd);
     void setF(float dt, FSMState fsm, float w_x, float w_y, float w_z); 
-    Eigen::Matrix<float, 3, 1> BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> x_k);
-    Eigen::Matrix<float, 3, 1> getThrust(float timestamp, euler_t angles, FSMState FSM_state);
-    Eigen::Matrix<float, 3, 1> GlobalToBody(euler_t angles, const Eigen::Matrix<float, 3, 1> world_vector);
+    Eigen::Matrix<float, 3, 1> *BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> x_k);
+    Eigen::Matrix<float, 3, 1> *getThrust(float timestamp, euler_t angles, FSMState FSM_state);
+    Eigen::Matrix<float, 3, 1> *GlobalToBody(euler_t angles, const Eigen::Matrix<float, 3, 1> world_vector);
 
     KalmanData getState() override;
     void setState(KalmanState state) override;
@@ -41,12 +41,12 @@ private:
     float Ca = 0;
     float Cn = 0;
     float Cp = 0;
+    Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
     KalmanState kalman_state;
     FSMState last_fsm = FSMState::STATE_IDLE;
     float stage_timestamp = 0;
 
     Eigen::Matrix<float, 3, 1> init_accel = Eigen::Matrix<float, 3, 1>::Zero();
-    Eigen::Matrix<float, 3, 1> world_accel;
     Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
     KalmanData state;
 };
