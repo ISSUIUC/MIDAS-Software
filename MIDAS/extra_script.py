@@ -17,7 +17,7 @@ def find_python():
         try:
             pythons = subprocess.run([which_name, python_stem], check=True, capture_output=True).stdout.decode("utf-8")
         except:
-            return None
+            continue
         for python_name in pythons.splitlines():
             if "platformio" in python_name:
                 continue
@@ -28,7 +28,7 @@ def find_python():
             version = tuple(int(part) for part in version_string[7:].rstrip().split("."))
             if version >= (3, 9, 5):
                 return python_name
-        return None
+    return None
 
 python_name = find_python()
 if python_name is None:
