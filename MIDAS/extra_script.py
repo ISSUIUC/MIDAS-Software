@@ -7,31 +7,32 @@ assert sys.version_info >= (3, 5)
 
 Import("env")
 
-right_version = True
-python_name = "python3"
-parts = None
-pythons = (subprocess.run(["where", "python"], check=True, capture_output=True).stdout.decode("utf-8"))
-pythons = pythons.split("\n")
+def find_python():
+    if sys.platform == "win32":
+        which_name = "where"
+    else:
+        which_name = "which"
 
-for py in pythons:
-    if "platformio" not in py:
-        python_name = py.strip()
-        break
+    try:
+        pythons = subprocess.run([which_name, "python"], check=True, capture_output=True).stdout.decode("utf-8")
+    except:
+        return None
+    for python_name in pythons.splitlines():
+        if "platformio" in python_name:
+            continue
+        try:
+            version_string = subprocess.run([python_name, "--version"], capture_output=True, check=True).stdout.decode("utf-8")
+        except:
+            continue
+        version = tuple(int(part) for part in version_string[7:].rstrip().split("."))
+        if version >= (3, 9, 5):
+            return python_name
+    return None
 
-try:
-    parts = subprocess.run([python_name, "--version"], capture_output=True, check=True).stdout.decode("utf-8")[7:].rstrip().split(".")
-except:
-    right_version = False
-    parts = subprocess.run(["python", "--version"], capture_output=True, check=True).stdout.decode("utf-8")[7:].rstrip().split(".")
-    python_name = "python"
-    right_version = True
-
-if tuple(int(p) for p in parts) < (3, 9, 5):
-    right_version = False
-
-if not right_version:
+python_name = find_python()
+if python_name is None:
     raise Exception("Python could not be found or version < 3.9.5")
-
+print("Using", python_name)
 
 subprocess.run([python_name, "-m", "pip", "install", "lark"], check=True)
 
