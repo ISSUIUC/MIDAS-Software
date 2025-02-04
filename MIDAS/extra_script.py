@@ -13,21 +13,22 @@ def find_python():
     else:
         which_name = "which"
 
-    try:
-        pythons = subprocess.run([which_name, "python"], check=True, capture_output=True).stdout.decode("utf-8")
-    except:
-        return None
-    for python_name in pythons.splitlines():
-        if "platformio" in python_name:
-            continue
+    for python_stem in ["python", "python3"]:
         try:
-            version_string = subprocess.run([python_name, "--version"], capture_output=True, check=True).stdout.decode("utf-8")
+            pythons = subprocess.run([which_name, python_stem], check=True, capture_output=True).stdout.decode("utf-8")
         except:
-            continue
-        version = tuple(int(part) for part in version_string[7:].rstrip().split("."))
-        if version >= (3, 9, 5):
-            return python_name
-    return None
+            return None
+        for python_name in pythons.splitlines():
+            if "platformio" in python_name:
+                continue
+            try:
+                version_string = subprocess.run([python_name, "--version"], capture_output=True, check=True).stdout.decode("utf-8")
+            except:
+                continue
+            version = tuple(int(part) for part in version_string[7:].rstrip().split("."))
+            if version >= (3, 9, 5):
+                return python_name
+        return None
 
 python_name = find_python()
 if python_name is None:
