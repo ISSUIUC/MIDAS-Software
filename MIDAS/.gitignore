@@ -1,6 +1,6 @@
 .pio
 .vscode
-/src/log_header.h
+/src/log_checksum.h
 **/.DS_Store
 *.launch
 *.pyc
