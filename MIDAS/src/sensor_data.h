@@ -2,8 +2,11 @@
 
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
 #include "finite-state-machines/fsm_states.h"
+
+//#define CONTINUITY_PIN_COUNT 5
 
 /**
  * @brief
