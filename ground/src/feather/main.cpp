@@ -365,7 +365,7 @@ void Stest(const String key) {
     } else if (key == "PD") {
         command.command = CommandType::FIRE_PYRO_D;
     } else {
-        Serial.println("bad command");
+        Serial.println(json_command_bad);
         return;
     }
 
