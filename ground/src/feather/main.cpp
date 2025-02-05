@@ -71,6 +71,7 @@ constexpr const char* json_send_failure = R"({"type": "send_error", "error": "co
 constexpr int max_command_retries = 20;
 
 bool last_ack_bit = false;
+bool initial_ack_flag = true;
 
 
 template <typename T>
@@ -219,8 +220,14 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
     data.kf_reset = packet.alt & 1 == 1;
 
+    if(initial_ack_flag) {
+        last_ack_bit = data.kf_reset;
+        initial_ack_flag = false;
+    }
+
     if(data.kf_reset != last_ack_bit) {
         handle_acknowledge();
+        last_ack_bit = data.kf_reset;
     }
     // kinda hacky but it will work
     if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
