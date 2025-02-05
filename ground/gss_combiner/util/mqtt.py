@@ -138,6 +138,14 @@ class TelemetryThread(threading.Thread):
                             print("\n\nBAD COMMAND!!\n\n")
                             continue
 
+                        if packet_in['type'] == "command_acknowledge":
+                            print("\nCMD ACK\n")
+                            continue
+
+                        if packet_in['type'] == "command_sent":
+                            print("\nCMD SENT!\n")
+                            continue
+
                         # print(packet_in)
                         if not self.__rf_set:
                             # Wait for freq change and periodically send new command to try to change freq.
