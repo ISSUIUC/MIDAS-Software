@@ -258,7 +258,6 @@ if __name__ == "__main__":
         # print(sustainer_commands, booster_commands)
 
         for command in sustainer_commands:
-
             telem_threads_sustainer[0].send_command(command)
 
         for command in booster_commands:
