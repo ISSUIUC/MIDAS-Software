@@ -33,12 +33,12 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 426.15;
-float SUSTAINER_FREQ = 426.15;
+float RF95_FREQ = 425.15;
+float SUSTAINER_FREQ = 425.15;
 
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 426.15;
+float rf95_freq_MHZ = 425.15;
 
 float current_freq = 0;
 
@@ -186,9 +186,9 @@ double ConvertGPS(int32_t coord) {
 }
 
 void handle_acknowledge() {
-    if (!cmd_queue.empty()) {
+    Serial.println(json_command_ack);
+    while (!cmd_queue.empty()) {
         cmd_queue.pop();
-        Serial.println(json_command_ack);
     }
 }
 
