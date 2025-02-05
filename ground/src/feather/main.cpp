@@ -57,6 +57,7 @@ int command_ID = 0;
 short cmd_number = 0;
 
 constexpr const char* json_command_success = R"({"type": "command_success"})";
+constexpr const char* json_command_bad = R"({"type": "bad_command"})";
 constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
 constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
 
@@ -328,7 +329,7 @@ void SerialInput(const char* key, const char* value) {
     } else if (strcmp(key, "PD") == 0) {
         command.command = CommandType::FIRE_PYRO_D;
     } else {
-        Serial.println("bad command");
+        Serial.println(json_command_bad);
         return;
     }
 
@@ -337,6 +338,42 @@ void SerialInput(const char* key, const char* value) {
     // Send the command until acknowledge or 5 attempts
     cmd_queue.push({command, 5});
 }
+
+
+void Stest(const String key) {
+    if (!cmd_queue.empty()) {
+        Serial.println(json_buffer_full_error);
+        return;
+    }
+
+    TelemetryCommand command{};
+
+    if (key == "RESET_KF") {
+        command.command = CommandType::RESET_KF;
+    } else if (key == "SAFE") {
+        command.command = CommandType::SWITCH_TO_SAFE;
+    } else if (key == "IDLE") {
+        command.command = CommandType::SWITCH_TO_IDLE;
+    } else if (key == "PT") {
+        command.command = CommandType::SWITCH_TO_PYRO_TEST;
+    } else if (key == "PA") {
+        command.command = CommandType::FIRE_PYRO_A;
+    } else if (key == "PB") {
+        command.command = CommandType::FIRE_PYRO_B;
+    } else if (key == "PC") {
+        command.command = CommandType::FIRE_PYRO_C;
+    } else if (key == "PD") {
+        command.command = CommandType::FIRE_PYRO_D;
+    } else {
+        Serial.println("bad command");
+        return;
+    }
+
+    Serial.println(json_command_success);
+    // Send the command until acknowledge or 5 attempts
+    cmd_queue.push({command, 5});
+}
+
 
 void handle_acknowledge() {
     if (!cmd_queue.empty()) {
@@ -350,6 +387,8 @@ void process_command_queue() {
     cmd.retry_count --;
 
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
+
+    cmd_queue.pop();
 
     rf95.waitPacketSent();
 }
@@ -406,13 +445,35 @@ void ChangeFrequency(float freq) {
 }
 
 // void loop() {
-//     rf95.send((uint8_t *) "greet thomas", strlen("hello thomas") + 1);
+//     TelemetryCommand tc;
+//     tc.command = CommandType::SWITCH_TO_IDLE;
+//     tc.freq = 1234.5678;
+
+//     rf95.send((uint8_t*)&tc.command, sizeof(tc.command));
+
+//     // rf95.send((uint8_t *) "greet thomas", strlen("hello thomas") + 1);
 //     delay(1000);
 //     rf95.handleInterrupt();
 // }
 
+int last_cmd_sent = 0;
+String cur_input = "";
+
 void loop() {
     PrintDequeue();
+
+    // if(millis() - last_cmd_sent > 10000) {
+    //     Serial.println("cmd enqueued");
+    //     TelemetryCommand command{};
+    //     command.command = CommandType::SWITCH_TO_SAFE;
+    //     cmd_queue.push({command, 5});
+    //     last_cmd_sent = millis();
+
+    //     process_command_queue();
+    // }
+
+    // return;
+
     if (rf95.available()) {
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
         TelemetryPacket packet;
@@ -422,18 +483,31 @@ void loop() {
             digitalWrite(LED_BUILTIN, HIGH);
             delay(50);
             digitalWrite(LED_BUILTIN, LOW);
+
+            // print out buf
+
+            // for(unsigned i = 0; i < len; i++) {
+            //     Serial.print(buf[i]);
+            // }
+
+            // Serial.println("   <eot>");
+
+            // return;
             // Serial.println("Received packet");
             // Serial.println(len);
             memcpy(&packet, buf, sizeof(packet));
             EnqueuePacket(packet, current_freq);
-            if (!cmd_queue.empty()) {
-                auto& cmd = cmd_queue.front();
-                    cmd.retry_count++;
-                    if (cmd.retry_count >= max_command_retries) {
-                        cmd_queue.pop();
-                        Serial.println(json_send_failure);
-                    }
-            }
+            // if (!cmd_queue.empty()) {
+            //     auto& cmd = cmd_queue.front();
+            //         cmd.retry_count++;
+            //         Serial.print("ATTEMPT #");
+            //         Serial.println(cmd.retry_count);
+            //         if (cmd.retry_count >= max_command_retries) {
+            //             Serial.println("Popping command");
+            //             cmd_queue.pop();
+            //             Serial.println(json_send_failure);
+            //         }
+            // }
 
             process_command_queue();
 
@@ -441,15 +515,32 @@ void loop() {
             Serial.println(json_receive_failure);
         }
     }
-    serial_parser.read();
+
+    // serial_parser.read();
     if (Serial.available()) {
-        String input = Serial.readStringUntil('\n');
-        if (input.startsWith("FREQ:")) {
-            float freq = input.substring(5).toFloat(); // Extract frequency value
-            set_freq_local_bug_fix(freq);
-            RF95_FREQ = freq;
-            current_freq = freq;
+        String input = Serial.readString();
+
+        if(input.indexOf('\n') != -1) {
+            cur_input += input;
+            cur_input.replace("\r", ""); // Remove carriage returns
+
+            Stest(input.substring(0, input.length() - 2));
+
+            cur_input = "";
+        } else {
+            cur_input += input;
         }
+
+        // if (input.startsWith("FREQ:")) {
+        //     float freq = input.substring(5).toFloat(); // Extract frequency value
+        //     set_freq_local_bug_fix(freq);
+        //     RF95_FREQ = freq;
+        //     current_freq = freq;
+        // }
+
+        // SerialInput(input.c_str(), "");
+
+        // Avoid serialparser.
     }
 }
 
