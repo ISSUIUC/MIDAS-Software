@@ -119,7 +119,6 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
     }   
 }
 
-// Ever device which communicates over i2c is on this thread to avoid interference
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         Continuity reading2 = arg->sensors.continuity.read();
