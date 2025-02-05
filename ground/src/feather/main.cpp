@@ -184,6 +184,13 @@ double ConvertGPS(int32_t coord) {
     return complete;
 }
 
+void handle_acknowledge() {
+    if (!cmd_queue.empty()) {
+        cmd_queue.pop();
+        Serial.println(json_command_ack);
+    }
+}
+
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     int64_t start_printing = millis();
@@ -380,13 +387,6 @@ void Stest(const String key) {
     cmd_queue.push({command, 5});
 }
 
-
-void handle_acknowledge() {
-    if (!cmd_queue.empty()) {
-        cmd_queue.pop();
-        Serial.println(json_command_ack);
-    }
-}
 
 void process_command_queue() {
     if (cmd_queue.empty()) return;
