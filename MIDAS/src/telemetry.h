@@ -26,7 +26,7 @@ public:
     ErrorCode __attribute__((warn_unused_result)) init();
 
     void transmit(RocketData& rocket_data, LEDController& led);
-    int receive(TelemetryCommand* command, int wait_milliseconds);
+    bool receive(TelemetryCommand* command, int wait_milliseconds);
     void acknowledgeReceived();
 private:
     int received_count;
