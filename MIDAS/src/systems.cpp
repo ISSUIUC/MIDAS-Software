@@ -288,12 +288,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 2000) == 0) {
-                Serial.print(command.verify[0]);
-                Serial.print(command.verify[1]);
-                Serial.print(command.verify[2]);
-                Serial.println("rec command");
                 if (command.valid()) {
-                    Serial.println("Valid command");
                     arg->tlm.acknowledgeReceived();
                     handle_tlm_command(command, arg, current_state);
                 }
