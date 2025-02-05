@@ -64,10 +64,10 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
-#ifdef IS_SUSTAINER
+// #ifdef IS_SUSTAINER
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);
-#endif
+// #endif
         LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
@@ -312,10 +312,10 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
-#ifdef IS_SUSTAINER
+// #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-#endif
+// #endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
@@ -355,9 +355,9 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-#ifdef IS_SUSTAINER
+// #ifdef IS_SUSTAINER
     START_THREAD(orientation, SENSOR_CORE, config, 10);
-#endif
+// #endif
 
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
@@ -375,9 +375,9 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     while (true) {
         THREAD_SLEEP(1000);
-        // Serial.print("Running (Log Latency: ");
-        // Serial.print(config->rocket_data.log_latency.getLatency());
-        // Serial.println(")");
+        Serial.print("Running (Log Latency: ");
+        Serial.print(config->rocket_data.log_latency.getLatency());
+        Serial.println(")");
     }
 }
 
