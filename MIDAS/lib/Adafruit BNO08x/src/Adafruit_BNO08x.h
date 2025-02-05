@@ -40,7 +40,6 @@
  */
 class Adafruit_BNO08x {
 public:
-  Adafruit_BNO08x(GpioAddress reset_pin);
   Adafruit_BNO08x(int reset_pin);
   ~Adafruit_BNO08x();
 
