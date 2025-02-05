@@ -138,6 +138,7 @@ struct Continuity {
 */
 struct Voltage {
     float voltage = 0;
+    float current = 0;
 };
 
 /**
