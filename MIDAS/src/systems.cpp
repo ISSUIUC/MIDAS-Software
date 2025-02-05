@@ -76,18 +76,12 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(orientation, RocketSystems* arg) {
-    size_t last_millis = 0;
     while (true) {
         Orientation reading = arg->sensors.orientation.read();
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
         }
         // Serial.println("orient");
-        if(millis() - last_millis > 102) {
-            Serial.print("Orient error" );
-            Serial.println(millis() - last_millis);
-        }
-        last_millis = millis();
         THREAD_SLEEP(100);
     }
 }
@@ -127,7 +121,6 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 
 // Ever device which communicates over i2c is on this thread to avoid interference
 DECLARE_THREAD(voltage, RocketSystems* arg) {
-    size_t last_millis = 0;
     while (true) {
         Continuity reading2 = arg->sensors.continuity.read();
 
