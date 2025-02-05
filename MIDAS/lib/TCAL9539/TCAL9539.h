@@ -52,7 +52,7 @@ struct GpioReadResult {
     GpioError error;
 };
 
-bool TCAL9539Init();
+bool TCAL9539Init(int reset_pin);
 
 /**
  * wirenum: decides which wire to use on the GPIO
