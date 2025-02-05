@@ -5,8 +5,8 @@
 
 #define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
 
-int read_baord_pwr_monitor_register(int reg, int bytes) {
-    Wire1.beginTransmission(0x44); // I2C Address 0x41 is pyro pwr monitor
+int read_board_pwr_monitor_register(int reg, int bytes) {
+    Wire1.beginTransmission(0x44);
     Wire1.write(reg);
     if(Wire1.endTransmission()){
         Serial.println("I2C Error");
@@ -40,7 +40,7 @@ ErrorCode VoltageSensor::init() {
 */
 Voltage VoltageSensor::read() {
     Voltage v_battery;
-    int voltage = read_baord_pwr_monitor_register(0x5, 2);
+    int voltage = read_board_pwr_monitor_register(0x5, 2);
     // int16_t current = read_baord_pwr_monitor_register(0x7, 2);
 
     float voltage_normalized = voltage * 3.125 / 1000.0;
