@@ -12,7 +12,7 @@
 // ----------------------------------
 
 // Regardless of sensor inputs, stay on pyro firing states for at LEAST this time. (ms)
-#define sustainer_pyro_firing_time_minimum 200
+#define sustainer_pyro_firing_time_minimum 100
 
 // Transition to FIRST_BOOST if acceleration is greater than this (G)
 #define sustainer_idle_to_first_boost_acceleration_threshold 3

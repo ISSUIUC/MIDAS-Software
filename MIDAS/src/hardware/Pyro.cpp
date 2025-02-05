@@ -8,7 +8,7 @@
 
 
 // Fire the pyros for this time during PYRO_TEST (ms)
-#define PYRO_TEST_FIRE_TIME 1000
+#define PYRO_TEST_FIRE_TIME 100
 
 #define MAXIMUM_TILT_ANGLE (M_PI/9)    // 20 degrees
 
