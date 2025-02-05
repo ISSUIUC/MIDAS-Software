@@ -218,7 +218,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
     data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
-    data.kf_reset = packet.alt & 1 == 1;
+    data.kf_reset = packet.alt & 1;
 
     if(initial_ack_flag) {
         last_ack_bit = data.kf_reset;

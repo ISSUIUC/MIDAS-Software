@@ -58,6 +58,9 @@ bool TCAL9539Init(int reset_pin);
  * wirenum: decides which wire to use on the GPIO
  * pin: which pin to write or read signal from
  * mode: the mode of the pin
+ * 
+ * wire = 0 means we are using our main i2c bus
+ * wire = 1 means we are using the pyro i2c bus
  */
 GpioError gpioPinMode(GpioAddress pin, int mode, int wirenum = 0);
 

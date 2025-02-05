@@ -87,3 +87,5 @@
 #define FLASH_DAT1 12
 #define FLASH_DAT2 15
 #define FLASH_DAT3 16
+
+#define GPIO_RESET 47
