@@ -26,10 +26,6 @@ RocketSystems systems{.log_sink = sinks};
 
 void setup()
 {
-    if (!TCAL9539Init(GPIO_RESET)) {
-        Serial.println(":(");
-    }
-
     // begin serial port
     Serial.begin(9600);
 
@@ -43,6 +39,10 @@ void setup()
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL, 100000);
     Wire1.begin(PYRO_SDA, PYRO_SCL, 400000);
+
+    if (!TCAL9539Init(GPIO_RESET)) {
+        Serial.println(":(");
+    }
 
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
