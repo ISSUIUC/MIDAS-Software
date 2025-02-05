@@ -41,7 +41,7 @@ ErrorCode VoltageSensor::init() {
 Voltage VoltageSensor::read() {
     Voltage v_battery;
     int voltage = read_board_pwr_monitor_register(0x5, 2);
-    int16_t current = read_baord_pwr_monitor_register(0x7, 2);
+    int16_t current = read_board_pwr_monitor_register(0x7, 2);
 
     float voltage_normalized = voltage * 3.125 / 1000.0;
     float absolute_current = current * 1.2 / 1000.0;
