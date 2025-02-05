@@ -260,6 +260,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
 
     while (true) {
+
         arg->tlm.transmit(arg->rocket_data, arg->led);
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
@@ -356,9 +357,9 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
     }
 }
 

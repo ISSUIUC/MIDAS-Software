@@ -210,6 +210,8 @@ public:
 	bool send(uint8_t* data, size_t len);
 	int recv(uint8_t* data, size_t len, size_t timeout_ms);
 
+	bool has_busy_fault();
+
 private:
 	void wait_on_busy();
 	void write_command(RadioCommands_t command, uint8_t* buffer, size_t size);
@@ -239,5 +241,6 @@ private:
 	int prev_snr;
 	int prev_signal_rssi;
 	int prev_rx_error;
+	bool busy_fault;
 	SPISettings spiSettings = SPISettings(2000000, MSBFIRST, SPI_MODE0);
 };

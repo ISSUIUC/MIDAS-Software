@@ -12,9 +12,17 @@ void SX1268::wait_on_busy(){
 		if (timeout < 0)
 		{
 			Serial.println("ERR Wait too long on busy");
+
+            setup(); // Watchdog timer in case something goes wrong.
+            delay(100);
+
 			return;
 		}
 	}
+}
+
+bool SX1268::has_busy_fault() {
+    return busy_fault;
 }
 
 void SX1268::write_command(RadioCommands_t command, uint8_t* buffer, size_t size) {

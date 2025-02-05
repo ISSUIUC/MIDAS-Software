@@ -61,6 +61,7 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
 
     TelemetryPacket packet = makePacket(rocket_data);
     led.toggle(LED::BLUE);
+
     backend.send(packet);
 }
 
