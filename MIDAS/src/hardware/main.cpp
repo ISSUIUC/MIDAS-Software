@@ -8,44 +8,44 @@
 #include "hardware/SDLog.h"
 #include "sensor_data.h"
 
-
-void i2cscanner() {
+void i2cscanner()
+{
     byte error, address;
     int nDevices;
- 
-  Serial.println("Scanning...");
- 
-  nDevices = 0;
-  for(address = 1; address < 127; address++ )
-  {
-    // The i2c_scanner uses the return value of
-    // the Write.endTransmisstion to see if
-    // a device did acknowledge to the address.
-    Wire.beginTransmission(address);
-    error = Wire.endTransmission();
- 
-    if (error == 0)
+
+    Serial.println("Scanning...");
+
+    nDevices = 0;
+    for (address = 1; address < 127; address++)
     {
-      Serial.print("I2C device found at address 0x");
-      if (address<16)
-        Serial.print("0");
-      Serial.print(address,HEX);
-      Serial.println("  !");
- 
-      nDevices++;
+        // The i2c_scanner uses the return value of
+        // the Write.endTransmisstion to see if
+        // a device did acknowledge to the address.
+        Wire.beginTransmission(address);
+        error = Wire.endTransmission();
+
+        if (error == 0)
+        {
+            Serial.print("I2C device found at address 0x");
+            if (address < 16)
+                Serial.print("0");
+            Serial.print(address, HEX);
+            Serial.println("  !");
+
+            nDevices++;
+        }
+        else if (error == 4)
+        {
+            Serial.print("Unknown error at address 0x");
+            if (address < 16)
+                Serial.print("0");
+            Serial.println(address, HEX);
+        }
     }
-    else if (error==4)
-    {
-      Serial.print("Unknown error at address 0x");
-      if (address<16)
-        Serial.print("0");
-      Serial.println(address,HEX);
-    }    
-  }
-  if (nDevices == 0)
-    Serial.println("No I2C devices found\n");
-  else
-    Serial.println("done\n");
+    if (nDevices == 0)
+        Serial.println("No I2C devices found\n");
+    else
+        Serial.println("done\n");
 }
 /**
  * Sets the config file and then starts all the threads using the config.
@@ -57,13 +57,14 @@ MultipleLogSink<SDSink> sinks;
 // #else
 // MultipleLogSink<> sinks;
 // #endif
-RocketSystems systems { .log_sink = sinks };
+RocketSystems systems{.log_sink = sinks};
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
-*/
+ */
 
-void setup() {
-    //begin serial port
+void setup()
+{
+    // begin serial port
     Serial.begin(9600);
 
     delay(200);
@@ -74,8 +75,8 @@ void setup() {
 
     //begin I2C bus
     Serial.println("Starting I2C...");
-    Wire.begin(I2C_SDA, I2C_SCL);
-    Wire1.begin(PYRO_SDA, PYRO_SCL);
+    Wire.begin(I2C_SDA, I2C_SCL, 100000);
+    Wire1.begin(PYRO_SDA, PYRO_SCL, 400000);
 
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
@@ -110,10 +111,10 @@ void setup() {
 
     delay(200);
 
-    //init and start threads
+    // init and start threads
     begin_systems(&systems);
 }
 
-void loop() {
-
+void loop()
+{
 }

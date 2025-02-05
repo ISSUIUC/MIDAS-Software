@@ -64,33 +64,30 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
-// #ifdef IS_SUSTAINER
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);
-// #endif
         LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
-
-        // Serial.print("Highg ");
-        // Serial.print(highg.ax);
-        // Serial.print(" ");
-        // Serial.print(highg.ay);
-        // Serial.print(" ");
-        // Serial.println(highg.az);
 
         THREAD_SLEEP(2);
     }
 }
 
 DECLARE_THREAD(orientation, RocketSystems* arg) {
+    size_t last_millis = 0;
     while (true) {
         Orientation reading = arg->sensors.orientation.read();
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
         }
         // Serial.println("orient");
+        if(millis() - last_millis > 102) {
+            Serial.print("Orient error" );
+            Serial.println(millis() - last_millis);
+        }
+        last_millis = millis();
         THREAD_SLEEP(100);
     }
 }
@@ -99,46 +96,44 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
-        THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
-        // Serial.print("mag ");
-        // Serial.print(reading.mx);
-        // Serial.print(" ");
-        // Serial.print(reading.my);
-        // Serial.print(" ");
-        // Serial.println(reading.mz);
+        THREAD_SLEEP(50);
     }
 }
 
-// Ever device which communicates over i2c is on this thread to avoid interference
-DECLARE_THREAD(i2c, RocketSystems* arg) {
-    int i = 0;
-
-    while (true) {
-        if (i % 10 == 0) {
-            if (arg->sensors.gps.valid()) {
-                GPS reading = arg->sensors.gps.read();
-                arg->rocket_data.gps.update(reading);
-            } // Otherwise it's just dead :skull:
-
-            FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            CommandFlags& telem_commands = arg->rocket_data.command_flags;
-
-            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
-            arg->rocket_data.pyro.update(new_pyro_state);
-
-            Continuity reading2 = arg->sensors.continuity.read();
-
-            arg->rocket_data.continuity.update(reading2);
-
-            Voltage reading3 = arg->sensors.voltage.read();
-            arg->rocket_data.voltage.update(reading3);
-            // Serial.println("i2c");
+DECLARE_THREAD(gps, RocketSystems* arg) {
+    while(true) {
+        if(arg->sensors.gps.valid()) {
+            GPS reading = arg->sensors.gps.read();
+            arg->rocket_data.gps.update(reading);
         }
+        //GPS waits internally
+        THREAD_SLEEP(1);
+    }
+}
+
+DECLARE_THREAD(pyro, RocketSystems* arg) {
+    while(true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        CommandFlags& telem_commands = arg->rocket_data.command_flags;
+
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
+        arg->rocket_data.pyro.update(new_pyro_state);
 
         arg->led.update();
-        i += 1;
 
         THREAD_SLEEP(10);
+    }   
+}
+
+// Ever device which communicates over i2c is on this thread to avoid interference
+DECLARE_THREAD(voltage, RocketSystems* arg) {
+    size_t last_millis = 0;
+    while (true) {
+        Continuity reading2 = arg->sensors.continuity.read();
+
+        arg->rocket_data.continuity.update(reading2);
+
+        THREAD_SLEEP(100);
     }
 }
 
@@ -147,7 +142,6 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
-
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
@@ -357,7 +351,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
-    START_THREAD(i2c, SENSOR_CORE, config, 9);
+    START_THREAD(gps, SENSOR_CORE, config, 8);
+    START_THREAD(voltage, SENSOR_CORE, config, 9);
+    START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
