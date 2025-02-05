@@ -233,7 +233,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
     }
-    data.kf_vx = packet.kf_vx;
+    data.kf_vx = packet.kf_vx / ((1 << 16) - 1) * 4000 - 2000;
     data.freq = RF95_FREQ;
     if(packet.RSSI == 0.0) {
         data.rssi = packet.RSSI;
