@@ -64,7 +64,7 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
-bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
+int Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
     return backend.read(command, wait_milliseconds);
 }
 
@@ -109,9 +109,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.pyro |= tilt_extra << 28;
 
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint8_t sat_count = gps.satellite_count < 8 ? gps.satellite_count : 7;
+    uint8_t sat_count = gps.fix_type;
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
-    packet.kf_vx = kalman.velocity.vx;
+    float kf_vx_clamped = std::clamp(kalman.velocity.vx, -2000.f, 2000.f);
+    packet.kf_vx = (uint16_t) ((kf_vx_clamped + 2000) / 4000. * ((1 << 16) - 1));
 
     #ifdef IS_SUSTAINER
     packet.fsm_callsign_satcount |= (1 << 7);

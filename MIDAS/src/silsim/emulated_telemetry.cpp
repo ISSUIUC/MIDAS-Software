@@ -9,7 +9,7 @@ ErrorCode __attribute__((warn_unused_result)) TelemetryBackend::init() {
     return ErrorCode::NoError;
 }
 
-int8_t TelemetryBackend::getRecentRssi() {
+int16_t TelemetryBackend::getRecentRssi() {
     return 1;
 }
 

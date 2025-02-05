@@ -848,8 +848,6 @@ public:
     /// \param none
     /// \return uint8_t deviceID
     uint8_t getDeviceVersion();
-    
-protected:
 
     /// Do whatever is necesary to establish the interrupt handler. Subclasses may have different needs 
     bool setupInterruptHandler();
@@ -875,7 +873,6 @@ protected:
     /// True if the RFO transmitter output pin is to be used.
     bool                _useRFO;
     
-private:
     /// Low level interrupt service routine for device connected to interrupt 0
     static void         isr0();
 

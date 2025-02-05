@@ -1,11 +1,11 @@
 #pragma once
 
-#include <RH_RF95.h>
-
 #include "errors.h"
 #include "hal.h"
-#include "TCAL9539.h"
 #include "pins.h"
+#include <TCAL9539.h>
+
+#include "E22.h"
 
 /**
  * @class TelemetryBackend
@@ -17,7 +17,7 @@ public:
     TelemetryBackend();
     ErrorCode __attribute__((warn_unused_result)) init();
 
-    int8_t getRecentRssi();
+    int16_t getRecentRssi();
     void setFrequency(float frequency);
 
     /**
@@ -34,22 +34,12 @@ public:
      */
     template<typename T>
     void send(const T& data) {
-        static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to send is too large");
-        // gpioDigitalWrite(LED_BLUE, led_state);
+        static_assert(sizeof(T) <= 0xFF, "The data type to send is too large"); // Max payload is 255
+        gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
-//        Serial.println("Sending bytes");
-        rf95.send((uint8_t*) &data, sizeof(T));
-        for(int i = 1;; i++){
-            THREAD_SLEEP(1);
-            if(digitalRead(rf95._interruptPin)){
-                break;
-            }
-            if(i % 1024 == 0){
-                Serial.println("long telem wait");
-            }
-        }
-        rf95.handleInterrupt();
+        lora.send((uint8_t*) &data, sizeof(T));
+
     }
 
     /**
@@ -60,34 +50,14 @@ public:
      * @return bool indicating a successful read and write to buffer
     */
     template<typename T>
-    bool read(T* write, int wait_milliseconds) {
-        static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to receive is too large");
+    int read(T* write, int wait_milliseconds) {
+        static_assert(sizeof(T) <= 0xFF, "The data type to receive is too large");
         uint8_t len = sizeof(T);
-
         // set receive mode
-        rf95.setModeRx();
-
-        // busy wait for interrupt signalling
-        for(int i = 1; i < wait_milliseconds; i++){
-            THREAD_SLEEP(1);
-            if(digitalRead(rf95._interruptPin)){
-                rf95.handleInterrupt();
-                break;
-            }
-        }
-
-        if (rf95.available() && rf95.recv((uint8_t*) write, &len)) {
-            if (sizeof(T) == len) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
+        return lora.recv((uint8_t*) write, len, wait_milliseconds);
     }
 
 private:
-    RH_RF95 rf95;
-
+    SX1268 lora;
     bool led_state;
 };

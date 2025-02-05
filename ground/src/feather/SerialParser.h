@@ -15,6 +15,7 @@ class SerialParser {
     SerialParser(SuccessCallback success, ErrorCallback error) : success(success), error(error) {}
     void read() {
         while (Serial.available()) {
+            
             char c = Serial.read();
             if (write_head < 256) {
                 input_buffer[write_head++] = c;

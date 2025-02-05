@@ -84,6 +84,7 @@ struct OrientationSensor {
  */
 struct GPSSensor {
     ErrorCode init();
+    bool valid();
     GPS read();
     bool is_leap = false;
 };

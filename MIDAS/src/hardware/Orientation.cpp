@@ -17,7 +17,7 @@ float deltaTime = 0;
  */
 ErrorCode OrientationSensor::init()
 {
-    gpioPinMode(BNO086_RESET, OUTPUT);
+    digitalWrite(BNO086_RESET, OUTPUT);
     delay(100);
     // do whatever steps to initialize the sensor
     // if it errors, return the relevant error code
