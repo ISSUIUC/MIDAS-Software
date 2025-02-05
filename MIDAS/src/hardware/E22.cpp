@@ -185,6 +185,7 @@ void SX1268::setup(){
     DBG_PRINT("setup start");
     wait_on_busy();
     set_standby();
+    set_tx_power(22);
     set_lora();
     set_base_address(0x00, 0x00);
 }
