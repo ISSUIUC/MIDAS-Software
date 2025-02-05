@@ -81,7 +81,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
         }
-        // Serial.println("orient");
         THREAD_SLEEP(100);
     }
 }
@@ -121,9 +120,11 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        Continuity reading2 = arg->sensors.continuity.read();
+        Continuity reading = arg->sensors.continuity.read();
+        Voltage reading2 = arg->sensors.voltage.read();;
 
-        arg->rocket_data.continuity.update(reading2);
+        arg->rocket_data.continuity.update(reading);
+        arg->rocket_data.voltage.update(reading2);
 
         THREAD_SLEEP(100);
     }
@@ -292,10 +293,8 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
-// #ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-// #endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
@@ -335,10 +334,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-// #ifdef IS_SUSTAINER
     START_THREAD(orientation, SENSOR_CORE, config, 10);
-// #endif
-
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);

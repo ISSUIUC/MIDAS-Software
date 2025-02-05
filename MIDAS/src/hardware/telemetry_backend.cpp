@@ -50,17 +50,9 @@ TelemetryBackend::TelemetryBackend() : lora(SPI, E22_CS, E22_BUSY, E22_DI01, E22
  * @return Error Code
 */
 ErrorCode TelemetryBackend::init() {
-    pinMode(E22_RESET, OUTPUT);
-    digitalWrite(E22_RESET, HIGH);
-    delay(100);
-    digitalWrite(E22_RESET, LOW);
-    delay(100);
-    digitalWrite(E22_RESET, HIGH);
-    delay(5);
-
-	lora.setup();
-	lora.set_frequency((uint32_t) (TX_FREQ * 1e6));
-    lora.set_modulation_params(8, LORA_BW_250, LORA_CR_4_8, false);
+	if(lora.setup() != SX1268Error::NoError) return ErrorCode::LoraCouldNotBeInitialized;
+	if(lora.set_frequency((uint32_t) (TX_FREQ * 1e6)) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
+    if(lora.set_modulation_params(8, LORA_BW_250, LORA_CR_4_8, false) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
 
     return ErrorCode::NoError;
 }
@@ -79,6 +71,10 @@ int16_t TelemetryBackend::getRecentRssi() {
  *
  * @param freq New frequency to set the LoRa module to
 */
-void TelemetryBackend::setFrequency(float freq) {
-    lora.set_frequency((uint32_t) (freq * 1e6));
+ErrorCode TelemetryBackend::setFrequency(float freq) {
+    if(lora.set_frequency((uint32_t) (freq * 1e6)) != SX1268Error::NoError) {
+        return ErrorCode::LoraCommunicationFailed;
+    } else {
+        return ErrorCode::NoError;
+    }
 }

@@ -190,6 +190,16 @@ typedef enum
 	LORA_CAD_16_SYMBOL = 0x04,
 } RadioLoRaCadSymbols_t;
 
+enum class SX1268Error {
+	NoError,
+	BusyTimeout,
+	BadParameter,
+	TxTimeout,
+	RxTimeout,
+	CrcError,
+	UnknownError,
+};
+
 #define REG_OCP 0x08E7
 #define XTAL_FREQ (double)32000000
 #define FREQ_DIV (double)pow(2.0, 25.0)
@@ -203,33 +213,31 @@ public:
 	spi(spi), pin_cs(cs), pin_busy(busy), pin_dio1(dio1),
 	pin_rxen(rxen), pin_reset(reset) {}
 	
-	void setup();
-	void set_frequency(uint32_t freq);
-	void set_modulation_params(uint8_t spreading_factor, RadioLoRaBandwidths_t bandwidth, RadioLoRaCodingRates_t cr, bool low_data_rate);
-	void set_tx_power(int8_t dbm);
-	bool send(uint8_t* data, size_t len);
-	int recv(uint8_t* data, size_t len, size_t timeout_ms);
-
-	bool has_busy_fault();
+	[[nodiscard]] SX1268Error setup();
+	[[nodiscard]] SX1268Error set_frequency(uint32_t freq);
+	[[nodiscard]] SX1268Error set_modulation_params(uint8_t spreading_factor, RadioLoRaBandwidths_t bandwidth, RadioLoRaCodingRates_t cr, bool low_data_rate);
+	[[nodiscard]] SX1268Error set_tx_power(int8_t dbm);
+	[[nodiscard]] SX1268Error send(uint8_t* data, size_t len);
+	[[nodiscard]] SX1268Error recv(uint8_t* data, size_t len, size_t timeout_ms);
 
 private:
-	void wait_on_busy();
-	void write_command(RadioCommands_t command, uint8_t* buffer, size_t size);
-	void read_command(RadioCommands_t command, uint8_t* buffer, size_t size);
-	void write_buffer(uint8_t offset, const uint8_t* buffer, size_t size);
-	void read_buffer(uint8_t offset, uint8_t* buffer, size_t size);
-	void write_registers(uint16_t address, uint8_t* buffer, size_t size);
-	void read_registers(uint16_t address, uint8_t* buffer, size_t size);
-	void calibrate_image(uint32_t freq);
-	void set_dio_irq_params(uint16_t irq_mask, uint16_t dio_1_mask, uint16_t dio_2_mask, uint16_t dio_3_mask);
-	void set_packet_params(uint16_t preamble_len,  RadioLoRaPacketLengthsMode_t header_type, uint8_t payload_len, RadioLoRaCrcModes_t crc_mode, RadioLoRaIQModes_t invert_iq);
-	void set_packet(uint8_t* data, size_t len);
-	void set_base_address(uint8_t tx_base, uint8_t rx_base);
-	void set_pa_config(uint8_t pa_duty_cycle, uint8_t hp_max);
-	void set_tx_params(int8_t power, RadioRampTimes_t ramp_time);
-	void set_standby();
-	void set_lora();
-	void clear_irq();
+	[[nodiscard]] SX1268Error wait_on_busy();
+	[[nodiscard]] SX1268Error write_command(RadioCommands_t command, uint8_t* buffer, size_t size);
+	[[nodiscard]] SX1268Error read_command(RadioCommands_t command, uint8_t* buffer, size_t size);
+	[[nodiscard]] SX1268Error write_buffer(uint8_t offset, const uint8_t* buffer, size_t size);
+	[[nodiscard]] SX1268Error read_buffer(uint8_t offset, uint8_t* buffer, size_t size);
+	[[nodiscard]] SX1268Error write_registers(uint16_t address, uint8_t* buffer, size_t size);
+	[[nodiscard]] SX1268Error read_registers(uint16_t address, uint8_t* buffer, size_t size);
+	[[nodiscard]] SX1268Error calibrate_image(uint32_t freq);
+	[[nodiscard]] SX1268Error set_dio_irq_params(uint16_t irq_mask, uint16_t dio_1_mask, uint16_t dio_2_mask, uint16_t dio_3_mask);
+	[[nodiscard]] SX1268Error set_packet_params(uint16_t preamble_len,  RadioLoRaPacketLengthsMode_t header_type, uint8_t payload_len, RadioLoRaCrcModes_t crc_mode, RadioLoRaIQModes_t invert_iq);
+	[[nodiscard]] SX1268Error set_packet(uint8_t* data, size_t len);
+	[[nodiscard]] SX1268Error set_base_address(uint8_t tx_base, uint8_t rx_base);
+	[[nodiscard]] SX1268Error set_pa_config(uint8_t pa_duty_cycle, uint8_t hp_max);
+	[[nodiscard]] SX1268Error set_tx_params(int8_t power, RadioRampTimes_t ramp_time);
+	[[nodiscard]] SX1268Error set_standby();
+	[[nodiscard]] SX1268Error set_lora();
+	[[nodiscard]] SX1268Error clear_irq();
 
 	SPIClass& spi;
 	uint8_t pin_cs;

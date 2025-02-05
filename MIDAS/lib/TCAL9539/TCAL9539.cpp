@@ -10,6 +10,14 @@ static constexpr uint8_t POLARITY_INVERSION1 = 0x5;
 static constexpr uint8_t REG_CONFIG0 = 0x6;
 static constexpr uint8_t REG_CONFIG1 = 0x7;
 
+TwoWire& tcal_get_wire_by_id(int index) {
+    if(I2C_BUS_Map[index] == 0) {
+        return Wire; 
+    } else {
+        return Wire1;
+    }
+}
+
 bool TCAL9539Init(int reset_pin){
     pinMode(reset_pin, OUTPUT);
     digitalWrite(reset_pin, HIGH);
@@ -20,45 +28,24 @@ bool TCAL9539Init(int reset_pin){
 
     uint8_t addrs[] = {GPIO0_ADDRESS, GPIO1_ADDRESS, GPIO2_ADDRESS};
     
-    TwoWire* wirezero = &Wire;
-    TwoWire* wireone = &Wire1;
+    for(int i = 0; i < std::size(addrs); i++){
+        TwoWire& wire = tcal_get_wire_by_id(i);
+        uint8_t addr = addrs[i];
 
-    for(uint8_t addr : addrs){
-        Serial.print("Testing ");
-        Serial.println(addr);
-
-        //wirezero
-        wirezero->beginTransmission(addr);
-        wirezero->write(REG_OUTPUT0);
-        if(!wirezero->endTransmission()){
-            Serial.println("Failed at endTransmission");
+        wire.beginTransmission(addr);
+        wire.write(REG_OUTPUT0);
+        if(wire.endTransmission() != 0){
+            Serial.print("Failed at endTransmission ");
+            Serial.println(addr);
             return false;
         }
-        int ct = wirezero->requestFrom(addr, 1);
+        int ct = wire.requestFrom(addr, 1);
         if(ct != 1){
-            Serial.println("Failed at requestFrom");
+            Serial.print("Failed at requestFrom ");
+            Serial.println(addr);
             return false;
         }
-        int v = wirezero->read();
-        //REG_OUTPUT0 is set all ones on power up
-        if(v != 0xff){
-            Serial.println("Failed at REG_OUTPUT0");
-            return false;
-        }
-
-        //wireone
-        wireone->beginTransmission(addr);
-        wireone->write(REG_OUTPUT0);
-        if(!wireone->endTransmission()){
-            Serial.println("Failed at endTransmission");
-            return false;
-        }
-        ct = wireone->requestFrom(addr, 1);
-        if(ct != 1){
-            Serial.println("Failed at requestFrom");
-            return false;
-        }
-        v = wireone->read();
+        int v = wire.read();
         //REG_OUTPUT0 is set all ones on power up
         if(v != 0xff){
             Serial.println("Failed at REG_OUTPUT0");
@@ -68,22 +55,19 @@ bool TCAL9539Init(int reset_pin){
     return true;
 }
 
-static uint8_t pin_state[2][3][2] = {{{0xff,0xff},{0xff,0xff},{0xff,0xff}}, {{0xff,0xff},{0xff,0xff},{0xff,0xff}}};
-static uint8_t pin_config[2][3][2] = {{{0xff,0xff},{0xff,0xff},{0xff,0xff}}, {{0xff,0xff},{0xff,0xff},{0xff,0xff}}};
+static uint8_t pin_state[3][2] = {{0xff,0xff},{0xff,0xff},{0xff,0xff}};
+static uint8_t pin_config[3][2] = {{0xff,0xff},{0xff,0xff},{0xff,0xff}};
 
-GpioError gpioDigitalWrite(GpioAddress addr, int mode, int whichwire){
-    TwoWire* wire;
-    if (whichwire == 0) {
-        wire = &Wire;
-    } else {
-        wire = &Wire1;
-    }
+GpioError gpioDigitalWrite(GpioAddress addr, int mode){
+
 
     if(!addr.is_valid) {
         return GpioError::InvalidPinError;
     }
 
-    uint8_t current_state = pin_state[whichwire][addr.gpio_id][addr.port_idx];
+    TwoWire& wire = tcal_get_wire_by_id(addr.gpio_id);
+
+    uint8_t current_state = pin_state[addr.gpio_id][addr.port_idx];
     if(mode == HIGH){
         current_state |= (1 << addr.pin_offset);
     } else if(mode == LOW){
@@ -92,57 +76,47 @@ GpioError gpioDigitalWrite(GpioAddress addr, int mode, int whichwire){
         return GpioError::InvalidModeError;
     }
 
-    wire->beginTransmission(addr.gpio_address);
-    wire->write(REG_OUTPUT0 + addr.port_idx);
-    wire->write(current_state);
-    pin_state[whichwire][addr.gpio_id][addr.port_idx] = current_state;
+    wire.beginTransmission(addr.gpio_address);
+    wire.write(REG_OUTPUT0 + addr.port_idx);
+    wire.write(current_state);
+    pin_state[addr.gpio_id][addr.port_idx] = current_state;
     int err = 0;
-    err = wire->endTransmission(true);
+    err = wire.endTransmission(true);
     if(err != 0){
         return GpioError::I2CError;
     }
     return GpioError::NoError;
 }
 
-GpioReadResult gpioDigitalRead(GpioAddress addr, int whichwire){
-    TwoWire* wire;
-    if (whichwire == 0) {
-        wire = &Wire;
-    } else {
-        wire = &Wire1;
-    }
-
+GpioReadResult gpioDigitalRead(GpioAddress addr){
     if(!addr.is_valid) {
         return GpioReadResult{.value=LOW,.error=GpioError::InvalidPinError};
     }
 
-    wire->beginTransmission(addr.gpio_address);
-    wire->write(REG_INPUT0 + addr.port_idx);
-    if(!wire->endTransmission(true)){
+    TwoWire& wire = tcal_get_wire_by_id(addr.gpio_id);
+
+    wire.beginTransmission(addr.gpio_address);
+    wire.write(REG_INPUT0 + addr.port_idx);
+    if(wire.endTransmission(true) != 0){
         return GpioReadResult{.value=LOW,.error=GpioError::I2CError};
     }
-    int ct = wire->requestFrom(addr.gpio_address, 1);
+    int ct = wire.requestFrom(addr.gpio_address, 1);
     if(ct != 1){
         return GpioReadResult{.value=LOW,.error=GpioError::I2CError};
     }
 
-    uint8_t val = wire->read();    
+    uint8_t val = wire.read();    
     return GpioReadResult{.value=(val & (1 << addr.pin_offset)) != 0,.error=GpioError::NoError};
 }
 
-GpioError gpioPinMode(GpioAddress addr, int mode, int whichwire){
-    TwoWire* wire;
-    if (whichwire == 0) {
-        wire = &Wire;
-    } else {
-        wire = &Wire1;
-    }
-
+GpioError gpioPinMode(GpioAddress addr, int mode){
     if(!addr.is_valid){
         return GpioError::NoError;
     }
 
-    uint8_t current_state = pin_config[whichwire][addr.gpio_id][addr.port_idx];
+    TwoWire& wire = tcal_get_wire_by_id(addr.gpio_id);
+
+    uint8_t current_state = pin_config[addr.gpio_id][addr.port_idx];
 
     if(mode == INPUT){
         current_state |= (1 << addr.pin_offset);
@@ -152,18 +126,18 @@ GpioError gpioPinMode(GpioAddress addr, int mode, int whichwire){
         return GpioError::InvalidModeError;
     }
     
-    GpioError err = gpioDigitalWrite(addr, LOW, whichwire);
+    GpioError err = gpioDigitalWrite(addr, LOW);
     if(err != GpioError::NoError){
         return err;
     }
 
     //wirezero
-    wire->beginTransmission(addr.gpio_address);
-    wire->write(REG_CONFIG0 + addr.port_idx);
-    wire->write(current_state);
-    pin_config[whichwire][addr.gpio_id][addr.port_idx] = current_state;
+    wire.beginTransmission(addr.gpio_address);
+    wire.write(REG_CONFIG0 + addr.port_idx);
+    wire.write(current_state);
+    pin_config[addr.gpio_id][addr.port_idx] = current_state;
 
-    if(wire->endTransmission(true) != 0){
+    if(wire.endTransmission(true) != 0){
         return GpioError::I2CError;
     }
     return GpioError::NoError;

@@ -15,10 +15,10 @@
 class TelemetryBackend {
 public:
     TelemetryBackend();
-    ErrorCode __attribute__((warn_unused_result)) init();
+    [[nodiscard]] ErrorCode init();
 
     int16_t getRecentRssi();
-    void setFrequency(float frequency);
+    ErrorCode setFrequency(float frequency);
 
     /**
      * @brief This function transmits data from the struct provided as
@@ -38,8 +38,13 @@ public:
         gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
-        lora.send((uint8_t*) &data, sizeof(T));
-
+        SX1268Error result = lora.send((uint8_t*) &data, sizeof(T));
+        if(result != SX1268Error::NoError) {
+            Serial.print("Lora TX error ");
+            Serial.println((int)result);
+            // Re init the lora
+            (void)init();
+        }
     }
 
     /**
@@ -50,11 +55,23 @@ public:
      * @return bool indicating a successful read and write to buffer
     */
     template<typename T>
-    int read(T* write, int wait_milliseconds) {
+    bool read(T* write, int wait_milliseconds) {
         static_assert(sizeof(T) <= 0xFF, "The data type to receive is too large");
         uint8_t len = sizeof(T);
         // set receive mode
-        return lora.recv((uint8_t*) write, len, wait_milliseconds);
+        SX1268Error result = lora.recv((uint8_t*) write, len, wait_milliseconds);
+        if(result == SX1268Error::NoError) {
+            return true;
+        } else if(result == SX1268Error::RxTimeout) {
+            return false;
+        } else {
+            Serial.print("Lora error on rx ");
+            Serial.println((int)result);
+
+            //Re init the lora
+            (void)init();
+            return false;
+        }
     }
 
 private:

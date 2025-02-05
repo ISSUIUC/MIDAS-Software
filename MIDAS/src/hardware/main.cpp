@@ -69,11 +69,11 @@ void setup()
     gpioPinMode(LED_ORANGE, OUTPUT);
     gpioPinMode(LED_RED, OUTPUT);
 
-    gpioPinMode(PYROA_FIRE_PIN, OUTPUT, 1);
-    gpioPinMode(PYROB_FIRE_PIN, OUTPUT, 1);
-    gpioPinMode(PYROC_FIRE_PIN, OUTPUT, 1);
-    gpioPinMode(PYROD_FIRE_PIN, OUTPUT, 1);
-    gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT, 1);
+    gpioPinMode(PYROA_FIRE_PIN, OUTPUT);
+    gpioPinMode(PYROB_FIRE_PIN, OUTPUT);
+    gpioPinMode(PYROC_FIRE_PIN, OUTPUT);
+    gpioPinMode(PYROD_FIRE_PIN, OUTPUT);
+    gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT);
 
     delay(200);
 
