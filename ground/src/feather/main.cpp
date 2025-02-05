@@ -58,6 +58,8 @@ short cmd_number = 0;
 
 constexpr const char* json_command_success = R"({"type": "command_success"})";
 constexpr const char* json_command_bad = R"({"type": "bad_command"})";
+constexpr const char* json_command_sent = R"({"type": "command_sent"})";
+constexpr const char* json_command_ack = R"({"type": "command_acknowledge"})";
 constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
 constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
 
@@ -69,6 +71,7 @@ constexpr const char* json_send_failure = R"({"type": "send_error", "error": "co
 constexpr int max_command_retries = 20;
 
 bool last_ack_bit = false;
+bool initial_ack_flag = true;
 
 
 template <typename T>
@@ -182,6 +185,13 @@ double ConvertGPS(int32_t coord) {
     return complete;
 }
 
+void handle_acknowledge() {
+    if (!cmd_queue.empty()) {
+        cmd_queue.pop();
+        Serial.println(json_command_ack);
+    }
+}
+
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     int64_t start_printing = millis();
@@ -209,6 +219,16 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
     data.kf_reset = packet.alt & 1 == 1;
+
+    if(initial_ack_flag) {
+        last_ack_bit = data.kf_reset;
+        initial_ack_flag = false;
+    }
+
+    if(data.kf_reset != last_ack_bit) {
+        handle_acknowledge();
+        last_ack_bit = data.kf_reset;
+    }
     // kinda hacky but it will work
     if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
@@ -365,7 +385,7 @@ void Stest(const String key) {
     } else if (key == "PD") {
         command.command = CommandType::FIRE_PYRO_D;
     } else {
-        Serial.println("bad command");
+        Serial.println(json_command_bad);
         return;
     }
 
@@ -375,20 +395,13 @@ void Stest(const String key) {
 }
 
 
-void handle_acknowledge() {
-    if (!cmd_queue.empty()) {
-        cmd_queue.pop();
-    }
-}
-
 void process_command_queue() {
     if (cmd_queue.empty()) return;
     TelemetryCommandQueueElement& cmd = cmd_queue.front();
     cmd.retry_count --;
 
+    Serial.println(json_command_sent);
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
-
-    cmd_queue.pop();
 
     rf95.waitPacketSent();
 }
