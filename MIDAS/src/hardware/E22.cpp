@@ -12,7 +12,7 @@ void SX1268::wait_on_busy(){
 		if (timeout < 0)
 		{
 			Serial.println("ERR Wait too long on busy");
-
+            has_busy_fault = true;
             setup(); // Watchdog timer in case something goes wrong.
             delay(100);
 
