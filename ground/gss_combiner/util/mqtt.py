@@ -100,7 +100,6 @@ class TelemetryThread(threading.Thread):
                 if(len(self.__external_commands) > 0):
                     for cmd in self.__external_commands:
                         self.__log.console_log(f"Sending command '{cmd}'")
-                        print(f"Sending '{str(cmd) + "\n"}'")
                         self.__send_comport(str(cmd) + "\r\n")
                     self.__external_commands = []
 
@@ -131,19 +130,19 @@ class TelemetryThread(threading.Thread):
                             print("Read non dict?" + str(pkt) + " type " + str(type(packet_in)))
         
                         if packet_in['type'] == "command_success":
-                            print("\n\nGOOD COMMAND\n\n")
+                            self.__log.console_log("RX: Command good")
                             continue
 
                         if packet_in['type'] == "bad_command":
-                            print("\n\nBAD COMMAND!!\n\n")
+                            self.__log.console_log("RX: Command bad")
                             continue
 
                         if packet_in['type'] == "command_acknowledge":
-                            print("\nCMD ACK\n")
+                            self.__log.console_log("RX: Command ACK")
                             continue
 
                         if packet_in['type'] == "command_sent":
-                            print("\nCMD SENT!\n")
+                            self.__log.console_log("RX: Command send confirmed")
                             continue
 
                         # print(packet_in)
@@ -226,8 +225,8 @@ class MQTTThread(threading.Thread):
             except:
                 print(f"Failed to decode Command stream packet: {payload_str}")
 
-            # self.__log.console_log(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
-            print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
+            self.__log.console_log(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
+            # print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
 
             if(msg.topic == "Control-Sustainer"):
                 ack_msg = {"type": "acknowledge_combiner", "ch": "Control-Sustainer", "cmd_ack": raw_cmd}
@@ -250,17 +249,18 @@ class MQTTThread(threading.Thread):
     def get_telem_cmds(self):
         """Returns arrays of queued commands corresponding to (Sustainer, Booster)"""
         
+        if(len(self.__sustainer_cmds) > 0):
+            self.__log.console_log("Cmd: Ack queue good")
+
+
         with cmd_copy_lock:
             sus_cmds = copy.deepcopy(self.__sustainer_cmds)
             boost_cmds = copy.deepcopy(self.__booster_cmds)
             self.__sustainer_cmds = []
             self.__booster_cmds = []
 
-        if(len(self.__sustainer_cmds) > 0):
-            print("Initial queue OK")
-
         if(len(sus_cmds) > 0):
-            print("Copied queue OK")
+            self.__log.console_log("Cmd: Copy queue good")
 
 
 
