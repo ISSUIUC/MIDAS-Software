@@ -55,7 +55,6 @@ ErrorCode Pyro::init() {
 
 void Pyro::disarm_all_channels(PyroState& prev_state) {
     gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, LOW);
-
     gpioDigitalWrite(PYROA_FIRE_PIN, LOW);
     gpioDigitalWrite(PYROB_FIRE_PIN, LOW);
     gpioDigitalWrite(PYROC_FIRE_PIN, LOW);

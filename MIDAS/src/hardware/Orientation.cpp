@@ -113,7 +113,6 @@ float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
     return std::acos(dot_product / (mag1 * mag2));
 }
 
-
 /**
  * @brief Generates a rotation matrix that transforms a vector by the rotations described in rpy_vec {roll, pitch, yaw} (in that order!)
  */
@@ -211,7 +210,6 @@ Orientation OrientationSensor::read()
         if (initial_flag == 0)
         {
             initial_orientation = sensor_reading;
-            initial_quaternion = quat;
             initial_flag = 1;
         }
       
