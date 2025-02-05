@@ -167,6 +167,7 @@ struct CommandFlags {
     bool should_fire_pyro_b = false;            // CommandType::FIRE_PYRO_B
     bool should_fire_pyro_c = false;            // CommandType::FIRE_PYRO_C
     bool should_fire_pyro_d = false;            // CommandType::FIRE_PYRO_D
+    bool should_turn_on_cameras = false;        // CommandType::CAMERAS_ON
 };
 /**
  * @struct RocketData

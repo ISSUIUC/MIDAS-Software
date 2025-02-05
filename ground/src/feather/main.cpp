@@ -137,7 +137,7 @@ struct FullTelemetryData {
 
 
 
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, EMPTY };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAMERAS_ON, EMPTY };
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
@@ -328,7 +328,9 @@ void SerialInput(const char* key, const char* value) {
         command.command = CommandType::FIRE_PYRO_C;
     } else if (strcmp(key, "PD") == 0) {
         command.command = CommandType::FIRE_PYRO_D;
-    } else {
+    } else if (strcmp(key, "CAMERAS_ON") == 0) {
+        command.command = CommandType::CAMERAS_ON;
+    }else {
         Serial.println(json_command_bad);
         return;
     }
@@ -364,6 +366,8 @@ void Stest(const String key) {
         command.command = CommandType::FIRE_PYRO_C;
     } else if (key == "PD") {
         command.command = CommandType::FIRE_PYRO_D;
+    }else if (key == "CAMERAS_ON") {
+        command.command = CommandType::CAMERAS_ON;
     } else {
         Serial.println(json_command_bad);
         return;

@@ -267,6 +267,10 @@ Serial.println((int) command.command);
                 arg->rocket_data.command_flags.should_fire_pyro_d = true;
             }
             break;
+        case CommandType::CAMERAS_ON:
+            arg->rocket_data.command_flags.should_turn_on_cameras = true;
+            Serial.println("Turning cameras on");
+            break;
         default:
             break; // how
     }
