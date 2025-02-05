@@ -51,12 +51,12 @@ void i2cscanner() {
  * Sets the config file and then starts all the threads using the config.
  */
 
-#ifdef IS_SUSTAINER
+// #ifdef IS_SUSTAINER
 // MultipleLogSink<EMMCSink> sinks;
 MultipleLogSink<SDSink> sinks;
-#else
-MultipleLogSink<> sinks;
-#endif
+// #else
+// MultipleLogSink<> sinks;
+// #endif
 RocketSystems systems { .log_sink = sinks };
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
@@ -64,7 +64,6 @@ RocketSystems systems { .log_sink = sinks };
 
 void setup() {
     //begin serial port
-    while (!Serial);
     Serial.begin(9600);
 
     delay(200);

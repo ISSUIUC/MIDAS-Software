@@ -40,8 +40,6 @@ public:
 
         lora.send((uint8_t*) &data, sizeof(T));
 
-        THREAD_SLEEP(100);
-
     }
 
     /**

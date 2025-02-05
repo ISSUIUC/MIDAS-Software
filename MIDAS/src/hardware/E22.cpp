@@ -321,7 +321,6 @@ int SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
     uint16_t irq = irq_buff[1] + (irq_buff[2] << 8);
     // Serial.print("IRQ "); Serial.println(irq, 2);
     if(irq & IRQ_CRC_ERROR) {
-        Serial.println("CRC error");
         return 64;
     } else if(irq & IRQ_RX_DONE) {
         uint8_t packet_info[3]{};
@@ -342,13 +341,10 @@ int SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
             len = packet_ptr;
          }
         read_buffer(packet_len, data, len);
-        Serial.println((char*) data);
         return 0;
     } else if(irq & IRQ_RX_TX_TIMEOUT) {
-        Serial.println("timeout code");
         return 512;
     } else {
-        Serial.println("Unexpected interupt code");
         return 0xFF;
     }
     return 0xFF;
