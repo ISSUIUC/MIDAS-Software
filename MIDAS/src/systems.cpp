@@ -217,8 +217,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 }
 
 void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
-// maybe we should move this somewhere else but it can stay here for now
-Serial.println((int) command.command);
+    // maybe we should move this somewhere else but it can stay here for now
     switch(command.command) {
         case CommandType::RESET_KF:
             arg->rocket_data.command_flags.should_reset_kf = true;
@@ -281,7 +280,6 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
             }
         }
         THREAD_SLEEP(1);
-        // Serial.println("Telemetry");
     }
 }
 
