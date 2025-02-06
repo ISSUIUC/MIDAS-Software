@@ -33,6 +33,8 @@ class TelemetryThread(threading.Thread):
 
         self.__external_commands = []
 
+        self.__ack_queue = []
+
         
     def process_packet(self, packet_json):
         """Append metadata to a packet to conform to GSS v1.1 packet structure"""
@@ -70,6 +72,11 @@ class TelemetryThread(threading.Thread):
             return p_full.split("\n")
         else:
             return []
+        
+    def get_ack_queue(self):
+        q_copy = copy.deepcopy(self.__ack_queue)
+        self.__ack_queue.clear()
+        return q_copy
         
     def add_combiner(self, combiner):
         """Add a combiner data sink for this telemetry thread"""
@@ -131,18 +138,23 @@ class TelemetryThread(threading.Thread):
         
                         if packet_in['type'] == "command_success":
                             self.__log.console_log("RX: Command good")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
                             continue
 
+                        # This is jank but idc
                         if packet_in['type'] == "bad_command":
                             self.__log.console_log("RX: Command bad")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
                             continue
 
                         if packet_in['type'] == "command_acknowledge":
                             self.__log.console_log("RX: Command ACK")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
                             continue
 
                         if packet_in['type'] == "command_sent":
                             self.__log.console_log("RX: Command send confirmed")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
                             continue
 
                         # print(packet_in)
@@ -291,6 +303,11 @@ class MQTTThread(threading.Thread):
                 print(f"Unable to publish to '{topic}' : ", str(e)) # Always print
                 self.__log.fail()
             self.__log.waiting_delta(-1)
+
+    def send_raw(self, topic, data) -> None:
+        """Publish a set of packets to a `Data` topic"""
+        self.__mqttclient.publish(topic, json.dumps(data).encode("utf-8"))
+        self.__log.console_log(f"Published")
 
     def run(self) -> None:
         self.__mqttclient.loop_start()
