@@ -192,6 +192,14 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
     PyroState new_pyro_state = PyroState();
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
+    if (fsm_state == FSMState::STATE_SAFE) {
+        disarm_all_channels(new_pyro_state);
+        return new_pyro_state;
+    }
+
+    // If the state is not SAFE, we arm the global arm pin
+    new_pyro_state.is_global_armed = true;
+    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
     // If the state is IDLE or any state after that, we arm the global arm pin
     switch (fsm_state) {
         case FSMState::STATE_IDLE:

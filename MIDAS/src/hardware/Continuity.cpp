@@ -83,5 +83,7 @@ Continuity ContinuitySensor::read() {
     continuity.pins[1] = absolute_current;    // The absolute current running through the pyro bus
     continuity.pins[2] = expected_current;    // Calculated expected current based on current pyro bus voltage
     continuity.pins[3] = voltage_normalized;  // Pyro bus voltage
+
+    // Serial.println(continuous_channels);
     return continuity;
 }

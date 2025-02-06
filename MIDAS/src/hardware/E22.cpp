@@ -203,8 +203,8 @@ SX1268Error SX1268::setup(){
     DBG_PRINT("setup start");
     SX1268Check(wait_on_busy());
     SX1268Check(set_standby());
-    SX1268Check(set_tx_power(22));
     SX1268Check(set_lora());
+    SX1268Check(set_tx_power(22));
     SX1268Check(set_base_address(0x00, 0x00));
 
     return SX1268Error::NoError;

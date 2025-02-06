@@ -103,7 +103,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
     
     const float max_volts = 12;
-    packet.pyro |= ((((uint16_t) (continuity.pins[0] / max_volts * 127)) & 0x7F) << (0 * 7));
+    packet.pyro |= ((((uint16_t) (std::round(continuity.pins[0]))) & 0x7F) << (0 * 7));
     packet.pyro |= ((((uint16_t) (continuity.pins[1] / max_volts * 127)) & 0x7F) << (1 * 7));
     packet.pyro |= ((((uint16_t) (continuity.pins[2] / max_volts * 127)) & 0x7F) << (2 * 7));
     packet.pyro |= ((((uint16_t) (continuity.pins[3] / max_volts * 127)) & 0x7F) << (3 * 7));
