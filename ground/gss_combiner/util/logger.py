@@ -4,6 +4,7 @@
 from enum import Enum
 import datetime
 from pathlib import Path
+import os
 
 class LoggerOptions():
     def __init__(self, should_log, is_verbose) -> None:
@@ -21,7 +22,9 @@ class LoggerStream():
     def __init__(self, options: LoggerOptions, type: LoggerType, name: str, meta_category: str) -> None:
         self.__title = type.value + " " + name
         self.__filename = "./outputs/" + str(int(datetime.datetime.now().timestamp())) + "_" + type.value + "_" + name + "_raw_output.txt"
-        Path("./outputs/").mkdir(parents=True, exist_ok=True)
+        # Get dirname of filename
+
+        Path(os.path.dirname(self.__filename)).mkdir(parents=True, exist_ok=True)
         self.__lstype = type
         self.__meta_cat = meta_category
         
