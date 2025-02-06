@@ -269,6 +269,11 @@ if __name__ == "__main__":
 
         sustainer_commands, booster_commands = broadcast_thread.get_telem_cmds()
 
+        # Handle ack sending
+        for thread in (telem_threads_booster + telem_threads_relay + telem_threads_sustainer):
+            for packet in thread.get_ack_queue():
+                broadcast_thread.send_raw(packet[0], packet[1])
+
         # handle commands 
         # print(sustainer_commands, booster_commands)
 
