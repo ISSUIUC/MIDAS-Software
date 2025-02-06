@@ -90,17 +90,41 @@ def parse_params(arguments):
     if args.relay is not None:
         relay_sources = args.relay.split(",")
 
+    comports = list_ports.comports()
+    port_idx = 0
     if args.nboosters is not None:
         for i in range(0, args.nboosters):
-            booster_sources.append(str(list_ports.comports()[i]).split(' ')[0])
+            while port_idx < len(list_ports.comports()) and list_ports.comports()[port_idx].vid != 0x239A:
+                port_idx += 1
+            if port_idx >= len(list_ports.comports()):
+                # Warn
+                print("\x1b[33mWARNING: Not enough COM ports available for boosters! Stopping at ", port_idx, "\x1b[0m")
+                break
+            booster_sources.append(str(list_ports.comports()[port_idx].device))
+            port_idx += 1
 
     if args.nsustainers is not None:
-        for i in range(args.nboosters, args.nsustainers + args.nboosters):
-            sustainer_sources.append(str(list_ports.comports()[i]).split(' ')[0])
+        for i in range(0, args.nsustainers):
+            while port_idx < len(list_ports.comports()) and list_ports.comports()[port_idx].vid != 0x239A:
+                port_idx += 1
+            if port_idx >= len(list_ports.comports()):
+                # Warn
+                print("\x1b[33mWARNING: Not enough COM ports available for sustainers! Stopping at ", port_idx, "\x1b[0m")
+                break
+            sustainer_sources.append(str(list_ports.comports()[port_idx].device))
+            port_idx += 1
 
     if args.nrelays is not None:
-        for i in range(args.nsustainers + args.nboosters, args.nrelays + args.nsustainers + args.nboosters):
-            relay_sources.append(str(list_ports.comports()[i]).split(' ')[0])
+        for i in range(0, args.nrelays):
+            # Check if vid == 0x239A
+            while port_idx < len(list_ports.comports()) and list_ports.comports()[port_idx].vid != 0x239A:
+                port_idx += 1
+            if port_idx >= len(list_ports.comports()):
+                # Warn
+                print("\x1b[33mWARNING: Not enough COM ports available for relays! Stopping at ", port_idx, "\x1b[0m")
+                break
+            relay_sources.append(str(list_ports.comports()[port_idx].device))
+            port_idx += 1
 
     is_local = args.local
     should_log = not args.no_log
