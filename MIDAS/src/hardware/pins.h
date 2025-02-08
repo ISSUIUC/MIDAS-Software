@@ -40,6 +40,10 @@
 #define PYRO_SDA 41
 #define PYRO_SCL 42
 
+// Buzzer pins
+#define BUZZER_PIN 17
+#define BUZZER_CHANNEL 1
+
 // CAN pins
 #define CAN_CS 2
 #define RFM96W_CS 5

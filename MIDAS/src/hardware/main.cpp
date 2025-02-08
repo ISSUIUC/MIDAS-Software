@@ -31,6 +31,19 @@ void setup()
 
     delay(200);
 
+    // Immediate startup tone
+    pinMode(BUZZER_PIN, OUTPUT);
+    digitalWrite(BUZZER_PIN, LOW);
+    ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
+
+    ledcWriteTone(BUZZER_CHANNEL, 4000);
+    delay(200);
+    ledcWriteTone(BUZZER_CHANNEL, 0);
+    delay(50);
+    ledcWriteTone(BUZZER_CHANNEL, 4000);
+    delay(200);
+    ledcWriteTone(BUZZER_CHANNEL, 0);
+
     // begin sensor SPI bus
     Serial.println("Starting SPI...");
     SPI.begin(SPI_SCK, SPI_MISO, SPI_MOSI);
