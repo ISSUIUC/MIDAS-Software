@@ -4,18 +4,59 @@
 
 EKF::EKF() : KalmanFilter() {
     state = KalmanData();
-    initializeAerodynamicData();
 }
 
 
 // constants
 const float pi = 3.14159268;
+const float a = 343.0; // (m/s) speed of sound
 const float rho = 1.225; // average air density
-const float r = 0.03935; // meters
-const float height_full = 2.34; // height of rocket Full Stage - 2.34 m
-const float height_sustainer = 1.34;
-const float mass_full = 7.57; // kg Sustainer + Booster
-const float mass_sustainer = 4.08; // kg Sustainer
+const float r = 0.03935; // (m)
+const float height_full = 2.34; // (m) height of rocket Full Stage
+const float height_sustainer = 1.34;  // (m) height of rocket Sustainer
+const float mass_full = 7.57; // (kg) Sustainer + Booster
+const float mass_sustainer = 4.08; // (kg) Sustainer
+
+typedef struct {
+    float mach;
+    float alpha;
+    float CA_power_on;
+    float CN;
+    float CP;
+} AeroCoeff;
+
+// stores the aerodynamic coefficients for the corresponding Mach number
+const AeroCoeff aero_data[] = {
+    {0.04, 4, 1.332142905, 1.1827808455, 60.8267871968},
+    {0.08, 4, 1.326587387, 1.1827808455, 60.8267871968},
+    {0.12, 4, 1.31558627,  1.1827808455, 60.8267871968},
+    {0.16, 4, 1.306063953, 1.1827808455, 60.8267871968},
+    {0.20, 4, 1.298117084, 1.1827808455, 60.8267871968},
+    {0.24, 4, 1.291411025, 1.1827808455, 60.8267871968},
+    {0.28, 4, 1.290279857, 1.1827808455, 60.8267871968},
+    {0.32, 4, 1.291431043, 1.1827808455, 60.8267871968},
+    {0.36, 4, 1.293170653, 1.1827808455, 60.8267871968},
+    {0.40, 4, 1.295385827, 1.1827808455, 60.8267871968},
+    {0.44, 4, 1.297991738, 1.1827808455, 60.8267871968},
+    {0.48, 4, 1.300924032, 1.1827808455, 60.8267871968},
+    {0.52, 4, 1.304132086, 1.1827808455, 60.8267871968},
+    {0.56, 4, 1.309039395, 1.1827808455, 60.8267871968},
+    {0.60, 4, 1.314605487, 1.1827808455, 60.8267871968},
+    {0.64, 4, 1.330699437, 1.1827808455, 60.8267871968},
+    {0.68, 4, 1.346695167, 1.1827808455, 60.8267871968},
+    {0.72, 4, 1.362693183, 1.1827808455, 60.8267871968},
+    {0.76, 4, 1.378693074, 1.1827808455, 60.8267871968},
+    {0.80, 4, 1.394695194, 1.1827808455, 60.8267871968},
+    {0.84, 4, 1.41069913,  1.1827808455, 60.8267871968},
+    {0.88, 4, 1.426705046, 1.1827808455, 60.8267871968},
+    {0.92, 4, 1.473732816, 1.218959468,  60.91848997},
+    {0.96, 4, 1.582395672, 1.291316713,  61.10189551},
+    {1.00, 4, 1.681494886, 1.363673958,  61.28530105},
+};
+
+// Number of entries
+#define AERO_DATA_SIZE (sizeof(aero_data) / sizeof(aero_data[0]))
+
 
 
 // Moonburner motor thrust curve (Sustainer)
@@ -433,36 +474,6 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
 
 
 /**
- * @brief Initializes the aerodynamic data from a CSV file
- *
- * The function reads a CSV file containing aerodynamic data and stores it in a map.
- * The key is the Mach number, and the value is a tuple containing aerodynamic coefficients.
- */
-void EKF::initializeAerodynamicData() {
-    std::ifstream file("LookUp.csv");
-    std::string line;
-   
-    // Skip the header line
-    std::getline(file, line);
-   
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string token;
-        std::vector<double> row;
-       
-        while (std::getline(iss, token, ',')) {
-            row.push_back(std::stod(token));
-        }
-       
-        if (row.size() >= 5) {
-            double mach = std::round(row[0] / 0.04) * 0.04;
-            aerodynamicData[mach] = std::make_tuple(row[2], row[3], row[4]);
-        }
-    }
-}
-
-
-/**
  * @brief Getter for state X
  *
  * @return the current state, see sensor_data.h for KalmanData
@@ -601,6 +612,15 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz) {
     F_mat(3,4) = 1;
     F_mat(6,7) = 1;
 
+    
+    float velocity_magnitude = pow(x_k(1,0)*x_k(1,0) + x_k(4,0)*x_k(4,0) + x_k(7,0)*x_k(7,0), 0.5);
+    float mach = velocity_magnitude / a;
+    int index = std::round(mach / 0.04);
+    index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
+
+    Ca = aero_data[index].CA_power_on;
+    Cn = aero_data[index].CN;
+    Cp = aero_data[index].CP;
 
     float m = mass_sustainer;
     float h = height_sustainer;
@@ -623,13 +643,6 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz) {
     F_mat(7,1) = pi * Cn * r * r * rho * x_k(1,0) / m + w(1,0);
     F_mat(7,4) = pi * Cn * r * r * rho * x_k(2,0) / m - w(0,0);
     F_mat(7,7) = pi * Cn * r * r * rho * x_k(3,0) / m;
-
-
-    float velocity_magnitude = pow(x_k(1,0)*x_k(1,0) + x_k(4,0)*x_k(4,0) + x_k(7,0)*x_k(7,0), 0.5);
-    float mach = velocity_magnitude / 343.0;
-    mach = std::round(mach / 0.04) * 0.04;
-    std::tie(Ca, Cn, Cp) = aerodynamicData[mach];
-   
 }
 
 EKF ekf;
