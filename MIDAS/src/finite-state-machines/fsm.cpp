@@ -259,7 +259,8 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_DROGUE:
             // if altitude low enough then next state
-            if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold) {
+            // Also, wait at least 1 second after drogue deploy to deploy main.
+            if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold && (current_time - drogue_time) > sustainer_main_deploy_delay_after_drogue) {
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }
@@ -456,7 +457,9 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_DROGUE:
-            if (state_estimate.altitude <= booster_main_deploy_altitude_threshold) {
+            // if altitude low enough then next state
+            // Also, wait at least 1 second after drogue deploy to deploy main.
+            if (state_estimate.altitude <= booster_main_deploy_altitude_threshold && (current_time - drogue_time) > booster_main_deploy_delay_after_drogue) {
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }

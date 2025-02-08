@@ -50,6 +50,9 @@
 // Height required to deploy the main parachutes (m)
 #define sustainer_main_deploy_altitude_threshold 1006
 
+// The minimum delay between drogue deployment and main deployment
+#define sustainer_main_deploy_delay_after_drogue 1000
+
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define sustainer_ignition_to_second_boost_time_threshold 1000
 
@@ -115,6 +118,9 @@
 // Height required to deploy the main parachutes (m)
 // [STARGAZER 1.4] This is a "dontcare" value --> The booster does not have a drogue, we transition immediately to MAIN
 #define booster_main_deploy_altitude_threshold 999999
+
+// The minimum delay between drogue deployment and main deployment
+#define booster_main_deploy_delay_after_drogue 1000
 
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define booster_ignition_to_second_boost_time_threshold 1000
