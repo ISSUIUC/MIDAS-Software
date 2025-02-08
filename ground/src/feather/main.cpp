@@ -446,6 +446,8 @@ void setup() {
     Serial.println("}");
     rf95.setTxPower(23, false);
 
+    Serial.setTimeout(250);
+
 }
 
 void ChangeFrequency(float freq) {
