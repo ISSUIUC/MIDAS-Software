@@ -36,12 +36,12 @@ void setup()
     digitalWrite(BUZZER_PIN, LOW);
     ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
 
-    ledcWriteTone(BUZZER_CHANNEL, 4000);
-    delay(200);
+    ledcWriteTone(BUZZER_CHANNEL, 3200);
+    delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
-    delay(50);
-    ledcWriteTone(BUZZER_CHANNEL, 4000);
-    delay(200);
+    delay(100);
+    ledcWriteTone(BUZZER_CHANNEL, 3200);
+    delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
 
     // begin sensor SPI bus
