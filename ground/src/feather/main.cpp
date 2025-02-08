@@ -134,7 +134,7 @@ struct FullTelemetryData {
     float sat_count;
     float pyros[4];
     bool is_sustainer;
-    uint16_t kf_vx;
+    float kf_vx;
     bool kf_reset;
 };
 
