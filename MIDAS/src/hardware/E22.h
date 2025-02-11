@@ -190,6 +190,12 @@ typedef enum
 	LORA_CAD_16_SYMBOL = 0x04,
 } RadioLoRaCadSymbols_t;
 
+typedef enum
+{
+	PACKET_TYPE_GFSK = 0x00,
+	PACKET_TYPE_LORA = 0x01,
+} RadioPacketType_t;
+
 enum class SX1268Error {
 	NoError,
 	BusyTimeout,
@@ -197,6 +203,8 @@ enum class SX1268Error {
 	TxTimeout,
 	RxTimeout,
 	CrcError,
+	FailedReadback,
+	DeviceError,
 	UnknownError,
 };
 
@@ -236,8 +244,10 @@ private:
 	[[nodiscard]] SX1268Error set_pa_config(uint8_t pa_duty_cycle, uint8_t hp_max);
 	[[nodiscard]] SX1268Error set_tx_params(int8_t power, RadioRampTimes_t ramp_time);
 	[[nodiscard]] SX1268Error set_standby();
-	[[nodiscard]] SX1268Error set_lora();
+	[[nodiscard]] SX1268Error set_packet_type(RadioPacketType_t packet_type);
 	[[nodiscard]] SX1268Error clear_irq();
+	[[nodiscard]] SX1268Error check_device_errors();
+	[[nodiscard]] SX1268Error check_device_state();
 
 	SPIClass& spi;
 	uint8_t pin_cs;
@@ -245,10 +255,12 @@ private:
 	uint8_t pin_dio1;
 	uint8_t pin_rxen;
 	uint8_t pin_reset;
+	uint8_t tx_power = 0;
+	uint32_t frequency = 430000000;
 	int prev_rssi;
 	int prev_snr;
 	int prev_signal_rssi;
 	int prev_rx_error;
 	bool busy_fault;
-	SPISettings spiSettings = SPISettings(2000000, MSBFIRST, SPI_MODE0);
+	SPISettings spiSettings = SPISettings(10000000, MSBFIRST, SPI_MODE0);
 };

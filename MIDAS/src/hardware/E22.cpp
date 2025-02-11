@@ -175,10 +175,10 @@ SX1268Error SX1268::calibrate_image(uint32_t freq)
 }
 
 SX1268Error SX1268::set_frequency(uint32_t frequency) {
+    this->frequency = frequency;
+
     uint8_t buf[4];
 	uint32_t freq = 0;
-    Serial.print("Setting frequency to ");
-    Serial.println(frequency);
     SX1268Check(calibrate_image(frequency));
 	freq = (uint32_t)((double)frequency / (double)FREQ_STEP);
 	buf[0] = (uint8_t)((freq >> 24) & 0xFF);
@@ -186,6 +186,8 @@ SX1268Error SX1268::set_frequency(uint32_t frequency) {
 	buf[2] = (uint8_t)((freq >> 8) & 0xFF);
 	buf[3] = (uint8_t)(freq & 0xFF);
 	SX1268Check(write_command(RADIO_SET_RFFREQUENCY, buf, 4));
+
+    SX1268Check(check_device_errors());
 
     return SX1268Error::NoError;
 }
@@ -200,12 +202,14 @@ SX1268Error SX1268::setup(){
     digitalWrite(pin_reset, LOW);
     delay(10);
     digitalWrite(pin_reset, HIGH);
+    delay(1);
     DBG_PRINT("setup start");
     SX1268Check(wait_on_busy());
     SX1268Check(set_standby());
-    SX1268Check(set_lora());
+    SX1268Check(set_packet_type(PACKET_TYPE_LORA));
     SX1268Check(set_tx_power(22));
     SX1268Check(set_base_address(0x00, 0x00));
+    SX1268Check(check_device_errors());
 
     return SX1268Error::NoError;
 }
@@ -303,19 +307,31 @@ SX1268Error SX1268::set_tx_params(int8_t power, RadioRampTimes_t ramp_time) {
 SX1268Error SX1268::set_standby() {
     uint8_t STANDBY_RC = 0;
     SX1268Check(write_command(RADIO_SET_STANDBY, &STANDBY_RC, sizeof(STANDBY_RC)));
+    uint8_t readback{};
+    SX1268Check(read_command(RADIO_GET_STATUS, &readback, sizeof(readback)));
+    if(readback & 0x20 == 0) return SX1268Error::FailedReadback;
+
 
     return SX1268Error::NoError;
 }
 
-SX1268Error SX1268::set_lora() {
-    uint8_t LORA = 1;
-    SX1268Check(write_command(RADIO_SET_PACKETTYPE, &LORA, sizeof(LORA)));
+SX1268Error SX1268::set_packet_type(RadioPacketType_t packet_type) {
+    uint8_t type = packet_type;
+    SX1268Check(write_command(RADIO_SET_PACKETTYPE, &type, sizeof(type)));
+    uint8_t readback{};
+    SX1268Check(read_command(RADIO_GET_PACKETTYPE, &readback, sizeof(readback)));
+
+    if(readback != type) {
+        return SX1268Error::FailedReadback;
+    }
 
     return SX1268Error::NoError;
 }
 
 SX1268Error SX1268::set_tx_power(int8_t dbm) {
+    tx_power = dbm;
     SX1268Check(set_tx_params(dbm, RADIO_RAMP_800_US));
+
 
     return SX1268Error::NoError;
 }
@@ -329,9 +345,12 @@ SX1268Error SX1268::clear_irq() {
     return SX1268Error::NoError;
 }
 
+
 SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
     if(len > 255) return SX1268Error::BadParameter;
     SX1268Check(set_standby());
+    SX1268Check(set_packet_type(PACKET_TYPE_LORA));
+    SX1268Check(set_frequency(frequency));
     SX1268Check(set_base_address(0x00, 0x00));
     SX1268Check(set_packet_params(6, LORA_PACKET_EXPLICIT, len, LORA_CRC_ON, LORA_IQ_NORMAL));
     SX1268Check(set_dio_irq_params(
@@ -340,12 +359,14 @@ SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
         IRQ_RADIO_NONE,
         IRQ_RADIO_NONE));
 
+    SX1268Check(check_device_errors());
     size_t timeout = timeout_ms * TIME_DIVISION_PER_MS;
     uint8_t timeout_buf[] = {
         (uint8_t)((timeout >> 16) & 0xFF),
         (uint8_t)((timeout >> 8) & 0xFF),
         (uint8_t)((timeout >> 0) & 0xFF)
     };
+
 
     SX1268Check(write_command(RADIO_SET_RX, timeout_buf, sizeof(timeout)));
     for(int i = 0; i < timeout + 10; i++){
@@ -393,6 +414,9 @@ SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
 SX1268Error SX1268::send(uint8_t* data, size_t len) {
     if(len > 255) return SX1268Error::BadParameter;
     SX1268Check(set_standby());
+    SX1268Check(set_packet_type(PACKET_TYPE_LORA));
+    SX1268Check(set_frequency(frequency));
+    SX1268Check(set_tx_power(tx_power));
     SX1268Check(set_base_address(0x00, 0x00));
     SX1268Check(set_packet(data, len));
     SX1268Check(set_packet_params(10, LORA_PACKET_EXPLICIT, len, LORA_CRC_ON, LORA_IQ_NORMAL));
@@ -401,7 +425,7 @@ SX1268Error SX1268::send(uint8_t* data, size_t len) {
         IRQ_TX_DONE | IRQ_RX_TX_TIMEOUT,
         IRQ_RADIO_NONE,
         IRQ_RADIO_NONE));
-
+    SX1268Check(check_device_errors());
     uint8_t timeout[] = {0x00,0x00,0x00};
     SX1268Check(write_command(RADIO_SET_TX, timeout, sizeof(timeout)));
     for(int i = 0; i < 1000; i++){
@@ -416,3 +440,16 @@ SX1268Error SX1268::send(uint8_t* data, size_t len) {
 
     return SX1268Error::NoError;
 }
+
+SX1268Error SX1268::check_device_errors() {
+    uint8_t errors[2]{};
+    SX1268Check(read_command(RADIO_GET_ERROR, errors, sizeof(errors)));
+    if(errors[0] != 0 || errors[1] != 0) {
+        uint8_t zero = 0;
+        SX1268Check(write_command(RADIO_CLR_ERROR, &zero, sizeof(zero)));
+        return SX1268Error::DeviceError;
+    }
+
+    return SX1268Error::NoError;
+}
+

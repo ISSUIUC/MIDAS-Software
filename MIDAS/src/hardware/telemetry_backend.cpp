@@ -51,8 +51,9 @@ TelemetryBackend::TelemetryBackend() : lora(SPI, E22_CS, E22_BUSY, E22_DI01, E22
 */
 ErrorCode TelemetryBackend::init() {
 	if(lora.setup() != SX1268Error::NoError) return ErrorCode::LoraCouldNotBeInitialized;
-	if(lora.set_frequency((uint32_t) (TX_FREQ * 1e6)) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
     if(lora.set_modulation_params(8, LORA_BW_250, LORA_CR_4_8, false) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
+	if(lora.set_frequency((uint32_t) (TX_FREQ * 1e6)) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
+	if(lora.set_tx_power(22) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
 
     return ErrorCode::NoError;
 }
