@@ -5,8 +5,8 @@
 
 struct Cameras {
     ErrorCode init();
-    HardwareSerial cam1;
-    HardwareSerial cam2;
+    HardwareSerial* cam1;
+    HardwareSerial* cam2;
 };
 
 

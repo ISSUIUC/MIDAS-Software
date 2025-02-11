@@ -92,9 +92,28 @@ ErrorCode BuzzerController::init() {
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 
+
+#define g4_sharp_eight Sound{415, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
+#define c4_sharp_eight Sound{277, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
+#define c5_sharp_eight Sound{554, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
+#define c5_sharp_quart Sound{554, static_cast<uint8_t>(0.5 * MS_PER_4BEAT)}
+#define rest_eight Sound{0, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
+#define b5_sharp_eight Sound{523, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
+#define c4_sharp_quart Sound{277, static_cast<uint8_t>(0.5 * MS_PER_4BEAT)}
+
+
+
+
 /**
  * @brief free bird solo song, to be played on startup/ second stage iginition
 */
-Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
-    /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight
+// Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
+//     /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight,
+// };
+
+
+//Star Trek Voyager Theme (first few measures simplified)
+Sound free_bird[FREE_BIRD_LENGTH] = {
+    g4_sharp_eight, c4_sharp_eight, c5_sharp_quart, rest_eight, g4_sharp_eight, c4_sharp_eight, c5_sharp_eight, 
+    b5_sharp_eight, g4_sharp_eight, c4_sharp_quart
 };

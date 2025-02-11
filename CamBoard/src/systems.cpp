@@ -25,7 +25,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             Serial.print("Voltage ");
             Serial.println(voltage * 3.125 / 1000.0);
             Serial.print("Temp ");
-            Serial.println(temp * 125 / 1000.0);
+            Serial.println((temp>>4) * 125 / 1000.0);
             Serial.print("Current ");
             Serial.println(current * 1.2 / 1000.0);
             Serial.print("Power ");
@@ -34,7 +34,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         arg->led.update();
         i += 1;
 
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(100);
     }
 }
 

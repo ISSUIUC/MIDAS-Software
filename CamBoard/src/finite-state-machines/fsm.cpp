@@ -15,14 +15,14 @@
 FSMState FSM::tick_fsm(FSMState& state, RocketSystems* arg) {
     switch (state) {
         case FSMState::STATE_IDLE:
-            if (arg->rocket_data.commands.command.data[0] == (uint8_t) 1) {
+            if (arg->rocket_data.commands.command.data[0] == (uint8_t) 0) {
                 Serial.println("Swapping to STATE_ON");
                 state = FSMState::STATE_ON;
-                camera_on_off(arg->cameras.cam1);
-                camera_on_off(arg->cameras.cam2);
-                start_recording(arg->cameras.cam1);
+                camera_on_off(*(arg->cameras.cam1));
+                camera_on_off(*(arg->cameras.cam2));
+                start_recording(*(arg->cameras.cam1));
                 Serial.println("Turned on camera 1");
-                start_recording(arg->cameras.cam2);
+                start_recording(*(arg->cameras.cam2));
             }
             break;
 
@@ -44,10 +44,10 @@ FSMState FSM::tick_fsm(FSMState& state, RocketSystems* arg) {
         case FSMState::STATE_RECORDING_DESCENT:
             if (arg->rocket_data.commands.command.data[0] == (uint8_t) 4) {
                 state = FSMState::STATE_IDLE;
-                stop_recording(arg->cameras.cam1);
-                stop_recording(arg->cameras.cam2);
-                camera_on_off(arg->cameras.cam1);
-                camera_on_off(arg->cameras.cam2);
+                stop_recording(*(arg->cameras.cam1));
+                stop_recording(*(arg->cameras.cam2));
+                camera_on_off(*(arg->cameras.cam1));
+                camera_on_off(*(arg->cameras.cam2));
                 
             }
             break;
