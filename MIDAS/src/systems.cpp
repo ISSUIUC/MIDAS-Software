@@ -3,12 +3,15 @@
 #include "hal.h"
 #include "gnc/ekf.h"
 
+#include <TCAL9539.h>
+
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
 #elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
 #error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
 #endif
 
+#define ENABLE_TELEM
 
 /**
  * @brief These are all the functions that will run in each task
@@ -49,20 +52,25 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
             arg->rocket_data.barometer.update(reading);
             prev_reading = reading; // Only update prev_reading with accepted readings
         }
+        // Serial.print("Barometer ");
+        // Serial.print(reading.altitude);
+        // Serial.print(" ");
+        // Serial.print(reading.pressure);
+        // Serial.print(" ");
+        // Serial.println(reading.temperature);
         THREAD_SLEEP(6);
     }
 }
 
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
-#ifdef IS_SUSTAINER
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);
-#endif
         LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
         arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
+
         THREAD_SLEEP(2);
     }
 }
@@ -73,7 +81,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
         if (reading.has_data) {
             arg->rocket_data.orientation.update(reading);
         }
-
         THREAD_SLEEP(100);
     }
 }
@@ -82,34 +89,44 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
-        THREAD_SLEEP(50);  //data rate is 155hz so 7 is closest
+        THREAD_SLEEP(50);
     }
 }
 
-// Ever device which communicates over i2c is on this thread to avoid interference
-DECLARE_THREAD(i2c, RocketSystems* arg) {
-    int i = 0;
-
-    while (true) {
-        if (i % 10 == 0) {
+DECLARE_THREAD(gps, RocketSystems* arg) {
+    while(true) {
+        if(arg->sensors.gps.valid()) {
             GPS reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
-
-            FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-            PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync());
-            arg->rocket_data.pyro.update(new_pyro_state);
-
-            Continuity reading2 = arg->sensors.continuity.read();
-            arg->rocket_data.continuity.update(reading2);
-
-            Voltage reading3 = arg->sensors.voltage.read();
-            arg->rocket_data.voltage.update(reading3);
         }
+        //GPS waits internally
+        THREAD_SLEEP(1);
+    }
+}
+
+DECLARE_THREAD(pyro, RocketSystems* arg) {
+    while(true) {
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        CommandFlags& telem_commands = arg->rocket_data.command_flags;
+
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
+        arg->rocket_data.pyro.update(new_pyro_state);
 
         arg->led.update();
-        i += 1;
 
         THREAD_SLEEP(10);
+    }   
+}
+
+DECLARE_THREAD(voltage, RocketSystems* arg) {
+    while (true) {
+        Continuity reading = arg->sensors.continuity.read();
+        Voltage reading2 = arg->sensors.voltage.read();;
+
+        arg->rocket_data.continuity.update(reading);
+        arg->rocket_data.voltage.update(reading2);
+
+        THREAD_SLEEP(100);
     }
 }
 
@@ -117,19 +134,40 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     bool already_played_freebird = false;
+    double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
     while (true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
+        CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate);
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
 
         arg->rocket_data.fsm_state.update(next_state);
+
+        if (current_state == FSMState::STATE_SAFE) {
+            if((current_time - last_time_led_flash) > 250) {
+                // Flashes green LED at 4Hz while in SAFE mode.
+                last_time_led_flash = current_time;
+                arg->led.toggle(LED::GREEN);
+            }
+        } else {
+            arg->led.set(LED::GREEN, LOW);
+        }
+
+        if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing()) {
+            arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
+        }
+
+        if (current_state == FSMState::STATE_LANDED && !arg->buzzer.is_playing()) {
+            arg->buzzer.play_tune(land_tone, LAND_TONE_LENGTH);
+        }
 
         if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
-
+        // Serial.println("fsm");
         THREAD_SLEEP(50);
     }
 }
@@ -147,10 +185,10 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
     TickType_t last = xTaskGetTickCount();
     
     while (true) {
-        if(ekf.should_reinit){
+        if(arg->rocket_data.command_flags.should_reset_kf){
             ekf.initialize(arg);
             TickType_t last = xTaskGetTickCount();
-            ekf.should_reinit = false;
+            arg->rocket_data.command_flags.should_reset_kf = false;
         }
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
@@ -170,34 +208,76 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         arg->rocket_data.kalman.update(current_state);
 
         last = xTaskGetTickCount();
-
+        // Serial.println("Kalman");
         THREAD_SLEEP(50);
     }
 }
 
-DECLARE_THREAD(telemetry, RocketSystems* arg) {
-    while (true) {
-        arg->tlm.transmit(arg->rocket_data, arg->led);
-        
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        if (current_state == FSMState(STATE_IDLE)) {
-            TelemetryCommand command;
-            if (arg->tlm.receive(&command, 2000)) {
-                if(command.valid()) {
-                    arg->tlm.acknowledgeReceived();
-                    switch(command.command) {
-                        case CommandType::RESET_KF:
-                            ekf.should_reinit = true;
-                            break;
-                        default:
-                            break; 
-                    }
-                }
-
+void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
+    // maybe we should move this somewhere else but it can stay here for now
+    switch(command.command) {
+        case CommandType::RESET_KF:
+            arg->rocket_data.command_flags.should_reset_kf = true;
+            break;
+        case CommandType::SWITCH_TO_SAFE:
+            arg->rocket_data.command_flags.should_transition_safe = true;
+            break;
+        case CommandType::SWITCH_TO_PYRO_TEST:
+            arg->rocket_data.command_flags.should_transition_pyro_test = true;
+            Serial.println("Changing to pyro test");
+            break;
+        case CommandType::SWITCH_TO_IDLE:
+            arg->rocket_data.command_flags.should_transition_idle = true;
+            break;
+        case CommandType::FIRE_PYRO_A:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_a = true;
             }
-        } else {
-            THREAD_SLEEP(1);
+            break;
+        case CommandType::FIRE_PYRO_B:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_b = true;
+            }
+            break;
+        case CommandType::FIRE_PYRO_C:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_c = true;
+            }
+            break;
+        case CommandType::FIRE_PYRO_D:
+            if (current_state == FSMState::STATE_PYRO_TEST) {
+                arg->rocket_data.command_flags.should_fire_pyro_d = true;
+            }
+            break;
+        default:
+            break; // how
+    }
+}
+DECLARE_THREAD(telemetry, RocketSystems* arg) {
+    double launch_time = 0;
+
+    while (true) {
+
+        arg->tlm.transmit(arg->rocket_data, arg->led);
+
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+
+        if (current_state == FSMState::STATE_IDLE) {
+            launch_time = current_time;
         }
+
+        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
+            TelemetryCommand command;
+            if (arg->tlm.receive(&command, 200)) {
+                if (command.valid()) {
+                    arg->tlm.acknowledgeReceived();
+                    handle_tlm_command(command, arg, current_state);
+                }
+            }
+        }
+        THREAD_SLEEP(1);
     }
 }
 
@@ -209,10 +289,8 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
-#ifdef IS_SUSTAINER
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-#endif
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
@@ -223,7 +301,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.tlm);
+    #ifdef ENABLE_TELEM
+        INIT_SYSTEM(systems.tlm);
+    #endif
     INIT_SYSTEM(systems.sensors.gps);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
@@ -240,28 +320,30 @@ ErrorCode init_systems(RocketSystems& systems) {
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError) {
         // todo some message probably
+        Serial.print("Had Error: ");
+        Serial.print((int) init_error_code);
+        Serial.print("\n");
+        Serial.flush();
+        update_error_LED(init_error_code);
         while (true) {
-            Serial.print("Had Error: ");
-            Serial.print((int) init_error_code);
-            Serial.print("\n");
-            Serial.flush();
-            update_error_LED(init_error_code);
+
         }
     }
 
-#ifdef IS_SUSTAINER
     START_THREAD(orientation, SENSOR_CORE, config, 10);
-#endif
-
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
-    START_THREAD(i2c, SENSOR_CORE, config, 9);
+    START_THREAD(gps, SENSOR_CORE, config, 8);
+    START_THREAD(voltage, SENSOR_CORE, config, 9);
+    START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    #endif
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 

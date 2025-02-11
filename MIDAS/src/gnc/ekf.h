@@ -3,6 +3,7 @@
 #include "kalman_filter.h"
 #include "sensor_data.h"
 #include "Buffer.h"
+#include <fstream>
 
 #define NUM_STATES 9
 #define NUM_SENSOR_INPUTS 4
@@ -19,19 +20,21 @@ public:
 
     void setQ(float dt, float sd);
     void setF(float dt, FSMState fsm, float w_x, float w_y, float w_z); 
+    Eigen::Matrix<float, 3, 1> *BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> x_k);
     Eigen::Matrix<float, 3, 1> *getThrust(float timestamp, euler_t angles, FSMState FSM_state);
-    Eigen::Matrix<float, 3, 1> *BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> *x_k);
-    Eigen::Matrix<float, 3, 1> *GlobalToBody(euler_t angles);
+    Eigen::Matrix<float, 3, 1> *GlobalToBody(euler_t angles, const Eigen::Matrix<float, 3, 1> world_vector);
 
     KalmanData getState() override;
     void setState(KalmanState state) override;
 
+    void initializeAerodynamicData();
     float linearInterpolation(float x0, float y0, float x1, float y1, float x);
 
     void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
    
     bool should_reinit = false;
 private:
+    std::map<double, std::tuple<double, double, double>> aerodynamicData;
     float s_dt = 0.05f;
     float spectral_density_ = 13.0f;
     float kalman_apo = 0;

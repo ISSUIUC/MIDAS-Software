@@ -1,8 +1,28 @@
 #include "sensors.h"
 #include <Arduino.h>
 #include <ads7138-q1.h>
+#include <Wire.h>
 
 #define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
+
+int read_board_pwr_monitor_register(int reg, int bytes) {
+    Wire1.beginTransmission(0x44);
+    Wire1.write(reg);
+    if(Wire1.endTransmission()){
+        Serial.println("I2C Error");
+    }
+
+    Wire1.requestFrom(0x44, bytes);
+    int val = 0;
+
+    for(int i = 0; i < bytes; i++){
+        int v = Wire1.read();
+        if(v == -1) Serial.println("I2C Read Error");
+        val = (val << 8) | v;
+    }
+
+    return val;
+}
 
 /**
  * @brief "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
@@ -20,7 +40,19 @@ ErrorCode VoltageSensor::init() {
 */
 Voltage VoltageSensor::read() {
     Voltage v_battery;
-    v_battery.voltage = adcAnalogRead(ADCAddress{VOLTAGE_PIN}).value * 3.3f / 4095.0f / VOLTAGE_DIVIDER;
+    int voltage = read_board_pwr_monitor_register(0x5, 2);
+    int16_t current = read_board_pwr_monitor_register(0x7, 2);
+
+    float voltage_normalized = voltage * 3.125 / 1000.0;
+    float absolute_current = current * 1.2 / 1000.0;
+
+    // Serial.print("Voltage: ");
+    // Serial.println(voltage_normalized);
+    // Serial.print("Current: ");
+    // Serial.println(current);
+
+    v_battery.voltage = voltage_normalized;
+    v_battery.current = absolute_current;
 //    Serial.print("Raw voltage reading: ");
 //    Serial.print(v_battery.voltage);
 //    Serial.println("");

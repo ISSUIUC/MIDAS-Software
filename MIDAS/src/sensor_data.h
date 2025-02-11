@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
 #include "finite-state-machines/fsm_states.h"
 
@@ -127,7 +128,6 @@ struct Barometer {
  * @brief data about pyro continuity
 */
 struct Continuity {
-    float sense_pyro;
     float pins[4];
 };
 
@@ -138,6 +138,7 @@ struct Continuity {
 */
 struct Voltage {
     float voltage = 0;
+    float current = 0;
 };
 
 /**
@@ -148,9 +149,9 @@ struct Voltage {
 struct GPS {
     int32_t latitude = 0;
     int32_t longitude = 0;
-    float altitude = 0;
-    float speed = 0;
-    uint16_t satellite_count = 0;
+    float altitude = 0; // Altitude in meters
+    float speed = 0; // Speed in meters/second
+    uint16_t fix_type = 0;
     // Unix timestamp since 1970
     // This isn't included in the telem packet because this is
     // solely for the SD logger. We do not need to know what time it is
@@ -169,6 +170,17 @@ struct Magnetometer {
     float mz;
 };
 
+struct Quaternion {
+    float w, x, y, z;
+
+    static float dot(const Quaternion& q1, const Quaternion& q2) {
+        return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
+    }
+
+
+
+};
+
 /**
  * @struct Orientation
  * 
@@ -180,7 +192,6 @@ struct Orientation {
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-
     //For yessir.cpp
     euler_t getEuler() const {
         euler_t euler;
@@ -226,21 +237,18 @@ struct KalmanData {
 };
 
 /**
- * @struct PyroChannel
- * 
- * @brief data about a specific pyro channel
-*/
-struct PyroChannel {
-    bool is_armed = false;
-    bool is_firing = false;
-};
-
-/**
  * @struct PyroState
  * 
  * @brief data regarding all pyro channels
 */
 struct PyroState {
     bool is_global_armed = false;
-    PyroChannel channels[4];
+    bool channel_firing[4];
+    /**
+     * By convention, the pyro states are as follows:
+     * [0] PYRO A / APOGEE
+     * [1] PYRO B / MAIN
+     * [2] PYRO C / MOTOR
+     * [3] PYRO D / AUX
+     */
 };

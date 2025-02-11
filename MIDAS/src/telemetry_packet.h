@@ -18,17 +18,18 @@ struct TelemetryPacket {
     uint16_t highg_az; //14 bit signed ax [-16,16) 2 bit tilt angle
     uint8_t batt_volt;
     
-    
     // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
     //
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+    uint16_t kf_vx; // 16 bit meters/second
+    uint32_t pyro; // 7 bit continuity 4 bit tilt
 };
 
 
 // Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D };
 
 /**
  * @struct TelemetryCommand
@@ -37,7 +38,12 @@ enum class CommandType: uint8_t { RESET_KF };
 */
 struct TelemetryCommand {
     CommandType command;
-    std::array<char, 3> verify = {{'B', 'R', 'K'}};
+    union {
+        char callsign[8];
+        float new_freq;
+        bool do_abort;
+    };
+    std::array<char, 3> verify;
 
     bool valid() {
         return verify == std::array<char, 3>{{'B','R','K'}};

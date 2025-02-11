@@ -11,7 +11,7 @@ public:
     explicit TelemetryBackend(const char* file_name);
     ErrorCode __attribute__((warn_unused_result)) init();
 
-    int8_t getRecentRssi();
+    int16_t getRecentRssi();
     void setFrequency(float frequency);
 
     template<typename T>

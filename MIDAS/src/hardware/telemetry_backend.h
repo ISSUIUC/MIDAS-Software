@@ -1,11 +1,11 @@
 #pragma once
 
-#include <RH_RF95.h>
-
 #include "errors.h"
 #include "hal.h"
-#include "TCAL9539.h"
 #include "pins.h"
+#include <TCAL9539.h>
+
+#include "E22.h"
 
 /**
  * @class TelemetryBackend
@@ -15,10 +15,10 @@
 class TelemetryBackend {
 public:
     TelemetryBackend();
-    ErrorCode __attribute__((warn_unused_result)) init();
+    [[nodiscard]] ErrorCode init();
 
-    int8_t getRecentRssi();
-    void setFrequency(float frequency);
+    int16_t getRecentRssi();
+    ErrorCode setFrequency(float frequency);
 
     /**
      * @brief This function transmits data from the struct provided as
@@ -34,22 +34,17 @@ public:
      */
     template<typename T>
     void send(const T& data) {
-        static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to send is too large");
-        // gpioDigitalWrite(LED_BLUE, led_state);
+        static_assert(sizeof(T) <= 0xFF, "The data type to send is too large"); // Max payload is 255
+        gpioDigitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
-//        Serial.println("Sending bytes");
-        rf95.send((uint8_t*) &data, sizeof(T));
-        for(int i = 1;; i++){
-            THREAD_SLEEP(1);
-            if(digitalRead(rf95._interruptPin)){
-                break;
-            }
-            if(i % 1024 == 0){
-                Serial.println("long telem wait");
-            }
+        SX1268Error result = lora.send((uint8_t*) &data, sizeof(T));
+        if(result != SX1268Error::NoError) {
+            Serial.print("Lora TX error ");
+            Serial.println((int)result);
+            // Re init the lora
+            (void)init();
         }
-        rf95.handleInterrupt();
     }
 
     /**
@@ -61,33 +56,25 @@ public:
     */
     template<typename T>
     bool read(T* write, int wait_milliseconds) {
-        static_assert(sizeof(T) <= RH_RF95_MAX_MESSAGE_LEN, "The data type to receive is too large");
+        static_assert(sizeof(T) <= 0xFF, "The data type to receive is too large");
         uint8_t len = sizeof(T);
-
         // set receive mode
-        rf95.setModeRx();
+        SX1268Error result = lora.recv((uint8_t*) write, len, wait_milliseconds);
+        if(result == SX1268Error::NoError) {
+            return true;
+        } else if(result == SX1268Error::RxTimeout) {
+            return false;
+        } else {
+            Serial.print("Lora error on rx ");
+            Serial.println((int)result);
 
-        // busy wait for interrupt signalling
-        for(int i = 1; i < wait_milliseconds; i++){
-            THREAD_SLEEP(1);
-            if(digitalRead(rf95._interruptPin)){
-                rf95.handleInterrupt();
-                break;
-            }
+            //Re init the lora
+            (void)init();
+            return false;
         }
-
-        if (rf95.available() && rf95.recv((uint8_t*) write, &len)) {
-            if (sizeof(T) == len) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-        return false;
     }
 
 private:
-    RH_RF95 rf95;
-
+    SX1268 lora;
     bool led_state;
 };
