@@ -164,7 +164,9 @@ public:
  */
 struct RocketData {
 public:
-    SensorData<FSMState> fsm_state;
-    SensorData<VoltageSense> voltage_sense;
-    SensorData<MIDASCommands> commands;      //should this be an interrupt instead?
+    //SensorData<FSMState> fsm_state;
+    //SensorData<VoltageSense> voltage_sense;
+    //SensorData<MIDASCommands> commands;      //should this be an interrupt instead?
+    FSMState fsm_state;
+    MIDASCommands commands;
 };

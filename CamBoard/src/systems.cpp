@@ -21,12 +21,20 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             int current = read_reg(0x7, 2);
             int temp = read_reg(0x6, 2);
             int voltage = read_reg(0x5, 2);
-            arg->rocket_data.voltage_sense.update({power, current, temp, voltage});
+            //arg->rocket_data.voltage_sense.update({power, current, temp, voltage});
+            Serial.print("Voltage ");
+            Serial.println(voltage * 3.125 / 1000.0);
+            Serial.print("Temp ");
+            Serial.println(temp * 125 / 1000.0);
+            Serial.print("Current ");
+            Serial.println(current * 1.2 / 1000.0);
+            Serial.print("Power ");
+            Serial.println(power * 240 / 1000000.0);
         }
         arg->led.update();
         i += 1;
 
-        THREAD_SLEEP(10);
+        THREAD_SLEEP(50);
     }
 }
 
@@ -35,18 +43,18 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     // bool already_played_freebird = false;
     while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMState current_state = arg->rocket_data.fsm_state;
 
         FSMState next_state = fsm.tick_fsm(current_state, arg);
 
-        arg->rocket_data.fsm_state.update(next_state);
+        arg->rocket_data.fsm_state = next_state;
 
         // if (current_state == FSMState::STATE_ON && !already_played_freebird) {
         //     arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
         //     already_played_freebird = true;
         // }
 
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(20);
     }
 }
 
@@ -62,7 +70,7 @@ DECLARE_THREAD(can, RocketSystems* arg) {
     while (true) {
         CANFDMessage message;
         if (arg->can.recieve(message)) {
-            arg->rocket_data.commands.update(MIDASCommands({message}));
+            arg->rocket_data.commands = (MIDASCommands({message}));
         }
         THREAD_SLEEP(5);
     }

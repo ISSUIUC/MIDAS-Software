@@ -9,6 +9,7 @@
 #include "hardware/pins.h"
 #include "systems.h"
 
+
 /**
  * Sets the config file and then starts all the threads using the config.
  */
@@ -22,7 +23,7 @@ void setup() {
     //begin serial port
     Serial.begin(9600);
 
-//    while (!Serial);
+    while (!Serial);
 
     delay(200);
 
@@ -78,6 +79,26 @@ void setup() {
 
     //init and start threads
     begin_systems(&systems);
+
+    // Serial1.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
+    // digitalWrite(CAM1_ON_OFF, HIGH);
+    // camera_on_off(Serial1);
+    // start_recording(Serial1);
+    // Serial.println("Now recording");
+
+
+    //Camera test code
+
+    //cam1.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
+    //cam2.begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
+    // digitalWrite(CAM1_ON_OFF, HIGH);
+    // digitalWrite(CAM2_ON_OFF, HIGH);
+    // digitalWrite(VTX_ON_OFF, HIGH);
+
+    // camera_on_off(cam1);
+    // camera_on_off(cam2);
+    // start_recording(cam1);
+    // start_recording(cam2);
 }
 
 void loop() {

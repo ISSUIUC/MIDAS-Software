@@ -10,8 +10,8 @@ struct Cameras {
 };
 
 
-void camera_on_off(HardwareSerial camera);
+void camera_on_off(HardwareSerial& camera);
 
-void start_recording(HardwareSerial camera);
+void start_recording(HardwareSerial& camera);
 
-void stop_recording(HardwareSerial camera);
+void stop_recording(HardwareSerial& camera);
