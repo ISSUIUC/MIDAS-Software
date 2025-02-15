@@ -296,8 +296,20 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_LANDED:
 
             if((current_time - landed_time) > sustainer_landed_time_lockout) {
+
+                // Check for any telem transitions
+                // Force transtion to safe if requested + clear all transition flags.
+                if(telem_commands.should_transition_safe) {
+                    state = FSMState::STATE_SAFE;
+                    telem_commands.should_transition_pyro_test = false;
+                    telem_commands.should_transition_idle = false;
+                    telem_commands.should_transition_safe = false;
+                }
+
                 break;
             }
+
+            
 
             // if the slow speed was too brief then return to previous state
             if ((abs(state_estimate.vertical_speed) > sustainer_landed_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
@@ -493,6 +505,16 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_LANDED:
 
             if((current_time - landed_time) > booster_landed_time_lockout) {
+
+                // Check for any telem transitions
+                // Force transtion to safe if requested + clear all transition flags.
+                if(telem_commands.should_transition_safe) {
+                    state = FSMState::STATE_SAFE;
+                    telem_commands.should_transition_pyro_test = false;
+                    telem_commands.should_transition_idle = false;
+                    telem_commands.should_transition_safe = false;
+                }
+
                 break;
             }
 
