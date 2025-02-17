@@ -253,6 +253,9 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
                 arg->rocket_data.command_flags.should_fire_pyro_d = true;
             }
             break;
+        case CommandType::TOGGLE_CAM:
+            arg->b2b.camera.camera_on(0); // For stargazer, we will just toggle cam here.
+            break;
         default:
             break; // how
     }
@@ -305,6 +308,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
+    INIT_SYSTEM(systems.b2b);
     #ifdef ENABLE_TELEM
         INIT_SYSTEM(systems.tlm);
     #endif
