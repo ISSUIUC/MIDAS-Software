@@ -140,7 +140,7 @@ struct FullTelemetryData {
 
 
 
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, EMPTY };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_TOGGLE, EMPTY };
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
@@ -324,43 +324,8 @@ void set_freq_local_bug_fix(float freq) {
     Serial.println("}");
 }
 
-void SerialInput(const char* key, const char* value) {
-    if (!cmd_queue.empty()) {
-        Serial.println(json_buffer_full_error);
-        return;
-    }
 
-    TelemetryCommand command{};
-
-    if (strcmp(key, "RESET_KF") == 0) {
-        command.command = CommandType::RESET_KF;
-    } else if (strcmp(key, "SAFE") == 0) {
-        command.command = CommandType::SWITCH_TO_SAFE;
-    } else if (strcmp(key, "IDLE") == 0) {
-        command.command = CommandType::SWITCH_TO_IDLE;
-    } else if (strcmp(key, "PT") == 0) {
-        command.command = CommandType::SWITCH_TO_PYRO_TEST;
-    } else if (strcmp(key, "PA") == 0) {
-        command.command = CommandType::FIRE_PYRO_A;
-    } else if (strcmp(key, "PB") == 0) {
-        command.command = CommandType::FIRE_PYRO_B;
-    } else if (strcmp(key, "PC") == 0) {
-        command.command = CommandType::FIRE_PYRO_C;
-    } else if (strcmp(key, "PD") == 0) {
-        command.command = CommandType::FIRE_PYRO_D;
-    } else {
-        Serial.println(json_command_bad);
-        return;
-    }
-
-
-    Serial.println(json_command_success);
-    // Send the command until acknowledge or 5 attempts
-    cmd_queue.push({command, 5});
-}
-
-
-void Stest(const String key) {
+void HandleSerial(const String key) {
     if (!cmd_queue.empty()) {
         Serial.println(json_buffer_full_error);
         return;
@@ -384,6 +349,8 @@ void Stest(const String key) {
         command.command = CommandType::FIRE_PYRO_C;
     } else if (key == "PD") {
         command.command = CommandType::FIRE_PYRO_D;
+    } else if (key == "CAMT") {
+        command.command = CommandType::CAM_TOGGLE;
     } else {
         Serial.println(json_command_bad);
         return;
@@ -539,7 +506,7 @@ void loop() {
             cur_input += input;
             cur_input.replace("\r", ""); // Remove carriage returns
 
-            Stest(input.substring(0, input.length() - 2));
+            HandleSerial(input.substring(0, input.length() - 2));
 
             cur_input = "";
         } else {
