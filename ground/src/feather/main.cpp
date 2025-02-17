@@ -373,7 +373,6 @@ void process_command_queue() {
     rf95.waitPacketSent();
 }
 
-SerialParser serial_parser(SerialInput, SerialError);
 
 void setup() {
     while (!Serial)
