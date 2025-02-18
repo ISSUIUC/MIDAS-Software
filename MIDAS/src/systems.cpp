@@ -247,8 +247,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
-        KalmanData current_state = ekf.getState();
+        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
+        KalmanData current_state = yessir.getState();
 
         arg->rocket_data.kalman.update(current_state);
 
