@@ -66,7 +66,7 @@
 #define sustainer_coast_time 3000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
-#define sustainer_landed_vertical_speed_threshold 3
+#define sustainer_landed_vertical_speed_threshold 4
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define sustainer_landed_time_lockout 60000
