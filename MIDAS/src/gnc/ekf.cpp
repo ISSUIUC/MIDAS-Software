@@ -454,7 +454,7 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
         if (FSM_state != last_fsm) 
         {
             stage_timestamp = 0;
-            last_fsm = FSM_state
+            last_fsm = FSM_state;
         }
         stage_timestamp += dt;
         setF(dt, FSM_state, orientation.roll, orientation.pitch, orientation.yaw);
