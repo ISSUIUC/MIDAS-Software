@@ -32,9 +32,14 @@ struct CameraB2B {
     void camera_off(int cam_index);
     void camera_toggle(int cam_index);
 
+    void vtx_on();
+    void vtx_off();
+    void vtx_toggle();
+
     private:
     void transmit_command(CameraCommand command);
     bool cam_state_[2] = { false, false }; // false: off, true: on
+    bool vtx_state_ = false;
 };
 
 /**

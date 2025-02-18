@@ -254,7 +254,8 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
             }
             break;
         case CommandType::TOGGLE_CAM:
-            arg->b2b.camera.camera_on(0); // For stargazer, we will just toggle cam here.
+            arg->b2b.camera.camera_toggle(0); // For stargazer, we will just toggle cam here.
+            arg->b2b.camera.vtx_toggle();
             break;
         default:
             break; // how

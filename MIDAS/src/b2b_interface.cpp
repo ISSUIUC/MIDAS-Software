@@ -24,13 +24,33 @@ void CameraB2B::transmit_command(CameraCommand command) {
     #endif
 }
 
+void CameraB2B::vtx_on() {
+    transmit_command(CameraCommand::VTX_ON);
+    vtx_state_ = true;
+}
+
+void CameraB2B::vtx_off() {
+    transmit_command(CameraCommand::VTX_OFF);
+    vtx_state_ = false;
+}
+
+void CameraB2B::vtx_toggle() {
+    if(vtx_state_) {
+        vtx_off();
+    } else {
+        vtx_on();
+    }
+}
+
 void CameraB2B::camera_on(int cam_index) {
     switch (cam_index) {
         case 0:
             transmit_command(CameraCommand::CAMERA0_ON);
+            cam_state_[0] = true;
             break;
         case 1:
             transmit_command(CameraCommand::CAMERA1_ON);
+            cam_state_[1] = true;
             break;
         default:
             Serial.print("B2B camera on -- invalid index ");
@@ -43,9 +63,11 @@ void CameraB2B::camera_off(int cam_index) {
     switch (cam_index) {
         case 0:
             transmit_command(CameraCommand::CAMERA0_OFF);
+            cam_state_[0] = false;
             break;
         case 1:
             transmit_command(CameraCommand::CAMERA1_OFF);
+            cam_state_[1] = false;
             break;
         default:
             Serial.print("B2B camera on -- invalid index ");
@@ -58,16 +80,16 @@ void CameraB2B::camera_toggle(int cam_index) {
     switch (cam_index) {
         case 0:
             if (cam_state_[0]) {
-                transmit_command(CameraCommand::CAMERA0_OFF);
+                camera_off(0);
             } else {
-                transmit_command(CameraCommand::CAMERA0_ON);
+                camera_on(0);
             }
             break;
         case 1:
             if (cam_state_[1]) {
-                transmit_command(CameraCommand::CAMERA1_OFF);
+                camera_off(1);
             } else {
-                transmit_command(CameraCommand::CAMERA1_ON);
+                camera_on(1);
             }
             break;
         default:
