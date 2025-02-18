@@ -192,10 +192,21 @@ Orientation OrientationSensor::read()
         sensor_reading.pitch = euler.x;
         sensor_reading.roll = euler.z;
 
+
+       
+
         sensor_reading.linear_acceleration.ax = -event.un.accelerometer.y;
         sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;
         sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
 
+        Velocity velocity;
+        velocity.vx = sensor_reading.linear_acceleration.ax * deltaTime + velocity.vx;
+        velocity.vy = sensor_reading.linear_acceleration.ay * deltaTime + velocity.vy;
+        velocity.vz = sensor_reading.linear_acceleration.az * deltaTime + velocity.vz;
+
+
+        sensor_reading.orientation_velocity = velocity;
+        
         sensor_reading.gx = -event.un.gyroscope.y;
         sensor_reading.gy = event.un.gyroscope.x;
         sensor_reading.gz = event.un.gyroscope.z;
