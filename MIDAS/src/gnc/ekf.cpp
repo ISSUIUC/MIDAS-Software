@@ -292,7 +292,6 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         x_k(7, 0),
         (Faz + Ftz + Fgz) / m - (w_x * x_k(4, 0) - w_y * x_k(1, 0)),
         1.0;
-
     x_priori = (xdot * dt) + x_k;
     setF(dt, fsm, w_x, w_y, w_z);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
@@ -452,16 +451,16 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
 {
     if (FSM_state >= FSMState::STATE_IDLE)
     {
-        if (FSM_state != last_fsm)
+        if (FSM_state != last_fsm) 
         {
             stage_timestamp = 0;
+            last_fsm = FSM_state
         }
         stage_timestamp += dt;
         setF(dt, FSM_state, orientation.roll, orientation.pitch, orientation.yaw);
         setQ(dt, sd);
         priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
-        FSMState last_fsm = FSM_state;
     }
 }
 
@@ -580,7 +579,6 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
     Eigen::Matrix3f yaw;
     yaw << cos(angles.yaw), -sin(angles.yaw), 0, sin(angles.yaw), cos(angles.yaw), 0, 0, 0, 1;
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
-    // rotation_matrix(rotation_matrix).transpose();
     to_modify = rotation_matrix.transpose() * gravity;
     // return to_return;
 }
