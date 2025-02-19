@@ -48,7 +48,7 @@
 #define sustainer_main_to_main_deploy_timer_threshold 3000
 
 // Height required to deploy the main parachutes (m)
-#define sustainer_main_deploy_altitude_threshold 1006
+#define sustainer_main_deploy_altitude_threshold 975
 
 // The minimum delay between drogue deployment and main deployment
 #define sustainer_main_deploy_delay_after_drogue 1000
@@ -132,7 +132,7 @@
 #define booster_landed_timer_threshold 5000
 
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
-#define booster_first_boost_to_burnout_time_threshold 1000
+#define booster_first_boost_to_burnout_time_threshold 1500
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (G)
 #define booster_landed_vertical_speed_threshold 4
