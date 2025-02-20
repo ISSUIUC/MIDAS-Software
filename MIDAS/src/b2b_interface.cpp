@@ -45,11 +45,11 @@ void CameraB2B::vtx_toggle() {
 void CameraB2B::camera_on(int cam_index) {
     switch (cam_index) {
         case 0:
-            transmit_command(CameraCommand::CAMERA0_ON);
+            transmit_command(CameraCommand::CAMERA1_ON);
             cam_state_[0] = true;
             break;
         case 1:
-            transmit_command(CameraCommand::CAMERA1_ON);
+            transmit_command(CameraCommand::CAMERA2_ON);
             cam_state_[1] = true;
             break;
         default:
@@ -62,11 +62,11 @@ void CameraB2B::camera_on(int cam_index) {
 void CameraB2B::camera_off(int cam_index) {
     switch (cam_index) {
         case 0:
-            transmit_command(CameraCommand::CAMERA0_OFF);
+            transmit_command(CameraCommand::CAMERA1_OFF);
             cam_state_[0] = false;
             break;
         case 1:
-            transmit_command(CameraCommand::CAMERA1_OFF);
+            transmit_command(CameraCommand::CAMERA2_OFF);
             cam_state_[1] = false;
             break;
         default:

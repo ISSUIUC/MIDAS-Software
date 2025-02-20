@@ -16,14 +16,14 @@
 
 
 enum class CameraCommand {
-    CAMERA0_OFF = 0,
-    CAMERA0_ON = 1,
-    CAMERA1_OFF = 2,
-    CAMERA1_ON = 3,
+    CAMERA1_OFF = 0,
+    CAMERA1_ON = 1,
+    CAMERA2_OFF = 2,
+    CAMERA2_ON = 3,
     VTX_OFF = 4,
     VTX_ON = 5,
-    MUX_0 = 6,
-    MUX_1 = 7
+    MUX_1 = 6,
+    MUX_2 = 7
 };
 
 struct CameraB2B {
