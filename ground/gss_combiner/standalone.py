@@ -8,6 +8,7 @@ import sys
 
 import serial # PySerial
 import paho.mqtt.client as mqtt
+import time
 
 import argparse
 
@@ -19,6 +20,12 @@ class TelemetryStandalone():
         self.__comport.reset_input_buffer()
 
         self.__should_log = should_log
+        self.__outfile = None
+        self.__outfile_raw = None
+
+        if(self.__should_log):
+            self.__outfile = open(f"./outputs/{time.time()}_log.telem", "w")
+            self.__outfile_raw = open(f"./outputs/{time.time()}_raw_log.txt", "w")
 
         print("Pre-start diagnostics:")
         print("Logging? ", self.__should_log)
@@ -161,6 +168,9 @@ class TelemetryStandalone():
                         if type(packet_in) != dict:
                             # print("Read non dict?" + str(pkt) + " type " + str(type(packet_in)))
                             continue
+
+                        if(self.__should_log):
+                            self.__outfile_raw.write(f"{packet_in['type']}: " + str(packet_in) + "\n")
         
                         if packet_in['type'] == "command_success":
                             print("RX: Command good")
@@ -228,6 +238,10 @@ class TelemetryStandalone():
 
                     # Send to MQTT
                     data_encoded = json.dumps(packet_new).encode("utf-8")
+
+                    #log
+                    if(self.__should_log):
+                        self.__outfile.write(json.dumps(packet_new) + "\n")
 
                     try:
                         self.__mqttclient.publish(self.__data_channel, data_encoded)
