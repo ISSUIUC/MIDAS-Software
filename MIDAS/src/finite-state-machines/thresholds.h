@@ -63,7 +63,7 @@
 #define sustainer_landed_timer_threshold 5000
 
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
-#define sustainer_coast_time 3000
+#define sustainer_coast_time 1500
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
 #define sustainer_landed_vertical_speed_threshold 4
