@@ -68,6 +68,7 @@ void loop() {
     }
 
     if (message == "ls") {
+        size_t tot_size = 0;
         File root = SD_MMC.open("/");
         if (!root){
             Serial.println("Failed to open directory");
@@ -88,9 +89,13 @@ void loop() {
             Serial.print(file.name());
             Serial.print(" (");
             Serial.print(file.size());
+            tot_size += file.size();
             Serial.println(" bytes)");
             file = root.openNextFile();
         }
+        Serial.print("Total size taken up: ");
+        Serial.print(tot_size);
+        Serial.println("B / 8 000 000 000B");
         Serial.println("<done>");
     } else if (message == "dump") {
         String file_name = Serial.readStringUntil('\n');
@@ -128,7 +133,24 @@ void loop() {
         Serial.println("<done>");
     } else if (message == "<restart>") {
         Serial.println("eMMC Connected");
-    } else {
+    } else if (message == "rmall") {
+        // Delete all files in the root directory   
+        File root = SD_MMC.open("/");
+        while (true) {
+            File file = root.openNextFile();
+            if (!file) {
+                break; // No more files
+            }
+            Serial.print("Deleting file: ");
+            Serial.println(file.path());
+            file.close();
+            file.flush();
+            SD_MMC.remove(file.path());  
+        }
+        Serial.println("All files deleted!");
+        Serial.println("<done>");
+    } 
+    else {
         Serial.println("Unrecognized command: " + message);
         Serial.println("<done>");
     }
