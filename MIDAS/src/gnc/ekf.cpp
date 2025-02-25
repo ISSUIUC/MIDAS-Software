@@ -26,33 +26,33 @@ typedef struct
 } AeroCoeff;
 
 // stores the aerodynamic coefficients for the corresponding Mach number
-const AeroCoeff aero_data[] = {
-    {0.04, 4, 1.332142905, 1.1827808455, 60.8267871968},
-    {0.08, 4, 1.326587387, 1.1827808455, 60.8267871968},
-    {0.12, 4, 1.31558627, 1.1827808455, 60.8267871968},
-    {0.16, 4, 1.306063953, 1.1827808455, 60.8267871968},
-    {0.20, 4, 1.298117084, 1.1827808455, 60.8267871968},
-    {0.24, 4, 1.291411025, 1.1827808455, 60.8267871968},
-    {0.28, 4, 1.290279857, 1.1827808455, 60.8267871968},
-    {0.32, 4, 1.291431043, 1.1827808455, 60.8267871968},
-    {0.36, 4, 1.293170653, 1.1827808455, 60.8267871968},
-    {0.40, 4, 1.295385827, 1.1827808455, 60.8267871968},
-    {0.44, 4, 1.297991738, 1.1827808455, 60.8267871968},
-    {0.48, 4, 1.300924032, 1.1827808455, 60.8267871968},
-    {0.52, 4, 1.304132086, 1.1827808455, 60.8267871968},
-    {0.56, 4, 1.309039395, 1.1827808455, 60.8267871968},
-    {0.60, 4, 1.314605487, 1.1827808455, 60.8267871968},
-    {0.64, 4, 1.330699437, 1.1827808455, 60.8267871968},
-    {0.68, 4, 1.346695167, 1.1827808455, 60.8267871968},
-    {0.72, 4, 1.362693183, 1.1827808455, 60.8267871968},
-    {0.76, 4, 1.378693074, 1.1827808455, 60.8267871968},
-    {0.80, 4, 1.394695194, 1.1827808455, 60.8267871968},
-    {0.84, 4, 1.41069913, 1.1827808455, 60.8267871968},
-    {0.88, 4, 1.426705046, 1.1827808455, 60.8267871968},
-    {0.92, 4, 1.473732816, 1.218959468, 60.91848997},
-    {0.96, 4, 1.582395672, 1.291316713, 61.10189551},
-    {1.00, 4, 1.681494886, 1.363673958, 61.28530105},
-};
+// const AeroCoeff aero_data[] = {
+//     {0.04, 4, 1.332142905, 1.1827808455, 60.8267871968},
+//     {0.08, 4, 1.326587387, 1.1827808455, 60.8267871968},
+//     {0.12, 4, 1.31558627, 1.1827808455, 60.8267871968},
+//     {0.16, 4, 1.306063953, 1.1827808455, 60.8267871968},
+//     {0.20, 4, 1.298117084, 1.1827808455, 60.8267871968},
+//     {0.24, 4, 1.291411025, 1.1827808455, 60.8267871968},
+//     {0.28, 4, 1.290279857, 1.1827808455, 60.8267871968},
+//     {0.32, 4, 1.291431043, 1.1827808455, 60.8267871968},
+//     {0.36, 4, 1.293170653, 1.1827808455, 60.8267871968},
+//     {0.40, 4, 1.295385827, 1.1827808455, 60.8267871968},
+//     {0.44, 4, 1.297991738, 1.1827808455, 60.8267871968},
+//     {0.48, 4, 1.300924032, 1.1827808455, 60.8267871968},
+//     {0.52, 4, 1.304132086, 1.1827808455, 60.8267871968},
+//     {0.56, 4, 1.309039395, 1.1827808455, 60.8267871968},
+//     {0.60, 4, 1.314605487, 1.1827808455, 60.8267871968},
+//     {0.64, 4, 1.330699437, 1.1827808455, 60.8267871968},
+//     {0.68, 4, 1.346695167, 1.1827808455, 60.8267871968},
+//     {0.72, 4, 1.362693183, 1.1827808455, 60.8267871968},
+//     {0.76, 4, 1.378693074, 1.1827808455, 60.8267871968},
+//     {0.80, 4, 1.394695194, 1.1827808455, 60.8267871968},
+//     {0.84, 4, 1.41069913, 1.1827808455, 60.8267871968},
+//     {0.88, 4, 1.426705046, 1.1827808455, 60.8267871968},
+//     {0.92, 4, 1.473732816, 1.218959468, 60.91848997},
+//     {0.96, 4, 1.582395672, 1.291316713, 61.10189551},
+//     {1.00, 4, 1.681494886, 1.363673958, 61.28530105},
+// };
 
 // Number of entries
 #define AERO_DATA_SIZE (sizeof(aero_data) / sizeof(aero_data[0]))
@@ -241,14 +241,22 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     Velocity omega = orientation.getVelocity();
     euler_t angles = orientation.getEuler();
     // Eigen::Matrix<float, 3, 1> gravity = Eigen::Matrix<float, 3,1>::Zero();
-    gravity(0, 0) = -9.81;
+    if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED)) 
+    {
+        gravity(0, 0) = -9.81;
+    } else {
+        gravity(0, 0) = 0;
+    }
+    
     float m = mass_sustainer;
     float h = height_sustainer;
+
     if (fsm < FSMState::STATE_BURNOUT)
     {
         m = mass_full;
         h = height_full;
     }
+
     float w_x = omega.vx;
     float w_y = omega.vy;
     float w_z = omega.vz;
@@ -264,11 +272,11 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     Eigen::Matrix<float, 3, 1> Fg_body;
     
-    EKF::GlobalToBody(angles,Fg_body);
+    EKF::GlobalToBody(angles, gravity);
 
-    float Fgx = Fg_body(0, 0);
-    float Fgy = Fg_body(1, 0);
-    float Fgz = Fg_body(2, 0);
+    float Fgx = gravity(0, 0);
+    float Fgy = gravity(1, 0);
+    float Fgz = gravity(2, 0);
 
 
     Eigen::Matrix<float, 3, 1> T;
@@ -293,7 +301,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         (Faz + Ftz + Fgz) / m - (w_x * x_k(4, 0) - w_y * x_k(1, 0)),
         1.0;
     x_priori = (xdot * dt) + x_k;
-    setF(dt, fsm, w_x, w_y, w_z);
+    setF(dt, w_x, w_y, w_z);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
@@ -319,7 +327,7 @@ float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x)
  * which thrust curve to use. The time since ignition is also important to consider so that is reset once we reach a new stage.
  * The thrust force is then rotated into the body frame using the BodyToGlobal function.
  */
-void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state,Eigen::Matrix<float, 3, 1> &to_modify)
+void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::Matrix<float, 3, 1> &to_modify)
 {
     float interpolatedValue = 0;
     if (FSM_state >= STATE_FIRST_BOOST)
@@ -408,7 +416,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     angles.yaw = -angles.yaw;
 
     Eigen::Matrix<float, 3, 1> acc;
-    EKF::BodyToGlobal(angles, accel,acc);
+    EKF::BodyToGlobal(angles, accel, acc);
 
     y_k(1, 0) = ((acc)(0)) * 9.81 - 9.81;
     y_k(2, 0) = ((acc)(1)) * 9.81;
@@ -457,7 +465,7 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
             last_fsm = FSM_state;
         }
         stage_timestamp += dt;
-        setF(dt, FSM_state, orientation.roll, orientation.pitch, orientation.yaw);
+        setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
         setQ(dt, sd);
         priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
@@ -501,7 +509,8 @@ void EKF::setState(KalmanState state)
  * The Q matrix is the covariance matrix for the process noise and is
  * updated based on the time taken per cycle of the Kalman Filter Thread.
  */
-void EKF::setQ(float dt, float sd)
+void EKF::
+setQ(float dt, float sd)
 {
     Q(0, 0) = pow(dt, 5) / 20;
     Q(0, 1) = pow(dt, 4) / 8;
@@ -580,6 +589,7 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
     yaw << cos(angles.yaw), -sin(angles.yaw), 0, sin(angles.yaw), cos(angles.yaw), 0, 0, 0, 1;
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
     to_modify = rotation_matrix.transpose() * gravity;
+
     // return to_return;
 }
 
@@ -592,7 +602,7 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
  * by how the states change over time and also depends on the
  * current state of the rocket.
  */
-void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz)
+void EKF::setF(float dt, float wx, float wy, float wz)
 {
     Eigen::Matrix<float, 3, 1> w = Eigen::Matrix<float, 3, 1>::Zero();
     w(0, 0) = wx;
@@ -601,35 +611,13 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz)
     F_mat(0, 1) = 1;
     F_mat(3, 4) = 1;
     F_mat(6, 7) = 1;
-
-    float velocity_magnitude = pow(x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0), 0.5);
-    float mach = velocity_magnitude / a;
-    int index = std::round(mach / 0.04);
-    index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
-
-    Ca = aero_data[index].CA_power_on;
-    Cn = aero_data[index].CN;
-    Cp = aero_data[index].CP;
-
-    float m = mass_sustainer;
-    float h = height_sustainer;
-    if (fsm < FSMState::STATE_BURNOUT)
-    {
-        m = mass_full;
-        h = height_full;
-    }
-
-    F_mat(1, 1) = -pi * Ca * r * r * rho * x_k(1, 0) / m;
-    F_mat(1, 4) = -pi * Ca * r * r * rho * x_k(4, 0) / m + w(2, 0);
-    F_mat(1, 7) = -pi * Ca * r * r * rho * x_k(7, 0) / m - w(1, 0);
-
-    F_mat(4, 1) = pi * Cn * r * r * rho * x_k(1, 0) / m - w(2, 0);
-    F_mat(4, 4) = pi * Cn * r * r * rho * x_k(2, 0) / m + w(0, 0);
-    F_mat(4, 7) = pi * Cn * r * r * rho * x_k(3, 0) / m;
-
-    F_mat(7, 1) = pi * Cn * r * r * rho * x_k(1, 0) / m + w(1, 0);
-    F_mat(7, 4) = pi * Cn * r * r * rho * x_k(2, 0) / m - w(0, 0);
-    F_mat(7, 7) = pi * Cn * r * r * rho * x_k(3, 0) / m;
+    
+    F_mat(1, 4) = w(2, 0);
+    F_mat(1, 7) = -w(1, 0);
+    F_mat(4, 1) = -w(2, 0);
+    F_mat(4, 7) = w(0, 0);
+    F_mat(7, 1) = w(1, 0);
+    F_mat(7, 4) = -w(0, 0);
 }
 
 EKF ekf;

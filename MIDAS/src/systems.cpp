@@ -1,14 +1,7 @@
 #include "systems.h"
 
 #include "hal.h"
-
-#ifdef IS_SUSTAINER
 #include "gnc/ekf.h"
-#endif
-
-#ifdef IS_BOOSTER
-#include "gnc/yessir.h"
-#endif
 
 #include <TCAL9539.h>
 
@@ -187,7 +180,6 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-#ifdef IS_SUSTAINER
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     ekf.initialize(arg);
     // Serial.println("Initialized ekf :(");
@@ -221,43 +213,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         THREAD_SLEEP(50);
     }
 }
-#endif
 
-#ifdef IS_BOOSTER
-DECLARE_THREAD(kalman, RocketSystems* arg) {
-    yessir.initialize(arg);
-    Serial.println("Initialized YESSIR");
-    TickType_t last = xTaskGetTickCount();
-    
-    while (true) {
-        if(arg->rocket_data.command_flags.should_reset_kf){
-            yessir.initialize(arg);
-            TickType_t last = xTaskGetTickCount();
-            arg->rocket_data.command_flags.should_reset_kf = false;
-        }
-        // add the tick update function
-        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
-        Orientation current_orientation = arg->rocket_data.orientation.getRecent();
-        HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
-        Acceleration current_accelerations = {
-            .ax = current_accelerometer.ax,
-            .ay = current_accelerometer.ay,
-            .az = current_accelerometer.az
-        };
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
-        KalmanData current_state = yessir.getState();
-
-        arg->rocket_data.kalman.update(current_state);
-
-        last = xTaskGetTickCount();
-
-        THREAD_SLEEP(50);
-    }
-}
-#endif
 
 void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
     // maybe we should move this somewhere else but it can stay here for now
