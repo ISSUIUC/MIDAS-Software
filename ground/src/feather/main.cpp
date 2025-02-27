@@ -136,6 +136,7 @@ struct FullTelemetryData {
     bool is_sustainer;
     float kf_vx;
     bool kf_reset;
+    uint16_t kf_vx;
 };
 
 

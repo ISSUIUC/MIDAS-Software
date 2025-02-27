@@ -311,7 +311,6 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         arg->tlm.transmit(arg->rocket_data, arg->led);
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
         if (current_state == FSMState::STATE_IDLE) {

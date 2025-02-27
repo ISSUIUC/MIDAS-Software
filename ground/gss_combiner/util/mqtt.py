@@ -11,17 +11,18 @@ import paho.mqtt.client as mqtt
 
 import util.logger
 
+cmd_copy_lock = threading.Lock()
+
 class TelemetryThread(threading.Thread):
     """A thread class handling all communications between COM ports to which telemetry devices are connected."""
-    def __init__(self, com_port, mqtt_uri, all_data_topic, log_stream: util.logger.LoggerStream) -> None:
+    def __init__(self, com_port, log_stream: util.logger.LoggerStream) -> None:
         super(TelemetryThread, self).__init__(daemon=True)
         self.__log = log_stream
-        self.__topic = all_data_topic
         self.__log.console_log(f"Opening {com_port}")
+
         self.__comport: serial.Serial = serial.Serial(com_port, baudrate=4800, write_timeout=1)
-        self.__uri = mqtt_uri
         self.__comport.reset_input_buffer()
-        self.__mqttclient = None
+
         self.__log.console_log(f"Telemetry thread created.")
         self.__combiners = []
 
@@ -32,6 +33,8 @@ class TelemetryThread(threading.Thread):
 
         self.__external_commands = []
 
+        self.__ack_queue = []
+
         
     def process_packet(self, packet_json):
         """Append metadata to a packet to conform to GSS v1.1 packet structure"""
@@ -41,13 +44,15 @@ class TelemetryThread(threading.Thread):
         # Append timestamps :)
         return {'value': packet_json['value'], 'type': packet_json['type'], 'utc': str(time), 'unix': datetime.timestamp(time), 'src': self.__comport.name}
     
-    def write_frequency(self, frequency:float):
+    def write_frequency(self, frequency: float):
         """Send a FREQ command to the associated telemetry device to change frequencies, then wait for a response."""
         self.__log.console_log("Writing frequency command (FREQ:" + str(frequency) + ")")
         try:
             self.__send_comport("FREQ:" + str(frequency) + "\n")
             self.__rf_freq = frequency
+
             self.__rf_set = False
+
             self.__last_rf_command_sent = datetime.now().timestamp()
         except Exception as e:
             print("Unable to send FREQ command: ", e, "Continuing with no FREQ change.")
@@ -64,10 +69,14 @@ class TelemetryThread(threading.Thread):
                 data = self.__comport.read_all()
                 p_full += bytes.decode(data, encoding="ascii")
                 
-            
             return p_full.split("\n")
         else:
             return []
+        
+    def get_ack_queue(self):
+        q_copy = copy.deepcopy(self.__ack_queue)
+        self.__ack_queue.clear()
+        return q_copy
         
     def add_combiner(self, combiner):
         """Add a combiner data sink for this telemetry thread"""
@@ -81,23 +90,16 @@ class TelemetryThread(threading.Thread):
         self.__external_commands.append(command)
         
     def run(self) -> None:
-        # Initialize MQTT
-        self.__mqttclient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
-        self.__log.console_log(f"Connecting to MQTT @ {self.__uri}")
-        self.__mqttclient.connect(self.__uri)
         self.__log.console_log(f"Telemetry thread ready.")
 
         while True:
             # Wrap all in a try-except to catch errors.
 
             try:
-
                 if not self.__rf_set and datetime.now().timestamp() - self.__last_rf_command_sent >= self.__rf_command_period:
-                    # Send a new frequency command if the last one went unacknowledged.
-                    self.__send_comport("FREQ:" + self.__rf_freq + "\n")
-                    self.__last_rf_command_sent = datetime.now().timestamp()
+                    # Send a new frequency command if the last one went unacknowledged
+                    self.write_frequency(self.__rf_freq)
                     
-
                 # Read all from the comport
                 packets = self.__read_comport()
 
@@ -105,7 +107,7 @@ class TelemetryThread(threading.Thread):
                 if(len(self.__external_commands) > 0):
                     for cmd in self.__external_commands:
                         self.__log.console_log(f"Sending command '{cmd}'")
-                        self.__send_comport(str(cmd))
+                        self.__send_comport(str(cmd) + "\r\n")
                     self.__external_commands = []
 
                 if(len(packets) == 0):
@@ -115,6 +117,7 @@ class TelemetryThread(threading.Thread):
                 # Process raw to packet
                 self.__log.console_log(f"Processing {len(packets) - 1} packets..")
                 self.__log.set_waiting(len(packets) - 1)
+
                 for pkt_r in packets:
                     pkt = pkt_r.rstrip() # Strip whitespace characters
                     if(len(pkt) == 0):
@@ -132,14 +135,36 @@ class TelemetryThread(threading.Thread):
 
                         if type(packet_in) != dict:
                             print("Read non dict?" + str(pkt) + " type " + str(type(packet_in)))
+        
+                        if packet_in['type'] == "command_success":
+                            self.__log.console_log("RX: Command good")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
+                            continue
+
+                        # This is jank but idc
+                        if packet_in['type'] == "bad_command":
+                            self.__log.console_log("RX: Command bad")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
+                            continue
+
+                        if packet_in['type'] == "command_acknowledge":
+                            self.__log.console_log("RX: Command ACK")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
+                            continue
+
+                        if packet_in['type'] == "command_sent":
+                            self.__log.console_log("RX: Command send confirmed")
+                            self.__ack_queue.append([self.__combiners[0].get_mqtt_control_topic(), packet_in])
+                            continue
 
                         # print(packet_in)
                         if not self.__rf_set:
                             # Wait for freq change and periodically send new command to try to change freq.
+
                             if packet_in['type'] == "freq_success":
 
                                 if float(packet_in['frequency']) == float(self.__rf_freq):
-                                    self.__log.console_log_always("Frequency set: Listening on " + str(self.__rf_freq))
+                                    self.__log.console_log("Frequency set: Listening on " + str(self.__rf_freq))
                                     self.__rf_set = True
                                 else:
                                     self.__log.console_log("Recieved incorrect frequency!")
@@ -149,22 +174,11 @@ class TelemetryThread(threading.Thread):
                             else:
                                 self.__log.console_log("Recieved packet from wrong stream.. Discarding due to freq change.")
                                 continue
-
-                        if packet_in['type'] == "heartbeat":
-                            # Send heartbeat to common stream
-                            heartbeat_only = {"battery_voltage": packet_in['value']['battery_voltage'], 'rssi': packet_in['value']['RSSI']}
-                            raw_in = {"source": "gss_combiner", "action": "heartbeat", "time": datetime.now().timestamp(), "data": heartbeat_only}
-                            proc_string = json.dumps(raw_in).encode('utf-8')
-                            self.__mqttclient.publish("Common", proc_string)
-                            self.__log.success()
-                            continue
-
+                        
+                        # No more logging heartbeats
                         if packet_in['type'] == 'data':
                             self.__log.console_log("reading packet type: " + ("sustainer" if packet_in['value']['is_sustainer'] else "booster"))
-                        else:
-                            # print()
-                            # print(packet_in)
-                            continue
+
                     except json.decoder.JSONDecodeError as json_err:
                         self.__log.console_log(f"Recieved corrupted JSON packet. Flushing buffer.")
                         self.__log.console_log(f" ---> DUMP_ERR: Recieved invalid packet of len {len(pkt)} : ")
@@ -178,12 +192,10 @@ class TelemetryThread(threading.Thread):
                     for combiner in self.__combiners:
                         combiner.enqueue_packet(processed)
 
-                    # Log all packets and send it to the all-data stream
+                    # Log all packets
                     proc_json = json.dumps(processed)
-                    proc_string = proc_json.encode('utf-8')
-                    self.__mqttclient.publish(self.__topic, proc_string)
                     self.__log.file_log(proc_json)
-                    self.__log.console_log(f"Processed packet @ {processed['unix']} --> '{self.__topic}'")
+                    self.__log.console_log(f"Processed packet @ {processed['unix']}")
                     self.__log.waiting_delta(-1)
                     self.__log.success()
 
@@ -192,7 +204,8 @@ class TelemetryThread(threading.Thread):
             except Exception as e:
                 try:
                     print(f"[Telem {self.__comport.name}] Ran into an uncaught exception.. continuing gracefully.") # Always print these.
-                    self.__log.console_log(f"Error dump:", traceback.format_exc(e))
+                    print(e)
+                    # print(f"Error dump:", traceback.format_exc(e))
                 except Exception as e:
                     print("Exception while handling excpetion!")
 
@@ -202,7 +215,7 @@ class MQTTThread(threading.Thread):
         super(MQTTThread, self).__init__(daemon=True)
         self.__log = log_stream
         self.__uri = server_uri
-        self.__mqttclient = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
+        self.__mqttclient: mqtt.Client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
 
         self.__log.console_log("Connecting to broker @ " + str(self.__uri))
         self.__mqttclient.connect(self.__uri, port=1884)
@@ -212,8 +225,8 @@ class MQTTThread(threading.Thread):
         self.__sustainer_cmds = []
 
         def on_message(client, userdata, msg): 
+            """Callback function that will be called every time the client receives a message from the broker (something is added to the topic, commands to be sent)"""
             payload_str = msg.payload.decode()
-
             try:
                 payload_obj = json.loads(payload_str)
                 type = payload_obj["type"]
@@ -222,16 +235,21 @@ class MQTTThread(threading.Thread):
                     return
                 raw_cmd = payload_obj["raw"]
             except:
-                self.__log.console_log(f"Failed to decode Command stream packet: {payload_str}")
+                print(f"Failed to decode Command stream packet: {payload_str}")
 
             self.__log.console_log(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
-            ack_msg = {"type": "acknowledge_combiner", "cmd_ack": raw_cmd}
+            # print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
+
             if(msg.topic == "Control-Sustainer"):
-                self.__sustainer_cmds.append(raw_cmd)
+                ack_msg = {"type": "acknowledge_combiner", "ch": "Control-Sustainer", "cmd_ack": raw_cmd}
+                with cmd_copy_lock:
+                    self.__sustainer_cmds.append(raw_cmd)
                 self.__mqttclient.publish(msg.topic, json.dumps(ack_msg))
                 return
             if(msg.topic == "Control-Booster"):
-                self.__booster_cmds.append(raw_cmd)
+                ack_msg = {"type": "acknowledge_combiner", "ch": "Control-Booster", "cmd_ack": raw_cmd}
+                with cmd_copy_lock:
+                    self.__booster_cmds.append(raw_cmd)
                 self.__mqttclient.publish(msg.topic, json.dumps(ack_msg))
                 return
             
@@ -242,10 +260,23 @@ class MQTTThread(threading.Thread):
 
     def get_telem_cmds(self):
         """Returns arrays of queued commands corresponding to (Sustainer, Booster)"""
-        sus_cmds = copy.deepcopy(self.__sustainer_cmds)
-        boost_cmds = copy.deepcopy(self.__booster_cmds)
-        self.__sustainer_cmds = []
-        self.__booster_cmds = []
+        
+        if(len(self.__sustainer_cmds) > 0):
+            self.__log.console_log("Cmd: Ack queue good")
+
+
+        with cmd_copy_lock:
+            sus_cmds = copy.deepcopy(self.__sustainer_cmds)
+            boost_cmds = copy.deepcopy(self.__booster_cmds)
+            self.__sustainer_cmds = []
+            self.__booster_cmds = []
+
+        if(len(sus_cmds) > 0):
+            self.__log.console_log("Cmd: Copy queue good")
+
+
+
+        
         
         return (sus_cmds, boost_cmds)
 
@@ -273,6 +304,11 @@ class MQTTThread(threading.Thread):
                 self.__log.fail()
             self.__log.waiting_delta(-1)
 
+    def send_raw(self, topic, data) -> None:
+        """Publish a set of packets to a `Data` topic"""
+        self.__mqttclient.publish(topic, json.dumps(data).encode("utf-8"))
+        self.__log.console_log(f"Published")
+
     def run(self) -> None:
         self.__mqttclient.loop_start()
 
@@ -280,10 +316,5 @@ class MQTTThread(threading.Thread):
             pass
     
     def publish_common(self, data: str):
-        """Publish arbitrary data to the `Common` topic"""
-        try:
-            self.__mqttclient.publish("Common", data)
-            self.__log.success()
-        except Exception as e:
-            print(f"Unable to publish to 'Common' : ", str(e)) # Always print
-            self.__log.fail()
+        """Publish one arbitrary packet to the `Common` topic"""
+        self.publish([data], "Common")
