@@ -1,7 +1,5 @@
 #include "buzzer.h"
-
-#define BUZZER_PIN (48)
-#define BUZZER_CHANNEL (1)
+#include <hardware/pins.h>
 
 /**
  * @brief starts playing a new song
@@ -72,6 +70,8 @@ void BuzzerController::tick_sounds() {
 */
 ErrorCode BuzzerController::init() {
     // ledcDetachPin(BUZZER_PIN);  // this probably isn't necessary but who am I do question the knowledge of github
+
+    // This is done for a startup tone before begin_systems, but it doesn't hurt to do it again ig.
     pinMode(BUZZER_PIN, OUTPUT);
     digitalWrite(BUZZER_PIN, LOW);
     ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);

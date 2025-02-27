@@ -33,12 +33,12 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 426.15;
-float SUSTAINER_FREQ = 426.15;
+float RF95_FREQ = 425.15;
+float SUSTAINER_FREQ = 425.15;
 
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 434.00;
+float rf95_freq_MHZ = 425.15;
 
 float current_freq = 0;
 
@@ -57,6 +57,9 @@ int command_ID = 0;
 short cmd_number = 0;
 
 constexpr const char* json_command_success = R"({"type": "command_success"})";
+constexpr const char* json_command_bad = R"({"type": "bad_command"})";
+constexpr const char* json_command_sent = R"({"type": "command_sent"})";
+constexpr const char* json_command_ack = R"({"type": "command_acknowledge"})";
 constexpr const char* json_command_parse_error = R"({"type": "command_error", "error": "serial parse error"})";
 constexpr const char* json_buffer_full_error = R"({"type": "command_error", "error": "command buffer not empty"})";
 
@@ -65,9 +68,10 @@ constexpr const char* json_init_success = R"({"type": "init_success"})";
 constexpr const char* json_set_frequency_failure = R"({"type": "freq_error", "error": "set_frequency failed"})";
 constexpr const char* json_receive_failure = R"({"type": "receive_error", "error": "recv failed"})";
 constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
-constexpr int max_command_retries = 5;
+constexpr int max_command_retries = 20;
 
 bool last_ack_bit = false;
+bool initial_ack_flag = true;
 
 
 template <typename T>
@@ -95,7 +99,7 @@ struct TelemetryPacket {
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
     uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
-    float RSSI = 0.0;
+    float RSSI;
 };
 
 // struct TelemetryPacket {
@@ -130,12 +134,14 @@ struct FullTelemetryData {
     float sat_count;
     float pyros[4];
     bool is_sustainer;
+    float kf_vx;
+    bool kf_reset;
     uint16_t kf_vx;
 };
 
 
 
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, EMPTY };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_TOGGLE, EMPTY };
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
@@ -180,13 +186,18 @@ double ConvertGPS(int32_t coord) {
     return complete;
 }
 
+void handle_acknowledge() {
+    if (!cmd_queue.empty()) {
+        cmd_queue.pop();
+        Serial.println(json_command_ack);
+    }
+}
+
 void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     int64_t start_printing = millis();
 
     FullTelemetryData data;
-    data.timestamp = start_printing;
-
     data.altitude = static_cast<float>(packet.alt);
     data.latitude = ConvertGPS(packet.lat);
     data.longitude = ConvertGPS(packet.lon);
@@ -204,16 +215,26 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
     data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
     data.FSM_State = packet.fsm_callsign_satcount & 0b1111;
-    data.pyros[0] = ((float) ((packet.pyro >> 0) & (0x7F)) / 127.) * 12.;
+    data.pyros[0] = (packet.pyro >> 0) & (0x7F);
     data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
     data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
+    data.kf_reset = packet.alt & 1;
 
+    if(initial_ack_flag) {
+        last_ack_bit = data.kf_reset;
+        initial_ack_flag = false;
+    }
+
+    if(data.kf_reset != last_ack_bit) {
+        handle_acknowledge();
+        last_ack_bit = data.kf_reset;
+    }
     // kinda hacky but it will work
     if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
         data.FSM_State = static_cast<uint8_t>(-1);
     }
-
+    data.kf_vx = (float) packet.kf_vx / (float) ((1 << 16) - 1) * 4000.f - 2000.f;
     data.freq = RF95_FREQ;
     if(packet.RSSI == 0.0) {
         data.rssi = packet.RSSI;
@@ -275,6 +296,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("pyro_a", packet.pyros[0]);
     printJSONField("pyro_b", packet.pyros[1]);
     printJSONField("pyro_c", packet.pyros[2]);
+    printJSONField("kf_reset", packet.kf_reset);
     printJSONField("pyro_d", packet.pyros[3], false);
     Serial.println("}}");
 }
@@ -303,7 +325,8 @@ void set_freq_local_bug_fix(float freq) {
     Serial.println("}");
 }
 
-void SerialInput(const char* key, const char* value) {
+
+void HandleSerial(const String key) {
     if (!cmd_queue.empty()) {
         Serial.println(json_buffer_full_error);
         return;
@@ -311,51 +334,46 @@ void SerialInput(const char* key, const char* value) {
 
     TelemetryCommand command{};
 
-    if (strcmp(key, "RESET_KF") == 0) {
+    if (key == "RESET_KF") {
         command.command = CommandType::RESET_KF;
-    } else if (strcmp(key, "SAFE") == 0) {
+    } else if (key == "SAFE") {
         command.command = CommandType::SWITCH_TO_SAFE;
-    } else if (strcmp(key, "IDLE") == 0) {
+    } else if (key == "IDLE") {
         command.command = CommandType::SWITCH_TO_IDLE;
-    } else if (strcmp(key, "PT") == 0) {
+    } else if (key == "PT") {
         command.command = CommandType::SWITCH_TO_PYRO_TEST;
-    } else if (strcmp(key, "PA") == 0) {
+    } else if (key == "PA") {
         command.command = CommandType::FIRE_PYRO_A;
-    } else if (strcmp(key, "PB") == 0) {
+    } else if (key == "PB") {
         command.command = CommandType::FIRE_PYRO_B;
-    } else if (strcmp(key, "PC") == 0) {
+    } else if (key == "PC") {
         command.command = CommandType::FIRE_PYRO_C;
-    } else if (strcmp(key, "PD") == 0) {
+    } else if (key == "PD") {
         command.command = CommandType::FIRE_PYRO_D;
+    } else if (key == "CAMT") {
+        command.command = CommandType::CAM_TOGGLE;
     } else {
-        Serial.println("bad command");
+        Serial.println(json_command_bad);
         return;
     }
-
 
     Serial.println(json_command_success);
     // Send the command until acknowledge or 5 attempts
     cmd_queue.push({command, 5});
 }
 
-void handle_acknowledge() {
-    if (!cmd_queue.empty()) {
-        cmd_queue.pop();
-    }
-}
 
 void process_command_queue() {
     if (cmd_queue.empty()) return;
     TelemetryCommandQueueElement& cmd = cmd_queue.front();
     cmd.retry_count --;
 
+    Serial.println(json_command_sent);
     rf95.send((uint8_t*)&cmd.command, sizeof(cmd.command));
 
-    Serial.printf("The command is: %d\n", cmd.command);
     rf95.waitPacketSent();
 }
 
-SerialParser serial_parser(SerialInput, SerialError);
 
 void setup() {
     while (!Serial)
@@ -395,6 +413,8 @@ void setup() {
     Serial.println("}");
     rf95.setTxPower(23, false);
 
+    Serial.setTimeout(250);
+
 }
 
 void ChangeFrequency(float freq) {
@@ -406,18 +426,103 @@ void ChangeFrequency(float freq) {
     Serial.println("}");
 }
 
+// void loop() {
+//     TelemetryCommand tc;
+//     tc.command = CommandType::SWITCH_TO_IDLE;
+//     tc.freq = 1234.5678;
+
+//     rf95.send((uint8_t*)&tc.command, sizeof(tc.command));
+
+//     // rf95.send((uint8_t *) "greet thomas", strlen("hello thomas") + 1);
+//     delay(1000);
+//     rf95.handleInterrupt();
+// }
+
+int last_cmd_sent = 0;
+String cur_input = "";
+
 void loop() {
+    PrintDequeue();
+
+    // if(millis() - last_cmd_sent > 10000) {
+    //     Serial.println("cmd enqueued");
+    //     TelemetryCommand command{};
+    //     command.command = CommandType::SWITCH_TO_SAFE;
+    //     cmd_queue.push({command, 5});
+    //     last_cmd_sent = millis();
+
+    //     process_command_queue();
+    // }
+
+    // return;
+
     if (rf95.available()) {
-        Serial.println("Packet received!");
         uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
+        TelemetryPacket packet;
         uint8_t len = sizeof(buf);
+
         if (rf95.recv(buf, &len)) {
-            Serial.print("Received: ");
-            Serial.println((char*)buf);
-            delay(2000);
+            digitalWrite(LED_BUILTIN, HIGH);
+            delay(50);
+            digitalWrite(LED_BUILTIN, LOW);
+
+            // print out buf
+
+            // for(unsigned i = 0; i < len; i++) {
+            //     Serial.print(buf[i]);
+            // }
+
+            // Serial.println("   <eot>");
+
+            // return;
+            // Serial.println("Received packet");
+            // Serial.println(len);
+            memcpy(&packet, buf, sizeof(packet));
+            EnqueuePacket(packet, current_freq);
+            // if (!cmd_queue.empty()) {
+            //     auto& cmd = cmd_queue.front();
+            //         cmd.retry_count++;
+            //         Serial.print("ATTEMPT #");
+            //         Serial.println(cmd.retry_count);
+            //         if (cmd.retry_count >= max_command_retries) {
+            //             Serial.println("Popping command");
+            //             cmd_queue.pop();
+            //             Serial.println(json_send_failure);
+            //         }
+            // }
+
+            process_command_queue();
+
         } else {
-            Serial.println("Receive failed");
+            Serial.println(json_receive_failure);
         }
+    }
+
+    // serial_parser.read();
+    if (Serial.available()) {
+        String input = Serial.readString();
+
+        if(input.indexOf('\n') != -1) {
+            cur_input += input;
+            cur_input.replace("\r", ""); // Remove carriage returns
+
+            HandleSerial(input.substring(0, input.length() - 2));
+
+            cur_input = "";
+        } else {
+            cur_input += input;
+        }
+
+        // if (input.startsWith("FREQ:")) {
+        //     float freq = input.substring(5).toFloat(); // Extract frequency value
+        //     set_freq_local_bug_fix(freq);
+        //     RF95_FREQ = freq;
+        //     current_freq = freq;
+        // }
+
+        // SerialInput(input.c_str(), "");
+
+        // Avoid serialparser.
     }
 }
 

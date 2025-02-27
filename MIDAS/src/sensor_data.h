@@ -128,7 +128,6 @@ struct Barometer {
  * @brief data about pyro continuity
 */
 struct Continuity {
-    float sense_pyro;
     float pins[4];
 };
 
@@ -139,6 +138,7 @@ struct Continuity {
 */
 struct Voltage {
     float voltage = 0;
+    float current = 0;
 };
 
 /**
@@ -149,9 +149,9 @@ struct Voltage {
 struct GPS {
     int32_t latitude = 0;
     int32_t longitude = 0;
-    float altitude = 0;
-    float speed = 0;
-    uint16_t satellite_count = 0;
+    float altitude = 0; // Altitude in meters
+    float speed = 0; // Speed in meters/second
+    uint16_t fix_type = 0;
     // Unix timestamp since 1970
     // This isn't included in the telem packet because this is
     // solely for the SD logger. We do not need to know what time it is
@@ -201,7 +201,13 @@ struct Orientation {
         return euler;
     }
 
+
     Velocity orientation_velocity;
+
+    Velocity getVelocity() const {
+        return orientation_velocity;
+    }
+
     Acceleration orientation_acceleration;
 
     Acceleration linear_acceleration;

@@ -12,7 +12,7 @@
 // ----------------------------------
 
 // Regardless of sensor inputs, stay on pyro firing states for at LEAST this time. (ms)
-#define sustainer_pyro_firing_time_minimum 200
+#define sustainer_pyro_firing_time_minimum 100
 
 // Transition to FIRST_BOOST if acceleration is greater than this (G)
 #define sustainer_idle_to_first_boost_acceleration_threshold 3
@@ -48,7 +48,10 @@
 #define sustainer_main_to_main_deploy_timer_threshold 3000
 
 // Height required to deploy the main parachutes (m)
-#define sustainer_main_deploy_altitude_threshold 1006
+#define sustainer_main_deploy_altitude_threshold 975
+
+// The minimum delay between drogue deployment and main deployment
+#define sustainer_main_deploy_delay_after_drogue 1000
 
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define sustainer_ignition_to_second_boost_time_threshold 1000
@@ -60,10 +63,10 @@
 #define sustainer_landed_timer_threshold 5000
 
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
-#define sustainer_coast_time 3000
+#define sustainer_coast_time 1500
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
-#define sustainer_landed_vertical_speed_threshold 3
+#define sustainer_landed_vertical_speed_threshold 4
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define sustainer_landed_time_lockout 60000
@@ -116,6 +119,9 @@
 // [STARGAZER 1.4] This is a "dontcare" value --> The booster does not have a drogue, we transition immediately to MAIN
 #define booster_main_deploy_altitude_threshold 999999
 
+// The minimum delay between drogue deployment and main deployment
+#define booster_main_deploy_delay_after_drogue 1000
+
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define booster_ignition_to_second_boost_time_threshold 1000
 
@@ -126,7 +132,7 @@
 #define booster_landed_timer_threshold 5000
 
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
-#define booster_first_boost_to_burnout_time_threshold 1000
+#define booster_first_boost_to_burnout_time_threshold 1500
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (G)
 #define booster_landed_vertical_speed_threshold 4

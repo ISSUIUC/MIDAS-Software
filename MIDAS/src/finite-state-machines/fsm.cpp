@@ -62,13 +62,13 @@ StateEstimate::StateEstimate(RocketData& state) {
     acceleration = sensor_average<HighGData, 8>(state.high_g, [](HighGData& data) {
         return (double) data.ax;
     });
-    altitude = sensor_average<Barometer, 8>(state.barometer, [](Barometer& data) {
+    altitude = sensor_average<Barometer, 16>(state.barometer, [](Barometer& data) {
         return (double) data.altitude;
     });
     jerk = sensor_derivative<HighGData, 8>(state.high_g, [](HighGData& data) {
         return (double) data.ax;
     });
-    vertical_speed = sensor_derivative<Barometer, 8>(state.barometer, [](Barometer& data) {
+    vertical_speed = sensor_derivative<Barometer, 16>(state.barometer, [](Barometer& data) {
         return (double) data.altitude;
     });
 }
@@ -259,7 +259,8 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_DROGUE:
             // if altitude low enough then next state
-            if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold) {
+            // Also, wait at least 1 second after drogue deploy to deploy main.
+            if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold && (current_time - drogue_time) > sustainer_main_deploy_delay_after_drogue) {
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }
@@ -295,8 +296,20 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_LANDED:
 
             if((current_time - landed_time) > sustainer_landed_time_lockout) {
+
+                // Check for any telem transitions
+                // Force transtion to safe if requested + clear all transition flags.
+                if(telem_commands.should_transition_safe) {
+                    state = FSMState::STATE_SAFE;
+                    telem_commands.should_transition_pyro_test = false;
+                    telem_commands.should_transition_idle = false;
+                    telem_commands.should_transition_safe = false;
+                }
+
                 break;
             }
+
+            
 
             // if the slow speed was too brief then return to previous state
             if ((abs(state_estimate.vertical_speed) > sustainer_landed_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
@@ -456,7 +469,9 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_DROGUE:
-            if (state_estimate.altitude <= booster_main_deploy_altitude_threshold) {
+            // if altitude low enough then next state
+            // Also, wait at least 1 second after drogue deploy to deploy main.
+            if (state_estimate.altitude <= booster_main_deploy_altitude_threshold && (current_time - drogue_time) > booster_main_deploy_delay_after_drogue) {
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }
@@ -490,6 +505,16 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_LANDED:
 
             if((current_time - landed_time) > booster_landed_time_lockout) {
+
+                // Check for any telem transitions
+                // Force transtion to safe if requested + clear all transition flags.
+                if(telem_commands.should_transition_safe) {
+                    state = FSMState::STATE_SAFE;
+                    telem_commands.should_transition_pyro_test = false;
+                    telem_commands.should_transition_idle = false;
+                    telem_commands.should_transition_safe = false;
+                }
+
                 break;
             }
 

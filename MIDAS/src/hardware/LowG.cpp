@@ -18,7 +18,7 @@ ErrorCode LowGSensor::init() {
     return error;
 }
 
-/**
+/** 
  * @brief Reads and returns the data from the sensor
  * 
  * @return a LowGData packet with current acceleration in all three axes

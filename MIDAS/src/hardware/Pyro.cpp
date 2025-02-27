@@ -8,9 +8,9 @@
 
 
 // Fire the pyros for this time during PYRO_TEST (ms)
-#define PYRO_TEST_FIRE_TIME 1000
+#define PYRO_TEST_FIRE_TIME 100
 
-#define MAXIMUM_TILT_ANGLE (M_PI/9)    // 20 degrees
+#define MAXIMUM_TILT_ANGLE (M_PI/5)    // 36 degrees
 
 /**
  * @brief Returns true if the error_code signals failure.
@@ -192,6 +192,14 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
     PyroState new_pyro_state = PyroState();
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
+    if (fsm_state == FSMState::STATE_SAFE) {
+        disarm_all_channels(new_pyro_state);
+        return new_pyro_state;
+    }
+
+    // If the state is not SAFE, we arm the global arm pin
+    new_pyro_state.is_global_armed = true;
+    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
     // If the state is IDLE or any state after that, we arm the global arm pin
     switch (fsm_state) {
         case FSMState::STATE_IDLE:

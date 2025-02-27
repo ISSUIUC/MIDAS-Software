@@ -25,11 +25,11 @@ struct TelemetryPacket {
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
     uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
-}  __attribute__((packed));
+};
 
 
 // Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, TOGGLE_CAM };
 
 /**
  * @struct TelemetryCommand
@@ -39,9 +39,11 @@ enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST,
 struct TelemetryCommand {
     CommandType command;
     union {
+        char callsign[8];
         float new_freq;
+        bool do_abort;
     };
-    std::array<char, 3> verify = {{'B', 'R', 'K'}};
+    std::array<char, 3> verify;
 
     bool valid() {
         return verify == std::array<char, 3>{{'B','R','K'}};
