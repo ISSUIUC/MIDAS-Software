@@ -145,9 +145,11 @@ int decodeLastTwoBits(uint16_t ax, uint16_t ay, uint16_t az) {
 }
 
 double ConvertGPS(int32_t coord) {
-    double mins = fmod(static_cast<double>(std::abs(coord)), 10000000) / 100000.;
+    /*double mins = fmod(static_cast<double>(std::abs(coord)), 10000000) / 100000.;
     double degs = floor(static_cast<double>(std::abs(coord)) / 10000000.);
-    double complete = (degs + (mins / 60.));
+    double complete = (degs + (mins / 60.));*/
+    double complete = static_cast<double>(coord) / 10000000.0;
+
     if (coord < 0) {
         complete *= -1.;
     }
