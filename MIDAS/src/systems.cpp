@@ -114,9 +114,9 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 DECLARE_THREAD(pyro, RocketSystems* arg) {
     while(true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        CommandFlags& telem_commands = arg->rocket_data.command_flags;
+        CommandFlags& command_flags = arg->rocket_data.command_flags;
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), command_flags);
         arg->rocket_data.pyro.update(new_pyro_state);
 
         arg->led.update();
@@ -174,7 +174,14 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
-        // Serial.println("fsm");
+        
+        // FSM-based camera control
+        if(arg->rocket_data.command_flags.FSM_should_swap_camera_feed) { 
+            // Swap camera feed to MUX 2 (recovery bay camera)
+            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
+            arg->b2b.camera.vmux_set(CAM_2);
+        }
+
         THREAD_SLEEP(50);
     }
 }
