@@ -32,7 +32,7 @@ class FSM {
 public:
     FSM() = default;
 
-    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& telem_commands);
+    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
 
 private:
     double launch_time;
