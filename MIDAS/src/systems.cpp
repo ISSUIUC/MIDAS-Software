@@ -295,9 +295,18 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
                 arg->rocket_data.command_flags.should_fire_pyro_d = true;
             }
             break;
-        case CommandType::TOGGLE_CAM:
-            arg->b2b.camera.camera_toggle(0); // For stargazer, we will just toggle cam here.
-            arg->b2b.camera.vtx_toggle();
+        case CommandType::CAM_ON:
+            arg->b2b.camera.camera_on(CAM_1);
+            arg->b2b.camera.camera_on(CAM_2);
+            arg->b2b.camera.vtx_on();
+            break;
+        case CommandType::CAM_OFF:
+            arg->b2b.camera.camera_off(CAM_1);
+            arg->b2b.camera.camera_off(CAM_2);
+            arg->b2b.camera.vtx_off();
+            break;
+        case CommandType::TOGGLE_CAM_VMUX:
+            arg->b2b.camera.vmux_toggle();
             break;
         default:
             break; // how
