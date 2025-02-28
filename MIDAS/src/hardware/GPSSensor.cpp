@@ -18,10 +18,7 @@ ErrorCode GPSSensor::init() {
         return ErrorCode::GPSCouldNotBeInitialized;
     }
 
-
-
     ublox.setDynamicModel(DYN_MODEL_AIRBORNE4g);
-
 	ublox.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA); //Set the I2C port to output both NMEA and UBX messages
     // Set the measurment rate faster than one HZ if necessary
     // ublox.setMeasurementRate(100);
