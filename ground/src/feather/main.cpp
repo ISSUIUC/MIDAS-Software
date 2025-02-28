@@ -136,7 +136,6 @@ struct FullTelemetryData {
     bool is_sustainer;
     float kf_vx;
     bool kf_reset;
-    uint16_t kf_vx;
 };
 
 
@@ -176,13 +175,9 @@ int decodeLastTwoBits(uint16_t ax, uint16_t ay, uint16_t az) {
     return tilt;
 }
 
+
 double ConvertGPS(int32_t coord) {
-    double mins = fmod(static_cast<double>(std::abs(coord)), 10000000) / 100000.;
-    double degs = floor(static_cast<double>(std::abs(coord)) / 10000000.);
-    double complete = (degs + (mins / 60.));
-    if (coord < 0) {
-        complete *= -1.;
-    }
+    double complete = static_cast<double>(coord) / 10000000.0;
     return complete;
 }
 
