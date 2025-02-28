@@ -150,9 +150,9 @@ double ConvertGPS(int32_t coord) {
     double complete = (degs + (mins / 60.));*/
     double complete = static_cast<double>(coord) / 10000000.0;
 
-    if (coord < 0) {
+    /*if (coord < 0) {
         complete *= -1.;
-    }
+    }*/
     return complete;
 }
 
