@@ -188,9 +188,9 @@ Orientation OrientationSensor::read()
 
         Velocity velocity_from_pos;
         
-        velocity_from_pos.vx = (euler.z-sensor_reading.roll) / std::max(deltaTime,100);
-        velocity_from_pos.vy = (euler.x-sensor_reading.pitch) / std::max(deltaTime,100);
-        velocity_from_pos.vz = (-euler.y - sensor_reading.yaw) / std::max(deltaTime,100);
+        velocity_from_pos.vx = (euler.z-sensor_reading.roll) / std::max(deltaTime, 100.0f);
+        velocity_from_pos.vy = (euler.x-sensor_reading.pitch) / std::max(deltaTime, 100.0f);
+        velocity_from_pos.vz = (-euler.y - sensor_reading.yaw) / std::max(deltaTime, 100.0f);
 
         sensor_reading.yaw = -euler.y;
         sensor_reading.pitch = euler.x;
