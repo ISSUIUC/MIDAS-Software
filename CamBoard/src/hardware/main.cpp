@@ -9,6 +9,69 @@
 #include "hardware/pins.h"
 #include "systems.h"
 
+#define CAMBOARD_I2C_ADDR 0x69
+
+enum class CameraCommand {
+    CAMERA0_OFF = 0,
+    CAMERA0_ON = 1,
+    CAMERA1_OFF = 2,
+    CAMERA1_ON = 3,
+    VTX_OFF = 4,
+    VTX_ON = 5,
+    MUX_0 = 6,
+    MUX_1 = 7
+  };
+
+void onReceive(int len) {
+    Serial.print("Recieved: ");
+    while (Wire1.available()) {
+      uint8_t recieve = Wire1.read();
+      Serial.print(recieve);
+      Serial.print(": ");
+      
+      switch(recieve) {
+        case 0:
+          digitalWrite(CAM1_ON_OFF, LOW);
+          Serial.println("Case 0\n");
+          break;
+        case 1:
+          digitalWrite(CAM1_ON_OFF, HIGH);
+          Serial.println("Case 1\n");
+          read_mem_cap_data(Serial1);
+          sleep(1);
+
+          break;
+        case 2:
+          digitalWrite(CAM2_ON_OFF, LOW);
+          Serial.println("Case 2\n");
+          break;
+        case 3:
+          digitalWrite(CAM2_ON_OFF, HIGH);
+          Serial.println("Case 3\n");
+          break;
+        case 4:
+          digitalWrite(VTX_ON_OFF, LOW);
+          Serial.println("Case 4\n");
+          break;
+        case 5:
+          digitalWrite(VTX_ON_OFF, HIGH);
+          Serial.println("Case 5\n");
+          break;
+        case 6:
+          digitalWrite(VIDEO_SELECT, LOW);
+          Serial.println("Case 6\n");
+          break;
+        case 7:
+          digitalWrite(VIDEO_SELECT, HIGH);
+          Serial.println("Case 7\n");
+          break;
+        default:
+          break;
+      }
+    }
+    Serial.println("(EOT)");
+  }
+
 
 /**
  * Sets the config file and then starts all the threads using the config.
@@ -41,6 +104,8 @@ void setup() {
         // Wire.begin(I2C_SDA, I2C_SCL);
     Serial.println("Starting Battery Sense I2C...");
     Wire.begin(BATTSENSE_SDA, BATTSENSE_SCL);
+    Wire1.onReceive(onReceive);
+    Wire1.begin((uint8_t)CAMBOARD_I2C_ADDR);
 
     //begin UART
     // Serial.println("Starting UART...");

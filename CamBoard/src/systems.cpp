@@ -15,6 +15,8 @@
 DECLARE_THREAD(i2c, RocketSystems* arg) {
     int i = 0;
 
+    read_mem_cap_data(Serial1);
+
     while (true) {
         if (i % 10 == 0) {
             int power = read_reg(0x8, 3);
@@ -66,15 +68,15 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-DECLARE_THREAD(can, RocketSystems* arg) {
-    while (true) {
-        CANFDMessage message;
-        if (arg->can.recieve(message)) {
-            arg->rocket_data.commands = (MIDASCommands({message}));
-        }
-        THREAD_SLEEP(5);
-    }
-}
+// DECLARE_THREAD(can, RocketSystems* arg) {
+//     while (true) {
+//         CANFDMessage message;
+//         if (arg->can.recieve(message)) {
+//             arg->rocket_data.commands = (MIDASCommands({message}));
+//         }
+//         THREAD_SLEEP(5);
+//     }
+// }
 
 // DECLARE_THREAD(camera, RocketSystems* arg) {
 //     while (true) {
@@ -131,7 +133,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(i2c, MAIN_CORE, config, 9);
     START_THREAD(fsm, MAIN_CORE, config, 8);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
-    START_THREAD(can, MAIN_CORE, config, 15);
+    //START_THREAD(can, MAIN_CORE, config, 15);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 

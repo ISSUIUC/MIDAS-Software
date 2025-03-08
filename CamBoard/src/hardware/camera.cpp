@@ -25,18 +25,6 @@ void camera_on_off(HardwareSerial& camera) {
         camera.flush();
     Serial.println("Finished turning camera on");
     Serial.flush();
-
-    // uint8_t read1[3] = {0xCC, 0x00, 0x60}; 
-    // uint8_t read2[5];
-    // camera.write(read1, 3);
-    // delay(10);
-    // Serial.println(camera.available());
-    // camera.read(read2, 5);
-    // Serial.println(read2[0]);
-    // Serial.println(read2[1]);
-    // Serial.println(read2[2]);
-    // Serial.println(read2[3]);
-    // Serial.println(read2[4]);
 }
 
 void start_recording(HardwareSerial& camera) {
@@ -55,4 +43,49 @@ void stop_recording(HardwareSerial& camera) {
         camera.flush();
     Serial.println("Finished camera recording");
     Serial.flush();
+}
+
+uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a) {
+    crc ^= a;
+    for (int ii = 0; ii < 8; ++ii) {
+        if (crc & 0x80) {
+            crc = (crc << 1) ^ 0xD5;
+        } else {
+            crc = crc << 1;
+        }
+    }
+
+    return crc;
+}
+
+uint8_t generate_crc(uint8_t* buf, unsigned int buf_len) {
+  uint8_t crc = 0x00;
+  for(unsigned i = 0; i < buf_len; i++) {
+    crc = crc8_dvb_s2(crc, buf[i]);
+  }
+  return crc;
+}
+
+bool check_crc(uint8_t* buf, unsigned int buf_len, uint8_t expected_crc) {
+  return generate_crc(buf, buf_len) == expected_crc;
+}
+
+// static unsigned gSendDate = 0 ;
+// static unsigned gSentCount = 0 ;
+
+void read_mem_cap_data(HardwareSerial& camera) {
+  uint8_t buf[32];
+  if(camera.available()) {
+    camera.read(buf, 4);
+    uint8_t msg_len = buf[2] - 1; // account for offsets
+    Serial.print("MSG LEN: ");
+    Serial.println(msg_len);
+
+    camera.read(buf, msg_len);
+    for(int i = 1; i < msg_len; i++) {
+      Serial.print((char)buf[i]);
+    }
+    Serial.print("   CRC: ");
+    Serial.println(buf[msg_len]);
+  }
 }
