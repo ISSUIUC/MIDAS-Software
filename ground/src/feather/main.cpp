@@ -33,12 +33,12 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 425.15;
-float SUSTAINER_FREQ = 425.15;
+float RF95_FREQ = 426.15;
+float SUSTAINER_FREQ = 426.15;
 
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 425.15;
+float rf95_freq_MHZ = 426.15;
 
 float current_freq = 0;
 
@@ -136,7 +136,6 @@ struct FullTelemetryData {
     bool is_sustainer;
     float kf_vx;
     bool kf_reset;
-    uint16_t kf_vx;
 };
 
 

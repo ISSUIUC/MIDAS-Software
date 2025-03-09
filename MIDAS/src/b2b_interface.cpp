@@ -59,11 +59,11 @@ void CameraB2B::vmux_set(int cam_select) {
     if(cam_select) {
         // If cam_select is 1, switch to MUX 2
         transmit_command(CameraCommand::MUX_2);
-        mux_select_ = false;
+        mux_select_ = true;
     } else {
         // Otherwise switch to MUX 1
         transmit_command(CameraCommand::MUX_1);
-        mux_select_ = true;
+        mux_select_ = false;
     }
 }
 
