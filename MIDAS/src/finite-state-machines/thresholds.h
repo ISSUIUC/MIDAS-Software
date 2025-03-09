@@ -15,13 +15,13 @@
 #define sustainer_pyro_firing_time_minimum 100
 
 // Transition to FIRST_BOOST if acceleration is greater than this (G)
-#define sustainer_idle_to_first_boost_acceleration_threshold 3
+#define sustainer_idle_to_first_boost_acceleration_threshold 5
 
 // Return state to IDLE if not boosting for this amount of time (ms)
 #define sustainer_idle_to_first_boost_time_threshold 1000
 
 // Transition to SECOND_BOOST from SUSTAINER_IGNITION if acceleration greater than this (G)
-#define sustainer_ignition_to_second_boost_acceleration_threshold 4
+#define sustainer_ignition_to_second_boost_acceleration_threshold 3
 
 // Return state to SECOND_BOOST if not boosting for this amount of time (ms)
 #define sustainer_second_boost_to_coast_time_threshold 1000
@@ -66,7 +66,7 @@
 #define sustainer_coast_time 1500
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
-#define sustainer_landed_vertical_speed_threshold 4
+#define sustainer_landed_vertical_speed_threshold 1
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define sustainer_landed_time_lockout 60000
