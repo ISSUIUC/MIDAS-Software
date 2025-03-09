@@ -309,10 +309,8 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 break;
             }
 
-            
-
             // if the slow speed was too brief then return to previous state
-            if ((abs(state_estimate.vertical_speed) > sustainer_landed_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
+            if ((abs(state_estimate.vertical_speed) > sustainer_landed_to_main_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
                 state = FSMState::STATE_MAIN;
             }
             break;
@@ -518,7 +516,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 break;
             }
 
-            if ((abs(state_estimate.vertical_speed) > booster_landed_vertical_speed_threshold) && ((current_time - landed_time) > booster_landed_timer_threshold)) {
+            if ((abs(state_estimate.vertical_speed) > booster_landed_to_main_vertical_speed_threshold) && ((current_time - landed_time) > booster_landed_timer_threshold)) {
                 state = FSMState::STATE_MAIN;
             }
             break;

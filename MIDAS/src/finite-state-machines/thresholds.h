@@ -15,13 +15,13 @@
 #define sustainer_pyro_firing_time_minimum 100
 
 // Transition to FIRST_BOOST if acceleration is greater than this (G)
-#define sustainer_idle_to_first_boost_acceleration_threshold 3
+#define sustainer_idle_to_first_boost_acceleration_threshold 5
 
 // Return state to IDLE if not boosting for this amount of time (ms)
 #define sustainer_idle_to_first_boost_time_threshold 1000
 
 // Transition to SECOND_BOOST from SUSTAINER_IGNITION if acceleration greater than this (G)
-#define sustainer_ignition_to_second_boost_acceleration_threshold 4
+#define sustainer_ignition_to_second_boost_acceleration_threshold 3
 
 // Return state to SECOND_BOOST if not boosting for this amount of time (ms)
 #define sustainer_second_boost_to_coast_time_threshold 1000
@@ -30,7 +30,7 @@
 #define sustainer_coast_detection_acceleration_threshold 0.2
 
 // Reach apogee state when vertical speed is less than or equal to this value (m/s)
-#define sustainer_coast_to_apogee_vertical_speed_threshold 15
+#define sustainer_coast_to_apogee_vertical_speed_threshold 25
 
 // Revert back to COAST if the vertical speed in apogee is too high (was 0 before which may have caused it keep jumping back to COAST) (m/s)
 #define sustainer_apogee_backto_coast_vertical_speed_threshold 10
@@ -38,8 +38,8 @@
 // Revert back to COAST if apogee was too brief (ms)
 #define sustainer_apogee_check_threshold 1000
 
-// Move on to DROGUE_DEPLOT after being in apogee for this amount of time (ms)
-#define sustainer_apogee_timer_threshold 1000
+// Move on to DROGUE_DEPLOY after being in apogee for this amount of time (ms)
+#define sustainer_apogee_timer_threshold 500
 
 // Move on to DROGUE after a second of reaching apogee (ms)
 #define sustainer_drogue_timer_threshold 3000
@@ -48,7 +48,7 @@
 #define sustainer_main_to_main_deploy_timer_threshold 3000
 
 // Height required to deploy the main parachutes (m)
-#define sustainer_main_deploy_altitude_threshold 975
+#define sustainer_main_deploy_altitude_threshold 1350
 
 // The minimum delay between drogue deployment and main deployment
 #define sustainer_main_deploy_delay_after_drogue 1000
@@ -63,10 +63,13 @@
 #define sustainer_landed_timer_threshold 5000
 
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
-#define sustainer_coast_time 1500
+#define sustainer_coast_time 8000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
-#define sustainer_landed_vertical_speed_threshold 4
+#define sustainer_landed_vertical_speed_threshold 1
+
+// Transition back to MAIN if vertical speed is greater than this threshold (m/s)
+#define sustainer_landed_to_main_vertical_speed_threshold 5
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define sustainer_landed_time_lockout 60000
@@ -89,7 +92,7 @@
 #define booster_pyro_firing_time_minimum 200
 
 // Transition to FIRST_BOOST if acceleration is greater than this (G)
-#define booster_idle_to_first_boost_acceleration_threshold 3
+#define booster_idle_to_first_boost_acceleration_threshold 5
 
 // Return state to IDLE if not boosting for this amount of time (ms)
 #define booster_idle_to_first_boost_time_threshold 1000
@@ -134,8 +137,11 @@
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
 #define booster_first_boost_to_burnout_time_threshold 1500
 
-// Transition to LANDED from MAIN if vertical speed is less than this threshold (G)
-#define booster_landed_vertical_speed_threshold 4
+// Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
+#define booster_landed_vertical_speed_threshold 1
+
+// Transition back to MAIN if vertical speed is greater than this threshold (m/s)
+#define booster_landed_to_main_vertical_speed_threshold 5
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define booster_landed_time_lockout 60000
