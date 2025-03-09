@@ -114,9 +114,9 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 DECLARE_THREAD(pyro, RocketSystems* arg) {
     while(true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        CommandFlags& telem_commands = arg->rocket_data.command_flags;
+        CommandFlags& command_flags = arg->rocket_data.command_flags;
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), command_flags);
         arg->rocket_data.pyro.update(new_pyro_state);
 
         arg->led.update();
@@ -174,7 +174,20 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
-        // Serial.println("fsm");
+        
+        // FSM-based camera control
+        if(arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1) { 
+            // Swap camera feed to MUX 1 (Side-facing camera) at launch.
+            arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
+            arg->b2b.camera.vmux_set(CAM_1);
+        }
+
+        if(arg->rocket_data.command_flags.FSM_should_swap_camera_feed) { 
+            // Swap camera feed to MUX 2 (recovery bay camera)
+            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
+            arg->b2b.camera.vmux_set(CAM_2);
+        }
+
         THREAD_SLEEP(50);
     }
 }
@@ -295,9 +308,18 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
                 arg->rocket_data.command_flags.should_fire_pyro_d = true;
             }
             break;
-        case CommandType::TOGGLE_CAM:
-            arg->b2b.camera.camera_toggle(0); // For stargazer, we will just toggle cam here.
-            arg->b2b.camera.vtx_toggle();
+        case CommandType::CAM_ON:
+            arg->b2b.camera.camera_on(CAM_1);
+            arg->b2b.camera.camera_on(CAM_2);
+            arg->b2b.camera.vtx_on();
+            break;
+        case CommandType::CAM_OFF:
+            arg->b2b.camera.camera_off(CAM_1);
+            arg->b2b.camera.camera_off(CAM_2);
+            arg->b2b.camera.vtx_off();
+            break;
+        case CommandType::TOGGLE_CAM_VMUX:
+            arg->b2b.camera.vmux_toggle();
             break;
         default:
             break; // how

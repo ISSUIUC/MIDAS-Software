@@ -14,6 +14,9 @@
 #error "At least one B2B_I2C or B2B_CAN must be defined"
 #endif
 
+#define CAM_1 0
+#define CAM_2 1
+
 
 enum class CameraCommand {
     CAMERA1_OFF = 0,
@@ -36,10 +39,14 @@ struct CameraB2B {
     void vtx_off();
     void vtx_toggle();
 
+    void vmux_set(int cam_select);
+    void vmux_toggle();
+
     private:
     void transmit_command(CameraCommand command);
     bool cam_state_[2] = { false, false }; // false: off, true: on
     bool vtx_state_ = false;
+    bool mux_select_ = false; // false: VMUX 1, true: VMUX 2
 };
 
 /**
