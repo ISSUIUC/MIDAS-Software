@@ -7,6 +7,8 @@
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
 #define REPORT_INTERVAL_US 5000
+// 25 ms
+#define REPORT_INTERVAL_US_AV 25000
 unsigned long lastTime = 0;
 float deltaTime = 0;
 
@@ -25,11 +27,17 @@ ErrorCode OrientationSensor::init()
     {
         return ErrorCode::CannotConnectBNO;
     }
-    Serial.println("Setting desired reports");
+    Serial.println("Setting BNO desired reports");
     if (!imu.enableReport(SH2_ARVR_STABILIZED_RV, REPORT_INTERVAL_US))
     {
         return ErrorCode::CannotInitBNO;
     }
+
+    if (!imu.enableReport(SH2_GYRO_INTEGRATED_RV, REPORT_INTERVAL_US_AV))
+    {
+        return ErrorCode::CannotInitBNO;
+    }
+
     return ErrorCode::NoError;
 }
 
@@ -161,15 +169,23 @@ Orientation OrientationSensor::read()
 
     if (imu.getSensorEvent(&event))
     {
+        Orientation sensor_reading;
+        sensor_reading.has_data = true;
+
         switch (event.sensorId)
         {
         case SH2_ARVR_STABILIZED_RV:
             euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
+            sensor_reading.reading_type = OrientationReadingType::FULL_READING;
             break;
         case SH2_GYRO_INTEGRATED_RV:
-            // faster (more noise?)
-            euler = quaternionToEulerGI(&event.un.gyroIntegratedRV, true);
-            break;
+            sensor_reading.reading_type = OrientationReadingType::ANGULAR_VELOCITY_UPDATE;
+
+            sensor_reading.angular_velocity.vx = event.un.gyroIntegratedRV.angVelX;
+            sensor_reading.angular_velocity.vy = event.un.gyroIntegratedRV.angVelY;
+            sensor_reading.angular_velocity.vz = event.un.gyroIntegratedRV.angVelZ;
+            
+            return sensor_reading;
         }
         
         // filtered_euler.x = alpha * (euler.x) + (1 - alpha) * prev_x;
@@ -180,8 +196,6 @@ Orientation OrientationSensor::read()
         // prev_y = euler.y;
         // prev_z = euler.z;
         
-        Orientation sensor_reading;
-        sensor_reading.has_data = true;
         /*
         sensor_reading.yaw = -filtered_euler.y;
         sensor_reading.pitch = filtered_euler.x;
@@ -191,9 +205,6 @@ Orientation OrientationSensor::read()
         sensor_reading.yaw = -euler.y;
         sensor_reading.pitch = euler.x;
         sensor_reading.roll = euler.z;
-
-
-       
 
         sensor_reading.linear_acceleration.ax = -event.un.accelerometer.y;
         sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;

@@ -182,12 +182,21 @@ struct Quaternion {
 };
 
 /**
+ * @enum Orientation reading type
+ */
+enum class OrientationReadingType {
+    FULL_READING = 0,
+    ANGULAR_VELOCITY_UPDATE = 1
+};
+
+/**
  * @struct Orientation
  * 
  * @brief data from the BNO
 */
 struct Orientation {
     bool has_data = false;
+    OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
 
     float yaw = 0;
     float pitch = 0;
@@ -203,6 +212,7 @@ struct Orientation {
 
 
     Velocity orientation_velocity;
+    Velocity angular_velocity;
 
     Velocity getVelocity() const {
         return orientation_velocity;

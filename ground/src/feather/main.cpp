@@ -33,12 +33,12 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 425.15;
-float SUSTAINER_FREQ = 425.15;
+float RF95_FREQ = 426.15;
+float SUSTAINER_FREQ = 426.15;
 
 float BOOSTER_FREQ = 425.15;
 float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 425.15;
+float rf95_freq_MHZ = 426.15;
 
 float current_freq = 0;
 
@@ -210,8 +210,11 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
     data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
     data.FSM_State = packet.fsm_callsign_satcount & 0b1111;
-    data.pyros[0] = (packet.pyro >> 0) & (0x7F);
-    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
+
+    constexpr float max_roll_rate_hz = 10.0f;
+
+    data.pyros[0] = (((packet.pyro >> 0) & (0xFF)) / 255) * max_roll_rate_hz; // Pyro A is rotation rate
+    data.pyros[1] = ((float) ((packet.pyro >> 8) & (0xFF)));
     data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
     data.kf_reset = packet.alt & 1;
