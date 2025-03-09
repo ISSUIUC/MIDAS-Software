@@ -15,8 +15,6 @@
 DECLARE_THREAD(i2c, RocketSystems* arg) {
     int i = 0;
 
-    read_mem_cap_data(Serial1);
-
     while (true) {
         if (i % 10 == 0) {
             int power = read_reg(0x8, 3);
@@ -32,6 +30,39 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             Serial.println(current * 1.2 / 1000.0);
             Serial.print("Power ");
             Serial.println(power * 240 / 1000000.0);
+
+            //read_mem_cap_data(Serial1);
+
+            int change = 0;
+
+          while(change == 0) {
+            Serial.println("Trying to turn on camera");
+            digitalWrite(CAM1_ON_OFF, HIGH);
+            camera_on_off(Serial1);
+            
+            struct read_mem_cap_data_return toReturn1;
+            toReturn1 = read_mem_cap_data(Serial1);
+            while(toReturn1.status == 0) {
+              toReturn1 = read_mem_cap_data(Serial1);
+            }
+
+            struct read_mem_cap_data_return toReturn2;
+            toReturn2 = read_mem_cap_data(Serial1);
+            while(toReturn2.status == 0) {
+              toReturn2 = read_mem_cap_data(Serial1);
+            }
+
+            for(int i = 0; i < 12; i++) {
+              if(toReturn1.buf[i] != toReturn2.buf[2]) {
+                change = 1;
+                break;
+              }
+            }
+
+            if(change == 1) {
+              break;
+            }
+          }
         }
         arg->led.update();
         i += 1;
@@ -131,7 +162,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
     START_THREAD(i2c, MAIN_CORE, config, 9);
-    START_THREAD(fsm, MAIN_CORE, config, 8);
+    //START_THREAD(fsm, MAIN_CORE, config, 8);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     //START_THREAD(can, MAIN_CORE, config, 15);
 

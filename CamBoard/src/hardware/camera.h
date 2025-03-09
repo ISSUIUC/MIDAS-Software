@@ -2,6 +2,10 @@
 #include <HardwareSerial.h>
 #include "errors.h"
 
+struct read_mem_cap_data_return {
+    uint8_t buf[32];
+    uint8_t status;
+  };
 
 struct Cameras {
     ErrorCode init();
@@ -22,4 +26,4 @@ uint8_t generate_crc(uint8_t* buf, unsigned int buf_len);
 
 bool check_crc(uint8_t* buf, unsigned int buf_len, uint8_t expected_crc);
 
-void read_mem_cap_data(HardwareSerial& camera);
+struct read_mem_cap_data_return read_mem_cap_data(HardwareSerial& camera);

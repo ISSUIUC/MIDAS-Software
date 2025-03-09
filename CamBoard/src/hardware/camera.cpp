@@ -73,19 +73,36 @@ bool check_crc(uint8_t* buf, unsigned int buf_len, uint8_t expected_crc) {
 // static unsigned gSendDate = 0 ;
 // static unsigned gSentCount = 0 ;
 
-void read_mem_cap_data(HardwareSerial& camera) {
-  uint8_t buf[32];
+struct read_mem_cap_data_return read_mem_cap_data(HardwareSerial& camera) {
+  uint8_t get_setting_raw[4] = {0xCC, 0x11, 0x03, 0x00};
+  uint8_t get_setting[5] = {0xCC, 0x11, 0x03, 0x00, generate_crc(get_setting_raw, 4)};
+  Serial1.write(get_setting, 5);
+  Serial.write("Reading...");
+  delay(2000);
+  
+  struct read_mem_cap_data_return toReturn;
+  toReturn.status = 0;
+
   if(camera.available()) {
-    camera.read(buf, 4);
-    uint8_t msg_len = buf[2] - 1; // account for offsets
+    camera.read(toReturn.buf, 4);
+    uint8_t msg_len = toReturn.buf[2] - 1; // account for offsets
     Serial.print("MSG LEN: ");
     Serial.println(msg_len);
 
-    camera.read(buf, msg_len);
+    camera.read(toReturn.buf, msg_len);
     for(int i = 1; i < msg_len; i++) {
-      Serial.print((char)buf[i]);
+      Serial.print((char)toReturn.buf[i]);
     }
     Serial.print("   CRC: ");
-    Serial.println(buf[msg_len]);
+    Serial.println(toReturn.buf[msg_len]);
+
+
+    if(msg_len != 255) {
+      toReturn.status = 1;
+      return toReturn;
+    }
   }
+  
+  return toReturn;
 }
+

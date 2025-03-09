@@ -8,8 +8,11 @@
 
 #include "hardware/pins.h"
 #include "systems.h"
+#include "camera.h"
 
 #define CAMBOARD_I2C_ADDR 0x69
+
+
 
 enum class CameraCommand {
     CAMERA0_OFF = 0,
@@ -34,13 +37,38 @@ void onReceive(int len) {
           digitalWrite(CAM1_ON_OFF, LOW);
           Serial.println("Case 0\n");
           break;
-        case 1:
-          digitalWrite(CAM1_ON_OFF, HIGH);
+        case 1: {
           Serial.println("Case 1\n");
-          read_mem_cap_data(Serial1);
-          sleep(1);
 
-          break;
+          int change = 0;
+
+          while(change == 0) {
+            Serial.println("Trying to turn on camera");
+            digitalWrite(CAM1_ON_OFF, HIGH);
+            struct read_mem_cap_data_return toReturn1;
+            toReturn1 = read_mem_cap_data(Serial1);
+            while(toReturn1.status == 0) {
+              toReturn1 = read_mem_cap_data(Serial1);
+            }
+
+            struct read_mem_cap_data_return toReturn2;
+            toReturn2 = read_mem_cap_data(Serial1);
+            while(toReturn2.status == 0) {
+              toReturn2 = read_mem_cap_data(Serial1);
+            }
+
+            for(int i = 0; i < 12; i++) {
+              if(toReturn1.buf[i] != toReturn2.buf[2]) {
+                change = 1;
+                break;
+              }
+            }
+
+            if(change == 1) {
+              break;
+            }
+          }
+          break;}
         case 2:
           digitalWrite(CAM2_ON_OFF, LOW);
           Serial.println("Case 2\n");
@@ -124,6 +152,9 @@ void setup() {
     digitalWrite(VTX_ON_OFF, LOW);
     pinMode(VIDEO_SELECT, OUTPUT);
     digitalWrite(VIDEO_SELECT, LOW);
+
+    //digitalWrite(CAM1_ON_OFF, HIGH);
+
 
     //begin CAN
     Serial.println("Starting CAN...");
