@@ -108,11 +108,11 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, max_roll_rate_hz);
 
     const float max_volts = 12;
-    Serial.println(((((uint16_t) (roll_rate_hz / max_roll_rate_hz * 255)) & 0xFF) << (0 * 8)));
+
     packet.pyro |= ((((uint16_t) (roll_rate_hz / max_roll_rate_hz * 255)) & 0xFF) << (0 * 8)); // bits 0-7
     packet.pyro |= ((((uint16_t) (data.camera_state)) & 0xFF) << (1 * 8));                     // bits 8-15
     // packet.pyro |= ((((uint16_t) (continuity.pins[2] / max_volts * 127)) & 0x7F) << (2 * 7)); unused (for now)
-    // packet.pyro |= ((((uint16_t) (continuity.pins[3] / max_volts * 127)) & 0x7F) << (3 * 7));
+    packet.pyro |= ((((uint16_t) (continuity.pins[3] / max_volts * 127)) & 0x7F) << (2 * 8));
     packet.pyro |= tilt_extra << 28;
 
     static_assert(FSMState::FSM_STATE_COUNT < 16);
