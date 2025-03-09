@@ -9,9 +9,9 @@ ErrorCode Cameras::init() {
     //HardwareSerial cam1(1);
     cam1->begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
     //HardwareSerial cam2(2);
-    //cam2->begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
+    cam2->begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
 
-    digitalWrite(CAM1_ON_OFF, HIGH);
+   // digitalWrite(CAM1_ON_OFF, HIGH);
     //digitalWrite(CAM2_ON_OFF, HIGH);
     //digitalWrite(VTX_ON_OFF, HIGH);
    Serial.println("Finished setting up cameras");

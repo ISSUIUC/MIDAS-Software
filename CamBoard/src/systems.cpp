@@ -33,36 +33,36 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
 
             //read_mem_cap_data(Serial1);
 
-            int change = 0;
+          // int change = 0;
 
-          while(change == 0) {
-            Serial.println("Trying to turn on camera");
-            digitalWrite(CAM1_ON_OFF, HIGH);
-            camera_on_off(Serial1);
+          // while(change == 0) {
+          //   Serial.println("Trying to turn on camera");
+          //   digitalWrite(CAM1_ON_OFF, HIGH);
             
-            struct read_mem_cap_data_return toReturn1;
-            toReturn1 = read_mem_cap_data(Serial1);
-            while(toReturn1.status == 0) {
-              toReturn1 = read_mem_cap_data(Serial1);
-            }
+          //   struct read_mem_cap_data_return toReturn1;
+          //   toReturn1 = read_mem_cap_data(Serial1);
+          //   while(toReturn1.status == 0) {
+          //     toReturn1 = read_mem_cap_data(Serial1);
+          //   }
 
-            struct read_mem_cap_data_return toReturn2;
-            toReturn2 = read_mem_cap_data(Serial1);
-            while(toReturn2.status == 0) {
-              toReturn2 = read_mem_cap_data(Serial1);
-            }
+          //   struct read_mem_cap_data_return toReturn2;
+          //   toReturn2 = read_mem_cap_data(Serial1);
+          //   while(toReturn2.status == 0) {
+          //     toReturn2 = read_mem_cap_data(Serial1);
+          //   }
 
-            for(int i = 0; i < 12; i++) {
-              if(toReturn1.buf[i] != toReturn2.buf[2]) {
-                change = 1;
-                break;
-              }
-            }
+          //   for(int i = 0; i < 12; i++) {
+          //     if(toReturn1.buf[i] != toReturn2.buf[2]) {
+          //       change = 1;
+          //       break;
+          //     }
+          //   }
 
-            if(change == 1) {
-              break;
-            }
-          }
+          //   if(change == 0) {
+          //     camera_on_off(Serial1);
+          //   }
+          //   delay(5000);
+          // }
         }
         arg->led.update();
         i += 1;
