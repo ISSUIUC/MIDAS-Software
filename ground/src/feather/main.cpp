@@ -213,7 +213,7 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
 
     constexpr float max_roll_rate_hz = 10.0f;
 
-    data.pyros[0] = (((packet.pyro >> 0) & (0xFF)) / 255) * max_roll_rate_hz; // Pyro A is rotation rate
+    data.pyros[0] = ((float) ((packet.pyro >> 0) & (0xFF)) / 255) * max_roll_rate_hz; // Pyro A is rotation rate
     data.pyros[1] = ((float) ((packet.pyro >> 8) & (0xFF)));
     data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
@@ -291,11 +291,19 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("sat_count", packet.sat_count);
     printJSONField("kf_velocity", packet.kf_vx);
     printJSONField("is_sustainer", packet.is_sustainer);
-    printJSONField("pyro_a", packet.pyros[0]);
-    printJSONField("pyro_b", packet.pyros[1]);
-    printJSONField("pyro_c", packet.pyros[2]);
-    printJSONField("kf_reset", packet.kf_reset);
-    printJSONField("pyro_d", packet.pyros[3], false);
+    printJSONField("roll_rate", packet.pyros[0]);
+    printJSONField("c_valid", ((((uint8_t) std::round(packet.pyros[1])) >> 7) & 0x01 )); // Leftmost bit (is 0 if valid)
+    printJSONField("c_on", (((uint8_t) std::round(packet.pyros[1])) >> 0) & 0x03); // Rightmost 2 bits
+    printJSONField("c_rec", (((uint8_t) std::round(packet.pyros[1])) >> 2) & 0x03); // next 2 bits
+    printJSONField("vtx_on", (((uint8_t) std::round(packet.pyros[1])) >> 4) & 0x01); // next bit
+    printJSONField("vmux_stat", (((uint8_t) std::round(packet.pyros[1])) >> 5) & 0x01); // next bit
+    printJSONField("cam_ack", (((uint8_t) std::round(packet.pyros[1])) >> 6) & 0x01); // next bit
+    // printJSONField("pyro_a", packet.pyros[0]);
+    // printJSONField("pyro_b", packet.pyros[1]);
+    // printJSONField("pyro_c", packet.pyros[2]);
+    // printJSONField("pyro_d", packet.pyros[3], false);
+    printJSONField("kf_reset", packet.kf_reset, false);
+    
     Serial.println("}}");
 }
 
