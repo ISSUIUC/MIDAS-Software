@@ -146,6 +146,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // once a significant amount of acceleration is detected change states
             if (state_estimate.acceleration > sustainer_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
+                commands.FSM_should_set_cam_feed_cam1 = true;
                 state = FSMState::STATE_FIRST_BOOST;
             }
 
@@ -393,6 +394,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // once a significant amount of acceleration is detected change states
             if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
+                commands.FSM_should_set_cam_feed_cam1 = true;
                 state = FSMState::STATE_FIRST_BOOST;
             }
 

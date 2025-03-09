@@ -169,6 +169,7 @@ struct CommandFlags {
     bool should_fire_pyro_c = false;            // CommandType::FIRE_PYRO_C
     bool should_fire_pyro_d = false;            // CommandType::FIRE_PYRO_D
     // FSM Transition commands
+    bool FSM_should_set_cam_feed_cam1 = false;  // Triggered at launch (IDLE --> FIRST_BOOST)
     bool FSM_should_swap_camera_feed = false;   // Triggered COAST --> APOGEE
 };
 /**

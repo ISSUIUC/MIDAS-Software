@@ -176,6 +176,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         }
         
         // FSM-based camera control
+        if(arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1) { 
+            // Swap camera feed to MUX 1 (Side-facing camera) at launch.
+            arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
+            arg->b2b.camera.vmux_set(CAM_1);
+        }
+
         if(arg->rocket_data.command_flags.FSM_should_swap_camera_feed) { 
             // Swap camera feed to MUX 2 (recovery bay camera)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
