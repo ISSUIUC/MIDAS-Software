@@ -26,33 +26,33 @@ typedef struct
 } AeroCoeff;
 
 // stores the aerodynamic coefficients for the corresponding Mach number
-const AeroCoeff aero_data[] = {
-    {0.04, 4, 1.332142905, 1.1827808455, 60.8267871968},
-    {0.08, 4, 1.326587387, 1.1827808455, 60.8267871968},
-    {0.12, 4, 1.31558627, 1.1827808455, 60.8267871968},
-    {0.16, 4, 1.306063953, 1.1827808455, 60.8267871968},
-    {0.20, 4, 1.298117084, 1.1827808455, 60.8267871968},
-    {0.24, 4, 1.291411025, 1.1827808455, 60.8267871968},
-    {0.28, 4, 1.290279857, 1.1827808455, 60.8267871968},
-    {0.32, 4, 1.291431043, 1.1827808455, 60.8267871968},
-    {0.36, 4, 1.293170653, 1.1827808455, 60.8267871968},
-    {0.40, 4, 1.295385827, 1.1827808455, 60.8267871968},
-    {0.44, 4, 1.297991738, 1.1827808455, 60.8267871968},
-    {0.48, 4, 1.300924032, 1.1827808455, 60.8267871968},
-    {0.52, 4, 1.304132086, 1.1827808455, 60.8267871968},
-    {0.56, 4, 1.309039395, 1.1827808455, 60.8267871968},
-    {0.60, 4, 1.314605487, 1.1827808455, 60.8267871968},
-    {0.64, 4, 1.330699437, 1.1827808455, 60.8267871968},
-    {0.68, 4, 1.346695167, 1.1827808455, 60.8267871968},
-    {0.72, 4, 1.362693183, 1.1827808455, 60.8267871968},
-    {0.76, 4, 1.378693074, 1.1827808455, 60.8267871968},
-    {0.80, 4, 1.394695194, 1.1827808455, 60.8267871968},
-    {0.84, 4, 1.41069913, 1.1827808455, 60.8267871968},
-    {0.88, 4, 1.426705046, 1.1827808455, 60.8267871968},
-    {0.92, 4, 1.473732816, 1.218959468, 60.91848997},
-    {0.96, 4, 1.582395672, 1.291316713, 61.10189551},
-    {1.00, 4, 1.681494886, 1.363673958, 61.28530105},
-};
+// const AeroCoeff aero_data[] = {
+//     {0.04, 4, 1.332142905, 1.1827808455, 60.8267871968},
+//     {0.08, 4, 1.326587387, 1.1827808455, 60.8267871968},
+//     {0.12, 4, 1.31558627, 1.1827808455, 60.8267871968},
+//     {0.16, 4, 1.306063953, 1.1827808455, 60.8267871968},
+//     {0.20, 4, 1.298117084, 1.1827808455, 60.8267871968},
+//     {0.24, 4, 1.291411025, 1.1827808455, 60.8267871968},
+//     {0.28, 4, 1.290279857, 1.1827808455, 60.8267871968},
+//     {0.32, 4, 1.291431043, 1.1827808455, 60.8267871968},
+//     {0.36, 4, 1.293170653, 1.1827808455, 60.8267871968},
+//     {0.40, 4, 1.295385827, 1.1827808455, 60.8267871968},
+//     {0.44, 4, 1.297991738, 1.1827808455, 60.8267871968},
+//     {0.48, 4, 1.300924032, 1.1827808455, 60.8267871968},
+//     {0.52, 4, 1.304132086, 1.1827808455, 60.8267871968},
+//     {0.56, 4, 1.309039395, 1.1827808455, 60.8267871968},
+//     {0.60, 4, 1.314605487, 1.1827808455, 60.8267871968},
+//     {0.64, 4, 1.330699437, 1.1827808455, 60.8267871968},
+//     {0.68, 4, 1.346695167, 1.1827808455, 60.8267871968},
+//     {0.72, 4, 1.362693183, 1.1827808455, 60.8267871968},
+//     {0.76, 4, 1.378693074, 1.1827808455, 60.8267871968},
+//     {0.80, 4, 1.394695194, 1.1827808455, 60.8267871968},
+//     {0.84, 4, 1.41069913, 1.1827808455, 60.8267871968},
+//     {0.88, 4, 1.426705046, 1.1827808455, 60.8267871968},
+//     {0.92, 4, 1.473732816, 1.218959468, 60.91848997},
+//     {0.96, 4, 1.582395672, 1.291316713, 61.10189551},
+//     {1.00, 4, 1.681494886, 1.363673958, 61.28530105},
+// };
 
 // Number of entries
 #define AERO_DATA_SIZE (sizeof(aero_data) / sizeof(aero_data[0]))
@@ -241,14 +241,20 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     Velocity omega = orientation.getVelocity();
     euler_t angles = orientation.getEuler();
     // Eigen::Matrix<float, 3, 1> gravity = Eigen::Matrix<float, 3,1>::Zero();
-    gravity(0, 0) = -9.81;
+    if (fsm > FSMState::STATE_IDLE) 
+    {
+        gravity(0, 0) = -9.81;
+    }
+    
     float m = mass_sustainer;
     float h = height_sustainer;
+
     if (fsm < FSMState::STATE_BURNOUT)
     {
         m = mass_full;
         h = height_full;
     }
+
     float w_x = omega.vx;
     float w_y = omega.vy;
     float w_z = omega.vz;
@@ -264,11 +270,11 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     Eigen::Matrix<float, 3, 1> Fg_body;
     
-    EKF::GlobalToBody(angles,Fg_body);
+    EKF::GlobalToBody(angles, gravity);
 
-    float Fgx = Fg_body(0, 0);
-    float Fgy = Fg_body(1, 0);
-    float Fgz = Fg_body(2, 0);
+    float Fgx = gravity(0, 0);
+    float Fgy = gravity(1, 0);
+    float Fgz = gravity(2, 0);
 
 
     Eigen::Matrix<float, 3, 1> T;
@@ -319,7 +325,7 @@ float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x)
  * which thrust curve to use. The time since ignition is also important to consider so that is reset once we reach a new stage.
  * The thrust force is then rotated into the body frame using the BodyToGlobal function.
  */
-void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state,Eigen::Matrix<float, 3, 1> &to_modify)
+void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::Matrix<float, 3, 1> &to_modify)
 {
     float interpolatedValue = 0;
     if (FSM_state >= STATE_FIRST_BOOST)
@@ -580,6 +586,7 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
     yaw << cos(angles.yaw), -sin(angles.yaw), 0, sin(angles.yaw), cos(angles.yaw), 0, 0, 0, 1;
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
     to_modify = rotation_matrix.transpose() * gravity;
+
     // return to_return;
 }
 
@@ -605,11 +612,14 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz)
     float velocity_magnitude = pow(x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0), 0.5);
     float mach = velocity_magnitude / a;
     int index = std::round(mach / 0.04);
-    index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
+    // index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
 
-    Ca = aero_data[index].CA_power_on;
-    Cn = aero_data[index].CN;
-    Cp = aero_data[index].CP;
+    Cn = -0.0333 * mach + 1.7414;
+    Ca = -0.2035 * mach + 0.7785;
+    Cp = 0.6842 * mach + 126.1671;
+    // Ca = aero_data[index].CA_power_on;
+    // Cn = aero_data[index].CN;
+    // Cp = aero_data[index].CP;
 
     float m = mass_sustainer;
     float h = height_sustainer;
