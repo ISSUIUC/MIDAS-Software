@@ -237,7 +237,7 @@ void setup() {
         // Wire.begin(I2C_SDA, I2C_SCL);
     Serial.println("Starting Battery Sense I2C...");
     Wire.begin(BATTSENSE_SDA, BATTSENSE_SCL);
-    Wire1.begin(I2C_SDA, I2C_SCL);
+    Wire1.setPins(I2C_SDA, I2C_SCL);
     Wire1.onReceive(onReceive);
     Wire1.begin((uint8_t)CAMBOARD_I2C_ADDR);
 
