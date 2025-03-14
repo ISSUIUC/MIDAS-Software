@@ -325,8 +325,10 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
             break; // how
     }
 }
+
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
+    bool has_triggered_vmux_fallback = false;
 
     while (true) {
 
@@ -337,11 +339,13 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         if (current_state == FSMState::STATE_IDLE) {
             launch_time = current_time;
+            has_triggered_vmux_fallback = false;
         }
 
-        if ((current_time - launch_time) > 80000) {
+        if ((current_time - launch_time) > 80000 && !has_triggered_vmux_fallback) {
             // THIS IS A HARDCODED VALUE FOR AETHER 3/15/2025
             // If the rocket has been in flight for over 80 seconds, we swap the FSM camera feed to the bulkhead camera
+            has_triggered_vmux_fallback = true;
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
 
