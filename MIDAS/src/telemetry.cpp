@@ -105,7 +105,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     // Pack all data into pyro struct (we will eventually use pyro properly, just not now.)
     // Roll rate
     constexpr float max_roll_rate_hz = 10.0f;
-    constexpr float max_kf_altitude = 35000.0f;
+    constexpr float max_kf_altitude = 40000.0f;
     float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, max_roll_rate_hz);
     float kf_px_clamped = std::clamp(kalman.position.px, 0.0f, max_kf_altitude);
     const float max_volts = 12;
