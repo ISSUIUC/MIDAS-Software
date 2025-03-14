@@ -6,6 +6,16 @@ ErrorCode B2BInterface::init() {
     return ErrorCode::NoError;
 }
 
+uint8_t CameraB2B::read() {
+    #ifdef B2B_I2C
+    Wire.requestFrom(0x69, 1);
+    uint8_t res = Wire.read();
+    return res;
+    #endif
+
+    return 0xFF;
+}
+
 /** 
  * @brief Transmits the given CameraCommand over I2C / CAN (depending on which interface type is defined)
  */
