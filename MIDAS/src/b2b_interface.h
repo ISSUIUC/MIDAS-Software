@@ -17,6 +17,9 @@
 #define CAM_1 0
 #define CAM_2 1
 
+#define SIDE_CAMERA CAM_1
+#define BULKHEAD_CAMERA CAM_2
+
 
 enum class CameraCommand {
     CAMERA1_OFF = 0,
