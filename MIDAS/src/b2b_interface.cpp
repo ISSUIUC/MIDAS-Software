@@ -6,8 +6,9 @@ ErrorCode B2BInterface::init() {
     return ErrorCode::NoError;
 }
 
-
-
+/** 
+ * @brief Transmits the given CameraCommand over I2C / CAN (depending on which interface type is defined)
+ */
 void CameraB2B::transmit_command(CameraCommand command) {
     #ifdef B2B_I2C
 
@@ -24,16 +25,25 @@ void CameraB2B::transmit_command(CameraCommand command) {
     #endif
 }
 
+/** 
+ * @brief Transmits command to toggle on the video transmitter
+ */
 void CameraB2B::vtx_on() {
     transmit_command(CameraCommand::VTX_ON);
     vtx_state_ = true;
 }
 
+/** 
+ * @brief Transmits command to toggle off the video transmitter
+ */
 void CameraB2B::vtx_off() {
     transmit_command(CameraCommand::VTX_OFF);
     vtx_state_ = false;
 }
 
+/** 
+ * @brief Transmits command to toggle the video transmitter
+ */
 void CameraB2B::vtx_toggle() {
     if(vtx_state_) {
         vtx_off();
@@ -42,6 +52,31 @@ void CameraB2B::vtx_toggle() {
     }
 }
 
+/** 
+ * @brief Transmits command to set which camera is currently active on the video multiplexer
+ */
+void CameraB2B::vmux_set(int cam_select) {
+    if(cam_select) {
+        // If cam_select is 1, switch to MUX 2
+        transmit_command(CameraCommand::MUX_2);
+        mux_select_ = true;
+    } else {
+        // Otherwise switch to MUX 1
+        transmit_command(CameraCommand::MUX_1);
+        mux_select_ = false;
+    }
+}
+
+/** 
+ * @brief Transmits command to toggle which camera is currently active on the video multiplexer
+ */
+void CameraB2B::vmux_toggle() {
+    vmux_set(!mux_select_);
+}
+
+/** 
+ * @brief Transmits command to enable power to a camera
+ */
 void CameraB2B::camera_on(int cam_index) {
     switch (cam_index) {
         case 0:
@@ -59,6 +94,11 @@ void CameraB2B::camera_on(int cam_index) {
     }
 }
 
+/** 
+ * @brief Transmits command to disable power to a camera
+ * 
+ * If the camera was previously on, it will first stop recording, then power off.
+ */
 void CameraB2B::camera_off(int cam_index) {
     switch (cam_index) {
         case 0:
@@ -70,12 +110,15 @@ void CameraB2B::camera_off(int cam_index) {
             cam_state_[1] = false;
             break;
         default:
-            Serial.print("B2B camera on -- invalid index ");
+            Serial.print("B2B camera off -- invalid index ");
             Serial.println(cam_index);  
             break;
     }
 }
 
+/** 
+ * @brief Transmits command to toggle power to a camera
+ */
 void CameraB2B::camera_toggle(int cam_index) {
     switch (cam_index) {
         case 0:
@@ -93,7 +136,7 @@ void CameraB2B::camera_toggle(int cam_index) {
             }
             break;
         default:
-            Serial.print("B2B camera on -- invalid index ");
+            Serial.print("B2B camera toggle -- invalid index ");
             Serial.println(cam_index);  
             break;
     }

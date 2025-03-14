@@ -1,14 +1,7 @@
 #include "systems.h"
 
 #include "hal.h"
-
-#ifdef IS_SUSTAINER
 #include "gnc/ekf.h"
-#endif
-
-#ifdef IS_BOOSTER
-#include "gnc/yessir.h"
-#endif
 
 #include <TCAL9539.h>
 
@@ -130,9 +123,9 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 DECLARE_THREAD(pyro, RocketSystems* arg) {
     while(true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        CommandFlags& telem_commands = arg->rocket_data.command_flags;
+        CommandFlags& command_flags = arg->rocket_data.command_flags;
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), telem_commands);
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), command_flags);
         arg->rocket_data.pyro.update(new_pyro_state);
 
         arg->led.update();
@@ -190,7 +183,20 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
         }
-        // Serial.println("fsm");
+        
+        // FSM-based camera control
+        if(arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1) { 
+            // Swap camera feed to MUX 1 (Side-facing camera) at launch.
+            arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
+            arg->b2b.camera.vmux_set(SIDE_CAMERA);
+        }
+
+        if(arg->rocket_data.command_flags.FSM_should_swap_camera_feed) { 
+            // Swap camera feed to MUX 2 (recovery bay camera)
+            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
+            arg->b2b.camera.vmux_set(BULKHEAD_CAMERA);
+        }
+
         THREAD_SLEEP(50);
     }
 }
@@ -203,7 +209,6 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-#ifdef IS_SUSTAINER
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     ekf.initialize(arg);
     // Serial.println("Initialized ekf :(");
@@ -237,43 +242,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         THREAD_SLEEP(50);
     }
 }
-#endif
 
-#ifdef IS_BOOSTER
-DECLARE_THREAD(kalman, RocketSystems* arg) {
-    yessir.initialize(arg);
-    Serial.println("Initialized YESSIR");
-    TickType_t last = xTaskGetTickCount();
-    
-    while (true) {
-        if(arg->rocket_data.command_flags.should_reset_kf){
-            yessir.initialize(arg);
-            TickType_t last = xTaskGetTickCount();
-            arg->rocket_data.command_flags.should_reset_kf = false;
-        }
-        // add the tick update function
-        Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
-        Orientation current_orientation = arg->rocket_data.orientation.getRecent();
-        HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
-        Acceleration current_accelerations = {
-            .ax = current_accelerometer.ax,
-            .ay = current_accelerometer.ay,
-            .az = current_accelerometer.az
-        };
-        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        yessir.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
-        KalmanData current_state = yessir.getState();
-
-        arg->rocket_data.kalman.update(current_state);
-
-        last = xTaskGetTickCount();
-
-        THREAD_SLEEP(50);
-    }
-}
-#endif
 
 void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
     // maybe we should move this somewhere else but it can stay here for now
@@ -311,16 +280,27 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
                 arg->rocket_data.command_flags.should_fire_pyro_d = true;
             }
             break;
-        case CommandType::TOGGLE_CAM:
-            arg->b2b.camera.camera_toggle(0); // For stargazer, we will just toggle cam here.
-            arg->b2b.camera.vtx_toggle();
+        case CommandType::CAM_ON:
+            arg->b2b.camera.camera_on(CAM_1);
+            arg->b2b.camera.camera_on(CAM_2);
+            arg->b2b.camera.vtx_on();
+            break;
+        case CommandType::CAM_OFF:
+            arg->b2b.camera.camera_off(CAM_1);
+            arg->b2b.camera.camera_off(CAM_2);
+            arg->b2b.camera.vtx_off();
+            break;
+        case CommandType::TOGGLE_CAM_VMUX:
+            arg->b2b.camera.vmux_toggle();
             break;
         default:
             break; // how
     }
 }
+
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
+    bool has_triggered_vmux_fallback = false;
 
     while (true) {
 
@@ -331,6 +311,14 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         if (current_state == FSMState::STATE_IDLE) {
             launch_time = current_time;
+            has_triggered_vmux_fallback = false;
+        }
+
+        if ((current_time - launch_time) > 80000 && !has_triggered_vmux_fallback) {
+            // THIS IS A HARDCODED VALUE FOR AETHER 3/15/2025
+            // If the rocket has been in flight for over 80 seconds, we swap the FSM camera feed to the bulkhead camera
+            has_triggered_vmux_fallback = true;
+            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
 
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {

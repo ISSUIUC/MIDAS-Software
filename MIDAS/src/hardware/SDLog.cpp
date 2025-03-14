@@ -18,7 +18,7 @@ ErrorCode SDSink::init() {
     }
     if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
         failed = true;
-        return ErrorCode::NoError;
+        return ErrorCode::SDBeginFailed;
     }
 
     char file_name[16] = "data";
@@ -28,7 +28,7 @@ ErrorCode SDSink::init() {
     file = SD_MMC.open(file_name, FILE_WRITE, true);
     if (!file) {
         failed = true;
-        return ErrorCode::NoError;
+        return ErrorCode::SDCouldNotOpenFile;
     }
 
     return ErrorCode::NoError;
