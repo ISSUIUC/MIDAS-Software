@@ -6,12 +6,14 @@ ErrorCode B2BInterface::init() {
     return ErrorCode::NoError;
 }
 
-void CameraB2B::update_cam_board_state() {
+uint8_t CameraB2B::read() {
     #ifdef B2B_I2C
     Wire.requestFrom(0x69, 1);
     uint8_t res = Wire.read();
-    cam_board_state = res;
+    return res;
     #endif
+
+    return 0xFF;
 }
 
 /** 

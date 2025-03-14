@@ -300,7 +300,7 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
     while (true) {
-        arg->b2b.camera.update_cam_board_state();
+        arg->rocket_data.camera_state = arg->b2b.camera.read();
         THREAD_SLEEP(200);
     }
 }
