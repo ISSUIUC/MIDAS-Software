@@ -77,10 +77,26 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
 
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
+        Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
         Orientation reading = arg->sensors.orientation.read();
         if (reading.has_data) {
-            arg->rocket_data.orientation.update(reading);
+            if(reading.reading_type == OrientationReadingType::ANGULAR_VELOCITY_UPDATE) {
+                orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
+                orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
+                orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
+            } else {
+                float old_vx = orientation_holder.angular_velocity.vx;
+                float old_vy = orientation_holder.angular_velocity.vy;
+                float old_vz = orientation_holder.angular_velocity.vz;
+                orientation_holder = reading;
+                orientation_holder.angular_velocity.vx = old_vx;
+                orientation_holder.angular_velocity.vy = old_vy;
+                orientation_holder.angular_velocity.vz = old_vz;
+            }
+
+            arg->rocket_data.orientation.update(orientation_holder);
         }
+
         THREAD_SLEEP(100);
     }
 }

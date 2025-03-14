@@ -33,6 +33,7 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
+
 // True if this is the sustainer feather
 #define SUSTAINER
 
@@ -214,9 +215,12 @@ void EnqueuePacket(const TelemetryPacket& packet, float frequency) {
     data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
     data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
     data.FSM_State = packet.fsm_callsign_satcount & 0b1111;
-    data.pyros[0] = (packet.pyro >> 0) & (0x7F);
-    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * 12.;
-    data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * 12.;
+
+    constexpr float max_roll_rate_hz = 10.0f;
+
+    data.pyros[0] = ((float) ((packet.pyro >> 0) & (0xFF)) / 255) * max_roll_rate_hz; // Pyro A is rotation rate
+    data.pyros[1] = ((float) ((packet.pyro >> 8) & (0xFF)));                          // Pyro B is camera state
+    data.pyros[2] = ((float) ((packet.pyro >> 16) & (0xFFF)) / 4095.) * 40000.;       // Pyro C is kf_px
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * 12.;
     data.kf_reset = packet.alt & 1;
 
@@ -291,12 +295,21 @@ void printPacketJson(FullTelemetryData const& packet) {
     printJSONField("RSSI", packet.rssi);
     printJSONField("sat_count", packet.sat_count);
     printJSONField("kf_velocity", packet.kf_vx);
+    printJSONField("kf_position", packet.pyros[2]);
     printJSONField("is_sustainer", packet.is_sustainer);
-    printJSONField("pyro_a", packet.pyros[0]);
-    printJSONField("pyro_b", packet.pyros[1]);
-    printJSONField("pyro_c", packet.pyros[2]);
-    printJSONField("kf_reset", packet.kf_reset);
-    printJSONField("pyro_d", packet.pyros[3], false);
+    printJSONField("roll_rate", packet.pyros[0]);
+    printJSONField("c_valid", ((((uint8_t) std::round(packet.pyros[1])) >> 7) & 0x01 )); // Leftmost bit (is 0 if valid)
+    printJSONField("c_on", (((uint8_t) std::round(packet.pyros[1])) >> 0) & 0x03); // Rightmost 2 bits
+    printJSONField("c_rec", (((uint8_t) std::round(packet.pyros[1])) >> 2) & 0x03); // next 2 bits
+    printJSONField("vtx_on", (((uint8_t) std::round(packet.pyros[1])) >> 4) & 0x01); // next bit
+    printJSONField("vmux_stat", (((uint8_t) std::round(packet.pyros[1])) >> 5) & 0x01); // next bit
+    printJSONField("cam_ack", (((uint8_t) std::round(packet.pyros[1])) >> 6) & 0x01); // next bit
+    // printJSONField("pyro_a", packet.pyros[0]);
+    // printJSONField("pyro_b", packet.pyros[1]);
+    // printJSONField("pyro_c", packet.pyros[2]);
+    // printJSONField("pyro_d", packet.pyros[3], false);
+    printJSONField("kf_reset", packet.kf_reset, false);
+    
     Serial.println("}}");
 }
 
