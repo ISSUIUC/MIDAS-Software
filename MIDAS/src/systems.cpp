@@ -179,13 +179,13 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         if(arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1) { 
             // Swap camera feed to MUX 1 (Side-facing camera) at launch.
             arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
-            arg->b2b.camera.vmux_set(CAM_1);
+            arg->b2b.camera.vmux_set(SIDE_CAMERA);
         }
 
         if(arg->rocket_data.command_flags.FSM_should_swap_camera_feed) { 
             // Swap camera feed to MUX 2 (recovery bay camera)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
-            arg->b2b.camera.vmux_set(CAM_2);
+            arg->b2b.camera.vmux_set(BULKHEAD_CAMERA);
         }
 
         THREAD_SLEEP(50);
@@ -337,6 +337,12 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         if (current_state == FSMState::STATE_IDLE) {
             launch_time = current_time;
+        }
+
+        if ((current_time - launch_time) > 80000) {
+            // THIS IS A HARDCODED VALUE FOR AETHER 3/15/2025
+            // If the rocket has been in flight for over 80 seconds, we swap the FSM camera feed to the bulkhead camera
+            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
 
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
