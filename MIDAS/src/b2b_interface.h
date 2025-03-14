@@ -45,6 +45,9 @@ struct CameraB2B {
     void vmux_set(int cam_select);
     void vmux_toggle();
 
+    void update_cam_board_state();
+    uint8_t cam_board_state;
+
     private:
     void transmit_command(CameraCommand command);
     bool cam_state_[2] = { false, false }; // false: off, true: on

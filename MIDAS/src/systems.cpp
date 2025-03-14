@@ -298,6 +298,13 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
     }
 }
 
+DECLARE_THREAD(cam, RocketSystems* arg) {
+    while (true) {
+        arg->b2b.camera.update_cam_board_state();
+        THREAD_SLEEP(200);
+    }
+}
+
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
     bool has_triggered_vmux_fallback = false;
@@ -392,6 +399,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(voltage, SENSOR_CORE, config, 9);
     START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
+    START_THREAD(cam, SENSOR_CORE, config, 16);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
