@@ -33,12 +33,16 @@
 #define VoltagePin 14
 // #define LED 13 // Blinks on receipt
 
-float RF95_FREQ = 426.15;
-float SUSTAINER_FREQ = 426.15;
+// True if this is the sustainer feather
+#define SUSTAINER
 
-float BOOSTER_FREQ = 425.15;
-float GROUND_FREQ = 420;
-float rf95_freq_MHZ = 426.15;
+#ifdef SUSTAINER
+float RF95_FREQ = 421.15;
+#else
+float RF95_FREQ = 425.15;
+#endif
+
+float rf95_freq_MHZ = RF95_FREQ;
 
 float current_freq = 0;
 
