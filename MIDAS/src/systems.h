@@ -4,7 +4,6 @@
 #include "buzzer.h"
 #include "led.h"
 #include "telemetry.h"
-#include "b2b_interface.h"
 #include "finite-state-machines/fsm.h"
 #include "gnc/ekf.h"
 #include "pyro.h"
@@ -78,13 +77,14 @@ struct RocketSystems {
     RocketData rocket_data;
     LogSink& log_sink;
     BuzzerController buzzer;
-    LEDController led;
+    LEDController<Hw> led;
     PyroLogic<Hw> pyro;
-    Telemetry tlm;
-    B2BInterface b2b;
+    Telemetry<Hw> tlm;
     EKF ekf;
 
-    RocketSystems(HwInterface<Hw>& hw, LogSink& log_sink) : hw(hw), log_sink(log_sink), pyro(hw) { }
+    bool video_toggle = false;
+
+    RocketSystems(HwInterface<Hw>& hw, LogSink& log_sink) : hw(hw), log_sink(log_sink), pyro(hw), led(hw), tlm(hw, led) { }
 
     ErrorCode init_systems();
     [[noreturn]] void begin();
@@ -283,13 +283,13 @@ DEFINE_THREAD(fsm) {
         if (rocket_data.command_flags.FSM_should_set_cam_feed_cam1) {
             // Swap camera feed to MUX 1 (Side-facing camera) at launch.
             rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
-            b2b.camera.vmux_set(SIDE_CAMERA);
+            hw.set_camera_source(Camera::Side);
         }
 
         if (rocket_data.command_flags.FSM_should_swap_camera_feed) {
             // Swap camera feed to MUX 2 (recovery bay camera)
             rocket_data.command_flags.FSM_should_swap_camera_feed = false;
-            b2b.camera.vmux_set(BULKHEAD_CAMERA);
+            hw.set_camera_source(Camera::Bulkhead);
         }
 
         THREAD_SLEEP(50);
@@ -387,19 +387,20 @@ void RocketSystems<Hw>::handle_tlm_command(TelemetryCommand& command, FSMState c
             break;
         }
         case CommandType::CAM_ON: {
-            b2b.camera.camera_on(CAM_1);
-            b2b.camera.camera_on(CAM_2);
-            b2b.camera.vtx_on();
+            hw.set_camera_on(Camera::Side, true);
+            hw.set_camera_on(Camera::Bulkhead, true);
+            hw.set_video_transmit(true);
             break;
         }
         case CommandType::CAM_OFF: {
-            b2b.camera.camera_off(CAM_1);
-            b2b.camera.camera_off(CAM_2);
-            b2b.camera.vtx_off();
+            hw.set_camera_on(Camera::Side, false);
+            hw.set_camera_on(Camera::Bulkhead, false);
+            hw.set_video_transmit(false);
             break;
         }
         case CommandType::TOGGLE_CAM_VMUX: {
-            b2b.camera.vmux_toggle();
+            hw.set_camera_source(video_toggle ? Camera::Bulkhead : Camera::Side);
+            video_toggle = !video_toggle;
             break;
         }
         default: {
@@ -410,7 +411,7 @@ void RocketSystems<Hw>::handle_tlm_command(TelemetryCommand& command, FSMState c
 
 DEFINE_THREAD(cam) {
     while (true) {
-        rocket_data.camera_state = b2b.camera.read();
+        rocket_data.camera_state = hw.get_camera_state();
         THREAD_SLEEP(200);
     }
 }
@@ -420,8 +421,7 @@ DEFINE_THREAD(telemetry) {
     bool has_triggered_vmux_fallback = false;
 
     while (true) {
-
-        tlm.transmit(rocket_data, led);
+        tlm.transmit(rocket_data);
 
         FSMState current_state = rocket_data.fsm_state.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -460,18 +460,13 @@ DEFINE_THREAD(telemetry) {
  */
 template<typename Hw>
 ErrorCode RocketSystems<Hw>::init_systems() {
-    gpioDigitalWrite(LED_ORANGE, HIGH);
+    hw.set_led(LED::ORANGE, true);
     ErrorCode c = hw.init_all();
     if (c != ErrorCode::NoError) {
         return c;
     }
-    INIT_SYSTEM(led);
     INIT_SYSTEM(buzzer);
-    INIT_SYSTEM(b2b);
-#ifdef ENABLE_TELEM
-    INIT_SYSTEM(tlm);
-#endif
-    gpioDigitalWrite(LED_ORANGE, LOW);
+    hw.set_led(LED::ORANGE, false);
     return NoError;
 }
 #undef INIT_SYSTEM

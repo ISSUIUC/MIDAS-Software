@@ -1,25 +1,17 @@
 #include <Wire.h>
 #include <SPI.h>
-#include "TCAL9539.h"
+#include <TCAL9539.h>
 
 #include "systems.h"
 #include "hardware/pins.h"
-#include "hardware/Emmc.h"
 #include "hardware/SDLog.h"
-#include "sensor_data.h"
-#include "pins.h"
 
 /**
  * Sets the config file and then starts all the threads using the config.
  */
 
 HwImpl hw_impl;
-// #ifdef IS_SUSTAINER
-// MultipleLogSink<EMMCSink> sinks;
-MultipleLogSink<SDSink> sinks;
-// #else
-// MultipleLogSink<> sinks;
-// #endif
+SDSink sinks;
 RocketSystems<HwImpl> systems(hw_impl, sinks);
 
 /**

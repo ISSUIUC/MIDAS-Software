@@ -21,6 +21,25 @@
 */
 #define THREAD_SLEEP(millis) vTaskDelay(pdMS_TO_TICKS(millis))
 
+enum class LED {
+    BLUE = 0,
+    RED = 1,
+    ORANGE = 2,
+    GREEN = 3
+};
+
+enum class Channel {
+    A = 0,
+    B = 1,
+    C = 2,
+    D = 3
+};
+
+enum class Camera {
+    Side = 0,
+    Bulkhead = 1
+};
+
 /**
  * @struct Sensors
  *
@@ -42,8 +61,23 @@ struct HwInterface {
     bool is_gps_ready() { return static_cast<HwImpl*>(this)->is_gps_ready(); }
     GPSData read_gps() { return static_cast<HwImpl*>(this)->read_gps(); }
 
+    void set_led(LED which, bool value) { return static_cast<HwImpl*>(this)->set_led(which, value); }
+
+    void transmit_bytes(uint8_t* memory, size_t count) { return static_cast<HwImpl*>(this)->transmit_bytes(memory, count); }
+    bool receive_bytes(uint8_t* memory, size_t count, int wait_milliseconds) { return static_cast<HwImpl*>(this)->receive_bytes(memory, count, wait_milliseconds); }
+
+    template<typename T>
+    void transmit(T* value) { return transmit_bytes((uint8_t*) value, sizeof(T)); }
+    template<typename T>
+    bool receive(T* value, int wait_milliseconds) { return receive_bytes((uint8_t*) value, sizeof(T), wait_milliseconds); }
+
     void set_global_arm(bool to_high) { return static_cast<HwImpl*>(this)->set_global_arm(to_high); }
-    void set_pin_firing(int which, bool to_high)  { return static_cast<HwImpl*>(this)->set_pin_firing(which, to_high); }
+    void set_pin_firing(Channel which, bool to_high)  { return static_cast<HwImpl*>(this)->set_pin_firing(which, to_high); }
+
+    void set_camera_on(Camera which, bool on) { return static_cast<HwImpl*>(this)->set_camera_on(which, on); }
+    void set_camera_source(Camera which) { return static_cast<HwImpl*>(this)->set_camera_source(which); }
+    void set_video_transmit(bool on) { return static_cast<HwImpl*>(this)->set_video_transmit(on); }
+    uint8_t get_camera_state() { return static_cast<HwImpl*>(this)->get_camera_state(); }
 
 protected:
     HwInterface() = default;

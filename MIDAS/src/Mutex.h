@@ -44,10 +44,10 @@ public:
      * @return The value in the mutex.
      */
     T read() {
-        if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
-            Serial.flush();
-        }
+//        if (!mutex_handle || mutex_handle != check) {
+//            Serial.println("Aw shucks");
+//            Serial.flush();
+//        }
         xSemaphoreTake(mutex_handle, portMAX_DELAY);
 //        while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         T ret = data;
@@ -70,10 +70,10 @@ public:
      * @param ptr buffer to store data in
     */
     void read2(T* ptr) {
-        if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
-            Serial.flush();
-        }
+//        if (!mutex_handle || mutex_handle != check) {
+//            Serial.println("Aw shucks");
+//            Serial.flush();
+//        }
         xSemaphoreTake(mutex_handle, portMAX_DELAY);
 //        while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         *ptr = data;
@@ -86,10 +86,10 @@ public:
      * @param value What to update the mutex to.
      */
     void write(T value) {
-        if (!mutex_handle || mutex_handle != check) {
-            Serial.println("Aw shucks");
-            Serial.flush();
-        }
+//        if (!mutex_handle || mutex_handle != check) {
+//            Serial.println("Aw shucks");
+//            Serial.flush();
+//        }
 
         while (!xSemaphoreTake(mutex_handle, MUTEX_TIMEOUT)) { }
         data = value;

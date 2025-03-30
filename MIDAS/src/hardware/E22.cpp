@@ -1,4 +1,4 @@
-#include"E22.h"
+#include "E22.h"
 
 #define DBG_PRINT(x) (void) 0
 #define SX1268Check(x) if((x) == SX1268Error::BusyTimeout) { return SX1268Error::BusyTimeout; }
@@ -452,4 +452,3 @@ SX1268Error SX1268::check_device_errors() {
 
     return SX1268Error::NoError;
 }
-

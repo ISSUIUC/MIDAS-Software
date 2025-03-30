@@ -1,70 +1,44 @@
 #pragma once
 
-#include "errors.h"
-#include "sensor_data.h"
+#include "hal.h"
 
-#include "silsim/simulation/simulation.h"
+struct EmulatedHw : HwInterface<EmulatedHw> {
+    ErrorCode init_all();
 
+    LowGData read_low_g();
+    LowGLSMData read_low_g_lsm();
+    HighGData read_high_g();
+    BarometerData read_barometer();
+    ContinuityData read_continuity();
+    VoltageData read_voltage();
+    bool is_orientation_ready();
+    OrientationData read_orientation();
+    MagnetometerData read_magnetometer();
+    bool is_gps_ready();
+    GPSData read_gps();
 
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
+    void set_led(LED which, bool value);
 
-    SimulatedRocket* rocket;
-};
+    void transmit_bytes(uint8_t* memory, size_t count);
+    bool receive_bytes(uint8_t* memory, size_t count, int wait_milliseconds);
 
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
+    void set_global_arm(bool to_high);
+    void set_pin_firing(Channel which, bool to_high);
 
-    SimulatedRocket* rocket;
-};
+    void set_camera_on(Camera which, bool on);
+    void set_camera_source(Camera which);
+    void set_video_transmit(bool on);
+    uint8_t get_camera_state();
 
-struct HighGSensor {
-    ErrorCode init();
-    HighGData read();
+    LowGData lowGData;
+    LowGLSMData lowGlsmData;
+    HighGData highGData;
+    BarometerData barometerData;
+    ContinuityData continuityData;
+    VoltageData voltageData;
+    OrientationData orientationData;
+    MagnetometerData magnetometerData;
+    GPSData gpsData;
 
-    SimulatedRocket* rocket;
-};
-
-struct BarometerSensor {
-    ErrorCode init();
-    Barometer read();
-
-    SimulatedRocket* rocket;
-};
-
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
-
-    bool should_be_continous;
-};
-
-struct VoltageSensor {
-    ErrorCode init();
-    Voltage read();
-
-    SimulatedRocket* rocket;
-};
-
-struct MagnetometerSensor {
-    ErrorCode init();
-    Magnetometer read();
-
-    SimulatedRocket* rocket;
-};
-
-struct OrientationSensor {
-    ErrorCode init();
-    Orientation read();
-
-    SimulatedRocket* rocket;
-};
-
-struct GPSSensor {
-    ErrorCode init();
-    GPS read();
-
-    SimulatedRocket* rocket;
+    std::vector<uint8_t> pending_transmissions;
 };

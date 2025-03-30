@@ -1,5 +1,6 @@
 #pragma once
 
+#define _USE_MATH_DEFINES
 #include <cstdio>
 #include <cstdint>
 #include <queue>
@@ -55,6 +56,7 @@ private:
 
 typedef SemaphoreHandle_s* SemaphoreHandle_t;
 typedef size_t TickType_t;
+#define portMAX_DELAY ((TickType_t) -1)
 
 SemaphoreHandle_t xSemaphoreCreateMutexStatic(StaticSemaphore_t* buffer);
 bool xSemaphoreTake(SemaphoreHandle_t semaphore, TickType_t timeout);
@@ -71,7 +73,7 @@ public:
         return this;
     }
 
-    void push(void* item) {
+    bool push(void* item) {
         std::memcpy(&buffer[tail_idx * item_size], item, item_size);
         tail_idx++;
         if (tail_idx == max_count) {
@@ -85,6 +87,7 @@ public:
         } else {
             count++;
         }
+        return true;
     }
 
     bool pop(void* item) {
@@ -114,6 +117,8 @@ typedef StaticQueue_t* QueueHandle_t;
 #define xQueueCreateStatic(length, item_size, buffer, queue) ((queue)->initialize(length, item_size, buffer))
 #define xQueueSendToBack(queue, value_ptr, timeout) ((queue)->push(value_ptr))
 #define xQueueReceive(queue, store_ptr, timeout) ((queue)->pop(store_ptr))
+
+#define errQUEUE_FULL (false)
 
 void vTaskDelay(int32_t time);
 void vTaskDelete(void* something_probably);
