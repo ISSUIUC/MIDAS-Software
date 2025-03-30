@@ -12,10 +12,10 @@ class EKF : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 {
 public:
     EKF();
-    void initialize(RocketSystems* args) override;
-    void priori();
-    void priori(float dt, Orientation &orientation, FSMState fsm); 
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
+    void initialize(RocketData& data) override;
+    void priori() override;
+    void priori(float dt, OrientationData &orientation, FSMState fsm);
+    void update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState state) override;
 
     void setQ(float dt, float sd);
     void setF(float dt, float w_x, float w_y, float w_z); 
@@ -28,7 +28,7 @@ public:
 
     float linearInterpolation(float x0, float y0, float x1, float y1, float x);
 
-    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
+    void tick(float dt, float sd, BarometerData &barometer, Acceleration acceleration, OrientationData &orientation, FSMState state);
    
     bool should_reinit = false;
 private:
@@ -47,5 +47,3 @@ private:
     Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
     KalmanData state;
 };
-
-extern EKF ekf;

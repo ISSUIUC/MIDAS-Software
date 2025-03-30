@@ -62,13 +62,13 @@ StateEstimate::StateEstimate(RocketData& state) {
     acceleration = sensor_average<HighGData, 8>(state.high_g, [](HighGData& data) {
         return (double) data.ax;
     });
-    altitude = sensor_average<Barometer, 16>(state.barometer, [](Barometer& data) {
+    altitude = sensor_average<BarometerData, 16>(state.barometer, [](BarometerData& data) {
         return (double) data.altitude;
     });
     jerk = sensor_derivative<HighGData, 8>(state.high_g, [](HighGData& data) {
         return (double) data.ax;
     });
-    vertical_speed = sensor_derivative<Barometer, 16>(state.barometer, [](Barometer& data) {
+    vertical_speed = sensor_derivative<BarometerData, 16>(state.barometer, [](BarometerData& data) {
         return (double) data.altitude;
     });
 }

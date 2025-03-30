@@ -1,9 +1,9 @@
 #include "ekf.h"
 #include "finite-state-machines/fsm_states.h"
+#include "hal.h"
 
-EKF::EKF() : KalmanFilter()
-{
-state = KalmanData();
+EKF::EKF() : KalmanFilter() {
+    state = KalmanData();
 }
 
 // constants
@@ -16,8 +16,7 @@ const float height_sustainer = 2.029; // (m) height of rocket Sustainer
 const float mass_full = 33.84; // (kg) Sustainer + Booster
 const float mass_sustainer = 10.93; // (kg) Sustainer
 
-typedef struct
-{
+typedef struct {
     float mach;
     float alpha;
     float CA_power_on;
@@ -27,31 +26,31 @@ typedef struct
 
 // stores the aerodynamic coefficients for the corresponding Mach number
 const AeroCoeff aero_data[] = {
-    {0.04,0,1.000001789,25.80486518,123.856999},
-    {0.08,0,0.899149955,25.80486518,123.856999},
-    {0.12,0,0.848262793,25.80486518,123.856999},
-    {0.16,0,0.815490497,25.80486518,123.856999},
-    {0.2,0,0.791977907,25.80486518,123.856999},
-    {0.24,0,0.77407759,25.80486518,123.856999},
-    {0.28,0,0.763046286,25.80486518,123.856999},
-    {0.32,0,0.758319846,25.80486518,123.856999},
-    {0.36,0,0.760511343,25.80486518,123.856999},
-    {0.4,0,0.763737136,25.80486518,123.856999},
-    {0.44,0,0.767325178,25.80486518,123.856999},
-    {0.48,0,0.771334851,25.80486518,123.856999},
-    {0.52,0,0.775843406,25.80486518,123.856999},
-    {0.56,0,0.780953377,25.80486518,123.856999},
-    {0.6,0,0.785771581,25.80486518,123.856999},
-    {0.64,0,0.793730593,25.80486518,123.856999},
-    {0.68,0,0.80285965,25.80486518,123.856999},
-    {0.72,0,0.807910063,25.80486518,123.856999},
-    {0.76,0,0.807403195,25.80486518,123.856999},
-    {0.8,0,0.806889479,25.80486518,123.856999},
-    {0.84,0,0.832707826,25.80486518,123.856999},
-    {0.88,0,0.858519521,25.80486518,123.856999},
-    {0.92,0,0.895125486,25.492166,124.3408619},
-    {0.96,0,0.923744595,24.86676763,125.3085876},
-    {1,0,0.941214699,24.24136926,126.2763132},
+    {0.04, 0, 1.000001789, 25.80486518, 123.856999},
+    {0.08, 0, 0.899149955, 25.80486518, 123.856999},
+    {0.12, 0, 0.848262793, 25.80486518, 123.856999},
+    {0.16, 0, 0.815490497, 25.80486518, 123.856999},
+    {0.2, 0, 0.791977907, 25.80486518, 123.856999},
+    {0.24, 0, 0.77407759, 25.80486518, 123.856999},
+    {0.28, 0, 0.763046286, 25.80486518, 123.856999},
+    {0.32, 0, 0.758319846, 25.80486518, 123.856999},
+    {0.36, 0, 0.760511343, 25.80486518, 123.856999},
+    {0.4, 0, 0.763737136, 25.80486518, 123.856999},
+    {0.44, 0, 0.767325178, 25.80486518, 123.856999},
+    {0.48, 0, 0.771334851, 25.80486518, 123.856999},
+    {0.52, 0, 0.775843406, 25.80486518, 123.856999},
+    {0.56, 0, 0.780953377, 25.80486518, 123.856999},
+    {0.6, 0, 0.785771581, 25.80486518, 123.856999},
+    {0.64, 0, 0.793730593, 25.80486518, 123.856999},
+    {0.68, 0, 0.80285965, 25.80486518, 123.856999},
+    {0.72, 0, 0.807910063, 25.80486518, 123.856999},
+    {0.76, 0, 0.807403195, 25.80486518, 123.856999},
+    {0.8, 0, 0.806889479, 25.80486518, 123.856999},
+    {0.84, 0, 0.832707826, 25.80486518, 123.856999},
+    {0.88, 0, 0.858519521, 25.80486518, 123.856999},
+    {0.92, 0, 0.895125486, 25.492166, 124.3408619},
+    {0.96, 0, 0.923744595, 24.86676763, 125.3085876},
+    {1, 0, 0.941214699, 24.24136926, 126.2763132},
 };
 
 // Number of entries
@@ -145,33 +144,27 @@ std::map<float, float> O5500X_data = {
 * be kept consistent (do not mix GPS altitude and barometric).
 *
 */
-void EKF::initialize(RocketSystems *args)
-{
-    Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
+void EKF::initialize(RocketData& data) {
     float sum = 0;
 
-    for (int i = 0; i < 30; i++)
-    {
-    Barometer barometer = args->rocket_data.barometer.getRecent();
-    LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
-    Acceleration accelerations = {
-    .ax = initial_accelerometer.ax,
-    .ay = initial_accelerometer.ay,
-    .az = initial_accelerometer.az};
-    sum += barometer.altitude;
+    for (int i = 0; i < 30; i++) {
+        BarometerData barometer = data.barometer.getRecent();
+        LowGData initial_accelerometer = data.low_g.getRecent();
+        Acceleration accelerations = {
+            .ax = initial_accelerometer.ax,
+            .ay = initial_accelerometer.ay,
+            .az = initial_accelerometer.az};
+        sum += barometer.altitude;
 
-    init_accel(0, 0) += accelerations.az;
-    init_accel(1, 0) += accelerations.ay;
-    init_accel(2, 0) += -accelerations.ax;
-    THREAD_SLEEP(100);
+        init_accel(0, 0) += accelerations.az;
+        init_accel(1, 0) += accelerations.ay;
+        init_accel(2, 0) += -accelerations.ax;
+        THREAD_SLEEP(100);
     }
 
     init_accel(0, 0) /= 30;
     init_accel(1, 0) /= 30;
     init_accel(2, 0) /= 30;
-
-    euler_t euler = orientation.getEuler();
-    euler.yaw = -euler.yaw;
 
     // set x_k
     x_k(0, 0) = sum / 30;
@@ -236,25 +229,22 @@ void EKF::initialize(RocketSystems *args)
 * it extrapolates the state at time n+1 based on the state at time n.
 */
 
-void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
-{
+void EKF::priori(float dt, OrientationData& orientation, FSMState fsm) {
     Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
-    Velocity omega = orientation.getVelocity();
-    euler_t angles = orientation.getEuler();
+    Velocity omega = orientation.orientation_velocity;
+    euler_t angles = orientation.euler;
     // Eigen::Matrix<float, 3, 1> gravity = Eigen::Matrix<float, 3,1>::Zero();
-    if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED))
-    {
-    gravity(0, 0) = -9.81;
+    if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED)) {
+        gravity(0, 0) = -9.81;
     } else {
-    gravity(0, 0) = 0;
+        gravity(0, 0) = 0;
     }
     float m = mass_sustainer;
     float h = height_sustainer;
 
-    if (fsm < FSMState::STATE_BURNOUT)
-    {
-    m = mass_full;
-    h = height_full;
+    if (fsm < FSMState::STATE_BURNOUT) {
+        m = mass_full;
+        h = height_full;
     }
 
     float w_x = omega.vx;
@@ -270,11 +260,12 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     float velocity_magnitude = pow(vel_mag_squared, 0.5);
     float mach = velocity_magnitude / a;
     int index = std::round(mach / 0.04);
-    index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
+    index = std::clamp(index, 0, (int) AERO_DATA_SIZE - 1);
     Ca = aero_data[index].CA_power_on;
 
     float Fax = -0.5 * rho * (vel_mag_squared) * float(Ca) * (pi * r * r);
-    float Fay = 0; float Faz = 0;
+    float Fay = 0;
+    float Faz = 0;
 
     Eigen::Matrix<float, 3, 1> Fg_body;
     EKF::GlobalToBody(angles, gravity);
@@ -295,16 +286,16 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
 
     xdot << x_k(1, 0),
-    (Fax + Ftx + Fgx) / m - (w_y * x_k(7, 0) - w_z * x_k(4, 0)),
-    1.0,
+        (Fax + Ftx + Fgx) / m - (w_y * x_k(7, 0) - w_z * x_k(4, 0)),
+        1.0,
 
-    x_k(4, 0),
-    (Fay + Fty + Fgy) / m - (w_z * x_k(1, 0) - w_x * x_k(7, 0)),
-    1.0,
+        x_k(4, 0),
+        (Fay + Fty + Fgy) / m - (w_z * x_k(1, 0) - w_x * x_k(7, 0)),
+        1.0,
 
-    x_k(7, 0),
-    (Faz + Ftz + Fgz) / m - (w_x * x_k(4, 0) - w_y * x_k(1, 0)),
-    1.0;
+        x_k(7, 0),
+        (Faz + Ftz + Fgz) / m - (w_x * x_k(4, 0) - w_y * x_k(1, 0)),
+        1.0;
     x_priori = (xdot * dt) + x_k;
     setF(dt, w_x, w_y, w_z);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
@@ -313,8 +304,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 /**
 * @brief linearly interpolates the a value based on the lower and upper bound, similar to lerp_() in PySim
 */
-float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x)
-{
+float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x) {
     return y0 + ((x - x0) * (y1 - y0) / (x1 - x0));
 }
 
@@ -332,19 +322,14 @@ float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x)
 * which thrust curve to use. The time since ignition is also important to consider so that is reset once we reach a new stage.
 * The thrust force is then rotated into the body frame using the BodyToGlobal function.
 */
-void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::Matrix<float, 3, 1> &to_modify)
-{
+void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::Matrix<float, 3, 1>& to_modify) {
     float interpolatedValue = 0;
-    if (FSM_state >= STATE_FIRST_BOOST)
-    {
-        if (FSM_state < FSMState::STATE_BURNOUT)
-        {
+    if (FSM_state >= STATE_FIRST_BOOST) {
+        if (FSM_state < FSMState::STATE_BURNOUT) {
             // first stage
-            if (timestamp >= 0.009)
-            {
+            if (timestamp >= 0.009) {
                 auto it = O5500X_data.lower_bound(timestamp);
-                if (it != O5500X_data.end())
-                {
+                if (it != O5500X_data.end()) {
                     float x0 = it->first;
                     float y0 = it->second;
                     ++it;
@@ -353,21 +338,17 @@ void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::
                     interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp);
                 }
             }
-        }
-        else
-        {
-            if (timestamp >= 0.083)
-            {
-            // second stage
-            auto it = M685W_data.lower_bound(timestamp);
-                if (it != M685W_data.end())
-                {
-                float x0 = it->first;
-                float y0 = it->second;
-                ++it;
-                float x1 = it->first;
-                float y1 = it->second;
-                interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp);
+        } else {
+            if (timestamp >= 0.083) {
+                // second stage
+                auto it = M685W_data.lower_bound(timestamp);
+                if (it != M685W_data.end()) {
+                    float x0 = it->first;
+                    float y0 = it->second;
+                    ++it;
+                    float x1 = it->first;
+                    float y1 = it->second;
+                    interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp);
                 }
             }
         }
@@ -385,22 +366,17 @@ void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::
 * the new sensor data is. After updating the gain, the state estimate is updated.
 *
 */
-void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state)
-{
-    if (FSM_state == FSMState::STATE_IDLE)
-    {
+void EKF::update(BarometerData barometer, Acceleration acceleration, OrientationData orientation, FSMState FSM_state) {
+    if (FSM_state == FSMState::STATE_IDLE) {
         float sum = 0;
         float data[10];
         alt_buffer.readSlice(data, 0, 10);
-        for (float i : data)
-        {
+        for (float i : data) {
             sum += i;
         }
-        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
+        KalmanState kalman_state = (KalmanState) {sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
         setState(kalman_state);
-    }
-    else if (FSM_state >= FSMState::STATE_APOGEE)
-    {
+    } else if (FSM_state >= FSMState::STATE_APOGEE) {
         H(1, 2) = 0;
     }
 
@@ -416,7 +392,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     (accel)(1, 0) = acceleration.ay - 0.065;
     (accel)(2, 0) = -acceleration.ax - 0.06;
 
-    euler_t angles = orientation.getEuler();
+    euler_t angles = orientation.euler;
     angles.yaw = -angles.yaw;
 
     Eigen::Matrix<float, 3, 1> acc;
@@ -444,9 +420,12 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     kalman_state.state_est_vel_z = x_k(7, 0);
     kalman_state.state_est_accel_z = x_k(8, 0);
 
-    state.position = (Position){kalman_state.state_est_pos_x, kalman_state.state_est_pos_y, kalman_state.state_est_pos_z};
-    state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
-    state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
+    state.position = (Position) {kalman_state.state_est_pos_x, kalman_state.state_est_pos_y,
+                                 kalman_state.state_est_pos_z};
+    state.velocity = (Velocity) {kalman_state.state_est_vel_x, kalman_state.state_est_vel_y,
+                                 kalman_state.state_est_vel_z};
+    state.acceleration = (Acceleration) {kalman_state.state_est_accel_x, kalman_state.state_est_accel_y,
+                                         kalman_state.state_est_accel_z};
 }
 
 /**
@@ -459,17 +438,14 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
 * @param &orientation Current orientation
 * @param current_state Current FSM_state
 */
-void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state)
-{
-    if (FSM_state >= FSMState::STATE_IDLE)
-    {
-        if (FSM_state != last_fsm)
-        {
+void EKF::tick(float dt, float sd, BarometerData& barometer, Acceleration acceleration, OrientationData& orientation, FSMState FSM_state) {
+    if (FSM_state >= FSMState::STATE_IDLE) {
+        if (FSM_state != last_fsm) {
             stage_timestamp = 0;
             last_fsm = FSM_state;
         }
         stage_timestamp += dt;
-        setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
+        setF(dt, orientation.euler.roll, orientation.euler.pitch, orientation.euler.yaw);
         setQ(dt, sd);
         priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
@@ -481,8 +457,7 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
 *
 * @return the current state, see sensor_data.h for KalmanData
 */
-KalmanData EKF::getState()
-{
+KalmanData EKF::getState() {
     return state;
 }
 
@@ -491,8 +466,7 @@ KalmanData EKF::getState()
 *
 * @param state Wanted state vector
 */
-void EKF::setState(KalmanState state)
-{
+void EKF::setState(KalmanState state) {
     this->state.position.px = state.state_est_pos_x;
     this->state.position.py = state.state_est_pos_y;
     this->state.position.pz = state.state_est_pos_z;
@@ -514,8 +488,7 @@ void EKF::setState(KalmanState state)
 * updated based on the time taken per cycle of the Kalman Filter Thread.
 */
 void EKF::
-setQ(float dt, float sd)
-{
+setQ(float dt, float sd) {
     Q(0, 0) = pow(dt, 5) / 20;
     Q(0, 1) = pow(dt, 4) / 8;
     Q(0, 2) = pow(dt, 3) / 6;
@@ -555,8 +528,7 @@ setQ(float dt, float sd)
 * @param body_vect Vector for rotation in the body frame
 * @return Eigen::Matrix<float, 3, 1> Rotated vector in the global frame
 */
-void EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> &body_vect,Eigen::Matrix<float, 3, 1> &to_modify )
-{
+void EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1>& body_vect, Eigen::Matrix<float, 3, 1>& to_modify) {
     Eigen::Matrix3f roll, pitch, yaw;
     roll << 1., 0., 0., 0., cos(angles.roll), -sin(angles.roll), 0., sin(angles.roll), cos(angles.roll);
     pitch << cos(angles.pitch), 0., sin(angles.pitch), 0., 1., 0., -sin(angles.pitch), 0., cos(angles.pitch);
@@ -566,11 +538,10 @@ void EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> &body_vect,Eig
 }
 
 
-
 /**
 * THIS IS A PLACEHOLDER FUNCTION SO WE CAN ABSTRACT FROM `kalman_filter.h`
 */
-void EKF::priori() {};
+void EKF::priori() {}
 
 /**
 * @brief Converts a vector in the global frame to the body frame
@@ -581,8 +552,7 @@ void EKF::priori() {};
 * @return Eigen::Matrix<float, 3, 1> Rotated vector in the body frame
 *
 */
-void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
-{
+void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1>& to_modify) {
     Eigen::Matrix3f roll;
     roll << 1, 0, 0, 0, cos(angles.roll), -sin(angles.roll), 0, sin(angles.roll), cos(angles.roll);
     Eigen::Matrix3f pitch;
@@ -602,8 +572,7 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
 * by how the states change over time and also depends on the
 * current state of the rocket.
 */
-void EKF::setF(float dt, float wx, float wy, float wz)
-{
+void EKF::setF(float dt, float wx, float wy, float wz) {
     Eigen::Matrix<float, 3, 1> w = Eigen::Matrix<float, 3, 1>::Zero();
     w(0, 0) = wx;
     w(1, 0) = wy;
@@ -618,5 +587,3 @@ void EKF::setF(float dt, float wx, float wy, float wz)
     F_mat(7, 1) = w(1, 0);
     F_mat(7, 4) = -w(0, 0);
 }
-
-EKF ekf;

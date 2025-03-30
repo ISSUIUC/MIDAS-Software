@@ -81,14 +81,14 @@ void Telemetry::acknowledgeReceived() {
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
-    GPS gps = data.gps.getRecentUnsync();
-    Voltage voltage = data.voltage.getRecentUnsync();
-    Barometer barometer = data.barometer.getRecentUnsync();
+    GPSData gps = data.gps.getRecentUnsync();
+    VoltageData voltage = data.voltage.getRecentUnsync();
+    BarometerData barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    Continuity continuity = data.continuity.getRecentUnsync();
+    ContinuityData continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
-    Orientation orientation = data.orientation.getRecentUnsync();
+    OrientationData orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
 
     packet.lat = gps.latitude;

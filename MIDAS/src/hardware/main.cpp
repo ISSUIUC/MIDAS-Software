@@ -13,19 +13,19 @@
  * Sets the config file and then starts all the threads using the config.
  */
 
+HwImpl hw_impl;
 // #ifdef IS_SUSTAINER
 // MultipleLogSink<EMMCSink> sinks;
 MultipleLogSink<SDSink> sinks;
 // #else
 // MultipleLogSink<> sinks;
 // #endif
-RocketSystems systems{.log_sink = sinks};
+RocketSystems<HwImpl> systems(hw_impl, sinks);
+
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
  */
-
-void setup()
-{
+void setup() {
     // begin serial port
     Serial.begin(9600);
 
@@ -59,23 +59,23 @@ void setup()
 
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
-	pinMode(KX134_CS, OUTPUT);
-	pinMode(ADXL355_CS, OUTPUT);
-	pinMode(LIS3MDL_CS, OUTPUT);
-	pinMode(BNO086_CS, OUTPUT);
-	pinMode(BNO086_RESET, OUTPUT);
-	pinMode(CAN_CS, OUTPUT);
-	pinMode(E22_CS, OUTPUT);
-	pinMode(MS5611_CS, OUTPUT);
+    pinMode(KX134_CS, OUTPUT);
+    pinMode(ADXL355_CS, OUTPUT);
+    pinMode(LIS3MDL_CS, OUTPUT);
+    pinMode(BNO086_CS, OUTPUT);
+    pinMode(BNO086_RESET, OUTPUT);
+    pinMode(CAN_CS, OUTPUT);
+    pinMode(E22_CS, OUTPUT);
+    pinMode(MS5611_CS, OUTPUT);
 
-	digitalWrite(MS5611_CS, HIGH);
-	digitalWrite(LSM6DS3_CS, HIGH);
-	digitalWrite(KX134_CS, HIGH);
-	digitalWrite(ADXL355_CS, HIGH);
-	digitalWrite(LIS3MDL_CS, HIGH);
-	digitalWrite(BNO086_CS, HIGH);
-	digitalWrite(CAN_CS, HIGH);
-	digitalWrite(E22_CS, HIGH);
+    digitalWrite(MS5611_CS, HIGH);
+    digitalWrite(LSM6DS3_CS, HIGH);
+    digitalWrite(KX134_CS, HIGH);
+    digitalWrite(ADXL355_CS, HIGH);
+    digitalWrite(LIS3MDL_CS, HIGH);
+    digitalWrite(BNO086_CS, HIGH);
+    digitalWrite(CAN_CS, HIGH);
+    digitalWrite(E22_CS, HIGH);
     //configure output leds
     gpioPinMode(LED_BLUE, OUTPUT);
     gpioPinMode(LED_GREEN, OUTPUT);
@@ -91,9 +91,8 @@ void setup()
     delay(200);
 
     // init and start threads
-    begin_systems(&systems);
+    systems.begin();
 }
 
-void loop()
-{
+void loop() {
 }
