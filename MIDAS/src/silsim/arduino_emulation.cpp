@@ -9,5 +9,6 @@ uint32_t millis(){
 }
 
 void SerialPatch::begin(int baudrate) {}
+void SerialPatch::flush() {}
 
 SerialPatch Serial;

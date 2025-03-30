@@ -1,8 +1,7 @@
 #pragma once
-#include<cstdint>
-#include<stddef.h>
-#include<Arduino.h>
-#include<SPI.h>
+#include <cstdint>
+#include <Arduino.h>
+#include <SPI.h>
 
 
 /*!

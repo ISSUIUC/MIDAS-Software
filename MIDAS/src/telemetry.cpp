@@ -1,3 +1,4 @@
+#define _USE_MATH_DEFINES
 #include <cmath>
 
 #include "telemetry.h"
@@ -5,7 +6,6 @@
 inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
-
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
@@ -46,49 +46,20 @@ std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData con
 }
 
 /**
- * @brief move constructor for the telemetry backend
-*/
-Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) { }
-
-/**
- * @brief transmit telemetry data through LoRa
- * 
- * @param rocket_data rocket_data to transmit
- * @param led led state to transmit
-*/
-void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
-    // static_assert(sizeof(TelemetryPacket) == 20);
-
-    TelemetryPacket packet = makePacket(rocket_data);
-    led.toggle(LED::BLUE);
-
-    backend.send(packet);
-}
-
-bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
-    return backend.read(command, wait_milliseconds);
-}
-
-void Telemetry::acknowledgeReceived() {
-    received_count ++;
-}
-
-/**
  * @brief creates the packet to send through the telemetry system
  * 
  * @param data the data to serialize into a packet
 */
-TelemetryPacket Telemetry::makePacket(RocketData& data) {
-
+TelemetryPacket makePacket(RocketData& data, int received_count) {
     TelemetryPacket packet { };
-    GPS gps = data.gps.getRecentUnsync();
-    Voltage voltage = data.voltage.getRecentUnsync();
-    Barometer barometer = data.barometer.getRecentUnsync();
+    GPSData gps = data.gps.getRecentUnsync();
+    VoltageData voltage = data.voltage.getRecentUnsync();
+    BarometerData barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    Continuity continuity = data.continuity.getRecentUnsync();
+    ContinuityData continuity = data.continuity.getRecentUnsync();
     HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
-    Orientation orientation = data.orientation.getRecentUnsync();
+    OrientationData orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
 
     packet.lat = gps.latitude;
@@ -106,7 +77,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     // Roll rate
     constexpr float max_roll_rate_hz = 10.0f;
     constexpr float max_kf_altitude = 40000.0f;
-    float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, max_roll_rate_hz);
+    float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(M_PI)), 0.0f, max_roll_rate_hz);
     float kf_px_clamped = std::clamp(kalman.position.px, 0.0f, max_kf_altitude);
     const float max_volts = 12;
 
@@ -121,18 +92,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     float kf_vx_clamped = std::clamp(kalman.velocity.vx, -2000.f, 2000.f);
     packet.kf_vx = (uint16_t) ((kf_vx_clamped + 2000) / 4000. * ((1 << 16) - 1));
 
-    #ifdef IS_SUSTAINER
+#ifdef IS_SUSTAINER
     packet.fsm_callsign_satcount |= (1 << 7);
-    #endif
+#endif
 
     return packet;
-}
-
-/**
- * @brief initializes the Telemetry system
- * 
- * @return Error Code
-*/
-ErrorCode __attribute__((warn_unused_result)) Telemetry::init() {
-    return backend.init();
 }

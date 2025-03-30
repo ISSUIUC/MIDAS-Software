@@ -1,36 +1,43 @@
 #pragma once
 
+#include "hal.h"
 #include "telemetry_packet.h"
 #include "rocket_state.h"
-#include "errors.h"
 #include "led.h"
 
-#if defined(SILSIM)
-#include "silsim/emulated_telemetry.h"
-#elif defined(HILSIM)
-#include "hilsim/telemetry_backend.h"
-#else
-#include "hardware/telemetry_backend.h"
-#endif
+TelemetryPacket makePacket(RocketData& data, int received_count);
 
 /**
  * @class Telemetry
  * 
  * @brief wraps the telemetry system to create and send a packet
-*/
+ */
+template<typename Hw>
 class Telemetry {
 public:
-    Telemetry() = default;
-    explicit Telemetry(TelemetryBackend&& backend);
+    Telemetry(HwInterface<Hw>& hw, LEDController<Hw>& led) : hw(hw), led(led) { }
 
-    ErrorCode __attribute__((warn_unused_result)) init();
+    void transmit(RocketData& rocket_data) {
+        static_assert(sizeof(TelemetryPacket) <= 0xFF, "The data type to send is too large"); // Max payload is 255
 
-    void transmit(RocketData& rocket_data, LEDController& led);
-    bool receive(TelemetryCommand* command, int wait_milliseconds);
-    void acknowledgeReceived();
+        TelemetryPacket packet = makePacket(rocket_data, received_count);
+        led.toggle(LED::BLUE);
+
+        hw.transmit(&packet);
+    }
+
+    bool receive(TelemetryCommand* command, int wait_milliseconds) {
+        static_assert(sizeof(TelemetryCommand) <= 0xFF, "The data type to receive is too large"); // Max payload is 255
+        return hw.receive(command, wait_milliseconds);
+    }
+
+    void acknowledgeReceived() {
+        received_count++;
+    }
+
 private:
-    int received_count;
-    TelemetryPacket makePacket(RocketData& data);
+    int received_count = 0;
 
-    TelemetryBackend backend;
+    HwInterface<Hw>& hw;
+    LEDController<Hw>& led;
 };

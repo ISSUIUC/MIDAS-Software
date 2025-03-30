@@ -1,88 +1,91 @@
-#include "silsim/emulated_sensors.h"
-#include <cmath>
+#include "emulated_sensors.h"
 
-
-ErrorCode BarometerSensor::init() {
+ErrorCode EmulatedHw::init_all() {
     return ErrorCode::NoError;
 }
 
-Barometer BarometerSensor::read() {
-    return { 273.15, 0, (float) rocket->height };
+LowGData EmulatedHw::read_low_g() {
+    return lowGData;
 }
 
-ErrorCode LowGLSMSensor::init() {
-    return ErrorCode::NoError;
+LowGLSMData EmulatedHw::read_low_g_lsm() {
+    return lowGlsmData;
 }
 
-LowGLSM LowGLSMSensor::read() {
-    return { .gx = 0, .gy = 0, .gz = 0, .ax = 0, .ay = 0, .az =0 };
+HighGData EmulatedHw::read_high_g() {
+    return highGData;
 }
 
-ErrorCode ContinuitySensor::init() {
-    return ErrorCode::NoError;
+BarometerData EmulatedHw::read_barometer() {
+    return barometerData;
 }
 
-Continuity ContinuitySensor::read() {
-    return { };
+ContinuityData EmulatedHw::read_continuity() {
+    return continuityData;
 }
 
-ErrorCode HighGSensor::init() {
-    return ErrorCode::NoError;
+VoltageData EmulatedHw::read_voltage() {
+    return voltageData;
 }
 
-HighGData HighGSensor::read() {
-    return { 0, 0, (float) rocket->acceleration };
+bool EmulatedHw::is_orientation_ready() {
+    return true;
 }
 
-ErrorCode LowGSensor::init() {
-    return ErrorCode::NoError;
+OrientationData EmulatedHw::read_orientation() {
+    return orientationData;
 }
 
-LowGData LowGSensor::read() {
-    return { 0, 0, (float) rocket->acceleration };
+MagnetometerData EmulatedHw::read_magnetometer() {
+    return magnetometerData;
 }
 
-ErrorCode OrientationSensor::init() {
-    return ErrorCode::NoError;
+bool EmulatedHw::is_gps_ready() {
+    return true;
 }
 
-Orientation OrientationSensor::read() {
-    return {
-            .has_data = true,
-            .yaw = 0,
-            .pitch = 0,
-            .roll = 0,
-            .orientation_velocity = { .vx = 0, .vy = 0, .vz = (float) rocket->velocity },
-            .orientation_acceleration = { .ax = 0, .ay = 0, .az = 0 },
-            .linear_acceleration = { .ax = 0, .ay = 0, .az = (float) rocket->acceleration },
-            .gx = 0,
-            .gy = 0,
-            .gz = 0,  // todo I don't know what the g's are
-            .magnetometer = { .mx = 0, .my = 0, .mz = 0},
-            .temperature = 273.15,
-    };
+GPSData EmulatedHw::read_gps() {
+    return gpsData;
 }
 
-ErrorCode VoltageSensor::init() {
-    return ErrorCode::NoError;
+void EmulatedHw::set_led(LED which, bool value) {
+    return;
 }
 
-Voltage VoltageSensor::read() {
-    return { .voltage = 9 };
+void EmulatedHw::transmit_bytes(uint8_t* memory, size_t count) {
+    return;
 }
 
-ErrorCode MagnetometerSensor::init() {
-    return ErrorCode::NoError;
+bool EmulatedHw::receive_bytes(uint8_t* memory, size_t count, int wait_milliseconds) {
+    if (pending_transmissions.size() < count) {
+        return false;
+    } else {
+        memcpy(memory, pending_transmissions.data(), count);
+        pending_transmissions.erase(pending_transmissions.begin(), pending_transmissions.begin()+count);
+        return true;
+    }
 }
 
-Magnetometer MagnetometerSensor::read() {
-    return { .mx = 0, .my = 0, .mz = 0 };
+void EmulatedHw::set_global_arm(bool to_high) {
+    return;
 }
 
-ErrorCode GPSSensor::init() {
-    return ErrorCode::NoError;
+void EmulatedHw::set_pin_firing(Channel which, bool to_high) {
+    return;
 }
 
-GPS GPSSensor::read() {
-    return { };
+void EmulatedHw::set_camera_on(Camera which, bool on) {
+    return;
+}
+
+void EmulatedHw::set_camera_source(Camera which) {
+    return;
+}
+
+void EmulatedHw::set_video_transmit(bool on) {
+    return;
+}
+
+uint8_t EmulatedHw::get_camera_state() {
+    return 0xFF;
 }

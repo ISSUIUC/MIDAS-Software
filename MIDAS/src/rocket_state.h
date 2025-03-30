@@ -1,10 +1,10 @@
 #pragma once
 
-#include <array>
-
 #include "sensor_data.h"
 #include "hal.h"
 #include "Buffer.h"
+#include "Mutex.h"
+#include "Queue.h"
 
 /** 
  * @brief The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
@@ -172,6 +172,7 @@ struct CommandFlags {
     bool FSM_should_set_cam_feed_cam1 = false;  // Triggered at launch (IDLE --> FIRST_BOOST)
     bool FSM_should_swap_camera_feed = false;   // Triggered COAST --> APOGEE
 };
+
 /**
  * @struct RocketData
  * 
@@ -186,15 +187,15 @@ public:
     SensorData<KalmanData> kalman;
     SensorData<LowGData> low_g;
     BufferedSensorData<HighGData, 8> high_g;
-    BufferedSensorData<Barometer, 16> barometer;
-    SensorData<LowGLSM> low_g_lsm;
-    SensorData<Continuity> continuity;
+    BufferedSensorData<BarometerData, 16> barometer;
+    SensorData<LowGLSMData> low_g_lsm;
+    SensorData<ContinuityData> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
-    SensorData<GPS> gps;
-    SensorData<Magnetometer> magnetometer;
-    SensorData<Orientation> orientation;
-    SensorData<Voltage> voltage;
+    SensorData<GPSData> gps;
+    SensorData<MagnetometerData> magnetometer;
+    SensorData<OrientationData> orientation;
+    SensorData<VoltageData> voltage;
     
     CommandFlags command_flags;
     uint8_t camera_state = 127;

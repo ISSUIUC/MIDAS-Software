@@ -41,13 +41,13 @@ struct LoggedReading {
     union {
         LowGData low_g;
         HighGData high_g;
-        Barometer barometer;
-        Continuity continuity;
-        Voltage voltage;
-        GPS gps;
-        Magnetometer magnetometer;
-        Orientation orientation;
-        LowGLSM lowg_lsm;
+        BarometerData barometer;
+        ContinuityData continuity;
+        VoltageData voltage;
+        GPSData gps;
+        MagnetometerData magnetometer;
+        OrientationData orientation;
+        LowGLSMData lowg_lsm;
         KalmanData kalman;
         FSMState fsm;
         PyroState pyro;

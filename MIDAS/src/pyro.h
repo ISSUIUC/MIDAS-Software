@@ -1,90 +1,64 @@
+#pragma once
+
 #include <cmath>
 
-#include "sensors.h"
-#include "pins.h"
-
-#include "TCAL9539.h"
-#include <rocket_state.h>
+#include "sensor_data.h"
+#include "rocket_state.h"
+#include "hal.h"
 
 
-// Fire the pyros for this time during PYRO_TEST (ms)
-#define PYRO_TEST_FIRE_TIME 100
+template<typename Hw>
+struct PyroLogic {
+private:
+    HwInterface<Hw>& hw;
+    double safety_pyro_start_firing_time;    // Time when pyros have fired "this cycle" (pyro test) -- Used to only fire pyros for a time then transition to SAFE
+    bool safety_has_fired_pyros_this_cycle;  // If pyros have fired "this cycle" (pyro test) -- Allows only firing 1 pyro per cycle.
 
-#define MAXIMUM_TILT_ANGLE (M_PI/5)    // 36 degrees
+public:
+    explicit PyroLogic(HwInterface<Hw>& hw) : hw(hw) { }
+    PyroState tick(FSMState fsm_state, OrientationData orientation, CommandFlags& telem_commands);
 
-/**
- * @brief Returns true if the error_code signals failure.
- */
-bool error_is_failure(GpioError error_code) {
-    return error_code != GpioError::NoError;
-}
+    void disarm_all_channels(PyroState& prev_state) {
+        hw.set_global_arm(false);
+        hw.set_pin_firing(Channel::A, false);
+        hw.set_pin_firing(Channel::B, false);
+        hw.set_pin_firing(Channel::C, false);
+        hw.set_pin_firing(Channel::D, false);
 
-/**
- * @brief Determines if orientation is in an acceptable range to ignite second stage.
- * 
- * @return True if acceptable, false if not.
- */
-bool can_fire_igniter(Orientation orientation) {
-    // With new GNC orientation code we can add a simple check.
-    return orientation.tilt < MAXIMUM_TILT_ANGLE;
-}
+        prev_state.is_global_armed = false;
 
-
-/**
- * @brief Initializes the pyro thread. The main initialization will be done by the GPIO expander, so the pyro thread doesn't
- *        have to do anything special and will always return NoError.
- */
-ErrorCode Pyro::init() {
-    bool has_failed_gpio_init = false;
-
-    // global arm
-    has_failed_gpio_init |= error_is_failure(gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT));
-
-    // fire pins
-    has_failed_gpio_init |= error_is_failure(gpioPinMode(PYROA_FIRE_PIN, OUTPUT));
-    has_failed_gpio_init |= error_is_failure(gpioPinMode(PYROB_FIRE_PIN, OUTPUT));
-    has_failed_gpio_init |= error_is_failure(gpioPinMode(PYROC_FIRE_PIN, OUTPUT));
-    has_failed_gpio_init |= error_is_failure(gpioPinMode(PYROD_FIRE_PIN, OUTPUT));
-
-//    if (has_failed_gpio_init) {
-//        return ErrorCode::PyroGPIOCouldNotBeInitialized;
-//    } else {
-    return ErrorCode::NoError;   // GPIO Driver always claimes it errored even when it doesn't.
-//    }
-}
-
-void Pyro::disarm_all_channels(PyroState& prev_state) {
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, LOW);
-    gpioDigitalWrite(PYROA_FIRE_PIN, LOW);
-    gpioDigitalWrite(PYROB_FIRE_PIN, LOW);
-    gpioDigitalWrite(PYROC_FIRE_PIN, LOW);
-    gpioDigitalWrite(PYROD_FIRE_PIN, LOW);
-
-    prev_state.is_global_armed = false;
-    
-    for(size_t i = 0; i < 4; ++i) {
-        // Update each channel's state sequentially
-        prev_state.channel_firing[i] = false;
+        for (size_t i = 0; i < 4; ++i) {
+            // Update each channel's state sequentially
+            prev_state.channel_firing[i] = false;
+        }
     }
+
+    void set_pyro_safety() {
+        safety_pyro_start_firing_time = pdTICKS_TO_MS(xTaskGetTickCount());
+        safety_has_fired_pyros_this_cycle = true;
+    }
+
+    void reset_pyro_safety() {
+        safety_has_fired_pyros_this_cycle = false;
+    }
+};
+
+inline bool can_fire_igniter(OrientationData orientation) {
+    // With new GNC orientation code we can add a simple check.
+    return orientation.tilt < (M_PI/5);    // 36 degrees;
 }
 
-void Pyro::set_pyro_safety() {
-    safety_pyro_start_firing_time = pdTICKS_TO_MS(xTaskGetTickCount());
-    safety_has_fired_pyros_this_cycle = true;
-}
-
-void Pyro::reset_pyro_safety() {
-    safety_has_fired_pyros_this_cycle = false;
-}
+#define PYRO_TEST_FIRE_TIME 100
 
 #ifdef IS_SUSTAINER
 
 /**
  * @brief Upper stage only! Fires channels by setting their pin on the GPIO.
- * 
+ *
  * @return A pyro struct indicating which pyro channels are armed and/or firing.
  */
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands) {
+template<typename Hw>
+PyroState PyroLogic<Hw>::tick(FSMState fsm_state, OrientationData orientation, CommandFlags& telem_commands) {
     PyroState new_pyro_state = PyroState();
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
@@ -95,18 +69,18 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
 
     // If the state is not SAFE, we arm the global arm pin
     new_pyro_state.is_global_armed = true;
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
+    hw.set_global_arm(true);
 
     switch (fsm_state) {
-        case FSMState::STATE_IDLE:
+        case FSMState::STATE_IDLE: {
             reset_pyro_safety(); // Ensure that pyros can be fired when we transition away from this state
             break;
-        case FSMState::STATE_PYRO_TEST:
-
-            if(safety_has_fired_pyros_this_cycle) {
-                // If a fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
+        }
+        case FSMState::STATE_PYRO_TEST: {
+            if (safety_has_fired_pyros_this_cycle) {
+                // If a fire pyro command has already been acknowledged, do not acknowledge more commands, just fire pyro for the defined time
                 // then, transition to SAFE.
-                if((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
+                if ((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
                     telem_commands.should_transition_safe = true;
                     disarm_all_channels(new_pyro_state);
                     telem_commands.should_fire_pyro_a = false;
@@ -120,56 +94,57 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
             }
 
             // Respond to telem commands to fire igniters
-            if(telem_commands.should_fire_pyro_a) {
+            if (telem_commands.should_fire_pyro_a) {
                 // Fire pyro channel "A"
                 new_pyro_state.channel_firing[0] = true;
-                gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
+                hw.set_pin_firing(Channel::A, true);
                 set_pyro_safety();
             }
 
-            if(telem_commands.should_fire_pyro_b) {
+            if (telem_commands.should_fire_pyro_b) {
                 // Fire pyro channel "B"
                 new_pyro_state.channel_firing[1] = true;
-                gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
-
+                hw.set_pin_firing(Channel::B, true);
                 set_pyro_safety();
             }
 
-            if(telem_commands.should_fire_pyro_c) {
+            if (telem_commands.should_fire_pyro_c) {
                 // Fire pyro channel "C"
                 new_pyro_state.channel_firing[2] = true;
-                gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
-
+                hw.set_pin_firing(Channel::C, true);
                 set_pyro_safety();
             }
 
-            if(telem_commands.should_fire_pyro_d) {
+            if (telem_commands.should_fire_pyro_d) {
                 // Fire pyro channel "D"
                 new_pyro_state.channel_firing[0] = true;
-                gpioDigitalWrite(PYROD_FIRE_PIN, HIGH);
-
+                hw.set_pin_firing(Channel::D, true);
                 set_pyro_safety();
             }
-            
+
             break;
-        case FSMState::STATE_SUSTAINER_IGNITION:
+        }
+        case FSMState::STATE_SUSTAINER_IGNITION: {
             // Fire "Pyro C" to ignite sustainer (Pyro C is motor channel)
             // Additionally, check if orientation allows for firing
             if (can_fire_igniter(orientation)) {
                 new_pyro_state.channel_firing[2] = true;
-                gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
+                hw.set_pin_firing(Channel::C, true);
             }
             break;
-        case FSMState::STATE_DROGUE_DEPLOY:
+        }
+        case FSMState::STATE_DROGUE_DEPLOY: {
             // Fire "Pyro A" to deploy upper stage drogue
             new_pyro_state.channel_firing[0] = true;
-            gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
+            hw.set_pin_firing(Channel::A, true);
             break;
-        case FSMState::STATE_MAIN_DEPLOY:
+        }
+        case FSMState::STATE_MAIN_DEPLOY: {
             // Fire "Pyro B" to deploy main.
             new_pyro_state.channel_firing[1] = true;
-            gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
+            hw.set_pin_firing(Channel::B, true);
             break;
+        }
         default:
             break;
     }
@@ -183,12 +158,13 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
 
 /**
  * Lower stage only!
- * 
+ *
  * @brief Fires channels by setting their pin on the GPIO.
- * 
+ *
  * @return A new pyro struct, with data depending on whether or not each pyro channel should be firing.
 */
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands) {
+template<typename Hw>
+PyroState PyroLogic<Hw>::tick(FSMState fsm_state, OrientationData orientation, CommandFlags& telem_commands) {
     PyroState new_pyro_state = PyroState();
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
@@ -199,7 +175,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
 
     // If the state is not SAFE, we arm the global arm pin
     new_pyro_state.is_global_armed = true;
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, HIGH);
+    hw.set_global_arm(true);
     // If the state is IDLE or any state after that, we arm the global arm pin
     switch (fsm_state) {
         case FSMState::STATE_IDLE:
@@ -227,14 +203,14 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
             if(telem_commands.should_fire_pyro_a) {
                 // Fire pyro channel "A"
                 new_pyro_state.channel_firing[0] = true;
-                gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
+                hw.set_pin_firing(Channel::A, true);
                 set_pyro_safety();
             }
 
             if(telem_commands.should_fire_pyro_b) {
                 // Fire pyro channel "B"
                 new_pyro_state.channel_firing[1] = true;
-                gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
+                hw.set_pin_firing(Channel::B, true);
 
                 set_pyro_safety();
             }
@@ -242,7 +218,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
             if(telem_commands.should_fire_pyro_c) {
                 // Fire pyro channel "C"
                 new_pyro_state.channel_firing[2] = true;
-                gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
+                hw.set_pin_firing(Channel::C, true);
 
                 set_pyro_safety();
             }
@@ -250,26 +226,26 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
             if(telem_commands.should_fire_pyro_d) {
                 // Fire pyro channel "D"
                 new_pyro_state.channel_firing[3] = true;
-                gpioDigitalWrite(PYROD_FIRE_PIN, HIGH);
+                hw.set_pin_firing(Channel::D, true);
 
                 set_pyro_safety();
             }
-            
+
             break;
         case FSMState::STATE_FIRST_SEPARATION:
             // Fire "Pyro D" when separating stage 1
             new_pyro_state.channel_firing[3] = true;
-            gpioDigitalWrite(PYROD_FIRE_PIN, HIGH);
+            hw.set_pin_firing(Channel::D, true);
             break;
         case FSMState::STATE_DROGUE_DEPLOY:
             // Fire "Pyro A" to deploy drogue
             new_pyro_state.channel_firing[0] = true;
-            gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
+            hw.set_pin_firing(Channel::A, true);
             break;
         case FSMState::STATE_MAIN_DEPLOY:
             // Fire "Pyro B" to deploy Main
             new_pyro_state.channel_firing[1] = true;
-            gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
+            hw.set_pin_firing(Channel::B, true);
             break;
         default:
             break;

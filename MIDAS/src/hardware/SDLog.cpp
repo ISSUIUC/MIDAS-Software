@@ -3,6 +3,7 @@
 #include <SD_MMC.h>
 
 #include "SDLog.h"
+#include "pins.h"
 
 /**
  * @brief Initializes the SD card logger

@@ -1,5 +1,4 @@
 #include "errors.h"
-#include "TCAL9539.h"
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
@@ -118,6 +117,6 @@ void update_error_LED(ErrorCode error) {
 
 void update_error_LED(ErrorCode error) {
 
-};
+}
 
 #endif

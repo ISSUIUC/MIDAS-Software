@@ -16,6 +16,7 @@ struct SerialPatch {
     }
 
     void begin(int baudrate);
+    void flush();
 };
 
 extern SerialPatch Serial;
