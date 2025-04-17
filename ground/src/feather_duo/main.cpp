@@ -72,7 +72,19 @@ void Radio_Rx_Thread(void * arg) {
     }
 }
 
+// Identifies this device over serial
+void serial_identify() {
+    Serial.println("IDENT_RESPONSE:FEATHER_DUO");
+}
+
 void handle_serial(const String& key) {
+
+
+    if (key == "IDENT") {
+        serial_identify();
+        return;
+    }
+
     TelemetryCommand command{};
 
     if(key.length() < 1) {
