@@ -338,7 +338,20 @@ void set_freq_local_bug_fix(float freq) {
 }
 
 
+// Identifies this device over serial
+void serial_identify() {
+    Serial.println("IDENT_RESPONSE:FEATHER_M0");
+}
+
+
 void HandleSerial(const String key) {
+
+    
+    if (key == "IDENT") {
+        serial_identify();
+        return;
+    }
+
     if (!cmd_queue.empty()) {
         Serial.println(json_buffer_full_error);
         return;

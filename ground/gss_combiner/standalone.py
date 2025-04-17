@@ -4,7 +4,9 @@ from sys import getsizeof
 import json
 import copy
 import time
+import threading
 import sys
+import queue
 
 import serial # PySerial
 import paho.mqtt.client as mqtt
@@ -13,6 +15,15 @@ import time
 import argparse
 
 import util.logger
+
+stdin_q = queue.Queue()
+
+def read_stdin():
+    for line in sys.stdin:
+        stdin_q.put(line)
+
+threading.Thread(target=read_stdin, daemon=True).start()
+
 class TelemetryStandalone():
     """A thread class handling all communications between COM ports to which telemetry devices are connected."""
     def __init__(self, com_port, server_uri, stage, should_log) -> None:
@@ -24,8 +35,8 @@ class TelemetryStandalone():
         self.__outfile_raw = None
 
         if(self.__should_log):
-            self.__outfile = open(f"./outputs/{time.time()}_log.telem", "w")
-            self.__outfile_raw = open(f"./outputs/{time.time()}_raw_log.txt", "w")
+            self.__outfile = open(f"./outputs/{time.time()}_log.telem", "w+")
+            self.__outfile_raw = open(f"./outputs/{time.time()}_raw_log.txt", "w+")
 
         print("Pre-start diagnostics:")
         print("Logging? ", self.__should_log)
@@ -82,7 +93,9 @@ class TelemetryStandalone():
 
         self.__in_buf = ""
 
-        
+        self.__out_all = False
+
+
     def process_packet(self, packet_json):
         """Append metadata to a packet to conform to GSS v1.1 packet structure"""
         # Incoming packets are of form {"type": "data", value: { ... }}
@@ -127,7 +140,8 @@ class TelemetryStandalone():
     def run(self) -> None:
         print("Starting background systems...")
         self.__mqttclient.loop_start()
-        print("\nReady!\n")
+        print(f"REPORT_OK:{self.__uri}", flush=True)
+        print("\nReady!\n", flush=True)
         while True:
             # Wrap all in a try-except to catch errors.
 
@@ -139,10 +153,44 @@ class TelemetryStandalone():
                 # Read all from the comport
                 packets = self.__read_comport()
 
+                if len(packets) > 0:
+                    if self.__out_all:
+                        for p in packets:
+                            print(f"[F] {p.strip()}", flush=True)
+
+                # Process stdin
+                if not stdin_q.empty():
+                    line = stdin_q.get().strip()
+                    is_internal = False
+                    if line == "HELP":
+                        is_internal = True
+                        print("[CMD] HELP : Send commands to the combiner and feather.\nHELP - Show this screen\nPING - Test command\nOUT_ALL - Output all serial input\nOUT_DEFAULT - (Default setting) only output default combiner data", flush=True)
+
+                    if line == "PING":
+                        is_internal = True
+                        print("[CMD] PONG", flush=True)
+
+                    if line == "OUT_ALL":
+                        is_internal = True
+                        self.__out_all = True
+                        print("[CMD] OUT_ALL - Now outputting all serial data.")
+                        print("Note: Serial data from the feather will be formatted like below:")
+                        print("[F] This is a sample serial output.", flush=True)
+
+                    if line == "OUT_DEFAULT":
+                        is_internal = True
+                        self.__out_all = False
+                        print("[CMD] OUT_DEFAULT - Now outputting only combiner data.", flush=True)
+                        
+                    if not is_internal:
+                        print("[CMD] Non internal command, forwarding to feather.", flush=True)
+                        self.__external_commands.append(line)
+
+
                 # Write if needed to comport
                 if(len(self.__external_commands) > 0):
                     for cmd in self.__external_commands:
-                        print(f"Sending command '{cmd}'")
+                        print(f"[TO FEATHER] '{cmd}'", flush=True)
                         self.__send_comport(str(cmd) + "\r\n")
                     self.__external_commands = []
 
@@ -173,26 +221,26 @@ class TelemetryStandalone():
                             self.__outfile_raw.write(f"{packet_in['type']}: " + str(packet_in) + "\n")
         
                         if packet_in['type'] == "command_success":
-                            print("RX: Command good")
+                            print("[RX] Command good")
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
 
                         # This is jank but idc
                         if packet_in['type'] == "bad_command":
-                            print("RX: Command bad")
+                            print("[RX] Command bad")
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
 
                         if packet_in['type'] == "command_acknowledge":
-                            print("RX: Command ACK")
+                            print("[RX] Command ACK")
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
 
                         if packet_in['type'] == "command_sent":
-                            print("RX: Command send confirmed")
+                            print("[RX] Command send confirmed")
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
@@ -239,16 +287,21 @@ class TelemetryStandalone():
                     # Send to MQTT
                     data_encoded = json.dumps(packet_new).encode("utf-8")
 
+                    if processed['value']['is_sustainer'] == True:
+                        data_channel = "FlightData-Sustainer"
+                    else:
+                        data_channel = "FlightData-Booster"
+
                     #log
                     if(self.__should_log):
                         self.__outfile.write(json.dumps(packet_new) + "\n")
 
                     try:
-                        self.__mqttclient.publish(self.__data_channel, data_encoded)
+                        self.__mqttclient.publish(data_channel, data_encoded)
                         print("PACKETS GOOD: ", self.__consecutive_good, end="   \r")
                         self.__consecutive_good += 1
                     except Exception as e:
-                        print("Fail pub")
+                        print("Failed to publish!")
                     
 
                     
