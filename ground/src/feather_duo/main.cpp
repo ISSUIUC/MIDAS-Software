@@ -18,6 +18,11 @@ enum class Stage {
     Sustainer
 };
 
+void SERIAL_PRINTLN(const char* msg) {
+    Serial.println(msg);
+    Serial.flush();
+}
+
 struct RadioConfig
 {
     SX1268 * radio;
@@ -74,7 +79,7 @@ void Radio_Rx_Thread(void * arg) {
 
 // Identifies this device over serial
 void serial_identify() {
-    Serial.println("IDENT_RESPONSE:FEATHER_DUO");
+    SERIAL_PRINTLN("IDENT_RESPONSE:FEATHER_DUO");
 }
 
 void handle_serial(const String& key) {
@@ -88,7 +93,7 @@ void handle_serial(const String& key) {
     TelemetryCommand command{};
 
     if(key.length() < 1) {
-        Serial.println(json_command_bad);
+        SERIAL_PRINTLN(json_command_bad);
         return;
     }
     Stage stage;
@@ -100,7 +105,7 @@ void handle_serial(const String& key) {
             stage = Stage::Sustainer;
             break;
         default:
-            Serial.println(json_command_bad);
+            SERIAL_PRINTLN(json_command_bad);
             return;
     }
 
@@ -125,7 +130,7 @@ void handle_serial(const String& key) {
     } else if (cmd_name == "CAMT") {
         command.command = CommandType::CAM_TOGGLE;
     } else {
-        Serial.println(json_command_bad);
+        SERIAL_PRINTLN(json_command_bad);
         return;
     }
 
@@ -136,7 +141,7 @@ void handle_serial(const String& key) {
         sustainer_cmds.send(command);
     }
 
-    Serial.println(json_command_success);
+    SERIAL_PRINTLN(json_command_success);
 }
 
 void Management_Thread(void * arg) {
@@ -175,9 +180,9 @@ void setup() {
     SPI0.begin(Pins::SPI_SCK_0, Pins::SPI_MISO_0, Pins::SPI_MOSI_0);
     SPI1.begin(Pins::SPI_SCK_1, Pins::SPI_MISO_1, Pins::SPI_MOSI_1);
     
-    if(!init_radio(Radio0, BOOSTER_FREQ)) Serial.println(json_init_failure);
-    if(!init_radio(Radio1, SUSTAINER_FREQ)) Serial.println(json_init_failure);
-    Serial.println(json_init_success);
+    if(!init_radio(Radio0, BOOSTER_FREQ)) SERIAL_PRINTLN(json_init_failure);
+    if(!init_radio(Radio1, SUSTAINER_FREQ)) SERIAL_PRINTLN(json_init_failure);
+    SERIAL_PRINTLN(json_init_success);
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
 
@@ -198,9 +203,9 @@ void setup() {
         .indicator_led=Pins::LED_BLUE,
     };
 
-    xTaskCreate(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr);
-    xTaskCreate(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr);
-    xTaskCreate(Management_Thread, "Managmenet_thread", 8192, nullptr, 0, nullptr);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }
