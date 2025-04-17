@@ -89,6 +89,7 @@ class FeatherSubprocess:
             time.sleep(0.5)
             data = self.__serial.read_all().decode().splitlines()
             for line in data:
+                print(f"[{self.__port}] {line}")
                 if line.startswith("IDENT_RESPONSE:"):
                     ident_value = line[15:]
                     
