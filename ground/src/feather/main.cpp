@@ -535,7 +535,7 @@ void loop() {
             cur_input += input;
             cur_input.replace("\r", ""); // Remove carriage returns
 
-            HandleSerial(input.substring(0, input.length() - 2));
+            HandleSerial(cur_input.substring(0, cur_input.length() - 1));
 
             cur_input = "";
         } else {

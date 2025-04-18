@@ -47,6 +47,8 @@ class FeatherSubprocess:
         self.pipe_conn = None
         self.__ip = ""
 
+        self.has_errored = False
+
         self.main_stdout = []
         self.__terminal_output = None
 
@@ -116,14 +118,23 @@ class FeatherSubprocess:
     def is_online(self):
         return self.stat.lower() == "online"
     
-    def cleanup(self):
-        self.pipe_conn.send("kill")
+    def clean_visual(self):
         self.meta = ""
         self.set_ip("")
         self.stat = "OFFLINE"
         self.proc = None
         self.main_stdout = []
-        self.pipe_conn.close()
+
+    def cleanup(self):
+        if self.pipe_conn:
+            self.pipe_conn.send("kill")
+        self.clean_visual()
+
+        if self.pipe_conn:
+            self.pipe_conn.close()
+        self.pipe_conn = None
+
+
 
     def get_port(self):
         return self.__port
@@ -198,7 +209,8 @@ def run_standalone_worker(pipe_conn, ip, port, stage_sel, do_log):
     
     # End loop and clean up
     proc.kill()
-    print("Cleaning up process")
+    pipe_conn.close()
+    print(f"[{port}] Cleaning up process")
 
 
 class DeviceApp(tk.Tk):
@@ -218,6 +230,7 @@ class DeviceApp(tk.Tk):
         # Remove old ports that aren't connected
         for d in devices:
             if d.get_port() not in ports:
+                print("[!] Deleting ", d.get_port())
                 d.cleanup()
 
                 for window in self.windows:
@@ -241,14 +254,27 @@ class DeviceApp(tk.Tk):
         for device in devices:
             if device.pipe_conn is None or device.proc is None:
                 continue
-            while device.pipe_conn.poll():
-                msg = device.pipe_conn.recv()
-                # print("MSG RECV: ", msg)
-                if msg.startswith("REPORT_OK:"):
-                    ip = msg[10:]
-                    device.stat = "ONLINE"
-                    device.set_ip(ip)
-                device.add_to_stdout(msg)
+            
+            try:
+                while device.pipe_conn.poll():
+                    msg = device.pipe_conn.recv()
+                    # print("MSG RECV: ", msg)
+                    if msg.startswith("REPORT_OK:"):
+                        ip = msg[10:]
+                        device.stat = "ONLINE"
+                        device.set_ip(ip)
+
+                    if msg.startswith("REPORT_ERR"):
+                        print(f"[!] Process {device.get_port()} flagged an error and exited.")
+                        device.cleanup()
+                        print(f"[!] Process {device.get_port()} Triggering a device cleanup:")
+                        continue
+                    device.add_to_stdout(msg)
+            except:
+                print(f"[{device.get_port()}] Detected an unexpected pipe closure, but process isn't cleaned up!")
+                device.meta = "ERR: UNEXPECTED TERM"
+                device.has_errored = True
+                device.pipe_conn = None
 
         self.after(50, self.update_stdouts)
 
@@ -263,6 +289,8 @@ class DeviceApp(tk.Tk):
             tags = ("disabled",) if device["status"].upper() in ("NONE", "IDENTIFYING...") else ()
             if _device.is_online():
                 tags = tags + ("connected",)
+            if _device.has_errored:
+                tags = tags + ("errored",)
             new_item = self.tree.insert(
                 "", "end",
                 values=(device["port"], device["name"], device["status"], device["server"], device["meta"]),
@@ -283,11 +311,13 @@ class DeviceApp(tk.Tk):
                     self.radio1.config(state="normal")
                     self.radio2.config(state="normal")
                     self.radio3.config(state="disabled")
+                    self.stage_sel.set("sustainer")
 
                 if _device.type == "FEATHER DUO":
                     self.radio1.config(state="disabled")
                     self.radio2.config(state="disabled")
                     self.radio3.config(state="normal")
+                    self.stage_sel.set("duo")
 
         # Update stats
         self.total_label.config(text=f"Total Devices: {len(devices)}")
@@ -327,6 +357,7 @@ class DeviceApp(tk.Tk):
         self.tree.pack(fill="both", expand=True)
 
         self.tree.tag_configure("connected", background="#d2ffd2")
+        self.tree.tag_configure("errored", background="#ffd2d2")
 
         # Right side: control panel
         control_frame = ttk.Frame(main_frame)
@@ -451,6 +482,7 @@ class DeviceApp(tk.Tk):
 
             should_log = self.do_log.get()
 
+            target_device.has_errored = False
             target_device.reset()
             target_device.stat = "STARTUP..."
             target_device.meta = self.stage_sel.get().upper()

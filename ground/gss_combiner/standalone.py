@@ -48,7 +48,12 @@ class TelemetryStandalone():
         self.__uri = server_uri
         self.__mqttclient: mqtt.Client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2)
         print("Connecting to broker @ " + str(self.__uri))
-        self.__mqttclient.connect(self.__uri, port=1884)
+        try:
+            self.__mqttclient.connect(self.__uri, port=1884)
+        except:
+            print("UNABLE TO CONNECT TO ", self.__uri)
+            print("REPORT_ERR", flush=True)
+            sys.exit(1) 
         print("Subscribing to MQTT streams...")
 
         self.__data_channel = "FlightData-" + stage
@@ -346,7 +351,7 @@ def parse_params(arguments):
 
     if args.duo:
         source = "Multistage (Sustainer / Booster)"
-        print("Disregarding any booster/sustasiner commands. Initializing as Feather Duo.", flush=True)
+        print("Disregarding any booster/sustainer commands. Initializing as Feather Duo.", flush=True)
 
     ip = "localhost"
     if args.ip:
