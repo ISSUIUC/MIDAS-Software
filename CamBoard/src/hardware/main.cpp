@@ -79,6 +79,10 @@ void onReceive(int len) {
 
           int change = 0;
 
+          digitalWrite(LED_GREEN, HIGH);
+          delay(4000);
+          digitalWrite(LED_GREEN, LOW);
+
           while(change == 0) {
             Serial.println("Trying to turn on camera 1");
             digitalWrite(CAM1_ON_OFF, HIGH);
@@ -89,11 +93,15 @@ void onReceive(int len) {
               toReturn1 = read_mem_cap_data(Serial1);
             }
 
+            digitalWrite(LED_GREEN, HIGH);
+
             struct read_mem_cap_data_return toReturn2;
             toReturn2 = read_mem_cap_data(Serial1);
             while(toReturn2.status == 0) {
               toReturn2 = read_mem_cap_data(Serial1);
             }
+
+            digitalWrite(LED_BLUE, HIGH);
 
             for(int i = 0; i < 12; i++) {
               if(toReturn1.buf[i] != toReturn2.buf[2]) {
@@ -102,10 +110,17 @@ void onReceive(int len) {
               }
             }
 
+            digitalWrite(LED_RED, HIGH);
+
             if(change == 0) {
               camera_on_off(Serial1);
+              digitalWrite(LED_ORANGE, HIGH);
             }
             delay(5000);
+            digitalWrite(LED_GREEN, LOW);
+            digitalWrite(LED_BLUE, LOW);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, LOW);
           }
           
           break;}
@@ -163,11 +178,13 @@ void onReceive(int len) {
               toReturn1 = read_mem_cap_data(Serial2);
             }
 
+
             struct read_mem_cap_data_return toReturn2;
             toReturn2 = read_mem_cap_data(Serial2);
             while(toReturn2.status == 0) {
               toReturn2 = read_mem_cap_data(Serial2);
             }
+
 
             for(int i = 0; i < 12; i++) {
               if(toReturn1.buf[i] != toReturn2.buf[2]) {
@@ -175,6 +192,7 @@ void onReceive(int len) {
                 break;
               }
             }
+
 
             if(change == 0) {
               camera_on_off(Serial2);
