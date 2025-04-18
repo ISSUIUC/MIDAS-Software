@@ -61,6 +61,7 @@ class FeatherSubprocess:
 
     def add_to_stdout(self, msg):
         self.main_stdout.append(msg)
+        # print(f"[PIPE] {msg}")
         if self.__terminal_output:
             self.__terminal_output.config(state="normal")
             msg_str: str = str(msg)
@@ -84,7 +85,7 @@ class FeatherSubprocess:
             self.stat = "IDENTIFYING..."
             self.type = "UNKNOWN"
 
-            self.__serial.write("IDENT \n".encode())
+            self.__serial.write("IDENT\n".encode())
 
             time.sleep(0.5)
             data = self.__serial.read_all().decode().splitlines()
@@ -183,7 +184,6 @@ def run_standalone_worker(pipe_conn, ip, port, stage_sel, do_log):
 
     while True:
         if pipe_conn.poll():
-            print("Poll triggered")
             msg = pipe_conn.recv()
             if msg == "kill":
                 break

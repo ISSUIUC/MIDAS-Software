@@ -324,6 +324,7 @@ def parse_params(arguments):
 
     arg_parser.add_argument("--booster", action="store_true", help="Should we use booster?")
     arg_parser.add_argument("--sustainer", action="store_true", help="Should we use sustainer?")
+    arg_parser.add_argument("--duo", action="store_true", help="Should we use feather duo?")
 
     arg_parser.add_argument("-n", "--no-log", action="store_true", help="Will not log data to logfiles for this run")
     arg_parser.add_argument("-i", "--ip", type=str, help="Connects to a specific IP. (Defaults to localhost)")
@@ -342,6 +343,10 @@ def parse_params(arguments):
 
     if args.sustainer:
         source = "Sustainer"
+
+    if args.duo:
+        source = "Multistage (Sustainer / Booster)"
+        print("Disregarding any booster/sustasiner commands. Initializing as Feather Duo.", flush=True)
 
     ip = "localhost"
     if args.ip:
