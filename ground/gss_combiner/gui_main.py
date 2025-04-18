@@ -8,6 +8,7 @@ import os
 import serial
 from serial.tools.list_ports import comports
 import time
+import json
 
 import threading
 import sys
@@ -38,7 +39,6 @@ class FeatherSubprocess:
     def __init__(self, port):
         self.__port: str = port
         self.__serial = None
-        self.__stage_sel: str = ""
         self.meta: str = ""
         self.stat: str = "NONE"
         self.type: str = "UNKNOWN"
@@ -46,6 +46,8 @@ class FeatherSubprocess:
         self.proc = None
         self.pipe_conn = None
         self.__ip = ""
+        self.should_log = False
+        self.stage_sel = ""
 
         self.has_errored = False
 
@@ -55,6 +57,9 @@ class FeatherSubprocess:
         print(f"Initializing new device on {self.__port}")
         self.check_type()
     
+    def get_stat(self):
+        return self.__ip, self.should_log
+
     def set_terminal_output(self, outpt):
         self.__terminal_output = outpt
 
@@ -307,18 +312,6 @@ class DeviceApp(tk.Tk):
                     self.inspect_btn.config(state="disabled")
                     self.connect_btn.config(text="Connect")
 
-                if _device.type == "FEATHER M0":
-                    self.radio1.config(state="normal")
-                    self.radio2.config(state="normal")
-                    self.radio3.config(state="disabled")
-                    self.stage_sel.set("sustainer")
-
-                if _device.type == "FEATHER DUO":
-                    self.radio1.config(state="disabled")
-                    self.radio2.config(state="disabled")
-                    self.radio3.config(state="normal")
-                    self.stage_sel.set("duo")
-
         # Update stats
         self.total_label.config(text=f"Total Devices: {len(devices)}")
         online_count = sum(1 for d in devices if d.to_dict()["status"].lower() == "online")
@@ -392,6 +385,7 @@ class DeviceApp(tk.Tk):
         self.radio1.config(state="disabled")
         self.radio2.config(state="disabled")
         self.radio3.config(state="disabled")
+        self.do_log_checkbox.config(state="disabled")
         # Separator
         ttk.Separator(control_frame, orient="horizontal").pack(fill="x", pady=15)
 
@@ -407,7 +401,7 @@ class DeviceApp(tk.Tk):
         self.connect_btn = ttk.Button(control_frame, text="Connect", command=self.perform_action, state="disabled")
         self.connect_btn.pack(pady=2)
 
-        self.inspect_btn = ttk.Button(control_frame, text="Inspect", command=self.inspect_window, state="disabled")
+        self.inspect_btn = ttk.Button(control_frame, text="Console", command=self.inspect_window, state="disabled")
         self.inspect_btn.pack(pady=2)
 
 
@@ -451,10 +445,33 @@ class DeviceApp(tk.Tk):
                 return
 
             values = self.tree.item(item, "values")
+            is_same_select = values[0] == self.selected_device
             self.selected_device = values[0]
             self.device_label.config(text=f"Selected: {self.selected_device}")
             self.connect_btn.config(state="normal")
             self.do_log_checkbox.config(state="normal")
+
+            _device = get_device(self.selected_device)
+
+            if not is_same_select:
+                if _device.type == "FEATHER M0":
+                    self.radio1.config(state="normal")
+                    self.radio2.config(state="normal")
+                    self.radio3.config(state="disabled")
+                    self.stage_sel.set("sustainer")
+
+                if _device.type == "FEATHER DUO":
+                    self.radio1.config(state="disabled")
+                    self.radio2.config(state="disabled")
+                    self.radio3.config(state="normal")
+                    self.stage_sel.set("duo")
+
+                if _device.is_online():
+                    dev_ip, dev_sl = _device.get_stat()
+                    self.do_log.set(dev_sl)
+                    self.ip_entry.delete(0, tk.END) # Clear existing content
+                    self.ip_entry.insert(0, dev_ip)
+                    self.stage_sel.set(_device.stage_sel)
 
     def perform_action(self):
         global devices
@@ -464,6 +481,8 @@ class DeviceApp(tk.Tk):
             if target_device.is_online():
                 # disconnect & close windows
                 target_device.cleanup()
+
+                target_device.proc = None
 
                 for window in self.windows:
                     _device, _window = window
@@ -482,10 +501,13 @@ class DeviceApp(tk.Tk):
 
             should_log = self.do_log.get()
 
+            target_device.should_log = should_log
+
             target_device.has_errored = False
             target_device.reset()
             target_device.stat = "STARTUP..."
-            target_device.meta = self.stage_sel.get().upper()
+            target_device.meta = f"{self.stage_sel.get().upper()} (LOG: {"YES" if should_log else "NO"})"
+            target_device.stage_sel = self.stage_sel.get()
             target_device.pipe_conn, child_conn = multiprocessing.Pipe()
             target_device.proc = multiprocessing.Process(target=run_standalone_worker, args=(child_conn, ip, self.selected_device, self.stage_sel.get(), should_log))
             target_device.proc.start()
@@ -496,6 +518,36 @@ class DeviceApp(tk.Tk):
             print("Opening terminal window")
             self.open_terminal_window(self.selected_device)
             # Add real logic here
+
+    def show_json_window(self):
+        window = tk.Toplevel(self)
+
+        title = "Data"
+        json_data = {"hello": "world", "bruh": "moment"}
+        window.title(title)
+        window.geometry("600x400")
+
+        label = ttk.Label(window, text=title, font=("Helvetica", 14, "bold"))
+        label.pack(pady=5)
+
+        # Text widget with scrollbar
+        text_frame = ttk.Frame(window)
+        text_frame.pack(fill="both", expand=True, padx=10, pady=5)
+
+        scrollbar = ttk.Scrollbar(text_frame)
+        scrollbar.pack(side="right", fill="y")
+
+        text = tk.Text(text_frame, wrap="none", yscrollcommand=scrollbar.set, bg="#1e1e1e", fg="#d4d4d4", insertbackground="white")
+        text.pack(fill="both", expand=True)
+        scrollbar.config(command=text.yview)
+
+        # Pretty-print the JSON
+        pretty_json = json.dumps(json_data, indent=4)
+        text.insert("1.0", pretty_json)
+        text.config(state="disabled")  # Make it read-only
+
+        # Optional: allow closing with Esc
+        window.bind("<Escape>", lambda e: window.destroy())
 
     def open_terminal_window(self, device):
         global devices

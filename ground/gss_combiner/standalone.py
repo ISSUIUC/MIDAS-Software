@@ -226,26 +226,26 @@ class TelemetryStandalone():
                             self.__outfile_raw.write(f"{packet_in['type']}: " + str(packet_in) + "\n")
         
                         if packet_in['type'] == "command_success":
-                            print("[RX] Command good")
+                            print("[RX] Command good", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
 
                         # This is jank but idc
                         if packet_in['type'] == "bad_command":
-                            print("[RX] Command bad")
+                            print("[RX] Command bad", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
 
                         if packet_in['type'] == "command_acknowledge":
-                            print("[RX] Command ACK")
+                            print("[RX] Command ACK", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
 
                         if packet_in['type'] == "command_sent":
-                            print("[RX] Command send confirmed")
+                            print("[RX] Command send confirmed", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
                             self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
                             continue
@@ -256,13 +256,13 @@ class TelemetryStandalone():
 
                             if packet_in['type'] == "freq_success":
                                 if float(packet_in['frequency']) == float(self.__rf_freq):
-                                    print("Frequency set: Listening on " + str(self.__rf_freq))
+                                    print("Frequency set: Listening on " + str(self.__rf_freq), flush=True)
                                     self.__rf_set = True
                                 else:
                                     print("Recieved incorrect frequency!")
                                     continue    
                             if packet_in['type'] == "command_success":
-                                print("Successful command")
+                                print("[CMD] Command Success!", flush=True)
                             else:
                                 print("Recieved packet from wrong stream.. Discarding due to freq change.")
                                 continue
@@ -303,10 +303,10 @@ class TelemetryStandalone():
 
                     try:
                         self.__mqttclient.publish(data_channel, data_encoded)
-                        print("PACKETS GOOD: ", self.__consecutive_good, end="   \r")
+                        print("PACKETS GOOD: ", self.__consecutive_good, flush=True)
                         self.__consecutive_good += 1
                     except Exception as e:
-                        print("Failed to publish!")
+                        print("Failed to publish!", flush=True)
                     
 
                     
