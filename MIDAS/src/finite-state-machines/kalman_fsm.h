@@ -1,20 +1,34 @@
-#include "fsm_states.h" // fix import paths please
+#pragma once
 
-class KalmanFSM {
-    public:
-        KalmanFSM() = default;
-        void tickFSM();
+#include "fsm_states.h"
+#include "fsm.h"
+
+class KalmanFSM : public FSM  {
+   public:
+    KalmanFSM() = default;
+
+    void tickFSM() override;
+
     private:
-        FSMState rocket_state_ = FSMState::STATE_IDLE; // Initial state
-        double launch_time_ = 0;
-        double burnout_time_ = 0;
-        double sustainer_ignition_time_ = 0;
-        double second_boost_time_ = 0;
-        double coast_time_ = 0;
-        double drogue_time_ = 0;
-        double apogee_time_ = 0;
-        double main_time_ = 0;
-        double main_deployed_time_ = 0;
-        double landed_time_ = 0;
-        double pyro_test_entry_time_ = 0;
+    systime_t launch_time_ = 0;
+    sysinterval_t burn_timer_ = 0;
+    systime_t burnout_time_ = 0;
+    sysinterval_t coast_timer_ = 0;
+
+    systime_t apogee_time_ = 0;
+    sysinterval_t apogee_timer_ = 0;
+
+    systime_t drogue_time_ = 0;
+    sysinterval_t drogue_timer_ = 0;
+
+    systime_t main_time_ = 0;
+    sysinterval_t main_timer_ = 0;
+
+    systime_t landing_time_ = 0;
+    sysinterval_t landing_timer = 0;
+
+    double getAltitudeAverage(size_t start, size_t len);
+    double getSecondDerivativeAltitudeAverage(size_t start, size_t len);
+    double getAccelerationAverage(size_t start, size_t len);
+
 };
