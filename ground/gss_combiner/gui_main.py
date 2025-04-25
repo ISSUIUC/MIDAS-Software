@@ -36,6 +36,7 @@ def is_port_taken(port):
 
 
 class FeatherSubprocess:
+    MAXIMUM_STDOUT_LINES = 300
     def __init__(self, port):
         self.__port: str = port
         self.__serial = None
@@ -52,7 +53,7 @@ class FeatherSubprocess:
         self.has_errored = False
 
         self.main_stdout = []
-        self.__terminal_output = None
+        self.__terminal_outputs = []
 
         print(f"Initializing new device on {self.__port}")
         self.check_type()
@@ -61,22 +62,26 @@ class FeatherSubprocess:
         return self.__ip, self.should_log
 
     def set_terminal_output(self, outpt):
-        self.__terminal_output = outpt
+        self.__terminal_outputs.append(outpt)
 
     def set_ip(self, ip):
         self.__ip = ip
 
     def add_to_stdout(self, msg):
         self.main_stdout.append(msg)
-        # print(f"[PIPE] {msg}")
-        if self.__terminal_output:
-            self.__terminal_output.config(state="normal")
+
+        if len(self.main_stdout) > FeatherSubprocess.MAXIMUM_STDOUT_LINES:
+            self.main_stdout = self.main_stdout[1:]
+
+        for outpt in self.__terminal_outputs:
+            outpt.config(state="normal")
             msg_str: str = str(msg)
             if msg_str.startswith("[F]"):
-                self.__terminal_output.insert("end", f"{msg_str}\n", "raw_out")
+                outpt.insert("end", f"{msg_str}\n", "raw_out")
             else:
-                self.__terminal_output.insert("end", f"{msg_str}\n")
-            self.__terminal_output.config(state="disabled")
+                outpt.insert("end", f"{msg_str}\n")
+            outpt.config(state="disabled")
+            outpt.see("end")
 
     def check_type(self):
         print("Check type invoked on ", self.__port)
@@ -124,15 +129,17 @@ class FeatherSubprocess:
         return self.stat.lower() == "online"
     
     def clean_visual(self):
-        self.meta = ""
         self.set_ip("")
         self.stat = "OFFLINE"
         self.proc = None
         self.main_stdout = []
 
+
     def cleanup(self):
+        print(f"[{self.__port}] FeatherSubprocess.cleanup invoked!")
         if self.pipe_conn:
-            self.pipe_conn.send("kill")
+            self.pipe_conn.send("kill\n")
+            
         self.clean_visual()
 
         if self.pipe_conn:
@@ -201,7 +208,7 @@ def run_standalone_worker(pipe_conn, ip, port, stage_sel, do_log):
     while True:
         if pipe_conn.poll():
             msg = pipe_conn.recv()
-            if msg == "kill":
+            if msg == "kill\n":
                 break
             proc.stdin.write(msg)
             proc.stdin.flush()
@@ -280,6 +287,13 @@ class DeviceApp(tk.Tk):
                 device.meta = "ERR: UNEXPECTED TERM"
                 device.has_errored = True
                 device.pipe_conn = None
+                device.cleanup()
+
+                for window in self.windows:
+                    _device, _window = window
+                    if device.get_port() == _device:
+                        _window.destroy()
+
 
         self.after(50, self.update_stdouts)
 
@@ -483,6 +497,7 @@ class DeviceApp(tk.Tk):
                 target_device.cleanup()
 
                 target_device.proc = None
+                target_device.meta = ""
 
                 for window in self.windows:
                     _device, _window = window
@@ -490,12 +505,15 @@ class DeviceApp(tk.Tk):
                         _window.destroy()
                 return
 
+            if target_device.pipe_conn is not None or target_device.proc is not None:
+                print("Cleaned up device.")
+                target_device.cleanup()
+                target_device.pipe_conn = None
+                target_device.proc = None
 
             ip = self.ip_entry.get()
             print(f"Running device {self.selected_device}")
             print(f"Connecting to... {self.ip_entry.get()}")
-
-            
 
             # self.open_terminal_window(self.selected_device)
 
@@ -598,7 +616,6 @@ class DeviceApp(tk.Tk):
                 output.insert("end", f">> {command}\n", "user_in")
                 output.config(state="disabled")
                 output.see("end")
-                print("Sending on pipe ", command)
                 target_device.pipe_conn.send(command + "\n")
                 input_var.set("")
 
