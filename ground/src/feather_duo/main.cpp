@@ -8,7 +8,7 @@
 #include"Command.h"
 #include"Queue.h"
 
-constexpr uint32_t BOOSTER_FREQ = 425150000;
+constexpr uint32_t BOOSTER_FREQ = 421150000;
 constexpr uint32_t SUSTAINER_FREQ = 426150000;
 Queue<TelemetryCommand> booster_cmds;
 Queue<TelemetryCommand> sustainer_cmds;
@@ -198,9 +198,9 @@ void setup() {
         .indicator_led=Pins::LED_BLUE,
     };
 
-    xTaskCreate(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr);
-    xTaskCreate(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr);
-    xTaskCreate(Management_Thread, "Managmenet_thread", 8192, nullptr, 0, nullptr);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Management_Thread, "Managmenet_thread", 8192, nullptr, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }
