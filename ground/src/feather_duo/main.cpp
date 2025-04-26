@@ -57,16 +57,22 @@ void Radio_Rx_Thread(void * arg) {
             if(data.kf_reset != reset_state) {
                 data.kf_reset = reset_state;
                 to_send.command = CommandType::EMPTY;
+                Serial.println("DEBUG: KF_RESET STATE");
             }
 
             if(to_send.command == CommandType::EMPTY) {
                 if(!cfg->cmd_queue->receive(&to_send)){
                     to_send.command = CommandType::EMPTY;
+                    Serial.println("DEBUG: NO CMD STATE");
+                } else {
+                    Serial.println("DEBUG: YES CMD");
                 }
             }
 
             if(to_send.command != CommandType::EMPTY) {
+                Serial.println("DEBUG: SENDING CMD");
                 (void)cfg->radio->send((uint8_t*)&to_send, sizeof(to_send));
+                Serial.println(json_command_sent);
             }
         }
     }
