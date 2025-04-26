@@ -1,5 +1,6 @@
 #include"Output.h"
 #include<Arduino.h>
+#include <algorithm>
 
 void printFloat(float f, int precision = 5) {
     if (isinf(f) || isnan(f)) {
@@ -38,7 +39,7 @@ void printPacketJson(FullTelemetryData const& packet) {
 
     bool is_heartbeat = packet.FSM_State == static_cast<uint8_t>(-1);
     char buff[1024]{};
-    int len = sprintf(buff, R"({"type": "data", "value": {"barometer_altitude": %f, "latitude": %f, "longitude": %f, "altitude": %i, "highG_ax": %f, "highG_ay": %f, "highG_az": %f, "battery_voltage": %f, "FSM_State": %i, "tilt_angle": %f, "frequency": %f, "RSSI": %f, "sat_count": %f, "kf_velocity": %f, "is_sustainer": %i, "pyro_a": %f, "pyro_b": %f, "pyro_c": %f, "pyro_d": %f, "kf_reset": %i}})",
+    int len = sprintf(buff, R"({"type": "data", "value": {"barometer_altitude": %f, "latitude": %f, "longitude": %f, "altitude": %i, "highG_ax": %f, "highG_ay": %f, "highG_az": %f, "battery_voltage": %f, "FSM_State": %i, "tilt_angle": %f, "frequency": %f, "RSSI": %f, "sat_count": %f, "kf_velocity": %f, "kf_position": %f, "is_sustainer": %i, "roll_rate": %f, "c_valid": %u, "c_on": %u, "c_rec": %u, "vtx_on": %u, "vmux_stat": %u, "cam_ack": %u, "kf_reset": %i}})",
     packet.barometer_altitude,
     packet.latitude,
     packet.longitude,
@@ -53,11 +54,15 @@ void printPacketJson(FullTelemetryData const& packet) {
     packet.rssi,
     packet.sat_count,
     packet.kf_vx,
+    packet.pyros[2],
     packet.is_sustainer,
     packet.pyros[0],
-    packet.pyros[1],
-    packet.pyros[2],
-    packet.pyros[3],
+    ((((uint8_t) round(packet.pyros[1])) >> 7) & 0x01 ), // c_valid
+    (((uint8_t) round(packet.pyros[1])) >> 0) & 0x03, // c_on
+    (((uint8_t) round(packet.pyros[1])) >> 2) & 0x03, // c_rec
+    (((uint8_t) round(packet.pyros[1])) >> 4) & 0x01, //vtx_on
+    (((uint8_t) round(packet.pyros[1])) >> 5) & 0x01, //vmux_stat
+    (((uint8_t) round(packet.pyros[1])) >> 6) & 0x01, //cam_ack
     packet.kf_reset
     );
     Serial.println(buff);
