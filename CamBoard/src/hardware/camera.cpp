@@ -19,7 +19,6 @@ ErrorCode Cameras::init() {
 }
 
 void camera_on_off(HardwareSerial& camera) {
-    Serial.println("Turning camera on");
     uint8_t arr[4] = {0xCC, 0x01, 0x01, 0xE7};
         camera.write(arr, 4);
         camera.flush();
@@ -73,12 +72,31 @@ bool check_crc(uint8_t* buf, unsigned int buf_len, uint8_t expected_crc) {
 // static unsigned gSendDate = 0 ;
 // static unsigned gSentCount = 0 ;
 
+size_t read_memory_number_from_buf(uint8_t* buf) {
+  // Advance by static offset
+  uint8_t* ptr = buf + 0;
+
+  // Read until we encounter "/" and convert that number to size_t
+  size_t value = 0;
+  while (*ptr != '/' && *ptr != '\0') {
+      if (*ptr >= '0' && *ptr <= '9') {
+          value = value * 10 + (*ptr - '0');
+      } else {
+          // Handle non-digit error if needed
+      }
+      ptr++;
+  }
+
+  return value;
+}
+
+
 struct read_mem_cap_data_return read_mem_cap_data(HardwareSerial& camera) {
   uint8_t get_setting_raw[4] = {0xCC, 0x11, 0x03, 0x00};
   uint8_t get_setting[5] = {0xCC, 0x11, 0x03, 0x00, generate_crc(get_setting_raw, 4)};
   Serial1.write(get_setting, 5);
   Serial.write("Reading...");
-  delay(2000);
+  delay(750);
   
   struct read_mem_cap_data_return toReturn;
   toReturn.status = 0;
@@ -90,14 +108,17 @@ struct read_mem_cap_data_return read_mem_cap_data(HardwareSerial& camera) {
     Serial.println(msg_len);
 
     camera.read(toReturn.buf, msg_len);
-    for(int i = 1; i < msg_len; i++) {
+    for(int i = 0; i < msg_len; i++) {
       Serial.print((char)toReturn.buf[i]);
     }
     Serial.print("   CRC: ");
     Serial.println(toReturn.buf[msg_len]);
 
 
-    if(msg_len != 255) {
+    if(msg_len >= 7 && msg_len <= 17) {
+      toReturn.mem_size = read_memory_number_from_buf(toReturn.buf);
+      Serial.print(toReturn.mem_size);
+      Serial.print("\n");
       toReturn.status = 1;
       return toReturn;
     }

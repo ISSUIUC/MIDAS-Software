@@ -4,6 +4,7 @@
 
 struct read_mem_cap_data_return {
     uint8_t buf[32];
+    size_t mem_size;
     uint8_t status;
   };
 

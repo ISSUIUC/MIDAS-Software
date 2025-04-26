@@ -22,6 +22,17 @@ struct Sensors {
     VoltageSensor voltage;
 };
 
+struct cam_state_t {
+    volatile bool cam1_on = false;
+    volatile bool cam2_on = false;
+    volatile bool cam1_rec = false;
+    volatile bool cam2_rec = false;
+    volatile bool vtx_on = false;
+    volatile bool vmux_state = false; // false=CAM1, true=CAM2
+    volatile bool cam_ack = false;
+};
+
+
 /**
  * @struct RocketData
  * 
@@ -35,5 +46,7 @@ struct RocketSystems {
     Cameras cameras;
     CAN can;
 };
+
+
 
 [[noreturn]] void begin_systems(RocketSystems* config);

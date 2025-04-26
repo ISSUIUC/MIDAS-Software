@@ -84,8 +84,8 @@
 
 // Camera/Video Control Pins
 #define CAM1_ON_OFF 3
-#define CAM2_ON_OFF 2
-#define VTX_ON_OFF 4
+#define CAM2_ON_OFF 4
+#define VTX_ON_OFF 2
 
 #define VIDEO_SELECT 1
 

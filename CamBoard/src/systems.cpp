@@ -3,6 +3,8 @@
 
 #include "hal.h"
 
+cam_state_t GLOBAL_CAM_STATE;
+cam_state_t DESIRED_CAM_STATE;
 
 /**
  * @brief These are all the functions that will run in each task
@@ -71,23 +73,111 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
     }
 }
 
+
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
-    FSM fsm{};
-    // bool already_played_freebird = false;
+    // Data and telemetry thread
+    size_t current_mem_cam1 = 0;
+    size_t cam1_consecutive_invalid = 0;
+    size_t current_mem_cam2 = 0;
+    size_t cam2_consecutive_invalid = 0;
+
     while (true) {
-        FSMState current_state = arg->rocket_data.fsm_state;
+        
+        // Read all camera state
+        // ignore all errors, try again next
 
-        FSMState next_state = fsm.tick_fsm(current_state, arg);
+        // CAMERA 1 STATE
+        struct read_mem_cap_data_return toReturn1;
+        Serial.println("CAM1 reading...");
+        toReturn1 = read_mem_cap_data(Serial1);
+        if (toReturn1.status == 1) {
+            Serial.print("read: ");
+            Serial.println(toReturn1.status);
+            GLOBAL_CAM_STATE.cam1_on = true;
+            cam1_consecutive_invalid = 0;
 
-        arg->rocket_data.fsm_state = next_state;
+            if(current_mem_cam1 == 0) {
+                Serial.println("first capture!");
+                current_mem_cam1 = toReturn1.mem_size;
+            } else {
+                Serial.println("valid memory capture!");
+                if (current_mem_cam1 != toReturn1.mem_size) {
+                    Serial.println("is recording!");
+                    GLOBAL_CAM_STATE.cam1_rec = true;
+                } else {
+                    GLOBAL_CAM_STATE.cam1_rec = false;
+                }
+                current_mem_cam1 = toReturn1.mem_size;
+            }
+        } else {
+            Serial.println("bad read");
+            cam1_consecutive_invalid++;
+            if(cam1_consecutive_invalid >= 3) {
+                GLOBAL_CAM_STATE.cam1_on = false;
+                GLOBAL_CAM_STATE.cam1_rec = false;
+            }
+        }
+        
+        // CAMERA 2 STATE
+        struct read_mem_cap_data_return toReturn2;
+        toReturn2 = read_mem_cap_data(Serial2);
+        
+        if (toReturn2.status == 1) {
+            GLOBAL_CAM_STATE.cam2_on = true;
+            cam2_consecutive_invalid = 0;
 
-        // if (current_state == FSMState::STATE_ON && !already_played_freebird) {
-        //     arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
-        //     already_played_freebird = true;
-        // }
+            if(current_mem_cam2 == 0) {
+                current_mem_cam2 = toReturn2.mem_size;
+            } else {
+                if (current_mem_cam2 != toReturn2.mem_size) {
+                    GLOBAL_CAM_STATE.cam2_rec = true;
+                } else {
+                    GLOBAL_CAM_STATE.cam2_rec = false;
+                }
+                current_mem_cam2 = toReturn2.mem_size;
+            }
+        } else {
+            cam2_consecutive_invalid++;
+            if(cam2_consecutive_invalid >= 3) {
+                GLOBAL_CAM_STATE.cam2_on = false;
+                GLOBAL_CAM_STATE.cam2_rec = false;
+            }
+        }
 
-        THREAD_SLEEP(20);
+
+    
+
+        // if the read is good for cam1
+        // set cam1_rec to whether its recording or not
+
+        if(DESIRED_CAM_STATE.cam1_on == false && GLOBAL_CAM_STATE.cam1_on == true) {
+            // If we want to trun cam1 off, only do so when it has stopped recording.
+            if(!GLOBAL_CAM_STATE.cam1_rec) {
+              digitalWrite(CAM1_ON_OFF, LOW);
+              Serial.println("camera attempting to turn off");
+            }
+        }
+
+
+        // if the read is good for cam2
+        // set cam2_rec to whether its recording or not
+
+        if(DESIRED_CAM_STATE.cam2_on == false && GLOBAL_CAM_STATE.cam2_on == true) {
+            // If we want to trun cam2 off, only do so when it has stopped recording.
+            if(!GLOBAL_CAM_STATE.cam2_rec) {
+              digitalWrite(CAM2_ON_OFF, LOW);
+              Serial.println("camera attempting to turn off");
+            }
+        }
+
+
+        // Generate telemetry packet back to midas
+
+
+        // Send telemetry packet back to midas
+
+        THREAD_SLEEP(100);
     }
 }
 
@@ -162,7 +252,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
     START_THREAD(i2c, MAIN_CORE, config, 9);
-    //START_THREAD(fsm, MAIN_CORE, config, 8);
+    START_THREAD(fsm, MAIN_CORE, config, 8);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     //START_THREAD(can, MAIN_CORE, config, 15);
 

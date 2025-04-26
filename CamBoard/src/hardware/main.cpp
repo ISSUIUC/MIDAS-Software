@@ -12,18 +12,49 @@
 
 #define CAMBOARD_I2C_ADDR 0x69
 
-
-
 enum class CameraCommand {
-    CAMERA0_OFF = 0,
-    CAMERA0_ON = 1,
-    CAMERA1_OFF = 2,
-    CAMERA1_ON = 3,
-    VTX_OFF = 4,
-    VTX_ON = 5,
-    MUX_0 = 6,
-    MUX_1 = 7
-  };
+  CAMERA0_OFF = 0,
+  CAMERA0_ON = 1,
+  CAMERA1_OFF = 2,
+  CAMERA1_ON = 3,
+  VTX_OFF = 4,
+  VTX_ON = 5,
+  MUX_0 = 6,
+  MUX_1 = 7
+};
+
+extern cam_state_t GLOBAL_CAM_STATE;
+extern cam_state_t DESIRED_CAM_STATE;
+
+void onRequest() {
+  uint8_t cam_dat = 0;
+  // encode data
+
+  // "FSM" thread data
+  cam_dat |= (GLOBAL_CAM_STATE.cam1_on) << 1;
+  cam_dat |= (GLOBAL_CAM_STATE.cam2_on) << 0;
+  cam_dat |= (GLOBAL_CAM_STATE.cam1_rec) << 3;
+  cam_dat |= (GLOBAL_CAM_STATE.cam2_rec) << 2;
+
+  // Main thread data
+  cam_dat |= (GLOBAL_CAM_STATE.vtx_on) << 4;
+  cam_dat |= (GLOBAL_CAM_STATE.vmux_state) << 5;
+  cam_dat |= (GLOBAL_CAM_STATE.cam_ack) << 6;
+
+  // print for debug
+  Serial.print("telemetry: CAM 1 (on / recording) ");
+  Serial.print(GLOBAL_CAM_STATE.cam1_on);
+  Serial.print(" / ");
+  Serial.print(GLOBAL_CAM_STATE.cam1_rec);
+  Serial.print("    CAM 2 (on / recording) ");
+  Serial.print(GLOBAL_CAM_STATE.cam2_on);
+  Serial.print(" / ");
+  Serial.println(GLOBAL_CAM_STATE.cam2_rec);
+
+  // Send to MIDAS
+  uint8_t buf[1] = { cam_dat };
+  Wire1.slaveWrite(buf, 1);
+}
 
 void onReceive(int len) {
     Serial.print("Recieved: ");
@@ -31,190 +62,50 @@ void onReceive(int len) {
       uint8_t recieve = Wire1.read();
       Serial.print(recieve);
       Serial.print(": ");
-      
+
+      GLOBAL_CAM_STATE.cam_ack = !GLOBAL_CAM_STATE.cam_ack;
       switch(recieve) {
-        case 0:{
+        case 0: {
           Serial.println("Case 0\n");
-
-          int change = 1;
-          while(change == 1) {
-            Serial.println("Trying to turn off camera 1");
-            
-            struct read_mem_cap_data_return toReturn1;
-            toReturn1 = read_mem_cap_data(Serial1);
-            while(toReturn1.status == 0) {
-              toReturn1 = read_mem_cap_data(Serial1);
-            }
-
-            struct read_mem_cap_data_return toReturn2;
-            toReturn2 = read_mem_cap_data(Serial1);
-            while(toReturn2.status == 0) {
-              toReturn2 = read_mem_cap_data(Serial1);
-            }
-
-            int i;
-            for(i = 0; i < 12; i++) {
-              if(toReturn1.buf[i] != toReturn2.buf[2]) {
-                change = 1;
-                break;
-              }
-            }
-
-            if(i == 12) {
-              change = 0;
-            }
-
-            if(change == 1) {
-              camera_on_off(Serial1);
-            }
-
-            delay(5000);
-          }
-
-          digitalWrite(CAM1_ON_OFF, LOW);
-
+          camera_on_off(Serial1); // Stop recording
+          DESIRED_CAM_STATE.cam1_on = false; // Attempt to turn off the camera when recording stopped.
           break;}
         case 1: {
           Serial.println("Case 1\n");
-
-          int change = 0;
-
-          digitalWrite(LED_GREEN, HIGH);
-          delay(4000);
-          digitalWrite(LED_GREEN, LOW);
-
-          while(change == 0) {
-            Serial.println("Trying to turn on camera 1");
-            digitalWrite(CAM1_ON_OFF, HIGH);
-            
-            struct read_mem_cap_data_return toReturn1;
-            toReturn1 = read_mem_cap_data(Serial1);
-            while(toReturn1.status == 0) {
-              toReturn1 = read_mem_cap_data(Serial1);
-            }
-
-            digitalWrite(LED_GREEN, HIGH);
-
-            struct read_mem_cap_data_return toReturn2;
-            toReturn2 = read_mem_cap_data(Serial1);
-            while(toReturn2.status == 0) {
-              toReturn2 = read_mem_cap_data(Serial1);
-            }
-
-            digitalWrite(LED_BLUE, HIGH);
-
-            for(int i = 0; i < 12; i++) {
-              if(toReturn1.buf[i] != toReturn2.buf[2]) {
-                change = 1;
-                break;
-              }
-            }
-
-            digitalWrite(LED_RED, HIGH);
-
-            if(change == 0) {
-              camera_on_off(Serial1);
-              digitalWrite(LED_ORANGE, HIGH);
-            }
-            delay(5000);
-            digitalWrite(LED_GREEN, LOW);
-            digitalWrite(LED_BLUE, LOW);
-            digitalWrite(LED_ORANGE, LOW);
-            digitalWrite(LED_RED, LOW);
-          }
-          
+          DESIRED_CAM_STATE.cam1_on = true;
+          Serial.println("Trying to turn on camera 1");
+          digitalWrite(CAM1_ON_OFF, HIGH);
           break;}
         case 2:{
           Serial.println("Case 2\n");
-
-          int change = 1;
-          while(change == 1) {
-            Serial.println("Trying to turn off camera 2");
-            
-            struct read_mem_cap_data_return toReturn1;
-            toReturn1 = read_mem_cap_data(Serial2);
-            while(toReturn1.status == 0) {
-              toReturn1 = read_mem_cap_data(Serial2);
-            }
-
-            struct read_mem_cap_data_return toReturn2;
-            toReturn2 = read_mem_cap_data(Serial2);
-            while(toReturn2.status == 0) {
-              toReturn2 = read_mem_cap_data(Serial2);
-            }
-
-            int i;
-            for(i = 0; i < 12; i++) {
-              if(toReturn1.buf[i] != toReturn2.buf[2]) {
-                change = 1;
-                break;
-              }
-            }
-
-            if(i == 12) {
-              change = 0;
-            }
-
-            if(change == 1) {
-              camera_on_off(Serial2);
-            }
-            
-            delay(5000);
-          }
-
-          digitalWrite(CAM2_ON_OFF, LOW);
+          camera_on_off(Serial2); // Stop recording
+          DESIRED_CAM_STATE.cam2_on = false; // Attempt to turn off the camera when recording stopped.
           break;}
         case 3: {
           Serial.println("Case 3\n");
-
-          int change = 0;
-          while(change == 0) {
-            Serial.println("Trying to turn on camera 2");
-            digitalWrite(CAM2_ON_OFF, HIGH);
-            
-            struct read_mem_cap_data_return toReturn1;
-            toReturn1 = read_mem_cap_data(Serial2);
-            while(toReturn1.status == 0) {
-              toReturn1 = read_mem_cap_data(Serial2);
-            }
-
-
-            struct read_mem_cap_data_return toReturn2;
-            toReturn2 = read_mem_cap_data(Serial2);
-            while(toReturn2.status == 0) {
-              toReturn2 = read_mem_cap_data(Serial2);
-            }
-
-
-            for(int i = 0; i < 12; i++) {
-              if(toReturn1.buf[i] != toReturn2.buf[2]) {
-                change = 1;
-                break;
-              }
-            }
-
-
-            if(change == 0) {
-              camera_on_off(Serial2);
-            }
-            delay(5000);
-          }
+          DESIRED_CAM_STATE.cam2_on = true;
+          Serial.println("Trying to turn on camera 2");
+          digitalWrite(CAM2_ON_OFF, HIGH);
           break;}
         case 4:
           digitalWrite(VTX_ON_OFF, LOW);
           Serial.println("Case 4\n");
+          GLOBAL_CAM_STATE.vtx_on = false;
           break;
         case 5:
           digitalWrite(VTX_ON_OFF, HIGH);
           Serial.println("Case 5\n");
+          GLOBAL_CAM_STATE.vtx_on = true;
           break;
         case 6:
           digitalWrite(VIDEO_SELECT, LOW);
           Serial.println("Case 6\n");
+          GLOBAL_CAM_STATE.vmux_state = false;
           break;
         case 7:
           digitalWrite(VIDEO_SELECT, HIGH);
           Serial.println("Case 7\n");
+          GLOBAL_CAM_STATE.vmux_state = true;
           break;
         default:
           break;
@@ -257,6 +148,7 @@ void setup() {
     Wire.begin(BATTSENSE_SDA, BATTSENSE_SCL);
     Wire1.setPins(I2C_SDA, I2C_SCL);
     Wire1.onReceive(onReceive);
+    Wire1.onRequest(onRequest);
     Wire1.begin((uint8_t)CAMBOARD_I2C_ADDR);
 
     //begin UART
@@ -328,6 +220,7 @@ void setup() {
 void loop() {
 
 }
+
 
 // #define LED_TEST
 
