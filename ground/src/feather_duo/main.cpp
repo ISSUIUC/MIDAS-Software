@@ -123,8 +123,12 @@ void handle_serial(const String& key) {
         command.command = CommandType::FIRE_PYRO_C;
     } else if (cmd_name == "PD") {
         command.command = CommandType::FIRE_PYRO_D;
-    } else if (cmd_name == "CAMT") {
-        command.command = CommandType::CAM_TOGGLE;
+    } else if (cmd_name == "CAMON") {
+        command.command = CommandType::CAM_ON;
+    } else if (cmd_name == "CAMOFF") {
+        command.command = CommandType::CAM_OFF;
+    } else if (cmd_name == "VMUXT") {
+        command.command = CommandType::TOGGLE_CAM_VMUX;
     } else {
         Serial.println(json_command_bad);
         return;
