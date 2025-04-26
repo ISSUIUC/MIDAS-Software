@@ -13,6 +13,7 @@ constexpr uint32_t SUSTAINER_FREQ = 421150000;
 Queue<TelemetryCommand> booster_cmds;
 Queue<TelemetryCommand> sustainer_cmds;
 
+
 enum class Stage {
     Booster,
     Sustainer
@@ -41,6 +42,7 @@ void Radio_Rx_Thread(void * arg) {
     RadioConfig* cfg = (RadioConfig*)arg;
     bool led_state = false;
     bool reset_state = false;
+    bool initial_ack_flag = true;
     TelemetryCommand to_send;
     to_send.command = CommandType::EMPTY;
 
@@ -54,8 +56,14 @@ void Radio_Rx_Thread(void * arg) {
             data.rssi = cfg->radio->get_last_snr();
             printPacketJson(data);
 
+            if(initial_ack_flag) {
+                reset_state = data.kf_reset;
+                initial_ack_flag = false;
+            }
+
             if(data.kf_reset != reset_state) {
-                data.kf_reset = reset_state;
+                reset_state = data.kf_reset;
+                Serial.println(json_command_ack);
                 to_send.command = CommandType::EMPTY;
             }
 
