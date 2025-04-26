@@ -23,7 +23,7 @@
 #ifdef IS_BOOSTER
 #define TX_FREQ 425.15
 #else
-#define TX_FREQ 426.15
+#define TX_FREQ 421.15
 #endif
 
 #define TX_OUTPUT_POWER 22		// dBm
