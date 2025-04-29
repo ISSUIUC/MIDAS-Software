@@ -34,8 +34,8 @@
 #define GPS_ENABLE 0
 
 // i2c bus pins
-#define I2C_SDA 10
-#define I2C_SCL 9
+#define I2C_SDA 9
+#define I2C_SCL 10
 
 #define PYRO_SDA 41
 #define PYRO_SCL 42

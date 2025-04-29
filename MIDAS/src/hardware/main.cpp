@@ -1,7 +1,8 @@
 #include <Wire.h>
+#include <math.h>
 #include <SPI.h>
+#include <SoftwareSerial.h>
 #include "TCAL9539.h"
-
 #include "systems.h"
 #include "hardware/pins.h"
 #include "hardware/Emmc.h"
@@ -24,10 +25,16 @@ RocketSystems systems{.log_sink = sinks};
  * @brief Sets up pinmodes for all sensors and starts threads
  */
 
+// Swap I2C_SCL and I2C_SDA order for TX/RX communication
+SoftwareSerial mySerial(I2C_SCL, I2C_SDA);
+
 void setup()
 {
-    // begin serial port
-    Serial.begin(9600);
+    // begin serial port, set baud rates
+    Serial.begin(9600);   
+
+    // begin mySerial UART communication
+    mySerial.begin(9600);
 
     delay(200);
 
@@ -50,12 +57,13 @@ void setup()
 
     //begin I2C bus
     Serial.println("Starting I2C...");
-    Wire.begin(I2C_SDA, I2C_SCL, 100000);
+    //Wire.begin(I2C_SDA, I2C_SCL, 100000);
     Wire1.begin(PYRO_SDA, PYRO_SCL, 400000);
 
+    /*
     if (!TCAL9539Init(GPIO_RESET)) {
         Serial.println(":(");
-    }
+    }*/
 
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
@@ -77,23 +85,60 @@ void setup()
 	digitalWrite(CAN_CS, HIGH);
 	digitalWrite(E22_CS, HIGH);
     //configure output leds
+
+
+    /*
     gpioPinMode(LED_BLUE, OUTPUT);
     gpioPinMode(LED_GREEN, OUTPUT);
     gpioPinMode(LED_ORANGE, OUTPUT);
     gpioPinMode(LED_RED, OUTPUT);
 
+    
     gpioPinMode(PYROA_FIRE_PIN, OUTPUT);
     gpioPinMode(PYROB_FIRE_PIN, OUTPUT);
     gpioPinMode(PYROC_FIRE_PIN, OUTPUT);
     gpioPinMode(PYROD_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT);
+    gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT);*/
 
     delay(200);
 
     // init and start threads
     begin_systems(&systems);
+
+    
 }
 
 void loop()
 {
+
+    Serial.println("Transmitting over UART...\n");
+    //mySerial.write(50);
+   
+    /*
+    Serial.println("Low G: ");
+    Serial.println(systems.rocket_data.low_g.getRecent().ax);
+    Serial.println(systems.rocket_data.low_g.getRecent().ay);
+    Serial.println(systems.rocket_data.low_g.getRecent().az);
+
+    Serial.println("Magnetometer: ");
+    Serial.println(systems.rocket_data.magnetometer.getRecent().mx);
+    Serial.println(systems.rocket_data.magnetometer.getRecent().my);
+    Serial.println(systems.rocket_data.magnetometer.getRecent().mz);
+
+    Serial.println("High G: ");
+    Serial.println(systems.rocket_data.high_g.getRecent().ax);
+    Serial.println(systems.rocket_data.high_g.getRecent().ay);
+    Serial.println(systems.rocket_data.high_g.getRecent().az);*/
+
+    mySerial.write(atan(systems.rocket_data.high_g.getRecent().ay / systems.rocket_data.high_g.getRecent().ax));
+    Serial.print("Motor Angle: ");
+    Serial.println(atan(systems.rocket_data.high_g.getRecent().ay / systems.rocket_data.high_g.getRecent().ax));
+    
+    delay(200);
+
+    Serial.print("Read Value: ");
+    Serial.println(mySerial.read());
+
+    //u_int16_t bytesPrint = mySerial.println("Testing\n");
+
 }
