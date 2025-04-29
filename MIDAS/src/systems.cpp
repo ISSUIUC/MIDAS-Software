@@ -418,10 +418,10 @@ ErrorCode init_systems(RocketSystems& systems) {
     mySerial.begin(9600);
 
     while (true) {
-        THREAD_SLEEP(400);
+        // THREAD_SLEEP(400);
 
         
-        Serial.println("Transmitting over UART...\n");
+        // Serial.println("Transmitting over UART...\n");
         //mySerial.write(50);
 
         /*
@@ -440,15 +440,18 @@ ErrorCode init_systems(RocketSystems& systems) {
         Serial.println(systems.rocket_data.high_g.getRecent().ay);
         Serial.println(systems.rocket_data.high_g.getRecent().az);*/
 
-        mySerial.write(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
-        Serial.print("Motor Angle: ");
-        Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
+        if(mySerial.available()) {
+            int val = mySerial.read();
+            if(val == 99) {
+                mySerial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
+                Serial.print("Motor Angle: ");
+                Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
+            }
+        }
+        
 
         //set angle
-        delay(200);
-
-        Serial.print("Read Value: ");
-        Serial.println(mySerial.read());
+        delay(1);
 
         //u_int16_t bytesPrint = mySerial.println("Testing\n");
 
