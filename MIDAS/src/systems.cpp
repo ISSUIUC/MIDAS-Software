@@ -1,5 +1,4 @@
 #include "systems.h"
-
 #include <SoftwareSerial.h>
 #include "hal.h"
 #include <math.h>
@@ -394,12 +393,6 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    // Swap I2C_SCL and I2C_SDA order for TX/RX communication
-    SoftwareSerial mySerial(I2C_SCL, I2C_SDA);
-
-    // begin mySerial UART communication
-    mySerial.begin(9600);
-
     //START_THREAD(orientation, SENSOR_CORE, config, 10);
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
@@ -417,6 +410,12 @@ ErrorCode init_systems(RocketSystems& systems) {
     #endif
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+
+    // Swap I2C_SCL and I2C_SDA order for TX/RX communication
+    SoftwareSerial mySerial(I2C_SCL, I2C_SDA);
+
+    // begin mySerial UART communication
+    mySerial.begin(9600);
 
     while (true) {
         THREAD_SLEEP(400);
@@ -441,10 +440,11 @@ ErrorCode init_systems(RocketSystems& systems) {
         Serial.println(systems.rocket_data.high_g.getRecent().ay);
         Serial.println(systems.rocket_data.high_g.getRecent().az);*/
 
-        //mySerial.write(50);
+        mySerial.write(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
         Serial.print("Motor Angle: ");
         Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
 
+        //set angle
         delay(200);
 
         Serial.print("Read Value: ");
