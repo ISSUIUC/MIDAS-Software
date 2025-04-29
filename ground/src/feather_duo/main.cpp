@@ -172,6 +172,18 @@ void Management_Thread(void * arg) {
     }
 }
 
+void Feather_Detect_Thread(void* arg) {
+    const unsigned long DETECT_INTERVAL = 3000;
+    unsigned long last_detect_time = 0;
+    while(true) {
+        if(millis() - last_detect_time >= DETECT_INTERVAL) {
+            Serial.println(R"({"type": "feather_detect_duo"})");
+            last_detect_time = millis();
+        }
+        delay(10)
+    }
+}
+
 void setup() {
     Serial.begin(460800);
     
@@ -214,6 +226,7 @@ void setup() {
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Management_Thread, "Managmenet_thread", 8192, nullptr, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Feather_Detect_Thread, "Feather_Detect_thread", 2048, nullptr, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }
