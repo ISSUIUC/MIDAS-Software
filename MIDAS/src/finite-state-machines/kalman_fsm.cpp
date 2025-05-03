@@ -42,18 +42,18 @@ void KalmanFSM::tick_fsm() {
             }
             break;
         case FSMState::STATE_SUSTAINER_IGNITION:
-            if ((current_time - sustainer_ignition_time_) > sustainer_ignition_timeout) { // determine correct treshold
+            if ((current_time - sustainer_ignition_time_) > sustainer_ignition_timeout) {
                 coast_time_ = current_time;
                 rocket_state_ = FSMState::STATE_COAST;
                 break;
             }
-            if (current_state.acceleration.ax > sustainer_boost_threshold) { // determine correct treshold
+            if (current_state.acceleration.ax > sustainer_ignition_to_second_boost_acceleration_threshold) {
                 second_boost_time_ = current_time;
                 rocket_state_ = FSMState::STATE_SECOND_BOOST;
             }
             break;
         case FSMState::STATE_SECOND_BOOST:
-            if ((current_state.acceleration < sustainer_boost_threshold) && ((current_time - second_boost_time_) < sustainer_second_boost_to_coast_time_threshold)) {
+            if ((current_state.acceleration < sustainer_ignition_to_second_boost_acceleration_threshold) && ((current_time - second_boost_time_) < sustainer_second_boost_to_coast_time_threshold)) {
                 rocket_state_ = FSMState::STATE_SUSTAINER_IGNITION;
                 break;
             }

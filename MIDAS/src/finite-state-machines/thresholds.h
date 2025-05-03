@@ -83,6 +83,10 @@
 // Stores a small jerk value (m/s^3)
 #define sustainer_main_jerk_threshold 300
 
+// Stores time for ignition timeout (ms)
+
+#define sustainer_ignition_timeout 4000
+
 
 // ----------------------------------
 // FIRST STAGE THRESHOLDS
