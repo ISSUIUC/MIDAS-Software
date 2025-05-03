@@ -157,7 +157,7 @@ DECLARE_THREAD(kalman_fsm, RocketSystems* arg) {
         fsm.tick_fsm();
         FSMState next_state = fsm.get_rocket_state_fsm();
 
-        arg->rocket_data.fsm_state.update(next_state);
+        arg->rocket_data.kalman_fsm_state.update(next_state);
     }
 }
 

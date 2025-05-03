@@ -191,6 +191,7 @@ public:
     SensorData<Continuity> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
+    SensorData<FSMState> kalman_fsm_state;
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
