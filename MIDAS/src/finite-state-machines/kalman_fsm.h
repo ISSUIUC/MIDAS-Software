@@ -4,7 +4,8 @@
 class KalmanFSM : public FSM  {
    public:
     KalmanFSM() = default;
-    void tick_fsm() override;
+    void tick_fsm();
+    FSMState get_rocket_state_fsm();
     private:
     FSMState rocket_state_ = FSMState::STATE_IDLE;
     double launch_time_ = 0;

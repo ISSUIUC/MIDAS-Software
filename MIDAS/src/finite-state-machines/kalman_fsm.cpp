@@ -5,11 +5,19 @@
 #include "../gnc/yessir.h" // this too
 #include "../sensor_data.h" // this too
 double KalmanFSM::getAltitudeAverage(size_t start, size_t len) {
+    return 0.0;
 }
 double KalmanFSM::getSecondDerivativeAltitudeAverage(size_t start, size_t len) {
+    return 0.0;
 }
 double KalmanFSM::getAccelerationAverage(size_t start, size_t len) {
+    return 0.0;
 }
+
+FSMState KalmanFSM::get_rocket_state_fsm() {
+    return rocket_state_;
+}
+
 void KalmanFSM::tick_fsm() {
     KalmanData current_state = ekf.getState();
     //Get current time
@@ -53,7 +61,7 @@ void KalmanFSM::tick_fsm() {
             }
             break;
         case FSMState::STATE_SECOND_BOOST:
-            if ((current_state.acceleration < sustainer_ignition_to_second_boost_acceleration_threshold) && ((current_time - second_boost_time_) < sustainer_second_boost_to_coast_time_threshold)) {
+            if ((current_state.acceleration.ax < sustainer_ignition_to_second_boost_acceleration_threshold) && ((current_time - second_boost_time_) < sustainer_second_boost_to_coast_time_threshold)) {
                 rocket_state_ = FSMState::STATE_SUSTAINER_IGNITION;
                 break;
             }
@@ -87,7 +95,7 @@ void KalmanFSM::tick_fsm() {
             }
             break;
         case FSMState::STATE_DROGUE:
-            if ((current_state.position.x <= sustainer_main_deploy_altitude_threshold) && ((current_time - drogue_time_) > main_deploy_delay)) {
+            if ((current_state.position.px <= sustainer_main_deploy_altitude_threshold) && ((current_time - drogue_time_) > sustainer_main_deploy_delay_after_drogue)) {
                 main_time_ = current_time;
                 rocket_state_ = FSMState::STATE_MAIN_DEPLOY;
             }

@@ -146,6 +146,21 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     }
 }
 
+DECLARE_THREAD(kalman_fsm, RocketSystems* arg) {
+    KalmanFSM fsm{};
+    while (true) {
+        FSMState current_state = fsm.get_rocket_state_fsm();
+        StateEstimate state_estimate(arg->rocket_data);
+        CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+
+        fsm.tick_fsm();
+        FSMState next_state = fsm.get_rocket_state_fsm();
+
+        arg->rocket_data.fsm_state.update(next_state);
+    }
+}
+
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};

@@ -11,6 +11,7 @@
 #include "telemetry.h"
 #include "finite-state-machines/fsm.h"
 #include "b2b_interface.h"
+#include "finite-state-machines/kalman_fsm.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
