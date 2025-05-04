@@ -77,7 +77,7 @@ class TelemetryStandalone():
             print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
             # print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
 
-            ack_msg = {"type": "acknowledge_combiner", "ch": self.__control_channel, "cmd_ack": raw_cmd}
+            ack_msg = {"type": "acknowledge_combiner", "ch": "Common", "cmd_ack": raw_cmd}
             self.__external_commands.append([raw_cmd, channel])
             self.__mqttclient.publish(msg.topic, json.dumps(ack_msg))
 
@@ -240,26 +240,26 @@ class TelemetryStandalone():
                         if packet_in['type'] == "command_success":
                             print("[RX] Command good", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
-                            self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
+                            self.__mqttclient.publish("Common", packet_ack_encoded)
                             continue
 
                         # This is jank but idc
                         if packet_in['type'] == "bad_command":
                             print("[RX] Command bad", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
-                            self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
+                            self.__mqttclient.publish("Common", packet_ack_encoded)
                             continue
 
                         if packet_in['type'] == "command_acknowledge":
                             print("[RX] Command ACK", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
-                            self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
+                            self.__mqttclient.publish("Common", packet_ack_encoded)
                             continue
 
                         if packet_in['type'] == "command_sent":
                             print("[RX] Command send confirmed", flush=True)
                             packet_ack_encoded = json.dumps(packet_in).encode("utf-8")
-                            self.__mqttclient.publish(self.__control_channel, packet_ack_encoded)
+                            self.__mqttclient.publish("Common", packet_ack_encoded)
                             continue
 
                         # print(packet_in)
