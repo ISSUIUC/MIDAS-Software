@@ -56,8 +56,6 @@ class TelemetryStandalone():
             sys.exit(1) 
         print("Subscribing to MQTT streams...")
 
-        self.__data_channel = "FlightData-" + stage
-        self.__control_channel = "Control-" + stage
 
 
         def on_message(client, userdata, msg): 
@@ -66,6 +64,7 @@ class TelemetryStandalone():
             try:
                 payload_obj = json.loads(payload_str)
                 type = payload_obj["type"]
+                channel = payload_obj["ch"]
 
                 if(type != "telemetry_command"):
                     return
@@ -73,17 +72,21 @@ class TelemetryStandalone():
             except:
                 print(f"Failed to decode Command stream packet: {payload_str}")
 
+            
+
             print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
             # print(f"Recieved command '{raw_cmd}', acknowledged & sent to telemetry threads.")
 
             ack_msg = {"type": "acknowledge_combiner", "ch": self.__control_channel, "cmd_ack": raw_cmd}
-            self.__external_commands.append(raw_cmd)
+            self.__external_commands.append([raw_cmd, channel])
             self.__mqttclient.publish(msg.topic, json.dumps(ack_msg))
 
         self.__mqttclient.on_message = on_message
 
-        self.__mqttclient.subscribe(self.__control_channel) 
-        print("Control channel: ", self.__control_channel)
+        self.__mqttclient.subscribe("Control-Sustainer") 
+        self.__mqttclient.subscribe("Control-Booster") 
+        print("Control channel (sustainer): Control-Sustainer")
+        print("Control channel (booster): Control-Booster")
 
         print("MQTT systems initialized.")
 
@@ -189,14 +192,23 @@ class TelemetryStandalone():
                         
                     if not is_internal:
                         print("[CMD] Non internal command, forwarding to feather.", flush=True)
-                        self.__external_commands.append(line)
+                        self.__external_commands.append([line, ""])
 
 
                 # Write if needed to comport
                 if(len(self.__external_commands) > 0):
-                    for cmd in self.__external_commands:
-                        print(f"[TO FEATHER] '{cmd}'", flush=True)
-                        self.__send_comport(str(cmd) + "\r\n")
+                    for cmd_ in self.__external_commands:
+                        cmd = cmd_[0]
+                        chan = cmd_[1]
+                        print(f"[TO FEATHER] '{cmd}' -- {chan}", flush=True)
+
+                        chan_extension = ""
+                        if chan == "Control-Booster":
+                            chan_extension = "0"
+                        elif chan == "Control-Sustainer":
+                            chan_extension = "1"
+
+                        self.__send_comport(chan_extension + str(cmd) + "\r\n")
                     self.__external_commands = []
 
                 if(len(packets) == 0):
@@ -280,11 +292,16 @@ class TelemetryStandalone():
                     # Process and queue the packet
                     processed = self.process_packet(packet_in)
 
+                    if processed['value']['is_sustainer'] == 1:
+                        data_channel = "FlightData-Sustainer"
+                    else:
+                        data_channel = "FlightData-Booster"
+
                     # Add packet metadata
                     packet_new = {
                         "data": processed,
                         "metadata": {
-                            "raw_stream": self.__data_channel,
+                            "raw_stream": data_channel,
                             "time_published": time.time()
                         }
                     }
@@ -292,10 +309,8 @@ class TelemetryStandalone():
                     # Send to MQTT
                     data_encoded = json.dumps(packet_new).encode("utf-8")
 
-                    if processed['value']['is_sustainer'] == True:
-                        data_channel = "FlightData-Sustainer"
-                    else:
-                        data_channel = "FlightData-Booster"
+
+
 
                     #log
                     if(self.__should_log):
@@ -350,7 +365,7 @@ def parse_params(arguments):
         source = "Sustainer"
 
     if args.duo:
-        source = "Multistage (Sustainer / Booster)"
+        source = "Multistage"
         print("Disregarding any booster/sustainer commands. Initializing as Feather Duo.", flush=True)
 
     ip = "localhost"
