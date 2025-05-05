@@ -422,7 +422,7 @@ void setup() {
     rf95.setPayloadCRC(true);
 
     rf95.setSignalBandwidth(250000);
-    rf95.setPreambleLength(8);
+    rf95.setPreambleLength(10);
 
     Serial.print(R"({"type": "freq_success", "frequency":)");
     Serial.print(current_freq);

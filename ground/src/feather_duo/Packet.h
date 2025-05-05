@@ -1,13 +1,8 @@
 #pragma once
+#include<stdint.h>
 
-#include <array>
-#include <cstdint>
+typedef uint32_t systime_t;
 
-/**
- * @struct TelemetryPacket
- * 
- * @brief format of the telemetry packet
-*/
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
@@ -28,19 +23,25 @@ struct TelemetryPacket {
 };
 
 
-// Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX };
-
-/**
- * @struct TelemetryCommand
- * 
- * @brief format of the packet that telemetry receives
-*/
-struct TelemetryCommand {
-    CommandType command;
-    std::array<char, 3> verify;
-
-    bool valid() {
-        return verify == std::array<char, 3>{{'B','R','K'}};
-    }
+struct FullTelemetryData {
+    systime_t timestamp;  //[0, 2^32]
+    uint16_t altitude; // [0, 4096]
+    float latitude; // [-90, 90]
+    float longitude; // [-180, 180]
+    float barometer_altitude; // [0, 4096]
+    float highG_ax; // [-16, 16]
+    float highG_ay; // [-16, 16]
+    float highG_az; // [-16, 16]
+    float battery_voltage; // [0, 5]
+    uint8_t FSM_State; // [0, 255]
+    float tilt_angle; // [-90, 90]
+    float freq;
+    float rssi;
+    float sat_count;
+    float pyros[4];
+    bool is_sustainer;
+    float kf_vx;
+    bool kf_reset;
 };
+
+FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency);

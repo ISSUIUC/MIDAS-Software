@@ -198,6 +198,7 @@ SX1268Error SX1268::setup(){
     pinMode(pin_busy, INPUT);
     pinMode(pin_rxen, OUTPUT);
     pinMode(pin_reset, OUTPUT);
+    pinMode(pin_txen, OUTPUT);
     digitalWrite(pin_cs, HIGH);
     digitalWrite(pin_reset, LOW);
     delay(10);
@@ -348,6 +349,8 @@ SX1268Error SX1268::clear_irq() {
 
 SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
     if(len > 255) return SX1268Error::BadParameter;
+    digitalWrite(pin_txen, LOW);
+    digitalWrite(pin_rxen, HIGH);
     SX1268Check(set_standby());
     SX1268Check(set_packet_type(PACKET_TYPE_LORA));
     SX1268Check(set_frequency(frequency));
@@ -393,9 +396,9 @@ SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
         uint8_t packet_ptr = packet_info[2];
         uint8_t packet_data[4]{};
         SX1268Check(read_command(RADIO_GET_PACKETSTATUS, packet_data, sizeof(packet_data)));
-        prev_rssi = -packet_data[1]/2;
-        prev_snr = packet_data[2] / 4;
-        prev_signal_rssi = -packet_data[3] / 2;
+        prev_rssi = -((int8_t)packet_data[1])/2.0;
+        prev_snr = (packet_data[2])/4.0;
+        prev_signal_rssi = -((int8_t)packet_data[3]) / 2.0;
          // I think the datasheet is just lying
          // It's supposed to be packet_len then packet_ptr,
          // but it's not the case, so we just swap it
@@ -413,6 +416,8 @@ SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
 
 SX1268Error SX1268::send(uint8_t* data, size_t len) {
     if(len > 255) return SX1268Error::BadParameter;
+    digitalWrite(pin_txen, HIGH);
+    digitalWrite(pin_rxen, LOW);
     SX1268Check(set_standby());
     SX1268Check(set_packet_type(PACKET_TYPE_LORA));
     SX1268Check(set_frequency(frequency));
@@ -432,7 +437,6 @@ SX1268Error SX1268::send(uint8_t* data, size_t len) {
         if(digitalRead(pin_dio1)) break;
         delay(1);
         if(i > 999) {
-            Serial.println("TX TIMEOUT");
             return SX1268Error::TxTimeout;
         }
     }
