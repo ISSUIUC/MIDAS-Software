@@ -8,7 +8,7 @@
 #include"Command.h"
 #include"Queue.h"
 
-constexpr uint32_t BOOSTER_FREQ = 426150000;
+constexpr uint32_t BOOSTER_FREQ = 425150000;
 constexpr uint32_t SUSTAINER_FREQ = 421150000;
 Queue<TelemetryCommand> booster_cmds;
 Queue<TelemetryCommand> sustainer_cmds;
@@ -23,7 +23,7 @@ struct RadioConfig
 {
     SX1268 * radio;
     Queue<TelemetryCommand>* cmd_queue;
-    uint32_t frequnecy;
+    uint32_t frequency;
     Stage stage;
     uint8_t indicator_led;
 };
@@ -52,7 +52,7 @@ void Radio_Rx_Thread(void * arg) {
         if(res == SX1268Error::NoError) {
             led_state = !led_state;
             digitalWrite(cfg->indicator_led, led_state);
-            FullTelemetryData data = DecodePacket(packet, cfg->frequnecy / 1e6);
+            FullTelemetryData data = DecodePacket(packet, cfg->frequency / 1e6);
             data.rssi = cfg->radio->get_last_snr();
             printPacketJson(data);
 
@@ -198,7 +198,7 @@ void setup() {
     RadioConfig booster_cfg{
         .radio=&Radio0,
         .cmd_queue=&booster_cmds,
-        .frequnecy=BOOSTER_FREQ,
+        .frequency=BOOSTER_FREQ,
         .stage=Stage::Booster,
         .indicator_led=Pins::LED_ORANGE,
     };
@@ -206,14 +206,14 @@ void setup() {
     RadioConfig sustainer_cfg{
         .radio=&Radio1,
         .cmd_queue=&sustainer_cmds,
-        .frequnecy=SUSTAINER_FREQ,
+        .frequency=SUSTAINER_FREQ,
         .stage=Stage::Sustainer,
         .indicator_led=Pins::LED_BLUE,
     };
 
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Management_Thread, "Managmenet_thread", 8192, nullptr, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }
