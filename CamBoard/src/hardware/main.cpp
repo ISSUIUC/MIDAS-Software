@@ -5,6 +5,7 @@
 #include <HardwareSerial.h>
 #include <ACAN2517FD.h>
 #include <ACAN2517FDSettings.h>
+#include <EEPROM.h>
 
 #include "hardware/pins.h"
 #include "systems.h"
@@ -115,6 +116,22 @@ void onReceive(int len) {
   }
 
 
+  
+void update_desired_state(uint8_t state_byte) {
+  DESIRED_CAM_STATE.cam1_on = state_byte & 0b00000001;
+  DESIRED_CAM_STATE.cam2_on = state_byte & 0b00000010;
+  DESIRED_CAM_STATE.vtx_on = state_byte & 0b00000100;
+  DESIRED_CAM_STATE.vmux_state = state_byte & 0b00001000;
+  DESIRED_CAM_STATE.cam1_rec = state_byte & 0b00010000;
+  DESIRED_CAM_STATE.cam2_rec = state_byte & 0b00100000;
+
+  // Turn on cameras if we want them to be on
+  digitalWrite(CAM1_ON_OFF, DESIRED_CAM_STATE.cam1_on ? HIGH : LOW);
+  digitalWrite(CAM2_ON_OFF, DESIRED_CAM_STATE.cam2_on ? HIGH : LOW);
+  digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
+  digitalWrite(VIDEO_SELECT, DESIRED_CAM_STATE.vmux_state ? HIGH : LOW);
+}
+
 /**
  * Sets the config file and then starts all the threads using the config.
  */
@@ -129,8 +146,20 @@ void setup() {
     //begin serial port
     Serial.begin(9600);
 
+    // Immediate buzzer tone
+    pinMode(BUZZER_PIN, OUTPUT);
+    digitalWrite(BUZZER_PIN, LOW);
+    ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
 
-    delay(5000);
+    ledcWriteTone(BUZZER_CHANNEL, 2730);
+    delay(300);
+    ledcWriteTone(BUZZER_CHANNEL, 0);
+    delay(500);
+    ledcWriteTone(BUZZER_CHANNEL, 2730);
+    delay(300);
+    ledcWriteTone(BUZZER_CHANNEL, 0);
+
+    delay(100);
 
     Serial1.setPins(CAM1_RX, CAM1_TX);
     Serial2.setPins(CAM2_RX, CAM2_TX);
@@ -191,66 +220,49 @@ void setup() {
     pinMode(LED_ORANGE, OUTPUT);
     pinMode(LED_RED, OUTPUT);
 
-    delay(200);
+
+    // Read the desired state from flash memory
+    uint8_t desired_state = EEPROM.read(0);
+    update_desired_state(desired_state);
+
+    // CAM state will be given by 3 beeps -- CAM1, CAM2, VTX. HIGH means it's on, LOW means it's off.
+    if(DESIRED_CAM_STATE.cam1_on) {
+      ledcWriteTone(BUZZER_CHANNEL, 3000);
+      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+    } else {
+      ledcWriteTone(BUZZER_CHANNEL, 2300);
+      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+    }
+    delay(40);
+
+    if(DESIRED_CAM_STATE.cam2_on) {
+      ledcWriteTone(BUZZER_CHANNEL, 3000);
+      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+    } else {
+      ledcWriteTone(BUZZER_CHANNEL, 2300);
+      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+    }
+    delay(40);
+
+    if(DESIRED_CAM_STATE.vtx_on) {
+      ledcWriteTone(BUZZER_CHANNEL, 3000);
+      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+    } else {
+      ledcWriteTone(BUZZER_CHANNEL, 2300);
+      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 0);
+    }
+    delay(140);
 
     //init and start threads
     begin_systems(&systems);
-
-    // Serial1.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
-    // digitalWrite(CAM1_ON_OFF, HIGH);
-    // camera_on_off(Serial1);
-    // start_recording(Serial1);
-    // Serial.println("Now recording");
-
-
-    //Camera test code
-
-    //cam1.begin(115200, SERIAL_8N1, CAM1_RX, CAM1_TX);
-    //cam2.begin(115200, SERIAL_8N1, CAM2_RX, CAM2_TX);
-    // digitalWrite(CAM1_ON_OFF, HIGH);
-    // digitalWrite(CAM2_ON_OFF, HIGH);
-    // digitalWrite(VTX_ON_OFF, HIGH);
-
-    // camera_on_off(cam1);
-    // camera_on_off(cam2);
-    // start_recording(cam1);
-    // start_recording(cam2);
 }
 
 void loop() {
 
 }
-
-
-// #define LED_TEST
-
-// void setup() {
-//   // put your setup code here, to run once:
-//   // Serial.begin(9600);
-//   // while(!Serial);
-
-//   // Serial.println("Beginning cam board test setup");
-//   #ifdef LED_TEST
-//     pinMode(BLUE_LED_PIN, OUTPUT); // Set BLUE LED to output
-//     // Serial.println("Set LED pinmode");
-//   #endif
-
-
-//   // Serial.println("cam board test setup complete\n");
-// }
-
-// void loop() {
-//   // put your main code here, to run repeatedly:
-
-//   #ifdef LED_TEST
-//     // Flash blue LED at 1hz (ish)
-//     // Serial.println("LED test Loop high");
-//     digitalWrite(BLUE_LED_PIN, HIGH);
-//     delay(500);
-//     // Serial.println("LED test Loop low");
-//     digitalWrite(BLUE_LED_PIN, LOW);
-//     delay(500);
-//   #endif
-
-//   delay(10);
-// }

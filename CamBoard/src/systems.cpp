@@ -1,4 +1,5 @@
 #include "systems.h"
+#include "EEPROM.h"
 #include "hardware/voltage.h"
 
 #include "hal.h"
@@ -72,6 +73,29 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         THREAD_SLEEP(100);
     }
 }
+
+DECLARE_THREAD(flash, RocketSystems* arg) {
+
+    while (true) {
+        // Flash memory will store the desired state of the cameras as a single byte.
+        // We will just store DESIRED_STATE and read from it on power on.
+
+        // Convert DESIRED_STATE to a single byte
+        uint8_t desired_state = 0;
+        desired_state |= (0b00000001 & DESIRED_CAM_STATE.cam1_on);
+        desired_state |= (0b00000010 & DESIRED_CAM_STATE.cam2_on);
+        desired_state |= (0b00000100 & DESIRED_CAM_STATE.vtx_on);
+        desired_state |= (0b00001000 & DESIRED_CAM_STATE.vmux_state);
+
+        // Cameras should always be recording if they're on, but we can add that data here anyway
+        desired_state |= (0b00010000 & DESIRED_CAM_STATE.cam1_rec);
+        desired_state |= (0b00100000 & DESIRED_CAM_STATE.cam2_rec);
+
+        EEPROM.write(0, desired_state);
+        THREAD_SLEEP(500);
+    }
+}
+
 
 
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
@@ -206,6 +230,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 //     }
 // }
 
+
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 
 /**
@@ -223,7 +248,7 @@ ErrorCode init_systems(RocketSystems& systems) {
 
 
     // Just a short delay
-    delay(3000);
+    delay(500);
     Serial.println("Finish setup");
     digitalWrite(LED_ORANGE, LOW);
 
@@ -252,10 +277,14 @@ ErrorCode init_systems(RocketSystems& systems) {
             update_error_LED(init_error_code);
         }
     }
+
     START_THREAD(i2c, MAIN_CORE, config, 9);
     START_THREAD(fsm, MAIN_CORE, config, 8);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
+    START_THREAD(flash, MAIN_CORE, config, 10);
     //START_THREAD(can, MAIN_CORE, config, 15);
+
+
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
