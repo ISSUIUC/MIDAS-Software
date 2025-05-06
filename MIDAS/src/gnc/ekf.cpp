@@ -263,10 +263,6 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     float w_y = omega.vy;
     float w_z = omega.vz;
 
-    float J_x = 0.5 * m * r * r;
-    float J_y = (1 / 3) * m * h * h + 0.25 * m * r * r;
-    float J_z = J_y;
-
     float vel_mag_squared = x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
 
     float velocity_magnitude = pow(vel_mag_squared, 0.5);
@@ -421,8 +417,17 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
 
     Eigen::Matrix<float, 3, 1> acc;
     EKF::BodyToGlobal(angles, accel, acc);
+    float g;
+    if ((FSM_state > FSMState::STATE_IDLE) && (FSM_state < FSMState::STATE_LANDED))
+    {
+        g = -9.81;
+    }
+    else
+    {
+        g = 0;
+    }
 
-    y_k(1, 0) = ((acc)(0)) * 9.81 - 9.81;
+    y_k(1, 0) = ((acc)(0)) * 9.81 + g;
     y_k(2, 0) = ((acc)(1)) * 9.81;
     y_k(3, 0) = ((acc)(2)) * 9.81;
 
