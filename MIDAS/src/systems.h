@@ -54,4 +54,19 @@ struct RocketSystems {
     B2BInterface b2b;
 };
 
+/**
+ * @struct SamTurretData
+ * 
+ * @brief holds relevant sensor data for Sam Turret positioning
+*/
+
+typedef struct SamTurretData {
+    
+    float mag_x;
+    float mag_y;
+    float mag_z;
+    float tilt;
+    
+} SamTurretData;
+
 [[noreturn]] void begin_systems(RocketSystems* config);

@@ -352,7 +352,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 ErrorCode init_systems(RocketSystems& systems) {
     //gpioDigitalWrite(LED_ORANGE, HIGH);
     INIT_SYSTEM(systems.sensors.low_g);
-    //INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     //INIT_SYSTEM(systems.sensors.low_g_lsm);
@@ -393,7 +393,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    //START_THREAD(orientation, SENSOR_CORE, config, 10);
+    START_THREAD(orientation, SENSOR_CORE, config, 10);
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     //START_THREAD(barometer, SENSOR_CORE, config, 12);
@@ -417,70 +417,46 @@ ErrorCode init_systems(RocketSystems& systems) {
     // begin mySerial UART communication
     mySerial.begin(9600);
 
+    // Initialize st_data struct
+    SamTurretData st_data; 
+
     while (true) {
         // THREAD_SLEEP(400);
-
-        
-        // Serial.println("Transmitting over UART...\n");
-        //mySerial.write(50);
-
-        /*
-        Serial.println("Low G: ");
-        Serial.println(systems.rocket_data.low_g.getRecent().ax);
-        Serial.println(systems.rocket_data.low_g.getRecent().ay);
-        Serial.println(systems.rocket_data.low_g.getRecent().az);
-
-        Serial.println("Magnetometer: ");
-        Serial.println(systems.rocket_data.magnetometer.getRecent().mx);
-        Serial.println(systems.rocket_data.magnetometer.getRecent().my);
-        Serial.println(systems.rocket_data.magnetometer.getRecent().mz);
-
-        Serial.println("High G: ");
-        Serial.println(systems.rocket_data.high_g.getRecent().ax);
-        Serial.println(systems.rocket_data.high_g.getRecent().ay);
-        Serial.println(systems.rocket_data.high_g.getRecent().az);*/
 
         if(mySerial.available()) {
             int val = mySerial.read();
             if(val == 99) {
-                mySerial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
-                Serial.print("Motor Angle: ");
-                Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
+
+                // 05/05/25: Magnetometer data used since GPS conflicts with Software Serial I2C pins
+
+                st_data.mag_x = config->rocket_data.magnetometer.getRecent().mx;
+                st_data.mag_y = config->rocket_data.magnetometer.getRecent().my;
+                st_data.mag_z = config->rocket_data.magnetometer.getRecent().mz;
+                st_data.tilt = config->rocket_data.orientation.getRecent().tilt;
+                
+                Serial.print("Mag x: ");
+                Serial.println(st_data.mag_x);
+
+                Serial.print("Mag y: ");
+                Serial.println(st_data.mag_y);
+
+                Serial.print("Mag z: ");
+                Serial.println(st_data.mag_z);
+
+                Serial.print("Tilt: ");
+                Serial.println(st_data.tilt);
+
+                mySerial.write((byte *)&st_data, sizeof(st_data));
             }
         }
-        
 
-        //set angle
-        delay(1);
-
-        //u_int16_t bytesPrint = mySerial.println("Testing\n");
+        delay(100);
 
         // Print Log latency and sensor data
         /*
         Serial.print("Running (Log Latency: ");
         Serial.print(config->rocket_data.log_latency.getLatency());
         Serial.println(")");*/
-        
-        /*
-        Serial.println("Low G: ");
-        Serial.println(config->rocket_data.low_g.getRecent().ax);
-        Serial.println(config->rocket_data.low_g.getRecent().ay);
-        Serial.println(config->rocket_data.low_g.getRecent().az);
-        
-         
-        Serial.println("Magnetometer: ");
-        Serial.println(config->rocket_data.magnetometer.getRecent().mx);
-        Serial.println(config->rocket_data.magnetometer.getRecent().my);
-        Serial.println(config->rocket_data.magnetometer.getRecent().mz);
-
-        Serial.println("High G: ");
-        Serial.println(config->rocket_data.high_g.getRecent().ax);
-        Serial.println(config->rocket_data.high_g.getRecent().ay);
-        Serial.println(config->rocket_data.high_g.getRecent().az);
-
-        Serial.println("X/Y angle: ");
-        Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
-        */
     }
 }
 

@@ -110,35 +110,5 @@ void setup()
 
 void loop()
 {
-
-    Serial.println("Transmitting over UART...\n");
-    //mySerial.write(50);
-   
-    /*
-    Serial.println("Low G: ");
-    Serial.println(systems.rocket_data.low_g.getRecent().ax);
-    Serial.println(systems.rocket_data.low_g.getRecent().ay);
-    Serial.println(systems.rocket_data.low_g.getRecent().az);
-
-    Serial.println("Magnetometer: ");
-    Serial.println(systems.rocket_data.magnetometer.getRecent().mx);
-    Serial.println(systems.rocket_data.magnetometer.getRecent().my);
-    Serial.println(systems.rocket_data.magnetometer.getRecent().mz);
-
-    Serial.println("High G: ");
-    Serial.println(systems.rocket_data.high_g.getRecent().ax);
-    Serial.println(systems.rocket_data.high_g.getRecent().ay);
-    Serial.println(systems.rocket_data.high_g.getRecent().az);*/
-
-    mySerial.write(atan(systems.rocket_data.high_g.getRecent().ay / systems.rocket_data.high_g.getRecent().ax));
-    Serial.print("Motor Angle: ");
-    Serial.println(atan(systems.rocket_data.high_g.getRecent().ay / systems.rocket_data.high_g.getRecent().ax));
     
-    delay(200);
-
-    Serial.print("Read Value: ");
-    Serial.println(mySerial.read());
-
-    //u_int16_t bytesPrint = mySerial.println("Testing\n");
-
 }
