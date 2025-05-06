@@ -33,7 +33,7 @@
 #define sustainer_coast_to_apogee_vertical_speed_threshold 25
 
 // Revert back to COAST if the vertical speed in apogee is too high (was 0 before which may have caused it keep jumping back to COAST) (m/s)
-#define sustainer_apogee_backto_coast_vertical_speed_threshold 10
+#define sustainer_apogee_backto_coast_vertical_speed_threshold 25
 
 // Revert back to COAST if apogee was too brief (ms)
 #define sustainer_apogee_check_threshold 1000

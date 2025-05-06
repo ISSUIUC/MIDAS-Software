@@ -316,14 +316,16 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        if (current_state == FSMState::STATE_IDLE) {
+        // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
+        if (current_state <= FSMState::STATE_IDLE) {
             launch_time = current_time;
             has_triggered_vmux_fallback = false;
         }
 
-        if ((current_time - launch_time) > 80000 && !has_triggered_vmux_fallback) {
-            // THIS IS A HARDCODED VALUE FOR AETHER 3/15/2025
-            // If the rocket has been in flight for over 80 seconds, we swap the FSM camera feed to the bulkhead camera
+        if ((current_time - launch_time) > 79200 && !has_triggered_vmux_fallback) {
+            // THIS IS A HARDCODED VALUE FOR AETHER II 6/21/2025 -- Value is optimal TTA from SDA
+            // If the rocket has been in flight for over 79.2 seconds, we swap the FSM camera feed to the bulkhead camera
+            // This is a fallback in case we can't detect the APOGEE event, so it is more conservative.
             has_triggered_vmux_fallback = true;
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
