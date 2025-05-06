@@ -121,15 +121,20 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         
         // CAMERA 2 STATE
         struct read_mem_cap_data_return toReturn2;
+        Serial.println("CAM2 reading...");
         toReturn2 = read_mem_cap_data(Serial2);
         
         if (toReturn2.status == 1) {
+            Serial.print("Cam2 read: ");
+            Serial.println(toReturn2.status);
             GLOBAL_CAM_STATE.cam2_on = true;
             cam2_consecutive_invalid = 0;
 
             if(current_mem_cam2 == 0) {
+                Serial.println("Cam2 first capture!");
                 current_mem_cam2 = toReturn2.mem_size;
             } else {
+                Serial.println("cam2 valid memory capture!");
                 if (current_mem_cam2 != toReturn2.mem_size) {
                     GLOBAL_CAM_STATE.cam2_rec = true;
                 } else {
@@ -138,6 +143,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
                 current_mem_cam2 = toReturn2.mem_size;
             }
         } else {
+            Serial.println("cam2 invalid memory capture!");
             cam2_consecutive_invalid++;
             if(cam2_consecutive_invalid >= 3) {
                 GLOBAL_CAM_STATE.cam2_on = false;
@@ -155,7 +161,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             // If we want to trun cam1 off, only do so when it has stopped recording.
             if(!GLOBAL_CAM_STATE.cam1_rec) {
               digitalWrite(CAM1_ON_OFF, LOW);
-              Serial.println("camera attempting to turn off");
+              Serial.println("camera 1 attempting to turn off");
             }
         }
 
@@ -167,15 +173,10 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             // If we want to trun cam2 off, only do so when it has stopped recording.
             if(!GLOBAL_CAM_STATE.cam2_rec) {
               digitalWrite(CAM2_ON_OFF, LOW);
-              Serial.println("camera attempting to turn off");
+              Serial.println("camera 2 attempting to turn off");
             }
         }
 
-
-        // Generate telemetry packet back to midas
-
-
-        // Send telemetry packet back to midas
 
         THREAD_SLEEP(100);
     }

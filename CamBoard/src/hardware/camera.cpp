@@ -94,8 +94,8 @@ size_t read_memory_number_from_buf(uint8_t* buf) {
 struct read_mem_cap_data_return read_mem_cap_data(HardwareSerial& camera) {
   uint8_t get_setting_raw[4] = {0xCC, 0x11, 0x03, 0x00};
   uint8_t get_setting[5] = {0xCC, 0x11, 0x03, 0x00, generate_crc(get_setting_raw, 4)};
-  Serial1.write(get_setting, 5);
-  Serial.write("Reading...");
+  camera.write(get_setting, 5);
+  camera.write("Reading...");
   delay(750);
   
   struct read_mem_cap_data_return toReturn;
