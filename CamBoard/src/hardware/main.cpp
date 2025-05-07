@@ -222,16 +222,17 @@ void setup() {
     pinMode(LED_ORANGE, OUTPUT);
     pinMode(LED_RED, OUTPUT);
 
-
-    // Read the desired state from flash memory
-    EEPROM.begin((size_t)EEPROM_SIZE);
-    uint8_t desired_state = EEPROM.read(0);
-    update_desired_state(desired_state);
-
-    // Signs of life
     ledcWriteTone(BUZZER_CHANNEL, 2730);
     delay(300);
     ledcWriteTone(BUZZER_CHANNEL, 0);
+
+    // Read the desired state from flash memory
+    // EEPROM.begin((size_t)EEPROM_SIZE);
+    // uint8_t desired_state = EEPROM.read(0);
+    // update_desired_state(desired_state);
+
+    // Signs of life
+
     delay(500);
     ledcWriteTone(BUZZER_CHANNEL, 2730);
     delay(300);
