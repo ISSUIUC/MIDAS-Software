@@ -227,34 +227,34 @@ void setup() {
 
     // CAM state will be given by 3 beeps -- CAM1, CAM2, VTX. HIGH means it's on, LOW means it's off.
     if(DESIRED_CAM_STATE.cam1_on) {
-      ledcWriteTone(BUZZER_CHANNEL, 3000);
-      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 2800);
+      delay(120);
       ledcWriteTone(BUZZER_CHANNEL, 0);
     } else {
       ledcWriteTone(BUZZER_CHANNEL, 2300);
-      delay(80);
+      delay(120);
       ledcWriteTone(BUZZER_CHANNEL, 0);
     }
     delay(40);
 
     if(DESIRED_CAM_STATE.cam2_on) {
-      ledcWriteTone(BUZZER_CHANNEL, 3000);
-      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 2800);
+      delay(120);
       ledcWriteTone(BUZZER_CHANNEL, 0);
     } else {
       ledcWriteTone(BUZZER_CHANNEL, 2300);
-      delay(80);
+      delay(120);
       ledcWriteTone(BUZZER_CHANNEL, 0);
     }
     delay(40);
 
     if(DESIRED_CAM_STATE.vtx_on) {
-      ledcWriteTone(BUZZER_CHANNEL, 3000);
-      delay(80);
+      ledcWriteTone(BUZZER_CHANNEL, 2800);
+      delay(120);
       ledcWriteTone(BUZZER_CHANNEL, 0);
     } else {
       ledcWriteTone(BUZZER_CHANNEL, 2300);
-      delay(80);
+      delay(120);
       ledcWriteTone(BUZZER_CHANNEL, 0);
     }
     delay(140);
