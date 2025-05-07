@@ -163,16 +163,6 @@ void setup() {
     digitalWrite(BUZZER_PIN, LOW);
     ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
 
-    ledcWriteTone(BUZZER_CHANNEL, 2730);
-    delay(300);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    delay(500);
-    ledcWriteTone(BUZZER_CHANNEL, 2730);
-    delay(300);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-
-    delay(100);
-
     Serial1.setPins(CAM1_RX, CAM1_TX);
     Serial2.setPins(CAM2_RX, CAM2_TX);
     RocketSystems systems{RocketData{}, BuzzerController{}, LEDController{}, Cameras{&Serial1, &Serial2}, CAN{}};
@@ -237,6 +227,17 @@ void setup() {
     EEPROM.begin((size_t)EEPROM_SIZE);
     uint8_t desired_state = EEPROM.read(0);
     update_desired_state(desired_state);
+
+    // Signs of life
+    ledcWriteTone(BUZZER_CHANNEL, 2730);
+    delay(300);
+    ledcWriteTone(BUZZER_CHANNEL, 0);
+    delay(500);
+    ledcWriteTone(BUZZER_CHANNEL, 2730);
+    delay(300);
+    ledcWriteTone(BUZZER_CHANNEL, 0);
+
+    delay(100);
 
     // CAM state will be given by 3 beeps -- CAM1, CAM2, VTX. HIGH means it's on, LOW means it's off.
     if(DESIRED_CAM_STATE.cam1_on) {
