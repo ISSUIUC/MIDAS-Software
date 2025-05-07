@@ -12,6 +12,7 @@
 #include "camera.h"
 
 #define CAMBOARD_I2C_ADDR 0x69
+#define EEPROM_SIZE 64
 
 enum class CameraCommand {
   CAMERA0_OFF = 0,
@@ -26,6 +27,9 @@ enum class CameraCommand {
 
 extern cam_state_t GLOBAL_CAM_STATE;
 extern cam_state_t DESIRED_CAM_STATE;
+
+bool BLUE_LED_STATE = false;
+bool GREEN_LED_STATE = false;
 
 void onRequest() {
   uint8_t cam_dat = 0;
@@ -42,6 +46,10 @@ void onRequest() {
   cam_dat |= (GLOBAL_CAM_STATE.vmux_state) << 5;
   cam_dat |= (GLOBAL_CAM_STATE.cam_ack) << 6;
 
+  // Toggle blue LED
+  BLUE_LED_STATE = !BLUE_LED_STATE;
+  digitalWrite(LED_BLUE, BLUE_LED_STATE ? HIGH : LOW);
+
   // print for debug
   Serial.print("telemetry: CAM 1 (on / recording) ");
   Serial.print(GLOBAL_CAM_STATE.cam1_on);
@@ -53,6 +61,7 @@ void onRequest() {
   Serial.println(GLOBAL_CAM_STATE.cam2_rec);
 
   // Send to MIDAS
+
   uint8_t buf[1] = { cam_dat };
   Wire1.slaveWrite(buf, 1);
 }
@@ -63,6 +72,9 @@ void onReceive(int len) {
       uint8_t recieve = Wire1.read();
       Serial.print(recieve);
       Serial.print(": ");
+
+      GREEN_LED_STATE = !GREEN_LED_STATE;
+      digitalWrite(LED_GREEN, GREEN_LED_STATE ? HIGH : LOW);
 
       GLOBAL_CAM_STATE.cam_ack = !GLOBAL_CAM_STATE.cam_ack;
       switch(recieve) {
@@ -222,6 +234,7 @@ void setup() {
 
 
     // Read the desired state from flash memory
+    EEPROM.begin((size_t)EEPROM_SIZE);
     uint8_t desired_state = EEPROM.read(0);
     update_desired_state(desired_state);
 

@@ -92,6 +92,7 @@ DECLARE_THREAD(flash, RocketSystems* arg) {
         desired_state |= (0b00100000 & DESIRED_CAM_STATE.cam2_rec);
 
         EEPROM.write(0, desired_state);
+        EEPROM.commit();
         THREAD_SLEEP(500);
     }
 }
