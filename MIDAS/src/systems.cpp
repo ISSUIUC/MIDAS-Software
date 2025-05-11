@@ -392,6 +392,7 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.gps);
@@ -436,17 +437,8 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    
-
-    #ifdef IS_SAM_SENSOR
-    START_THREAD(orientation, DATA_CORE, config, 10);
-    START_THREAD(accelerometers, DATA_CORE, config, 13);
-    START_THREAD(gps, DATA_CORE, config, 8);
-    START_THREAD(magnetometer, DATA_CORE, config, 11);
-    #endif
-    
-    #ifndef IS_SAM_SENSOR
     START_THREAD(orientation, SENSOR_CORE, config, 10);
+    START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     START_THREAD(gps, SENSOR_CORE, config, 8);
     START_THREAD(logger, DATA_CORE, config, 15);
@@ -467,12 +459,52 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
+    // Swap I2C_SCL and I2C_SDA order for TX/RX communication
+    SoftwareSerial mySerial(I2C_SCL, I2C_SDA);
+
+    // begin mySerial UART communication
+    mySerial.begin(9600);
+
+    // Initialize st_data struct
+    SamTurretData st_data; 
+
     while (true) {
-        THREAD_SLEEP(1000);
-        Serial.println("RUNNING!");
-        // Serial.print("Running (Log Latency: ");
-        // Serial.print(config->rocket_data.log_latency.getLatency());
-        // Serial.println(")");
+        // THREAD_SLEEP(400);
+
+        if(mySerial.available()) {
+            int val = mySerial.read();
+            if(val == 99) {
+
+                // 05/05/25: Magnetometer data used since GPS conflicts with Software Serial I2C pins
+
+                st_data.mag_x = config->rocket_data.magnetometer.getRecent().mx;
+                st_data.mag_y = config->rocket_data.magnetometer.getRecent().my;
+                st_data.mag_z = config->rocket_data.magnetometer.getRecent().mz;
+                st_data.tilt = config->rocket_data.orientation.getRecent().tilt;
+                
+                Serial.print("Mag x: ");
+                Serial.println(st_data.mag_x);
+
+                Serial.print("Mag y: ");
+                Serial.println(st_data.mag_y);
+
+                Serial.print("Mag z: ");
+                Serial.println(st_data.mag_z);
+
+                Serial.print("Tilt: ");
+                Serial.println(st_data.tilt);
+
+                mySerial.write((byte *)&st_data, sizeof(st_data));
+            }
+        }
+
+        delay(100);
+
+        // Print Log latency and sensor data
+        /*
+        Serial.print("Running (Log Latency: ");
+        Serial.print(config->rocket_data.log_latency.getLatency());
+        Serial.println(")");*/
     }
 }
 
