@@ -1,5 +1,4 @@
 #include "systems.h"
-#include <SoftwareSerial.h>
 #include "hal.h"
 #include <math.h>
 #include "gnc/ekf.h"
@@ -99,6 +98,20 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
             arg->rocket_data.orientation.update(orientation_holder);
         }
 
+        #ifdef IS_SAM_SENSOR
+        Orientation r = arg->sensors.orientation.read();
+        if (r.has_data) {
+            
+            Serial.print("ORIENTATION:");
+            Serial.print(r.pitch, 4);
+            Serial.print(",");
+            Serial.print(r.roll, 4);
+            Serial.print(",");
+            Serial.println(r.yaw, 5);
+        }
+
+        #endif
+
         THREAD_SLEEP(100);
     }
 }
@@ -108,6 +121,17 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         Magnetometer reading = arg->sensors.magnetometer.read();
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);
+        #ifdef IS_SAM_SENSOR
+        Serial.print("MAGNETOMETER:");
+        Magnetometer r = arg->sensors.magnetometer.read();
+        Serial.print(r.mx, 5);
+        Serial.print(",");
+        Serial.print(r.my, 5);
+        Serial.print(",");
+        Serial.println(r.mz, 5);
+        THREAD_SLEEP(450);
+        
+        #endif
     }
 }
 
@@ -119,6 +143,17 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
         }
         //GPS waits internally
         THREAD_SLEEP(1);
+        #ifdef IS_SAM_SENSOR
+        Serial.print("GPS:");
+        GPS r = arg->sensors.gps.read();
+        Serial.print(r.latitude, 5);
+        Serial.print(",");
+        Serial.print(r.longitude, 5);
+        Serial.print(",");
+        Serial.println(r.altitude, 5);
+        THREAD_SLEEP(499);
+
+        #endif
     }
 }
 
@@ -350,25 +385,33 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  *        Turns on the Orange LED while initialization is running.
  */
 ErrorCode init_systems(RocketSystems& systems) {
-    //gpioDigitalWrite(LED_ORANGE, HIGH);
+    gpioDigitalWrite(LED_ORANGE, HIGH);
+    gpioDigitalWrite(LED_BLUE, HIGH);
+    gpioDigitalWrite(LED_GREEN, HIGH);
+    gpioDigitalWrite(LED_BLUE, HIGH);
+
     INIT_SYSTEM(systems.sensors.low_g);
-    //INIT_SYSTEM(systems.sensors.orientation);
-    INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.sensors.high_g);
-    //INIT_SYSTEM(systems.sensors.low_g_lsm);
-    //INIT_SYSTEM(systems.sensors.barometer);
+    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    INIT_SYSTEM(systems.sensors.gps);
+
+    #ifndef IS_SAM_SENSOR
+    INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    //INIT_SYSTEM(systems.sensors.continuity);
-    //INIT_SYSTEM(systems.sensors.voltage);
-    //INIT_SYSTEM(systems.sensors.pyro);
-    //INIT_SYSTEM(systems.led);
-    //INIT_SYSTEM(systems.buzzer);
-    //INIT_SYSTEM(systems.b2b);
+    INIT_SYSTEM(systems.sensors.continuity);
+    INIT_SYSTEM(systems.sensors.voltage);
+    INIT_SYSTEM(systems.sensors.pyro);
+    INIT_SYSTEM(systems.led);
+    INIT_SYSTEM(systems.buzzer);
+    INIT_SYSTEM(systems.b2b);
+    INIT_SYSTEM(systems.log_sink);
     #ifdef ENABLE_TELEM
-        //INIT_SYSTEM(systems.tlm);
+        INIT_SYSTEM(systems.tlm);
     #endif
-    //INIT_SYSTEM(systems.sensors.gps);
-    //gpioDigitalWrite(LED_ORANGE, LOW);
+    #endif
+    
+    gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
 #undef INIT_SYSTEM
@@ -393,94 +436,43 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    //START_THREAD(orientation, SENSOR_CORE, config, 10);
-    START_THREAD(logger, DATA_CORE, config, 15);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
-    //START_THREAD(barometer, SENSOR_CORE, config, 12);
-    //START_THREAD(gps, SENSOR_CORE, config, 8);
-    //START_THREAD(voltage, SENSOR_CORE, config, 9);
-    //START_THREAD(pyro, SENSOR_CORE, config, 14);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    //START_THREAD(cam, SENSOR_CORE, config, 16);
-    //START_THREAD(kalman, SENSOR_CORE, config, 7);
-    //START_THREAD(fsm, SENSOR_CORE, config, 8);
-    //START_THREAD(buzzer, SENSOR_CORE, config, 6);
-    #ifdef ENABLE_TELEM
-    //START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    
+
+    #ifdef IS_SAM_SENSOR
+    START_THREAD(orientation, DATA_CORE, config, 10);
+    START_THREAD(accelerometers, DATA_CORE, config, 13);
+    START_THREAD(gps, DATA_CORE, config, 8);
+    START_THREAD(magnetometer, DATA_CORE, config, 11);
     #endif
+    
+    #ifndef IS_SAM_SENSOR
+    START_THREAD(orientation, SENSOR_CORE, config, 10);
+    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    START_THREAD(gps, SENSOR_CORE, config, 8);
+    START_THREAD(logger, DATA_CORE, config, 15);
+    START_THREAD(barometer, SENSOR_CORE, config, 12);
+    START_THREAD(voltage, SENSOR_CORE, config, 9);
+    START_THREAD(pyro, SENSOR_CORE, config, 14);
+    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
+    START_THREAD(cam, SENSOR_CORE, config, 16);
+    START_THREAD(kalman, SENSOR_CORE, config, 7);
+    START_THREAD(fsm, SENSOR_CORE, config, 8);
+    START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    #ifdef ENABLE_TELEM
+    START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    #endif
+    #endif
+
+    Serial.println("Got here");
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
-    // Swap I2C_SCL and I2C_SDA order for TX/RX communication
-    SoftwareSerial mySerial(I2C_SCL, I2C_SDA);
-
-    // begin mySerial UART communication
-    mySerial.begin(9600);
-
     while (true) {
-        // THREAD_SLEEP(400);
-
-        
-        // Serial.println("Transmitting over UART...\n");
-        //mySerial.write(50);
-
-        /*
-        Serial.println("Low G: ");
-        Serial.println(systems.rocket_data.low_g.getRecent().ax);
-        Serial.println(systems.rocket_data.low_g.getRecent().ay);
-        Serial.println(systems.rocket_data.low_g.getRecent().az);
-
-        Serial.println("Magnetometer: ");
-        Serial.println(systems.rocket_data.magnetometer.getRecent().mx);
-        Serial.println(systems.rocket_data.magnetometer.getRecent().my);
-        Serial.println(systems.rocket_data.magnetometer.getRecent().mz);
-
-        Serial.println("High G: ");
-        Serial.println(systems.rocket_data.high_g.getRecent().ax);
-        Serial.println(systems.rocket_data.high_g.getRecent().ay);
-        Serial.println(systems.rocket_data.high_g.getRecent().az);*/
-
-        if(mySerial.available()) {
-            int val = mySerial.read();
-            if(val == 99) {
-                mySerial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
-                Serial.print("Motor Angle: ");
-                Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
-            }
-        }
-        
-
-        //set angle
-        delay(1);
-
-        //u_int16_t bytesPrint = mySerial.println("Testing\n");
-
-        // Print Log latency and sensor data
-        /*
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");*/
-        
-        /*
-        Serial.println("Low G: ");
-        Serial.println(config->rocket_data.low_g.getRecent().ax);
-        Serial.println(config->rocket_data.low_g.getRecent().ay);
-        Serial.println(config->rocket_data.low_g.getRecent().az);
-        
-         
-        Serial.println("Magnetometer: ");
-        Serial.println(config->rocket_data.magnetometer.getRecent().mx);
-        Serial.println(config->rocket_data.magnetometer.getRecent().my);
-        Serial.println(config->rocket_data.magnetometer.getRecent().mz);
-
-        Serial.println("High G: ");
-        Serial.println(config->rocket_data.high_g.getRecent().ax);
-        Serial.println(config->rocket_data.high_g.getRecent().ay);
-        Serial.println(config->rocket_data.high_g.getRecent().az);
-
-        Serial.println("X/Y angle: ");
-        Serial.println(atan(config->rocket_data.high_g.getRecent().ay / config->rocket_data.high_g.getRecent().ax));
-        */
+        THREAD_SLEEP(1000);
+        Serial.println("RUNNING!");
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
     }
 }
 
