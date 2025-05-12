@@ -86,22 +86,25 @@ DECLARE_THREAD(comms_check, RocketSystems* arg) {
     bool is_in_recovery_state = false;
     bool is_in_fallback_state = false;
     uint32_t time_entered_fallback_state = millis();
+    uint32_t recovery_debounce = millis();
+    uint32_t fail_detect_debounce = millis();
+
     while(true) {
         uint32_t cur_time = millis();
         // The other half of I2C stuff -- checking communication.
         if(is_in_recovery_state) {
-
-            if(digitalRead(I2C_SCL) == LOW || digitalRead(I2C_SDA) == LOW) {
-                Serial.println("Bus read low... attempting recovery");
+            if(cur_time > recovery_debounce) {
+                Serial.println("Attempting recovery...");
+                recovery_debounce = cur_time + 5000; // Only attempt recovery every 3 seconds.
                 // Attempt recovery.
                 Wire1.begin((uint8_t)CAMBOARD_I2C_ADDR);
                 Serial.println("Sleeping for recovery test...");
                 THREAD_SLEEP(500);
 
-                // If we've communicated since, we know we've recovered!
                 if(millis() - LAST_I2C_COMM <= I2C_RECOVERY_STATE_THRESHOLD) {
                     Serial.println("Successfully recovered!");
                     digitalWrite(LED_ORANGE, LOW);
+                    fail_detect_debounce = millis() + 3000; // After successful recovery, we only detect fault after 3 more sec
                     is_in_recovery_state = false;
                     is_in_fallback_state = false;
                     digitalWrite(LED_RED, LOW);
@@ -111,28 +114,32 @@ DECLARE_THREAD(comms_check, RocketSystems* arg) {
                     pinMode(I2C_SDA, INPUT);
                     Serial.println("Failed to recover.");
                 }
-
-                // Otherwise we've failed to communicate.
-                // Serial.println("bruh1");
             }
-            // if(time_entered_fallback_state - cur_time > I2C_RECOVERY_FALLBACK_TIME && !is_in_fallback_state) {
-            //     is_in_fallback_state = true;
-            //     digitalWrite(LED_RED, HIGH);
-            //     digitalWrite(CAM1_ON_OFF, HIGH);
-            //     digitalWrite(CAM2_ON_OFF, HIGH);
-            //     digitalWrite(VTX_ON_OFF, HIGH);
-            //     digitalWrite(VIDEO_SELECT, LOW);
 
-            //     DESIRED_CAM_STATE.cam1_on = true;
-            //     DESIRED_CAM_STATE.cam2_on = true;
-            //     DESIRED_CAM_STATE.cam1_rec = true;
-            //     DESIRED_CAM_STATE.cam2_rec = true;
-            //     DESIRED_CAM_STATE.vtx_on = true;
-            //     DESIRED_CAM_STATE.vmux_state = false;
-            // }
+            if(cur_time - time_entered_fallback_state > I2C_RECOVERY_FALLBACK_TIME && !is_in_fallback_state) {
+                Serial.println("AHHHHHHHHHHHHHHHHHHHHH");
+                Serial.println(cur_time);
+                Serial.println(time_entered_fallback_state);
+                Serial.println(cur_time - time_entered_fallback_state);
+                Serial.println(is_in_fallback_state);
+                Serial.println(I2C_RECOVERY_FALLBACK_TIME);
+                is_in_fallback_state = true;
+                digitalWrite(LED_RED, HIGH);
+                digitalWrite(CAM1_ON_OFF, HIGH);
+                digitalWrite(CAM2_ON_OFF, HIGH);
+                digitalWrite(VTX_ON_OFF, HIGH);
+                digitalWrite(VIDEO_SELECT, LOW);
+
+                DESIRED_CAM_STATE.cam1_on = true;
+                DESIRED_CAM_STATE.cam2_on = true;
+                DESIRED_CAM_STATE.cam1_rec = true;
+                DESIRED_CAM_STATE.cam2_rec = true;
+                DESIRED_CAM_STATE.vtx_on = true;
+                DESIRED_CAM_STATE.vmux_state = false;
+            }
         }
 
-        if(cur_time - LAST_I2C_COMM > I2C_RECOVERY_STATE_THRESHOLD && !is_in_recovery_state) {
+        if(cur_time - LAST_I2C_COMM > I2C_RECOVERY_STATE_THRESHOLD && !is_in_recovery_state && cur_time > fail_detect_debounce) {
             is_in_recovery_state = true;
             time_entered_fallback_state = cur_time;
             digitalWrite(LED_ORANGE, HIGH);

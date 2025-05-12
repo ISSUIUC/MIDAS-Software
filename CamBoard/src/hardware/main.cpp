@@ -228,9 +228,15 @@ void setup() {
     ledcWriteTone(BUZZER_CHANNEL, 0);
 
     // Read the desired state from flash memory
-    // EEPROM.begin((size_t)EEPROM_SIZE);
-    // uint8_t desired_state = EEPROM.read(0);
-    // update_desired_state(desired_state);
+    EEPROM.begin((size_t)EEPROM_SIZE);
+
+    // EEPROM.write(0, 0); // For resetting flash
+    // EEPROM.commit();
+    // delay(999999);
+
+    uint8_t desired_state = EEPROM.read(0);
+    Serial.println(desired_state, 2);
+    update_desired_state(desired_state);
 
     // Signs of life
 
