@@ -11,7 +11,6 @@
 #include "systems.h"
 #include "camera.h"
 
-#define CAMBOARD_I2C_ADDR 0x69
 #define EEPROM_SIZE 64
 
 enum class CameraCommand {
@@ -27,6 +26,7 @@ enum class CameraCommand {
 
 extern cam_state_t GLOBAL_CAM_STATE;
 extern cam_state_t DESIRED_CAM_STATE;
+extern uint32_t LAST_I2C_COMM;
 
 bool BLUE_LED_STATE = false;
 bool GREEN_LED_STATE = false;
@@ -63,6 +63,7 @@ void onRequest() {
   // Send to MIDAS
 
   uint8_t buf[1] = { cam_dat };
+  LAST_I2C_COMM = millis();
   Wire1.slaveWrite(buf, 1);
 }
 
@@ -275,6 +276,7 @@ void setup() {
     delay(140);
 
     //init and start threads
+    LAST_I2C_COMM = millis();
     begin_systems(&systems);
 }
 

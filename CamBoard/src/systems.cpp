@@ -4,8 +4,16 @@
 
 #include "hal.h"
 
+// Amount of time (in ms) without communication that causes us to go into the i2c recovery state.
+#define I2C_RECOVERY_STATE_THRESHOLD 3000
+
+// Amount of time that, if spent in the recovery state, we instead fallback to "ALL CAMS ON"
+// Defaults to 3 min
+#define I2C_RECOVERY_FALLBACK_TIME 180000
+
 cam_state_t GLOBAL_CAM_STATE;
 cam_state_t DESIRED_CAM_STATE;
+uint32_t LAST_I2C_COMM;
 
 /**
  * @brief These are all the functions that will run in each task
@@ -71,6 +79,73 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
         i += 1;
 
         THREAD_SLEEP(100);
+    }
+}
+
+DECLARE_THREAD(comms_check, RocketSystems* arg) {
+    bool is_in_recovery_state = false;
+    bool is_in_fallback_state = false;
+    uint32_t time_entered_fallback_state = millis();
+    while(true) {
+        uint32_t cur_time = millis();
+        // The other half of I2C stuff -- checking communication.
+        if(is_in_recovery_state) {
+
+            if(digitalRead(I2C_SCL) == LOW || digitalRead(I2C_SDA) == LOW) {
+                Serial.println("Bus read low... attempting recovery");
+                // Attempt recovery.
+                Wire1.begin((uint8_t)CAMBOARD_I2C_ADDR);
+                Serial.println("Sleeping for recovery test...");
+                THREAD_SLEEP(500);
+
+                // If we've communicated since, we know we've recovered!
+                if(millis() - LAST_I2C_COMM <= I2C_RECOVERY_STATE_THRESHOLD) {
+                    Serial.println("Successfully recovered!");
+                    digitalWrite(LED_ORANGE, LOW);
+                    is_in_recovery_state = false;
+                    is_in_fallback_state = false;
+                    digitalWrite(LED_RED, LOW);
+                } else {
+                    Wire1.end();
+                    pinMode(I2C_SCL, INPUT);
+                    pinMode(I2C_SDA, INPUT);
+                    Serial.println("Failed to recover.");
+                }
+
+                // Otherwise we've failed to communicate.
+                // Serial.println("bruh1");
+            }
+            // if(time_entered_fallback_state - cur_time > I2C_RECOVERY_FALLBACK_TIME && !is_in_fallback_state) {
+            //     is_in_fallback_state = true;
+            //     digitalWrite(LED_RED, HIGH);
+            //     digitalWrite(CAM1_ON_OFF, HIGH);
+            //     digitalWrite(CAM2_ON_OFF, HIGH);
+            //     digitalWrite(VTX_ON_OFF, HIGH);
+            //     digitalWrite(VIDEO_SELECT, LOW);
+
+            //     DESIRED_CAM_STATE.cam1_on = true;
+            //     DESIRED_CAM_STATE.cam2_on = true;
+            //     DESIRED_CAM_STATE.cam1_rec = true;
+            //     DESIRED_CAM_STATE.cam2_rec = true;
+            //     DESIRED_CAM_STATE.vtx_on = true;
+            //     DESIRED_CAM_STATE.vmux_state = false;
+            // }
+        }
+
+        if(cur_time - LAST_I2C_COMM > I2C_RECOVERY_STATE_THRESHOLD && !is_in_recovery_state) {
+            is_in_recovery_state = true;
+            time_entered_fallback_state = cur_time;
+            digitalWrite(LED_ORANGE, HIGH);
+            Serial.println("I2C Comms not seen!");
+            Wire1.end();
+
+            pinMode(I2C_SCL, INPUT);
+            pinMode(I2C_SDA, INPUT);
+            Serial.println("Entered recovery mode");
+        }
+        // Serial.println("bruh5");
+        THREAD_SLEEP(10);
+        // Serial.println("bruh6");
     }
 }
 
@@ -283,9 +358,8 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(fsm, MAIN_CORE, config, 8);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     START_THREAD(flash, MAIN_CORE, config, 10);
+    START_THREAD(comms_check, MAIN_CORE, config, 10);
     //START_THREAD(can, MAIN_CORE, config, 15);
-
-
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 

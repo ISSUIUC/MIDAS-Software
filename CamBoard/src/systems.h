@@ -13,6 +13,8 @@
 #include <ACAN2517FD.h>
 #include "finite-state-machines/fsm.h"
 
+#define CAMBOARD_I2C_ADDR 0x69
+
 /**
  * @struct Sensors
  * 
