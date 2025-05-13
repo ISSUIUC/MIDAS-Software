@@ -276,7 +276,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     float Faz = 0;
 
     Eigen::Matrix<float, 3, 1> Fg_body;
-    EKF::GlobalToBody(angles, gravity);
+    EKF::GlobalToBody(angles, Fg_body);
 
     float Fgx = gravity(0, 0);
     float Fgy = gravity(1, 0);
@@ -581,7 +581,7 @@ void EKF::priori() {};
  * @param world_vector Vector for rotation in the global frame
  *
  * @return Eigen::Matrix<float, 3, 1> Rotated vector in the body frame
- *
+ * TODO: Don't pass in gravity and pass in a vector instead
  */
 void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1> &to_modify)
 {
