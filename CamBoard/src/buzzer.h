@@ -40,4 +40,6 @@ public:
 };
 
 #define FREE_BIRD_LENGTH 11
+#define BEEP_LENGTH 2
 extern Sound free_bird[FREE_BIRD_LENGTH];
+extern Sound beep_beep[BEEP_LENGTH];

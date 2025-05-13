@@ -9,7 +9,7 @@
 
 // Amount of time that, if spent in the recovery state, we instead fallback to "ALL CAMS ON"
 // Defaults to 3 min
-#define I2C_RECOVERY_FALLBACK_TIME 180000
+#define I2C_RECOVERY_FALLBACK_TIME 15000
 
 cam_state_t GLOBAL_CAM_STATE;
 cam_state_t DESIRED_CAM_STATE;
@@ -119,7 +119,10 @@ DECLARE_THREAD(comms_check, RocketSystems* arg) {
             if(cur_time - time_entered_fallback_state > I2C_RECOVERY_FALLBACK_TIME && !is_in_fallback_state) {
                 is_in_fallback_state = true;
                 digitalWrite(LED_RED, HIGH);
+                arg->buzzer.play_tune(beep_beep, BEEP_LENGTH);
+                delay(50);
                 digitalWrite(CAM1_ON_OFF, HIGH);
+                delay(50);
                 digitalWrite(CAM2_ON_OFF, HIGH);
                 delay(50);
                 digitalWrite(VTX_ON_OFF, HIGH);

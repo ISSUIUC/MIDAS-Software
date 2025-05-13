@@ -141,8 +141,20 @@ void update_desired_state(uint8_t state_byte) {
   DESIRED_CAM_STATE.cam2_rec = state_byte & 0b00100000;
 
   // Turn on cameras if we want them to be on
-  digitalWrite(CAM1_ON_OFF, DESIRED_CAM_STATE.cam1_on ? HIGH : LOW);
-  digitalWrite(CAM2_ON_OFF, DESIRED_CAM_STATE.cam2_on ? HIGH : LOW);
+  if(DESIRED_CAM_STATE.cam1_on) {
+    delay(50);
+    digitalWrite(CAM1_ON_OFF, HIGH);
+  } else {
+    digitalWrite(CAM1_ON_OFF, LOW);
+  }
+  
+  if(DESIRED_CAM_STATE.cam2_on) {
+    delay(50);
+    digitalWrite(CAM2_ON_OFF, HIGH);
+  } else {
+    digitalWrite(CAM2_ON_OFF, LOW);
+  }
+  
   if(DESIRED_CAM_STATE.vtx_on) {
     delay(50);
     digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);

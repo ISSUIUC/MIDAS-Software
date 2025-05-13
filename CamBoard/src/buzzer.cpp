@@ -77,6 +77,7 @@ ErrorCode BuzzerController::init() {
 #define MS_PER_4BEAT 6000
 
 #define rest Sound{0, 10}
+#define long_rest Sound{0, 150}
 #define d4_eight Sound{294, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
 #define g4_eight Sound{392, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
 #define f_nat_4_eight Sound{350, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
@@ -91,6 +92,7 @@ ErrorCode BuzzerController::init() {
 #define f_nat_4_fifth Sound{350, static_cast<uint8_t>(0.05 * MS_PER_4BEAT)}
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
+#define loud_beep Sound{2730, 200}
 
 
 #define g4_sharp_eight Sound{415, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
@@ -116,4 +118,7 @@ ErrorCode BuzzerController::init() {
 Sound free_bird[FREE_BIRD_LENGTH] = {
     g4_sharp_eight, c4_sharp_eight, c5_sharp_quart, rest_eight, g4_sharp_eight, c4_sharp_eight, c5_sharp_eight, 
     b5_sharp_eight, g4_sharp_eight, c4_sharp_quart
+};
+Sound beep_beep[2] = {
+    loud_beep, long_rest
 };
