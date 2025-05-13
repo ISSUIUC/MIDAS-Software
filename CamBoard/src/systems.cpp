@@ -165,13 +165,13 @@ DECLARE_THREAD(flash, RocketSystems* arg) {
         // Convert DESIRED_STATE to a single byte
         uint8_t desired_state = 0;
         desired_state |= (0b00000001 & DESIRED_CAM_STATE.cam1_on);
-        desired_state |= (0b00000010 & DESIRED_CAM_STATE.cam2_on);
-        desired_state |= (0b00000100 & DESIRED_CAM_STATE.vtx_on);
-        desired_state |= (0b00001000 & DESIRED_CAM_STATE.vmux_state);
+        desired_state |= (0b00000010 & (DESIRED_CAM_STATE.cam2_on << 1));
+        desired_state |= (0b00000100 & (DESIRED_CAM_STATE.vtx_on << 2));
+        desired_state |= (0b00001000 & (DESIRED_CAM_STATE.vmux_state << 3));
 
         // Cameras should always be recording if they're on, but we can add that data here anyway
-        desired_state |= (0b00010000 & DESIRED_CAM_STATE.cam1_rec);
-        desired_state |= (0b00100000 & DESIRED_CAM_STATE.cam2_rec);
+        desired_state |= (0b00010000 & (DESIRED_CAM_STATE.cam1_rec << 4));
+        desired_state |= (0b00100000 & (DESIRED_CAM_STATE.cam2_rec << 5));
 
         EEPROM.write(0, desired_state);
         EEPROM.commit();
