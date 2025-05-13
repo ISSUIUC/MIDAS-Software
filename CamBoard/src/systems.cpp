@@ -117,16 +117,11 @@ DECLARE_THREAD(comms_check, RocketSystems* arg) {
             }
 
             if(cur_time - time_entered_fallback_state > I2C_RECOVERY_FALLBACK_TIME && !is_in_fallback_state) {
-                Serial.println("AHHHHHHHHHHHHHHHHHHHHH");
-                Serial.println(cur_time);
-                Serial.println(time_entered_fallback_state);
-                Serial.println(cur_time - time_entered_fallback_state);
-                Serial.println(is_in_fallback_state);
-                Serial.println(I2C_RECOVERY_FALLBACK_TIME);
                 is_in_fallback_state = true;
                 digitalWrite(LED_RED, HIGH);
                 digitalWrite(CAM1_ON_OFF, HIGH);
                 digitalWrite(CAM2_ON_OFF, HIGH);
+                delay(50);
                 digitalWrite(VTX_ON_OFF, HIGH);
                 digitalWrite(VIDEO_SELECT, LOW);
 
