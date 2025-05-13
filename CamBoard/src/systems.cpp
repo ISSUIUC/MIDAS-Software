@@ -9,7 +9,7 @@
 
 // Amount of time that, if spent in the recovery state, we instead fallback to "ALL CAMS ON"
 // Defaults to 3 min
-#define I2C_RECOVERY_FALLBACK_TIME 15000
+#define I2C_RECOVERY_FALLBACK_TIME 180000
 
 cam_state_t GLOBAL_CAM_STATE;
 cam_state_t DESIRED_CAM_STATE;
