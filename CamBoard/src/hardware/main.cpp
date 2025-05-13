@@ -143,7 +143,11 @@ void update_desired_state(uint8_t state_byte) {
   // Turn on cameras if we want them to be on
   digitalWrite(CAM1_ON_OFF, DESIRED_CAM_STATE.cam1_on ? HIGH : LOW);
   digitalWrite(CAM2_ON_OFF, DESIRED_CAM_STATE.cam2_on ? HIGH : LOW);
-  digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
+  if(DESIRED_CAM_STATE.vtx_on) {
+    delay(50);
+    digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
+  }
+  
   digitalWrite(VIDEO_SELECT, DESIRED_CAM_STATE.vmux_state ? HIGH : LOW);
 }
 
