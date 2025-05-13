@@ -105,11 +105,13 @@ void onReceive(int len) {
           digitalWrite(VTX_ON_OFF, LOW);
           Serial.println("Case 4\n");
           GLOBAL_CAM_STATE.vtx_on = false;
+          DESIRED_CAM_STATE.vtx_on = false;
           break;
         case 5:
           digitalWrite(VTX_ON_OFF, HIGH);
           Serial.println("Case 5\n");
           GLOBAL_CAM_STATE.vtx_on = true;
+          DESIRED_CAM_STATE.vtx_on = true;
           break;
         case 6:
           digitalWrite(VIDEO_SELECT, LOW);
