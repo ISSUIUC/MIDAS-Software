@@ -6,17 +6,19 @@
 
 /**
  * @brief Initializes the SD card logger
+ * In MIDAS v2.x, the flash module has the same interface as
+ * the SD card, we just need to set the appropiate pins
  * 
  * @return Error Code
 */
 ErrorCode SDSink::init() {
     Serial.println("Connecting to SD...");
-    if (!SD_MMC.setPins(SD_CLK, SD_CMD, SD_D0)) {
+    if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
         return ErrorCode::SDBeginFailed;
     }
     if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
         failed = true;
-        return ErrorCode::NoError;
+        return ErrorCode::SDBeginFailed;
     }
 
     char file_name[16] = "data";
@@ -26,7 +28,7 @@ ErrorCode SDSink::init() {
     file = SD_MMC.open(file_name, FILE_WRITE, true);
     if (!file) {
         failed = true;
-        return ErrorCode::NoError;
+        return ErrorCode::SDCouldNotOpenFile;
     }
 
     return ErrorCode::NoError;

@@ -32,7 +32,7 @@ class FSM {
 public:
     FSM() = default;
 
-    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate);
+    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
 
 private:
     double launch_time;
@@ -43,6 +43,8 @@ private:
     double drogue_time;
     double apogee_time;
     double main_time;
+    double main_deployed_time;
     double landed_time;
     double first_separation_time;
+    double pyro_test_entry_time;
 };

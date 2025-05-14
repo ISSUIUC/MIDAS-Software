@@ -4,6 +4,7 @@
 from datetime import datetime, timezone
 from collections import deque
 import copy
+import time
 
 import util.mqtt as mqtt
 import util.logger
@@ -37,29 +38,31 @@ class TelemetryCombiner():
         
     class DuplicateDatapoints():
         """Helper class to handle duplicate handling in `TelemetryCombiner`"""
-        class DP():
-            """A single duplicate packet list checker"""
-            def __init__(self, packets) -> None:
-                self.__packets = packets
-                self.__ts = datetime.now().timestamp()
 
+        """Holds each unique packet for the duplicate checker to test off of"""
+        class UniquePacket():
+            def __init__(self, packet):
+                self.__packet = packet
+                self.__ts = datetime.now().timestamp()
+            
             def get_ts(self) -> float:
                 """Return the timestamp this packet list was added"""
                 return self.__ts
 
             def check(self, packet) -> bool:
-                """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` (Tests for duplicates)"""
-                return True
+                """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` based on the current UniquePacket (Tests for duplicates)"""
+                print(">>>>", packet['value'])
                 try:
-                    for pkt in self.__packets:
-                        incoming = copy.copy(packet['value'])
-                        existing = copy.copy(pkt['value'])
-                        incoming['RSSI'] = 0 # This will compare everything but RSSI, filter out identical packets with different RSSIs.
-                        existing['RSSI'] = 0
+                    incoming = copy.copy(packet['value'])
+                    existing = copy.copy(self.__packet['value'])
 
-                        # print(incoming, existing)
-                        if incoming == existing:
-                            return False
+                    incoming['RSSI'] = 0 # This will compare everything but RSSI, filter out identical packets with different RSSIs.
+                    existing['RSSI'] = 0
+
+                    # print(incoming, existing)
+                    if incoming == existing:
+                        return False
+                    
                     return True
                 except Exception as e:
                     print(e)
@@ -68,46 +71,64 @@ class TelemetryCombiner():
                 
 
         def __init__(self, timeout: float) -> None:
-            self.__duplicates = []
             self.__timeout = timeout
+            self.__unique_packets = []
 
-        def insert(self, pkt_list):
+        def insert(self, packet):
             """Add a packet list to the `DuplicateDatapoints` checker"""
-            self.__duplicates.append(TelemetryCombiner.DuplicateDatapoints.DP(pkt_list))
+            self.__unique_packets.append(TelemetryCombiner.DuplicateDatapoints.UniquePacket(packet))
 
         def clear_old(self):
             """Removes packet lists whose `timeout` has expired."""
             new_list = []
-            for dp in self.__duplicates:
-                if (datetime.now().timestamp() + self.__timeout > dp.get_ts()):
-                    new_list.append(dp)
-            self.__duplicates = new_list
+            for up in self.__unique_packets:
+                if (datetime.now().timestamp() + self.__timeout > up.get_ts()):
+                    new_list.append(up)
+            self.__unique_packets = new_list
 
         def check(self, packet) -> bool:
             """Returns whether or not this packet should be allowed to be added to the `TelemetryCombiner` (Tests for duplicates)"""
             self.clear_old()
-            for dp in self.__duplicates:
-                if not dp.check(packet):
+            for pkt in self.__unique_packets:
+                if not pkt.check(packet):
                     return False
             return True
 
             
 
     # splitter_list is a list of TelemetryCombiners acting as relay recievers.
-    def __init__(self, stage, log_stream: util.logger.LoggerStream, filter=FilterOptions()):
+    def __init__(self, stage, log_stream: util.logger.LoggerStream, filter=None):
+        if filter is None:
+            filter = TelemetryCombiner.FilterOptions()
+            
         self.__log = log_stream
         self.__stage = stage
         self.__ts_latest = datetime.now(timezone.utc).timestamp()
         self.__filter = filter
         self.__packets_in = deque()
-        self.__mqtt_threads = []
+        self.__mqtt_threads: list[mqtt.MQTTThread] = []
         self.__duplicate = TelemetryCombiner.DuplicateDatapoints(2)
 
     def enqueue_packet(self, packet):
         """Add a packet to this telemetry combiner to be checked and sent"""
-        self.__packets_in.append(packet)
-        filter = self.filter()
-        self.__duplicate.insert(filter)
+
+        # Add packet metadata
+        packet_new = {
+            "data": packet,
+            "metadata": {
+                "raw_stream": self.get_mqtt_data_topic(),
+                "time_published": time.time()
+            }
+        }
+
+        self.__packets_in.append(packet_new)
+
+      
+        filter, used = self.filter()
+        
+        if used:
+            self.__duplicate.insert(packet_new)
+
         for mqtt_src in self.__mqtt_threads:
             mqtt_src.publish(filter, self.get_mqtt_data_topic())
 
@@ -139,27 +160,37 @@ class TelemetryCombiner():
         self.__log.set_waiting(len(self.__packets_in))
         queue = copy.copy(self.__packets_in)
         self.__packets_in = deque()
+
+        # flag to tell if the most recently added packet was kept when filtering
+        used = False
+
         for packet in queue:
+
+            packet_test = self.__filter.test(packet['data'])
+            dubplicate_test = True # self.__duplicate.check(packet['data'])
             
             # Check if packet passes filter
-            self.__log.console_log("Packet states: flt: (" + str(self.__filter.test(packet)) + ") dup: (" + str(self.__duplicate.check(packet)) + ")")
-            if not (packet['unix'] in seen_timestamps) and self.__filter.test(packet) and self.__duplicate.check(packet):
-                # Do use this packet
+            self.__log.console_log("Packet states: flt: (" + str(packet_test) + ") dup: (" + str(dubplicate_test) + ")")
+            if not (packet['data']['unix'] in seen_timestamps) and packet_test and dubplicate_test:
+                # Use this packet
                 
-                if self.__ts_latest > packet['unix']:
-                    self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['unix']}")
+                if self.__ts_latest > packet['data']['unix']:
+                    self.__log.console_log(f"Released packet out of order! {self.__ts_latest} > {packet['data']['unix']}")
 
-                if (packet['unix'] > cur_latest):
-                    cur_latest = packet['unix']
+                if (packet['data']['unix'] > cur_latest):
+                    cur_latest = packet['data']['unix']
 
-                seen_timestamps.add(packet['unix'])
+                seen_timestamps.add(packet['data']['unix'])
                 packet_release.append(packet)
                 
                 self.__log.success()
                 self.__log.waiting_delta(-1)
 
+                used = True
+            else:
+                used = False
+
                 
         self.__ts_latest = cur_latest
         self.__log.file_log(str(packet_release))
-        return packet_release
-    
+        return packet_release, used

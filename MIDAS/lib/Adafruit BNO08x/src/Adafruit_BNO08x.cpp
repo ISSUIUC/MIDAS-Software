@@ -40,7 +40,7 @@
 
 static Adafruit_SPIDevice *spi_dev = NULL; ///< Pointer to SPI bus interface
 static int8_t _int_pin;
-static GpioAddress _reset_pin(0, 0);
+static int _reset_pin;
 
 static Adafruit_I2CDevice *i2c_dev = NULL; ///< Pointer to I2C bus interface
 static HardwareSerial *uart_dev = NULL;
@@ -82,7 +82,7 @@ static void hal_hardwareReset(void);
  *
  * @param reset_pin The arduino pin # connected to the BNO Reset pin
  */
-Adafruit_BNO08x::Adafruit_BNO08x(GpioAddress reset_pin) { _reset_pin = reset_pin; }
+Adafruit_BNO08x::Adafruit_BNO08x(int reset_pin) { _reset_pin = reset_pin; }
 
 /**
  * @brief Destroy the Adafruit_BNO08x::Adafruit_BNO08x object
@@ -626,12 +626,12 @@ static void hal_hardwareReset(void) {
 //  if (_reset_pin != -1) {
     // Serial.println("BNO08x Hardware reset");
 
-    gpioPinMode(_reset_pin, OUTPUT);
-    gpioDigitalWrite(_reset_pin, HIGH);
+    pinMode(_reset_pin, OUTPUT);
+    digitalWrite(_reset_pin, HIGH);
     delay(10);
-    gpioDigitalWrite(_reset_pin, LOW);
+    digitalWrite(_reset_pin, LOW);
     delay(10);
-    gpioDigitalWrite(_reset_pin, HIGH);
+    digitalWrite(_reset_pin, HIGH);
     delay(10);
 //  }
 }

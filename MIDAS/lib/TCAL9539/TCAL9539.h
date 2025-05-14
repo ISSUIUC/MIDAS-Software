@@ -4,6 +4,7 @@
 static constexpr uint8_t GPIO0_ADDRESS = 0x74;
 static constexpr uint8_t GPIO1_ADDRESS = 0x75;
 static constexpr uint8_t GPIO2_ADDRESS = 0x77;
+static constexpr int I2C_BUS_Map[] = {1,0,0};
 
 static constexpr int GPIO_LOW_BIT_COUNT = 8;
 static constexpr int GPIO_HIGH_BIT_COUNT = 16;
@@ -52,7 +53,18 @@ struct GpioReadResult {
     GpioError error;
 };
 
-bool TCAL9539Init();
+bool TCAL9539Init(int reset_pin);
+
+/**
+ * wirenum: decides which wire to use on the GPIO
+ * pin: which pin to write or read signal from
+ * mode: the mode of the pin
+ * 
+ * wire = 0 means we are using our main i2c bus
+ * wire = 1 means we are using the pyro i2c bus
+ */
 GpioError gpioPinMode(GpioAddress pin, int mode);
+
 GpioError gpioDigitalWrite(GpioAddress pin, int mode);
+
 GpioReadResult gpioDigitalRead(GpioAddress pin);

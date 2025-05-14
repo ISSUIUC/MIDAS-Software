@@ -16,63 +16,45 @@
  * Magilan Sendhil
  */
 
-#include <RHHardwareSPI.h>
-
 #include "hardware/telemetry_backend.h"
 #include "hardware/pins.h"
 
-
 // Change to 434.0 or other frequency, must match RX's freq!
 #ifdef IS_BOOSTER
-#define RF95_FREQ 425.15
+#define TX_FREQ 425.15
 #else
-#define RF95_FREQ 426.15
+#define TX_FREQ 421.15
 #endif
+
+#define TX_OUTPUT_POWER 22		// dBm
+#define LORA_BANDWIDTH 0		// [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
+#define LORA_SPREADING_FACTOR 8// [SF7..SF12]
+#define LORA_CODINGRATE 4		// [1: 4/5, 2: 4/6,  3: 4/7,  4: 4/8]
+#define LORA_PREAMBLE_LENGTH 10  // Same for Tx and Rx
+#define LORA_SYMBOL_TIMEOUT 0   // Symbols
+#define LORA_FIX_LENGTH_PAYLOAD_ON false
+#define LORA_IQ_INVERSION_ON false
+#define RX_TIMEOUT_VALUE 1000
+#define TX_TIMEOUT_VALUE 1000
+#define LORA_BUFFER_SIZE 64 // Define the payload size here
 
 /**
  * @brief Default constructor for the telemetry system
 */
-TelemetryBackend::TelemetryBackend() : rf95(RFM96_CS, RFM96_INT) {
+TelemetryBackend::TelemetryBackend() : lora(SPI, E22_CS, E22_BUSY, E22_DI01, E22_RXEN, E22_RESET) {
     led_state = false;
 }
-
 /**
  * @brief Initializes the telemetry system
  * 
  * @return Error Code
 */
 ErrorCode TelemetryBackend::init() {
-    pinMode(RFM96_RESET, OUTPUT);
-    digitalWrite(RFM96_RESET, HIGH);
-    delay(100);
-    digitalWrite(RFM96_RESET, LOW);
-    delay(100);
-    digitalWrite(RFM96_RESET, HIGH);
-    delay(5);
+	if(lora.setup() != SX1268Error::NoError) return ErrorCode::LoraCouldNotBeInitialized;
+    if(lora.set_modulation_params(8, LORA_BW_250, LORA_CR_4_8, false) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
+	if(lora.set_frequency((uint32_t) (TX_FREQ * 1e6)) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
+	if(lora.set_tx_power(22) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
 
-    if (!rf95.init()) {
-        return ErrorCode::RadioInitFailed;
-    }
-    Serial.println("[DEBUG]: Radio Initialized");
-
-    // Defaults after init are 434.0MHz, 13dBm, Bw = 125 kHz, Cr = 4/5, Sf =
-    // 128chips/symbol, CRC on
-
-    if (!rf95.setFrequency(RF95_FREQ)) {
-        return ErrorCode::RadioSetFrequencyFailed;
-    }
-    rf95.setSignalBandwidth(125000);
-    rf95.setCodingRate4(8);
-    rf95.setSpreadingFactor(10);
-    rf95.setPayloadCRC(true);
-    /*
-     * The default transmitter power is 13dBm, using PA_BOOST.
-     * If you are using RFM95/96/97/98 modules which uses the PA_BOOST
-     * transmitter pin, then you can set transmitter powers from 5 to 23 dBm:
-     */
-    rf95.setTxPower(23, false);
-
-    sei();
     return ErrorCode::NoError;
 }
 
@@ -81,15 +63,19 @@ ErrorCode TelemetryBackend::init() {
  * 
  * @return RSSI of most recent packet
 */
-int8_t TelemetryBackend::getRecentRssi() {
-    return rf95.lastRssi();
+int16_t TelemetryBackend::getRecentRssi() {
+    return 0;
 }
 
 /**
  * @brief Sets new frequency for the LoRa module
- * 
+ *
  * @param freq New frequency to set the LoRa module to
 */
-void TelemetryBackend::setFrequency(float freq) {
-    rf95.setFrequency(freq);
+ErrorCode TelemetryBackend::setFrequency(float freq) {
+    if(lora.set_frequency((uint32_t) (freq * 1e6)) != SX1268Error::NoError) {
+        return ErrorCode::LoraCommunicationFailed;
+    } else {
+        return ErrorCode::NoError;
+    }
 }

@@ -23,7 +23,7 @@ static AdcRegReadResult adc_reg_read(uint8_t address, uint8_t reg_address) {
   WIRE.beginTransmission(address);
   WIRE.write(ADC_REG_READ);
   WIRE.write(reg_address);
-  if(!WIRE.endTransmission(true)){
+  if(WIRE.endTransmission(true) != 0){
     return AdcRegReadResult{.value=0, .error=AdcError::I2CError};
   }
   uint8_t ct = WIRE.requestFrom((int)address, 1, 1);
@@ -39,7 +39,7 @@ static AdcError adc_reg_write(uint8_t address, uint8_t reg_address, uint8_t data
   WIRE.write(ADC_REG_WRITE);
   WIRE.write(reg_address);
   WIRE.write(data);
-  if(!WIRE.endTransmission(true)){
+  if(WIRE.endTransmission(true) != 0){
     return AdcError::I2CError;
   }
   return AdcError::NoError;
