@@ -52,7 +52,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: firmware-${{ matrix.env }}
-        path: .pio/build/${{ matrix.env }}/firmware*.*
+        path: MIDAS/.pio/build/${{ matrix.env }}/firmware*.*
 
   # notify:
   #   name: Build Notifications
