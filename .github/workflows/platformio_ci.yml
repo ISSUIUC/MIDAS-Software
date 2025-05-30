@@ -54,16 +54,16 @@ jobs:
         name: firmware-${{ matrix.env }}
         path: MIDAS/.pio/build/${{ matrix.env }}/firmware*.*
 
-  # notify:
-  #   name: Build Notifications
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   if: always()
-  #   steps:
-  #     - name: Slack Notification
-  #       uses: rtCamp/action-slack-notify@v2
-  #       env:
-  #         SLACK_COLOR: ${{ needs.build.result }}
-  #         SLACK_MESSAGE: "Matrix build completed with status: ${{ needs.build.result }}"
-  #         SLACK_TITLE: "Firmware Matrix Build Summary: ${{ needs.build.result }}"
-  #         SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
+  notify:
+    name: Build Notifications
+    needs: build
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_COLOR: ${{ needs.build.result }}
+          SLACK_MESSAGE: "Matrix build completed with status: ${{ needs.build.result }}"
+          SLACK_TITLE: "Firmware Matrix Build Summary: ${{ needs.build.result }}"
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
