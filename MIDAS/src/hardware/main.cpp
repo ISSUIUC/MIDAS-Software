@@ -44,6 +44,8 @@ void setup()
     ledcWriteTone(BUZZER_CHANNEL, 3200);
     delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
+
+    !! THIS IS A SYNTAX ERROR TO CAUSE A BUILD FAILURE ONLY ON SUSTAINER !!
     #endif
 
     #ifdef IS_BOOSTER

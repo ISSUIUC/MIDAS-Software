@@ -3,8 +3,6 @@
 #include "sensors.h"
 #include "hal.h"
 
-!! THIS IS A SYNTAX ERROR TO CAUSE A BUILD FAILURE !!
-
 Adafruit_LIS3MDL LIS3MDL;           // global static instance of the sensor
 
 ErrorCode MagnetometerSensor::init() {
