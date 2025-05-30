@@ -3,8 +3,8 @@ name: CI -- Build Firmware
 on:
   push:
     branches:
-      - 'ci-firmware-build'  # Trigger builds on this branch
-  workflow_dispatch:      # Allows manual trigger
+      - '**' # Run CI on all branches
+  workflow_dispatch: 
 
 jobs:
   build_sustainer:
@@ -88,10 +88,10 @@ jobs:
           path: MIDAS/.pio/build/mcu_main_booster/firmware*.*
 
   notify:
-    name: Slack Notification Summary
+    name: Slack Notification Summary (main)
     needs: [build_sustainer, build_booster]
     runs-on: ubuntu-latest
-    if: always()
+    if: github.ref == 'refs/heads/main'
     steps:
       - name: Send Slack Summary
         uses: rtCamp/action-slack-notify@v2
@@ -100,6 +100,8 @@ jobs:
           SLACK_TITLE: "Firmware Build Summary"
           SLACK_MESSAGE: |
             Build results:
-            - mcu_main_sustainer: ${{ needs.build_sustainer.result }}
-            - mcu_main_booster: ${{ needs.build_booster.result }}
+            - *mcu_main_sustainer*: ${{ needs.build_sustainer.result }}
+            - *mcu_main_booster*: ${{ needs.build_booster.result }}
+
+            :information_source: CI Notifications only run on the `main` branch.
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
