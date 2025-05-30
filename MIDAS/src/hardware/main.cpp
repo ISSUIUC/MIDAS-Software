@@ -44,7 +44,6 @@ void setup()
     ledcWriteTone(BUZZER_CHANNEL, 3200);
     delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
-    
     #endif
 
     #ifdef IS_BOOSTER
