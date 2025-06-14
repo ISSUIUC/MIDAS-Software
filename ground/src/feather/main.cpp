@@ -338,7 +338,20 @@ void set_freq_local_bug_fix(float freq) {
 }
 
 
+// Identifies this device over serial
+void serial_identify() {
+    Serial.println("IDENT_RESPONSE:FEATHER_M0");
+}
+
+
 void HandleSerial(const String key) {
+
+    
+    if (key == "IDENT") {
+        serial_identify();
+        return;
+    }
+
     if (!cmd_queue.empty()) {
         Serial.println(json_buffer_full_error);
         return;
@@ -522,7 +535,7 @@ void loop() {
             cur_input += input;
             cur_input.replace("\r", ""); // Remove carriage returns
 
-            HandleSerial(input.substring(0, input.length() - 2));
+            HandleSerial(cur_input.substring(0, cur_input.length() - 1));
 
             cur_input = "";
         } else {
