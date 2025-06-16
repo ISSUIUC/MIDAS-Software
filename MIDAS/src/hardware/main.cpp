@@ -1,7 +1,11 @@
 #include <Wire.h>
 #include <SPI.h>
 #include "TCAL9539.h"
+#include <esp_now.h>
+#include <WiFi.h>
 
+// REPLACE WITH YOUR RECEIVER MAC Address
+uint8_t broadcastAddress[] = {0xf4,0x12,0xfa,0x74,0x84,0xbc};
 #include "systems.h"
 #include "hardware/pins.h"
 #include "hardware/Emmc.h"
@@ -15,7 +19,7 @@
 
 // #ifdef IS_SUSTAINER
 // MultipleLogSink<EMMCSink> sinks;
-MultipleLogSink<SDSink> sinks;
+MultipleLogSink<> sinks;
 // #else
 // MultipleLogSink<> sinks;
 // #endif
@@ -23,6 +27,14 @@ RocketSystems systems{.log_sink = sinks};
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
  */
+
+// callback when data is sent
+void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
+//   Serial.print("\r\nLast Packet Send Status:\t");
+if(status != ESP_NOW_SEND_SUCCESS) Serial.println("Delivery fail");
+//   Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
+}
+esp_now_peer_info_t peerInfo;
 
 void setup()
 {
@@ -104,6 +116,22 @@ void setup()
     gpioPinMode(PYROC_FIRE_PIN, OUTPUT);
     gpioPinMode(PYROD_FIRE_PIN, OUTPUT);
     gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT);
+
+    WiFi.mode(WIFI_STA);
+    if(esp_now_init() != ESP_OK) {
+        Serial.println("Error initing ESP NOW (protocol for talking with stepper board)");
+    }
+    esp_now_register_send_cb(OnDataSent);
+
+    // Register peer
+    memcpy(peerInfo.peer_addr, broadcastAddress, 6);
+    peerInfo.channel = 0;  
+    peerInfo.encrypt = false;
+    
+    // Add peer        
+    if (esp_now_add_peer(&peerInfo) != ESP_OK){
+        Serial.println("Failed to add esp now peer");
+    }
 
     delay(200);
 

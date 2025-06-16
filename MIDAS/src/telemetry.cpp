@@ -65,8 +65,8 @@ void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
     backend.send(packet);
 }
 
-bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
-    return backend.read(command, wait_milliseconds);
+bool Telemetry::receive(TelemetryPacket* packet, int wait_milliseconds) {
+    return backend.read(packet, wait_milliseconds);
 }
 
 void Telemetry::acknowledgeReceived() {

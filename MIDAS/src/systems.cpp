@@ -4,6 +4,7 @@
 #include "gnc/ekf.h"
 
 #include <TCAL9539.h>
+#include <esp_now.h>
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -306,42 +307,94 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
     }
 }
 
+struct GpsData { 
+    float my_lat;
+    float my_lon;
+    float my_alt;
+    float my_pitch;
+    float rocket_lat;
+    float rocket_lon; 
+    float rocket_alt;
+};
+
+DECLARE_THREAD(esp_now, RocketSystems* arg) {
+    uint8_t broadcastAddress[] = {0xf4,0x12,0xfa,0x74,0x84,0xbc};
+    uint32_t start = millis();
+    while (true) {
+        GpsData to_send{};
+        GPS my_gps = arg->rocket_data.gps.getRecent();
+        GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+        LowGData lowg = arg->rocket_data.low_g.getRecent();
+        float dt = (millis() - start) / 1000.0;
+        to_send.my_alt = 1000.0;
+        to_send.my_lat = 44.0;
+        to_send.my_lon = -88.0;
+        to_send.rocket_alt = 1000.0 + dt * 1000.0;
+        to_send.rocket_lat = 44.1 - dt / 50;
+        to_send.rocket_lon = -88.0;
+        // to_send.my_alt = my_gps.altitude;
+        // to_send.my_lat = my_gps.latitude;
+        // to_send.my_lon = my_gps.longitude;
+        to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
+        // to_send.rocket_alt = rocket_gps.altitude;
+        // to_send.rocket_lat = rocket_gps.latitude;
+        // to_send.rocket_lon = rocket_gps.longitude;
+
+        esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&to_send, sizeof(to_send));
+        if (result == ESP_OK) {
+        // Serial.println("Sent with success");
+        }
+        else {
+        Serial.println("Error sending the data");
+        }
+        THREAD_SLEEP(10);
+    }
+}
+
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
-    double launch_time = 0;
-    bool has_triggered_vmux_fallback = false;
+    // double launch_time = 0;
+    // bool has_triggered_vmux_fallback = false;
 
     // Temporary for Aether II launch 2025! This should not be the case for later launches :)
-    arg->rocket_data.fsm_state.update(FSMState::STATE_IDLE);
+    // arg->rocket_data.fsm_state.update(FSMState::STATE_IDLE);
 
     while (true) {
 
-        arg->tlm.transmit(arg->rocket_data, arg->led);
+        // arg->tlm.transmit(arg->rocket_data, arg->led);
 
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
-        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+        // FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        // double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
-        if (current_state <= FSMState::STATE_IDLE) {
-            launch_time = current_time;
-            has_triggered_vmux_fallback = false;
-        }
+        // // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
+        // if (current_state <= FSMState::STATE_IDLE) {
+        //     launch_time = current_time;
+        //     has_triggered_vmux_fallback = false;
+        // }
 
-        if ((current_time - launch_time) > 79200 && !has_triggered_vmux_fallback) {
-            // THIS IS A HARDCODED VALUE FOR AETHER II 6/21/2025 -- Value is optimal TTA from SDA
-            // If the rocket has been in flight for over 79.2 seconds, we swap the FSM camera feed to the bulkhead camera
-            // This is a fallback in case we can't detect the APOGEE event, so it is more conservative.
-            has_triggered_vmux_fallback = true;
-            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
-        }
+        // if ((current_time - launch_time) > 79200 && !has_triggered_vmux_fallback) {
+        //     // THIS IS A HARDCODED VALUE FOR AETHER II 6/21/2025 -- Value is optimal TTA from SDA
+        //     // If the rocket has been in flight for over 79.2 seconds, we swap the FSM camera feed to the bulkhead camera
+        //     // This is a fallback in case we can't detect the APOGEE event, so it is more conservative.
+        //     has_triggered_vmux_fallback = true;
+        //     arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
+        // }
 
-        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
-            TelemetryCommand command;
-            if (arg->tlm.receive(&command, 200)) {
-                if (command.valid()) {
-                    arg->tlm.acknowledgeReceived();
-                    handle_tlm_command(command, arg, current_state);
-                }
-            }
+        // if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {
+        //     TelemetryCommand command;
+        //     if (arg->tlm.receive(&command, 200)) {
+        //         if (command.valid()) {
+        //             arg->tlm.acknowledgeReceived();
+        //             handle_tlm_command(command, arg, current_state);
+        //         }
+        //     }
+        // }
+        TelemetryPacket packet;
+        if(arg->tlm.receive(&packet, 2000)) {
+            GPS gps_data;
+            gps_data.latitude = packet.lat * 1.0e-7;
+            gps_data.longitude = packet.lon * 1.0e-7;
+            gps_data.altitude = packet.alt;
+            arg->rocket_data.rocket_gps.update(gps_data);
         }
         THREAD_SLEEP(1);
     }
@@ -356,27 +409,26 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
     INIT_SYSTEM(systems.sensors.low_g);
-    INIT_SYSTEM(systems.sensors.orientation);
+    // INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
-    INIT_SYSTEM(systems.sensors.barometer);
+    // INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
-    INIT_SYSTEM(systems.led);
+    // INIT_SYSTEM(systems.sensors.continuity);
+    // INIT_SYSTEM(systems.sensors.voltage);
+    // INIT_SYSTEM(systems.sensors.pyro);
+    // INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.b2b);
-    #ifdef ENABLE_TELEM
-        INIT_SYSTEM(systems.tlm);
-    #endif
+    // INIT_SYSTEM(systems.b2b);
+    // #ifdef ENABLE_TELEM
+    INIT_SYSTEM(systems.tlm);
+    // #endif
     INIT_SYSTEM(systems.sensors.gps);
-    gpioDigitalWrite(LED_ORANGE, LOW);
+    // gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
 #undef INIT_SYSTEM
-
 
 /**
  * @brief Initializes the systems, and then creates and starts the thread for each system.
@@ -397,29 +449,29 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    START_THREAD(orientation, SENSOR_CORE, config, 10);
+    // START_THREAD(orientation, SENSOR_CORE, config, 10);
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
-    START_THREAD(barometer, SENSOR_CORE, config, 12);
+    // START_THREAD(barometer, SENSOR_CORE, config, 12);
     START_THREAD(gps, SENSOR_CORE, config, 8);
-    START_THREAD(voltage, SENSOR_CORE, config, 9);
-    START_THREAD(pyro, SENSOR_CORE, config, 14);
+    // START_THREAD(voltage, SENSOR_CORE, config, 9);
+    // START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(cam, SENSOR_CORE, config, 16);
-    START_THREAD(kalman, SENSOR_CORE, config, 7);
-    START_THREAD(fsm, SENSOR_CORE, config, 8);
+    // START_THREAD(cam, SENSOR_CORE, config, 16);
+    // START_THREAD(kalman, SENSOR_CORE, config, 7);
+    // START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
-    #ifdef ENABLE_TELEM
+    // #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
-    #endif
+    START_THREAD(esp_now, SENSOR_CORE, config, 9);
+    // #endif
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
-
     while (true) {
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
     }
 }
 

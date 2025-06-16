@@ -195,6 +195,7 @@ public:
     SensorData<Magnetometer> magnetometer;
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
+    SensorData<GPS> rocket_gps;
     
     CommandFlags command_flags;
     uint8_t camera_state = 127;
