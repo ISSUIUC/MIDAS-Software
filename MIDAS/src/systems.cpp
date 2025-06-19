@@ -312,9 +312,11 @@ struct GpsData {
     float my_lon;
     float my_alt;
     float my_pitch;
+    float my_yaw;
     float rocket_lat;
     float rocket_lon; 
     float rocket_alt;
+    int mode;
 };
 
 DECLARE_THREAD(esp_now, RocketSystems* arg) {
@@ -326,19 +328,15 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
         GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
         LowGData lowg = arg->rocket_data.low_g.getRecent();
         float dt = (millis() - start) / 1000.0;
-        // to_send.my_alt = 1000.0;
-        // to_send.my_lat = 44.0;
-        // to_send.my_lon = -88.0;
-        // to_send.rocket_alt = 1000.0 + dt * 1000.0;
-        // to_send.rocket_lat = 44.1 - dt / 50;
-        // to_send.rocket_lon = -88.0;
         to_send.my_alt = my_gps.altitude;
         to_send.my_lat = my_gps.latitude;
         to_send.my_lon = my_gps.longitude;
         to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
+        to_send.my_yaw = atan2(lowg.az, lowg.ay);
         to_send.rocket_alt = rocket_gps.altitude;
         to_send.rocket_lat = rocket_gps.latitude;
         to_send.rocket_lon = rocket_gps.longitude;
+        to_send.mode = 0;
 
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&to_send, sizeof(to_send));
         if (result == ESP_OK) {
