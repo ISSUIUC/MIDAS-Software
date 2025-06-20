@@ -322,21 +322,42 @@ struct GpsData {
 DECLARE_THREAD(esp_now, RocketSystems* arg) {
     uint8_t broadcastAddress[] = {0xf4,0x12,0xfa,0x74,0x84,0xbc};
     uint32_t start = millis();
+    int mode = 0;
+    float manual_pitch = 0.0;
+    float manual_yaw = 0.0;
     while (true) {
         GpsData to_send{};
         GPS my_gps = arg->rocket_data.gps.getRecent();
         GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
         LowGData lowg = arg->rocket_data.low_g.getRecent();
         float dt = (millis() - start) / 1000.0;
+        if(Serial.available()){
+            int v = Serial.read();
+            if(v == 'w') {
+                manual_pitch += 0.08;
+            } else if(v == 's') {
+                manual_pitch -= 0.08;
+            } else if(v == 'a') {
+                manual_yaw -= 0.08;
+            } else if(v == 'd') {
+                manual_yaw += 0.08;
+            } else if(v == '0') {
+                mode = 0;
+            } else if(v == '1') {
+                mode = 1;
+            }
+        }
         to_send.my_alt = my_gps.altitude;
         to_send.my_lat = my_gps.latitude;
         to_send.my_lon = my_gps.longitude;
-        to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
-        to_send.my_yaw = atan2(lowg.az, lowg.ay);
+        to_send.my_pitch = manual_pitch;
+        to_send.my_yaw = manual_yaw;
+        // to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
+        // to_send.my_yaw = atan2(lowg.az, lowg.ay);
         to_send.rocket_alt = rocket_gps.altitude;
         to_send.rocket_lat = rocket_gps.latitude;
         to_send.rocket_lon = rocket_gps.longitude;
-        to_send.mode = 0;
+        to_send.mode = mode;
 
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&to_send, sizeof(to_send));
         if (result == ESP_OK) {
