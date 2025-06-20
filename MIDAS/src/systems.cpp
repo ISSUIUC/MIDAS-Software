@@ -335,8 +335,10 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
             int v = Serial.read();
             if(v == 'w') {
                 manual_pitch += 0.08;
+                if(manual_pitch < M_PI/2) manual_pitch = M_PI/2;
             } else if(v == 's') {
                 manual_pitch -= 0.08;
+                if(manual_pitch < 0) manual_pitch = 0;
             } else if(v == 'a') {
                 manual_yaw -= 0.08;
             } else if(v == 'd') {
