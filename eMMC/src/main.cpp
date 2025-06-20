@@ -2,6 +2,13 @@
 #include <SD_MMC.h>
 #include <stdint.h>
 
+#define FLASH_CMD 14
+#define FLASH_CLK 18
+#define FLASH_DAT0 13
+#define FLASH_DAT1 12
+#define FLASH_DAT2 15
+#define FLASH_DAT3 16
+
 #define EMMC_CLK 38
 #define EMMC_CMD 39
 #define EMMC_D0 44
@@ -14,22 +21,39 @@ uint8_t buffer[1024];
 void setup() {
     Serial.begin(9600);
 
+    delay(2000);
+
     while (!Serial) { }
 
-    if (!SD_MMC.setPins(EMMC_CLK, EMMC_CMD, EMMC_D0, EMMC_D1, EMMC_D2, EMMC_D3)) {
+    Serial.println("setup");
+
+    Serial.println("Connecting to SD...");
+    if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
         Serial.println("Pin change failed!");
         return;
     }
-    // if(!SD_MMC.begin()){
-    if (!SD_MMC.begin("/sdcard", false, true, SDMMC_FREQ_52M, 5)) {
+    if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
         Serial.println("Card Mount Failed");
         return;
     }
 
-    if (!SD_MMC.begin()) {
-        Serial.println("Could not mount SDMMC.");
-        return;
-    }
+    // if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
+    //     Serial.println("Pin change failed!");
+    //     return;
+    // }
+
+    // // if(!SD_MMC.begin()){
+    // if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
+    //     Serial.println("Card Mount Failed");
+    //     return;
+    // }
+
+    // if (!SD_MMC.begin()) {
+    //     Serial.println("Could not mount SDMMC.");
+    //     return;
+    // }
+
+    Serial.println("success!");
 }
 
 
@@ -44,6 +68,7 @@ void loop() {
     }
 
     if (message == "ls") {
+        size_t tot_size = 0;
         File root = SD_MMC.open("/");
         if (!root){
             Serial.println("Failed to open directory");
@@ -64,9 +89,13 @@ void loop() {
             Serial.print(file.name());
             Serial.print(" (");
             Serial.print(file.size());
+            tot_size += file.size();
             Serial.println(" bytes)");
             file = root.openNextFile();
         }
+        Serial.print("Total size taken up: ");
+        Serial.print(tot_size);
+        Serial.println("B / 8 000 000 000B");
         Serial.println("<done>");
     } else if (message == "dump") {
         String file_name = Serial.readStringUntil('\n');
@@ -104,7 +133,25 @@ void loop() {
         Serial.println("<done>");
     } else if (message == "<restart>") {
         Serial.println("eMMC Connected");
-    } else {
+    } else if (message == "rmall") {
+        // Delete all files in the root directory   
+        File root = SD_MMC.open("/");
+        while (true) {
+            File file = root.openNextFile();
+            if (!file) {
+                break; // No more files
+            }
+            Serial.print("Deleting file: ");
+            Serial.println(file.path());
+            String fullpath = "/" + String(file.name());
+            file.close();
+            file.flush();
+            SD_MMC.remove(fullpath.c_str());  
+        }
+        Serial.println("All files deleted!");
+        Serial.println("<done>");
+    } 
+    else {
         Serial.println("Unrecognized command: " + message);
         Serial.println("<done>");
     }
