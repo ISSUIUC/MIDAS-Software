@@ -143,9 +143,10 @@ void loop() {
             }
             Serial.print("Deleting file: ");
             Serial.println(file.path());
+            String fullpath = "/" + String(file.name());
             file.close();
             file.flush();
-            SD_MMC.remove(file.path());  
+            SD_MMC.remove(fullpath.c_str());  
         }
         Serial.println("All files deleted!");
         Serial.println("<done>");
