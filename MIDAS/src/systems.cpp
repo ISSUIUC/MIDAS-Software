@@ -342,8 +342,10 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
             } else if(v == 'd') {
                 manual_yaw += 0.08;
             } else if(v == '0') {
+                Serial.println("Auto Mode");
                 mode = 0;
             } else if(v == '1') {
+                Serial.println("Manual Mode");
                 mode = 1;
             }
         }
