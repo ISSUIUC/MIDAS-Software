@@ -325,10 +325,16 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
     int mode = 0;
     float manual_pitch = 0.0;
     float manual_yaw = 0.0;
+
+    int32_t lat = 353471297;
+    int32_t lon = -1178067700;
+    float alt = 1000;
     while (true) {
         GpsData to_send{};
         GPS my_gps = arg->rocket_data.gps.getRecent();
-        GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+        // GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+        int gps_v = Serial.read();
+        GPS rocket_gps = GPS{lat, lon, alt, 0, 0, 0};
         LowGData lowg = arg->rocket_data.low_g.getRecent();
         float dt = (millis() - start) / 1000.0;
         if(Serial.available()){
@@ -349,6 +355,16 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
             } else if(v == '1') {
                 Serial.println("Manual Mode");
                 mode = 1;
+            } else if (v == 'r') {
+                Serial.println('r was pressed');
+                lat += 100000;
+                lon += 100000;
+                alt += 100;
+            } else if (v == 't') {
+                Serial.println("t was pressed");
+                lat -= 100000;
+                lon -= 100000;
+                alt -= 100;
             }
         }
         to_send.my_alt = my_gps.altitude;
@@ -359,8 +375,8 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
         // to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
         // to_send.my_yaw = atan2(lowg.az, lowg.ay);
         to_send.rocket_alt = rocket_gps.altitude;
-        to_send.rocket_lat = rocket_gps.latitude;
-        to_send.rocket_lon = rocket_gps.longitude;
+        to_send.rocket_lat = static_cast<float>(rocket_gps.latitude * 1.0e-7);
+        to_send.rocket_lon = static_cast<float>(rocket_gps.longitude * 1.0e-7);
         to_send.mode = mode;
 
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&to_send, sizeof(to_send));
@@ -414,8 +430,8 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         TelemetryPacket packet;
         if(arg->tlm.receive(&packet, 2000)) {
             GPS gps_data;
-            gps_data.latitude = packet.lat * 1.0e-7;
-            gps_data.longitude = packet.lon * 1.0e-7;
+            gps_data.latitude = packet.lat;
+            gps_data.longitude = packet.lon;
             gps_data.altitude = packet.alt;
             arg->rocket_data.rocket_gps.update(gps_data);
         }
