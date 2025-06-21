@@ -328,11 +328,23 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
     while (true) {
         GpsData to_send{};
         GPS my_gps = arg->rocket_data.gps.getRecent();
-        GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+        //GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+
+
+
+
+
+
+        GPS rocket_gps = GPS{353048905, -1178088819, 1000, 0, 0, 0};
         LowGData lowg = arg->rocket_data.low_g.getRecent();
         float dt = (millis() - start) / 1000.0;
         if(Serial.available()){
             int v = Serial.read();
+            //(353471297, -1178067700, 1000); // Example GPS coordinates for the rocket East
+            //(35.3482780, -117.8246596); // Example GPS coordinates for the rocket West
+            
+
+            //GPS rocket_gps = GPS{353482780, -1178246596, 1000, 0, 0, 0};
             if(v == 'w') {
                 manual_pitch += 0.08;
                 if(manual_pitch > M_PI/2) manual_pitch = M_PI/2;
@@ -359,8 +371,10 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
         // to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
         // to_send.my_yaw = atan2(lowg.az, lowg.ay);
         to_send.rocket_alt = rocket_gps.altitude;
-        to_send.rocket_lat = rocket_gps.latitude;
-        to_send.rocket_lon = rocket_gps.longitude;
+        to_send.rocket_lat = static_cast<float>(rocket_gps.latitude * 1.0e-7);
+        to_send.rocket_lon = static_cast<float>(rocket_gps.longitude * 1.0e-7);
+        Serial.println(to_send.rocket_lat);
+        Serial.println(to_send.rocket_lon);
         to_send.mode = mode;
 
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t*)&to_send, sizeof(to_send));
