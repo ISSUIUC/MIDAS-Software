@@ -339,6 +339,33 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
         float dt = (millis() - start) / 1000.0;
         if(Serial.available()){
             int v = Serial.read();
+            if (v == 'L') {
+                Serial.println("Enter new latitude:");
+                while (!Serial.available()) { THREAD_SLEEP(1); }
+                String lat_str = Serial.readStringUntil('\n');
+                float new_lat = lat_str.toFloat();
+                my_gps.latitude = new_lat;
+                Serial.print("Latitude set to: ");
+                Serial.println(new_lat, 7);
+
+                Serial.println("Enter new longitude:");
+                while (!Serial.available()) { THREAD_SLEEP(1); }
+                String long_str = Serial.readStringUntil('\n');
+                float new_long= long_str.toFloat();
+                my_gps.longitude = new_long;
+                Serial.print("Longitude set to: ");
+                Serial.println(new_long, 7);
+
+                Serial.println("Enter new altitude:");
+                while (!Serial.available()) { THREAD_SLEEP(1); }
+                String alt_str = Serial.readStringUntil('\n');
+                float new_alt = alt_str.toFloat();
+                my_gps.altitdue = new_alt;
+                Serial.print("Altitude set to: ");
+                Serial.println(new_alt, 7);
+            }
+
+
             if(v == 'w') {
                 manual_pitch += 0.08;
                 if(manual_pitch > M_PI/2) manual_pitch = M_PI/2;
@@ -367,7 +394,7 @@ DECLARE_THREAD(esp_now, RocketSystems* arg) {
                 alt -= 100;
             }
         }
-        to_send.my_alt = my_gps.altitude;
+        to_send.my_alt = ;;.altitude;
         to_send.my_lat = my_gps.latitude;
         to_send.my_lon = my_gps.longitude;
         to_send.my_pitch = manual_pitch;
