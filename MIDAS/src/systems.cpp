@@ -372,13 +372,22 @@ DECLARE_THREAD(esp_now, RocketSystems *arg)
     int mode = 0;
     float manual_pitch = 0.0;
     float manual_yaw = 0.0;
+    
     while (true)
     {
         GpsData to_send{};
         // Important set long, lat to current position of Sam Turret before launch
-        GPS my_gps = GPS{353481050, -1178077020, 640, 0, 0, 0};
+        GPS my_gps = GPS{353501160, -1178017930, 640, 0, 0, 0};
         // GPS my_gps = arg->rocket_data.gps.getRecent();
-        GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+        // GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
+        
+        GPS rocket_gps = GPS{arg->rocket_data.rocket_gps.getRecent().latitude*1e7,arg->rocket_data.rocket_gps.getRecent().longitude*1e7,arg->rocket_data.rocket_gps.getRecent().altitude, 0, 0, 0}; // Example GPS coordinates for the rocket East
+        // GPS rocket_gps = GPS{353478930, -1178093950, 100000, 0, 0, 0};
+        Serial.println(arg->rocket_data.rocket_gps.getRecent().latitude);
+        Serial.println(arg->rocket_data.rocket_gps.getRecent().longitude);
+        // Serial.println(arg->rocket_data.rocket_gps.getRecent().latitude);
+
+        // Serial.println(rocket_gps.longitude);
         /*Debugging Stuff*/
         // GPS rocket_gps = GPS{353333321, -1179142655, 1000, 0, 0, 0}; //East
         // GPS rocket_gps = GPS{352054774, -1179798053, 1000, 0, 0, 0}; //SW
@@ -423,7 +432,7 @@ DECLARE_THREAD(esp_now, RocketSystems *arg)
                 Serial.println("Auto Mode");
                 mode = 1;
             }
-        }
+        } 
         to_send.my_alt = my_gps.altitude;
         to_send.my_lat = static_cast<float>(my_gps.latitude * 1.0e-7);
         to_send.my_lon = static_cast<float>(my_gps.longitude * 1.0e-7);
@@ -434,6 +443,7 @@ DECLARE_THREAD(esp_now, RocketSystems *arg)
         to_send.rocket_alt = rocket_gps.altitude;
         to_send.rocket_lat = static_cast<float>(rocket_gps.latitude * 1.0e-7);
         to_send.rocket_lon = static_cast<float>(rocket_gps.longitude * 1.0e-7);
+
         // Serial.println(to_send.rocket_lat,7);
         // Serial.println(to_send.rocket_lon,7);
         to_send.mode = mode;
