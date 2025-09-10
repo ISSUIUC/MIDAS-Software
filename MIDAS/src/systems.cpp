@@ -113,7 +113,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
     while(true) {
         if(arg->sensors.gps.valid()) {
             GPS reading = arg->sensors.gps.read();
-            arg->rocket_data.gps.update(reading);
+            // arg->rocket_data.gps.update(reading);
         }
         //GPS waits internally
         THREAD_SLEEP(1);
@@ -358,22 +358,22 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
-    INIT_SYSTEM(systems.sensors.low_g);
-    INIT_SYSTEM(systems.sensors.orientation);
-    INIT_SYSTEM(systems.log_sink);
-    INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
-    INIT_SYSTEM(systems.sensors.barometer);
-    INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
-    INIT_SYSTEM(systems.led);
-    INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.b2b);
-    #ifdef ENABLE_TELEM
-        INIT_SYSTEM(systems.tlm);
-    #endif
+    // INIT_SYSTEM(systems.sensors.low_g);
+    // INIT_SYSTEM(systems.sensors.orientation);
+    // INIT_SYSTEM(systems.log_sink);
+    // INIT_SYSTEM(systems.sensors.high_g);
+    // INIT_SYSTEM(systems.sensors.low_g_lsm);
+    // INIT_SYSTEM(systems.sensors.barometer);
+    // INIT_SYSTEM(systems.sensors.magnetometer);
+    // INIT_SYSTEM(systems.sensors.continuity);
+    // INIT_SYSTEM(systems.sensors.voltage);
+    // INIT_SYSTEM(systems.sensors.pyro);
+    // INIT_SYSTEM(systems.led);
+    // INIT_SYSTEM(systems.buzzer);
+    // INIT_SYSTEM(systems.b2b);
+    // #ifdef ENABLE_TELEM
+    //     INIT_SYSTEM(systems.tlm);
+    // #endif
     INIT_SYSTEM(systems.sensors.gps);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
@@ -400,29 +400,29 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    START_THREAD(orientation, SENSOR_CORE, config, 10);
-    START_THREAD(logger, DATA_CORE, config, 15);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
-    START_THREAD(barometer, SENSOR_CORE, config, 12);
+    // START_THREAD(orientation, SENSOR_CORE, config, 10);
+    // START_THREAD(logger, DATA_CORE, config, 15);
+    // START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    // START_THREAD(barometer, SENSOR_CORE, config, 12);
     START_THREAD(gps, SENSOR_CORE, config, 8);
-    START_THREAD(voltage, SENSOR_CORE, config, 9);
-    START_THREAD(pyro, SENSOR_CORE, config, 14);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(cam, SENSOR_CORE, config, 16);
-    START_THREAD(kalman, SENSOR_CORE, config, 7);
-    START_THREAD(fsm, SENSOR_CORE, config, 8);
-    START_THREAD(buzzer, SENSOR_CORE, config, 6);
-    #ifdef ENABLE_TELEM
-    START_THREAD(telemetry, SENSOR_CORE, config, 15);
-    #endif
+    // START_THREAD(voltage, SENSOR_CORE, config, 9);
+    // START_THREAD(pyro, SENSOR_CORE, config, 14);
+    // START_THREAD(magnetometer, SENSOR_CORE, config, 11);
+    // START_THREAD(cam, SENSOR_CORE, config, 16);
+    // START_THREAD(kalman, SENSOR_CORE, config, 7);
+    // START_THREAD(fsm, SENSOR_CORE, config, 8);
+    // START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    // #ifdef ENABLE_TELEM
+    // START_THREAD(telemetry, SENSOR_CORE, config, 15);
+    // #endif
 
-    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    // config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
     }
 }
 

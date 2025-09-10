@@ -24,8 +24,8 @@ ErrorCode GPSSensor::init() {
     // ublox.setMeasurementRate(100);
 	ublox.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT); //Save (only) the communications port settings to flash and BBR
 
+    ublox.logRXMSFRBX();
 	//This will pipe all NMEA sentences to the serial port so we can see them
-
     return ErrorCode::NoError;
 }
 
@@ -36,6 +36,13 @@ ErrorCode GPSSensor::init() {
  * @return GPS data packet
  */
 GPS GPSSensor::read() {
+    ublox.extractFileBufferData(data, 512);
+    for (int i = 0; i < 512; i++) {
+        Serial.print(data[i]);
+        Serial.print(" ");
+    }
+    Serial.println();
+    ublox.checkUblox();
     return GPS{ublox.getLatitude(), ublox.getLongitude(), (float) ublox.getAltitude() / 1000.f, (float) ublox.getGroundSpeed() / 1000.f, ublox.getFixType(), ublox.getUnixEpoch()};
 }
 

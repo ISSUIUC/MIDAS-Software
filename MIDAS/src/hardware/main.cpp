@@ -29,7 +29,7 @@ void setup()
     // begin serial port
     Serial.begin(9600);
 
-    delay(200);
+    delay(2000);
 
     // Immediate startup tone
     pinMode(BUZZER_PIN, OUTPUT);

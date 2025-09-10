@@ -87,6 +87,7 @@ struct GPSSensor {
     bool valid();
     GPS read();
     bool is_leap = false;
+    uint8_t data[512];
 };
 
 /**
