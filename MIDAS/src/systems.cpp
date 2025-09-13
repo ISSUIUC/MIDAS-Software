@@ -312,7 +312,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
     bool has_triggered_vmux_fallback = false;
 
-
+    arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true) {
 
         arg->tlm.transmit(arg->rocket_data, arg->led);
