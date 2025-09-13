@@ -171,8 +171,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             arg->led.set(LED::GREEN, LOW);
         }
 
-        // Comment below is temporary for Aether II launch! pls remove for safety later.
-        if ((current_state == FSMState::STATE_PYRO_TEST /*|| current_state == FSMState::STATE_IDLE*/) && !arg->buzzer.is_playing()) {
+        if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing()) {
             arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
         }
 
@@ -313,9 +312,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
     bool has_triggered_vmux_fallback = false;
 
-    // Temporary for Aether II launch 2025! This should not be the case for later launches :)
-    arg->rocket_data.fsm_state.update(FSMState::STATE_IDLE);
-
+    arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true) {
 
         arg->tlm.transmit(arg->rocket_data, arg->led);
