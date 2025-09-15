@@ -28,12 +28,12 @@ ErrorCode OrientationSensor::init()
         return ErrorCode::CannotConnectBNO;
     }
     Serial.println("Setting BNO desired reports");
-    if (!imu.enableReport(SH2_ARVR_STABILIZED_RV, REPORT_INTERVAL_US))
+    if (!imu.enableReport(SH2_ARVR_STABILIZED_RV, REPORT_INTERVAL_US_AV))
     {
         return ErrorCode::CannotInitBNO;
     }
 
-    if (!imu.enableReport(SH2_GYRO_INTEGRATED_RV, REPORT_INTERVAL_US_AV))
+    if (!imu.enableReport(SH2_GYRO_INTEGRATED_RV, REPORT_INTERVAL_US))
     {
         return ErrorCode::CannotInitBNO;
     }
