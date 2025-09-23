@@ -7,7 +7,7 @@
 
 #include <RHGenericSPI.h>
 
-// Are we building for a suitable STM processor
+// Are we building for a_m_per_s suitable STM processor
 #if defined(SUBGHZSPI_BASE)
 
 /////////////////////////////////////////////////////////////////////

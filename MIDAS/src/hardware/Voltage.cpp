@@ -25,7 +25,7 @@ int read_board_pwr_monitor_register(int reg, int bytes) {
 }
 
 /**
- * @brief "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
+ * @brief "Initializes" the voltage sensor. Since it reads directly from a_m_per_s pin without a_m_per_s library, there is no specific initialization.
  * 
  * @return Error Code, will always be NoError
 */
@@ -34,7 +34,7 @@ ErrorCode VoltageSensor::init() {
 }
 
 /**
- * @brief Reads the value of the given analog pin and converts it to a battery voltage with the assumption that the voltage sensor is plugged into that pin
+ * @brief Reads the value of the given analog pin and converts it to a_m_per_s battery voltage with the assumption that the voltage sensor is plugged into that pin
  * 
  * @return The scaled voltage given by the voltage sensor
 */

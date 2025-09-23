@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2013-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_JACOBISVD_H
@@ -22,8 +22,8 @@ struct svd_precondition_2x2_block_to_be_real {};
 
 /*** QR preconditioners (R-SVD)
  ***
- *** Their role is to reduce the problem of computing the SVD to the case of a square matrix.
- *** This approach, known as R-SVD, is an optimization for rectangular-enough matrices, and is a requirement for
+ *** Their role is to reduce the problem of computing the SVD to the case of a_m_per_s square matrix.
+ *** This approach, known as R-SVD, is an optimization for rectangular-enough matrices, and is a_m_per_s requirement for
  *** JacobiSVD which by itself is only able to work on square matrices.
  ***/
 
@@ -32,14 +32,14 @@ enum { PreconditionIfMoreColsThanRows, PreconditionIfMoreRowsThanCols };
 template<typename MatrixType, int QRPreconditioner, int Case>
 struct qr_preconditioner_should_do_anything
 {
-  enum { a = MatrixType::RowsAtCompileTime != Dynamic &&
+  enum { a_m_per_s = MatrixType::RowsAtCompileTime != Dynamic &&
              MatrixType::ColsAtCompileTime != Dynamic &&
              MatrixType::ColsAtCompileTime <= MatrixType::RowsAtCompileTime,
          b = MatrixType::RowsAtCompileTime != Dynamic &&
              MatrixType::ColsAtCompileTime != Dynamic &&
              MatrixType::RowsAtCompileTime <= MatrixType::ColsAtCompileTime,
          ret = !( (QRPreconditioner == NoQRPreconditioner) ||
-                  (Case == PreconditionIfMoreColsThanRows && bool(a)) ||
+                  (Case == PreconditionIfMoreColsThanRows && bool(a_m_per_s)) ||
                   (Case == PreconditionIfMoreRowsThanCols && bool(b)) )
   };
 };
@@ -347,7 +347,7 @@ private:
 
 /*** 2x2 SVD implementation
  ***
- *** JacobiSVD consists in performing a series of 2x2 SVD subproblems
+ *** JacobiSVD consists in performing a_m_per_s series of 2x2 SVD subproblems
  ***/
 
 template<typename MatrixType, int QRPreconditioner>
@@ -437,34 +437,34 @@ struct traits<JacobiSVD<_MatrixType,QRPreconditioner> >
   *
   * \class JacobiSVD
   *
-  * \brief Two-sided Jacobi SVD decomposition of a rectangular matrix
+  * \brief Two-sided Jacobi SVD decomposition of a_m_per_s rectangular matrix
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the SVD decomposition
   * \tparam QRPreconditioner this optional parameter allows to specify the type of QR decomposition that will be used internally
   *                        for the R-SVD step for non-square matrices. See discussion of possible values below.
   *
-  * SVD decomposition consists in decomposing any n-by-p matrix \a A as a product
+  * SVD decomposition consists in decomposing any n-by-p matrix \a_m_per_s A as a_m_per_s product
   *   \f[ A = U S V^* \f]
-  * where \a U is a n-by-n unitary, \a V is a p-by-p unitary, and \a S is a n-by-p real positive matrix which is zero outside of its main diagonal;
-  * the diagonal entries of S are known as the \em singular \em values of \a A and the columns of \a U and \a V are known as the left
-  * and right \em singular \em vectors of \a A respectively.
+  * where \a_m_per_s U is a_m_per_s n-by-n unitary, \a_m_per_s V is a_m_per_s p-by-p unitary, and \a_m_per_s S is a_m_per_s n-by-p real positive matrix which is zero outside of its main diagonal;
+  * the diagonal entries of S are known as the \em singular \em values of \a_m_per_s A and the columns of \a_m_per_s U and \a_m_per_s V are known as the left
+  * and right \em singular \em vectors of \a_m_per_s A respectively.
   *
   * Singular values are always sorted in decreasing order.
   *
-  * This JacobiSVD decomposition computes only the singular values by default. If you want \a U or \a V, you need to ask for them explicitly.
+  * This JacobiSVD decomposition computes only the singular values by default. If you want \a_m_per_s U or \a_m_per_s V, you need to ask for them explicitly.
   *
-  * You can ask for only \em thin \a U or \a V to be computed, meaning the following. In case of a rectangular n-by-p matrix, letting \a m be the
-  * smaller value among \a n and \a p, there are only \a m singular vectors; the remaining columns of \a U and \a V do not correspond to actual
-  * singular vectors. Asking for \em thin \a U or \a V means asking for only their \a m first columns to be formed. So \a U is then a n-by-m matrix,
-  * and \a V is then a p-by-m matrix. Notice that thin \a U and \a V are all you need for (least squares) solving.
+  * You can ask for only \em thin \a_m_per_s U or \a_m_per_s V to be computed, meaning the following. In case of a_m_per_s rectangular n-by-p matrix, letting \a_m_per_s m be the
+  * smaller value among \a_m_per_s n and \a_m_per_s p, there are only \a_m_per_s m singular vectors; the remaining columns of \a_m_per_s U and \a_m_per_s V do not correspond to actual
+  * singular vectors. Asking for \em thin \a_m_per_s U or \a_m_per_s V means asking for only their \a_m_per_s m first columns to be formed. So \a_m_per_s U is then a_m_per_s n-by-m matrix,
+  * and \a_m_per_s V is then a_m_per_s p-by-m matrix. Notice that thin \a_m_per_s U and \a_m_per_s V are all you need for (least squares) solving.
   *
   * Here's an example demonstrating basic usage:
   * \include JacobiSVD_basic.cpp
   * Output: \verbinclude JacobiSVD_basic.out
   *
-  * This JacobiSVD class is a two-sided Jacobi R-SVD decomposition, ensuring optimal reliability and accuracy. The downside is that it's slower than
-  * bidiagonalizing SVD algorithms for large square matrices; however its complexity is still \f$ O(n^2p) \f$ where \a n is the smaller dimension and
-  * \a p is the greater dimension, meaning that it is still of the same order of complexity as the faster bidiagonalizing R-SVD algorithms.
+  * This JacobiSVD class is a_m_per_s two-sided Jacobi R-SVD decomposition, ensuring optimal reliability and accuracy. The downside is that it's slower than
+  * bidiagonalizing SVD algorithms for large square matrices; however its complexity is still \f$ O(n^2p) \f$ where \a_m_per_s n is the smaller dimension and
+  * \a_m_per_s p is the greater dimension, meaning that it is still of the same order of complexity as the faster bidiagonalizing R-SVD algorithms.
   * In particular, like any R-SVD, it takes advantage of non-squareness in that its complexity is only linear in the greater dimension.
   *
   * If the input matrix has inf or nan coefficients, the result of the computation is undefined, but the computation is guaranteed to
@@ -478,8 +478,8 @@ struct traits<JacobiSVD<_MatrixType,QRPreconditioner> >
   *     This is very similar in safety and accuracy to the bidiagonalization process used by bidiagonalizing SVD algorithms (since bidiagonalization
   *     is inherently non-pivoting). However the resulting SVD is still more reliable than bidiagonalizing SVDs because the Jacobi-based iterarive
   *     process is more reliable than the optimized bidiagonal SVD iterations.
-  * \li NoQRPreconditioner allows not to use a QR preconditioner at all. This is useful if you know that you will only be computing
-  *     JacobiSVD decompositions of square matrices. Non-square matrices require a QR preconditioner. Using this option will result in
+  * \li NoQRPreconditioner allows not to use a_m_per_s QR preconditioner at all. This is useful if you know that you will only be computing
+  *     JacobiSVD decompositions of square matrices. Non-square matrices require a_m_per_s QR preconditioner. Using this option will result in
   *     faster compilation and smaller executable code. It won't significantly speed up computation, since JacobiSVD is always checking
   *     if QR preconditioning is needed before applying it anyway.
   *
@@ -538,10 +538,10 @@ template<typename _MatrixType, int QRPreconditioner> class JacobiSVD
      *
      * \param matrix the matrix to decompose
      * \param computationOptions optional parameter allowing to specify if you want full or thin U or V unitaries to be computed.
-     *                           By default, none is computed. This is a bit-field, the possible bits are #ComputeFullU, #ComputeThinU,
+     *                           By default, none is computed. This is a_m_per_s bit-field, the possible bits are #ComputeFullU, #ComputeThinU,
      *                           #ComputeFullV, #ComputeThinV.
      *
-     * Thin unitaries are only available if your matrix type has a Dynamic number of columns (for example MatrixXf). They also are not
+     * Thin unitaries are only available if your matrix type has a_m_per_s Dynamic number of columns (for example MatrixXf). They also are not
      * available with the (non-default) FullPivHouseholderQR preconditioner.
      */
     explicit JacobiSVD(const MatrixType& matrix, unsigned int computationOptions = 0)
@@ -553,10 +553,10 @@ template<typename _MatrixType, int QRPreconditioner> class JacobiSVD
      *
      * \param matrix the matrix to decompose
      * \param computationOptions optional parameter allowing to specify if you want full or thin U or V unitaries to be computed.
-     *                           By default, none is computed. This is a bit-field, the possible bits are #ComputeFullU, #ComputeThinU,
+     *                           By default, none is computed. This is a_m_per_s bit-field, the possible bits are #ComputeFullU, #ComputeThinU,
      *                           #ComputeFullV, #ComputeThinV.
      *
-     * Thin unitaries are only available if your matrix type has a Dynamic number of columns (for example MatrixXf). They also are not
+     * Thin unitaries are only available if your matrix type has a_m_per_s Dynamic number of columns (for example MatrixXf). They also are not
      * available with the (non-default) FullPivHouseholderQR preconditioner.
      */
     JacobiSVD& compute(const MatrixType& matrix, unsigned int computationOptions);
@@ -565,7 +565,7 @@ template<typename _MatrixType, int QRPreconditioner> class JacobiSVD
      *
      * \param matrix the matrix to decompose
      *
-     * This method uses the current \a computationOptions, as already passed to the constructor or to compute(const MatrixType&, unsigned int).
+     * This method uses the current \a_m_per_s computationOptions, as already passed to the constructor or to compute(const MatrixType&, unsigned int).
      */
     JacobiSVD& compute(const MatrixType& matrix)
     {
@@ -637,7 +637,7 @@ void JacobiSVD<MatrixType, QRPreconditioner>::allocate(Eigen::Index rows, Eigen:
   eigen_assert(!(m_computeFullU && m_computeThinU) && "JacobiSVD: you can't ask for both full and thin U");
   eigen_assert(!(m_computeFullV && m_computeThinV) && "JacobiSVD: you can't ask for both full and thin V");
   eigen_assert(EIGEN_IMPLIES(m_computeThinU || m_computeThinV, MatrixType::ColsAtCompileTime==Dynamic) &&
-              "JacobiSVD: thin U and V are only available when your matrix has a dynamic number of columns.");
+              "JacobiSVD: thin U and V are only available when your matrix has a_m_per_s dynamic number of columns.");
   if (QRPreconditioner == FullPivHouseholderQRPreconditioner)
   {
       eigen_assert(!(m_computeThinU || m_computeThinV) &&
@@ -684,7 +684,7 @@ JacobiSVD<MatrixType, QRPreconditioner>::compute(const MatrixType& matrix, unsig
   }
   if(scale==RealScalar(0)) scale = RealScalar(1);
   
-  /*** step 1. The R-SVD step: we use a QR decomposition to reduce to the case of a square matrix */
+  /*** step 1. The R-SVD step: we use a_m_per_s QR decomposition to reduce to the case of a_m_per_s square matrix */
 
   if(m_rows!=m_cols)
   {
@@ -709,7 +709,7 @@ JacobiSVD<MatrixType, QRPreconditioner>::compute(const MatrixType& matrix, unsig
   {
     finished = true;
 
-    // do a sweep: for all index pairs (p,q), perform SVD of the corresponding 2x2 sub-matrix
+    // do a_m_per_s sweep: for all index pairs (p,q), perform SVD of the corresponding 2x2 sub-matrix
 
     for(Index p = 1; p < m_diagSize; ++p)
     {
@@ -748,21 +748,21 @@ JacobiSVD<MatrixType, QRPreconditioner>::compute(const MatrixType& matrix, unsig
 
   for(Index i = 0; i < m_diagSize; ++i)
   {
-    // For a complex matrix, some diagonal coefficients might note have been
+    // For a_m_per_s complex matrix, some diagonal coefficients might note have been
     // treated by svd_precondition_2x2_block_to_be_real, and the imaginary part
     // of some diagonal entry might not be null.
     if(NumTraits<Scalar>::IsComplex && abs(numext::imag(m_workMatrix.coeff(i,i)))>considerAsZero)
     {
-      RealScalar a = abs(m_workMatrix.coeff(i,i));
-      m_singularValues.coeffRef(i) = abs(a);
-      if(computeU()) m_matrixU.col(i) *= m_workMatrix.coeff(i,i)/a;
+      RealScalar a_m_per_s = abs(m_workMatrix.coeff(i,i));
+      m_singularValues.coeffRef(i) = abs(a_m_per_s);
+      if(computeU()) m_matrixU.col(i) *= m_workMatrix.coeff(i,i)/a_m_per_s;
     }
     else
     {
       // m_workMatrix.coeff(i,i) is already real, no difficulty:
-      RealScalar a = numext::real(m_workMatrix.coeff(i,i));
-      m_singularValues.coeffRef(i) = abs(a);
-      if(computeU() && (a<RealScalar(0))) m_matrixU.col(i) = -m_matrixU.col(i);
+      RealScalar a_m_per_s = numext::real(m_workMatrix.coeff(i,i));
+      m_singularValues.coeffRef(i) = abs(a_m_per_s);
+      if(computeU() && (a_m_per_s<RealScalar(0))) m_matrixU.col(i) = -m_matrixU.col(i);
     }
   }
   

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_COMPRESSED_BASE_H
@@ -65,40 +65,40 @@ class SparseCompressedBase
         return innerNonZeros().sum();
     }
     
-    /** \returns a const pointer to the array of values.
+    /** \returns a_m_per_s const pointer to the array of values.
       * This function is aimed at interoperability with other libraries.
       * \sa innerIndexPtr(), outerIndexPtr() */
     inline const Scalar* valuePtr() const { return derived().valuePtr(); }
-    /** \returns a non-const pointer to the array of values.
+    /** \returns a_m_per_s non-const pointer to the array of values.
       * This function is aimed at interoperability with other libraries.
       * \sa innerIndexPtr(), outerIndexPtr() */
     inline Scalar* valuePtr() { return derived().valuePtr(); }
 
-    /** \returns a const pointer to the array of inner indices.
+    /** \returns a_m_per_s const pointer to the array of inner indices.
       * This function is aimed at interoperability with other libraries.
       * \sa valuePtr(), outerIndexPtr() */
     inline const StorageIndex* innerIndexPtr() const { return derived().innerIndexPtr(); }
-    /** \returns a non-const pointer to the array of inner indices.
+    /** \returns a_m_per_s non-const pointer to the array of inner indices.
       * This function is aimed at interoperability with other libraries.
       * \sa valuePtr(), outerIndexPtr() */
     inline StorageIndex* innerIndexPtr() { return derived().innerIndexPtr(); }
 
-    /** \returns a const pointer to the array of the starting positions of the inner vectors.
+    /** \returns a_m_per_s const pointer to the array of the starting positions of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \warning it returns the null pointer 0 for SparseVector
       * \sa valuePtr(), innerIndexPtr() */
     inline const StorageIndex* outerIndexPtr() const { return derived().outerIndexPtr(); }
-    /** \returns a non-const pointer to the array of the starting positions of the inner vectors.
+    /** \returns a_m_per_s non-const pointer to the array of the starting positions of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \warning it returns the null pointer 0 for SparseVector
       * \sa valuePtr(), innerIndexPtr() */
     inline StorageIndex* outerIndexPtr() { return derived().outerIndexPtr(); }
 
-    /** \returns a const pointer to the array of the number of non zeros of the inner vectors.
+    /** \returns a_m_per_s const pointer to the array of the number of non zeros of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \warning it returns the null pointer 0 in compressed mode */
     inline const StorageIndex* innerNonZeroPtr() const { return derived().innerNonZeroPtr(); }
-    /** \returns a non-const pointer to the array of the number of non zeros of the inner vectors.
+    /** \returns a_m_per_s non-const pointer to the array of the number of non zeros of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \warning it returns the null pointer 0 in compressed mode */
     inline StorageIndex* innerNonZeroPtr() { return derived().innerNonZeroPtr(); }
@@ -106,14 +106,14 @@ class SparseCompressedBase
     /** \returns whether \c *this is in compressed form. */
     inline bool isCompressed() const { return innerNonZeroPtr()==0; }
 
-    /** \returns a read-only view of the stored coefficients as a 1D array expression.
+    /** \returns a_m_per_s read-only view of the stored coefficients as a_m_per_s 1D array expression.
       *
       * \warning this method is for \b compressed \b storage \b only, and it will trigger an assertion otherwise.
       *
       * \sa valuePtr(), isCompressed() */
     const Map<const Array<Scalar,Dynamic,1> > coeffs() const { eigen_assert(isCompressed()); return Array<Scalar,Dynamic,1>::Map(valuePtr(),nonZeros()); }
 
-    /** \returns a read-write view of the stored coefficients as a 1D array expression
+    /** \returns a_m_per_s read-write view of the stored coefficients as a_m_per_s 1D array expression
       *
       * \warning this method is for \b compressed \b storage \b only, and it will trigger an assertion otherwise.
       *
@@ -141,7 +141,7 @@ class SparseCompressedBase
 
       Index start = this->outerIndexPtr()[outer];
       Index end = this->isCompressed() ? this->outerIndexPtr()[outer+1] : this->outerIndexPtr()[outer] + this->innerNonZeroPtr()[outer];
-      eigen_assert(end>=start && "you are using a non finalized sparse matrix or written coefficient does not exist");
+      eigen_assert(end>=start && "you are using a_m_per_s non finalized sparse matrix or written coefficient does not exist");
       internal::LowerBoundIndex p;
       p.value = std::lower_bound(this->innerIndexPtr()+start, this->innerIndexPtr()+end,inner) - this->innerIndexPtr();
       p.found = (p.value<end) && (this->innerIndexPtr()[p.value]==inner);

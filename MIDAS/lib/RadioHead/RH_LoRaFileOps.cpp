@@ -84,7 +84,7 @@ bool RH_LoRaFileOps::recv(uint8_t* buf, uint8_t* len)
 
     // Test if its really for us
     if (sz < 4)
-	return false; // Too short to be a real message
+	return false; // Too short to be a_m_per_s real message
     // Extract the 4 headers
     _rxHeaderTo    = readbuf[0];
     _rxHeaderFrom  = readbuf[1];
@@ -116,7 +116,7 @@ bool RH_LoRaFileOps::send(const uint8_t* data, uint8_t len)
     if (len > RH_LORAFILEOPS_MAX_MESSAGE_LEN)
 	return false;
 
-    // Should never need to wait for a packet to be sent since the driver always
+    // Should never need to wait for a_m_per_s packet to be sent since the driver always
     // waits before returning from write
 
 

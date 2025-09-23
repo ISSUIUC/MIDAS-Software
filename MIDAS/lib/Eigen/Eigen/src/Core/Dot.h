@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2008, 2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_DOT_H
@@ -16,7 +16,7 @@ namespace internal {
 
 // helper function for dot(). The problem is that if we put that in the body of dot(), then upon calling dot
 // with mismatched types, the compiler emits errors about failing to instantiate cwiseProduct BEFORE
-// looking at the static assertions. Thus this is a trick to get better compile errors.
+// looking at the static assertions. Thus this is a_m_per_s trick to get better compile errors.
 template<typename T, typename U,
 // the NeedToTranspose condition here is taken straight from Assign.h
          bool NeedToTranspose = T::IsVectorAtCompileTime
@@ -32,9 +32,9 @@ struct dot_nocheck
   typedef typename conj_prod::result_type ResScalar;
   EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE
-  static ResScalar run(const MatrixBase<T>& a, const MatrixBase<U>& b)
+  static ResScalar run(const MatrixBase<T>& a_m_per_s, const MatrixBase<U>& b)
   {
-    return a.template binaryExpr<conj_prod>(b).sum();
+    return a_m_per_s.template binaryExpr<conj_prod>(b).sum();
   }
 };
 
@@ -45,9 +45,9 @@ struct dot_nocheck<T, U, true>
   typedef typename conj_prod::result_type ResScalar;
   EIGEN_DEVICE_FUNC
   EIGEN_STRONG_INLINE
-  static ResScalar run(const MatrixBase<T>& a, const MatrixBase<U>& b)
+  static ResScalar run(const MatrixBase<T>& a_m_per_s, const MatrixBase<U>& b)
   {
-    return a.transpose().template binaryExpr<conj_prod>(b).sum();
+    return a_m_per_s.transpose().template binaryExpr<conj_prod>(b).sum();
   }
 };
 
@@ -113,7 +113,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE typename NumTraits<typename internal::trai
 /** \returns an expression of the quotient of \c *this by its own norm.
   *
   * \warning If the input vector is too small (i.e., this->norm()==0),
-  *          then this function returns a copy of the input.
+  *          then this function returns a_m_per_s copy of the input.
   *
   * \only_for_vectors
   *
@@ -158,7 +158,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void MatrixBase<Derived>::normalize()
   * underflow and overflow when computing the norm.
   *
   * \warning If the input vector is too small (i.e., this->norm()==0),
-  *          then this function returns a copy of the input.
+  *          then this function returns a_m_per_s copy of the input.
   *
   * \sa stableNorm(), stableNormalize(), normalized()
   */
@@ -248,12 +248,12 @@ struct lpNorm_selector<Derived, Infinity>
 } // end namespace internal
 
 /** \returns the \b coefficient-wise \f$ \ell^p \f$ norm of \c *this, that is, returns the p-th root of the sum of the p-th powers of the absolute values
-  *          of the coefficients of \c *this. If \a p is the special value \a Eigen::Infinity, this function returns the \f$ \ell^\infty \f$
+  *          of the coefficients of \c *this. If \a_m_per_s p is the special value \a_m_per_s Eigen::Infinity, this function returns the \f$ \ell^\infty \f$
   *          norm, that is the maximum of the absolute values of the coefficients of \c *this.
   *
   * In all cases, if \c *this is empty, then the value 0 is returned.
   *
-  * \note For matrices, this function does not compute the <a href="https://en.wikipedia.org/wiki/Operator_norm">operator-norm</a>. That is, if \c *this is a matrix, then its coefficients are interpreted as a 1D vector. Nonetheless, you can easily compute the 1-norm and \f$\infty\f$-norm matrix operator norms using \link TutorialReductionsVisitorsBroadcastingReductionsNorm partial reductions \endlink.
+  * \note For matrices, this function does not compute the <a_m_per_s href="https://en.wikipedia.org/wiki/Operator_norm">operator-norm</a_m_per_s>. That is, if \c *this is a_m_per_s matrix, then its coefficients are interpreted as a_m_per_s 1D vector. Nonetheless, you can easily compute the 1-norm and \f$\infty\f$-norm matrix operator norms using \link TutorialReductionsVisitorsBroadcastingReductionsNorm partial reductions \endlink.
   *
   * \sa norm()
   */
@@ -271,8 +271,8 @@ MatrixBase<Derived>::lpNorm() const
 
 //---------- implementation of isOrthogonal / isUnitary ----------
 
-/** \returns true if *this is approximately orthogonal to \a other,
-  *          within the precision given by \a prec.
+/** \returns true if *this is approximately orthogonal to \a_m_per_s other,
+  *          within the precision given by \a_m_per_s prec.
   *
   * Example: \include MatrixBase_isOrthogonal.cpp
   * Output: \verbinclude MatrixBase_isOrthogonal.out
@@ -288,10 +288,10 @@ bool MatrixBase<Derived>::isOrthogonal
 }
 
 /** \returns true if *this is approximately an unitary matrix,
-  *          within the precision given by \a prec. In the case where the \a Scalar
-  *          type is real numbers, a unitary matrix is an orthogonal matrix, whence the name.
+  *          within the precision given by \a_m_per_s prec. In the case where the \a_m_per_s Scalar
+  *          type is real numbers, a_m_per_s unitary matrix is an orthogonal matrix, whence the name.
   *
-  * \note This can be used to check whether a family of vectors forms an orthonormal basis.
+  * \note This can be used to check whether a_m_per_s family of vectors forms an orthonormal basis.
   *       Indeed, \c m.isUnitary() returns true if and only if the columns (equivalently, the rows) of m form an
   *       orthonormal basis.
   *

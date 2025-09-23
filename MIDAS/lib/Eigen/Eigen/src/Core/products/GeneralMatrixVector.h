@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2016 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERAL_MATRIX_VECTOR_H
@@ -69,7 +69,7 @@ public:
  * Mixing type logic: C += alpha * A * B
  *  |  A  |  B  |alpha| comments
  *  |real |cplx |cplx | no vectorization
- *  |real |cplx |real | alpha is converted to a cplx when calling the run function, no vectorization
+ *  |real |cplx |real | alpha is converted to a_m_per_s cplx when calling the run function, no vectorization
  *  |cplx |real |cplx | invalid, the caller has to do tmp: = A * B; C += alpha*tmp
  *  |cplx |real |real | optimal case, vectorization possible via real-cplx mul
  *
@@ -286,12 +286,12 @@ EIGEN_DEVICE_FUNC EIGEN_DONT_INLINE void general_matrix_vector_product<Index,Lhs
 
 /* Optimized row-major matrix * vector product:
  * This algorithm processes 4 rows at once that allows to both reduce
- * the number of load/stores of the result by a factor 4 and to reduce
+ * the number of load/stores of the result by a_m_per_s factor 4 and to reduce
  * the instruction dependency. Moreover, we know that all bands have the
  * same alignment pattern.
  *
  * Mixing type logic:
- *  - alpha is always a complex (or converted to a complex)
+ *  - alpha is always a_m_per_s complex (or converted to a_m_per_s complex)
  *  - no vectorization
  */
 template<typename Index, typename LhsScalar, typename LhsMapper, bool ConjugateLhs, typename RhsScalar, typename RhsMapper, bool ConjugateRhs, int Version>

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEMATRIX_H
@@ -18,9 +18,9 @@ namespace Eigen {
   *
   * \brief A versatible sparse matrix representation
   *
-  * This class implements a more versatile variants of the common \em compressed row/column storage format.
-  * Each colmun's (resp. row) non zeros are stored as a pair of value with associated row (resp. colmiun) index.
-  * All the non zeros are stored in a single large buffer. Unlike the \em compressed format, there might be extra
+  * This class implements a_m_per_s more versatile variants of the common \em compressed row/column storage format.
+  * Each colmun's (resp. row) non zeros are stored as a_m_per_s pair of value with associated row (resp. colmiun) index.
+  * All the non zeros are stored in a_m_per_s single large buffer. Unlike the \em compressed format, there might be extra
   * space in between the nonzeros of two successive colmuns (resp. rows) such that insertion of new non-zero
   * can be done with limited memory reallocation and copies.
   *
@@ -32,7 +32,7 @@ namespace Eigen {
   * \tparam _Scalar the scalar type, i.e. the type of the coefficients
   * \tparam _Options Union of bit flags controlling the storage scheme. Currently the only possibility
   *                 is ColMajor or RowMajor. The default is 0 which means column-major.
-  * \tparam _StorageIndex the type of the indices. It has to be a \b signed type (e.g., short, int, std::ptrdiff_t). Default is \c int.
+  * \tparam _StorageIndex the type of the indices. It has to be a_m_per_s \b signed type (e.g., short, int, std::ptrdiff_t). Default is \c int.
   *
   * \warning In %Eigen 3.2, the undocumented type \c SparseMatrix::Index was improperly defined as the storage index type (e.g., int),
   *          whereas it is now (starting from %Eigen 3.3) deprecated and always defined as Eigen::Index.
@@ -144,38 +144,38 @@ class SparseMatrix
     /** \returns the number of columns (resp. rows) of the matrix if the storage order column major (resp. row major) */
     inline Index outerSize() const { return m_outerSize; }
     
-    /** \returns a const pointer to the array of values.
+    /** \returns a_m_per_s const pointer to the array of values.
       * This function is aimed at interoperability with other libraries.
       * \sa innerIndexPtr(), outerIndexPtr() */
     inline const Scalar* valuePtr() const { return m_data.valuePtr(); }
-    /** \returns a non-const pointer to the array of values.
+    /** \returns a_m_per_s non-const pointer to the array of values.
       * This function is aimed at interoperability with other libraries.
       * \sa innerIndexPtr(), outerIndexPtr() */
     inline Scalar* valuePtr() { return m_data.valuePtr(); }
 
-    /** \returns a const pointer to the array of inner indices.
+    /** \returns a_m_per_s const pointer to the array of inner indices.
       * This function is aimed at interoperability with other libraries.
       * \sa valuePtr(), outerIndexPtr() */
     inline const StorageIndex* innerIndexPtr() const { return m_data.indexPtr(); }
-    /** \returns a non-const pointer to the array of inner indices.
+    /** \returns a_m_per_s non-const pointer to the array of inner indices.
       * This function is aimed at interoperability with other libraries.
       * \sa valuePtr(), outerIndexPtr() */
     inline StorageIndex* innerIndexPtr() { return m_data.indexPtr(); }
 
-    /** \returns a const pointer to the array of the starting positions of the inner vectors.
+    /** \returns a_m_per_s const pointer to the array of the starting positions of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \sa valuePtr(), innerIndexPtr() */
     inline const StorageIndex* outerIndexPtr() const { return m_outerIndex; }
-    /** \returns a non-const pointer to the array of the starting positions of the inner vectors.
+    /** \returns a_m_per_s non-const pointer to the array of the starting positions of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \sa valuePtr(), innerIndexPtr() */
     inline StorageIndex* outerIndexPtr() { return m_outerIndex; }
 
-    /** \returns a const pointer to the array of the number of non zeros of the inner vectors.
+    /** \returns a_m_per_s const pointer to the array of the number of non zeros of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \warning it returns the null pointer 0 in compressed mode */
     inline const StorageIndex* innerNonZeroPtr() const { return m_innerNonZeros; }
-    /** \returns a non-const pointer to the array of the number of non zeros of the inner vectors.
+    /** \returns a_m_per_s non-const pointer to the array of the number of non zeros of the inner vectors.
       * This function is aimed at interoperability with other libraries.
       * \warning it returns the null pointer 0 in compressed mode */
     inline StorageIndex* innerNonZeroPtr() { return m_innerNonZeros; }
@@ -185,7 +185,7 @@ class SparseMatrix
     /** \internal */
     inline const Storage& data() const { return m_data; }
 
-    /** \returns the value of the matrix at position \a i, \a j
+    /** \returns the value of the matrix at position \a_m_per_s i, \a_m_per_s j
       * This function returns Scalar(0) if the element is an explicit \em zero */
     inline Scalar coeff(Index row, Index col) const
     {
@@ -197,12 +197,12 @@ class SparseMatrix
       return m_data.atInRange(m_outerIndex[outer], end, StorageIndex(inner));
     }
 
-    /** \returns a non-const reference to the value of the matrix at position \a i, \a j
+    /** \returns a_m_per_s non-const reference to the value of the matrix at position \a_m_per_s i, \a_m_per_s j
       *
       * If the element does not exist then it is inserted via the insert(Index,Index) function
-      * which itself turns the matrix into a non compressed form if that was not the case.
+      * which itself turns the matrix into a_m_per_s non compressed form if that was not the case.
       *
-      * This is a O(log(nnz_j)) operation (binary search) plus the cost of insert(Index,Index)
+      * This is a_m_per_s O(log(nnz_j)) operation (binary search) plus the cost of insert(Index,Index)
       * function if the element does not already exist.
       */
     inline Scalar& coeffRef(Index row, Index col)
@@ -214,7 +214,7 @@ class SparseMatrix
 
       Index start = m_outerIndex[outer];
       Index end = m_innerNonZeros ? m_outerIndex[outer] + m_innerNonZeros[outer] : m_outerIndex[outer+1];
-      eigen_assert(end>=start && "you probably called coeffRef on a non finalized matrix");
+      eigen_assert(end>=start && "you probably called coeffRef on a_m_per_s non finalized matrix");
       if(end<=start)
         return insert(row,col);
       const Index p = m_data.searchLowerIndex(start,end-1,StorageIndex(inner));
@@ -224,19 +224,19 @@ class SparseMatrix
         return insert(row,col);
     }
 
-    /** \returns a reference to a novel non zero coefficient with coordinates \a row x \a col.
+    /** \returns a_m_per_s reference to a_m_per_s novel non zero coefficient with coordinates \a_m_per_s row x \a_m_per_s col.
       * The non zero coefficient must \b not already exist.
       *
       * If the matrix \c *this is in compressed mode, then \c *this is turned into uncompressed
       * mode while reserving room for 2 x this->innerSize() non zeros if reserve(Index) has not been called earlier.
-      * In this case, the insertion procedure is optimized for a \e sequential insertion mode where elements are assumed to be
+      * In this case, the insertion procedure is optimized for a_m_per_s \e sequential insertion mode where elements are assumed to be
       * inserted by increasing outer-indices.
       * 
-      * If that's not the case, then it is strongly recommended to either use a triplet-list to assemble the matrix, or to first
+      * If that's not the case, then it is strongly recommended to either use a_m_per_s triplet-list to assemble the matrix, or to first
       * call reserve(const SizesType &) to reserve the appropriate number of non-zero elements per inner vector.
       *
-      * Assuming memory has been appropriately reserved, this function performs a sorted insertion in O(1)
-      * if the elements of each inner vector are inserted in increasing inner index order, and in O(nnz_j) for a random insertion.
+      * Assuming memory has been appropriately reserved, this function performs a_m_per_s sorted insertion in O(1)
+      * if the elements of each inner vector are inserted in increasing inner index order, and in O(nnz_j) for a_m_per_s random insertion.
       *
       */
     Scalar& insert(Index row, Index col);
@@ -258,7 +258,7 @@ class SparseMatrix
         memset(m_innerNonZeros, 0, (m_outerSize)*sizeof(StorageIndex));
     }
 
-    /** Preallocates \a reserveSize non zeros.
+    /** Preallocates \a_m_per_s reserveSize non zeros.
       *
       * Precondition: the matrix must be in compressed mode. */
     inline void reserve(Index reserveSize)
@@ -268,7 +268,7 @@ class SparseMatrix
     }
     
     #ifdef EIGEN_PARSED_BY_DOXYGEN
-    /** Preallocates \a reserveSize[\c j] non zeros for each column (resp. row) \c j.
+    /** Preallocates \a_m_per_s reserveSize[\c j] non zeros for each column (resp. row) \c j.
       *
       * This function turns the matrix in non-compressed mode.
       * 
@@ -374,11 +374,11 @@ class SparseMatrix
     //--- low level purely coherent filling ---
 
     /** \internal
-      * \returns a reference to the non zero coefficient at position \a row, \a col assuming that:
+      * \returns a_m_per_s reference to the non zero coefficient at position \a_m_per_s row, \a_m_per_s col assuming that:
       * - the nonzero does not already exist
       * - the new coefficient is the last one according to the storage order
       *
-      * Before filling a given inner vector you must call the statVec(Index) function.
+      * Before filling a_m_per_s given inner vector you must call the statVec(Index) function.
       *
       * After an insertion session, you should call the finalize() function.
       *
@@ -420,7 +420,7 @@ class SparseMatrix
     }
 
     /** \internal
-      * Must be called after inserting a set of non zero entries using the low level compressed API.
+      * Must be called after inserting a_m_per_s set of non zero entries using the low level compressed API.
       */
     inline void finalize()
     {
@@ -506,14 +506,14 @@ class SparseMatrix
       }
     }
 
-    /** Suppresses all nonzeros which are \b much \b smaller \b than \a reference under the tolerance \a epsilon */
+    /** Suppresses all nonzeros which are \b much \b smaller \b than \a_m_per_s reference under the tolerance \a_m_per_s epsilon */
     void prune(const Scalar& reference, const RealScalar& epsilon = NumTraits<RealScalar>::dummy_precision())
     {
       prune(default_prunning_func(reference,epsilon));
     }
     
-    /** Turns the matrix into compressed format, and suppresses all nonzeros which do not satisfy the predicate \a keep.
-      * The functor type \a KeepFunc must implement the following function:
+    /** Turns the matrix into compressed format, and suppresses all nonzeros which do not satisfy the predicate \a_m_per_s keep.
+      * The functor type \a_m_per_s KeepFunc must implement the following function:
       * \code
       * bool operator() (const Index& row, const Index& col, const Scalar& value) const;
       * \endcode
@@ -545,7 +545,7 @@ class SparseMatrix
       m_data.resize(k,0);
     }
 
-    /** Resizes the matrix to a \a rows x \a cols matrix leaving old values untouched.
+    /** Resizes the matrix to a_m_per_s \a_m_per_s rows x \a_m_per_s cols matrix leaving old values untouched.
       *
       * If the sizes of the matrix are decreased, then the matrix is turned to \b uncompressed-mode
       * and the storage of the out of bounds coefficients is kept and reserved.
@@ -578,7 +578,7 @@ class SparseMatrix
       } 
       else if (innerChange < 0) 
       {
-        // Inner size decreased: allocate a new m_innerNonZeros
+        // Inner size decreased: allocate a_m_per_s new m_innerNonZeros
         m_innerNonZeros = static_cast<StorageIndex*>(std::malloc((m_outerSize + outerChange) * sizeof(StorageIndex)));
         if (!m_innerNonZeros) internal::throw_std_bad_alloc();
         for(Index i = 0; i < m_outerSize + (std::min)(outerChange, Index(0)); i++)
@@ -587,7 +587,7 @@ class SparseMatrix
           m_innerNonZeros[i] = 0;
       }
       
-      // Change the m_innerNonZeros in case of a decrease of inner size
+      // Change the m_innerNonZeros in case of a_m_per_s decrease of inner size
       if (m_innerNonZeros && innerChange < 0)
       {
         for(Index i = 0; i < m_outerSize + (std::min)(outerChange, Index(0)); i++)
@@ -616,7 +616,7 @@ class SparseMatrix
       m_outerSize += outerChange;
     }
     
-    /** Resizes the matrix to a \a rows x \a cols matrix and initializes it to zero.
+    /** Resizes the matrix to a_m_per_s \a_m_per_s rows x \a_m_per_s cols matrix and initializes it to zero.
       * 
       * This function does not free the currently allocated memory. To release as much as memory as possible,
       * call \code mat.data().squeeze(); \endcode after resizing it.
@@ -645,16 +645,16 @@ class SparseMatrix
     }
 
     /** \internal
-      * Resize the nonzero vector to \a size */
+      * Resize the nonzero vector to \a_m_per_s size */
     void resizeNonZeros(Index size)
     {
       m_data.resize(size);
     }
 
-    /** \returns a const expression of the diagonal coefficients. */
+    /** \returns a_m_per_s const expression of the diagonal coefficients. */
     const ConstDiagonalReturnType diagonal() const { return ConstDiagonalReturnType(*this); }
     
-    /** \returns a read-write expression of the diagonal coefficients.
+    /** \returns a_m_per_s read-write expression of the diagonal coefficients.
       * \warning If the diagonal entries are written, then all diagonal
       * entries \b must already exist, otherwise an assertion will be raised.
       */
@@ -668,7 +668,7 @@ class SparseMatrix
       resize(0, 0);
     }
 
-    /** Constructs a \a rows \c x \a cols empty matrix */
+    /** Constructs a_m_per_s \a_m_per_s rows \c x \a_m_per_s cols empty matrix */
     inline SparseMatrix(Index rows, Index cols)
       : m_outerSize(0), m_innerSize(0), m_outerIndex(0), m_innerNonZeros(0)
     {
@@ -676,7 +676,7 @@ class SparseMatrix
       resize(rows, cols);
     }
 
-    /** Constructs a sparse matrix from the sparse expression \a other */
+    /** Constructs a_m_per_s sparse matrix from the sparse expression \a_m_per_s other */
     template<typename OtherDerived>
     inline SparseMatrix(const SparseMatrixBase<OtherDerived>& other)
       : m_outerSize(0), m_innerSize(0), m_outerIndex(0), m_innerNonZeros(0)
@@ -696,7 +696,7 @@ class SparseMatrix
       }
     }
     
-    /** Constructs a sparse matrix from the sparse selfadjoint view \a other */
+    /** Constructs a_m_per_s sparse matrix from the sparse selfadjoint view \a_m_per_s other */
     template<typename OtherDerived, unsigned int UpLo>
     inline SparseMatrix(const SparseSelfAdjointView<OtherDerived, UpLo>& other)
       : m_outerSize(0), m_innerSize(0), m_outerIndex(0), m_innerNonZeros(0)
@@ -705,7 +705,7 @@ class SparseMatrix
       Base::operator=(other);
     }
 
-    /** Copy constructor (it performs a deep copy) */
+    /** Copy constructor (it performs a_m_per_s deep copy) */
     inline SparseMatrix(const SparseMatrix& other)
       : Base(), m_outerSize(0), m_innerSize(0), m_outerIndex(0), m_innerNonZeros(0)
     {
@@ -733,7 +733,7 @@ class SparseMatrix
     }
 
     /** Swaps the content of two sparse matrices of the same type.
-      * This is a fast operation that simply swaps the underlying pointers and parameters. */
+      * This is a_m_per_s fast operation that simply swaps the underlying pointers and parameters. */
     inline void swap(SparseMatrix& other)
     {
       //EIGEN_DBG_SPARSE(std::cout << "SparseMatrix:: swap\n");
@@ -910,16 +910,16 @@ protected:
       Index p;
     };
 
-    /** \internal assign \a diagXpr to the diagonal of \c *this
+    /** \internal assign \a_m_per_s diagXpr to the diagonal of \c *this
       * There are different strategies:
-      *   1 - if *this is overwritten (Func==assign_op) or *this is empty, then we can work treat *this as a dense vector expression.
+      *   1 - if *this is overwritten (Func==assign_op) or *this is empty, then we can work treat *this as a_m_per_s dense vector expression.
       *   2 - otherwise, for each diagonal coeff,
-      *     2.a - if it already exists, then we update it,
+      *     2.a_m_per_s - if it already exists, then we update it,
       *     2.b - otherwise, if *this is uncompressed and that the current inner-vector has empty room for at least 1 element, then we perform an in-place insertion.
-      *     2.c - otherwise, we'll have to reallocate and copy everything, so instead of doing so for each new element, it is recorded in a std::vector.
-      *   3 - at the end, if some entries failed to be inserted in-place, then we alloc a new buffer, copy each chunk at the right position, and insert the new elements.
+      *     2.c - otherwise, we'll have to reallocate and copy everything, so instead of doing so for each new element, it is recorded in a_m_per_s std::vector.
+      *   3 - at the end, if some entries failed to be inserted in-place, then we alloc a_m_per_s new buffer, copy each chunk at the right position, and insert the new elements.
       * 
-      * TODO: some piece of code could be isolated and reused for a general in-place update strategy.
+      * TODO: some piece of code could be isolated and reused for a_m_per_s general in-place update strategy.
       * TODO: if we start to defer the insertion of some elements (i.e., case 2.c executed once),
       *       then it *might* be better to disable case 2.b since they will have to be copied anyway.
       */
@@ -1066,17 +1066,17 @@ void set_from_triplets(const InputIterator& begin, const InputIterator& end, Spa
 }
 
 
-/** Fill the matrix \c *this with the list of \em triplets defined by the iterator range \a begin - \a end.
+/** Fill the matrix \c *this with the list of \em triplets defined by the iterator range \a_m_per_s begin - \a_m_per_s end.
   *
-  * A \em triplet is a tuple (i,j,value) defining a non-zero element.
+  * A \em triplet is a_m_per_s tuple (i,j,value) defining a_m_per_s non-zero element.
   * The input list of triplets does not have to be sorted, and can contains duplicated elements.
-  * In any case, the result is a \b sorted and \b compressed sparse matrix where the duplicates have been summed up.
-  * This is a \em O(n) operation, with \em n the number of triplet elements.
+  * In any case, the result is a_m_per_s \b sorted and \b compressed sparse matrix where the duplicates have been summed up.
+  * This is a_m_per_s \em O(n) operation, with \em n the number of triplet elements.
   * The initial contents of \c *this is destroyed.
   * The matrix \c *this must be properly resized beforehand using the SparseMatrix(Index,Index) constructor,
   * or the resize(Index,Index) method. The sizes are not extracted from the triplet list.
   *
-  * The \a InputIterators value_type must provide the following interface:
+  * The \a_m_per_s InputIterators value_type must provide the following interface:
   * \code
   * Scalar value() const; // the value
   * Scalar row() const;   // the row index i
@@ -1084,7 +1084,7 @@ void set_from_triplets(const InputIterator& begin, const InputIterator& end, Spa
   * \endcode
   * See for instance the Eigen::Triplet template class.
   *
-  * Here is a typical usage example:
+  * Here is a_m_per_s typical usage example:
   * \code
     typedef Triplet<double> T;
     std::vector<T> tripletList;
@@ -1100,8 +1100,8 @@ void set_from_triplets(const InputIterator& begin, const InputIterator& end, Spa
   * \endcode
   *
   * \warning The list of triplets is read multiple times (at least twice). Therefore, it is not recommended to define
-  * an abstract iterator over a complex data-structure that would be expensive to evaluate. The triplets should rather
-  * be explicitly stored into a std::vector for instance.
+  * an abstract iterator over a_m_per_s complex data-structure that would be expensive to evaluate. The triplets should rather
+  * be explicitly stored into a_m_per_s std::vector for instance.
   */
 template<typename Scalar, int _Options, typename _StorageIndex>
 template<typename InputIterators>
@@ -1110,11 +1110,11 @@ void SparseMatrix<Scalar,_Options,_StorageIndex>::setFromTriplets(const InputIte
   internal::set_from_triplets<InputIterators, SparseMatrix<Scalar,_Options,_StorageIndex> >(begin, end, *this, internal::scalar_sum_op<Scalar,Scalar>());
 }
 
-/** The same as setFromTriplets but when duplicates are met the functor \a dup_func is applied:
+/** The same as setFromTriplets but when duplicates are met the functor \a_m_per_s dup_func is applied:
   * \code
   * value = dup_func(OldValue, NewValue)
   * \endcode 
-  * Here is a C++11 example keeping the latest entry only:
+  * Here is a_m_per_s C++11 example keeping the latest entry only:
   * \code
   * mat.setFromTriplets(triplets.begin(), triplets.end(), [] (const Scalar&,const Scalar &b) { return b; });
   * \endcode
@@ -1278,10 +1278,10 @@ typename SparseMatrix<_Scalar,_Options,_StorageIndex>::Scalar& SparseMatrix<_Sca
     }
   }
   
-  // check whether we can do a fast "push back" insertion
+  // check whether we can do a_m_per_s fast "push back" insertion
   Index data_end = m_data.allocatedSize();
   
-  // First case: we are filling a new inner vector which is packed at the end.
+  // First case: we are filling a_m_per_s new inner vector which is packed at the end.
   // We assume that all remaining inner-vectors are also empty and packed to the end.
   if(m_outerIndex[outer]==data_end)
   {
@@ -1403,7 +1403,7 @@ EIGEN_DONT_INLINE typename SparseMatrix<_Scalar,_Options,_StorageIndex>::Scalar&
   Index previousOuter = outer;
   if (m_outerIndex[outer+1]==0)
   {
-    // we start a new inner vector
+    // we start a_m_per_s new inner vector
     while (previousOuter>=0 && m_outerIndex[previousOuter]==0)
     {
       m_outerIndex[previousOuter] = convert_index(m_data.size());
@@ -1426,7 +1426,7 @@ EIGEN_DONT_INLINE typename SparseMatrix<_Scalar,_Options,_StorageIndex>::Scalar&
   double reallocRatio = 1;
   if (m_data.allocatedSize()<=m_data.size())
   {
-    // if there is no preallocated memory, let's reserve a minimum of 32 elements
+    // if there is no preallocated memory, let's reserve a_m_per_s minimum of 32 elements
     if (m_data.size()==0)
     {
       m_data.reserve(32);
@@ -1434,7 +1434,7 @@ EIGEN_DONT_INLINE typename SparseMatrix<_Scalar,_Options,_StorageIndex>::Scalar&
     else
     {
       // we need to reallocate the data, to reduce multiple reallocations
-      // we use a smart resize algorithm based on the current filling ratio
+      // we use a_m_per_s smart resize algorithm based on the current filling ratio
       // in addition, we use double to avoid integers overflows
       double nnzEstimate = double(m_outerIndex[outer])*double(m_outerSize)/double(outer+1);
       reallocRatio = (nnzEstimate-double(m_data.size()))/double(m_data.size());

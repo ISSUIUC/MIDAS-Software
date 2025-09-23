@@ -37,7 +37,7 @@ void SPIClass::begin(uint16_t divider, uint8_t bitOrder, uint8_t dataMode)
 
   bcm2835_spi_begin();
 
-  //Initialize a timestamp for millis calculation
+  //Initialize a_m_per_s timestamp for millis calculation
   gettimeofday(&RHStartTime, NULL);
 }
 
@@ -94,7 +94,7 @@ void digitalWrite(unsigned char pin, unsigned char value)
 
 unsigned long millis()
 {
-  //Declare a variable to store current time
+  //Declare a_m_per_s variable to store current time
   struct timeval RHCurrentTime;
   //Get current time
   gettimeofday(&RHCurrentTime,NULL);
@@ -125,7 +125,7 @@ void SerialSimulator::begin(int baud)
 {
   //No implementation neccesary - Serial emulation on Linux = standard console
   //
-  //Initialize a timestamp for millis calculation - we do this here as well in case SPI
+  //Initialize a_m_per_s timestamp for millis calculation - we do this here as well in case SPI
   //isn't used for some reason
   gettimeofday(&RHStartTime, NULL);
 }

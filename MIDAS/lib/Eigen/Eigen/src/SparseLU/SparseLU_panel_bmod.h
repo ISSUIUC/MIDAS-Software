@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -25,7 +25,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSELU_PANEL_BMOD_H
@@ -61,7 +61,7 @@ void SparseLUImpl<Scalar,StorageIndex>::panel_bmod(const Index m, const Index w,
   Index ksub,jj,nextl_col; 
   Index fsupc, nsupc, nsupr, nrow; 
   Index krep, kfnz; 
-  Index lptr; // points to the row subscripts of a supernode 
+  Index lptr; // points to the row subscripts of a_m_per_s supernode 
   Index luptr; // ...
   Index segsize,no_zeros ; 
   // For each nonz supernode segment of U[*,j] in topological order
@@ -72,8 +72,8 @@ void SparseLUImpl<Scalar,StorageIndex>::panel_bmod(const Index m, const Index w,
   { // For each updating supernode
     /* krep = representative of current k-th supernode
      * fsupc =  first supernodal column
-     * nsupc = number of columns in a supernode
-     * nsupr = number of rows in a supernode
+     * nsupc = number of columns in a_m_per_s supernode
+     * nsupr = number of rows in a_m_per_s supernode
      */
     krep = segrep(k); k--; 
     fsupc = glu.xsup(glu.supno(krep)); 
@@ -203,7 +203,7 @@ void SparseLUImpl<Scalar,StorageIndex>::panel_bmod(const Index m, const Index w,
         
         Index lda = glu.xlusup(fsupc+1)-glu.xlusup(fsupc);// nsupr
         
-        // Perform a trianglar solve and block update, 
+        // Perform a_m_per_s trianglar solve and block update, 
         // then scatter the result of sup-col update to dense[]
         no_zeros = kfnz - fsupc; 
               if(segsize==1)  LU_kernel_bmod<1>::run(segsize, dense_col, tempv, glu.lusup, luptr, lda, nrow, glu.lsub, lptr, no_zeros);

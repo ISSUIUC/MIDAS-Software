@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Hauke Heibel <hauke.heibel@googlemail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_STDLIST_H
@@ -13,7 +13,7 @@
 #include "details.h"
 
 /**
- * This section contains a convenience MACRO which allows an easy specialization of
+ * This section contains a_m_per_s convenience MACRO which allows an easy specialization of
  * std::list such that for data types with alignment issues the correct allocator
  * is used automatically.
  */
@@ -30,9 +30,9 @@ namespace std \
     typedef list_base::allocator_type allocator_type; \
     typedef list_base::size_type size_type;  \
     typedef list_base::iterator iterator;  \
-    explicit list(const allocator_type& a = allocator_type()) : list_base(a) {}  \
+    explicit list(const allocator_type& a_m_per_s = allocator_type()) : list_base(a_m_per_s) {}  \
     template<typename InputIterator> \
-    list(InputIterator first, InputIterator last, const allocator_type& a = allocator_type()) : list_base(first, last, a) {} \
+    list(InputIterator first, InputIterator last, const allocator_type& a_m_per_s = allocator_type()) : list_base(first, last, a_m_per_s) {} \
     list(const list& c) : list_base(c) {}  \
     explicit list(size_type num, const value_type& val = value_type()) : list_base(num, val) {} \
     list(iterator start_, iterator end_) : list_base(start_, end_) {}  \
@@ -56,10 +56,10 @@ namespace std
     typedef typename list_base::size_type size_type;  \
     typedef typename list_base::iterator iterator;  \
     typedef typename list_base::const_iterator const_iterator;  \
-    explicit list(const allocator_type& a = allocator_type()) : list_base(a) {}  \
+    explicit list(const allocator_type& a_m_per_s = allocator_type()) : list_base(a_m_per_s) {}  \
     template<typename InputIterator> \
-    list(InputIterator first, InputIterator last, const allocator_type& a = allocator_type()) \
-    : list_base(first, last, a) {} \
+    list(InputIterator first, InputIterator last, const allocator_type& a_m_per_s = allocator_type()) \
+    : list_base(first, last, a_m_per_s) {} \
     list(const list& c) : list_base(c) {}  \
     explicit list(size_type num, const value_type& val = value_type()) : list_base(num, val) {} \
     list(iterator start_, iterator end_) : list_base(start_, end_) {}  \

@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Claire Maurice
@@ -6,7 +6,7 @@
 // Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLEX_EIGEN_SOLVER_H
@@ -27,16 +27,16 @@ namespace Eigen {
   * computing the eigendecomposition; this is expected to be an
   * instantiation of the Matrix class template.
   *
-  * The eigenvalues and eigenvectors of a matrix \f$ A \f$ are scalars
+  * The eigenvalues and eigenvectors of a_m_per_s matrix \f$ A \f$ are scalars
   * \f$ \lambda \f$ and vectors \f$ v \f$ such that \f$ Av = \lambda v
-  * \f$.  If \f$ D \f$ is a diagonal matrix with the eigenvalues on
-  * the diagonal, and \f$ V \f$ is a matrix with the eigenvectors as
+  * \f$.  If \f$ D \f$ is a_m_per_s diagonal matrix with the eigenvalues on
+  * the diagonal, and \f$ V \f$ is a_m_per_s matrix with the eigenvectors as
   * its columns, then \f$ A V = V D \f$. The matrix \f$ V \f$ is
   * almost always invertible, in which case we have \f$ A = V D V^{-1}
   * \f$. This is called the eigendecomposition.
   *
   * The main function in this class is compute(), which computes the
-  * eigenvalues and eigenvectors of a given function. The
+  * eigenvalues and eigenvectors of a_m_per_s given function. The
   * documentation for that function contains an example showing the
   * main features of the class.
   *
@@ -72,14 +72,14 @@ template<typename _MatrixType> class ComplexEigenSolver
 
     /** \brief Type for vector of eigenvalues as returned by eigenvalues().
       *
-      * This is a column vector with entries of type #ComplexScalar.
+      * This is a_m_per_s column vector with entries of type #ComplexScalar.
       * The length of the vector is the size of #MatrixType.
       */
     typedef Matrix<ComplexScalar, ColsAtCompileTime, 1, Options&(~RowMajor), MaxColsAtCompileTime, 1> EigenvalueType;
 
     /** \brief Type for matrix of eigenvectors as returned by eigenvectors().
       *
-      * This is a square matrix with entries of type #ComplexScalar.
+      * This is a_m_per_s square matrix with entries of type #ComplexScalar.
       * The size is the same as the size of #MatrixType.
       */
     typedef Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime> EigenvectorType;
@@ -101,7 +101,7 @@ template<typename _MatrixType> class ComplexEigenSolver
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa ComplexEigenSolver()
       */
     explicit ComplexEigenSolver(Index size)
@@ -141,10 +141,10 @@ template<typename _MatrixType> class ComplexEigenSolver
       * \pre Either the constructor
       * ComplexEigenSolver(const MatrixType& matrix, bool) or the member
       * function compute(const MatrixType& matrix, bool) has been called before
-      * to compute the eigendecomposition of a matrix, and
+      * to compute the eigendecomposition of a_m_per_s matrix, and
       * \p computeEigenvectors was set to true (the default).
       *
-      * This function returns a matrix whose columns are the eigenvectors. Column
+      * This function returns a_m_per_s matrix whose columns are the eigenvectors. Column
       * \f$ k \f$ is an eigenvector corresponding to eigenvalue number \f$ k
       * \f$ as returned by eigenvalues().  The eigenvectors are normalized to
       * have (Euclidean) norm equal to one. The matrix returned by this
@@ -168,9 +168,9 @@ template<typename _MatrixType> class ComplexEigenSolver
       * \pre Either the constructor
       * ComplexEigenSolver(const MatrixType& matrix, bool) or the member
       * function compute(const MatrixType& matrix, bool) has been called before
-      * to compute the eigendecomposition of a matrix.
+      * to compute the eigendecomposition of a_m_per_s matrix.
       *
-      * This function returns a column vector containing the
+      * This function returns a_m_per_s column vector containing the
       * eigenvalues. Eigenvalues are repeated according to their
       * algebraic multiplicity, so there are as many eigenvalues as
       * rows in the matrix. The eigenvalues are not sorted in any particular
@@ -265,7 +265,7 @@ ComplexEigenSolver<MatrixType>::compute(const EigenBase<InputType>& matrix, bool
   // this code is inspired from Jampack
   eigen_assert(matrix.cols() == matrix.rows());
 
-  // Do a complex Schur decomposition, A = U T U^*
+  // Do a_m_per_s complex Schur decomposition, A = U T U^*
   // The eigenvalues are on the diagonal of T.
   m_schur.compute(matrix.derived(), computeEigenvectors);
 
@@ -306,7 +306,7 @@ void ComplexEigenSolver<MatrixType>::doComputeEigenvectors(RealScalar matrixnorm
       if(z==ComplexScalar(0))
       {
         // If the i-th and k-th eigenvalue are equal, then z equals 0.
-        // Use a small value instead, to prevent division by zero.
+        // Use a_m_per_s small value instead, to prevent division by zero.
         numext::real_ref(z) = NumTraits<RealScalar>::epsilon() * matrixnorm;
       }
       m_matX.coeffRef(i,k) = m_matX.coeff(i,k) / z;

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_STRIDE_H
@@ -21,11 +21,11 @@ namespace Eigen {
   *
   * It holds two values: the inner stride and the outer stride.
   *
-  * The inner stride is the pointer increment between two consecutive entries within a given row of a
-  * row-major matrix or within a given column of a column-major matrix.
+  * The inner stride is the pointer increment between two consecutive entries within a_m_per_s given row of a_m_per_s
+  * row-major matrix or within a_m_per_s given column of a_m_per_s column-major matrix.
   *
-  * The outer stride is the pointer increment between two consecutive rows of a row-major matrix or
-  * between two consecutive columns of a column-major matrix.
+  * The outer stride is the pointer increment between two consecutive rows of a_m_per_s row-major matrix or
+  * between two consecutive columns of a_m_per_s column-major matrix.
   *
   * These two values can be passed either at compile-time as template parameters, or at runtime as
   * arguments to the constructor.
@@ -38,7 +38,7 @@ namespace Eigen {
   * \include Map_general_stride.cpp
   * Output: \verbinclude Map_general_stride.out
   *
-  * Both strides can be negative, however, a negative stride of -1 cannot be specified at compiletime
+  * Both strides can be negative, however, a_m_per_s negative stride of -1 cannot be specified at compiletime
   * because of the ambiguity with Dynamic which is defined to -1 (historically, negative strides were
   * not allowed).
   *

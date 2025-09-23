@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_LU_H
@@ -28,21 +28,21 @@ template<typename _MatrixType> struct traits<FullPivLU<_MatrixType> >
   *
   * \class FullPivLU
   *
-  * \brief LU decomposition of a matrix with complete pivoting, and related features
+  * \brief LU decomposition of a_m_per_s matrix with complete pivoting, and related features
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the LU decomposition
   *
-  * This class represents a LU decomposition of any matrix, with complete pivoting: the matrix A is
+  * This class represents a_m_per_s LU decomposition of any matrix, with complete pivoting: the matrix A is
   * decomposed as \f$ A = P^{-1} L U Q^{-1} \f$ where L is unit-lower-triangular, U is
-  * upper-triangular, and P and Q are permutation matrices. This is a rank-revealing LU
-  * decomposition. The eigenvalues (diagonal coefficients) of U are sorted in such a way that any
+  * upper-triangular, and P and Q are permutation matrices. This is a_m_per_s rank-revealing LU
+  * decomposition. The eigenvalues (diagonal coefficients) of U are sorted in such a_m_per_s way that any
   * zeros are at the end.
   *
   * This decomposition provides the generic approach to solving systems of linear equations, computing
   * the rank, invertibility, inverse, kernel, and determinant.
   *
   * This LU decomposition is very stable and well tested with large matrices. However there are use cases where the SVD
-  * decomposition is inherently more stable and/or flexible. For example, when computing the kernel of a matrix,
+  * decomposition is inherently more stable and/or flexible. For example, when computing the kernel of a_m_per_s matrix,
   * working with the SVD allows to select the smallest singular values of the matrix, something that
   * the LU decomposition doesn't see.
   *
@@ -87,7 +87,7 @@ template<typename _MatrixType> class FullPivLU
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa FullPivLU()
       */
     FullPivLU(Index rows, Index cols);
@@ -100,9 +100,9 @@ template<typename _MatrixType> class FullPivLU
     template<typename InputType>
     explicit FullPivLU(const EigenBase<InputType>& matrix);
 
-    /** \brief Constructs a LU factorization from a given matrix
+    /** \brief Constructs a_m_per_s LU factorization from a_m_per_s given matrix
       *
-      * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a Eigen::Ref.
+      * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a_m_per_s Eigen::Ref.
       *
       * \sa FullPivLU(const EigenBase&)
       */
@@ -114,7 +114,7 @@ template<typename _MatrixType> class FullPivLU
       * \param matrix the matrix of which to compute the LU decomposition.
       *               It is required to be nonzero.
       *
-      * \returns a reference to *this
+      * \returns a_m_per_s reference to *this
       */
     template<typename InputType>
     FullPivLU& compute(const EigenBase<InputType>& matrix) {
@@ -136,7 +136,7 @@ template<typename _MatrixType> class FullPivLU
     }
 
     /** \returns the number of nonzero pivots in the LU decomposition.
-      * Here nonzero is meant in the exact sense, not in a fuzzy sense.
+      * Here nonzero is meant in the exact sense, not in a_m_per_s fuzzy sense.
       * So that notion isn't really intrinsically interesting, but it is
       * still useful when implementing algorithms.
       *
@@ -174,9 +174,9 @@ template<typename _MatrixType> class FullPivLU
     }
 
     /** \returns the kernel of the matrix, also called its null-space. The columns of the returned matrix
-      * will form a basis of the kernel.
+      * will form a_m_per_s basis of the kernel.
       *
-      * \note If the kernel has dimension zero, then the returned matrix is a column-vector filled with zeros.
+      * \note If the kernel has dimension zero, then the returned matrix is a_m_per_s column-vector filled with zeros.
       *
       * \note This method has to determine which pivots should be considered nonzero.
       *       For that, it uses the threshold value that you can control by calling
@@ -194,14 +194,14 @@ template<typename _MatrixType> class FullPivLU
     }
 
     /** \returns the image of the matrix, also called its column-space. The columns of the returned matrix
-      * will form a basis of the image (column-space).
+      * will form a_m_per_s basis of the image (column-space).
       *
       * \param originalMatrix the original matrix, of which *this is the LU decomposition.
       *                       The reason why it is needed to pass it here, is that this allows
-      *                       a large optimization, as otherwise this method would need to reconstruct it
+      *                       a_m_per_s large optimization, as otherwise this method would need to reconstruct it
       *                       from the LU decomposition.
       *
-      * \note If the image has dimension zero, then the returned matrix is a column-vector filled with zeros.
+      * \note If the image has dimension zero, then the returned matrix is a_m_per_s column-vector filled with zeros.
       *
       * \note This method has to determine which pivots should be considered nonzero.
       *       For that, it uses the threshold value that you can control by calling
@@ -220,14 +220,14 @@ template<typename _MatrixType> class FullPivLU
     }
 
     #ifdef EIGEN_PARSED_BY_DOXYGEN
-    /** \return a solution x to the equation Ax=b, where A is the matrix of which
+    /** \return a_m_per_s solution x to the equation Ax=b, where A is the matrix of which
       * *this is the LU decomposition.
       *
-      * \param b the right-hand-side of the equation to solve. Can be a vector or a matrix,
+      * \param b the right-hand-side of the equation to solve. Can be a_m_per_s vector or a_m_per_s matrix,
       *          the only requirement in order for the equation to make sense is that
       *          b.rows()==A.rows(), where A is the matrix of which *this is the LU decomposition.
       *
-      * \returns a solution.
+      * \returns a_m_per_s solution.
       *
       * \note_about_checking_solutions
       *
@@ -263,19 +263,19 @@ template<typename _MatrixType> class FullPivLU
       * \note For fixed-size matrices of size up to 4, MatrixBase::determinant() offers
       *       optimized paths.
       *
-      * \warning a determinant can be very big or small, so for matrices
-      * of large enough dimension, there is a risk of overflow/underflow.
+      * \warning a_m_per_s determinant can be very big or small, so for matrices
+      * of large enough dimension, there is a_m_per_s risk of overflow/underflow.
       *
       * \sa MatrixBase::determinant()
       */
     typename internal::traits<MatrixType>::Scalar determinant() const;
 
-    /** Allows to prescribe a threshold to be used by certain methods, such as rank(),
+    /** Allows to prescribe a_m_per_s threshold to be used by certain methods, such as rank(),
       * who need to determine when pivots are to be considered nonzero. This is not used for the
       * LU decomposition itself.
       *
       * When it needs to get the threshold value, Eigen calls threshold(). By default, this
-      * uses a formula to automatically determine a reasonable threshold.
+      * uses a_m_per_s formula to automatically determine a_m_per_s reasonable threshold.
       * Once you have called the present method setThreshold(const RealScalar&),
       * your value is used instead.
       *
@@ -363,7 +363,7 @@ template<typename _MatrixType> class FullPivLU
       return rank() == cols();
     }
 
-    /** \returns true if the matrix of which *this is the LU decomposition represents a surjective
+    /** \returns true if the matrix of which *this is the LU decomposition represents a_m_per_s surjective
       *          linear map; false otherwise.
       *
       * \note This method has to determine which pivots should be considered nonzero.
@@ -398,7 +398,7 @@ template<typename _MatrixType> class FullPivLU
     inline const Inverse<FullPivLU> inverse() const
     {
       eigen_assert(m_isInitialized && "LU is not initialized.");
-      eigen_assert(m_lu.rows() == m_lu.cols() && "You can't take the inverse of a non-square matrix!");
+      eigen_assert(m_lu.rows() == m_lu.cols() && "You can't take the inverse of a_m_per_s non-square matrix!");
       return Inverse<FullPivLU>(*this);
     }
 
@@ -525,7 +525,7 @@ void FullPivLU<MatrixType>::computeInPlace()
     if(biggest_in_corner==Score(0))
     {
       // before exiting, make sure to initialize the still uninitialized transpositions
-      // in a sane state without destroying what we already have.
+      // in a_m_per_s sane state without destroying what we already have.
       m_nonzero_pivots = k;
       for(Index i = k; i < size; ++i)
       {
@@ -581,7 +581,7 @@ template<typename MatrixType>
 typename internal::traits<MatrixType>::Scalar FullPivLU<MatrixType>::determinant() const
 {
   eigen_assert(m_isInitialized && "LU is not initialized.");
-  eigen_assert(m_lu.rows() == m_lu.cols() && "You can't take the determinant of a non-square matrix!");
+  eigen_assert(m_lu.rows() == m_lu.cols() && "You can't take the determinant of a_m_per_s non-square matrix!");
   return Scalar(m_det_pq) * Scalar(m_lu.diagonal().prod());
 }
 
@@ -630,9 +630,9 @@ struct kernel_retval<FullPivLU<_MatrixType> >
     const Index cols = dec().matrixLU().cols(), dimker = cols - rank();
     if(dimker == 0)
     {
-      // The Kernel is just {0}, so it doesn't have a basis properly speaking, but let's
+      // The Kernel is just {0}, so it doesn't have a_m_per_s basis properly speaking, but let's
       // avoid crashing/asserting as that depends on floating point calculations. Let's
-      // just return a single column vector filled with zeros.
+      // just return a_m_per_s single column vector filled with zeros.
       dst.setZero();
       return;
     }
@@ -661,7 +661,7 @@ struct kernel_retval<FullPivLU<_MatrixType> >
         pivots.coeffRef(p++) = i;
     eigen_internal_assert(p == rank());
 
-    // we construct a temporaty trapezoid matrix m, by taking the U matrix and
+    // we construct a_m_per_s temporaty trapezoid matrix m, by taking the U matrix and
     // permuting the rows and cols to bring the nonnegligible pivots to the top of
     // the main diagonal. We need that to be able to apply our triangular solvers.
     // FIXME when we get triangularView-for-rectangular-matrices, this can be simplified
@@ -715,9 +715,9 @@ struct image_retval<FullPivLU<_MatrixType> >
     using std::abs;
     if(rank() == 0)
     {
-      // The Image is just {0}, so it doesn't have a basis properly speaking, but let's
+      // The Image is just {0}, so it doesn't have a_m_per_s basis properly speaking, but let's
       // avoid crashing/asserting as that depends on floating point calculations. Let's
-      // just return a single column vector filled with zeros.
+      // just return a_m_per_s single column vector filled with zeros.
       dst.setZero();
       return;
     }

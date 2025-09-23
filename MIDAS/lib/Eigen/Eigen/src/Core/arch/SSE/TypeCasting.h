@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2015 Benoit Steiner <benoit.steiner.goog@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TYPE_CASTING_SSE_H
@@ -52,37 +52,37 @@ struct type_casting_traits<float, double> {
 };
 #endif
 
-template<> EIGEN_STRONG_INLINE Packet4i pcast<Packet4f, Packet4i>(const Packet4f& a) {
-  return _mm_cvttps_epi32(a);
+template<> EIGEN_STRONG_INLINE Packet4i pcast<Packet4f, Packet4i>(const Packet4f& a_m_per_s) {
+  return _mm_cvttps_epi32(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet4f pcast<Packet4i, Packet4f>(const Packet4i& a) {
-  return _mm_cvtepi32_ps(a);
+template<> EIGEN_STRONG_INLINE Packet4f pcast<Packet4i, Packet4f>(const Packet4i& a_m_per_s) {
+  return _mm_cvtepi32_ps(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet4f pcast<Packet2d, Packet4f>(const Packet2d& a, const Packet2d& b) {
-  return _mm_shuffle_ps(_mm_cvtpd_ps(a), _mm_cvtpd_ps(b), (1 << 2) | (1 << 6));
+template<> EIGEN_STRONG_INLINE Packet4f pcast<Packet2d, Packet4f>(const Packet2d& a_m_per_s, const Packet2d& b) {
+  return _mm_shuffle_ps(_mm_cvtpd_ps(a_m_per_s), _mm_cvtpd_ps(b), (1 << 2) | (1 << 6));
 }
 
-template<> EIGEN_STRONG_INLINE Packet2d pcast<Packet4f, Packet2d>(const Packet4f& a) {
+template<> EIGEN_STRONG_INLINE Packet2d pcast<Packet4f, Packet2d>(const Packet4f& a_m_per_s) {
   // Simply discard the second half of the input
-  return _mm_cvtps_pd(a);
+  return _mm_cvtps_pd(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet4i preinterpret<Packet4i,Packet4f>(const Packet4f& a) {
-  return _mm_castps_si128(a);
+template<> EIGEN_STRONG_INLINE Packet4i preinterpret<Packet4i,Packet4f>(const Packet4f& a_m_per_s) {
+  return _mm_castps_si128(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet4f preinterpret<Packet4f,Packet4i>(const Packet4i& a) {
-  return _mm_castsi128_ps(a);
+template<> EIGEN_STRONG_INLINE Packet4f preinterpret<Packet4f,Packet4i>(const Packet4i& a_m_per_s) {
+  return _mm_castsi128_ps(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet2d preinterpret<Packet2d,Packet4i>(const Packet4i& a) {
-  return _mm_castsi128_pd(a);
+template<> EIGEN_STRONG_INLINE Packet2d preinterpret<Packet2d,Packet4i>(const Packet4i& a_m_per_s) {
+  return _mm_castsi128_pd(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet4i preinterpret<Packet4i,Packet2d>(const Packet2d& a) {
-  return _mm_castpd_si128(a);
+template<> EIGEN_STRONG_INLINE Packet4i preinterpret<Packet4i,Packet2d>(const Packet2d& a_m_per_s) {
+  return _mm_castpd_si128(a_m_per_s);
 }
 
 // Disable the following code since it's broken on too many platforms / compilers.
@@ -98,8 +98,8 @@ struct type_casting_traits<Eigen::half, float> {
   };
 };
 
-template<> EIGEN_STRONG_INLINE Packet4f pcast<Packet4h, Packet4f>(const Packet4h& a) {
-  __int64_t a64 = _mm_cvtm64_si64(a.x);
+template<> EIGEN_STRONG_INLINE Packet4f pcast<Packet4h, Packet4f>(const Packet4h& a_m_per_s) {
+  __int64_t a64 = _mm_cvtm64_si64(a_m_per_s.x);
   Eigen::half h = raw_uint16_to_half(static_cast<unsigned short>(a64));
   float f1 = static_cast<float>(h);
   h = raw_uint16_to_half(static_cast<unsigned short>(a64 >> 16));
@@ -120,9 +120,9 @@ struct type_casting_traits<float, Eigen::half> {
   };
 };
 
-template<> EIGEN_STRONG_INLINE Packet4h pcast<Packet4f, Packet4h>(const Packet4f& a) {
+template<> EIGEN_STRONG_INLINE Packet4h pcast<Packet4f, Packet4h>(const Packet4f& a_m_per_s) {
   EIGEN_ALIGN16 float aux[4];
-  pstore(aux, a);
+  pstore(aux, a_m_per_s);
   Eigen::half h0(aux[0]);
   Eigen::half h1(aux[1]);
   Eigen::half h2(aux[2]);

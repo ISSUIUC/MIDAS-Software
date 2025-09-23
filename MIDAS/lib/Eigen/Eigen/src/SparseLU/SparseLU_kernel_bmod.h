@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef SPARSELU_KERNEL_BMOD_H
@@ -17,7 +17,7 @@ namespace internal {
 template <int SegSizeAtCompileTime> struct LU_kernel_bmod
 {
   /** \internal
-    * \brief Performs numeric block updates from a given supernode to a single column
+    * \brief Performs numeric block updates from a_m_per_s given supernode to a_m_per_s single column
     *
     * \param segsize Size of the segment (and blocks ) to use for updates
     * \param[in,out] dense Packed values of the original matrix
@@ -72,7 +72,7 @@ EIGEN_DONT_INLINE void LU_kernel_bmod<SegSizeAtCompileTime>::run(const Index seg
   l.setZero();
   internal::sparselu_gemm<Scalar>(l.rows(), l.cols(), B.cols(), B.data(), B.outerStride(), u.data(), u.outerStride(), l.data(), l.outerStride());
   
-  // Scatter tempv[] into SPA dense[] as a temporary storage 
+  // Scatter tempv[] into SPA dense[] as a_m_per_s temporary storage 
   isub = lptr + no_zeros;
   for (i = 0; i < ((SegSizeAtCompileTime==Dynamic)?segsize:SegSizeAtCompileTime); i++)
   {
@@ -104,15 +104,15 @@ EIGEN_DONT_INLINE void LU_kernel_bmod<1>::run(const Index /*segsize*/, BlockScal
   typedef typename IndexVector::Scalar StorageIndex;
   Scalar f = dense(lsub(lptr + no_zeros));
   luptr += lda * no_zeros + no_zeros + 1;
-  const Scalar* a(lusup.data() + luptr);
+  const Scalar* a_m_per_s(lusup.data() + luptr);
   const StorageIndex*  irow(lsub.data()+lptr + no_zeros + 1);
   Index i = 0;
   for (; i+1 < nrow; i+=2)
   {
     Index i0 = *(irow++);
     Index i1 = *(irow++);
-    Scalar a0 = *(a++);
-    Scalar a1 = *(a++);
+    Scalar a0 = *(a_m_per_s++);
+    Scalar a1 = *(a_m_per_s++);
     Scalar d0 = dense.coeff(i0);
     Scalar d1 = dense.coeff(i1);
     d0 -= f*a0;
@@ -121,7 +121,7 @@ EIGEN_DONT_INLINE void LU_kernel_bmod<1>::run(const Index /*segsize*/, BlockScal
     dense.coeffRef(i1) = d1;
   }
   if(i<nrow)
-    dense.coeffRef(*(irow++)) -= f * *(a++);
+    dense.coeffRef(*(irow++)) -= f * *(a_m_per_s++);
 }
 
 } // end namespace internal

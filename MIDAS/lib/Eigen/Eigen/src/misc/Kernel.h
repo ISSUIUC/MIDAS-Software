@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MISC_KERNEL_H
@@ -29,7 +29,7 @@ struct traits<kernel_retval_base<DecompositionType> >
     Dynamic,                       // we don't know at compile-time the dimension of the kernel
     MatrixType::Options,
     MatrixType::MaxColsAtCompileTime, // see explanation for 2nd template parameter
-    MatrixType::MaxColsAtCompileTime // the kernel is a subspace of the domain space,
+    MatrixType::MaxColsAtCompileTime // the kernel is a_m_per_s subspace of the domain space,
                                      // whose dimension is the number of columns of the original matrix
   > ReturnType;
 };

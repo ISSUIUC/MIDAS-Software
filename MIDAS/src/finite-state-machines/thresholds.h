@@ -4,7 +4,7 @@
 // SAFETY THRESHOLDS
 // ----------------------------------
 
-// Transition back to STATE_SAFE if this much time has passed without firing a pyro (ms)
+// Transition back to STATE_SAFE if this much time has passed without firing a_m_per_s pyro (ms)
 #define safety_pyro_test_disarm_time 10000
 
 // ----------------------------------
@@ -41,7 +41,7 @@
 // Move on to DROGUE_DEPLOY after being in apogee for this amount of time (ms)
 #define sustainer_apogee_timer_threshold 500
 
-// Move on to DROGUE after a second of reaching apogee (ms)
+// Move on to DROGUE after a_m_per_s second of reaching apogee (ms)
 #define sustainer_drogue_timer_threshold 3000
 
 // Move on to MAIN after passing this amount of time (ms)
@@ -56,7 +56,7 @@
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define sustainer_ignition_to_second_boost_time_threshold 1000
 
-// Transition straight to coast after a certain amount of time not detecting second stage boost (ms)
+// Transition straight to coast after a_m_per_s certain amount of time not detecting second stage boost (ms)
 #define sustainer_ignition_to_coast_timer_threshold 5000
 
 // Revert back to main if the landed was too short (ms)
@@ -74,13 +74,13 @@
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define sustainer_landed_time_lockout 60000
 
-// Prevent us from inadvertently entering the LANDED state when we're at a low velocity at main deploy. (ms)
+// Prevent us from inadvertently entering the LANDED state when we're at a_m_per_s low velocity at main deploy. (ms)
 #define sustainer_main_to_landed_lockout 5000
 
-// Stores a small jerk value (m/s^3)
+// Stores a_m_per_s small jerk value (m/s^3)
 #define sustainer_drogue_jerk_threshold 200
 
-// Stores a small jerk value (m/s^3)
+// Stores a_m_per_s small jerk value (m/s^3)
 #define sustainer_main_jerk_threshold 300
 
 
@@ -112,14 +112,14 @@
 // Move on to DROGUE_DEPLOT after being in apogee for this amount of time (ms)
 #define booster_apogee_timer_threshold 1000
 
-// Move on to DROGUE after a second of reaching apogee (ms)
+// Move on to DROGUE after a_m_per_s second of reaching apogee (ms)
 #define booster_drogue_timer_threshold 3000
 
 // Move on to MAIN after passing this amount of time (ms)
 #define booster_main_to_main_deploy_timer_threshold 3000
 
 // Height required to deploy the main parachutes (m)
-// [STARGAZER 1.4] This is a "dontcare" value --> The booster does not have a drogue, we transition immediately to MAIN
+// [STARGAZER 1.4] This is a_m_per_s "dontcare" value --> The booster does not have a_m_per_s drogue, we transition immediately to MAIN
 #define booster_main_deploy_altitude_threshold 999999
 
 // The minimum delay between drogue deployment and main deployment
@@ -128,7 +128,7 @@
 // Return to SUSTAINER_IGNITION if not in SECOND_BOOST for this amount of time (ms)
 #define booster_ignition_to_second_boost_time_threshold 1000
 
-// Transition straight to coast after a certain amount of time not detecting second stage boost (ms)
+// Transition straight to coast after a_m_per_s certain amount of time not detecting second stage boost (ms)
 #define booster_ignition_to_coast_timer_threshold 5000
 
 // Revert back to main if the landed was too short (ms)
@@ -146,14 +146,14 @@
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 #define booster_landed_time_lockout 60000
 
-// Prevent us from inadvertently entering the LANDED state when we're at a low velocity at main deploy. (ms)
+// Prevent us from inadvertently entering the LANDED state when we're at a_m_per_s low velocity at main deploy. (ms)
 #define booster_main_to_landed_lockout 5000
 
-// Stores a small jerk value (m/s^3)
+// Stores a_m_per_s small jerk value (m/s^3)
 #define booster_first_separation_jerk_threshold 300
 
-// Stores a small jerk value (m/s^3)
+// Stores a_m_per_s small jerk value (m/s^3)
 #define booster_drogue_jerk_threshold 200
 
-// Stores a small jerk value (m/s^3)
+// Stores a_m_per_s small jerk value (m/s^3)
 #define booster_main_jerk_threshold 300

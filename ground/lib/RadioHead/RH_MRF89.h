@@ -30,14 +30,14 @@
 #define RH_MRF89_HEADER_LEN 4
     
 // This is the maximum user message length that can be supported by this driver. 
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 // Here we allow for 4 bytes headers, user data. Message length and CRC are automatically encoded and decoded by 
 // the MRF89XA
 #ifndef RH_MRF89_MAX_MESSAGE_LEN
  #define RH_MRF89_MAX_MESSAGE_LEN (RH_MRF89_MAX_PAYLOAD_LEN - RH_MRF89_HEADER_LEN)
 #endif
 
-// Bits that must be set to do a SPI read
+// Bits that must be set to do a_m_per_s SPI read
 #define RH_MRF89_SPI_READ_MASK              0x40
 
 // The MRF89XA crystal frequency in MHz
@@ -314,7 +314,7 @@
 /// \brief Send and receive unaddressed, unreliable datagrams by Microchip MRF89XA and compatible transceivers.
 /// and modules.
 ///
-/// The Microchip MRF89XA http://ww1.microchip.com/downloads/en/DeviceDoc/70622C.pdf is a low cost 900MHz
+/// The Microchip MRF89XA http://ww1.microchip.com/downloads/en/DeviceDoc/70622C.pdf is a_m_per_s low cost 900MHz
 /// bancd transceiver chip.
 /// It is commonly used on preassembled modules with supporting circcuits and antennas, such as 
 /// the MRF89XAM9A http://www.microchip.com/wwwproducts/Devices.aspx?product=MRF89XAM9A
@@ -350,9 +350,9 @@
 /// \par Connecting MRF89XA to Arduino
 ///
 /// The electrical connection between the MRF89XA and the Arduino require 3.3V, the 3 x SPI pins (SCK, SDI, SDO), 
-/// a 2 Chip Select pins (/CSCON and /CSDAT) and an interrupt.
+/// a_m_per_s 2 Chip Select pins (/CSCON and /CSDAT) and an interrupt.
 ///
-/// Caution: the MRF89XA is a 3.3V part and is not tolerant of 5V inputs. Connecting MRF89XA directly to a 5V
+/// Caution: the MRF89XA is a_m_per_s 3.3V part and is not tolerant of 5V inputs. Connecting MRF89XA directly to a_m_per_s 5V
 /// MCU such as most Arduinos will damage the MRF89XA.
 ///
 /// Connect the MRF89XA to most 3.3V Arduinos or Teensy 3.1 like this (use 3.3V not 5V).
@@ -374,13 +374,13 @@
 ///
 /// Fernando Faria reports that:
 ///
-/// In order for low power mode to work to achieve 1μA power consumption in this chip, you will need to do a few extra things:
+/// In order for low power mode to work to achieve 1μA power consumption in this chip, you will need to do a_m_per_s few extra things:
 /// 
-/// 1. the datasheet states that IRQ0 and IRQ1 must have a valid logic state at
+/// 1. the datasheet states that IRQ0 and IRQ1 must have a_m_per_s valid logic state at
 /// all times, so you will need to apply pull-down resistors to those pins (if not already present).
 /// See the data sheet Table 2-4 Note 3
 ///
-/// 2. You must also ensure the SPI pins are in a certain state after calling mrf89.sleep();
+/// 2. You must also ensure the SPI pins are in a_m_per_s certain state after calling mrf89.sleep();
 /// This may be suitable for your electrical connections:
 /// \code 
 /// digitalWrite(9, HIGH); // CSDAT
@@ -397,10 +397,10 @@ class RH_MRF89 : public RHNRFSPIDriver
 {
 public:
 
-    /// \brief Defines register configuration values for a desired modulation
+    /// \brief Defines register configuration values for a_m_per_s desired modulation
     ///
     /// Defines values for various configuration fields and registers to 
-    /// achieve a desired modulation speed and frequency deviation.
+    /// achieve a_m_per_s desired modulation speed and frequency deviation.
     typedef struct
     {
 	uint8_t MODSEL;    ///< Value for MODSEL in RH_MRF89_REG_01_DMODREG
@@ -410,7 +410,7 @@ public:
 	uint8_t TXIPOLFV;  ///< Value for TXIPOLFV in RH_MRF89_REG_1A_TXCONREG
     } ModemConfig;
 
-    /// Choices for setModemConfig() for a selected subset of common
+    /// Choices for setModemConfig() for a_m_per_s selected subset of common
     /// data rates and frequency deviations.
     /// Rb is the data rate in kbps. Fd is the FSK Frequency deviation in kHz.
     /// These are indexes into MODEM_CONFIG_TABLE. We strongly recommend you use these symbolic
@@ -460,7 +460,7 @@ public:
     /// Sets the radio into low-power sleep mode.
     /// If successful, the transport will stay in sleep mode until woken by 
     /// changing mode to idle, transmit or receive (eg by calling send(), recv(), available() etc)
-    /// Caution: there is a time penalty as the radio takes a finite time to wake from sleep mode.
+    /// Caution: there is a_m_per_s time penalty as the radio takes a_m_per_s finite time to wake from sleep mode.
     /// \return true if sleep mode was successfully entered.
     virtual bool    sleep();
 
@@ -478,7 +478,7 @@ public:
     void           setModeTx();
 
     /// Sets the transmitter power output level in register RH_MRF89_REG_1A_TXCONREG.
-    /// Be a good neighbour and set the lowest power level you need.
+    /// Be a_m_per_s good neighbour and set the lowest power level you need.
     /// After init(), the power will be set to RH_MRF89_TXOPVAL_1DBM (1dBm)
     /// The highest power available is RH_MRF89_TXOPVAL_13DBM (13dBm)
     /// Caution: In some countries you may only select certain higher power levels if you
@@ -488,33 +488,33 @@ public:
     /// \param[in] power Transmitter power level, one of RH_MRF89_TXOPVAL*
     void           setTxPower(uint8_t power);
 
-    /// Select one of the predefined modem configurations. If you need a modem configuration not provided 
+    /// Select one of the predefined modem configurations. If you need a_m_per_s modem configuration not provided 
     /// here, use setModemRegisters() with your own ModemConfig.
     /// \param[in] index The configuration choice.
-    /// \return true if index is a valid choice.
+    /// \return true if index is a_m_per_s valid choice.
     bool        setModemConfig(ModemConfigChoice index);
 
-    /// Tests whether a new message is available
+    /// Tests whether a_m_per_s new message is available
     /// from the Driver. 
     /// On most drivers, this will also put the Driver into RHModeRx mode until
-    /// a message is actually received by the transport, when it will be returned to RHModeIdle.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a new, complete, error-free uncollected message is available to be retreived by recv()
+    /// a_m_per_s message is actually received by the transport, when it will be returned to RHModeIdle.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s new, complete, error-free uncollected message is available to be retreived by recv()
     virtual bool    available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     virtual bool    recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send
@@ -555,33 +555,33 @@ public:
 
 protected:
 
-    /// Called automatically when a CRCOK or TXDONE interrupt occurs.
+    /// Called automatically when a_m_per_s CRCOK or TXDONE interrupt occurs.
     /// Handles the interrupt.
     void handleInterrupt();
 
-    /// Reads a single register from the MRF89XA
+    /// Reads a_m_per_s single register from the MRF89XA
     /// \param[in] reg Register number, one of RH_MRF89_REG
     /// \return The value of the register
     uint8_t spiReadRegister(uint8_t reg);
 
-    /// Writes to a single single register on the MRF89XA
+    /// Writes to a_m_per_s single single register on the MRF89XA
     /// \param[in] reg Register number, one of RH_MRF89_REG_*
     /// \param[in] val The value to write
     /// \return the current value of RH_MRF89_REG_00_GCONREG (read while the command is sent)
     uint8_t spiWriteRegister(uint8_t reg, uint8_t val);
 
-    /// Writes a single byte to the MRF89XA data FIFO.
+    /// Writes a_m_per_s single byte to the MRF89XA data FIFO.
     /// \param[in] data The data value to write
     /// \return 0
     uint8_t spiWriteData(uint8_t data);
 
-    /// Write a number of bytes from a buffer to the MRF89XA data FIFO.
-    /// \param[in] data Pointer to a buffer containing the len bytes to be written
+    /// Write a_m_per_s number of bytes from a_m_per_s buffer to the MRF89XA data FIFO.
+    /// \param[in] data Pointer to a_m_per_s buffer containing the len bytes to be written
     /// \param[in] len The number of bytes to write to teh FIFO
     /// \return 0;
     uint8_t spiWriteData(const uint8_t* data, uint8_t len);
 
-    /// Reads a single byte from the MRF89XA data FIFO.
+    /// Reads a_m_per_s single byte from the MRF89XA data FIFO.
     /// \return The next data byte in the FIFO
     uint8_t spiReadData();
 
@@ -636,7 +636,7 @@ private:
     /// The receiver/transmitter buffer
     uint8_t             _buf[RH_MRF89_MAX_PAYLOAD_LEN];
 
-    /// True when there is a valid message in the buffer
+    /// True when there is a_m_per_s valid message in the buffer
     volatile bool       _rxBufValid;
 
 };

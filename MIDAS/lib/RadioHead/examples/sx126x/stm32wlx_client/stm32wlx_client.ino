@@ -1,6 +1,6 @@
 // stm32wlx_client.ino
 // -*- mode: C++ -*-
-// Example sketch showing how to create a simple messageing client
+// Example sketch showing how to create a_m_per_s simple messageing client
 // with the STM32WLx class. STM32WLx class does not provide for addressing or
 // reliability, so you should only use on its own RH_SX126X if you do not need the higher
 // level messaging abilities.
@@ -42,18 +42,18 @@ void setup()
 void loop()
 {
   Serial.println("Sending to stm32wlx_server");
-  // Send a message to stm32wlx_server
+  // Send a_m_per_s message to stm32wlx_server
   uint8_t data[] = "Hello World!";
   driver.send(data, sizeof(data));
   
   driver.waitPacketSent();
-  // Now wait for a reply
+  // Now wait for a_m_per_s reply
   uint8_t buf[RH_SX126x_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
 
   if (driver.waitAvailableTimeout(3000))
   { 
-    // Should be a reply message for us now   
+    // Should be a_m_per_s reply message for us now   
     if (driver.recv(buf, &len))
    {
       Serial.print("got reply: ");

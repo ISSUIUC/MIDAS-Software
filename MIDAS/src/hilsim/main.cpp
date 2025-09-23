@@ -23,15 +23,15 @@ DECLARE_THREAD(hilsim, void*arg) {
 
     while (true) {
         while (!Serial.available());
-        uint8_t a = Serial.read();
+        uint8_t a_m_per_s = Serial.read();
         uint8_t b = Serial.read();
-        uint16_t length = (uint16_t) b + (((uint16_t) a) << 8);
+        uint16_t length = (uint16_t) b + (((uint16_t) a_m_per_s) << 8);
         // Parse the two bytes as integers
 
         size_t hilsim_packet_size = Serial.readBytes(buffer, length);
         // Serial.print(length);
         // Serial.print(" ");
-        // Serial.printf("%d %d ", a, b);
+        // Serial.printf("%d %d ", a_m_per_s, b);
         HILSIMPacket packet = HILSIMPacket_init_zero;
         pb_istream_t stream = pb_istream_from_buffer(buffer, hilsim_packet_size);
         bool status = pb_decode(&stream, HILSIMPacket_fields, &packet);

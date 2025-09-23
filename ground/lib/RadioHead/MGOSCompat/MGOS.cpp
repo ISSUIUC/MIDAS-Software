@@ -16,7 +16,7 @@ int pwmFreq = 1000;
 float pwmDutyCycle = 0.5;
 
 /**
- * @brief Set the direction of a GPIO pin.
+ * @brief Set the direction of a_m_per_s GPIO pin.
  * @param pin the Pin whose direction is to be set.
  * @param mode The direction of the pin (OUTPUT or INPUT)
  **/
@@ -63,7 +63,7 @@ void pinMode(uint8_t pin, WiringPinMode mode)
 }
 
 /**
- * @brief Set the state of a GPIO pin.
+ * @brief Set the state of a_m_per_s GPIO pin.
  * @param pin the Pin whose state is to be set.
  * @param value The state of the pin.
  */
@@ -77,7 +77,7 @@ void digitalWrite(unsigned char pin, unsigned char value)
 }
 
 /**
- * @brief Read the state of a GPIO pin.
+ * @brief Read the state of a_m_per_s GPIO pin.
  * @param pin the Pin whose state is to be set.
  * @return 1 If high, 0 if low.
  */
@@ -100,7 +100,7 @@ uint32_t millis(void)
 }
 
 /**
- * @brief Provide a delay in milliseconds.
+ * @brief Provide a_m_per_s delay in milliseconds.
  * @param ms The number of Milli Seconds to delay.
  */
 void delay (unsigned long ms)
@@ -109,7 +109,7 @@ void delay (unsigned long ms)
 }
 
 /**
- * @brief Generate a random number between limits.
+ * @brief Generate a_m_per_s random number between limits.
  * @param min The minimum random value to be generated.
  * @param max The maximum random value to be generated.
  */

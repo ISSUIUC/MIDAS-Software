@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -20,7 +20,7 @@ struct symbolic_last_tag {};
 /** \var last
   * \ingroup Core_Module
   *
-  * Can be used as a parameter to Eigen::seq and Eigen::seqN functions to symbolically reference the last element/row/columns
+  * Can be used as a_m_per_s parameter to Eigen::seq and Eigen::seqN functions to symbolically reference the last element/row/columns
   * of the underlying vector or matrix once passed to DenseBase::operator()(const RowIndices&, const ColIndices&).
   *
   * This symbolic placeholder supports standard arithmetic operations.
@@ -40,7 +40,7 @@ static const symbolic::SymbolExpr<internal::symbolic_last_tag> last; // PLEASE u
 /** \var lastp1
   * \ingroup Core_Module
   *
-  * Can be used as a parameter to Eigen::seq and Eigen::seqN functions to symbolically
+  * Can be used as a_m_per_s parameter to Eigen::seq and Eigen::seqN functions to symbolically
   * reference the last+1 element/row/columns of the underlying vector or matrix once
   * passed to DenseBase::operator()(const RowIndices&, const ColIndices&).
   *
@@ -52,7 +52,7 @@ static const symbolic::SymbolExpr<internal::symbolic_last_tag> last; // PLEASE u
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 static const auto lastp1 = last+fix<1>;
 #else
-// Using a FixedExpr<1> expression is important here to make sure the compiler
+// Using a_m_per_s FixedExpr<1> expression is important here to make sure the compiler
 // can fully optimize the computation starting indices with zero overhead.
 static const symbolic::AddExpr<symbolic::SymbolExpr<internal::symbolic_last_tag>,symbolic::ValueExpr<Eigen::internal::FixedInt<1> > > lastp1(last+fix<1>());
 #endif
@@ -81,7 +81,7 @@ template<typename T>
 EIGEN_CONSTEXPR Index first(const T& x) EIGEN_NOEXCEPT { return x.first(); }
 
 // IndexedViewCompatibleType/makeIndexedViewCompatible turn an arbitrary object of type T into something usable by MatrixSlice
-// The generic implementation is a no-op
+// The generic implementation is a_m_per_s no-op
 template<typename T,int XprSize,typename EnableIf=void>
 struct IndexedViewCompatibleType {
   typedef T type;
@@ -91,7 +91,7 @@ template<typename T,typename Q>
 const T& makeIndexedViewCompatible(const T& x, Index /*size*/, Q) { return x; }
 
 //--------------------------------------------------------------------------------
-// Handling of a single Index
+// Handling of a_m_per_s single Index
 //--------------------------------------------------------------------------------
 
 struct SingleRange {
@@ -109,11 +109,11 @@ template<> struct get_compile_time_incr<SingleRange> {
   enum { value = 1 }; // 1 or 0 ??
 };
 
-// Turn a single index into something that looks like an array (i.e., that exposes a .size(), and operator[](int) methods)
+// Turn a_m_per_s single index into something that looks like an array (i.e., that exposes a_m_per_s .size(), and operator[](int) methods)
 template<typename T, int XprSize>
 struct IndexedViewCompatibleType<T,XprSize,typename internal::enable_if<internal::is_integral<T>::value>::type> {
   // Here we could simply use Array, but maybe it's less work for the compiler to use
-  // a simpler wrapper as SingleRange
+  // a_m_per_s simpler wrapper as SingleRange
   //typedef Eigen::Array<Index,1,1> type;
   typedef SingleRange type;
 };
@@ -136,7 +136,7 @@ makeIndexedViewCompatible(const T& id, Index size, SpecializedType) {
 
 struct all_t { all_t() {} };
 
-// Convert a symbolic 'all' into a usable range type
+// Convert a_m_per_s symbolic 'all' into a_m_per_s usable range type
 template<int XprSize>
 struct AllRange {
   enum { SizeAtCompileTime = XprSize };
@@ -166,7 +166,7 @@ template<int Size> struct get_compile_time_incr<AllRange<Size> > {
 
 /** \var all
   * \ingroup Core_Module
-  * Can be used as a parameter to DenseBase::operator()(const RowIndices&, const ColIndices&) to index all rows or columns
+  * Can be used as a_m_per_s parameter to DenseBase::operator()(const RowIndices&, const ColIndices&) to index all rows or columns
   */
 static const Eigen::internal::all_t all; // PLEASE use Eigen::all instead of Eigen::placeholders::all
 

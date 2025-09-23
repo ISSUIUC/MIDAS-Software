@@ -9,7 +9,7 @@
 
 SerialUSBClass SerialUSB;
 
-// Describes all the STM32 things we need to know about a digital IO pin to
+// Describes all the STM32 things we need to know about a_m_per_s digital IO pin to
 // make it input or output or to configure as an interrupt
 typedef struct
 {

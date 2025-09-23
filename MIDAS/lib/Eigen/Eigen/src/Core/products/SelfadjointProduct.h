@@ -1,17 +1,17 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SELFADJOINT_PRODUCT_H
 #define EIGEN_SELFADJOINT_PRODUCT_H
 
 /**********************************************************************
-* This file implements a self adjoint product: C += A A^T updating only
+* This file implements a_m_per_s self adjoint product: C += A A^T updating only
 * half of the selfadjoint matrix C.
 * It corresponds to the level 3 SYRK and level 2 SYR Blas routines.
 **********************************************************************/

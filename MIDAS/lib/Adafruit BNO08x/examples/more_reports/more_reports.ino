@@ -1,11 +1,11 @@
 // Basic demo for readings from Adafruit BNO08x
 #include <Adafruit_BNO08x.h>
 
-// For SPI mode, we need a CS pin
+// For SPI mode, we need a_m_per_s CS pin
 #define BNO08X_CS 10
 #define BNO08X_INT 9
 
-// For SPI mode, we also need a RESET
+// For SPI mode, we also need a_m_per_s RESET
 //#define BNO08X_RESET 5
 // but not for I2C or UART
 #define BNO08X_RESET -1
@@ -22,7 +22,7 @@ void setup(void) {
 
   // Try to initialize!
   if (!bno08x.begin_I2C()) {
-    // if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte
+    // if (!bno08x.begin_UART(&Serial1)) {  // Requires a_m_per_s device with > 300 byte
     // UART buffer! if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
     Serial.println("Failed to find BNO08x chip");
     while (1) {
@@ -66,7 +66,7 @@ void setReports(void) {
     Serial.println("Could not enable linear acceleration");
   }
   if (!bno08x.enableReport(SH2_GRAVITY)) {
-    Serial.println("Could not enable gravity vector");
+    Serial.println("Could not enable gravity_vec vector");
   }
   if (!bno08x.enableReport(SH2_ROTATION_VECTOR)) {
     Serial.println("Could not enable rotation vector");
@@ -183,14 +183,14 @@ void loop() {
     break;
   case SH2_GRAVITY:
     Serial.print("Gravity - x: ");
-    Serial.print(sensorValue.un.gravity.x);
+    Serial.print(sensorValue.un.gravity_vec.x);
     Serial.print(" y: ");
-    Serial.print(sensorValue.un.gravity.y);
+    Serial.print(sensorValue.un.gravity_vec.y);
     Serial.print(" z: ");
-    Serial.println(sensorValue.un.gravity.z);
+    Serial.println(sensorValue.un.gravity_vec.z);
     break;
   case SH2_ROTATION_VECTOR:
-    Serial.print("Rotation Vector - r: ");
+    Serial.print("Rotation Vector - r_m: ");
     Serial.print(sensorValue.un.rotationVector.real);
     Serial.print(" i: ");
     Serial.print(sensorValue.un.rotationVector.i);
@@ -200,7 +200,7 @@ void loop() {
     Serial.println(sensorValue.un.rotationVector.k);
     break;
   case SH2_GEOMAGNETIC_ROTATION_VECTOR:
-    Serial.print("Geo-Magnetic Rotation Vector - r: ");
+    Serial.print("Geo-Magnetic Rotation Vector - r_m: ");
     Serial.print(sensorValue.un.geoMagRotationVector.real);
     Serial.print(" i: ");
     Serial.print(sensorValue.un.geoMagRotationVector.i);
@@ -211,7 +211,7 @@ void loop() {
     break;
 
   case SH2_GAME_ROTATION_VECTOR:
-    Serial.print("Game Rotation Vector - r: ");
+    Serial.print("Game Rotation Vector - r_m: ");
     Serial.print(sensorValue.un.gameRotationVector.real);
     Serial.print(" i: ");
     Serial.print(sensorValue.un.gameRotationVector.i);

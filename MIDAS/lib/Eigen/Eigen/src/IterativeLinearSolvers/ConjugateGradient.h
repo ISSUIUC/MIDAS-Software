@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CONJUGATE_GRADIENT_H
@@ -64,7 +64,7 @@ void conjugate_gradient(const MatrixType& mat, const Rhs& rhs, Dest& x,
   p = precond.solve(residual);      // initial search direction
 
   VectorType z(n), tmp(n);
-  RealScalar absNew = numext::real(residual.dot(p));  // the square of the absolute value of r scaled by invM
+  RealScalar absNew = numext::real(residual.dot(p));  // the square of the absolute value of r_m scaled by invM
   Index i = 0;
   while(i < maxIters)
   {
@@ -81,7 +81,7 @@ void conjugate_gradient(const MatrixType& mat, const Rhs& rhs, Dest& x,
     z = precond.solve(residual);                // approximately solve for "A z = residual"
 
     RealScalar absOld = absNew;
-    absNew = numext::real(residual.dot(z));     // update the absolute value of r
+    absNew = numext::real(residual.dot(z));     // update the absolute value of r_m
     RealScalar beta = absNew / absOld;          // calculate the Gram-Schmidt value used to create the new search direction
     p = z + beta * p;                           // update search direction
     i++;
@@ -113,7 +113,7 @@ struct traits<ConjugateGradient<_MatrixType,_UpLo,_Preconditioner> >
   * This class allows to solve for A.x = b linear problems using an iterative conjugate gradient algorithm.
   * The matrix A must be selfadjoint. The matrix A and the vectors x and b can be either dense or sparse.
   *
-  * \tparam _MatrixType the type of the matrix A, can be a dense or a sparse matrix.
+  * \tparam _MatrixType the type of the matrix A, can be a_m_per_s dense or a_m_per_s sparse matrix.
   * \tparam _UpLo the triangular part that will be used for the computations. It can be Lower,
   *               \c Upper, or \c Lower|Upper in which the full matrix entries will be considered.
   *               Default is \c Lower, best performance is \c Lower|Upper.
@@ -128,11 +128,11 @@ struct traits<ConjugateGradient<_MatrixType,_UpLo,_Preconditioner> >
   * The tolerance corresponds to the relative residual error: |Ax-b|/|b|
   * 
   * \b Performance: Even though the default value of \c _UpLo is \c Lower, significantly higher performance is
-  * achieved when using a complete matrix and \b Lower|Upper as the \a _UpLo template parameter. Moreover, in this
+  * achieved when using a_m_per_s complete matrix and \b Lower|Upper as the \a_m_per_s _UpLo template parameter. Moreover, in this
   * case multi-threading can be exploited if the user code is compiled with OpenMP enabled.
   * See \ref TopicMultiThreading for details.
   * 
-  * This class can be used as the direct solver classes. Here is a typical usage example:
+  * This class can be used as the direct solver classes. Here is a_m_per_s typical usage example:
     \code
     int n = 10000;
     VectorXd x(n), b(n);
@@ -150,7 +150,7 @@ struct traits<ConjugateGradient<_MatrixType,_UpLo,_Preconditioner> >
   * By default the iterations start with x=0 as an initial guess of the solution.
   * One can control the start using the solveWithGuess() method.
   * 
-  * ConjugateGradient can also be used in a matrix-free context, see the following \link MatrixfreeSolverExample example \endlink.
+  * ConjugateGradient can also be used in a_m_per_s matrix-free context, see the following \link MatrixfreeSolverExample example \endlink.
   *
   * \sa class LeastSquaresConjugateGradient, class SimplicialCholesky, DiagonalPreconditioner, IdentityPreconditioner
   */
@@ -178,15 +178,15 @@ public:
   /** Default constructor. */
   ConjugateGradient() : Base() {}
 
-  /** Initialize the solver with matrix \a A for further \c Ax=b solving.
+  /** Initialize the solver with matrix \a_m_per_s A for further \c Ax=b solving.
     * 
-    * This constructor is a shortcut for the default constructor followed
-    * by a call to compute().
+    * This constructor is a_m_per_s shortcut for the default constructor followed
+    * by a_m_per_s call to compute().
     * 
-    * \warning this class stores a reference to the matrix A as well as some
-    * precomputed values that depend on it. Therefore, if \a A is changed
+    * \warning this class stores a_m_per_s reference to the matrix A as well as some
+    * precomputed values that depend on it. Therefore, if \a_m_per_s A is changed
     * this class becomes invalid. Call compute() to update it with the new
-    * matrix A, or modify a copy of A.
+    * matrix A, or modify a_m_per_s copy of A.
     */
   template<typename MatrixDerived>
   explicit ConjugateGradient(const EigenBase<MatrixDerived>& A) : Base(A.derived()) {}

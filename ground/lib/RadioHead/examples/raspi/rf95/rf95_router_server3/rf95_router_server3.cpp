@@ -1,6 +1,6 @@
 // rf95_router_server3.cpp
 // -*- mode: C++ -*-
-// Example sketch showing how to create a simple addressed, routed reliable messaging server
+// Example sketch showing how to create a_m_per_s simple addressed, routed reliable messaging server
 // with the RHRouter class.
 // It is designed to work with the other example rf95_router_client.
 //
@@ -48,7 +48,7 @@ void sig_handler(int sig);
 #define RFM95_FREQUENCY  915.00
 #define RFM95_TXPOWER 14
 
-// Create an instance of a driver
+// Create an instance of a_m_per_s driver
 RH_RF95 rf95(RFM95_CS_PIN, RFM95_IRQ_PIN);
 
 // Class to manage message delivery and receipt, using the driver declared above
@@ -122,7 +122,7 @@ int main (int argc, const char* argv[] )
     	Serial.print(": ");
      	Serial.println((char*)buf);
 
-    	// Send a reply back to the originator client
+    	// Send a_m_per_s reply back to the originator client
     	if (manager.sendtoWait(data, sizeof(data), from) != RH_ROUTER_ERROR_NONE)
       		Serial.println("sendtoWait failed");
 #ifdef RFM95_LED

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PARTIALLU_H
@@ -44,13 +44,13 @@ struct enable_if_ref<Ref<T>,Derived> {
   *
   * \class PartialPivLU
   *
-  * \brief LU decomposition of a matrix with partial pivoting, and related features
+  * \brief LU decomposition of a_m_per_s matrix with partial pivoting, and related features
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the LU decomposition
   *
-  * This class represents a LU decomposition of a \b square \b invertible matrix, with partial pivoting: the matrix A
+  * This class represents a_m_per_s LU decomposition of a_m_per_s \b square \b invertible matrix, with partial pivoting: the matrix A
   * is decomposed as A = PLU where L is unit-lower-triangular, U is upper-triangular, and P
-  * is a permutation matrix.
+  * is a_m_per_s permutation matrix.
   *
   * Typically, partial pivoting LU decomposition is only considered numerically stable for square invertible
   * matrices. Thus LAPACK's dgesv and dgesvx require the matrix to be square and invertible. The present class
@@ -60,12 +60,12 @@ struct enable_if_ref<Ref<T>,Derived> {
   * The guaranteed safe alternative, working for all matrices, is the full pivoting LU decomposition, provided
   * by class FullPivLU.
   *
-  * This is \b not a rank-revealing LU decomposition. Many features are intentionally absent from this class,
+  * This is \b not a_m_per_s rank-revealing LU decomposition. Many features are intentionally absent from this class,
   * such as rank computation. If you need these features, use class FullPivLU.
   *
   * This LU decomposition is suitable to invert invertible matrices. It is what MatrixBase::inverse() uses
   * in the general case.
-  * On the other hand, it is \b not suitable to determine whether a given matrix is invertible.
+  * On the other hand, it is \b not suitable to determine whether a_m_per_s given matrix is invertible.
   *
   * The data of the LU decomposition can be directly accessed through the methods matrixLU(), permutationP().
   *
@@ -102,7 +102,7 @@ template<typename _MatrixType> class PartialPivLU
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa PartialPivLU()
       */
     explicit PartialPivLU(Index size);
@@ -158,7 +158,7 @@ template<typename _MatrixType> class PartialPivLU
     /** This method returns the solution x to the equation Ax=b, where A is the matrix of which
       * *this is the LU decomposition.
       *
-      * \param b the right-hand-side of the equation to solve. Can be a vector or a matrix,
+      * \param b the right-hand-side of the equation to solve. Can be a_m_per_s vector or a_m_per_s matrix,
       *          the only requirement in order for the equation to make sense is that
       *          b.rows()==A.rows(), where A is the matrix of which *this is the LU decomposition.
       *
@@ -207,8 +207,8 @@ template<typename _MatrixType> class PartialPivLU
       * \note For fixed-size matrices of size up to 4, MatrixBase::determinant() offers
       *       optimized paths.
       *
-      * \warning a determinant can be very big or small, so for matrices
-      * of large enough dimension, there is a risk of overflow/underflow.
+      * \warning a_m_per_s determinant can be very big or small, so for matrices
+      * of large enough dimension, there is a_m_per_s risk of overflow/underflow.
       *
       * \sa MatrixBase::determinant()
       */
@@ -345,15 +345,15 @@ struct partial_lu_impl
   typedef Ref<Matrix<Scalar, Dynamic, Dynamic, StorageOrder> > BlockType;
   typedef typename MatrixType::RealScalar RealScalar;
 
-  /** \internal performs the LU decomposition in-place of the matrix \a lu
+  /** \internal performs the LU decomposition in-place of the matrix \a_m_per_s lu
     * using an unblocked algorithm.
     *
     * In addition, this function returns the row transpositions in the
-    * vector \a row_transpositions which must have a size equal to the number
-    * of columns of the matrix \a lu, and an integer \a nb_transpositions
+    * vector \a_m_per_s row_transpositions which must have a_m_per_s size equal to the number
+    * of columns of the matrix \a_m_per_s lu, and an integer \a_m_per_s nb_transpositions
     * which returns the actual number of transpositions.
     *
-    * \returns The index of the first pivot which is exactly zero if any, or a negative number otherwise.
+    * \returns The index of the first pivot which is exactly zero if any, or a_m_per_s negative number otherwise.
     */
   static Index unblocked_lu(MatrixTypeRef& lu, PivIndex* row_transpositions, PivIndex& nb_transpositions)
   {
@@ -413,15 +413,15 @@ struct partial_lu_impl
   }
 
   /** \internal performs the LU decomposition in-place of the matrix represented
-    * by the variables \a rows, \a cols, \a lu_data, and \a lu_stride using a
+    * by the variables \a_m_per_s rows, \a_m_per_s cols, \a_m_per_s lu_data, and \a_m_per_s lu_stride using a_m_per_s
     * recursive, blocked algorithm.
     *
     * In addition, this function returns the row transpositions in the
-    * vector \a row_transpositions which must have a size equal to the number
-    * of columns of the matrix \a lu, and an integer \a nb_transpositions
+    * vector \a_m_per_s row_transpositions which must have a_m_per_s size equal to the number
+    * of columns of the matrix \a_m_per_s lu, and an integer \a_m_per_s nb_transpositions
     * which returns the actual number of transpositions.
     *
-    * \returns The index of the first pivot which is exactly zero if any, or a negative number otherwise.
+    * \returns The index of the first pivot which is exactly zero if any, or a_m_per_s negative number otherwise.
     *
     * \note This very low level interface using pointers, etc. is to:
     *   1 - reduce the number of instantiations to the strict minimum
@@ -469,7 +469,7 @@ struct partial_lu_impl
 
       PivIndex nb_transpositions_in_panel;
       // recursively call the blocked LU algorithm on [A11^T A21^T]^T
-      // with a very small blocking size:
+      // with a_m_per_s very small blocking size:
       Index ret = blocked_lu(trows+bs, bs, &lu.coeffRef(k,k), luStride,
                    row_transpositions+k, nb_transpositions_in_panel, 16);
       if(ret>=0 && first_zero_pivot==-1)

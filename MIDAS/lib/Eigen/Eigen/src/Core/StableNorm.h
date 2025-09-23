@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_STABLENORM_H
@@ -28,7 +28,7 @@ inline void stable_norm_kernel(const ExpressionType& bl, Scalar& ssq, Scalar& sc
       invScale = NumTraits<Scalar>::highest();
       scale = Scalar(1)/invScale;
     }
-    else if(maxCoeff>NumTraits<Scalar>::highest()) // we got a INF
+    else if(maxCoeff>NumTraits<Scalar>::highest()) // we got a_m_per_s INF
     {
       invScale = Scalar(1);
       scale = maxCoeff;
@@ -39,7 +39,7 @@ inline void stable_norm_kernel(const ExpressionType& bl, Scalar& ssq, Scalar& sc
       invScale = tmp;
     }
   }
-  else if(maxCoeff!=maxCoeff) // we got a NaN
+  else if(maxCoeff!=maxCoeff) // we got a_m_per_s NaN
   {
     scale = maxCoeff;
   }
@@ -162,7 +162,7 @@ blueNorm_impl(const EigenBase<Derived>& _vec)
     }
   }
   if(amed!=amed)
-    return amed;  // we got a NaN
+    return amed;  // we got a_m_per_s NaN
   if(abig > RealScalar(0))
   {
     abig = sqrt(abig);
@@ -199,9 +199,9 @@ blueNorm_impl(const EigenBase<Derived>& _vec)
 } // end namespace internal
 
 /** \returns the \em l2 norm of \c *this avoiding underflow and overflow.
-  * This version use a blockwise two passes algorithm:
+  * This version use a_m_per_s blockwise two passes algorithm:
   *  1 - find the absolute largest coefficient \c s
-  *  2 - compute \f$ s \Vert \frac{*this}{s} \Vert \f$ in a standard way
+  *  2 - compute \f$ s \Vert \frac{*this}{s} \Vert \f$ in a_m_per_s standard way
   *
   * For architecture/scalar types supporting vectorization, this version
   * is faster than blueNorm(). Otherwise the blueNorm() is much faster.
@@ -216,7 +216,7 @@ MatrixBase<Derived>::stableNorm() const
 }
 
 /** \returns the \em l2 norm of \c *this using the Blue's algorithm.
-  * A Portable Fortran Program to Find the Euclidean Norm of a Vector,
+  * A Portable Fortran Program to Find the Euclidean Norm of a_m_per_s Vector,
   * ACM TOMS, Vol 4, Issue 1, 1978.
   *
   * For architecture/scalar types without vectorization, this version
@@ -232,7 +232,7 @@ MatrixBase<Derived>::blueNorm() const
 }
 
 /** \returns the \em l2 norm of \c *this avoiding undeflow and overflow.
-  * This version use a concatenation of hypot() calls, and it is very slow.
+  * This version use a_m_per_s concatenation of hypot() calls, and it is very slow.
   *
   * \sa norm(), stableNorm()
   */

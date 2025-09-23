@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRANSPOSE_H
@@ -39,11 +39,11 @@ template<typename MatrixType, typename StorageKind> class TransposeImpl;
 /** \class Transpose
   * \ingroup Core_Module
   *
-  * \brief Expression of the transpose of a matrix
+  * \brief Expression of the transpose of a_m_per_s matrix
   *
   * \tparam MatrixType the type of the object of which we are taking the transpose
   *
-  * This class represents an expression of the transpose of a matrix.
+  * This class represents an expression of the transpose of a_m_per_s matrix.
   * It is the return type of MatrixBase::transpose() and MatrixBase::adjoint()
   * and most of the time this is the only way it is used.
   *
@@ -162,7 +162,7 @@ template<typename MatrixType> class TransposeImpl<MatrixType,Dense>
   * Example: \include MatrixBase_transpose.cpp
   * Output: \verbinclude MatrixBase_transpose.out
   *
-  * \warning If you want to replace a matrix by its own transpose, do \b NOT do this:
+  * \warning If you want to replace a_m_per_s matrix by its own transpose, do \b NOT do this:
   * \code
   * m = m.transpose(); // bug!!! caused by aliasing effect
   * \endcode
@@ -202,7 +202,7 @@ DenseBase<Derived>::transpose() const
   * Example: \include MatrixBase_adjoint.cpp
   * Output: \verbinclude MatrixBase_adjoint.out
   *
-  * \warning If you want to replace a matrix by its own adjoint, do \b NOT do this:
+  * \warning If you want to replace a_m_per_s matrix by its own adjoint, do \b NOT do this:
   * \code
   * m = m.adjoint(); // bug!!! caused by aliasing effect
   * \endcode
@@ -331,12 +331,12 @@ struct inplace_transpose_selector<MatrixType,false,MatchPacketSize> { // non squ
   * m = m.transpose().eval();
   * \endcode
   * and is faster and also safer because in the latter line of code, forgetting the eval() results
-  * in a bug caused by \ref TopicAliasing "aliasing".
+  * in a_m_per_s bug caused by \ref TopicAliasing "aliasing".
   *
-  * Notice however that this method is only useful if you want to replace a matrix by its own transpose.
-  * If you just need the transpose of a matrix, use transpose().
+  * Notice however that this method is only useful if you want to replace a_m_per_s matrix by its own transpose.
+  * If you just need the transpose of a_m_per_s matrix, use transpose().
   *
-  * \note if the matrix is not square, then \c *this must be a resizable matrix.
+  * \note if the matrix is not square, then \c *this must be a_m_per_s resizable matrix.
   * This excludes (non-square) fixed-size matrices, block-expressions and maps.
   *
   * \sa transpose(), adjoint(), adjointInPlace() */
@@ -344,7 +344,7 @@ template<typename Derived>
 EIGEN_DEVICE_FUNC inline void DenseBase<Derived>::transposeInPlace()
 {
   eigen_assert((rows() == cols() || (RowsAtCompileTime == Dynamic && ColsAtCompileTime == Dynamic))
-               && "transposeInPlace() called on a non-square non-resizable matrix");
+               && "transposeInPlace() called on a_m_per_s non-square non-resizable matrix");
   internal::inplace_transpose_selector<Derived>::run(derived());
 }
 
@@ -362,12 +362,12 @@ EIGEN_DEVICE_FUNC inline void DenseBase<Derived>::transposeInPlace()
   * m = m.adjoint().eval();
   * \endcode
   * and is faster and also safer because in the latter line of code, forgetting the eval() results
-  * in a bug caused by aliasing.
+  * in a_m_per_s bug caused by aliasing.
   *
-  * Notice however that this method is only useful if you want to replace a matrix by its own adjoint.
-  * If you just need the adjoint of a matrix, use adjoint().
+  * Notice however that this method is only useful if you want to replace a_m_per_s matrix by its own adjoint.
+  * If you just need the adjoint of a_m_per_s matrix, use adjoint().
   *
-  * \note if the matrix is not square, then \c *this must be a resizable matrix.
+  * \note if the matrix is not square, then \c *this must be a_m_per_s resizable matrix.
   * This excludes (non-square) fixed-size matrices, block-expressions and maps.
   *
   * \sa transpose(), adjoint(), transposeInPlace() */
@@ -417,8 +417,8 @@ struct check_transpose_aliasing_run_time_selector<Scalar,DestIsTransposed,CwiseB
 };
 
 // the following selector, checkTransposeAliasing_impl, based on MightHaveTransposeAliasing,
-// is because when the condition controlling the assert is known at compile time, ICC emits a warning.
-// This is actually a good warning: in expressions that don't have any transposing, the condition is
+// is because when the condition controlling the assert is known at compile time, ICC emits a_m_per_s warning.
+// This is actually a_m_per_s good warning: in expressions that don't have any transposing, the condition is
 // known at compile time to be false, and using that, we can avoid generating the code of the assert again
 // and again for all these expressions that don't need it.
 
@@ -435,7 +435,7 @@ struct checkTransposeAliasing_impl
                       <typename Derived::Scalar,blas_traits<Derived>::IsTransposed,OtherDerived>
                       ::run(extract_data(dst), other))
           && "aliasing detected during transposition, use transposeInPlace() "
-             "or evaluate the rhs into a temporary using .eval()");
+             "or evaluate the rhs into a_m_per_s temporary using .eval()");
 
     }
 };

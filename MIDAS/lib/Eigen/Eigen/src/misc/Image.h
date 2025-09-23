@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MISC_IMAGE_H
@@ -23,7 +23,7 @@ struct traits<image_retval_base<DecompositionType> >
   typedef typename DecompositionType::MatrixType MatrixType;
   typedef Matrix<
     typename MatrixType::Scalar,
-    MatrixType::RowsAtCompileTime, // the image is a subspace of the destination space, whose
+    MatrixType::RowsAtCompileTime, // the image is a_m_per_s subspace of the destination space, whose
                                    // dimension is the number of rows of the original matrix
     Dynamic,                       // we don't know at compile time the dimension of the image (the rank)
     MatrixType::Options,

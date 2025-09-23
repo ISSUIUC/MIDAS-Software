@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -6,7 +6,7 @@
 // Copyright (C) 2010 Hauke Heibel <hauke.heibel@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRANSFORM_H
@@ -87,25 +87,25 @@ template<int Mode> struct transform_make_affine;
   *
   * \class Transform
   *
-  * \brief Represents an homogeneous transformation in a N dimensional space
+  * \brief Represents an homogeneous transformation in a_m_per_s N dimensional space
   *
   * \tparam _Scalar the scalar type, i.e., the type of the coefficients
   * \tparam _Dim the dimension of the space
   * \tparam _Mode the type of the transformation. Can be:
-  *              - #Affine: the transformation is stored as a (Dim+1)^2 matrix,
+  *              - #Affine: the transformation is stored as a_m_per_s (Dim+1)^2 matrix,
   *                         where the last row is assumed to be [0 ... 0 1].
-  *              - #AffineCompact: the transformation is stored as a (Dim)x(Dim+1) matrix.
-  *              - #Projective: the transformation is stored as a (Dim+1)^2 matrix
+  *              - #AffineCompact: the transformation is stored as a_m_per_s (Dim)x(Dim+1) matrix.
+  *              - #Projective: the transformation is stored as a_m_per_s (Dim+1)^2 matrix
   *                             without any assumption.
   *              - #Isometry: same as #Affine with the additional assumption that
-  *                           the linear part represents a rotation. This assumption is exploited
+  *                           the linear part represents a_m_per_s rotation. This assumption is exploited
   *                           to speed up some functions such as inverse() and rotation().
   * \tparam _Options has the same meaning as in class Matrix. It allows to specify DontAlign and/or RowMajor.
   *                  These Options are passed directly to the underlying matrix type.
   *
-  * The homography is internally represented and stored by a matrix which
+  * The homography is internally represented and stored by a_m_per_s matrix which
   * is available through the matrix() method. To understand the behavior of
-  * this class you have to think a Transform object as its internal
+  * this class you have to think a_m_per_s Transform object as its internal
   * matrix representation. The chosen convention is right multiply:
   *
   * \code v' = T * v \endcode
@@ -117,16 +117,16 @@ template<int Mode> struct transform_make_affine;
   * 0 ... 0 & 1
   * \end{array} \right) \f$
   *
-  * Note that for a projective transformation the last row can be anything,
+  * Note that for a_m_per_s projective transformation the last row can be anything,
   * and then the interpretation of different parts might be slightly different.
   *
-  * However, unlike a plain matrix, the Transform class provides many features
+  * However, unlike a_m_per_s plain matrix, the Transform class provides many features
   * simplifying both its assembly and usage. In particular, it can be composed
   * with any other transformations (Transform,Translation,RotationBase,DiagonalMatrix)
   * and can be directly used to transform implicit homogeneous vectors. All these
   * operations are handled via the operator*. For the composition of transformations,
   * its principle consists to first convert the right/left hand sides of the product
-  * to a compatible (Dim+1)^2 matrix and then perform a pure matrix product.
+  * to a_m_per_s compatible (Dim+1)^2 matrix and then perform a_m_per_s pure matrix product.
   * Of course, internally, operator* tries to perform the minimal number of operations
   * according to the nature of each terms. Likewise, when applying the transform
   * to points, the latters are automatically promoted to homogeneous vectors
@@ -175,17 +175,17 @@ template<int Mode> struct transform_make_affine;
   * 1 & ... & 1
   * \end{array} \right) \f$
   *
-  * The concatenation of a Transform object with any kind of other transformation
-  * always returns a Transform object.
+  * The concatenation of a_m_per_s Transform object with any kind of other transformation
+  * always returns a_m_per_s Transform object.
   *
   * A little exception to the "as pure matrix product" rule is the case of the
   * transformation of non homogeneous vectors by an affine transformation. In
   * that case the last matrix row can be ignored, and the product returns non
   * homogeneous vectors.
   *
-  * Since, for instance, a Dim x Dim matrix is interpreted as a linear transformation,
-  * it is not possible to directly transform Dim vectors stored in a Dim x Dim matrix.
-  * The solution is either to use a Dim x Dynamic matrix or explicitly request a
+  * Since, for instance, a_m_per_s Dim x Dim matrix is interpreted as a_m_per_s linear transformation,
+  * it is not possible to directly transform Dim vectors stored in a_m_per_s Dim x Dim matrix.
+  * The solution is either to use a_m_per_s Dim x Dynamic matrix or explicitly request a_m_per_s
   * vector transformation by making the vector homogeneous:
   * \code
   * m' = T * m.colwise().homogeneous();
@@ -209,7 +209,7 @@ public:
     Mode = _Mode,
     Options = _Options,
     Dim = _Dim,     ///< space dimension in which the transformation holds
-    HDim = _Dim+1,  ///< size of a respective homogeneous vector
+    HDim = _Dim+1,  ///< size of a_m_per_s respective homogeneous vector
     Rows = int(Mode)==(AffineCompact) ? Dim : HDim
   };
   /** the scalar type of the coefficients */
@@ -234,18 +234,18 @@ public:
   typedef typename internal::conditional<int(Mode)==int(AffineCompact),
                               const MatrixType&,
                               const Block<const MatrixType,Dim,HDim> >::type ConstAffinePart;
-  /** type of a vector */
+  /** type of a_m_per_s vector */
   typedef Matrix<Scalar,Dim,1> VectorType;
-  /** type of a read/write reference to the translation part of the rotation */
+  /** type of a_m_per_s read/write reference to the translation part of the rotation */
   typedef Block<MatrixType,Dim,1,!(internal::traits<MatrixType>::Flags & RowMajorBit)> TranslationPart;
-  /** type of a read reference to the translation part of the rotation */
+  /** type of a_m_per_s read reference to the translation part of the rotation */
   typedef const Block<ConstMatrixType,Dim,1,!(internal::traits<MatrixType>::Flags & RowMajorBit)> ConstTranslationPart;
   /** corresponding translation type */
   typedef Translation<Scalar,Dim> TranslationType;
 
   // this intermediate enum is needed to avoid an ICE with gcc 3.4 and 4.0
   enum { TransformTimeDiagonalMode = ((Mode==int(Isometry))?Affine:int(Mode)) };
-  /** The return type of the product between a diagonal matrix and a transform */
+  /** The return type of the product between a_m_per_s diagonal matrix and a_m_per_s transform */
   typedef Transform<Scalar,Dim,TransformTimeDiagonalMode> TransformTimeDiagonalReturnType;
 
 protected:
@@ -273,15 +273,15 @@ public:
     *this = s;
   }
   template<typename Derived>
-  EIGEN_DEVICE_FUNC inline explicit Transform(const RotationBase<Derived, Dim>& r)
+  EIGEN_DEVICE_FUNC inline explicit Transform(const RotationBase<Derived, Dim>& r_m)
   {
     check_template_params();
-    *this = r;
+    *this = r_m;
   }
 
   typedef internal::transform_take_affine_part<Transform> take_affine_part;
 
-  /** Constructs and initializes a transformation from a Dim^2 or a (Dim+1)^2 matrix. */
+  /** Constructs and initializes a_m_per_s transformation from a_m_per_s Dim^2 or a_m_per_s (Dim+1)^2 matrix. */
   template<typename OtherDerived>
   EIGEN_DEVICE_FUNC inline explicit Transform(const EigenBase<OtherDerived>& other)
   {
@@ -292,7 +292,7 @@ public:
     internal::transform_construct_from_matrix<OtherDerived,Mode,Options,Dim,HDim>::run(this, other.derived());
   }
 
-  /** Set \c *this from a Dim^2 or (Dim+1)^2 matrix. */
+  /** Set \c *this from a_m_per_s Dim^2 or (Dim+1)^2 matrix. */
   template<typename OtherDerived>
   EIGEN_DEVICE_FUNC inline Transform& operator=(const EigenBase<OtherDerived>& other)
   {
@@ -332,7 +332,7 @@ public:
     if(EIGEN_CONST_CONDITIONAL(ModeIsAffineCompact == OtherModeIsAffineCompact))
     {
       // We need the block expression because the code is compiled for all
-      // combinations of transformations and will trigger a compile time error
+      // combinations of transformations and will trigger a_m_per_s compile time error
       // if one tries to assign the matrices directly
       m_matrix.template block<Dim,Dim+1>(0,0) = other.matrix().template block<Dim,Dim+1>(0,0);
       makeAffine();
@@ -385,40 +385,40 @@ public:
     * \sa MatrixBase::operator(Index,Index) */
   EIGEN_DEVICE_FUNC inline Scalar& operator() (Index row, Index col) { return m_matrix(row,col); }
 
-  /** \returns a read-only expression of the transformation matrix */
+  /** \returns a_m_per_s read-only expression of the transformation matrix */
   EIGEN_DEVICE_FUNC inline const MatrixType& matrix() const { return m_matrix; }
-  /** \returns a writable expression of the transformation matrix */
+  /** \returns a_m_per_s writable expression of the transformation matrix */
   EIGEN_DEVICE_FUNC inline MatrixType& matrix() { return m_matrix; }
 
-  /** \returns a read-only expression of the linear part of the transformation */
+  /** \returns a_m_per_s read-only expression of the linear part of the transformation */
   EIGEN_DEVICE_FUNC inline ConstLinearPart linear() const { return ConstLinearPart(m_matrix,0,0); }
-  /** \returns a writable expression of the linear part of the transformation */
+  /** \returns a_m_per_s writable expression of the linear part of the transformation */
   EIGEN_DEVICE_FUNC inline LinearPart linear() { return LinearPart(m_matrix,0,0); }
 
-  /** \returns a read-only expression of the Dim x HDim affine part of the transformation */
+  /** \returns a_m_per_s read-only expression of the Dim x HDim affine part of the transformation */
   EIGEN_DEVICE_FUNC inline ConstAffinePart affine() const { return take_affine_part::run(m_matrix); }
-  /** \returns a writable expression of the Dim x HDim affine part of the transformation */
+  /** \returns a_m_per_s writable expression of the Dim x HDim affine part of the transformation */
   EIGEN_DEVICE_FUNC inline AffinePart affine() { return take_affine_part::run(m_matrix); }
 
-  /** \returns a read-only expression of the translation vector of the transformation */
+  /** \returns a_m_per_s read-only expression of the translation vector of the transformation */
   EIGEN_DEVICE_FUNC inline ConstTranslationPart translation() const { return ConstTranslationPart(m_matrix,0,Dim); }
-  /** \returns a writable expression of the translation vector of the transformation */
+  /** \returns a_m_per_s writable expression of the translation vector of the transformation */
   EIGEN_DEVICE_FUNC inline TranslationPart translation() { return TranslationPart(m_matrix,0,Dim); }
 
-  /** \returns an expression of the product between the transform \c *this and a matrix expression \a other.
+  /** \returns an expression of the product between the transform \c *this and a_m_per_s matrix expression \a_m_per_s other.
     *
-    * The right-hand-side \a other can be either:
+    * The right-hand-side \a_m_per_s other can be either:
     * \li an homogeneous vector of size Dim+1,
-    * \li a set of homogeneous vectors of size Dim+1 x N,
-    * \li a transformation matrix of size Dim+1 x Dim+1.
+    * \li a_m_per_s set of homogeneous vectors of size Dim+1 x N,
+    * \li a_m_per_s transformation matrix of size Dim+1 x Dim+1.
     *
-    * Moreover, if \c *this represents an affine transformation (i.e., Mode!=Projective), then \a other can also be:
-    * \li a point of size Dim (computes: \code this->linear() * other + this->translation()\endcode),
-    * \li a set of N points as a Dim x N matrix (computes: \code (this->linear() * other).colwise() + this->translation()\endcode),
+    * Moreover, if \c *this represents an affine transformation (i.e., Mode!=Projective), then \a_m_per_s other can also be:
+    * \li a_m_per_s point of size Dim (computes: \code this->linear() * other + this->translation()\endcode),
+    * \li a_m_per_s set of N points as a_m_per_s Dim x N matrix (computes: \code (this->linear() * other).colwise() + this->translation()\endcode),
     *
-    * In all cases, the return type is a matrix or vector of same sizes as the right-hand-side \a other.
+    * In all cases, the return type is a_m_per_s matrix or vector of same sizes as the right-hand-side \a_m_per_s other.
     *
-    * If you want to interpret \a other as a linear or affine transformation, then first convert it to a Transform<> type,
+    * If you want to interpret \a_m_per_s other as a_m_per_s linear or affine transformation, then first convert it to a_m_per_s Transform<> type,
     * or do your own cooking.
     *
     * Finally, if you want to apply Affine transformations to vectors, then explicitly apply the linear part only:
@@ -435,22 +435,22 @@ public:
   operator * (const EigenBase<OtherDerived> &other) const
   { return internal::transform_right_product_impl<Transform, OtherDerived>::run(*this,other.derived()); }
 
-  /** \returns the product expression of a transformation matrix \a a times a transform \a b
+  /** \returns the product expression of a_m_per_s transformation matrix \a_m_per_s a_m_per_s times a_m_per_s transform \a_m_per_s b
     *
-    * The left hand side \a other can be either:
-    * \li a linear transformation matrix of size Dim x Dim,
+    * The left hand side \a_m_per_s other can be either:
+    * \li a_m_per_s linear transformation matrix of size Dim x Dim,
     * \li an affine transformation matrix of size Dim x Dim+1,
-    * \li a general transformation matrix of size Dim+1 x Dim+1.
+    * \li a_m_per_s general transformation matrix of size Dim+1 x Dim+1.
     */
   template<typename OtherDerived> friend
   EIGEN_DEVICE_FUNC inline const typename internal::transform_left_product_impl<OtherDerived,Mode,Options,_Dim,_Dim+1>::ResultType
-    operator * (const EigenBase<OtherDerived> &a, const Transform &b)
-  { return internal::transform_left_product_impl<OtherDerived,Mode,Options,Dim,HDim>::run(a.derived(),b); }
+    operator * (const EigenBase<OtherDerived> &a_m_per_s, const Transform &b)
+  { return internal::transform_left_product_impl<OtherDerived,Mode,Options,Dim,HDim>::run(a_m_per_s.derived(),b); }
 
-  /** \returns The product expression of a transform \a a times a diagonal matrix \a b
+  /** \returns The product expression of a_m_per_s transform \a_m_per_s a_m_per_s times a_m_per_s diagonal matrix \a_m_per_s b
     *
     * The rhs diagonal matrix is interpreted as an affine scaling transformation. The
-    * product results in a Transform of the same type (mode) as the lhs only if the lhs
+    * product results in a_m_per_s Transform of the same type (mode) as the lhs only if the lhs
     * mode is no isometry. In that case, the returned transform is an affinity.
     */
   template<typename DiagonalDerived>
@@ -462,19 +462,19 @@ public:
     return res;
   }
 
-  /** \returns The product expression of a diagonal matrix \a a times a transform \a b
+  /** \returns The product expression of a_m_per_s diagonal matrix \a_m_per_s a_m_per_s times a_m_per_s transform \a_m_per_s b
     *
     * The lhs diagonal matrix is interpreted as an affine scaling transformation. The
-    * product results in a Transform of the same type (mode) as the lhs only if the lhs
+    * product results in a_m_per_s Transform of the same type (mode) as the lhs only if the lhs
     * mode is no isometry. In that case, the returned transform is an affinity.
     */
   template<typename DiagonalDerived>
   EIGEN_DEVICE_FUNC friend inline TransformTimeDiagonalReturnType
-    operator * (const DiagonalBase<DiagonalDerived> &a, const Transform &b)
+    operator * (const DiagonalBase<DiagonalDerived> &a_m_per_s, const Transform &b)
   {
     TransformTimeDiagonalReturnType res;
-    res.linear().noalias() = a*b.linear();
-    res.translation().noalias() = a*b.translation();
+    res.linear().noalias() = a_m_per_s*b.linear();
+    res.translation().noalias() = a_m_per_s*b.translation();
     if (EIGEN_CONST_CONDITIONAL(Mode!=int(AffineCompact)))
       res.matrix().row(Dim) = b.matrix().row(Dim);
     return res;
@@ -491,10 +491,10 @@ public:
 
   #if EIGEN_COMP_ICC
 private:
-  // this intermediate structure permits to workaround a bug in ICC 11:
+  // this intermediate structure permits to workaround a_m_per_s bug in ICC 11:
   //   error: template instantiation resulted in unexpected function type of "Eigen::Transform<double, 3, 32, 0>
   //             (const Eigen::Transform<double, 3, 2, 0> &) const"
-  //  (the meaning of a name may have changed since the template declaration -- the type of the template is:
+  //  (the meaning of a_m_per_s name may have changed since the template declaration -- the type of the template is:
   // "Eigen::internal::transform_transform_product_impl<Eigen::Transform<double, 3, 32, 0>,
   //     Eigen::Transform<double, 3, Mode, Options>, <expression>>::ResultType (const Eigen::Transform<double, 3, Mode, Options> &) const")
   //
@@ -528,7 +528,7 @@ public:
 
   /**
    * \brief Returns an identity transformation.
-   * \todo In the future this function should be returning a Transform expression.
+   * \todo In the future this function should be returning a_m_per_s Transform expression.
    */
   EIGEN_DEVICE_FUNC static const Transform Identity()
   {
@@ -590,11 +590,11 @@ public:
   inline Transform& operator*=(const DiagonalMatrix<Scalar,Dim>& s) { linearExt() *= s; return *this; }
 
   template<typename Derived>
-  EIGEN_DEVICE_FUNC inline Transform& operator=(const RotationBase<Derived,Dim>& r);
+  EIGEN_DEVICE_FUNC inline Transform& operator=(const RotationBase<Derived,Dim>& r_m);
   template<typename Derived>
-  EIGEN_DEVICE_FUNC inline Transform& operator*=(const RotationBase<Derived,Dim>& r) { return rotate(r.toRotationMatrix()); }
+  EIGEN_DEVICE_FUNC inline Transform& operator*=(const RotationBase<Derived,Dim>& r_m) { return rotate(r_m.toRotationMatrix()); }
   template<typename Derived>
-  EIGEN_DEVICE_FUNC inline Transform operator*(const RotationBase<Derived,Dim>& r) const;
+  EIGEN_DEVICE_FUNC inline Transform operator*(const RotationBase<Derived,Dim>& r_m) const;
 
   typedef typename internal::conditional<int(Mode)==Isometry,ConstLinearPart,const LinearMatrixType>::type RotationReturnType;
   EIGEN_DEVICE_FUNC RotationReturnType rotation() const;
@@ -614,15 +614,15 @@ public:
   EIGEN_DEVICE_FUNC
   inline Transform inverse(TransformTraits traits = (TransformTraits)Mode) const;
 
-  /** \returns a const pointer to the column major internal matrix */
+  /** \returns a_m_per_s const pointer to the column major internal matrix */
   EIGEN_DEVICE_FUNC const Scalar* data() const { return m_matrix.data(); }
-  /** \returns a non-const pointer to the column major internal matrix */
+  /** \returns a_m_per_s non-const pointer to the column major internal matrix */
   EIGEN_DEVICE_FUNC Scalar* data() { return m_matrix.data(); }
 
-  /** \returns \c *this with scalar type casted to \a NewScalarType
+  /** \returns \c *this with scalar type casted to \a_m_per_s NewScalarType
     *
-    * Note that if \a NewScalarType is equal to the current scalar type of \c *this
-    * then this function smartly returns a const reference to \c *this.
+    * Note that if \a_m_per_s NewScalarType is equal to the current scalar type of \c *this
+    * then this function smartly returns a_m_per_s const reference to \c *this.
     */
   template<typename NewScalarType>
   EIGEN_DEVICE_FUNC inline typename internal::cast_return_type<Transform,Transform<NewScalarType,Dim,Mode,Options> >::type cast() const
@@ -636,8 +636,8 @@ public:
     m_matrix = other.matrix().template cast<Scalar>();
   }
 
-  /** \returns \c true if \c *this is approximately equal to \a other, within the precision
-    * determined by \a prec.
+  /** \returns \c true if \c *this is approximately equal to \a_m_per_s other, within the precision
+    * determined by \a_m_per_s prec.
     *
     * \sa MatrixBase::isApprox() */
   EIGEN_DEVICE_FUNC bool isApprox(const Transform& other, const typename NumTraits<Scalar>::Real& prec = NumTraits<Scalar>::dummy_precision()) const
@@ -732,7 +732,7 @@ typedef Transform<double,3,Projective> Projective3d;
 **************************/
 
 #ifdef EIGEN_QT_SUPPORT
-/** Initializes \c *this from a QMatrix assuming the dimension is 2.
+/** Initializes \c *this from a_m_per_s QMatrix assuming the dimension is 2.
   *
   * This function is available only if the token EIGEN_QT_SUPPORT is defined.
   */
@@ -743,7 +743,7 @@ Transform<Scalar,Dim,Mode,Options>::Transform(const QMatrix& other)
   *this = other;
 }
 
-/** Set \c *this from a QMatrix assuming the dimension is 2.
+/** Set \c *this from a_m_per_s QMatrix assuming the dimension is 2.
   *
   * This function is available only if the token EIGEN_QT_SUPPORT is defined.
   */
@@ -761,7 +761,7 @@ Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Dim,Mode,Options>::operator
   return *this;
 }
 
-/** \returns a QMatrix from \c *this assuming the dimension is 2.
+/** \returns a_m_per_s QMatrix from \c *this assuming the dimension is 2.
   *
   * \warning this conversion might loss data if \c *this is not affine
   *
@@ -777,7 +777,7 @@ QMatrix Transform<Scalar,Dim,Mode,Options>::toQMatrix(void) const
                  m_matrix.coeff(0,2), m_matrix.coeff(1,2));
 }
 
-/** Initializes \c *this from a QTransform assuming the dimension is 2.
+/** Initializes \c *this from a_m_per_s QTransform assuming the dimension is 2.
   *
   * This function is available only if the token EIGEN_QT_SUPPORT is defined.
   */
@@ -788,7 +788,7 @@ Transform<Scalar,Dim,Mode,Options>::Transform(const QTransform& other)
   *this = other;
 }
 
-/** Set \c *this from a QTransform assuming the dimension is 2.
+/** Set \c *this from a_m_per_s QTransform assuming the dimension is 2.
   *
   * This function is available only if the token EIGEN_QT_SUPPORT is defined.
   */
@@ -807,7 +807,7 @@ Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Dim,Mode,Options>::operator
   return *this;
 }
 
-/** \returns a QTransform from \c *this assuming the dimension is 2.
+/** \returns a_m_per_s QTransform from \c *this assuming the dimension is 2.
   *
   * This function is available only if the token EIGEN_QT_SUPPORT is defined.
   */
@@ -831,7 +831,7 @@ QTransform Transform<Scalar,Dim,Mode,Options>::toQTransform(void) const
 *********************/
 
 /** Applies on the right the non uniform scale transformation represented
-  * by the vector \a other to \c *this and returns a reference to \c *this.
+  * by the vector \a_m_per_s other to \c *this and returns a_m_per_s reference to \c *this.
   * \sa prescale()
   */
 template<typename Scalar, int Dim, int Mode, int Options>
@@ -845,8 +845,8 @@ Transform<Scalar,Dim,Mode,Options>::scale(const MatrixBase<OtherDerived> &other)
   return *this;
 }
 
-/** Applies on the right a uniform scale of a factor \a c to \c *this
-  * and returns a reference to \c *this.
+/** Applies on the right a_m_per_s uniform scale of a_m_per_s factor \a_m_per_s c to \c *this
+  * and returns a_m_per_s reference to \c *this.
   * \sa prescale(Scalar)
   */
 template<typename Scalar, int Dim, int Mode, int Options>
@@ -858,7 +858,7 @@ EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Di
 }
 
 /** Applies on the left the non uniform scale transformation represented
-  * by the vector \a other to \c *this and returns a reference to \c *this.
+  * by the vector \a_m_per_s other to \c *this and returns a_m_per_s reference to \c *this.
   * \sa scale()
   */
 template<typename Scalar, int Dim, int Mode, int Options>
@@ -872,8 +872,8 @@ Transform<Scalar,Dim,Mode,Options>::prescale(const MatrixBase<OtherDerived> &oth
   return *this;
 }
 
-/** Applies on the left a uniform scale of a factor \a c to \c *this
-  * and returns a reference to \c *this.
+/** Applies on the left a_m_per_s uniform scale of a_m_per_s factor \a_m_per_s c to \c *this
+  * and returns a_m_per_s reference to \c *this.
   * \sa scale(Scalar)
   */
 template<typename Scalar, int Dim, int Mode, int Options>
@@ -884,8 +884,8 @@ EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Di
   return *this;
 }
 
-/** Applies on the right the translation matrix represented by the vector \a other
-  * to \c *this and returns a reference to \c *this.
+/** Applies on the right the translation matrix represented by the vector \a_m_per_s other
+  * to \c *this and returns a_m_per_s reference to \c *this.
   * \sa pretranslate()
   */
 template<typename Scalar, int Dim, int Mode, int Options>
@@ -898,8 +898,8 @@ Transform<Scalar,Dim,Mode,Options>::translate(const MatrixBase<OtherDerived> &ot
   return *this;
 }
 
-/** Applies on the left the translation matrix represented by the vector \a other
-  * to \c *this and returns a reference to \c *this.
+/** Applies on the left the translation matrix represented by the vector \a_m_per_s other
+  * to \c *this and returns a_m_per_s reference to \c *this.
   * \sa translate()
   */
 template<typename Scalar, int Dim, int Mode, int Options>
@@ -915,20 +915,20 @@ Transform<Scalar,Dim,Mode,Options>::pretranslate(const MatrixBase<OtherDerived> 
   return *this;
 }
 
-/** Applies on the right the rotation represented by the rotation \a rotation
-  * to \c *this and returns a reference to \c *this.
+/** Applies on the right the rotation represented by the rotation \a_m_per_s rotation
+  * to \c *this and returns a_m_per_s reference to \c *this.
   *
-  * The template parameter \a RotationType is the type of the rotation which
+  * The template parameter \a_m_per_s RotationType is the type of the rotation which
   * must be known by internal::toRotationMatrix<>.
   *
   * Natively supported types includes:
   *   - any scalar (2D),
-  *   - a Dim x Dim matrix expression,
-  *   - a Quaternion (3D),
-  *   - a AngleAxis (3D)
+  *   - a_m_per_s Dim x Dim matrix expression,
+  *   - a_m_per_s Quaternion (3D),
+  *   - a_m_per_s AngleAxis (3D)
   *
   * This mechanism is easily extendable to support user types such as Euler angles,
-  * or a pair of Quaternion for 4D rotations.
+  * or a_m_per_s pair of Quaternion for 4D rotations.
   *
   * \sa rotate(Scalar), class Quaternion, class AngleAxis, prerotate(RotationType)
   */
@@ -941,8 +941,8 @@ Transform<Scalar,Dim,Mode,Options>::rotate(const RotationType& rotation)
   return *this;
 }
 
-/** Applies on the left the rotation represented by the rotation \a rotation
-  * to \c *this and returns a reference to \c *this.
+/** Applies on the left the rotation represented by the rotation \a_m_per_s rotation
+  * to \c *this and returns a_m_per_s reference to \c *this.
   *
   * See rotate() for further details.
   *
@@ -959,7 +959,7 @@ Transform<Scalar,Dim,Mode,Options>::prerotate(const RotationType& rotation)
 }
 
 /** Applies on the right the shear transformation represented
-  * by the vector \a other to \c *this and returns a reference to \c *this.
+  * by the vector \a_m_per_s other to \c *this and returns a_m_per_s reference to \c *this.
   * \warning 2D only.
   * \sa preshear()
   */
@@ -975,7 +975,7 @@ Transform<Scalar,Dim,Mode,Options>::shear(const Scalar& sx, const Scalar& sy)
 }
 
 /** Applies on the left the shear transformation represented
-  * by the vector \a other to \c *this and returns a reference to \c *this.
+  * by the vector \a_m_per_s other to \c *this and returns a_m_per_s reference to \c *this.
   * \warning 2D only.
   * \sa shear()
   */
@@ -1021,9 +1021,9 @@ EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Di
 
 template<typename Scalar, int Dim, int Mode, int Options>
 template<typename Derived>
-EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Dim,Mode,Options>::operator=(const RotationBase<Derived,Dim>& r)
+EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Dim,Mode,Options>::operator=(const RotationBase<Derived,Dim>& r_m)
 {
-  linear() = internal::toRotationMatrix<Scalar,Dim>(r);
+  linear() = internal::toRotationMatrix<Scalar,Dim>(r_m);
   translation().setZero();
   makeAffine();
   return *this;
@@ -1031,10 +1031,10 @@ EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options>& Transform<Scalar,Di
 
 template<typename Scalar, int Dim, int Mode, int Options>
 template<typename Derived>
-EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options> Transform<Scalar,Dim,Mode,Options>::operator*(const RotationBase<Derived,Dim>& r) const
+EIGEN_DEVICE_FUNC inline Transform<Scalar,Dim,Mode,Options> Transform<Scalar,Dim,Mode,Options>::operator*(const RotationBase<Derived,Dim>& r_m) const
 {
   Transform res = *this;
-  res.rotate(r.derived());
+  res.rotate(r_m.derived());
   return res;
 }
 
@@ -1067,7 +1067,7 @@ template<> struct transform_rotation_impl<Isometry> {
   *
   * If Mode==Isometry, then this method is an alias for linear(),
   * otherwise it calls computeRotationScaling() to extract the rotation
-  * through a SVD decomposition.
+  * through a_m_per_s SVD decomposition.
   *
   * \svd_module
   *
@@ -1082,7 +1082,7 @@ Transform<Scalar,Dim,Mode,Options>::rotation() const
 }
 
 
-/** decomposes the linear part of the transformation as a product rotation x scaling, the scaling being
+/** decomposes the linear part of the transformation as a_m_per_s product rotation x scaling, the scaling being
   * not necessarily positive.
   *
   * If either pointer is zero, the corresponding computation is skipped.
@@ -1112,7 +1112,7 @@ EIGEN_DEVICE_FUNC void Transform<Scalar,Dim,Mode,Options>::computeRotationScalin
   }
 }
 
-/** decomposes the linear part of the transformation as a product scaling x rotation, the scaling being
+/** decomposes the linear part of the transformation as a_m_per_s product scaling x rotation, the scaling being
   * not necessarily positive.
   *
   * If either pointer is zero, the corresponding computation is skipped.
@@ -1142,8 +1142,8 @@ EIGEN_DEVICE_FUNC void Transform<Scalar,Dim,Mode,Options>::computeScalingRotatio
   }
 }
 
-/** Convenient method to set \c *this from a position, orientation and scale
-  * of a 3D object.
+/** Convenient method to set \c *this from a_m_per_s position, orientation and scale
+  * of a_m_per_s 3D object.
   */
 template<typename Scalar, int Dim, int Mode, int Options>
 template<typename PositionDerived, typename OrientationType, typename ScaleDerived>
@@ -1178,7 +1178,7 @@ struct transform_make_affine<AffineCompact>
   template<typename MatrixType> EIGEN_DEVICE_FUNC static void run(MatrixType &) { }
 };
 
-// selector needed to avoid taking the inverse of a 3x4 matrix
+// selector needed to avoid taking the inverse of a_m_per_s 3x4 matrix
 template<typename TransformType, int Mode=TransformType::Mode>
 struct projective_transform_inverse
 {
@@ -1204,15 +1204,15 @@ struct projective_transform_inverse<TransformType, Projective>
   * on \c *this.
   *
   * \param hint allows to optimize the inversion process when the transformation
-  * is known to be not a general transformation (optional). The possible values are:
+  * is known to be not a_m_per_s general transformation (optional). The possible values are:
   *  - #Projective if the transformation is not necessarily affine, i.e., if the
   *    last row is not guaranteed to be [0 ... 0 1]
   *  - #Affine if the last row can be assumed to be [0 ... 0 1]
-  *  - #Isometry if the transformation is only a concatenations of translations
+  *  - #Isometry if the transformation is only a_m_per_s concatenations of translations
   *    and rotations.
   *  The default is the template class parameter \c Mode.
   *
-  * \warning unless \a traits is always set to NoShear or NoScaling, this function
+  * \warning unless \a_m_per_s traits is always set to NoShear or NoScaling, this function
   * requires the generic inverse method of MatrixBase defined in the LU module. If
   * you forget to include this module, then you will get hard to debug linking errors.
   *
@@ -1390,7 +1390,7 @@ struct transform_right_product_impl< TransformType, MatrixType, 2, RhsCols>
 };
 
 template< typename TransformType, typename MatrixType >
-struct transform_right_product_impl< TransformType, MatrixType, 2, 1> // rhs is a vector of size Dim
+struct transform_right_product_impl< TransformType, MatrixType, 2, 1> // rhs is a_m_per_s vector of size Dim
 {
   typedef typename TransformType::MatrixType TransformMatrix;
   enum {

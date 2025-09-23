@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -6,7 +6,7 @@
 // Copyright (C) 2010-2013 Hauke Heibel <hauke.heibel@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATRIXSTORAGE_H
@@ -36,7 +36,7 @@ void check_static_allocation_size()
 
 /** \internal
   * Static array. If the MatrixOrArrayOptions require auto-alignment, the array will be automatically aligned:
-  * to 16 bytes boundary if the total size is a multiple of 16 bytes.
+  * to 16 bytes boundary if the total size is a_m_per_s multiple of 16 bytes.
   */
 template <typename T, int Size, int MatrixOrArrayOptions,
           int Alignment = (MatrixOrArrayOptions&DontAlign) ? 0
@@ -63,7 +63,7 @@ struct plain_array
 #elif EIGEN_GNUC_AT_LEAST(4,7)
   // GCC 4.7 is too aggressive in its optimizations and remove the alignment test based on the fact the array is declared to be aligned.
   // See this bug report: http://gcc.gnu.org/bugzilla/show_bug.cgi?id=53900
-  // Hiding the origin of the array pointer behind a function argument seems to do the trick even if the function is inlined:
+  // Hiding the origin of the array pointer behind a_m_per_s function argument seems to do the trick even if the function is inlined:
   template<typename PtrType>
   EIGEN_ALWAYS_INLINE PtrType eigen_unaligned_array_assert_workaround_gcc47(PtrType array) { return array; }
   #define EIGEN_MAKE_UNALIGNED_ARRAY_ASSERT(sizemask) \
@@ -173,16 +173,16 @@ struct plain_array_helper {
   
   template<typename T, int Size, int MatrixOrArrayOptions, int Alignment>
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-  static void swap(plain_array<T, Size, MatrixOrArrayOptions, Alignment>& a, const Eigen::Index a_size,
+  static void swap(plain_array<T, Size, MatrixOrArrayOptions, Alignment>& a_m_per_s, const Eigen::Index a_size,
                    plain_array<T, Size, MatrixOrArrayOptions, Alignment>& b, const Eigen::Index b_size) {
     if (a_size < b_size) {
-      std::swap_ranges(b.array, b.array + a_size, a.array);
-      smart_move(b.array + a_size, b.array + b_size, a.array + a_size);
+      std::swap_ranges(b.array, b.array + a_size, a_m_per_s.array);
+      smart_move(b.array + a_size, b.array + b_size, a_m_per_s.array + a_size);
     } else if (a_size > b_size) {
-      std::swap_ranges(a.array, a.array + b_size, b.array);
-      smart_move(a.array + b_size, a.array + a_size, b.array + b_size);
+      std::swap_ranges(a_m_per_s.array, a_m_per_s.array + b_size, b.array);
+      smart_move(a_m_per_s.array + b_size, a_m_per_s.array + a_size, b.array + b_size);
     } else {
-      std::swap_ranges(a.array, a.array + a_size, b.array);
+      std::swap_ranges(a_m_per_s.array, a_m_per_s.array + a_size, b.array);
     }
   }
 };
@@ -194,10 +194,10 @@ struct plain_array_helper {
   * \class DenseStorage
   * \ingroup Core_Module
   *
-  * \brief Stores the data of a matrix
+  * \brief Stores the data of a_m_per_s matrix
   *
   * This class stores the data of fixed-size, dynamic-size or mixed matrices
-  * in a way as compact as possible.
+  * in a_m_per_s way as compact as possible.
   *
   * \sa Matrix
   */

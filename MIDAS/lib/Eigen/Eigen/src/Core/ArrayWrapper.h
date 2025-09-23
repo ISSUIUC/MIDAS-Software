@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ARRAYWRAPPER_H
@@ -15,7 +15,7 @@ namespace Eigen {
 /** \class ArrayWrapper
   * \ingroup Core_Module
   *
-  * \brief Expression of a mathematical vector or matrix as an array object
+  * \brief Expression of a_m_per_s mathematical vector or matrix as an array object
   *
   * This class is the return type of MatrixBase::array(), and most of the time
   * this is the only way it is use.
@@ -113,7 +113,7 @@ class ArrayWrapper : public ArrayBase<ArrayWrapper<ExpressionType> >
 /** \class MatrixWrapper
   * \ingroup Core_Module
   *
-  * \brief Expression of an array as a mathematical vector or matrix
+  * \brief Expression of an array as a_m_per_s mathematical vector or matrix
   *
   * This class is the return type of ArrayBase::matrix(), and most of the time
   * this is the only way it is use.

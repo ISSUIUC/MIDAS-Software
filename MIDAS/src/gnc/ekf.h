@@ -2,11 +2,14 @@
 
 #include "kalman_filter.h"
 #include "sensor_data.h"
+#include "constants.h"
+#include "aero_coeff.h"
 #include "Buffer.h"
 
 #define NUM_STATES 9
 #define NUM_SENSOR_INPUTS 4
 #define ALTITUDE_BUFFER_SIZE 10
+
 
 class EKF : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 {
@@ -38,13 +41,13 @@ private:
     float Ca = 0;
     float Cn = 0;
     float Cp = 0;
-    Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
+    Eigen::Matrix<float,3,1> gravity_vec = Eigen::Matrix<float,3,1>::Zero();
     KalmanState kalman_state;
     FSMState last_fsm = FSMState::STATE_IDLE;
     float stage_timestamp = 0;
 
     Eigen::Matrix<float, 3, 1> init_accel = Eigen::Matrix<float, 3, 1>::Zero();
-    Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
+    Buffer<float, ALTITUDE_BUFFER_SIZE_IDLE> alt_buffer_in_idle;
     KalmanData state;
 };
 

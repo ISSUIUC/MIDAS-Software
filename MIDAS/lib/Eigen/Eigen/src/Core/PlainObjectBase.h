@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_DENSESTORAGEBASE_H
@@ -61,19 +61,19 @@ template<typename MatrixTypeA, typename MatrixTypeB, bool SwapPointers> struct m
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 namespace doxygen {
 
-// This is a workaround to doxygen not being able to understand the inheritance logic
+// This is a_m_per_s workaround to doxygen not being able to understand the inheritance logic
 // when it is hidden by the dense_xpr_base helper struct.
 // Moreover, doxygen fails to include members that are not documented in the declaration body of
 // MatrixBase if we inherits MatrixBase<Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols> >,
 // this is why we simply inherits MatrixBase, though this does not make sense.
 
-/** This class is just a workaround for Doxygen and it does not not actually exist. */
+/** This class is just a_m_per_s workaround for Doxygen and it does not not actually exist. */
 template<typename Derived> struct dense_xpr_base_dispatcher;
-/** This class is just a workaround for Doxygen and it does not not actually exist. */
+/** This class is just a_m_per_s workaround for Doxygen and it does not not actually exist. */
 template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 struct dense_xpr_base_dispatcher<Matrix<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols> >
     : public MatrixBase {};
-/** This class is just a workaround for Doxygen and it does not not actually exist. */
+/** This class is just a_m_per_s workaround for Doxygen and it does not not actually exist. */
 template<typename _Scalar, int _Rows, int _Cols, int _Options, int _MaxRows, int _MaxCols>
 struct dense_xpr_base_dispatcher<Array<_Scalar, _Rows, _Cols, _Options, _MaxRows, _MaxCols> >
     : public ArrayBase {};
@@ -87,7 +87,7 @@ struct dense_xpr_base_dispatcher<Array<_Scalar, _Rows, _Cols, _Options, _MaxRows
   * This class can be extended with the help of the plugin mechanism described on the page
   * \ref TopicCustomizing_Plugins by defining the preprocessor symbol \c EIGEN_PLAINOBJECTBASE_PLUGIN.
   *
-  * \tparam Derived is the derived type, e.g., a Matrix or Array
+  * \tparam Derived is the derived type, e.g., a_m_per_s Matrix or Array
   *
   * \sa \ref TopicClassHierarchy
   */
@@ -243,22 +243,22 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       internal::pstoret<Scalar, PacketScalar, StoreMode>(m_storage.data() + index, val);
     }
 
-    /** \returns a const pointer to the data array of this matrix */
+    /** \returns a_m_per_s const pointer to the data array of this matrix */
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Scalar *data() const
     { return m_storage.data(); }
 
-    /** \returns a pointer to the data array of this matrix */
+    /** \returns a_m_per_s pointer to the data array of this matrix */
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Scalar *data()
     { return m_storage.data(); }
 
-    /** Resizes \c *this to a \a rows x \a cols matrix.
+    /** Resizes \c *this to a_m_per_s \a_m_per_s rows x \a_m_per_s cols matrix.
       *
       * This method is intended for dynamic-size matrices, although it is legal to call it on any
       * matrix as long as fixed dimensions are left unchanged. If you only want to change the number
       * of rows and/or of columns, you can use resize(NoChange_t, Index), resize(Index, NoChange_t).
       *
       * If the current number of coefficients of \c *this exactly matches the
-      * product \a rows * \a cols, then no memory allocation is performed and
+      * product \a_m_per_s rows * \a_m_per_s cols, then no memory allocation is performed and
       * the current values are left unchanged. In all other cases, including
       * shrinking, the data is reallocated and all previous values are lost.
       *
@@ -274,7 +274,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
                    && EIGEN_IMPLIES(ColsAtCompileTime!=Dynamic,cols==ColsAtCompileTime)
                    && EIGEN_IMPLIES(RowsAtCompileTime==Dynamic && MaxRowsAtCompileTime!=Dynamic,rows<=MaxRowsAtCompileTime)
                    && EIGEN_IMPLIES(ColsAtCompileTime==Dynamic && MaxColsAtCompileTime!=Dynamic,cols<=MaxColsAtCompileTime)
-                   && rows>=0 && cols>=0 && "Invalid sizes when resizing a matrix or array.");
+                   && rows>=0 && cols>=0 && "Invalid sizes when resizing a_m_per_s matrix or array.");
       internal::check_rows_cols_for_overflow<MaxSizeAtCompileTime>::run(rows, cols);
       #ifdef EIGEN_INITIALIZE_COEFFS
         Index size = rows*cols;
@@ -286,7 +286,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       #endif
     }
 
-    /** Resizes \c *this to a vector of length \a size
+    /** Resizes \c *this to a_m_per_s vector of length \a_m_per_s size
       *
       * \only_for_vectors. This method does not work for
       * partially dynamic matrices when the static dimension is anything other
@@ -342,10 +342,10 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       resize(rows, cols());
     }
 
-    /** Resizes \c *this to have the same dimensions as \a other.
+    /** Resizes \c *this to have the same dimensions as \a_m_per_s other.
       * Takes care of doing all the checking that's needed.
       *
-      * Note that copying a row-vector into a vector (and conversely) is allowed.
+      * Note that copying a_m_per_s row-vector into a_m_per_s vector (and conversely) is allowed.
       * The resizing, if any, is then done in the appropriate way so that row-vectors
       * remain row-vectors and vectors remain vectors.
       */
@@ -369,7 +369,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       else resize(other.rows(), other.cols());
     }
 
-    /** Resizes the matrix to \a rows x \a cols while leaving old values untouched.
+    /** Resizes the matrix to \a_m_per_s rows x \a_m_per_s cols while leaving old values untouched.
       *
       * The method is intended for matrices of dynamic size. If you only want to change the number
       * of rows and/or of columns, you can use conservativeResize(NoChange_t, Index) or
@@ -384,7 +384,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       internal::conservative_resize_like_impl<Derived>::run(*this, rows, cols);
     }
 
-    /** Resizes the matrix to \a rows x \a cols while leaving old values untouched.
+    /** Resizes the matrix to \a_m_per_s rows x \a_m_per_s cols while leaving old values untouched.
       *
       * As opposed to conservativeResize(Index rows, Index cols), this version leaves
       * the number of columns unchanged.
@@ -398,7 +398,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       conservativeResize(rows, cols());
     }
 
-    /** Resizes the matrix to \a rows x \a cols while leaving old values untouched.
+    /** Resizes the matrix to \a_m_per_s rows x \a_m_per_s cols while leaving old values untouched.
       *
       * As opposed to conservativeResize(Index rows, Index cols), this version leaves
       * the number of rows unchanged.
@@ -412,7 +412,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       conservativeResize(rows(), cols);
     }
 
-    /** Resizes the vector to \a size while retaining old values.
+    /** Resizes the vector to \a_m_per_s size while retaining old values.
       *
       * \only_for_vectors. This method does not work for
       * partially dynamic matrices when the static dimension is anything other
@@ -426,7 +426,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       internal::conservative_resize_like_impl<Derived>::run(*this, size);
     }
 
-    /** Resizes the matrix to \a rows x \a cols of \c other, while leaving old values untouched.
+    /** Resizes the matrix to \a_m_per_s rows x \a_m_per_s cols of \c other, while leaving old values untouched.
       *
       * The method is intended for matrices of dynamic size. If you only want to change the number
       * of rows and/or of columns, you can use conservativeResize(NoChange_t, Index) or
@@ -442,8 +442,8 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       internal::conservative_resize_like_impl<Derived,OtherDerived>::run(*this, other);
     }
 
-    /** This is a special case of the templated operator=. Its purpose is to
-      * prevent a default operator= from hiding the templated operator=.
+    /** This is a_m_per_s special case of the templated operator=. Its purpose is to
+      * prevent a_m_per_s default operator= from hiding the templated operator=.
       */
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE Derived& operator=(const PlainObjectBase& other)
@@ -519,14 +519,14 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     }
 
     #if EIGEN_HAS_CXX11
-    /** \brief Construct a row of column vector with fixed size from an arbitrary number of coefficients. \cpp11
+    /** \brief Construct a_m_per_s row of column vector with fixed size from an arbitrary number of coefficients. \cpp11
       *
       * \only_for_vectors
       *
       * This constructor is for 1D array or vectors with more than 4 coefficients.
       * There exists C++98 analogue constructors for fixed-size array/vector having 1, 2, 3, or 4 coefficients.
       *
-      * \warning To construct a column (resp. row) vector of fixed length, the number of values passed to this
+      * \warning To construct a_m_per_s column (resp. row) vector of fixed length, the number of values passed to this
       * constructor must match the the fixed number of rows (resp. columns) of \c *this.
       */
     template <typename... ArgTypes>
@@ -545,7 +545,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       static_cast<void>(x);
     }
 
-    /** \brief Constructs a Matrix or Array and initializes it by elements given by an initializer list of initializer
+    /** \brief Constructs a_m_per_s Matrix or Array and initializes it by elements given by an initializer list of initializer
       * lists \cpp11
       */
     EIGEN_DEVICE_FUNC
@@ -617,7 +617,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
 
   public:
 
-    /** \brief Copies the generic expression \a other into *this.
+    /** \brief Copies the generic expression \a_m_per_s other into *this.
       * \copydetails DenseBase::operator=(const EigenBase<OtherDerived> &other)
       */
     template<typename OtherDerived>
@@ -632,7 +632,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     /** \name Map
       * These are convenience functions returning Map objects. The Map() static functions return unaligned Map objects,
       * while the AlignedMap() functions return aligned Map objects and thus should be called only with 16-byte-aligned
-      * \a data pointers.
+      * \a_m_per_s data pointers.
       *
       * Here is an example using strides:
       * \include Matrix_Map_stride.cpp
@@ -735,10 +735,10 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     #endif
 
   protected:
-    /** \internal Resizes *this in preparation for assigning \a other to it.
+    /** \internal Resizes *this in preparation for assigning \a_m_per_s other to it.
       * Takes care of doing all the checking that's needed.
       *
-      * Note that copying a row-vector into a vector (and conversely) is allowed.
+      * Note that copying a_m_per_s row-vector into a_m_per_s vector (and conversely) is allowed.
       * The resizing, if any, is then done in the appropriate way so that row-vectors
       * remain row-vectors and vectors remain vectors.
       */
@@ -757,12 +757,12 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     }
 
     /**
-      * \brief Copies the value of the expression \a other into \c *this with automatic resizing.
+      * \brief Copies the value of the expression \a_m_per_s other into \c *this with automatic resizing.
       *
-      * *this might be resized to match the dimensions of \a other. If *this was a null matrix (not already initialized),
+      * *this might be resized to match the dimensions of \a_m_per_s other. If *this was a_m_per_s null matrix (not already initialized),
       * it will be initialized.
       *
-      * Note that copying a row-vector into a vector (and conversely) is allowed.
+      * Note that copying a_m_per_s row-vector into a_m_per_s vector (and conversely) is allowed.
       * The resizing, if any, is then done in the appropriate way so that row-vectors
       * remain row-vectors and vectors remain vectors.
       *
@@ -781,7 +781,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     }
 
     /** \internal Like _set() but additionally makes the assumption that no aliasing effect can happen (which
-      * is the case when creating a new matrix) so one can enforce lazy evaluation.
+      * is the case when creating a_m_per_s new matrix) so one can enforce lazy evaluation.
       *
       * \sa operator=(const MatrixBase<OtherDerived>&), _set()
       */
@@ -793,7 +793,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       // and lazyAssign will be called by the assign selector.
       //_resize_to_match(other);
       // the 'false' below means to enforce lazy evaluation. We don't use lazyAssign() because
-      // it wouldn't allow to copy a row-vector into a column-vector.
+      // it wouldn't allow to copy a_m_per_s row-vector into a_m_per_s column-vector.
       internal::call_assignment_no_alias(this->derived(), other.derived(), internal::assign_op<Scalar,typename OtherDerived::Scalar>());
       return this->derived();
     }
@@ -832,7 +832,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       m_storage.data()[1] = Scalar(val1);
     }
 
-    // The argument is convertible to the Index type and we either have a non 1x1 Matrix, or a dynamic-sized Array,
+    // The argument is convertible to the Index type and we either have a_m_per_s non 1x1 Matrix, or a_m_per_s dynamic-sized Array,
     // then the argument is meant to be the size of the object.
     template<typename T>
     EIGEN_DEVICE_FUNC
@@ -847,7 +847,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       resize(size);
     }
 
-    // We have a 1x1 matrix/array => the argument is interpreted as the value of the unique coefficient (case where scalar type can be implicitly converted)
+    // We have a_m_per_s 1x1 matrix/array => the argument is interpreted as the value of the unique coefficient (case where scalar type can be implicitly converted)
     template<typename T>
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE void _init1(const Scalar& val0, typename internal::enable_if<Base::SizeAtCompileTime==1 && internal::is_convertible<T, Scalar>::value,T>::type* = 0)
@@ -856,7 +856,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       m_storage.data()[0] = val0;
     }
 
-    // We have a 1x1 matrix/array => the argument is interpreted as the value of the unique coefficient (case where scalar type match the index type)
+    // We have a_m_per_s 1x1 matrix/array => the argument is interpreted as the value of the unique coefficient (case where scalar type match the index type)
     template<typename T>
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE void _init1(const Index& val0,
@@ -869,14 +869,14 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       m_storage.data()[0] = Scalar(val0);
     }
 
-    // Initialize a fixed size matrix from a pointer to raw data
+    // Initialize a_m_per_s fixed size matrix from a_m_per_s pointer to raw data
     template<typename T>
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE void _init1(const Scalar* data){
       this->_set_noalias(ConstMapType(data));
     }
 
-    // Initialize an arbitrary matrix from a dense expression
+    // Initialize an arbitrary matrix from a_m_per_s dense expression
     template<typename T, typename OtherDerived>
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE void _init1(const DenseBase<OtherDerived>& other){
@@ -890,7 +890,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
       this->_set_noalias(other);
     }
 
-    // Initialize an arbitrary matrix from a generic Eigen expression
+    // Initialize an arbitrary matrix from a_m_per_s generic Eigen expression
     template<typename T, typename OtherDerived>
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE void _init1(const EigenBase<OtherDerived>& other){
@@ -907,9 +907,9 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
 
     template<typename T, typename OtherDerived, int ColsAtCompileTime>
     EIGEN_DEVICE_FUNC
-    EIGEN_STRONG_INLINE void _init1(const RotationBase<OtherDerived,ColsAtCompileTime>& r)
+    EIGEN_STRONG_INLINE void _init1(const RotationBase<OtherDerived,ColsAtCompileTime>& r_m)
     {
-      this->derived() = r;
+      this->derived() = r_m;
     }
 
     // For fixed-size Array<Scalar,...>
@@ -988,7 +988,7 @@ class PlainObjectBase : public internal::dense_xpr_base<Derived>::type
     friend class Eigen::Map<Derived, Unaligned>;
     friend class Eigen::Map<const Derived, Unaligned>;
 #if EIGEN_MAX_ALIGN_BYTES>0
-    // for EIGEN_MAX_ALIGN_BYTES==0, AlignedMax==Unaligned, and many compilers generate warnings for friend-ing a class twice.
+    // for EIGEN_MAX_ALIGN_BYTES==0, AlignedMax==Unaligned, and many compilers generate warnings for friend-ing a_m_per_s class twice.
     friend class Eigen::Map<Derived, AlignedMax>;
     friend class Eigen::Map<const Derived, AlignedMax>;
 #endif
@@ -1105,9 +1105,9 @@ template<typename MatrixTypeA, typename MatrixTypeB, bool SwapPointers>
 struct matrix_swap_impl
 {
   EIGEN_DEVICE_FUNC
-  static EIGEN_STRONG_INLINE void run(MatrixTypeA& a, MatrixTypeB& b)
+  static EIGEN_STRONG_INLINE void run(MatrixTypeA& a_m_per_s, MatrixTypeB& b)
   {
-    a.base().swap(b);
+    a_m_per_s.base().swap(b);
   }
 };
 
@@ -1115,9 +1115,9 @@ template<typename MatrixTypeA, typename MatrixTypeB>
 struct matrix_swap_impl<MatrixTypeA, MatrixTypeB, true>
 {
   EIGEN_DEVICE_FUNC
-  static inline void run(MatrixTypeA& a, MatrixTypeB& b)
+  static inline void run(MatrixTypeA& a_m_per_s, MatrixTypeB& b)
   {
-    static_cast<typename MatrixTypeA::Base&>(a).m_storage.swap(static_cast<typename MatrixTypeB::Base&>(b).m_storage);
+    static_cast<typename MatrixTypeA::Base&>(a_m_per_s).m_storage.swap(static_cast<typename MatrixTypeB::Base&>(b).m_storage);
   }
 };
 

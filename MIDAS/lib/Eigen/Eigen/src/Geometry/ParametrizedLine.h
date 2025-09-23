@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PARAMETRIZEDLINE_H
@@ -19,12 +19,12 @@ namespace Eigen {
   *
   * \brief A parametrized line
   *
-  * A parametrized line is defined by an origin point \f$ \mathbf{o} \f$ and a unit
+  * A parametrized line is defined by an origin point \f$ \mathbf{o} \f$ and a_m_per_s unit
   * direction vector \f$ \mathbf{d} \f$ such that the line corresponds to
   * the set \f$ l(t) = \mathbf{o} + t \mathbf{d} \f$, \f$ t \in \mathbf{R} \f$.
   *
   * \tparam _Scalar the scalar type, i.e., the type of the coefficients
-  * \tparam _AmbientDim the dimension of the ambient space, can be a compile time value or Dynamic.
+  * \tparam _AmbientDim the dimension of the ambient space, can be a_m_per_s compile time value or Dynamic.
   */
 template <typename _Scalar, int _AmbientDim, int _Options>
 class ParametrizedLine
@@ -48,11 +48,11 @@ public:
    : m_origin(other.origin()), m_direction(other.direction())
   {}
 
-  /** Constructs a dynamic-size line with \a _dim the dimension
+  /** Constructs a_m_per_s dynamic-size line with \a_m_per_s _dim the dimension
     * of the ambient space */
   EIGEN_DEVICE_FUNC inline explicit ParametrizedLine(Index _dim) : m_origin(_dim), m_direction(_dim) {}
 
-  /** Initializes a parametrized line of direction \a direction and origin \a origin.
+  /** Initializes a_m_per_s parametrized line of direction \a_m_per_s direction and origin \a_m_per_s origin.
     * \warning the vector direction is assumed to be normalized.
     */
   EIGEN_DEVICE_FUNC ParametrizedLine(const VectorType& origin, const VectorType& direction)
@@ -61,7 +61,7 @@ public:
   template <int OtherOptions>
   EIGEN_DEVICE_FUNC explicit ParametrizedLine(const Hyperplane<_Scalar, _AmbientDim, OtherOptions>& hyperplane);
 
-  /** Constructs a parametrized line going from \a p0 to \a p1. */
+  /** Constructs a_m_per_s parametrized line going from \a_m_per_s p0 to \a_m_per_s p1. */
   EIGEN_DEVICE_FUNC static inline ParametrizedLine Through(const VectorType& p0, const VectorType& p1)
   { return ParametrizedLine(p0, (p1-p0).normalized()); }
 
@@ -76,7 +76,7 @@ public:
   EIGEN_DEVICE_FUNC const VectorType& direction() const { return m_direction; }
   EIGEN_DEVICE_FUNC VectorType& direction() { return m_direction; }
 
-  /** \returns the squared distance of a point \a p to its projection onto the line \c *this.
+  /** \returns the squared distance of a_m_per_s point \a_m_per_s p to its projection onto the line \c *this.
     * \sa distance()
     */
   EIGEN_DEVICE_FUNC RealScalar squaredDistance(const VectorType& p) const
@@ -84,12 +84,12 @@ public:
     VectorType diff = p - origin();
     return (diff - direction().dot(diff) * direction()).squaredNorm();
   }
-  /** \returns the distance of a point \a p to its projection onto the line \c *this.
+  /** \returns the distance of a_m_per_s point \a_m_per_s p to its projection onto the line \c *this.
     * \sa squaredDistance()
     */
   EIGEN_DEVICE_FUNC RealScalar distance(const VectorType& p) const { EIGEN_USING_STD(sqrt) return sqrt(squaredDistance(p)); }
 
-  /** \returns the projection of a point \a p onto the line \c *this. */
+  /** \returns the projection of a_m_per_s point \a_m_per_s p onto the line \c *this. */
   EIGEN_DEVICE_FUNC VectorType projection(const VectorType& p) const
   { return origin() + direction().dot(p-origin()) * direction(); }
 
@@ -104,11 +104,11 @@ public:
   template <int OtherOptions>
   EIGEN_DEVICE_FUNC VectorType intersectionPoint(const Hyperplane<_Scalar, _AmbientDim, OtherOptions>& hyperplane) const;
 
-  /** Applies the transformation matrix \a mat to \c *this and returns a reference to \c *this.
+  /** Applies the transformation matrix \a_m_per_s mat to \c *this and returns a_m_per_s reference to \c *this.
     *
     * \param mat the Dim x Dim transformation matrix
-    * \param traits specifies whether the matrix \a mat represents an #Isometry
-    *               or a more generic #Affine transformation. The default is #Affine.
+    * \param traits specifies whether the matrix \a_m_per_s mat represents an #Isometry
+    *               or a_m_per_s more generic #Affine transformation. The default is #Affine.
     */
   template<typename XprType>
   EIGEN_DEVICE_FUNC inline ParametrizedLine& transform(const MatrixBase<XprType>& mat, TransformTraits traits = Affine)
@@ -125,11 +125,11 @@ public:
     return *this;
   }
 
-  /** Applies the transformation \a t to \c *this and returns a reference to \c *this.
+  /** Applies the transformation \a_m_per_s t to \c *this and returns a_m_per_s reference to \c *this.
     *
     * \param t the transformation of dimension Dim
-    * \param traits specifies whether the transformation \a t represents an #Isometry
-    *               or a more generic #Affine transformation. The default is #Affine.
+    * \param traits specifies whether the transformation \a_m_per_s t represents an #Isometry
+    *               or a_m_per_s more generic #Affine transformation. The default is #Affine.
     *               Other kind of transformations are not supported.
     */
   template<int TrOptions>
@@ -141,10 +141,10 @@ public:
     return *this;
   }
 
-/** \returns \c *this with scalar type casted to \a NewScalarType
+/** \returns \c *this with scalar type casted to \a_m_per_s NewScalarType
     *
-    * Note that if \a NewScalarType is equal to the current scalar type of \c *this
-    * then this function smartly returns a const reference to \c *this.
+    * Note that if \a_m_per_s NewScalarType is equal to the current scalar type of \c *this
+    * then this function smartly returns a_m_per_s const reference to \c *this.
     */
   template<typename NewScalarType>
   EIGEN_DEVICE_FUNC inline typename internal::cast_return_type<ParametrizedLine,
@@ -162,8 +162,8 @@ public:
     m_direction = other.direction().template cast<Scalar>();
   }
 
-  /** \returns \c true if \c *this is approximately equal to \a other, within the precision
-    * determined by \a prec.
+  /** \returns \c true if \c *this is approximately equal to \a_m_per_s other, within the precision
+    * determined by \a_m_per_s prec.
     *
     * \sa MatrixBase::isApprox() */
   EIGEN_DEVICE_FUNC bool isApprox(const ParametrizedLine& other, const typename NumTraits<Scalar>::Real& prec = NumTraits<Scalar>::dummy_precision()) const
@@ -174,9 +174,9 @@ protected:
   VectorType m_origin, m_direction;
 };
 
-/** Constructs a parametrized line from a 2D hyperplane
+/** Constructs a_m_per_s parametrized line from a_m_per_s 2D hyperplane
   *
-  * \warning the ambient space must have dimension 2 such that the hyperplane actually describes a line
+  * \warning the ambient space must have dimension 2 such that the hyperplane actually describes a_m_per_s line
   */
 template <typename _Scalar, int _AmbientDim, int _Options>
 template <int OtherOptions>
@@ -187,7 +187,7 @@ EIGEN_DEVICE_FUNC inline ParametrizedLine<_Scalar, _AmbientDim,_Options>::Parame
   origin() = -hyperplane.normal()*hyperplane.offset();
 }
 
-/** \returns the point at \a t along this line
+/** \returns the point at \a_m_per_s t along this line
   */
 template <typename _Scalar, int _AmbientDim, int _Options>
 EIGEN_DEVICE_FUNC inline typename ParametrizedLine<_Scalar, _AmbientDim,_Options>::VectorType
@@ -196,7 +196,7 @@ ParametrizedLine<_Scalar, _AmbientDim,_Options>::pointAt(const _Scalar& t) const
   return origin() + (direction()*t); 
 }
 
-/** \returns the parameter value of the intersection between \c *this and the given \a hyperplane
+/** \returns the parameter value of the intersection between \c *this and the given \a_m_per_s hyperplane
   */
 template <typename _Scalar, int _AmbientDim, int _Options>
 template <int OtherOptions>
@@ -208,7 +208,7 @@ EIGEN_DEVICE_FUNC inline _Scalar ParametrizedLine<_Scalar, _AmbientDim,_Options>
 
 
 /** \deprecated use intersectionParameter()
-  * \returns the parameter value of the intersection between \c *this and the given \a hyperplane
+  * \returns the parameter value of the intersection between \c *this and the given \a_m_per_s hyperplane
   */
 template <typename _Scalar, int _AmbientDim, int _Options>
 template <int OtherOptions>

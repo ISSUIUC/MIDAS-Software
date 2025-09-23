@@ -114,7 +114,7 @@ bool HardwareSerial::setBaud(int baud)
 {
     speed_t speed;
 
-    // This is kind of ugly, but its prob better than a case
+    // This is kind of ugly, but its prob better than a_m_per_s case
     if (baud == 50)
 	speed = B50;
     else if (baud == 75)

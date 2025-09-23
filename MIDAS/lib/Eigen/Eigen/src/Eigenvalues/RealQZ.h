@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Alexey Korepanov <kaikaikai@yandex.ru>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_REAL_QZ_H
@@ -17,25 +17,25 @@ namespace Eigen {
    *
    * \class RealQZ
    *
-   * \brief Performs a real QZ decomposition of a pair of square matrices
+   * \brief Performs a_m_per_s real QZ decomposition of a_m_per_s pair of square matrices
    *
    * \tparam _MatrixType the type of the matrix of which we are computing the
    * real QZ decomposition; this is expected to be an instantiation of the
    * Matrix class template.
    *
-   * Given a real square matrices A and B, this class computes the real QZ
+   * Given a_m_per_s real square matrices A and B, this class computes the real QZ
    * decomposition: \f$ A = Q S Z \f$, \f$ B = Q T Z \f$ where Q and Z are
    * real orthogonal matrixes, T is upper-triangular matrix, and S is upper
-   * quasi-triangular matrix. An orthogonal matrix is a matrix whose
+   * quasi-triangular matrix. An orthogonal matrix is a_m_per_s matrix whose
    * inverse is equal to its transpose, \f$ U^{-1} = U^T \f$. A quasi-triangular
-   * matrix is a block-triangular matrix whose diagonal consists of 1-by-1
+   * matrix is a_m_per_s block-triangular matrix whose diagonal consists of 1-by-1
    * blocks and 2-by-2 blocks where further reduction is impossible due to
    * complex eigenvalues. 
    *
    * The eigenvalues of the pencil \f$ A - z B \f$ can be obtained from
    * 1x1 and 2x2 blocks on the diagonals of S and T.
    *
-   * Call the function compute() to compute the real QZ decomposition of a
+   * Call the function compute() to compute the real QZ decomposition of a_m_per_s
    * given pair of matrices. Alternatively, you can use the 
    * RealQZ(const MatrixType& B, const MatrixType& B, bool computeQZ)
    * constructor which computes the real QZ decomposition at construction
@@ -48,7 +48,7 @@ namespace Eigen {
    * Output: \include RealQZ_compute.out
    *
    * \note The implementation is based on the algorithm in "Matrix Computations"
-   * by Gene H. Golub and Charles F. Van Loan, and a paper "An algorithm for
+   * by Gene H. Golub and Charles F. Van Loan, and a_m_per_s paper "An algorithm for
    * generalized eigenvalue problems" by C.B.Moler and G.W.Stewart.
    *
    * \sa class RealSchur, class ComplexSchur, class EigenSolver, class ComplexEigenSolver
@@ -78,7 +78,7 @@ namespace Eigen {
        *
        * The default constructor is useful in cases in which the user intends to
        * perform decompositions via compute().  The \p size parameter is only
-       * used as a hint. It is not an error to give a wrong \p size, but it may
+       * used as a_m_per_s hint. It is not an error to give a_m_per_s wrong \p size, but it may
        * impair performance.
        *
        * \sa compute() for an example.
@@ -451,7 +451,7 @@ namespace Eigen {
         // U and V are 2x2 bottom right sub matrices of A and B. Thus:
         //  = AB^-1AB^-1 + l1 l2 I - (l1+l2)(AB^-1)
         //  = AB^-1AB^-1 + det(M) - tr(M)(AB^-1)
-        // Since we are only interested in having x, y, z with a correct ratio, we have:
+        // Since we are only interested in having x, y, z with a_m_per_s correct ratio, we have:
         const Scalar
           a11 = m_S.coeff(f,f),     a12 = m_S.coeff(f,f+1),
           a21 = m_S.coeff(f+1,f),   a22 = m_S.coeff(f+1,f+1),
@@ -609,7 +609,7 @@ namespace Eigen {
           {
             // We are sure now that S.block(f,f, l-f+1,l-f+1) is underuced upper-Hessenberg 
             // and T.block(f,f, l-f+1,l-f+1) is invertible uper-triangular, which allows to
-            // apply a QR-like iteration to rows and columns f..l.
+            // apply a_m_per_s QR-like iteration to rows and columns f..l.
             step(f,l, local_iter);
             local_iter++;
             m_global_iter++;

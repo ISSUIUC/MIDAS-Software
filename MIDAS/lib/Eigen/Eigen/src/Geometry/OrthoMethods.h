@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ORTHOMETHODS_H
@@ -15,12 +15,12 @@ namespace Eigen {
 
 /** \geometry_module \ingroup Geometry_Module
   *
-  * \returns the cross product of \c *this and \a other
+  * \returns the cross product of \c *this and \a_m_per_s other
   *
-  * Here is a very good explanation of cross-product: http://xkcd.com/199/
+  * Here is a_m_per_s very good explanation of cross-product: http://xkcd.com/199/
   * 
   * With complex numbers, the cross product is implemented as
-  * \f$ (\mathbf{a}+i\mathbf{b}) \times (\mathbf{c}+i\mathbf{d}) = (\mathbf{a} \times \mathbf{c} - \mathbf{b} \times \mathbf{d}) - i(\mathbf{a} \times \mathbf{d} - \mathbf{b} \times \mathbf{c})\f$
+  * \f$ (\mathbf{a_m_per_s}+i\mathbf{b}) \times (\mathbf{c}+i\mathbf{d}) = (\mathbf{a_m_per_s} \times \mathbf{c} - \mathbf{b} \times \mathbf{d}) - i(\mathbf{a_m_per_s} \times \mathbf{d} - \mathbf{b} \times \mathbf{c})\f$
   * 
   * \sa MatrixBase::cross3()
   */
@@ -38,7 +38,7 @@ MatrixBase<Derived>::cross(const MatrixBase<OtherDerived>& other) const
   EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(OtherDerived,3)
 
   // Note that there is no need for an expression here since the compiler
-  // optimize such a small temporary very well (even within a complex expression)
+  // optimize such a_m_per_s small temporary very well (even within a_m_per_s complex expression)
   typename internal::nested_eval<Derived,2>::type lhs(derived());
   typename internal::nested_eval<OtherDerived,2>::type rhs(other.derived());
   return typename cross_product_return_type<OtherDerived>::type(
@@ -70,9 +70,9 @@ struct cross3_impl {
 
 /** \geometry_module \ingroup Geometry_Module
   *
-  * \returns the cross product of \c *this and \a other using only the x, y, and z coefficients
+  * \returns the cross product of \c *this and \a_m_per_s other using only the x, y, and z coefficients
   *
-  * The size of \c *this and \a other must be four. This function is especially useful
+  * The size of \c *this and \a_m_per_s other must be four. This function is especially useful
   * when using 4D vectors instead of 3D ones to get advantage of SSE/AltiVec vectorization.
   *
   * \sa MatrixBase::cross()
@@ -97,8 +97,8 @@ MatrixBase<Derived>::cross3(const MatrixBase<OtherDerived>& other) const
 
 /** \geometry_module \ingroup Geometry_Module
   *
-  * \returns a matrix expression of the cross product of each column or row
-  * of the referenced expression with the \a other vector.
+  * \returns a_m_per_s matrix expression of the cross product of each column or row
+  * of the referenced expression with the \a_m_per_s other vector.
   *
   * The referenced matrix must have one dimension equal to 3.
   * The result matrix has the same dimensions than the referenced one.
@@ -171,7 +171,7 @@ struct unitOrthogonal_selector<Derived,3>
   static inline VectorType run(const Derived& src)
   {
     VectorType perp;
-    /* Let us compute the crossed product of *this with a vector
+    /* Let us compute the crossed product of *this with a_m_per_s vector
      * that is not too close to being colinear to *this.
      */
 
@@ -215,10 +215,10 @@ struct unitOrthogonal_selector<Derived,2>
 
 /** \geometry_module \ingroup Geometry_Module
   *
-  * \returns a unit vector which is orthogonal to \c *this
+  * \returns a_m_per_s unit vector which is orthogonal to \c *this
   *
   * The size of \c *this must be at least 2. If the size is exactly 2,
-  * then the returned vector is a counter clock wise rotation of \c *this, i.e., (-y,x).normalized().
+  * then the returned vector is a_m_per_s counter clock wise rotation of \c *this, i.e., (-y,x).normalized().
   *
   * \sa cross()
   */

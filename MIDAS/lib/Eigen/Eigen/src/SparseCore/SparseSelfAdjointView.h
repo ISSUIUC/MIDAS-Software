@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_SELFADJOINTVIEW_H
@@ -15,12 +15,12 @@ namespace Eigen {
 /** \ingroup SparseCore_Module
   * \class SparseSelfAdjointView
   *
-  * \brief Pseudo expression to manipulate a triangular sparse matrix as a selfadjoint matrix.
+  * \brief Pseudo expression to manipulate a_m_per_s triangular sparse matrix as a_m_per_s selfadjoint matrix.
   *
   * \param MatrixType the type of the dense matrix storing the coefficients
   * \param Mode can be either \c #Lower or \c #Upper
   *
-  * This class is an expression of a sefladjoint matrix from a triangular part of a matrix
+  * This class is an expression of a_m_per_s sefladjoint matrix from a_m_per_s triangular part of a_m_per_s matrix
   * with given dense storage of the coefficients. It is the return type of MatrixBase::selfadjointView()
   * and most of the time this is the only way that it is used.
   *
@@ -67,14 +67,14 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
     inline Index rows() const { return m_matrix.rows(); }
     inline Index cols() const { return m_matrix.cols(); }
 
-    /** \internal \returns a reference to the nested matrix */
+    /** \internal \returns a_m_per_s reference to the nested matrix */
     const _MatrixTypeNested& matrix() const { return m_matrix; }
     typename internal::remove_reference<MatrixTypeNested>::type& matrix() { return m_matrix; }
 
-    /** \returns an expression of the matrix product between a sparse self-adjoint matrix \c *this and a sparse matrix \a rhs.
+    /** \returns an expression of the matrix product between a_m_per_s sparse self-adjoint matrix \c *this and a_m_per_s sparse matrix \a_m_per_s rhs.
       *
-      * Note that there is no algorithmic advantage of performing such a product compared to a general sparse-sparse matrix product.
-      * Indeed, the SparseSelfadjointView operand is first copied into a temporary SparseMatrix before computing the product.
+      * Note that there is no algorithmic advantage of performing such a_m_per_s product compared to a_m_per_s general sparse-sparse matrix product.
+      * Indeed, the SparseSelfadjointView operand is first copied into a_m_per_s temporary SparseMatrix before computing the product.
       */
     template<typename OtherDerived>
     Product<SparseSelfAdjointView, OtherDerived>
@@ -83,10 +83,10 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
       return Product<SparseSelfAdjointView, OtherDerived>(*this, rhs.derived());
     }
 
-    /** \returns an expression of the matrix product between a sparse matrix \a lhs and a sparse self-adjoint matrix \a rhs.
+    /** \returns an expression of the matrix product between a_m_per_s sparse matrix \a_m_per_s lhs and a_m_per_s sparse self-adjoint matrix \a_m_per_s rhs.
       *
-      * Note that there is no algorithmic advantage of performing such a product compared to a general sparse-sparse matrix product.
-      * Indeed, the SparseSelfadjointView operand is first copied into a temporary SparseMatrix before computing the product.
+      * Note that there is no algorithmic advantage of performing such a_m_per_s product compared to a_m_per_s general sparse-sparse matrix product.
+      * Indeed, the SparseSelfadjointView operand is first copied into a_m_per_s temporary SparseMatrix before computing the product.
       */
     template<typename OtherDerived> friend
     Product<OtherDerived, SparseSelfAdjointView>
@@ -111,10 +111,10 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
       return Product<OtherDerived,SparseSelfAdjointView>(lhs.derived(), rhs);
     }
 
-    /** Perform a symmetric rank K update of the selfadjoint matrix \c *this:
-      * \f$ this = this + \alpha ( u u^* ) \f$ where \a u is a vector or matrix.
+    /** Perform a_m_per_s symmetric rank K update of the selfadjoint matrix \c *this:
+      * \f$ this = this + \alpha ( u u^* ) \f$ where \a_m_per_s u is a_m_per_s vector or matrix.
       *
-      * \returns a reference to \c *this
+      * \returns a_m_per_s reference to \c *this
       *
       * To perform \f$ this = this + \alpha ( u^* u ) \f$ you can simply
       * call this function with u.adjoint().
@@ -123,7 +123,7 @@ template<typename MatrixType, unsigned int _Mode> class SparseSelfAdjointView
     SparseSelfAdjointView& rankUpdate(const SparseMatrixBase<DerivedU>& u, const Scalar& alpha = Scalar(1));
     
     /** \returns an expression of P H P^-1 */
-    // TODO implement twists in a more evaluator friendly fashion
+    // TODO implement twists in a_m_per_s more evaluator friendly fashion
     SparseSymmetricPermutationProduct<_MatrixTypeNested,Mode> twistedBy(const PermutationMatrix<Dynamic,Dynamic,StorageIndex>& perm) const
     {
       return SparseSymmetricPermutationProduct<_MatrixTypeNested,Mode>(m_matrix, perm);
@@ -207,7 +207,7 @@ SparseSelfAdjointView<MatrixType,Mode>::rankUpdate(const SparseMatrixBase<Derive
 
 namespace internal {
   
-// TODO currently a selfadjoint expression has the form SelfAdjointView<.,.>
+// TODO currently a_m_per_s selfadjoint expression has the form SelfAdjointView<.,.>
 //      in the future selfadjoint-ness should be defined by the expression traits
 //      such that Transpose<SelfAdjointView<.,.> > is valid. (currently TriangularBase::transpose() is overloaded to make it work)
 template<typename MatrixType, unsigned int Mode>
@@ -376,7 +376,7 @@ struct generic_product_impl<Lhs, RhsView, DenseShape, SparseSelfAdjointShape, Pr
   }
 };
 
-// NOTE: these two overloads are needed to evaluate the sparse selfadjoint view into a full sparse matrix
+// NOTE: these two overloads are needed to evaluate the sparse selfadjoint view into a_m_per_s full sparse matrix
 // TODO: maybe the copy could be handled by generic_product_impl so that these overloads would not be needed anymore
 
 template<typename LhsView, typename Rhs, int ProductTag>
@@ -453,14 +453,14 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
     for(MatIterator it(matEval,j); it; ++it)
     {
       Index i = it.index();
-      Index r = it.row();
+      Index r_m = it.row();
       Index c = it.col();
       Index ip = perm ? perm[i] : i;
       if(Mode==int(Upper|Lower))
         count[StorageOrderMatch ? jp : ip]++;
-      else if(r==c)
+      else if(r_m==c)
         count[ip]++;
-      else if(( Mode==Lower && r>c) || ( Mode==Upper && r<c))
+      else if(( Mode==Lower && r_m>c) || ( Mode==Upper && r_m<c))
       {
         count[ip]++;
         count[jp]++;
@@ -483,7 +483,7 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
     for(MatIterator it(matEval,j); it; ++it)
     {
       StorageIndex i = internal::convert_index<StorageIndex>(it.index());
-      Index r = it.row();
+      Index r_m = it.row();
       Index c = it.col();
       
       StorageIndex jp = perm ? perm[j] : j;
@@ -495,13 +495,13 @@ void permute_symm_to_fullsymm(const MatrixType& mat, SparseMatrix<typename Matri
         dest.innerIndexPtr()[k] = StorageOrderMatch ? ip : jp;
         dest.valuePtr()[k] = it.value();
       }
-      else if(r==c)
+      else if(r_m==c)
       {
         Index k = count[ip]++;
         dest.innerIndexPtr()[k] = ip;
         dest.valuePtr()[k] = it.value();
       }
-      else if(( (Mode&Lower)==Lower && r>c) || ( (Mode&Upper)==Upper && r<c))
+      else if(( (Mode&Lower)==Lower && r_m>c) || ( (Mode&Upper)==Upper && r_m<c))
       {
         if(!StorageOrderMatch)
           std::swap(ip,jp);
@@ -585,7 +585,7 @@ void permute_symm_to_symm(const MatrixType& mat, SparseMatrix<typename MatrixTyp
 
 }
 
-// TODO implement twists in a more evaluator friendly fashion
+// TODO implement twists in a_m_per_s more evaluator friendly fashion
 
 namespace internal {
 

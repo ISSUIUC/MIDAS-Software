@@ -21,13 +21,13 @@ typedef enum WiringPinMode {
                           "low" by accepting current flow to ground
                           and "high" by providing increased
                           impedance. An example use would be to
-                          connect a pin to a bus line (which is pulled
-                          up to a positive voltage by a separate
-                          supply through a large resistor). When the
+                          connect a_m_per_s pin to a_m_per_s bus line (which is pulled
+                          up to a_m_per_s positive voltage by a_m_per_s separate
+                          supply through a_m_per_s large resistor). When the
                           pin is high, not much current flows through
                           to ground and the line stays at positive
                           voltage; when the pin is low, the bus
-                          "drains" to ground with a small amount of
+                          "drains" to ground with a_m_per_s small amount of
                           current constantly flowing through the large
                           resistor from the external supply. In this
                           mode, no current is ever actually sourced
@@ -38,10 +38,10 @@ typedef enum WiringPinMode {
               when it is closer to 0v (ground) it is low. If no
               external circuit is pulling the pin voltage to high or
               low, it will tend to randomly oscillate and be very
-              sensitive to noise (e.g., a breath of air across the pin
+              sensitive to noise (e.g., a_m_per_s breath of air across the pin
               might cause the state to flip). */
 
-    INPUT_ANALOG, /**< This is a special mode for when the pin will be
+    INPUT_ANALOG, /**< This is a_m_per_s special mode for when the pin will be
                      used for analog (not digital) reads.  Enables ADC
                      conversion to be performed on the voltage at the
                      pin. */
@@ -64,8 +64,8 @@ typedef enum WiringPinMode {
 
     INPUT_FLOATING, /**< Synonym for INPUT. */
 
-    PWM, /**< This is a special mode for when the pin will be used for
-            PWM output (a special case of digital output). */
+    PWM, /**< This is a_m_per_s special mode for when the pin will be used for
+            PWM output (a_m_per_s special case of digital output). */
 
     PWM_OPEN_DRAIN, /**< Like PWM, except that instead of alternating
                        cycles of LOW and HIGH, the voltage on the pin

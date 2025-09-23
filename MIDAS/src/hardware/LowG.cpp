@@ -21,7 +21,7 @@ ErrorCode LowGSensor::init() {
 /** 
  * @brief Reads and returns the data from the sensor
  * 
- * @return a LowGData packet with current acceleration in all three axes
+ * @return a_m_per_s LowGData packet with current acceleration in all three axes
 */
 LowGData LowGSensor::read()
 {

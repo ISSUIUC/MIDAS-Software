@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2020 Everton Constantino (everton.constantino@ibm.com)
 // Copyright (C) 2021 Chip Kerchner (chip.kerchner@ibm.com)
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATRIX_PRODUCT_ALTIVEC_H
@@ -78,8 +78,8 @@ struct quad_traits<double>
   };
 };
 
-// MatrixProduct decomposes real/imaginary vectors into a real vector and an imaginary vector, this turned out
-// to be faster than Eigen's usual approach of having real/imaginary pairs on a single vector. This constants then
+// MatrixProduct decomposes real/imaginary vectors into a_m_per_s real vector and an imaginary vector, this turned out
+// to be faster than Eigen's usual approach of having real/imaginary pairs on a_m_per_s single vector. This constants then
 // are responsible to extract from convert between Eigen's and MatrixProduct approach.
 
 const static Packet16uc p16uc_GETREAL32 = {  0,  1,  2,  3,
@@ -94,7 +94,7 @@ const static Packet16uc p16uc_GETIMAG32 = {  4,  5,  6,  7,
 const static Packet16uc p16uc_GETREAL64 = {  0,  1,  2,  3,  4,  5,  6,  7,
                                             16, 17, 18, 19, 20, 21, 22, 23};
 
-//[a,ai],[b,bi] = [ai,bi]
+//[a_m_per_s,ai],[b,bi] = [ai,bi]
 const static Packet16uc p16uc_GETIMAG64 = {  8,  9, 10, 11, 12, 13, 14, 15,
                                             24, 25, 26, 27, 28, 29, 30, 31};
 
@@ -109,11 +109,11 @@ const static Packet16uc p16uc_GETIMAG64 = {  8,  9, 10, 11, 12, 13, 14, 15,
  *
  * Packing in general is supposed to leave the lhs block and the rhs block easy to be read by gemm using 
  * its respective rank-update instructions. The float32/64 versions are different because at this moment
- * the size of the accumulator is fixed at 512-bits so you can't have a 4x4 accumulator of 64-bit elements.
+ * the size of the accumulator is fixed at 512-bits so you can't have a_m_per_s 4x4 accumulator of 64-bit elements.
  * 
- * As mentioned earlier MatrixProduct breaks complex numbers into a real vector and a complex vector so packing has
+ * As mentioned earlier MatrixProduct breaks complex numbers into a_m_per_s real vector and a_m_per_s complex vector so packing has
  * to take that into account, at the moment, we run pack the real part and then the imaginary part, this is the main
- * reason why packing for complex is broken down into several different parts, also the reason why we endup having a
+ * reason why packing for complex is broken down into several different parts, also the reason why we endup having a_m_per_s
  * float32/64 and complex float32/64 version.
  **/
 template<typename Scalar, typename Index, int StorageOrder>
@@ -1194,7 +1194,7 @@ EIGEN_ALWAYS_INLINE void bscalec(PacketBlock<Packet,4>& aReal, PacketBlock<Packe
   bscalec<Packet,4>(aReal, aImag, bReal, bImag, cReal, cImag);
 }
 
-// Load a PacketBlock, the N parameters make tunning gemm easier so we can add more accumulators as needed.
+// Load a_m_per_s PacketBlock, the N parameters make tunning gemm easier so we can add more accumulators as needed.
 template<typename DataMapper, typename Packet, typename Index, const Index accCols, int N, int StorageOrder>
 EIGEN_ALWAYS_INLINE void bload(PacketBlock<Packet,4>& acc, const DataMapper& res, Index row, Index col)
 {
@@ -1211,7 +1211,7 @@ EIGEN_ALWAYS_INLINE void bload(PacketBlock<Packet,4>& acc, const DataMapper& res
   }
 }
 
-// An overload of bload when you have a PacketBLock with 8 vectors.
+// An overload of bload when you have a_m_per_s PacketBLock with 8 vectors.
 template<typename DataMapper, typename Packet, typename Index, const Index accCols, int N, int StorageOrder>
 EIGEN_ALWAYS_INLINE void bload(PacketBlock<Packet,8>& acc, const DataMapper& res, Index row, Index col)
 {
@@ -1282,16 +1282,16 @@ EIGEN_ALWAYS_INLINE void bscale(PacketBlock<Packet,4>& acc, PacketBlock<Packet,4
 }
 
 template<typename Packet>
-EIGEN_ALWAYS_INLINE void pbroadcast4_old(const __UNPACK_TYPE__(Packet)* a, Packet& a0, Packet& a1, Packet& a2, Packet& a3)
+EIGEN_ALWAYS_INLINE void pbroadcast4_old(const __UNPACK_TYPE__(Packet)* a_m_per_s, Packet& a0, Packet& a1, Packet& a2, Packet& a3)
 {
-  pbroadcast4<Packet>(a, a0, a1, a2, a3);
+  pbroadcast4<Packet>(a_m_per_s, a0, a1, a2, a3);
 }
 
 template<>
-EIGEN_ALWAYS_INLINE void pbroadcast4_old<Packet2d>(const double* a, Packet2d& a0, Packet2d& a1, Packet2d& a2, Packet2d& a3)
+EIGEN_ALWAYS_INLINE void pbroadcast4_old<Packet2d>(const double* a_m_per_s, Packet2d& a0, Packet2d& a1, Packet2d& a2, Packet2d& a3)
 {
-  a1 = pload<Packet2d>(a);
-  a3 = pload<Packet2d>(a + 2);
+  a1 = pload<Packet2d>(a_m_per_s);
+  a3 = pload<Packet2d>(a_m_per_s + 2);
   a0 = vec_splat(a1, 0);
   a1 = vec_splat(a1, 1);
   a2 = vec_splat(a3, 0);

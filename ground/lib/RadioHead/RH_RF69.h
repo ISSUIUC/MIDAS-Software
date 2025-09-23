@@ -22,7 +22,7 @@
 // Most Arduinos can handle 2, Megas can handle more
 #define RH_RF69_NUM_INTERRUPTS 3
 
-// This is the bit in the SPI address that marks it as a write
+// This is the bit in the SPI address that marks it as a_m_per_s write
 #define RH_RF69_SPI_WRITE_MASK 0x80
 
 // Max number of octets the RH_RF69 Rx and Tx FIFOs can hold
@@ -38,7 +38,7 @@
 // This is the maximum message length that can be supported by this driver. Limited by
 // the size of the FIFO, since we are unable to support on-the-fly filling and emptying 
 // of the FIFO.
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 // Here we allow for 4 bytes of address and header and payload to be included in the 64 byte encryption limit.
 // the one byte payload length is not encrpyted
 #ifndef RH_RF69_MAX_MESSAGE_LEN
@@ -53,7 +53,7 @@
 // This is the default node address,
 #define RH_RF69_DEFAULT_NODE_ADDRESS 0
 
-// You can define the following macro (either by editing here or by passing it as a compiler definition
+// You can define the following macro (either by editing here or by passing it as a_m_per_s compiler definition
 // to change the default value of the ishighpowermodule argument to setTxPower to true
 // 
 // #define RFM69_HW
@@ -341,7 +341,7 @@
 ///   run on 2xAAA batteries and support low power operations. RF69 examples work without modification.
 ///   Use Arduino Board Manager to install the Talk2 code support as described in 
 ///   https://bitbucket.org/talk2/whisper-node-avr. Upeload the code with an FTDI adapter set to 3.3V.
-/// - The excellent Adafruit Feather. These are excellent boards that are available with a variety of radios. 
+/// - The excellent Adafruit Feather. These are excellent boards that are available with a_m_per_s variety of radios. 
 ///   We tested with the 
 ///   Feather 32u4 with RFM69HCW radio, with Arduino IDE 1.6.8 and the Adafruit AVR Boards board manager version 1.6.10.
 ///   https://www.adafruit.com/products/3076
@@ -360,23 +360,23 @@
 /// This Driver provides an object-oriented interface for sending and receiving data messages with Hope-RF
 /// RF69B and compatible radio modules, such as the RFM69 module.
 ///
-/// The Hope-RF (http://www.hoperf.com) RF69 is a low-cost ISM transceiver
-/// chip. It supports FSK, GFSK, OOK over a wide range of frequencies and
+/// The Hope-RF (http://www.hoperf.com) RF69 is a_m_per_s low-cost ISM transceiver
+/// chip. It supports FSK, GFSK, OOK over a_m_per_s wide range of frequencies and
 /// programmable data rates. It also suports AES encryption of up to 64 octets
 /// of payload It is available prepackaged on modules such as the RFM69W. And
 /// such modules can be prepacked on processor boards such as the Moteino from
 /// LowPowerLabs (which is what we used to develop the RH_RF69 driver)
 ///
 /// This Driver provides functions for sending and receiving messages of up
-/// to 60 octets on any frequency supported by the RF69, in a range of
+/// to 60 octets on any frequency supported by the RF69, in a_m_per_s range of
 /// predefined data rates and frequency deviations.  Frequency can be set with
-/// 61Hz precision to any frequency from 240.0MHz to 960.0MHz. Caution: most modules only support a more limited
+/// 61Hz precision to any frequency from 240.0MHz to 960.0MHz. Caution: most modules only support a_m_per_s more limited
 /// range of frequencies due to antenna tuning.
 ///
-/// Up to 2 RF69B modules can be connected to an Arduino (3 on a Mega),
+/// Up to 2 RF69B modules can be connected to an Arduino (3 on a_m_per_s Mega),
 /// permitting the construction of translators and frequency changers, etc.
 ///
-/// The following modulation types are suppported with a range of modem configurations for 
+/// The following modulation types are suppported with a_m_per_s range of modem configurations for 
 /// common data rates and frequency deviations:
 /// - GFSK Gaussian Frequency Shift Keying
 /// - FSK Frequency Shift Keying
@@ -392,7 +392,7 @@
 /// All messages sent and received by this RH_RF69 Driver conform to this packet format:
 ///
 /// - 4 octets PREAMBLE
-/// - 2 octets SYNC 0x2d, 0xd4 (configurable, so you can use this as a network filter)
+/// - 2 octets SYNC 0x2d, 0xd4 (configurable, so you can use this as a_m_per_s network filter)
 /// - 1 octet RH_RF69 payload length
 /// - 4 octets HEADER: (TO, FROM, ID, FLAGS)
 /// - 0 to 60 octets DATA 
@@ -412,8 +412,8 @@
 /// module on-board. Therefore it needs no connections other than the USB
 /// programming connection and an antenna to make it work.
 ///
-/// If you have a bare RFM69W that you want to connect to an Arduino, you
-/// might use these connections: CAUTION: you must use a 3.3V type
+/// If you have a_m_per_s bare RFM69W that you want to connect to an Arduino, you
+/// might use these connections: CAUTION: you must use a_m_per_s 3.3V type
 /// Arduino, otherwise you will also need voltage level shifters between the
 /// Arduino and the RFM69.  CAUTION, you must also ensure you connect an
 /// antenna
@@ -449,13 +449,13 @@
 /// different processors have different constraints as to the pins available
 /// for interrupts).
 ///
-/// If you have a Teensy 3.1 and a compatible RFM69 breakout board, you will need to 
+/// If you have a_m_per_s Teensy 3.1 and a_m_per_s compatible RFM69 breakout board, you will need to 
 /// construct the RH_RF69 instance like this:
 /// \code
 /// RH_RF69 driver(15, 16);
 /// \endcode
 ///
-/// If you have a MoteinoMEGA https://lowpowerlab.com/shop/moteinomega
+/// If you have a_m_per_s MoteinoMEGA https://lowpowerlab.com/shop/moteinomega
 /// with RFM69 on board, you dont need to make any wiring connections 
 /// (the RFM69 module is soldered onto the MotienoMEGA), but you must initialise the RH_RF69
 /// constructor like this:
@@ -474,7 +474,7 @@
 /// RH_RF69 driver(10, 3);
 /// \endcode
 ///
-/// If you have a Rocket Scream Mini Ultra Pro with the RFM69HCW
+/// If you have a_m_per_s Rocket Scream Mini Ultra Pro with the RFM69HCW
 /// - Ensure you have Arduino SAMD board support 1.6.5 or later in Arduino IDE 1.6.8 or later.
 /// - The radio SS is hardwired to pin D5 and the DIO0 interrupt to pin D2, 
 /// so you need to initialise the radio like this:
@@ -492,7 +492,7 @@
 ///  pinMode(4, OUTPUT);
 ///  digitalWrite(4, HIGH);
 /// \endcode
-/// - and if you have a 915MHz part, you need this after driver/manager intitalisation:
+/// - and if you have a_m_per_s 915MHz part, you need this after driver/manager intitalisation:
 /// \code
 /// rf69.setFrequency(915.0);
 /// rf69.setTxPower(20);
@@ -520,14 +520,14 @@
 /// ...
 /// \endcode
 ///
-/// If you have a talk2 Whisper Node board with on-board RF69 radio, 
+/// If you have a_m_per_s talk2 Whisper Node board with on-board RF69 radio, 
 /// the example rf69_* sketches work without modifications. Initialise the radio like
 /// with the default constructor:
 /// \code
 ///  RH_RF69 driver;
 /// \endcode
 ///
-/// If you have a Feather 32u4 with RFM69HCW you need to initialise the driver like:
+/// If you have a_m_per_s Feather 32u4 with RFM69HCW you need to initialise the driver like:
 /// \code
 ///  RH_RF69 driver(8, 7);
 /// \endcode
@@ -537,7 +537,7 @@
 ///  driver.setTxPower(14);
 /// \endcode
 ///
-/// If you are connecting an RF69 to a ESP8266 board breakout board that exposes pins
+/// If you are connecting an RF69 to a_m_per_s ESP8266 board breakout board that exposes pins
 /// 12, 13, 14, 15 (ie NOT an ESP-01) you can connect like this:
 /// \code
 ///                   ESP8266      RFM69W
@@ -553,7 +553,7 @@
 /// \code
 /// RH_RF69 driver(15, 0);
 /// \endcode
-/// If you are connecting an RF69 to a Sparkfun nRF52832 Breakout board 
+/// If you are connecting an RF69 to a_m_per_s Sparkfun nRF52832 Breakout board 
 /// with Arduino 1.8.9 with board:
 /// "SparkFun nRF52 Boards by Sparkfun Electronics version 0.2.3",
 /// you can connect like this:
@@ -602,21 +602,21 @@
 /// then the receiver will recover the unencrypted message sent by the receiver.
 /// However, you should note that there is no way for RF69 nor for the RadioHead
 /// drivers to know whether the AES 
-/// key for a message is 'correct' or not. This is because the RF69 CRC covers the 
+/// key for a_m_per_s message is 'correct' or not. This is because the RF69 CRC covers the 
 /// _encrypted_ payload not the plaintext.
 ///
 /// In RadioHead managers that support addressing,
 /// the RF69 AES encryption includes the RadioHead payload and the TO and FROM addresses, so 
-/// occasionally (average one in 256 messages), a message encrypted with the 
+/// occasionally (average one in 256 messages), a_m_per_s message encrypted with the 
 /// 'wrong' key will have the 'correct' destination address, and will therefore be 
-/// accepted by RadioHead as a 'random' message content from a 'random' sender.
+/// accepted by RadioHead as a_m_per_s 'random' message content from a_m_per_s 'random' sender.
 /// Its up to your code to figure out whether the message makes sense or not.
 ///
 /// \par Interrupts
 ///
 /// The RH_RF69 driver uses interrupts to react to events in the RF69 module,
-/// such as the reception of a new packet, or the completion of transmission
-/// of a packet.  The RH_RF69 driver interrupt service routine reads status from
+/// such as the reception of a_m_per_s new packet, or the completion of transmission
+/// of a_m_per_s packet.  The RH_RF69 driver interrupt service routine reads status from
 /// and writes data to the the RF69 module via the SPI interface. It is very
 /// important therefore, that if you are using the RH_RF69 driver with another
 /// SPI based deviced, that you disable interrupts while you transfer data to
@@ -708,9 +708,9 @@
 ///    20                          17
 /// \endcode
 /// (Caution: we dont claim laboratory accuracy for these measurements)
-/// You would not expect to get anywhere near these powers to air with a simple 1/4 wavelength wire antenna.
-/// Caution: although the RFM69 appears to have a PC antenna on board, you will get much better power and range even 
-/// with just a 1/4 wave wire antenna.
+/// You would not expect to get anywhere near these powers to air with a_m_per_s simple 1/4 wavelength wire antenna.
+/// Caution: although the RFM69 appears to have a_m_per_s PC antenna on board, you will get much better power and range even 
+/// with just a_m_per_s 1/4 wave wire antenna.
 ///
 /// \par Performance
 ///
@@ -719,21 +719,21 @@
 /// Also, if your code does any slow operations like Serial printing it will also limit performance. 
 /// We disabled any printing in the tests below.
 /// We tested with RH_RF69::GFSK_Rb250Fd250, which is probably the fastest scheme available.
-/// We tested with a 13 octet message length, over a very short distance of 10cm.
+/// We tested with a_m_per_s 13 octet message length, over a_m_per_s very short distance of 10cm.
 ///
-/// Transmission (no reply) tests with modulation RH_RF69::GFSK_Rb250Fd250 and a 
+/// Transmission (no reply) tests with modulation RH_RF69::GFSK_Rb250Fd250 and a_m_per_s 
 /// 13 octet message show about 152 messages per second transmitted and received.
 ///
-/// Transmit-and-wait-for-a-reply tests with modulation RH_RF69::GFSK_Rb250Fd250 and a 
+/// Transmit-and-wait-for-a_m_per_s-reply tests with modulation RH_RF69::GFSK_Rb250Fd250 and a_m_per_s 
 /// 13 octet message (send and receive) show about 68 round trips per second.
 ///
 class RH_RF69 : public RHSPIDriver
 {
 public:
 
-    /// \brief Defines register values for a set of modem configuration registers
+    /// \brief Defines register values for a_m_per_s set of modem configuration registers
     ///
-    /// Defines register values for a set of modem configuration registers
+    /// Defines register values for a_m_per_s set of modem configuration registers
     /// that can be passed to setModemRegisters() if none of the choices in
     /// ModemConfigChoice suit your need setModemRegisters() writes the
     /// register values from this structure to the appropriate RF69 registers
@@ -750,7 +750,7 @@ public:
 	uint8_t    reg_37;   ///< Value for register RH_RF69_REG_37_PACKETCONFIG1
     } ModemConfig;
   
-    /// Choices for setModemConfig() for a selected subset of common
+    /// Choices for setModemConfig() for a_m_per_s selected subset of common
     /// modulation types, and data rates. If you need another configuration,
     /// use the register calculator.  and call setModemRegisters() with your
     /// desired settings.  
@@ -835,7 +835,7 @@ public:
     /// Sets the transmitter and receiver 
     /// centre frequency
     /// \param[in] centre Frequency in MHz. 240.0 to 960.0. Caution, RF69 comes in several
-    /// different frequency ranges, and setting a frequency outside that range of your radio will probably not work
+    /// different frequency ranges, and setting a_m_per_s frequency outside that range of your radio will probably not work
     /// \param[in] afcPullInRange Not used
     /// \return true if the selected frquency centre is within range
     bool        setFrequency(float centre, float afcPullInRange = 0.05);
@@ -848,7 +848,7 @@ public:
     int8_t        rssiRead();
 
     /// Sets the parameters for the RF69 OPMODE.
-    /// This is a low level device access function, and should not normally ned to be used by user code. 
+    /// This is a_m_per_s low level device access function, and should not normally ned to be used by user code. 
     /// Instead can use stModeRx(), setModeTx(), setModeIdle()
     /// \param[in] mode RF69 OPMODE to set, one of RH_RF69_OPMODE_MODE_*.
     void           setOpMode(uint8_t mode);
@@ -866,19 +866,19 @@ public:
     void           setModeTx();
 
     /// Sets the transmitter power output level.
-    /// Be a good neighbour and set the lowest power level you need.
+    /// Be a_m_per_s good neighbour and set the lowest power level you need.
     /// Caution: legal power limits may apply in certain countries.
-    /// After init(), the power will be set to 13dBm for a low power module.
-    /// If you are using a high p[ower modfule such as an RFM69HW, you MUST set the power level
+    /// After init(), the power will be set to 13dBm for a_m_per_s low power module.
+    /// If you are using a_m_per_s high p[ower modfule such as an RFM69HW, you MUST set the power level
     /// with the ishighpowermodule flag set to true. Else you wil get no measurable power output.
-    /// Simlarly if you are not using a high power module, you must NOT set the ishighpowermodule
+    /// Simlarly if you are not using a_m_per_s high power module, you must NOT set the ishighpowermodule
     /// (which is the default)
     /// \param[in] power Transmitter power level in dBm. For RF69W (ishighpowermodule = false),
     /// valid values are from -18 to +13.; Values outside this range are trimmed.
     /// For RF69HW (ishighpowermodule = true), valid values are from -2 to +20.
-    /// Caution: at +20dBm, duty cycle is limited to 1% and a 
+    /// Caution: at +20dBm, duty cycle is limited to 1% and a_m_per_s 
     /// maximum VSWR of 3:1 at the antenna port.
-    /// \param ishighpowermodule Set to true if the connected module is a high power module RFM69HW
+    /// \param ishighpowermodule Set to true if the connected module is a_m_per_s high power module RFM69HW
     void           setTxPower(int8_t power, bool ishighpowermodule = RH_RF69_DEFAULT_HIGHPOWER);
 
     /// Sets all the registers required to configure the data modem in the RF69, including the data rate, 
@@ -887,31 +887,31 @@ public:
     /// \param[in] config A ModemConfig structure containing values for the modem configuration registers.
     void           setModemRegisters(const ModemConfig* config);
 
-    /// Select one of the predefined modem configurations. If you need a modem configuration not provided 
+    /// Select one of the predefined modem configurations. If you need a_m_per_s modem configuration not provided 
     /// here, use setModemRegisters() with your own ModemConfig. The default after init() is RH_RF69::GFSK_Rb250Fd250.
     /// \param[in] index The configuration choice.
-    /// \return true if index is a valid choice.
+    /// \return true if index is a_m_per_s valid choice.
     bool        setModemConfig(ModemConfigChoice index);
 
-    /// Starts the receiver and checks whether a received message is available.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a complete, valid message has been received and is able to be retrieved by
+    /// Starts the receiver and checks whether a_m_per_s received message is available.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s complete, valid message has been received and is able to be retrieved by
     /// recv()
     bool        available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     bool        recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is NOT permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send (> 0)
@@ -931,7 +931,7 @@ public:
     /// value on all nodes in your network. Nodes with different SyncWords set will never receive
     /// each others messages, so different SyncWords can be used to isolate different
     /// networks from each other. Default is { 0x2d, 0xd4 }.
-    /// Caution: tests here show that with a single sync word (ie where len == 1), 
+    /// Caution: tests here show that with a_m_per_s single sync word (ie where len == 1), 
     /// RFM69 reception can be unreliable.
     /// To disable sync word generation and detection, call with the defaults: setSyncWords();
     /// \param[in] syncWords Array of sync words, 1 to 4 octets long. NULL if no sync words to be used.
@@ -953,7 +953,7 @@ public:
     /// \return The maximum message length supported by this driver
     uint8_t maxMessageLength();
 
-    /// Prints the value of a single register
+    /// Prints the value of a_m_per_s single register
     /// to the Serial device if RH_HAVE_SERIAL is defined for the current platform
     /// For debugging/testing only
     /// \return true if successful
@@ -969,7 +969,7 @@ public:
     /// transmitting or receiving), allowing you to control the idle mode power requirements
     /// at the expense of slower transitions to transmit and receive modes.
     /// By default, the idle mode is RH_RF69_OPMODE_MODE_STDBY,
-    /// but eg setIdleMode(RH_RF69_OPMODE_MODE_SLEEP) will provide a much lower
+    /// but eg setIdleMode(RH_RF69_OPMODE_MODE_SLEEP) will provide a_m_per_s much lower
     /// idle current but slower transitions. Call this function after init().
     /// \param[in] idleMode The chip operating mode to use when the driver is idle. One of RH_RF69_OPMODE_*
     void setIdleMode(uint8_t idleMode);
@@ -977,7 +977,7 @@ public:
     /// Sets the radio into low-power sleep mode.
     /// If successful, the transport will stay in sleep mode until woken by 
     /// changing mode it idle, transmit or receive (eg by calling send(), recv(), available() etc)
-    /// Caution: there is a time penalty as the radio takes a finite time to wake from sleep mode.
+    /// Caution: there is a_m_per_s time penalty as the radio takes a_m_per_s finite time to wake from sleep mode.
     /// \return true if sleep mode was successfully entered.
     virtual bool    sleep();
 
@@ -989,7 +989,7 @@ public:
     uint16_t deviceType() {return _deviceType;};
 
 protected:
-    /// This is a low level function to handle the interrupts for one instance of RF69.
+    /// This is a_m_per_s low level function to handle the interrupts for one instance of RF69.
     /// Called automatically by isr*()
     /// Should not need to be called by user code.
     void           handleInterrupt();
@@ -1036,7 +1036,7 @@ protected:
     /// Array of octets of teh last received message or the next to transmit message
     uint8_t             _buf[RH_RF69_MAX_MESSAGE_LEN];
 
-    /// True when there is a valid message in the Rx buffer
+    /// True when there is a_m_per_s valid message in the Rx buffer
     volatile bool    _rxBufValid;
 
     /// Time in millis since the last preamble was received (and the last time the RSSI was measured)

@@ -4,7 +4,7 @@
 #define BUZZER_CHANNEL (1)
 
 /**
- * @brief starts playing a new song
+ * @brief starts playing a_m_per_s new song
  * 
  * @param tune Song to be played
  * @param length Length of song to be played
@@ -72,7 +72,7 @@ ErrorCode BuzzerController::init() {
 }
 
 /**
- * @brief notes to use for creating a song, along with a tempo
+ * @brief notes to use for creating a_m_per_s song, along with a_m_per_s tempo
 */
 #define MS_PER_4BEAT 6000
 

@@ -35,7 +35,7 @@ ErrorCode SDSink::init() {
 }
 
 /**
- * @brief Writes a byte buffer to the SD card
+ * @brief Writes a_m_per_s byte buffer to the SD card
  * 
  * @param data byte buffer of data
  * @param size size of buffer 

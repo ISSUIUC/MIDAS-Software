@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_AMBIVECTOR_H
@@ -38,7 +38,7 @@ class AmbiVector
 
     Index nonZeros() const;
 
-    /** Specifies a sub-vector to work on */
+    /** Specifies a_m_per_s sub-vector to work on */
     void setBounds(Index start, Index end) { m_start = convert_index(start); m_end = convert_index(end); }
 
     void setZero();
@@ -68,7 +68,7 @@ class AmbiVector
 
     void reallocate(Index size)
     {
-      // if the size of the matrix is not too large, let's allocate a bit more than needed such
+      // if the size of the matrix is not too large, let's allocate a_m_per_s bit more than needed such
       // that we can handle dense vector even in sparse mode.
       delete[] m_buffer;
       if (size<1000)
@@ -155,7 +155,7 @@ void AmbiVector<_Scalar,_StorageIndex>::init(int mode)
   }
 }
 
-/** Must be called whenever we might perform a write access
+/** Must be called whenever we might perform a_m_per_s write access
   * with an index smaller than the previous one.
   *
   * Don't worry, this function is extremely cheap.
@@ -239,7 +239,7 @@ _Scalar& AmbiVector<_Scalar,_StorageIndex>::coeffRef(Index i)
           llElements = reinterpret_cast<ListEl*>(m_buffer);
         }
         eigen_internal_assert(m_llSize<m_allocatedElements && "internal error: overflow in sparse mode");
-        // let's insert a new coefficient
+        // let's insert a_m_per_s new coefficient
         ListEl& el = llElements[m_llSize];
         el.value = Scalar(0);
         el.index = convert_index(i);
@@ -290,7 +290,7 @@ class AmbiVector<_Scalar,_StorageIndex>::Iterator
     /** Default constructor
       * \param vec the vector on which we iterate
       * \param epsilon the minimal value used to prune zero coefficients.
-      * In practice, all coefficients having a magnitude smaller than \a epsilon
+      * In practice, all coefficients having a_m_per_s magnitude smaller than \a_m_per_s epsilon
       * are skipped.
       */
     explicit Iterator(const AmbiVector& vec, const RealScalar& epsilon = 0)
@@ -301,8 +301,8 @@ class AmbiVector<_Scalar,_StorageIndex>::Iterator
       m_isDense = m_vector.m_mode==IsDense;
       if (m_isDense)
       {
-        m_currentEl = 0;   // this is to avoid a compilation warning
-        m_cachedValue = 0; // this is to avoid a compilation warning
+        m_currentEl = 0;   // this is to avoid a_m_per_s compilation warning
+        m_cachedValue = 0; // this is to avoid a_m_per_s compilation warning
         m_cachedIndex = m_vector.m_start-1;
         ++(*this);
       }
@@ -314,7 +314,7 @@ class AmbiVector<_Scalar,_StorageIndex>::Iterator
           m_currentEl = llElements[m_currentEl].next;
         if (m_currentEl<0)
         {
-          m_cachedValue = 0; // this is to avoid a compilation warning
+          m_cachedValue = 0; // this is to avoid a_m_per_s compilation warning
           m_cachedIndex = -1;
         }
         else

@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2018 Wave Computing, Inc.
@@ -7,7 +7,7 @@
 //   Alexey Frunze (afrunze@wavecomp.com)
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLEX_MSA_H
@@ -23,14 +23,14 @@ namespace internal {
 struct Packet2cf {
   EIGEN_STRONG_INLINE Packet2cf() {
   }
-  EIGEN_STRONG_INLINE explicit Packet2cf(const std::complex<float>& a,
+  EIGEN_STRONG_INLINE explicit Packet2cf(const std::complex<float>& a_m_per_s,
                                          const std::complex<float>& b) {
-    Packet4f t = { std::real(a), std::imag(a), std::real(b), std::imag(b) };
+    Packet4f t = { std::real(a_m_per_s), std::imag(a_m_per_s), std::real(b), std::imag(b) };
     v = t;
   }
-  EIGEN_STRONG_INLINE explicit Packet2cf(const Packet4f& a) : v(a) {
+  EIGEN_STRONG_INLINE explicit Packet2cf(const Packet4f& a_m_per_s) : v(a_m_per_s) {
   }
-  EIGEN_STRONG_INLINE Packet2cf(const Packet2cf& a) : v(a.v) {
+  EIGEN_STRONG_INLINE Packet2cf(const Packet2cf& a_m_per_s) : v(a_m_per_s.v) {
   }
   EIGEN_STRONG_INLINE Packet2cf& operator=(const Packet2cf& b) {
     v = b.v;
@@ -42,13 +42,13 @@ struct Packet2cf {
   EIGEN_STRONG_INLINE Packet2cf& operator*=(const Packet2cf& b) {
     Packet4f v1, v2;
 
-    // Get the real values of a | a1_re | a1_re | a2_re | a2_re |
+    // Get the real values of a_m_per_s | a1_re | a1_re | a2_re | a2_re |
     v1 = (Packet4f)__builtin_msa_ilvev_w((v4i32)v, (v4i32)v);
-    // Get the imag values of a | a1_im | a1_im | a2_im | a2_im |
+    // Get the imag values of a_m_per_s | a1_im | a1_im | a2_im | a2_im |
     v2 = (Packet4f)__builtin_msa_ilvod_w((v4i32)v, (v4i32)v);
-    // Multiply the real a with b
+    // Multiply the real a_m_per_s with b
     v1 = pmul(v1, b.v);
-    // Multiply the imag a with b
+    // Multiply the imag a_m_per_s with b
     v2 = pmul(v2, b.v);
     // Conjugate v2
     v2 = Packet2cf(v2).conjugate().v;
@@ -142,66 +142,66 @@ EIGEN_STRONG_INLINE Packet2cf pset1<Packet2cf>(const std::complex<float>& from) 
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf padd<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf padd<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return a + b;
+  return a_m_per_s + b;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf psub<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf psub<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return a - b;
+  return a_m_per_s - b;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pnegate(const Packet2cf& a) {
+EIGEN_STRONG_INLINE Packet2cf pnegate(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return -a;
+  return -a_m_per_s;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pconj(const Packet2cf& a) {
+EIGEN_STRONG_INLINE Packet2cf pconj(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return a.conjugate();
+  return a_m_per_s.conjugate();
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pmul<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf pmul<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return a * b;
+  return a_m_per_s * b;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pand<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf pand<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet2cf(pand(a.v, b.v));
+  return Packet2cf(pand(a_m_per_s.v, b.v));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf por<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf por<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet2cf(por(a.v, b.v));
+  return Packet2cf(por(a_m_per_s.v, b.v));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pxor<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf pxor<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet2cf(pxor(a.v, b.v));
+  return Packet2cf(pxor(a_m_per_s.v, b.v));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pandnot<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf pandnot<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet2cf(pandnot(a.v, b.v));
+  return Packet2cf(pandnot(a_m_per_s.v, b.v));
 }
 
 template <>
@@ -268,50 +268,50 @@ EIGEN_STRONG_INLINE void prefetch<std::complex<float> >(const std::complex<float
 }
 
 template <>
-EIGEN_STRONG_INLINE std::complex<float> pfirst<Packet2cf>(const Packet2cf& a) {
+EIGEN_STRONG_INLINE std::complex<float> pfirst<Packet2cf>(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return std::complex<float>(a.v[0], a.v[1]);
+  return std::complex<float>(a_m_per_s.v[0], a_m_per_s.v[1]);
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf preverse(const Packet2cf& a) {
+EIGEN_STRONG_INLINE Packet2cf preverse(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return Packet2cf((Packet4f)__builtin_msa_shf_w((v4i32)a.v, EIGEN_MSA_SHF_I8(2, 3, 0, 1)));
+  return Packet2cf((Packet4f)__builtin_msa_shf_w((v4i32)a_m_per_s.v, EIGEN_MSA_SHF_I8(2, 3, 0, 1)));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pcplxflip<Packet2cf>(const Packet2cf& a) {
+EIGEN_STRONG_INLINE Packet2cf pcplxflip<Packet2cf>(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return Packet2cf((Packet4f)__builtin_msa_shf_w((v4i32)a.v, EIGEN_MSA_SHF_I8(1, 0, 3, 2)));
+  return Packet2cf((Packet4f)__builtin_msa_shf_w((v4i32)a_m_per_s.v, EIGEN_MSA_SHF_I8(1, 0, 3, 2)));
 }
 
 template <>
-EIGEN_STRONG_INLINE std::complex<float> predux<Packet2cf>(const Packet2cf& a) {
+EIGEN_STRONG_INLINE std::complex<float> predux<Packet2cf>(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  Packet4f value = (Packet4f)preverse((Packet2d)a.v);
-  value += a.v;
+  Packet4f value = (Packet4f)preverse((Packet2d)a_m_per_s.v);
+  value += a_m_per_s.v;
   return std::complex<float>(value[0], value[1]);
 }
 
 template <>
-EIGEN_STRONG_INLINE std::complex<float> predux_mul<Packet2cf>(const Packet2cf& a) {
+EIGEN_STRONG_INLINE std::complex<float> predux_mul<Packet2cf>(const Packet2cf& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return std::complex<float>((a.v[0] * a.v[2]) - (a.v[1] * a.v[3]),
-                             (a.v[0] * a.v[3]) + (a.v[1] * a.v[2]));
+  return std::complex<float>((a_m_per_s.v[0] * a_m_per_s.v[2]) - (a_m_per_s.v[1] * a_m_per_s.v[3]),
+                             (a_m_per_s.v[0] * a_m_per_s.v[3]) + (a_m_per_s.v[1] * a_m_per_s.v[2]));
 }
 
 EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet2cf, Packet4f)
 
 template <>
-EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a, const Packet2cf& b) {
+EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) {
   EIGEN_MSA_DEBUG;
 
-  return a / b;
+  return a_m_per_s / b;
 }
 
 inline std::ostream& operator<<(std::ostream& os, const PacketBlock<Packet2cf, 2>& value) {
@@ -341,13 +341,13 @@ EIGEN_STRONG_INLINE Packet2cf pblend(const Selector<2>& ifPacket, const Packet2c
 struct Packet1cd {
   EIGEN_STRONG_INLINE Packet1cd() {
   }
-  EIGEN_STRONG_INLINE explicit Packet1cd(const std::complex<double>& a) {
-    v[0] = std::real(a);
-    v[1] = std::imag(a);
+  EIGEN_STRONG_INLINE explicit Packet1cd(const std::complex<double>& a_m_per_s) {
+    v[0] = std::real(a_m_per_s);
+    v[1] = std::imag(a_m_per_s);
   }
-  EIGEN_STRONG_INLINE explicit Packet1cd(const Packet2d& a) : v(a) {
+  EIGEN_STRONG_INLINE explicit Packet1cd(const Packet2d& a_m_per_s) : v(a_m_per_s) {
   }
-  EIGEN_STRONG_INLINE Packet1cd(const Packet1cd& a) : v(a.v) {
+  EIGEN_STRONG_INLINE Packet1cd(const Packet1cd& a_m_per_s) : v(a_m_per_s.v) {
   }
   EIGEN_STRONG_INLINE Packet1cd& operator=(const Packet1cd& b) {
     v = b.v;
@@ -360,13 +360,13 @@ struct Packet1cd {
   EIGEN_STRONG_INLINE Packet1cd& operator*=(const Packet1cd& b) {
     Packet2d v1, v2;
 
-    // Get the real values of a | a1_re | a1_re
+    // Get the real values of a_m_per_s | a1_re | a1_re
     v1 = (Packet2d)__builtin_msa_ilvev_d((v2i64)v, (v2i64)v);
-    // Get the imag values of a | a1_im | a1_im
+    // Get the imag values of a_m_per_s | a1_im | a1_im
     v2 = (Packet2d)__builtin_msa_ilvod_d((v2i64)v, (v2i64)v);
-    // Multiply the real a with b
+    // Multiply the real a_m_per_s with b
     v1 = pmul(v1, b.v);
-    // Multiply the imag a with b
+    // Multiply the imag a_m_per_s with b
     v2 = pmul(v2, b.v);
     // Conjugate v2
     v2 = Packet1cd(v2).conjugate().v;
@@ -467,66 +467,66 @@ EIGEN_STRONG_INLINE Packet1cd pset1<Packet1cd>(const std::complex<double>& from)
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd padd<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd padd<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return a + b;
+  return a_m_per_s + b;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd psub<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd psub<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return a - b;
+  return a_m_per_s - b;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pnegate(const Packet1cd& a) {
+EIGEN_STRONG_INLINE Packet1cd pnegate(const Packet1cd& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return -a;
+  return -a_m_per_s;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pconj(const Packet1cd& a) {
+EIGEN_STRONG_INLINE Packet1cd pconj(const Packet1cd& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return a.conjugate();
+  return a_m_per_s.conjugate();
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pmul<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd pmul<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return a * b;
+  return a_m_per_s * b;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pand<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd pand<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet1cd(pand(a.v, b.v));
+  return Packet1cd(pand(a_m_per_s.v, b.v));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd por<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd por<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet1cd(por(a.v, b.v));
+  return Packet1cd(por(a_m_per_s.v, b.v));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pxor<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd pxor<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet1cd(pxor(a.v, b.v));
+  return Packet1cd(pxor(a_m_per_s.v, b.v));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pandnot<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd pandnot<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return Packet1cd(pandnot(a.v, b.v));
+  return Packet1cd(pandnot(a_m_per_s.v, b.v));
 }
 
 template <>
@@ -581,40 +581,40 @@ EIGEN_DEVICE_FUNC inline void pscatter<std::complex<double>, Packet1cd>(std::com
 }
 
 template <>
-EIGEN_STRONG_INLINE std::complex<double> pfirst<Packet1cd>(const Packet1cd& a) {
+EIGEN_STRONG_INLINE std::complex<double> pfirst<Packet1cd>(const Packet1cd& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return std::complex<double>(a.v[0], a.v[1]);
+  return std::complex<double>(a_m_per_s.v[0], a_m_per_s.v[1]);
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd preverse(const Packet1cd& a) {
+EIGEN_STRONG_INLINE Packet1cd preverse(const Packet1cd& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return a;
+  return a_m_per_s;
 }
 
 template <>
-EIGEN_STRONG_INLINE std::complex<double> predux<Packet1cd>(const Packet1cd& a) {
+EIGEN_STRONG_INLINE std::complex<double> predux<Packet1cd>(const Packet1cd& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return pfirst(a);
+  return pfirst(a_m_per_s);
 }
 
 template <>
-EIGEN_STRONG_INLINE std::complex<double> predux_mul<Packet1cd>(const Packet1cd& a) {
+EIGEN_STRONG_INLINE std::complex<double> predux_mul<Packet1cd>(const Packet1cd& a_m_per_s) {
   EIGEN_MSA_DEBUG;
 
-  return pfirst(a);
+  return pfirst(a_m_per_s);
 }
 
 EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet1cd, Packet2d)
 
 template <>
-EIGEN_STRONG_INLINE Packet1cd pdiv<Packet1cd>(const Packet1cd& a, const Packet1cd& b) {
+EIGEN_STRONG_INLINE Packet1cd pdiv<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) {
   EIGEN_MSA_DEBUG;
 
-  return a / b;
+  return a_m_per_s / b;
 }
 
 EIGEN_STRONG_INLINE Packet1cd pcplxflip /*<Packet1cd>*/ (const Packet1cd& x) {
@@ -634,7 +634,7 @@ EIGEN_STRONG_INLINE void ptranspose(PacketBlock<Packet1cd, 2>& kernel) {
   Packet2d v1, v2;
 
   v1 = (Packet2d)__builtin_msa_ilvev_d((v2i64)kernel.packet[0].v, (v2i64)kernel.packet[1].v);
-  // Get the imag values of a
+  // Get the imag values of a_m_per_s
   v2 = (Packet2d)__builtin_msa_ilvod_d((v2i64)kernel.packet[0].v, (v2i64)kernel.packet[1].v);
 
   kernel.packet[0].v = v1;

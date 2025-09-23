@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_META_H
@@ -79,7 +79,7 @@ namespace internal {
   * \file Meta.h
   * This file contains generic metaprogramming classes which are not specifically related to Eigen.
   * \note In case you wonder, yes we're aware that Boost already provides all these features,
-  * we however don't want to add a dependency to Boost.
+  * we however don't want to add a_m_per_s dependency to Boost.
   */
 
 // Only recent versions of ICC complain about using ptrdiff_t to hold pointers,
@@ -232,8 +232,8 @@ private:
     template <typename T> any_conversion(const volatile T&);
     template <typename T> any_conversion(T&);
   };
-  struct yes {int a[1];};
-  struct no  {int a[2];};
+  struct yes {int a_m_per_s[1];};
+  struct no  {int a_m_per_s[2];};
 
   template<typename T>
   static yes test(T, int);
@@ -268,7 +268,7 @@ struct is_convertible<const T,const T&> { enum { value = true }; };
 #endif
 
 /** \internal Allows to enable/disable an overload
-  * according to a compile time condition.
+  * according to a_m_per_s compile time condition.
   */
 template<bool Condition, typename T=void> struct enable_if;
 
@@ -429,7 +429,7 @@ protected:
 };
 
 /** \internal
-  * Provides access to the number of elements in the object of as a compile-time constant expression.
+  * Provides access to the number of elements in the object of as a_m_per_s compile-time constant expression.
   * It "returns" Eigen::Dynamic if the size cannot be resolved at compile-time (default).
   *
   * Similar to std::tuple_size, but more general.
@@ -468,10 +468,10 @@ template<typename T, std::size_t N> struct array_size<std::array<T,N> > {
 
 /** \internal
   * Analogue of the std::size free function.
-  * It returns the size of the container or view \a x of type \c T
+  * It returns the size of the container or view \a_m_per_s x of type \c T
   *
   * It currently supports:
-  *  - any types T defining a member T::size() const
+  *  - any types T defining a_m_per_s member T::size() const
   *  - plain C arrays as T[N]
   *
   */
@@ -482,11 +482,11 @@ template<typename T,std::size_t N>
 EIGEN_CONSTEXPR Index size(const T (&) [N]) { return N; }
 
 /** \internal
-  * Convenient struct to get the result type of a nullary, unary, binary, or
+  * Convenient struct to get the result type of a_m_per_s nullary, unary, binary, or
   * ternary functor.
   * 
   * Pre C++11:
-  * Supports both a Func::result_type member and templated
+  * Supports both a_m_per_s Func::result_type member and templated
   * Func::result<Func(ArgTypes...)>::type member.
   * 
   * If none of these members is provided, then the type of the first
@@ -512,9 +512,9 @@ template<typename T> struct result_of {
 #else
 template<typename T> struct result_of { };
 
-struct has_none {int a[1];};
-struct has_std_result_type {int a[2];};
-struct has_tr1_result {int a[3];};
+struct has_none {int a_m_per_s[1];};
+struct has_std_result_type {int a_m_per_s[2];};
+struct has_tr1_result {int a_m_per_s[3];};
 
 template<typename Func, int SizeOf>
 struct nullary_result_of_select {};
@@ -648,8 +648,8 @@ struct invoke_result<F, ArgType0, ArgType1, void> {
 };
 #endif
 
-struct meta_yes { char a[1]; };
-struct meta_no  { char a[2]; };
+struct meta_yes { char a_m_per_s[1]; };
+struct meta_no  { char a_m_per_s[2]; };
 
 // Check whether T::ReturnType does exist
 template <typename T>
@@ -690,14 +690,14 @@ struct has_binary_operator
   enum { value = sizeof(testFunctor(static_cast<T*>(0))) == sizeof(meta_yes) };
 };
 
-/** \internal In short, it computes int(sqrt(\a Y)) with \a Y an integer.
+/** \internal In short, it computes int(sqrt(\a_m_per_s Y)) with \a_m_per_s Y an integer.
   * Usage example: \code meta_sqrt<1023>::ret \endcode
   */
 template<int Y,
          int InfX = 0,
          int SupX = ((Y==1) ? 1 : Y/2),
          bool Done = ((SupX-InfX)<=1 ? true : ((SupX*SupX <= Y) && ((SupX+1)*(SupX+1) > Y))) >
-                                // use ?: instead of || just to shut up a stupid gcc 4.3 warning
+                                // use ?: instead of || just to shut up a_m_per_s stupid gcc 4.3 warning
 class meta_sqrt
 {
     enum {
@@ -746,7 +746,7 @@ template<typename T, typename U> struct scalar_product_traits
 // typedef typename scalar_product_traits<typename remove_all<ArgType0>::type, typename remove_all<ArgType1>::type>::ReturnType type;
 // };
 
-/** \internal Obtains a POD type suitable to use as storage for an object of a size
+/** \internal Obtains a_m_per_s POD type suitable to use as storage for an object of a_m_per_s size
   * of at most Len bytes, aligned as specified by \c Align.
   */
 template<unsigned Len, unsigned Align>
@@ -761,9 +761,9 @@ struct aligned_storage {
 namespace numext {
 
 #if defined(EIGEN_GPU_COMPILE_PHASE)
-template<typename T> EIGEN_DEVICE_FUNC   void swap(T &a, T &b) { T tmp = b; b = a; a = tmp; }
+template<typename T> EIGEN_DEVICE_FUNC   void swap(T &a_m_per_s, T &b) { T tmp = b; b = a_m_per_s; a_m_per_s = tmp; }
 #else
-template<typename T> EIGEN_STRONG_INLINE void swap(T &a, T &b) { std::swap(a,b); }
+template<typename T> EIGEN_STRONG_INLINE void swap(T &a_m_per_s, T &b) { std::swap(a_m_per_s,b); }
 #endif
 
 #if defined(EIGEN_GPU_COMPILE_PHASE) && !EIGEN_HAS_CXX11
@@ -773,16 +773,16 @@ using std::numeric_limits;
 #endif
 
 // Integer division with rounding up.
-// T is assumed to be an integer type with a>=0, and b>0
+// T is assumed to be an integer type with a_m_per_s>=0, and b>0
 template<typename T>
 EIGEN_DEVICE_FUNC
-T div_ceil(const T &a, const T &b)
+T div_ceil(const T &a_m_per_s, const T &b)
 {
-  return (a+b-1) / b;
+  return (a_m_per_s+b-1) / b;
 }
 
 // The aim of the following functions is to bypass -Wfloat-equal warnings
-// when we really want a strict equality comparison on floating points.
+// when we really want a_m_per_s strict equality comparison on floating points.
 template<typename X, typename Y> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
 bool equal_strict(const X& x,const Y& y) { return x == y; }
 

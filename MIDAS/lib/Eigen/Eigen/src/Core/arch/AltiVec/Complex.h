@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010-2016 Konstantinos Margaritis <markos@freevec.org>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLEX32_ALTIVEC_H
@@ -30,22 +30,22 @@ static Packet2ul  p2ul_CONJ_XOR2 = (Packet2ul) vec_sld((Packet4ui) p2d_MZERO, (P
 struct Packet2cf
 {
   EIGEN_STRONG_INLINE explicit Packet2cf() {}
-  EIGEN_STRONG_INLINE explicit Packet2cf(const Packet4f& a) : v(a) {}
+  EIGEN_STRONG_INLINE explicit Packet2cf(const Packet4f& a_m_per_s) : v(a_m_per_s) {}
 
-  EIGEN_STRONG_INLINE Packet2cf pmul(const Packet2cf& a, const Packet2cf& b)
+  EIGEN_STRONG_INLINE Packet2cf pmul(const Packet2cf& a_m_per_s, const Packet2cf& b)
   {
     Packet4f v1, v2;
 
-    // Permute and multiply the real parts of a and b
-    v1 = vec_perm(a.v, a.v, p16uc_PSET32_WODD);
-    // Get the imaginary parts of a
-    v2 = vec_perm(a.v, a.v, p16uc_PSET32_WEVEN);
+    // Permute and multiply the real parts of a_m_per_s and b
+    v1 = vec_perm(a_m_per_s.v, a_m_per_s.v, p16uc_PSET32_WODD);
+    // Get the imaginary parts of a_m_per_s
+    v2 = vec_perm(a_m_per_s.v, a_m_per_s.v, p16uc_PSET32_WEVEN);
     // multiply a_re * b
     v1 = vec_madd(v1, b.v, p4f_ZERO);
     // multiply a_im * b and get the conjugate result
     v2 = vec_madd(v2, b.v, p4f_ZERO);
     v2 = reinterpret_cast<Packet4f>(pxor(v2, reinterpret_cast<Packet4f>(p4ui_CONJ_XOR)));
-    // permute back to a proper order
+    // permute back to a_m_per_s proper order
     v2 = vec_perm(v2, v2, p16uc_COMPLEX32_REV);
 
     return Packet2cf(padd<Packet4f>(v1, v2));
@@ -161,57 +161,57 @@ template<> EIGEN_DEVICE_FUNC inline void pscatter<std::complex<float>, Packet2cf
   to[1*stride] = af[1];
 }
 
-template<> EIGEN_STRONG_INLINE Packet2cf padd<Packet2cf>(const Packet2cf& a, const Packet2cf& b) { return Packet2cf(a.v + b.v); }
-template<> EIGEN_STRONG_INLINE Packet2cf psub<Packet2cf>(const Packet2cf& a, const Packet2cf& b) { return Packet2cf(a.v - b.v); }
-template<> EIGEN_STRONG_INLINE Packet2cf pnegate(const Packet2cf& a) { return Packet2cf(pnegate(a.v)); }
-template<> EIGEN_STRONG_INLINE Packet2cf pconj(const Packet2cf& a) { return Packet2cf(pxor<Packet4f>(a.v, reinterpret_cast<Packet4f>(p4ui_CONJ_XOR))); }
+template<> EIGEN_STRONG_INLINE Packet2cf padd<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) { return Packet2cf(a_m_per_s.v + b.v); }
+template<> EIGEN_STRONG_INLINE Packet2cf psub<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) { return Packet2cf(a_m_per_s.v - b.v); }
+template<> EIGEN_STRONG_INLINE Packet2cf pnegate(const Packet2cf& a_m_per_s) { return Packet2cf(pnegate(a_m_per_s.v)); }
+template<> EIGEN_STRONG_INLINE Packet2cf pconj(const Packet2cf& a_m_per_s) { return Packet2cf(pxor<Packet4f>(a_m_per_s.v, reinterpret_cast<Packet4f>(p4ui_CONJ_XOR))); }
 
-template<> EIGEN_STRONG_INLINE Packet2cf pand   <Packet2cf>(const Packet2cf& a, const Packet2cf& b) { return Packet2cf(pand<Packet4f>(a.v, b.v)); }
-template<> EIGEN_STRONG_INLINE Packet2cf por    <Packet2cf>(const Packet2cf& a, const Packet2cf& b) { return Packet2cf(por<Packet4f>(a.v, b.v)); }
-template<> EIGEN_STRONG_INLINE Packet2cf pxor   <Packet2cf>(const Packet2cf& a, const Packet2cf& b) { return Packet2cf(pxor<Packet4f>(a.v, b.v)); }
-template<> EIGEN_STRONG_INLINE Packet2cf pandnot<Packet2cf>(const Packet2cf& a, const Packet2cf& b) { return Packet2cf(pandnot<Packet4f>(a.v, b.v)); }
+template<> EIGEN_STRONG_INLINE Packet2cf pand   <Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) { return Packet2cf(pand<Packet4f>(a_m_per_s.v, b.v)); }
+template<> EIGEN_STRONG_INLINE Packet2cf por    <Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) { return Packet2cf(por<Packet4f>(a_m_per_s.v, b.v)); }
+template<> EIGEN_STRONG_INLINE Packet2cf pxor   <Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) { return Packet2cf(pxor<Packet4f>(a_m_per_s.v, b.v)); }
+template<> EIGEN_STRONG_INLINE Packet2cf pandnot<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b) { return Packet2cf(pandnot<Packet4f>(a_m_per_s.v, b.v)); }
 
 template<> EIGEN_STRONG_INLINE void prefetch<std::complex<float> >(const std::complex<float> * addr)    { EIGEN_PPC_PREFETCH(addr); }
 
-template<> EIGEN_STRONG_INLINE std::complex<float>  pfirst<Packet2cf>(const Packet2cf& a)
+template<> EIGEN_STRONG_INLINE std::complex<float>  pfirst<Packet2cf>(const Packet2cf& a_m_per_s)
 {
   EIGEN_ALIGN16 std::complex<float> res[2];
-  pstore((float *)&res, a.v);
+  pstore((float *)&res, a_m_per_s.v);
 
   return res[0];
 }
 
-template<> EIGEN_STRONG_INLINE Packet2cf preverse(const Packet2cf& a)
+template<> EIGEN_STRONG_INLINE Packet2cf preverse(const Packet2cf& a_m_per_s)
 {
   Packet4f rev_a;
-  rev_a = vec_perm(a.v, a.v, p16uc_COMPLEX32_REV2);
+  rev_a = vec_perm(a_m_per_s.v, a_m_per_s.v, p16uc_COMPLEX32_REV2);
   return Packet2cf(rev_a);
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<float> predux<Packet2cf>(const Packet2cf& a)
+template<> EIGEN_STRONG_INLINE std::complex<float> predux<Packet2cf>(const Packet2cf& a_m_per_s)
 {
   Packet4f b;
-  b = vec_sld(a.v, a.v, 8);
-  b = padd<Packet4f>(a.v, b);
+  b = vec_sld(a_m_per_s.v, a_m_per_s.v, 8);
+  b = padd<Packet4f>(a_m_per_s.v, b);
   return pfirst<Packet2cf>(Packet2cf(b));
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<float> predux_mul<Packet2cf>(const Packet2cf& a)
+template<> EIGEN_STRONG_INLINE std::complex<float> predux_mul<Packet2cf>(const Packet2cf& a_m_per_s)
 {
   Packet4f b;
   Packet2cf prod;
-  b = vec_sld(a.v, a.v, 8);
-  prod = pmul<Packet2cf>(a, Packet2cf(b));
+  b = vec_sld(a_m_per_s.v, a_m_per_s.v, 8);
+  prod = pmul<Packet2cf>(a_m_per_s, Packet2cf(b));
 
   return pfirst<Packet2cf>(prod);
 }
 
 EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet2cf,Packet4f)
 
-template<> EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a, const Packet2cf& b)
+template<> EIGEN_STRONG_INLINE Packet2cf pdiv<Packet2cf>(const Packet2cf& a_m_per_s, const Packet2cf& b)
 {
   // TODO optimize it for AltiVec
-  Packet2cf res = pmul(a, pconj(b));
+  Packet2cf res = pmul(a_m_per_s, pconj(b));
   Packet4f s = pmul<Packet4f>(b.v, b.v);
   return Packet2cf(pdiv(res.v, padd<Packet4f>(s, vec_perm(s, s, p16uc_COMPLEX32_REV))));
 }
@@ -228,8 +228,8 @@ EIGEN_STRONG_INLINE void ptranspose(PacketBlock<Packet2cf,2>& kernel)
   kernel.packet[0].v = tmp;
 }
 
-template<> EIGEN_STRONG_INLINE Packet2cf pcmp_eq(const Packet2cf& a, const Packet2cf& b) {
-  Packet4f eq = reinterpret_cast<Packet4f>(vec_cmpeq(a.v,b.v));
+template<> EIGEN_STRONG_INLINE Packet2cf pcmp_eq(const Packet2cf& a_m_per_s, const Packet2cf& b) {
+  Packet4f eq = reinterpret_cast<Packet4f>(vec_cmpeq(a_m_per_s.v,b.v));
   return Packet2cf(vec_and(eq, vec_perm(eq, eq, p16uc_COMPLEX32_REV)));
 }
 
@@ -241,9 +241,9 @@ template<> EIGEN_STRONG_INLINE Packet2cf pblend(const Selector<2>& ifPacket, con
 }
 #endif
 
-template<> EIGEN_STRONG_INLINE Packet2cf psqrt<Packet2cf>(const Packet2cf& a)
+template<> EIGEN_STRONG_INLINE Packet2cf psqrt<Packet2cf>(const Packet2cf& a_m_per_s)
 {
-  return psqrt_complex<Packet2cf>(a);
+  return psqrt_complex<Packet2cf>(a_m_per_s);
 }
 
 //---------- double ----------
@@ -251,16 +251,16 @@ template<> EIGEN_STRONG_INLINE Packet2cf psqrt<Packet2cf>(const Packet2cf& a)
 struct Packet1cd
 {
   EIGEN_STRONG_INLINE Packet1cd() {}
-  EIGEN_STRONG_INLINE explicit Packet1cd(const Packet2d& a) : v(a) {}
+  EIGEN_STRONG_INLINE explicit Packet1cd(const Packet2d& a_m_per_s) : v(a_m_per_s) {}
 
-  EIGEN_STRONG_INLINE Packet1cd pmul(const Packet1cd& a, const Packet1cd& b)
+  EIGEN_STRONG_INLINE Packet1cd pmul(const Packet1cd& a_m_per_s, const Packet1cd& b)
   {
     Packet2d a_re, a_im, v1, v2;
 
-    // Permute and multiply the real parts of a and b
-    a_re = vec_perm(a.v, a.v, p16uc_PSET64_HI);
-    // Get the imaginary parts of a
-    a_im = vec_perm(a.v, a.v, p16uc_PSET64_LO);
+    // Permute and multiply the real parts of a_m_per_s and b
+    a_re = vec_perm(a_m_per_s.v, a_m_per_s.v, p16uc_PSET64_HI);
+    // Get the imaginary parts of a_m_per_s
+    a_im = vec_perm(a_m_per_s.v, a_m_per_s.v, p16uc_PSET64_LO);
     // multiply a_re * b
     v1 = vec_madd(a_re, b.v, p2d_ZERO);
     // multiply a_im * b and get the conjugate result
@@ -343,40 +343,40 @@ template<> EIGEN_DEVICE_FUNC inline void pscatter<std::complex<double>, Packet1c
   pstore<std::complex<double> >(to, from);
 }
 
-template<> EIGEN_STRONG_INLINE Packet1cd padd<Packet1cd>(const Packet1cd& a, const Packet1cd& b) { return Packet1cd(a.v + b.v); }
-template<> EIGEN_STRONG_INLINE Packet1cd psub<Packet1cd>(const Packet1cd& a, const Packet1cd& b) { return Packet1cd(a.v - b.v); }
-template<> EIGEN_STRONG_INLINE Packet1cd pnegate(const Packet1cd& a) { return Packet1cd(pnegate(Packet2d(a.v))); }
-template<> EIGEN_STRONG_INLINE Packet1cd pconj(const Packet1cd& a) { return Packet1cd(pxor(a.v, reinterpret_cast<Packet2d>(p2ul_CONJ_XOR2))); }
+template<> EIGEN_STRONG_INLINE Packet1cd padd<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) { return Packet1cd(a_m_per_s.v + b.v); }
+template<> EIGEN_STRONG_INLINE Packet1cd psub<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) { return Packet1cd(a_m_per_s.v - b.v); }
+template<> EIGEN_STRONG_INLINE Packet1cd pnegate(const Packet1cd& a_m_per_s) { return Packet1cd(pnegate(Packet2d(a_m_per_s.v))); }
+template<> EIGEN_STRONG_INLINE Packet1cd pconj(const Packet1cd& a_m_per_s) { return Packet1cd(pxor(a_m_per_s.v, reinterpret_cast<Packet2d>(p2ul_CONJ_XOR2))); }
 
-template<> EIGEN_STRONG_INLINE Packet1cd pand   <Packet1cd>(const Packet1cd& a, const Packet1cd& b) { return Packet1cd(pand(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet1cd por    <Packet1cd>(const Packet1cd& a, const Packet1cd& b) { return Packet1cd(por(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet1cd pxor   <Packet1cd>(const Packet1cd& a, const Packet1cd& b) { return Packet1cd(pxor(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet1cd pandnot<Packet1cd>(const Packet1cd& a, const Packet1cd& b) { return Packet1cd(pandnot(a.v, b.v)); }
+template<> EIGEN_STRONG_INLINE Packet1cd pand   <Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) { return Packet1cd(pand(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet1cd por    <Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) { return Packet1cd(por(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet1cd pxor   <Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) { return Packet1cd(pxor(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet1cd pandnot<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b) { return Packet1cd(pandnot(a_m_per_s.v, b.v)); }
 
 template<> EIGEN_STRONG_INLINE Packet1cd ploaddup<Packet1cd>(const std::complex<double>*     from)  { return pset1<Packet1cd>(*from); }
 
 template<> EIGEN_STRONG_INLINE void prefetch<std::complex<double> >(const std::complex<double> * addr)    { EIGEN_PPC_PREFETCH(addr); }
 
-template<> EIGEN_STRONG_INLINE std::complex<double>  pfirst<Packet1cd>(const Packet1cd& a)
+template<> EIGEN_STRONG_INLINE std::complex<double>  pfirst<Packet1cd>(const Packet1cd& a_m_per_s)
 {
   EIGEN_ALIGN16 std::complex<double> res[2];
-  pstore<std::complex<double> >(res, a);
+  pstore<std::complex<double> >(res, a_m_per_s);
 
   return res[0];
 }
 
-template<> EIGEN_STRONG_INLINE Packet1cd preverse(const Packet1cd& a) { return a; }
+template<> EIGEN_STRONG_INLINE Packet1cd preverse(const Packet1cd& a_m_per_s) { return a_m_per_s; }
 
-template<> EIGEN_STRONG_INLINE std::complex<double> predux<Packet1cd>(const Packet1cd& a) { return pfirst(a); }
+template<> EIGEN_STRONG_INLINE std::complex<double> predux<Packet1cd>(const Packet1cd& a_m_per_s) { return pfirst(a_m_per_s); }
 
-template<> EIGEN_STRONG_INLINE std::complex<double> predux_mul<Packet1cd>(const Packet1cd& a) { return pfirst(a); }
+template<> EIGEN_STRONG_INLINE std::complex<double> predux_mul<Packet1cd>(const Packet1cd& a_m_per_s) { return pfirst(a_m_per_s); }
 
 EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet1cd,Packet2d)
 
-template<> EIGEN_STRONG_INLINE Packet1cd pdiv<Packet1cd>(const Packet1cd& a, const Packet1cd& b)
+template<> EIGEN_STRONG_INLINE Packet1cd pdiv<Packet1cd>(const Packet1cd& a_m_per_s, const Packet1cd& b)
 {
   // TODO optimize it for AltiVec
-  Packet1cd res = pmul(a,pconj(b));
+  Packet1cd res = pmul(a_m_per_s,pconj(b));
   Packet2d s = pmul<Packet2d>(b.v, b.v);
   return Packet1cd(pdiv(res.v, padd<Packet2d>(s, vec_perm(s, s, p16uc_REVERSE64))));
 }
@@ -393,20 +393,20 @@ EIGEN_STRONG_INLINE void ptranspose(PacketBlock<Packet1cd,2>& kernel)
   kernel.packet[0].v = tmp;
 }
 
-template<> EIGEN_STRONG_INLINE Packet1cd pcmp_eq(const Packet1cd& a, const Packet1cd& b) {
-  // Compare real and imaginary parts of a and b to get the mask vector:
-  // [re(a)==re(b), im(a)==im(b)]
-  Packet2d eq = reinterpret_cast<Packet2d>(vec_cmpeq(a.v,b.v));
+template<> EIGEN_STRONG_INLINE Packet1cd pcmp_eq(const Packet1cd& a_m_per_s, const Packet1cd& b) {
+  // Compare real and imaginary parts of a_m_per_s and b to get the mask vector:
+  // [re(a_m_per_s)==re(b), im(a_m_per_s)==im(b)]
+  Packet2d eq = reinterpret_cast<Packet2d>(vec_cmpeq(a_m_per_s.v,b.v));
   // Swap real/imag elements in the mask in to get:
-  // [im(a)==im(b), re(a)==re(b)]
+  // [im(a_m_per_s)==im(b), re(a_m_per_s)==re(b)]
   Packet2d eq_swapped = reinterpret_cast<Packet2d>(vec_sld(reinterpret_cast<Packet4ui>(eq), reinterpret_cast<Packet4ui>(eq), 8));
-  // Return re(a)==re(b) & im(a)==im(b) by computing bitwise AND of eq and eq_swapped
+  // Return re(a_m_per_s)==re(b) & im(a_m_per_s)==im(b) by computing bitwise AND of eq and eq_swapped
   return Packet1cd(vec_and(eq, eq_swapped));
 }
 
-template<> EIGEN_STRONG_INLINE Packet1cd psqrt<Packet1cd>(const Packet1cd& a)
+template<> EIGEN_STRONG_INLINE Packet1cd psqrt<Packet1cd>(const Packet1cd& a_m_per_s)
 {
-  return psqrt_complex<Packet1cd>(a);
+  return psqrt_complex<Packet1cd>(a_m_per_s);
 }
 
 #endif // __VSX__

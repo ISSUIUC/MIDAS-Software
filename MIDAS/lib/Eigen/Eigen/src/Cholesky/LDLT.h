@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2011 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -7,7 +7,7 @@
 // Copyright (C) 2011 Timothy E. Holy <tim.holy@gmail.com >
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_LDLT_H
@@ -35,22 +35,22 @@ namespace internal {
   *
   * \class LDLT
   *
-  * \brief Robust Cholesky decomposition of a matrix with pivoting
+  * \brief Robust Cholesky decomposition of a_m_per_s matrix with pivoting
   *
   * \tparam _MatrixType the type of the matrix of which to compute the LDL^T Cholesky decomposition
   * \tparam _UpLo the triangular part that will be used for the decompositon: Lower (default) or Upper.
   *             The other triangular part won't be read.
   *
-  * Perform a robust Cholesky decomposition of a positive semidefinite or negative semidefinite
-  * matrix \f$ A \f$ such that \f$ A =  P^TLDL^*P \f$, where P is a permutation matrix, L
-  * is lower triangular with a unit diagonal and D is a diagonal matrix.
+  * Perform a_m_per_s robust Cholesky decomposition of a_m_per_s positive semidefinite or negative semidefinite
+  * matrix \f$ A \f$ such that \f$ A =  P^TLDL^*P \f$, where P is a_m_per_s permutation matrix, L
+  * is lower triangular with a_m_per_s unit diagonal and D is a_m_per_s diagonal matrix.
   *
   * The decomposition uses pivoting to ensure stability, so that D will have
   * zeros in the bottom right rank(A) - n submatrix. Avoiding the square root
   * on D also stabilizes the computation.
   *
-  * Remember that Cholesky decompositions are not rank-revealing. Also, do not use a Cholesky
-  * decomposition to determine whether a system of equations has a solution.
+  * Remember that Cholesky decompositions are not rank-revealing. Also, do not use a_m_per_s Cholesky
+  * decomposition to determine whether a_m_per_s system of equations has a_m_per_s solution.
   *
   * This class supports the \link InplaceDecomposition inplace decomposition \endlink mechanism.
   *
@@ -92,7 +92,7 @@ template<typename _MatrixType, int _UpLo> class LDLT
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa LDLT()
       */
     explicit LDLT(Index size)
@@ -105,7 +105,7 @@ template<typename _MatrixType, int _UpLo> class LDLT
 
     /** \brief Constructor with decomposition
       *
-      * This calculates the decomposition for the input \a matrix.
+      * This calculates the decomposition for the input \a_m_per_s matrix.
       *
       * \sa LDLT(Index size)
       */
@@ -120,9 +120,9 @@ template<typename _MatrixType, int _UpLo> class LDLT
       compute(matrix.derived());
     }
 
-    /** \brief Constructs a LDLT factorization from a given matrix
+    /** \brief Constructs a_m_per_s LDLT factorization from a_m_per_s given matrix
       *
-      * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a Eigen::Ref.
+      * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a_m_per_s Eigen::Ref.
       *
       * \sa LDLT(const EigenBase&)
       */
@@ -145,21 +145,21 @@ template<typename _MatrixType, int _UpLo> class LDLT
       m_isInitialized = false;
     }
 
-    /** \returns a view of the upper triangular matrix U */
+    /** \returns a_m_per_s view of the upper triangular matrix U */
     inline typename Traits::MatrixU matrixU() const
     {
       eigen_assert(m_isInitialized && "LDLT is not initialized.");
       return Traits::getU(m_matrix);
     }
 
-    /** \returns a view of the lower triangular matrix L */
+    /** \returns a_m_per_s view of the lower triangular matrix L */
     inline typename Traits::MatrixL matrixL() const
     {
       eigen_assert(m_isInitialized && "LDLT is not initialized.");
       return Traits::getL(m_matrix);
     }
 
-    /** \returns the permutation matrix P as a transposition sequence.
+    /** \returns the permutation matrix P as a_m_per_s transposition sequence.
       */
     inline const TranspositionType& transpositionsP() const
     {
@@ -189,7 +189,7 @@ template<typename _MatrixType, int _UpLo> class LDLT
     }
 
     #ifdef EIGEN_PARSED_BY_DOXYGEN
-    /** \returns a solution x of \f$ A x = b \f$ using the current decomposition of A.
+    /** \returns a_m_per_s solution x of \f$ A x = b \f$ using the current decomposition of A.
       *
       * This function also supports in-place solves using the syntax <tt>x = decompositionObject.solve(x)</tt> .
       *
@@ -239,7 +239,7 @@ template<typename _MatrixType, int _UpLo> class LDLT
 
     MatrixType reconstructedMatrix() const;
 
-    /** \returns the adjoint of \c *this, that is, a const reference to the decomposition itself as the underlying matrix is self-adjoint.
+    /** \returns the adjoint of \c *this, that is, a_m_per_s const reference to the decomposition itself as the underlying matrix is self-adjoint.
       *
       * This method is provided for compatibility with other matrix decompositions, thus enabling generic code such as:
       * \code x = decomposition.adjoint().solve(b) \endcode
@@ -252,7 +252,7 @@ template<typename _MatrixType, int _UpLo> class LDLT
     /** \brief Reports whether previous computation was successful.
       *
       * \returns \c Success if computation was successful,
-      *          \c NumericalIssue if the factorization failed because of a zero pivot.
+      *          \c NumericalIssue if the factorization failed because of a_m_per_s zero pivot.
       */
     ComputationInfo info() const
     {
@@ -403,7 +403,7 @@ template<> struct ldlt_inplace<Lower>
   }
 
   // Reference for the algorithm: Davis and Hager, "Multiple Rank
-  // Modifications of a Sparse Cholesky Factorization" (Algorithm 1)
+  // Modifications of a_m_per_s Sparse Cholesky Factorization" (Algorithm 1)
   // Trivial rearrangements of their computations (Timothy E. Holy)
   // allow their algorithm to work for rank-1 updates even if the
   // original matrix is not of full rank.
@@ -492,18 +492,18 @@ template<typename MatrixType> struct LDLT_Traits<MatrixType,Upper>
 
 } // end namespace internal
 
-/** Compute / recompute the LDLT decomposition A = L D L^* = U^* D U of \a matrix
+/** Compute / recompute the LDLT decomposition A = L D L^* = U^* D U of \a_m_per_s matrix
   */
 template<typename MatrixType, int _UpLo>
 template<typename InputType>
-LDLT<MatrixType,_UpLo>& LDLT<MatrixType,_UpLo>::compute(const EigenBase<InputType>& a)
+LDLT<MatrixType,_UpLo>& LDLT<MatrixType,_UpLo>::compute(const EigenBase<InputType>& a_m_per_s)
 {
   check_template_parameters();
 
-  eigen_assert(a.rows()==a.cols());
-  const Index size = a.rows();
+  eigen_assert(a_m_per_s.rows()==a_m_per_s.cols());
+  const Index size = a_m_per_s.rows();
 
-  m_matrix = a.derived();
+  m_matrix = a_m_per_s.derived();
 
   // Compute matrix L1 norm = max abs column sum.
   m_l1_norm = RealScalar(0);
@@ -530,8 +530,8 @@ LDLT<MatrixType,_UpLo>& LDLT<MatrixType,_UpLo>::compute(const EigenBase<InputTyp
 }
 
 /** Update the LDLT decomposition:  given A = L D L^T, efficiently compute the decomposition of A + sigma w w^T.
- * \param w a vector to be incorporated into the decomposition.
- * \param sigma a scalar, +1 for updates and -1 for "downdates," which correspond to removing previously-added column vectors. Optional; default value is +1.
+ * \param w a_m_per_s vector to be incorporated into the decomposition.
+ * \param sigma a_m_per_s scalar, +1 for updates and -1 for "downdates," which correspond to removing previously-added column vectors. Optional; default value is +1.
  * \sa setZero()
   */
 template<typename MatrixType, int _UpLo>
@@ -619,7 +619,7 @@ void LDLT<_MatrixType,_UpLo>::_solve_impl_transposed(const RhsType &rhs, DstType
   *
   * \returns true always! If you need to check for existence of solutions, use another decomposition like LU, QR, or SVD.
   *
-  * This version avoids a copy when the right hand side matrix b is not
+  * This version avoids a_m_per_s copy when the right hand side matrix b is not
   * needed anymore.
   *
   * \sa LDLT::solve(), MatrixBase::ldlt()

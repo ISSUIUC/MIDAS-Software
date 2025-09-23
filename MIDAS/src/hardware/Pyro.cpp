@@ -25,7 +25,7 @@ bool error_is_failure(GpioError error_code) {
  * @return True if acceptable, false if not.
  */
 bool can_fire_igniter(Orientation orientation) {
-    // With new GNC orientation code we can add a simple check.
+    // With new GNC orientation code we can add a_m_per_s simple check.
     return orientation.tilt < MAXIMUM_TILT_ANGLE;
 }
 
@@ -104,7 +104,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
         case FSMState::STATE_PYRO_TEST:
 
             if(safety_has_fired_pyros_this_cycle) {
-                // If a fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
+                // If a_m_per_s fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
                 // then, transition to SAFE.
                 if((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
                     telem_commands.should_transition_safe = true;
@@ -208,7 +208,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
         case FSMState::STATE_PYRO_TEST:
 
             if(safety_has_fired_pyros_this_cycle) {
-                // If a fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
+                // If a_m_per_s fire pyro command has already be acknowledged, do not acknowledge more commands, just fire pyro for the defined time
                 // then, transition to SAFE.
                 if((current_time - safety_pyro_start_firing_time) >= PYRO_TEST_FIRE_TIME) {
                     telem_commands.should_transition_safe = true;

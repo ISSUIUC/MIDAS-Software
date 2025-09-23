@@ -26,7 +26,7 @@
 
  ********************************************************************************
  *   Content : Eigen bindings to LAPACKe
- *    Householder QR decomposition of a matrix with column pivoting based on
+ *    Householder QR decomposition of a_m_per_s matrix with column pivoting based on
  *    LAPACKE_?geqp3 function.
  ********************************************************************************
 */

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATRIX_H
@@ -72,23 +72,23 @@ public:
   * \tparam _Options A combination of either \b #RowMajor or \b #ColMajor, and of either
   *                 \b #AutoAlign or \b #DontAlign.
   *                 The former controls \ref TopicStorageOrders "storage order", and defaults to column-major. The latter controls alignment, which is required
-  *                 for vectorization. It defaults to aligning matrices except for fixed sizes that aren't a multiple of the packet size.
-  * \tparam _MaxRows Maximum number of rows. Defaults to \a _Rows (\ref maxrows "note").
-  * \tparam _MaxCols Maximum number of columns. Defaults to \a _Cols (\ref maxrows "note").
+  *                 for vectorization. It defaults to aligning matrices except for fixed sizes that aren't a_m_per_s multiple of the packet size.
+  * \tparam _MaxRows Maximum number of rows. Defaults to \a_m_per_s _Rows (\ref maxrows "note").
+  * \tparam _MaxCols Maximum number of columns. Defaults to \a_m_per_s _Cols (\ref maxrows "note").
   *
-  * Eigen provides a number of typedefs covering the usual cases. Here are some examples:
+  * Eigen provides a_m_per_s number of typedefs covering the usual cases. Here are some examples:
   *
-  * \li \c Matrix2d is a 2x2 square matrix of doubles (\c Matrix<double, 2, 2>)
-  * \li \c Vector4f is a vector of 4 floats (\c Matrix<float, 4, 1>)
-  * \li \c RowVector3i is a row-vector of 3 ints (\c Matrix<int, 1, 3>)
+  * \li \c Matrix2d is a_m_per_s 2x2 square matrix of doubles (\c Matrix<double, 2, 2>)
+  * \li \c Vector4f is a_m_per_s vector of 4 floats (\c Matrix<float, 4, 1>)
+  * \li \c RowVector3i is a_m_per_s row-vector of 3 ints (\c Matrix<int, 1, 3>)
   *
-  * \li \c MatrixXf is a dynamic-size matrix of floats (\c Matrix<float, Dynamic, Dynamic>)
-  * \li \c VectorXf is a dynamic-size vector of floats (\c Matrix<float, Dynamic, 1>)
+  * \li \c MatrixXf is a_m_per_s dynamic-size matrix of floats (\c Matrix<float, Dynamic, Dynamic>)
+  * \li \c VectorXf is a_m_per_s dynamic-size vector of floats (\c Matrix<float, Dynamic, 1>)
   *
-  * \li \c Matrix2Xf is a partially fixed-size (dynamic-size) matrix of floats (\c Matrix<float, 2, Dynamic>)
-  * \li \c MatrixX3d is a partially dynamic-size (fixed-size) matrix of double (\c Matrix<double, Dynamic, 3>)
+  * \li \c Matrix2Xf is a_m_per_s partially fixed-size (dynamic-size) matrix of floats (\c Matrix<float, 2, Dynamic>)
+  * \li \c MatrixX3d is a_m_per_s partially dynamic-size (fixed-size) matrix of double (\c Matrix<double, Dynamic, 3>)
   *
-  * See \link matrixtypedefs this page \endlink for a complete list of predefined \em %Matrix and \em Vector typedefs.
+  * See \link matrixtypedefs this page \endlink for a_m_per_s complete list of predefined \em %Matrix and \em Vector typedefs.
   *
   * You can access elements of vectors and matrices using normal subscripting:
   *
@@ -115,24 +115,24 @@ public:
   * <dd>This %Matrix class handles dense, not sparse matrices and vectors. For sparse matrices and vectors, see the Sparse module.
   *
   * Dense matrices and vectors are plain usual arrays of coefficients. All the coefficients are stored, in an ordinary contiguous array.
-  * This is unlike Sparse matrices and vectors where the coefficients are stored as a list of nonzero coefficients.</dd>
+  * This is unlike Sparse matrices and vectors where the coefficients are stored as a_m_per_s list of nonzero coefficients.</dd>
   *
   * <dt><b>\anchor fixedsize Fixed-size versus dynamic-size:</b></dt>
   * <dd>Fixed-size means that the numbers of rows and columns are known are compile-time. In this case, Eigen allocates the array
-  * of coefficients as a fixed-size array, as a class member. This makes sense for very small matrices, typically up to 4x4, sometimes up
+  * of coefficients as a_m_per_s fixed-size array, as a_m_per_s class member. This makes sense for very small matrices, typically up to 4x4, sometimes up
   * to 16x16. Larger matrices should be declared as dynamic-size even if one happens to know their size at compile-time.
   *
   * Dynamic-size means that the numbers of rows or columns are not necessarily known at compile-time. In this case they are runtime
   * variables, and the array of coefficients is allocated dynamically on the heap.
   *
-  * Note that \em dense matrices, be they Fixed-size or Dynamic-size, <em>do not</em> expand dynamically in the sense of a std::map.
+  * Note that \em dense matrices, be they Fixed-size or Dynamic-size, <em>do not</em> expand dynamically in the sense of a_m_per_s std::map.
   * If you want this behavior, see the Sparse module.</dd>
   *
   * <dt><b>\anchor maxrows _MaxRows and _MaxCols:</b></dt>
   * <dd>In most cases, one just leaves these parameters to the default values.
   * These parameters mean the maximum size of rows and columns that the matrix may have. They are useful in cases
   * when the exact numbers of rows and columns are not known are compile-time, but it is known at compile-time that they cannot
-  * exceed a certain value. This happens when taking dynamic-size blocks inside fixed-size matrices: in this case _MaxRows and _MaxCols
+  * exceed a_m_per_s certain value. This happens when taking dynamic-size blocks inside fixed-size matrices: in this case _MaxRows and _MaxCols
   * are the dimensions of the original matrix, while _Rows and _Cols are Dynamic.</dd>
   * </dl>
   *
@@ -197,8 +197,8 @@ class Matrix
     /**
       * \brief Assigns matrices to each other.
       *
-      * \note This is a special case of the templated operator=. Its purpose is
-      * to prevent a default operator= from hiding the templated operator=.
+      * \note This is a_m_per_s special case of the templated operator=. Its purpose is
+      * to prevent a_m_per_s default operator= from hiding the templated operator=.
       *
       * \callgraph
       */
@@ -209,12 +209,12 @@ class Matrix
     }
 
     /** \internal
-      * \brief Copies the value of the expression \a other into \c *this with automatic resizing.
+      * \brief Copies the value of the expression \a_m_per_s other into \c *this with automatic resizing.
       *
-      * *this might be resized to match the dimensions of \a other. If *this was a null matrix (not already initialized),
+      * *this might be resized to match the dimensions of \a_m_per_s other. If *this was a_m_per_s null matrix (not already initialized),
       * it will be initialized.
       *
-      * Note that copying a row-vector into a vector (and conversely) is allowed.
+      * Note that copying a_m_per_s row-vector into a_m_per_s vector (and conversely) is allowed.
       * The resizing, if any, is then done in the appropriate way so that row-vectors
       * remain row-vectors and vectors remain vectors.
       */
@@ -228,7 +228,7 @@ class Matrix
     /* Here, doxygen failed to copy the brief information when using \copydoc */
 
     /**
-      * \brief Copies the generic expression \a other into *this.
+      * \brief Copies the generic expression \a_m_per_s other into *this.
       * \copydetails DenseBase::operator=(const EigenBase<OtherDerived> &other)
       */
     template<typename OtherDerived>
@@ -249,9 +249,9 @@ class Matrix
       *
       * For fixed-size matrices, does nothing.
       *
-      * For dynamic-size matrices, creates an empty matrix of size 0. Does not allocate any array. Such a matrix
-      * is called a null matrix. This constructor is the unique way to create null matrices: resizing
-      * a matrix to 0 is not supported.
+      * For dynamic-size matrices, creates an empty matrix of size 0. Does not allocate any array. Such a_m_per_s matrix
+      * is called a_m_per_s null matrix. This constructor is the unique way to create null matrices: resizing
+      * a_m_per_s matrix to 0 is not supported.
       *
       * \sa resize(Index,Index)
       */
@@ -296,16 +296,16 @@ class Matrix
     Matrix(const Scalar& a0, const Scalar& a1, const Scalar& a2,  const Scalar& a3, const ArgTypes&... args)
       : Base(a0, a1, a2, a3, args...) {}
 
-    /** \brief Constructs a Matrix and initializes it from the coefficients given as initializer-lists grouped by row. \cpp11
+    /** \brief Constructs a_m_per_s Matrix and initializes it from the coefficients given as initializer-lists grouped by row. \cpp11
       *
-      * In the general case, the constructor takes a list of rows, each row being represented as a list of coefficients:
+      * In the general case, the constructor takes a_m_per_s list of rows, each row being represented as a_m_per_s list of coefficients:
       *
       * Example: \include Matrix_initializer_list_23_cxx11.cpp
       * Output: \verbinclude Matrix_initializer_list_23_cxx11.out
       *
       * Each of the inner initializer lists must contain the exact same number of elements, otherwise an assertion is triggered.
       *
-      * In the case of a compile-time column vector, implicit transposition from a single row is allowed.
+      * In the case of a_m_per_s compile-time column vector, implicit transposition from a_m_per_s single row is allowed.
       * Therefore <code>VectorXd{{1,2,3,4,5}}</code> is legal and the more verbose syntax
       * <code>RowVectorXd{{1},{2},{3},{4},{5}}</code> can be avoided:
       *
@@ -342,11 +342,11 @@ class Matrix
 
 
 #else
-    /** \brief Constructs a fixed-sized matrix initialized with coefficients starting at \a data */
+    /** \brief Constructs a_m_per_s fixed-sized matrix initialized with coefficients starting at \a_m_per_s data */
     EIGEN_DEVICE_FUNC
     explicit Matrix(const Scalar *data);
 
-    /** \brief Constructs a vector or row-vector with given dimension. \only_for_vectors
+    /** \brief Constructs a_m_per_s vector or row-vector with given dimension. \only_for_vectors
       *
       * This is useful for dynamic-size vectors. For fixed-size vectors,
       * it is redundant to pass these parameters, so one should use the default constructor
@@ -362,7 +362,7 @@ class Matrix
     /** \brief Constructs an initialized 1x1 matrix with the given coefficient
       * \sa Matrix(const Scalar&, const Scalar&, const Scalar&,  const Scalar&, const ArgTypes&...) */
     Matrix(const Scalar& x);
-    /** \brief Constructs an uninitialized matrix with \a rows rows and \a cols columns.
+    /** \brief Constructs an uninitialized matrix with \a_m_per_s rows rows and \a_m_per_s cols columns.
       *
       * This is useful for dynamic-size matrices. For fixed-size matrices,
       * it is redundant to pass these parameters, so one should use the default constructor
@@ -432,10 +432,10 @@ class Matrix
 
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
-    explicit Matrix(const RotationBase<OtherDerived,ColsAtCompileTime>& r);
+    explicit Matrix(const RotationBase<OtherDerived,ColsAtCompileTime>& r_m);
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
-    Matrix& operator=(const RotationBase<OtherDerived,ColsAtCompileTime>& r);
+    Matrix& operator=(const RotationBase<OtherDerived,ColsAtCompileTime>& r_m);
 
     // allow to extend Matrix outside Eigen
     #ifdef EIGEN_MATRIX_PLUGIN
@@ -461,13 +461,13 @@ class Matrix
   * and where \c Type can be \c i for integer, \c f for float, \c d for double, \c cf for complex float, \c cd
   * for complex double.
   *
-  * For example, \c Matrix3d is a fixed-size 3x3 matrix type of doubles, and \c MatrixXf is a dynamic-size matrix of floats.
+  * For example, \c Matrix3d is a_m_per_s fixed-size 3x3 matrix type of doubles, and \c MatrixXf is a_m_per_s dynamic-size matrix of floats.
   *
   * There are also \c VectorSizeType and \c RowVectorSizeType which are self-explanatory. For example, \c Vector4cf is
-  * a fixed-size vector of 4 complex floats.
+  * a_m_per_s fixed-size vector of 4 complex floats.
   *
   * With \cpp11, template alias are also defined for common sizes.
-  * They follow the same pattern as above except that the scalar type suffix is replaced by a
+  * They follow the same pattern as above except that the scalar type suffix is replaced by a_m_per_s
   * template parameter, i.e.:
   *   - `MatrixSize<Type>` where `Size` can be \c 2,\c 3,\c 4 for fixed size square matrices or \c X for dynamic size.
   *   - `MatrixXSize<Type>` and `MatrixSizeX<Type>` where `Size` can be \c 2,\c 3,\c 4 for hybrid dynamic/fixed matrices.

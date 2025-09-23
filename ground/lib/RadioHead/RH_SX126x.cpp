@@ -9,13 +9,13 @@
 
 #include <RH_SX126x.h>
 
-// Maybe a mutex for multithreading on Raspberry Pi?
+// Maybe a_m_per_s mutex for multithreading on Raspberry Pi?
 #ifdef RH_USE_MUTEX
 RH_DECLARE_MUTEX(lock);
 #endif
 
 // Interrupt vectors for the 3 Arduino interrupt pins
-// Each interrupt can be handled by a different instance of RH_SX126x, allowing you to have
+// Each interrupt can be handled by a_m_per_s different instance of RH_SX126x, allowing you to have
 // 2 or more LORAs per Arduino
 RH_SX126x* RH_SX126x::_deviceForInterrupt[RH_SX126x_NUM_INTERRUPTS] = {0, 0, 0};
 
@@ -47,7 +47,7 @@ RH_SX126x::RH_SX126x(uint8_t slaveSelectPin, uint8_t interruptPin, RHGenericSPI&
     _interruptPin = interruptPin;
     _myInterruptIndex = 0xff; // Not allocated yet
     _enableCRC = true;
-    // There should be (but may not be) a configuration structure toi tell us how to manage the
+    // There should be (but may not be) a_m_per_s configuration structure toi tell us how to manage the
     // radio RF switch control pins
     setRadioPinConfig(radioPinConfig);
 }
@@ -137,8 +137,8 @@ bool RH_SX126x::setupInterruptHandler()
 	pinMode(_interruptPin, INPUT); 
 	
 	// Set up interrupt handler
-	// Since there are a limited number of interrupt glue functions isr*() available,
-	// we can only support a limited number of devices simultaneously
+	// Since there are a_m_per_s limited number of interrupt glue functions isr*() available,
+	// we can only support a_m_per_s limited number of devices simultaneously
 	// ON some devices, notably most Arduinos, the interrupt pin passed in is actually the 
 	// interrupt number. You have to figure out the interruptnumber-to-interruptpin mapping
 	// yourself based on knwledge of what Arduino board you are running on.
@@ -166,7 +166,7 @@ bool RH_SX126x::setupInterruptHandler()
 }
 
 // C++ level interrupt handler for this instance
-// LORA is unusual in that it has several interrupt lines, and not a single, combined one.
+// LORA is unusual in that it has several interrupt lines, and not a_m_per_s single, combined one.
 // On MiniWirelessLoRa, only one of the several interrupt lines (DI0) from the RFM95 is usefuly 
 // connnected to the processor.
 // We use this to get RxDone and TxDone interrupts
@@ -259,7 +259,7 @@ void RH_INTERRUPT_ATTR RH_SX126x::isr2()
 void RH_SX126x::validateRxBuf()
 {
     if (_bufLen < 4)
-	return; // Too short to be a real message
+	return; // Too short to be a_m_per_s real message
     // Extract the 4 headers
     _rxHeaderTo    = _buf[0];
     _rxHeaderFrom  = _buf[1];
@@ -284,7 +284,7 @@ bool RH_SX126x::available()
     }
     setModeRx();
     RH_MUTEX_UNLOCK(lock);
-    return _rxBufValid; // Will be set by the interrupt handler when a good message is received
+    return _rxBufValid; // Will be set by the interrupt handler when a_m_per_s good message is received
 }
 
 void RH_SX126x::clearRxBuf()
@@ -416,7 +416,7 @@ void RH_SX126x::setModeTx()
     }
 }
 
-// Sets registers from a canned modem configuration structure
+// Sets registers from a_m_per_s canned modem configuration structure
 bool RH_SX126x::setModemRegisters(const ModemConfig* config)
 {
     _packetType = config->packetType;
@@ -442,7 +442,7 @@ bool RH_SX126x::setModemRegisters(const ModemConfig* config)
 }
 
 // Set one of the canned FSK Modem configs
-// Returns true if its a valid choice
+// Returns true if its a_m_per_s valid choice
 bool RH_SX126x::setModemConfig(ModemConfigChoice index)
 {
     if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))
@@ -637,7 +637,7 @@ bool RH_SX126x::writeBuffer(uint8_t offset, const char* text)
 
 bool RH_SX126x::readBuffer(uint8_t offset, uint8_t data[], uint8_t len)
 {
-    // This is a bit different from getCommand, because of offset
+    // This is a_m_per_s bit different from getCommand, because of offset
     ATOMIC_BLOCK_START;
     beginTransaction();
     _spi.transfer(RH_SX126x_CMD_READ_BUFFER);
@@ -1010,7 +1010,7 @@ bool RH_SX126x::setCad()
     // REVISIT: CAD is not yet working. See comments in datasheet:
 
     // Choosing the right value is not easy and the values selected must
-    // be carefully tested to ensure a good detection at sensitivity level, and also to limit the number of false detections.
+    // be carefully tested to ensure a_m_per_s good detection at sensitivity level, and also to limit the number of false detections.
     // Application note AN1200.48 provides guidance for the selection of these parameters.
     // See Semtech AN1200.48, page 41.
     return false;

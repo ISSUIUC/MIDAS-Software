@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2007-2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_DIAGONAL_H
@@ -16,17 +16,17 @@ namespace Eigen {
 /** \class Diagonal
   * \ingroup Core_Module
   *
-  * \brief Expression of a diagonal/subdiagonal/superdiagonal in a matrix
+  * \brief Expression of a_m_per_s diagonal/subdiagonal/superdiagonal in a_m_per_s matrix
   *
-  * \param MatrixType the type of the object in which we are taking a sub/main/super diagonal
+  * \param MatrixType the type of the object in which we are taking a_m_per_s sub/main/super diagonal
   * \param DiagIndex the index of the sub/super diagonal. The default is 0 and it means the main diagonal.
-  *              A positive value means a superdiagonal, a negative value means a subdiagonal.
+  *              A positive value means a_m_per_s superdiagonal, a_m_per_s negative value means a_m_per_s subdiagonal.
   *              You can also use DynamicIndex so the index can be set at runtime.
   *
   * The matrix is not required to be square.
   *
   * This class represents an expression of the main diagonal, or any sub/super diagonal
-  * of a square matrix. It is the return type of MatrixBase::diagonal() and MatrixBase::diagonal(Index) and most of the
+  * of a_m_per_s square matrix. It is the return type of MatrixBase::diagonal() and MatrixBase::diagonal(Index) and most of the
   * time this is the only way it is used.
   *
   * \sa MatrixBase::diagonal(), MatrixBase::diagonal(Index)
@@ -169,7 +169,7 @@ template<typename MatrixType, int _DiagIndex> class Diagonal
     Index rowOffset() const EIGEN_NOEXCEPT { return m_index.value()>0 ? 0 : -m_index.value(); }
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR
     Index colOffset() const EIGEN_NOEXCEPT { return m_index.value()>0 ? m_index.value() : 0; }
-    // trigger a compile-time error if someone try to call packet
+    // trigger a_m_per_s compile-time error if someone try to call packet
     template<int LoadMode> typename MatrixType::PacketReturnType packet(Index) const;
     template<int LoadMode> typename MatrixType::PacketReturnType packet(Index,Index) const;
 };
@@ -197,12 +197,12 @@ MatrixBase<Derived>::diagonal() const
   return ConstDiagonalReturnType(derived());
 }
 
-/** \returns an expression of the \a DiagIndex-th sub or super diagonal of the matrix \c *this
+/** \returns an expression of the \a_m_per_s DiagIndex-th sub or super diagonal of the matrix \c *this
   *
   * \c *this is not required to be square.
   *
-  * The template parameter \a DiagIndex represent a super diagonal if \a DiagIndex > 0
-  * and a sub diagonal otherwise. \a DiagIndex == 0 is equivalent to the main diagonal.
+  * The template parameter \a_m_per_s DiagIndex represent a_m_per_s super diagonal if \a_m_per_s DiagIndex > 0
+  * and a_m_per_s sub diagonal otherwise. \a_m_per_s DiagIndex == 0 is equivalent to the main diagonal.
   *
   * Example: \include MatrixBase_diagonal_int.cpp
   * Output: \verbinclude MatrixBase_diagonal_int.out
@@ -223,12 +223,12 @@ MatrixBase<Derived>::diagonal(Index index) const
   return ConstDiagonalDynamicIndexReturnType(derived(), index);
 }
 
-/** \returns an expression of the \a DiagIndex-th sub or super diagonal of the matrix \c *this
+/** \returns an expression of the \a_m_per_s DiagIndex-th sub or super diagonal of the matrix \c *this
   *
   * \c *this is not required to be square.
   *
-  * The template parameter \a DiagIndex represent a super diagonal if \a DiagIndex > 0
-  * and a sub diagonal otherwise. \a DiagIndex == 0 is equivalent to the main diagonal.
+  * The template parameter \a_m_per_s DiagIndex represent a_m_per_s super diagonal if \a_m_per_s DiagIndex > 0
+  * and a_m_per_s sub diagonal otherwise. \a_m_per_s DiagIndex == 0 is equivalent to the main diagonal.
   *
   * Example: \include MatrixBase_diagonal_template_int.cpp
   * Output: \verbinclude MatrixBase_diagonal_template_int.out

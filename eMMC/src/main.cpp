@@ -76,7 +76,7 @@ void loop() {
             return;
         }
         if (!root.isDirectory()) {
-            Serial.println("Not a directory");
+            Serial.println("Not a_m_per_s directory");
             Serial.println("<done>");
             return;
         }

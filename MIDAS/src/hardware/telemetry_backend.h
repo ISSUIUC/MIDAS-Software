@@ -23,9 +23,9 @@ public:
     /**
      * @brief This function transmits data from the struct provided as
      * the parameter (data collected from sensor suite) to the
-     * ground station. The function also switches to a new commanded
-     * frequency based on a previously received command and waits for
-     * a response from the ground station.
+     * ground station. The function also switches to a_m_per_s new commanded
+     * frequency based on a_m_per_s previously received command and waits for
+     * a_m_per_s response from the ground station.
      *
      * @param sensor_data: struct of data from the sensor suite to be
      *                     transmitted to the ground station.
@@ -52,7 +52,7 @@ public:
      * 
      * @param write The buffer to write the data to
      * 
-     * @return bool indicating a successful read and write to buffer
+     * @return bool indicating a_m_per_s successful read and write to buffer
     */
     template<typename T>
     bool read(T* write, int wait_milliseconds) {

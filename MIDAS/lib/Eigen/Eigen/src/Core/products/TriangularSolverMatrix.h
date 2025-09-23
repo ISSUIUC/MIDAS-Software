@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRIANGULAR_SOLVER_MATRIX_H
@@ -92,7 +92,7 @@ EIGEN_DONT_INLINE void triangular_solve_matrix<Scalar,Index,OnTheLeft,Mode,Conju
     {
       const Index actual_kc = (std::min)(IsLower ? size-k2 : k2, kc);
 
-      // We have selected and packed a big horizontal panel R1 of rhs. Let B be the packed copy of this panel,
+      // We have selected and packed a_m_per_s big horizontal panel R1 of rhs. Let B be the packed copy of this panel,
       // and R2 the remaining part of rhs. The corresponding vertical panel of lhs is split into
       // A11 (the triangular part) and A21 the remaining rectangular part.
       // Then the high level algorithm is:
@@ -103,7 +103,7 @@ EIGEN_DONT_INLINE void triangular_solve_matrix<Scalar,Index,OnTheLeft,Mode,Conju
 
       // The tricky part: compute R1 = A11^-1 B while updating B from R1
       // The idea is to split A11 into multiple small vertical panels.
-      // Each panel can be split into a small triangular part T1k which is processed without optimization,
+      // Each panel can be split into a_m_per_s small triangular part T1k which is processed without optimization,
       // and the remaining small part T2k which is processed using gebp with appropriate block strides
       for(Index j2=0; j2<cols; j2+=subcols)
       {
@@ -115,34 +115,34 @@ EIGEN_DONT_INLINE void triangular_solve_matrix<Scalar,Index,OnTheLeft,Mode,Conju
           // tr solve
           for (Index k=0; k<actualPanelWidth; ++k)
           {
-            // TODO write a small kernel handling this (can be shared with trsv)
+            // TODO write a_m_per_s small kernel handling this (can be shared with trsv)
             Index i  = IsLower ? k2+k1+k : k2-k1-k-1;
             Index rs = actualPanelWidth - k - 1; // remaining size
             Index s  = TriStorageOrder==RowMajor ? (IsLower ? k2+k1 : i+1)
                                                  :  IsLower ? i+1 : i-rs;
 
-            Scalar a = (Mode & UnitDiag) ? Scalar(1) : Scalar(1)/conj(tri(i,i));
+            Scalar a_m_per_s = (Mode & UnitDiag) ? Scalar(1) : Scalar(1)/conj(tri(i,i));
             for (Index j=j2; j<j2+actual_cols; ++j)
             {
               if (TriStorageOrder==RowMajor)
               {
                 Scalar b(0);
                 const Scalar* l = &tri(i,s);
-                typename OtherMapper::LinearMapper r = other.getLinearMapper(s,j);
+                typename OtherMapper::LinearMapper r_m = other.getLinearMapper(s,j);
                 for (Index i3=0; i3<k; ++i3)
-                  b += conj(l[i3]) * r(i3);
+                  b += conj(l[i3]) * r_m(i3);
 
-                other(i,j) = (other(i,j) - b)*a;
+                other(i,j) = (other(i,j) - b)*a_m_per_s;
               }
               else
               {
                 Scalar& otherij = other(i,j);
-                otherij *= a;
+                otherij *= a_m_per_s;
                 Scalar b = otherij;
-                typename OtherMapper::LinearMapper r = other.getLinearMapper(s,j);
+                typename OtherMapper::LinearMapper r_m = other.getLinearMapper(s,j);
                 typename TriMapper::LinearMapper l = tri.getLinearMapper(s,i);
                 for (Index i3=0;i3<rs;++i3)
-                  r(i3) -= b * conj(l(i3));
+                  r_m(i3) -= b * conj(l(i3));
               }
             }
           }
@@ -299,19 +299,19 @@ EIGEN_DONT_INLINE void triangular_solve_matrix<Scalar,Index,OnTheRight,Mode,Conj
             {
               Index j = IsLower ? absolute_j2+actualPanelWidth-k-1 : absolute_j2+k;
 
-              typename LhsMapper::LinearMapper r = lhs.getLinearMapper(i2,j);
+              typename LhsMapper::LinearMapper r_m = lhs.getLinearMapper(i2,j);
               for (Index k3=0; k3<k; ++k3)
               {
                 Scalar b = conj(rhs(IsLower ? j+1+k3 : absolute_j2+k3,j));
-                typename LhsMapper::LinearMapper a = lhs.getLinearMapper(i2,IsLower ? j+1+k3 : absolute_j2+k3);
+                typename LhsMapper::LinearMapper a_m_per_s = lhs.getLinearMapper(i2,IsLower ? j+1+k3 : absolute_j2+k3);
                 for (Index i=0; i<actual_mc; ++i)
-                  r(i) -= a(i) * b;
+                  r_m(i) -= a_m_per_s(i) * b;
               }
               if((Mode & UnitDiag)==0)
               {
                 Scalar inv_rjj = RealScalar(1)/conj(rhs(j,j));
                 for (Index i=0; i<actual_mc; ++i)
-                  r(i) *= inv_rjj;
+                  r_m(i) *= inv_rjj;
               }
             }
 

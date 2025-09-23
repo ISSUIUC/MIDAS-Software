@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ASSIGNMENT_FUNCTORS_H
@@ -21,11 +21,11 @@ namespace internal {
 template<typename DstScalar,typename SrcScalar> struct assign_op {
 
   EIGEN_EMPTY_STRUCT_CTOR(assign_op)
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a, const SrcScalar& b) const { a = b; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a_m_per_s, const SrcScalar& b) const { a_m_per_s = b; }
   
   template<int Alignment, typename Packet>
-  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a, const Packet& b) const
-  { internal::pstoret<DstScalar,Packet,Alignment>(a,b); }
+  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a_m_per_s, const Packet& b) const
+  { internal::pstoret<DstScalar,Packet,Alignment>(a_m_per_s,b); }
 };
 
 // Empty overload for void type (used by PermutationMatrix)
@@ -46,11 +46,11 @@ struct functor_traits<assign_op<DstScalar,SrcScalar> > {
 template<typename DstScalar,typename SrcScalar> struct add_assign_op {
 
   EIGEN_EMPTY_STRUCT_CTOR(add_assign_op)
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a, const SrcScalar& b) const { a += b; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a_m_per_s, const SrcScalar& b) const { a_m_per_s += b; }
   
   template<int Alignment, typename Packet>
-  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a, const Packet& b) const
-  { internal::pstoret<DstScalar,Packet,Alignment>(a,internal::padd(internal::ploadt<Packet,Alignment>(a),b)); }
+  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a_m_per_s, const Packet& b) const
+  { internal::pstoret<DstScalar,Packet,Alignment>(a_m_per_s,internal::padd(internal::ploadt<Packet,Alignment>(a_m_per_s),b)); }
 };
 template<typename DstScalar,typename SrcScalar>
 struct functor_traits<add_assign_op<DstScalar,SrcScalar> > {
@@ -67,11 +67,11 @@ struct functor_traits<add_assign_op<DstScalar,SrcScalar> > {
 template<typename DstScalar,typename SrcScalar> struct sub_assign_op {
 
   EIGEN_EMPTY_STRUCT_CTOR(sub_assign_op)
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a, const SrcScalar& b) const { a -= b; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a_m_per_s, const SrcScalar& b) const { a_m_per_s -= b; }
   
   template<int Alignment, typename Packet>
-  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a, const Packet& b) const
-  { internal::pstoret<DstScalar,Packet,Alignment>(a,internal::psub(internal::ploadt<Packet,Alignment>(a),b)); }
+  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a_m_per_s, const Packet& b) const
+  { internal::pstoret<DstScalar,Packet,Alignment>(a_m_per_s,internal::psub(internal::ploadt<Packet,Alignment>(a_m_per_s),b)); }
 };
 template<typename DstScalar,typename SrcScalar>
 struct functor_traits<sub_assign_op<DstScalar,SrcScalar> > {
@@ -89,11 +89,11 @@ template<typename DstScalar, typename SrcScalar=DstScalar>
 struct mul_assign_op {
 
   EIGEN_EMPTY_STRUCT_CTOR(mul_assign_op)
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a, const SrcScalar& b) const { a *= b; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a_m_per_s, const SrcScalar& b) const { a_m_per_s *= b; }
   
   template<int Alignment, typename Packet>
-  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a, const Packet& b) const
-  { internal::pstoret<DstScalar,Packet,Alignment>(a,internal::pmul(internal::ploadt<Packet,Alignment>(a),b)); }
+  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a_m_per_s, const Packet& b) const
+  { internal::pstoret<DstScalar,Packet,Alignment>(a_m_per_s,internal::pmul(internal::ploadt<Packet,Alignment>(a_m_per_s),b)); }
 };
 template<typename DstScalar, typename SrcScalar>
 struct functor_traits<mul_assign_op<DstScalar,SrcScalar> > {
@@ -110,11 +110,11 @@ struct functor_traits<mul_assign_op<DstScalar,SrcScalar> > {
 template<typename DstScalar, typename SrcScalar=DstScalar> struct div_assign_op {
 
   EIGEN_EMPTY_STRUCT_CTOR(div_assign_op)
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a, const SrcScalar& b) const { a /= b; }
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(DstScalar& a_m_per_s, const SrcScalar& b) const { a_m_per_s /= b; }
   
   template<int Alignment, typename Packet>
-  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a, const Packet& b) const
-  { internal::pstoret<DstScalar,Packet,Alignment>(a,internal::pdiv(internal::ploadt<Packet,Alignment>(a),b)); }
+  EIGEN_STRONG_INLINE void assignPacket(DstScalar* a_m_per_s, const Packet& b) const
+  { internal::pstoret<DstScalar,Packet,Alignment>(a_m_per_s,internal::pdiv(internal::ploadt<Packet,Alignment>(a_m_per_s),b)); }
 };
 template<typename DstScalar, typename SrcScalar>
 struct functor_traits<div_assign_op<DstScalar,SrcScalar> > {
@@ -127,29 +127,29 @@ struct functor_traits<div_assign_op<DstScalar,SrcScalar> > {
 /** \internal
   * \brief Template functor for scalar/packet assignment with swapping
   *
-  * It works as follow. For a non-vectorized evaluation loop, we have:
+  * It works as follow. For a_m_per_s non-vectorized evaluation loop, we have:
   *   for(i) func(A.coeffRef(i), B.coeff(i));
-  * where B is a SwapWrapper expression. The trick is to make SwapWrapper::coeff behaves like a non-const coeffRef.
-  * Actually, SwapWrapper might not even be needed since even if B is a plain expression, since it has to be writable
-  * B.coeff already returns a const reference to the underlying scalar value.
+  * where B is a_m_per_s SwapWrapper expression. The trick is to make SwapWrapper::coeff behaves like a_m_per_s non-const coeffRef.
+  * Actually, SwapWrapper might not even be needed since even if B is a_m_per_s plain expression, since it has to be writable
+  * B.coeff already returns a_m_per_s const reference to the underlying scalar value.
   * 
-  * The case of a vectorized loop is more tricky:
+  * The case of a_m_per_s vectorized loop is more tricky:
   *   for(i,j) func.assignPacket<A_Align>(&A.coeffRef(i,j), B.packet<B_Align>(i,j));
-  * Here, B must be a SwapWrapper whose packet function actually returns a proxy object holding a Scalar*,
+  * Here, B must be a_m_per_s SwapWrapper whose packet function actually returns a_m_per_s proxy object holding a_m_per_s Scalar*,
   * the actual alignment and Packet type.
   *
   */
 template<typename Scalar> struct swap_assign_op {
 
   EIGEN_EMPTY_STRUCT_CTOR(swap_assign_op)
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(Scalar& a, const Scalar& b) const
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void assignCoeff(Scalar& a_m_per_s, const Scalar& b) const
   {
 #ifdef EIGEN_GPUCC
     // FIXME is there some kind of cuda::swap?
-    Scalar t=b; const_cast<Scalar&>(b)=a; a=t;
+    Scalar t=b; const_cast<Scalar&>(b)=a_m_per_s; a_m_per_s=t;
 #else
     using std::swap;
-    swap(a,const_cast<Scalar&>(b));
+    swap(a_m_per_s,const_cast<Scalar&>(b));
 #endif
   }
 };
@@ -159,7 +159,7 @@ struct functor_traits<swap_assign_op<Scalar> > {
     Cost = 3 * NumTraits<Scalar>::ReadCost,
     PacketAccess = 
     #if defined(EIGEN_VECTORIZE_AVX) && EIGEN_COMP_CLANG && (EIGEN_COMP_CLANG<800 || defined(__apple_build_version__))
-    // This is a partial workaround for a bug in clang generating bad code
+    // This is a_m_per_s partial workaround for a_m_per_s bug in clang generating bad code
     // when mixing 256/512 bits loads and 128 bits moves.
     // See http://eigen.tuxfamily.org/bz/show_bug.cgi?id=1684
     //     https://bugs.llvm.org/show_bug.cgi?id=40815

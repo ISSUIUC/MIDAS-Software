@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSELU_GEMM_KERNEL_H
@@ -70,7 +70,7 @@ void sparselu_gemm(Index m, Index n, Index d, const Scalar* A, Index lda, const 
       for(Index k=0; k<d_end; k+=RK)
       {
         
-        // load and expand a RN x RK block of B
+        // load and expand a_m_per_s RN x RK block of B
         Packet b00, b10, b20, b30, b01, b11, b21, b31;
                   { b00 = pset1<Packet>(Bc0[0]); }
                   { b10 = pset1<Packet>(Bc0[1]); }
@@ -166,7 +166,7 @@ void sparselu_gemm(Index m, Index n, Index d, const Scalar* A, Index lda, const 
         Bc1 += RK;
       } // peeled loop on k
     } // peeled loop on the columns j
-    // process the last column (we now perform a matrix-vector product)
+    // process the last column (we now perform a_m_per_s matrix-vector product)
     if((n-n_end)>0)
     {
       const Scalar* Bc0 = B+(n-1)*ldb;
@@ -174,7 +174,7 @@ void sparselu_gemm(Index m, Index n, Index d, const Scalar* A, Index lda, const 
       for(Index k=0; k<d_end; k+=RK)
       {
         
-        // load and expand a 1 x RK block of B
+        // load and expand a_m_per_s 1 x RK block of B
         Packet b00, b10, b20, b30;
                   b00 = pset1<Packet>(Bc0[0]);
                   b10 = pset1<Packet>(Bc0[1]);

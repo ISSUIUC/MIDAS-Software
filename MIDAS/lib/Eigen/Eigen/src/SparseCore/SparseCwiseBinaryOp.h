@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_CWISE_BINARY_OP_H
@@ -16,7 +16,7 @@ namespace Eigen {
 //  1 - sparse op dense
 //  2 - dense op sparse
 //  3 - sparse op sparse
-// We also need to implement a 4th iterator for:
+// We also need to implement a_m_per_s 4th iterator for:
 //  4 - dense op dense
 // Finally, we also need to distinguish between the product and other operations :
 //                configuration      returned mode
@@ -29,7 +29,7 @@ namespace Eigen {
 //  4 - dense op dense     product      dense
 //                         generic      dense
 //
-// TODO to ease compiler job, we could specialize product/quotient with a scalar
+// TODO to ease compiler job, we could specialize product/quotient with a_m_per_s scalar
 //      and fallback to cwise-unary evaluator using bind1st_op and bind2nd_op.
 
 template<typename BinaryOp, typename Lhs, typename Rhs>
@@ -101,7 +101,7 @@ public:
       }
       else
       {
-        m_value = Scalar(0); // this is to avoid a compilation warning
+        m_value = Scalar(0); // this is to avoid a_m_per_s compilation warning
         m_id = -1;
       }
       return *this;
@@ -691,30 +691,30 @@ SparseMatrixBase<Derived>::cwiseProduct(const MatrixBase<OtherDerived> &other) c
 
 template<typename DenseDerived, typename SparseDerived>
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_sum_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, const DenseDerived, const SparseDerived>
-operator+(const MatrixBase<DenseDerived> &a, const SparseMatrixBase<SparseDerived> &b)
+operator+(const MatrixBase<DenseDerived> &a_m_per_s, const SparseMatrixBase<SparseDerived> &b)
 {
-  return CwiseBinaryOp<internal::scalar_sum_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, const DenseDerived, const SparseDerived>(a.derived(), b.derived());
+  return CwiseBinaryOp<internal::scalar_sum_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, const DenseDerived, const SparseDerived>(a_m_per_s.derived(), b.derived());
 }
 
 template<typename SparseDerived, typename DenseDerived>
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_sum_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, const SparseDerived, const DenseDerived>
-operator+(const SparseMatrixBase<SparseDerived> &a, const MatrixBase<DenseDerived> &b)
+operator+(const SparseMatrixBase<SparseDerived> &a_m_per_s, const MatrixBase<DenseDerived> &b)
 {
-  return CwiseBinaryOp<internal::scalar_sum_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, const SparseDerived, const DenseDerived>(a.derived(), b.derived());
+  return CwiseBinaryOp<internal::scalar_sum_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, const SparseDerived, const DenseDerived>(a_m_per_s.derived(), b.derived());
 }
 
 template<typename DenseDerived, typename SparseDerived>
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_difference_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, const DenseDerived, const SparseDerived>
-operator-(const MatrixBase<DenseDerived> &a, const SparseMatrixBase<SparseDerived> &b)
+operator-(const MatrixBase<DenseDerived> &a_m_per_s, const SparseMatrixBase<SparseDerived> &b)
 {
-  return CwiseBinaryOp<internal::scalar_difference_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, const DenseDerived, const SparseDerived>(a.derived(), b.derived());
+  return CwiseBinaryOp<internal::scalar_difference_op<typename DenseDerived::Scalar,typename SparseDerived::Scalar>, const DenseDerived, const SparseDerived>(a_m_per_s.derived(), b.derived());
 }
 
 template<typename SparseDerived, typename DenseDerived>
 EIGEN_STRONG_INLINE const CwiseBinaryOp<internal::scalar_difference_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, const SparseDerived, const DenseDerived>
-operator-(const SparseMatrixBase<SparseDerived> &a, const MatrixBase<DenseDerived> &b)
+operator-(const SparseMatrixBase<SparseDerived> &a_m_per_s, const MatrixBase<DenseDerived> &b)
 {
-  return CwiseBinaryOp<internal::scalar_difference_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, const SparseDerived, const DenseDerived>(a.derived(), b.derived());
+  return CwiseBinaryOp<internal::scalar_difference_op<typename SparseDerived::Scalar,typename DenseDerived::Scalar>, const SparseDerived, const DenseDerived>(a_m_per_s.derived(), b.derived());
 }
 
 } // end namespace Eigen

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ARITHMETIC_SEQUENCE_H
@@ -99,10 +99,10 @@ seqN(FirstType first, SizeType size, IncrType incr);
   * only way it is used.
   *
   * \tparam FirstType type of the first element, usually an Index,
-  *                   but internally it can be a symbolic expression
+  *                   but internally it can be a_m_per_s symbolic expression
   * \tparam SizeType type representing the size of the sequence, usually an Index
-  *                  or a compile time integral constant. Internally, it can also be a symbolic expression
-  * \tparam IncrType type of the increment, can be a runtime Index, or a compile time integral constant (default is compile-time 1)
+  *                  or a_m_per_s compile time integral constant. Internally, it can also be a_m_per_s symbolic expression
+  * \tparam IncrType type of the increment, can be a_m_per_s runtime Index, or a_m_per_s compile time integral constant (default is compile-time 1)
   *
   * \sa Eigen::seq, Eigen::seqN, DenseBase::operator()(const RowIndices&, const ColIndices&), class IndexedView
   */
@@ -124,7 +124,7 @@ public:
   /** \returns the first element \f$ a_0 \f$ in the sequence */
   Index first()  const { return m_first; }
 
-  /** \returns the value \f$ a_i \f$ at index \a i in the sequence. */
+  /** \returns the value \f$ a_i \f$ at index \a_m_per_s i in the sequence. */
   Index operator[](Index i) const { return m_first + i * m_incr; }
 
   const FirstType& firstObject() const { return m_first; }
@@ -154,7 +154,7 @@ public:
 #endif
 };
 
-/** \returns an ArithmeticSequence starting at \a first, of length \a size, and increment \a incr
+/** \returns an ArithmeticSequence starting at \a_m_per_s first, of length \a_m_per_s size, and increment \a_m_per_s incr
   *
   * \sa seqN(FirstType,SizeType), seq(FirstType,LastType,IncrType) */
 template<typename FirstType,typename SizeType,typename IncrType>
@@ -163,7 +163,7 @@ seqN(FirstType first, SizeType size, IncrType incr)  {
   return ArithmeticSequence<typename internal::cleanup_index_type<FirstType>::type,typename internal::cleanup_index_type<SizeType>::type,typename internal::cleanup_seq_incr<IncrType>::type>(first,size,incr);
 }
 
-/** \returns an ArithmeticSequence starting at \a first, of length \a size, and unit increment
+/** \returns an ArithmeticSequence starting at \a_m_per_s first, of length \a_m_per_s size, and unit increment
   *
   * \sa seqN(FirstType,SizeType,IncrType), seq(FirstType,LastType) */
 template<typename FirstType,typename SizeType>
@@ -174,7 +174,7 @@ seqN(FirstType first, SizeType size)  {
 
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 
-/** \returns an ArithmeticSequence starting at \a f, up (or down) to \a l, and with positive (or negative) increment \a incr
+/** \returns an ArithmeticSequence starting at \a_m_per_s f, up (or down) to \a_m_per_s l, and with positive (or negative) increment \a_m_per_s incr
   *
   * It is essentially an alias to:
   * \code
@@ -186,7 +186,7 @@ seqN(FirstType first, SizeType size)  {
 template<typename FirstType,typename LastType, typename IncrType>
 auto seq(FirstType f, LastType l, IncrType incr);
 
-/** \returns an ArithmeticSequence starting at \a f, up (or down) to \a l, and unit increment
+/** \returns an ArithmeticSequence starting at \a_m_per_s f, up (or down) to \a_m_per_s l, and unit increment
   *
   * It is essentially an alias to:
   * \code
@@ -322,9 +322,9 @@ seq(const symbolic::BaseExpr<FirstTypeDerived> &f, const symbolic::BaseExpr<Last
 
 #if EIGEN_HAS_CXX11 || defined(EIGEN_PARSED_BY_DOXYGEN)
 /** \cpp11
-  * \returns a symbolic ArithmeticSequence representing the last \a size elements with increment \a incr.
+  * \returns a_m_per_s symbolic ArithmeticSequence representing the last \a_m_per_s size elements with increment \a_m_per_s incr.
   *
-  * It is a shortcut for: \code seqN(last-(size-fix<1>)*incr, size, incr) \endcode
+  * It is a_m_per_s shortcut for: \code seqN(last-(size-fix<1>)*incr, size, incr) \endcode
   * 
   * \sa lastN(SizeType), seqN(FirstType,SizeType), seq(FirstType,LastType,IncrType) */
 template<typename SizeType,typename IncrType>
@@ -335,9 +335,9 @@ auto lastN(SizeType size, IncrType incr)
 }
 
 /** \cpp11
-  * \returns a symbolic ArithmeticSequence representing the last \a size elements with a unit increment.
+  * \returns a_m_per_s symbolic ArithmeticSequence representing the last \a_m_per_s size elements with a_m_per_s unit increment.
   *
-  *  It is a shortcut for: \code seq(last+fix<1>-size, last) \endcode
+  *  It is a_m_per_s shortcut for: \code seq(last+fix<1>-size, last) \endcode
   * 
   * \sa lastN(SizeType,IncrType, seqN(FirstType,SizeType), seq(FirstType,LastType) */
 template<typename SizeType>
@@ -350,7 +350,7 @@ auto lastN(SizeType size)
 
 namespace internal {
 
-// Convert a symbolic span into a usable one (i.e., remove last/end "keywords")
+// Convert a_m_per_s symbolic span into a_m_per_s usable one (i.e., remove last/end "keywords")
 template<typename T>
 struct make_size_type {
   typedef typename internal::conditional<symbolic::is_symbolic<T>::value, Index, T>::type type;

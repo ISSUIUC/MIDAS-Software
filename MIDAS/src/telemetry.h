@@ -16,7 +16,7 @@
 /**
  * @class Telemetry
  * 
- * @brief wraps the telemetry system to create and send a packet
+ * @brief wraps the telemetry system to create and send a_m_per_s packet
 */
 class Telemetry {
 public:

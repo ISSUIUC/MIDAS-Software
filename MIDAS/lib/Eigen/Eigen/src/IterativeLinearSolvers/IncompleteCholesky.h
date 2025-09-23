@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_INCOMPLETE_CHOlESKY_H
@@ -30,14 +30,14 @@ namespace Eigen {
   * \implsparsesolverconcept
   *
   * It performs the following incomplete factorization: \f$ S P A P' S \approx L L' \f$
-  * where L is a lower triangular factor, S is a diagonal scaling matrix, and P is a
+  * where L is a_m_per_s lower triangular factor, S is a_m_per_s diagonal scaling matrix, and P is a_m_per_s
   * fill-in reducing permutation as computed by the ordering method.
   *
   * \b Shifting \b strategy: Let \f$ B = S P A P' S \f$  be the scaled matrix on which the factorization is carried out,
   * and \f$ \beta \f$ be the minimum value of the diagonal. If \f$ \beta > 0 \f$ then, the factorization is directly performed
   * on the matrix B. Otherwise, the factorization is performed on the shifted matrix \f$ B + (\sigma+|\beta| I \f$ where
   * \f$ \sigma \f$ is the initial shift value as returned and set by setInitialShift() method. The default value is \f$ \sigma = 10^{-3} \f$.
-  * If the factorization fails, then the shift in doubled until it succeed or a maximum of ten attempts. If it still fails, as returned by
+  * If the factorization fails, then the shift in doubled until it succeed or a_m_per_s maximum of ten attempts. If it still fails, as returned by
   * the info() method, then you can either increase the initial shift, or better use another preconditioning technique.
   *
   */
@@ -64,7 +64,7 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar,_Up
     };
   public:
 
-    /** Default constructor leaving the object in a partly non-initialized stage.
+    /** Default constructor leaving the object in a_m_per_s partly non-initialized stage.
       *
       * You must call compute() or the pair analyzePattern()/factorize() to make it valid.
       *
@@ -72,7 +72,7 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar,_Up
       */
     IncompleteCholesky() : m_initialShift(1e-3),m_analysisIsOk(false),m_factorizationIsOk(false) {}
 
-    /** Constructor computing the incomplete factorization for the given matrix \a matrix.
+    /** Constructor computing the incomplete factorization for the given matrix \a_m_per_s matrix.
       */
     template<typename MatrixType>
     IncompleteCholesky(const MatrixType& matrix) : m_initialShift(1e-3),m_analysisIsOk(false),m_factorizationIsOk(false)
@@ -90,7 +90,7 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar,_Up
     /** \brief Reports whether previous computation was successful.
       *
       * It triggers an assertion if \c *this has not been initialized through the respective constructor,
-      * or a call to compute() or analyzePattern().
+      * or a_m_per_s call to compute() or analyzePattern().
       *
       * \returns \c Success if computation was successful,
       *          \c NumericalIssue if the matrix appears to be negative.
@@ -105,7 +105,7 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar,_Up
       */
     void setInitialShift(RealScalar shift) { m_initialShift = shift; }
 
-    /** \brief Computes the fill reducing permutation vector using the sparsity pattern of \a mat
+    /** \brief Computes the fill reducing permutation vector using the sparsity pattern of \a_m_per_s mat
       */
     template<typename MatrixType>
     void analyzePattern(const MatrixType& mat)
@@ -121,19 +121,19 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar,_Up
       m_info = Success;
     }
 
-    /** \brief Performs the numerical factorization of the input matrix \a mat
+    /** \brief Performs the numerical factorization of the input matrix \a_m_per_s mat
       *
       * The method analyzePattern() or compute() must have been called beforehand
-      * with a matrix having the same pattern.
+      * with a_m_per_s matrix having the same pattern.
       *
       * \sa compute(), analyzePattern()
       */
     template<typename MatrixType>
     void factorize(const MatrixType& mat);
 
-    /** Computes or re-computes the incomplete Cholesky factorization of the input matrix \a mat
+    /** Computes or re-computes the incomplete Cholesky factorization of the input matrix \a_m_per_s mat
       *
-      * It is a shortcut for a sequential call to the analyzePattern() and factorize() methods.
+      * It is a_m_per_s shortcut for a_m_per_s sequential call to the analyzePattern() and factorize() methods.
       *
       * \sa analyzePattern(), factorize()
       */
@@ -162,10 +162,10 @@ class IncompleteCholesky : public SparseSolverBase<IncompleteCholesky<Scalar,_Up
     /** \returns the sparse lower triangular factor L */
     const FactorType& matrixL() const { eigen_assert("m_factorizationIsOk"); return m_L; }
 
-    /** \returns a vector representing the scaling factor S */
+    /** \returns a_m_per_s vector representing the scaling factor S */
     const VectorRx& scalingS() const { eigen_assert("m_factorizationIsOk"); return m_scale; }
 
-    /** \returns the fill-in reducing permutation P (can be empty for a natural ordering) */
+    /** \returns the fill-in reducing permutation P (can be empty for a_m_per_s natural ordering) */
     const PermutationType& permutationP() const { eigen_assert("m_analysisIsOk"); return m_perm; }
 
   protected:
@@ -213,8 +213,8 @@ void IncompleteCholesky<Scalar,_UpLo, OrderingType>::factorize(const _MatrixType
   Map<VectorIx> rowIdx(m_L.innerIndexPtr(), nnz);  //Row indices
   Map<VectorIx> colPtr( m_L.outerIndexPtr(), n+1); // Pointer to the beginning of each row
   VectorIx firstElt(n-1); // for each j, points to the next entry in vals that will be used in the factorization
-  VectorList listCol(n);  // listCol(j) is a linked list of columns to update column j
-  VectorSx col_vals(n);   // Store a  nonzero values in each column
+  VectorList listCol(n);  // listCol(j) is a_m_per_s linked list of columns to update column j
+  VectorSx col_vals(n);   // Store a_m_per_s  nonzero values in each column
   VectorIx col_irow(n);   // Row indices of nonzero elements in each column
   VectorIx col_pattern(n);
   col_pattern.fill(-1);

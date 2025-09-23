@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_FORCEALIGNEDACCESS_H
@@ -123,7 +123,7 @@ MatrixBase<Derived>::forceAlignedAccess()
   return ForceAlignedAccess<Derived>(derived());
 }
 
-/** \returns an expression of *this with forced aligned access if \a Enable is true.
+/** \returns an expression of *this with forced aligned access if \a_m_per_s Enable is true.
   * \sa forceAlignedAccess(), class ForceAlignedAccess
   */
 template<typename Derived>
@@ -134,7 +134,7 @@ MatrixBase<Derived>::forceAlignedAccessIf() const
   return derived();  // FIXME This should not work but apparently is never used
 }
 
-/** \returns an expression of *this with forced aligned access if \a Enable is true.
+/** \returns an expression of *this with forced aligned access if \a_m_per_s Enable is true.
   * \sa forceAlignedAccess(), class ForceAlignedAccess
   */
 template<typename Derived>

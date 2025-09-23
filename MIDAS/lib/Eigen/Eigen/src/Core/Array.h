@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ARRAY_H
@@ -78,7 +78,7 @@ class Array
       return Base::operator=(other);
     }
 
-    /** Set all the entries to \a value.
+    /** Set all the entries to \a_m_per_s value.
       * \sa DenseBase::setConstant(), DenseBase::fill()
       */
     /* This overload is needed because the usage of
@@ -93,12 +93,12 @@ class Array
       return *this;
     }
 
-    /** Copies the value of the expression \a other into \c *this with automatic resizing.
+    /** Copies the value of the expression \a_m_per_s other into \c *this with automatic resizing.
       *
-      * *this might be resized to match the dimensions of \a other. If *this was a null matrix (not already initialized),
+      * *this might be resized to match the dimensions of \a_m_per_s other. If *this was a_m_per_s null matrix (not already initialized),
       * it will be initialized.
       *
-      * Note that copying a row-vector into a vector (and conversely) is allowed.
+      * Note that copying a_m_per_s row-vector into a_m_per_s vector (and conversely) is allowed.
       * The resizing, if any, is then done in the appropriate way so that row-vectors
       * remain row-vectors and vectors remain vectors.
       */
@@ -109,8 +109,8 @@ class Array
       return Base::_set(other);
     }
 
-    /** This is a special case of the templated operator=. Its purpose is to
-      * prevent a default operator= from hiding the templated operator=.
+    /** This is a_m_per_s special case of the templated operator=. Its purpose is to
+      * prevent a_m_per_s default operator= from hiding the templated operator=.
       */
     EIGEN_DEVICE_FUNC
     EIGEN_STRONG_INLINE Array& operator=(const Array& other)
@@ -122,9 +122,9 @@ class Array
       *
       * For fixed-size matrices, does nothing.
       *
-      * For dynamic-size matrices, creates an empty matrix of size 0. Does not allocate any array. Such a matrix
-      * is called a null matrix. This constructor is the unique way to create null matrices: resizing
-      * a matrix to 0 is not supported.
+      * For dynamic-size matrices, creates an empty matrix of size 0. Does not allocate any array. Such a_m_per_s matrix
+      * is called a_m_per_s null matrix. This constructor is the unique way to create null matrices: resizing
+      * a_m_per_s matrix to 0 is not supported.
       *
       * \sa resize(Index,Index)
       */
@@ -178,14 +178,14 @@ class Array
 
     /** \brief Constructs an array and initializes it from the coefficients given as initializer-lists grouped by row. \cpp11
       *
-      * In the general case, the constructor takes a list of rows, each row being represented as a list of coefficients:
+      * In the general case, the constructor takes a_m_per_s list of rows, each row being represented as a_m_per_s list of coefficients:
       *
       * Example: \include Array_initializer_list_23_cxx11.cpp
       * Output: \verbinclude Array_initializer_list_23_cxx11.out
       *
       * Each of the inner initializer lists must contain the exact same number of elements, otherwise an assertion is triggered.
       *
-      * In the case of a compile-time column 1D array, implicit transposition from a single row is allowed.
+      * In the case of a_m_per_s compile-time column 1D array, implicit transposition from a_m_per_s single row is allowed.
       * Therefore <code> Array<int,Dynamic,1>{{1,2,3,4,5}}</code> is legal and the more verbose syntax
       * <code>Array<int,Dynamic,1>{{1},{2},{3},{4},{5}}</code> can be avoided:
       *
@@ -219,9 +219,9 @@ class Array
     }
 
     #else
-    /** \brief Constructs a fixed-sized array initialized with coefficients starting at \a data */
+    /** \brief Constructs a_m_per_s fixed-sized array initialized with coefficients starting at \a_m_per_s data */
     EIGEN_DEVICE_FUNC explicit Array(const Scalar *data);
-    /** Constructs a vector or row-vector with given dimension. \only_for_vectors
+    /** Constructs a_m_per_s vector or row-vector with given dimension. \only_for_vectors
       *
       * Note that this is only useful for dynamic-size vectors. For fixed-size vectors,
       * it is redundant to pass the dimension here, so it makes more sense to use the default
@@ -232,7 +232,7 @@ class Array
     /** constructs an initialized 1x1 Array with the given coefficient
       * \sa const Scalar& a0, const Scalar& a1, const Scalar& a2, const Scalar& a3, const ArgTypes&... args */
     Array(const Scalar& value);
-    /** constructs an uninitialized array with \a rows rows and \a cols columns.
+    /** constructs an uninitialized array with \a_m_per_s rows rows and \a_m_per_s cols columns.
       *
       * This is useful for dynamic-size arrays. For fixed-size arrays,
       * it is redundant to pass these parameters, so one should use the default constructor
@@ -314,13 +314,13 @@ class Array
   * and where \c Type can be \c i for integer, \c f for float, \c d for double, \c cf for complex float, \c cd
   * for complex double.
   *
-  * For example, \c Array33d is a fixed-size 3x3 array type of doubles, and \c ArrayXXf is a dynamic-size matrix of floats.
+  * For example, \c Array33d is a_m_per_s fixed-size 3x3 array type of doubles, and \c ArrayXXf is a_m_per_s dynamic-size matrix of floats.
   *
   * There are also \c ArraySizeType which are self-explanatory. For example, \c Array4cf is
-  * a fixed-size 1D array of 4 complex floats.
+  * a_m_per_s fixed-size 1D array of 4 complex floats.
   *
   * With \cpp11, template alias are also defined for common sizes.
-  * They follow the same pattern as above except that the scalar type suffix is replaced by a
+  * They follow the same pattern as above except that the scalar type suffix is replaced by a_m_per_s
   * template parameter, i.e.:
   *   - `ArrayRowsCols<Type>` where `Rows` and `Cols` can be \c 2,\c 3,\c 4, or \c X for fixed or dynamic size.
   *   - `ArraySize<Type>` where `Size` can be \c 2,\c 3,\c 4 or \c X for fixed or dynamic size 1D arrays.

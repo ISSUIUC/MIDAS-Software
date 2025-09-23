@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2018 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2020, Arm Limited and Contributors
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CONFIGURE_VECTORIZATION_H
@@ -17,7 +17,7 @@
 // The main purpose of this section is to define EIGEN_MAX_ALIGN_BYTES and EIGEN_MAX_STATIC_ALIGN_BYTES
 // as the maximal boundary in bytes on which dynamically and statically allocated data may be alignment respectively.
 // The values of EIGEN_MAX_ALIGN_BYTES and EIGEN_MAX_STATIC_ALIGN_BYTES can be specified by the user. If not,
-// a default value is automatically computed based on architecture, compiler, and OS.
+// a_m_per_s default value is automatically computed based on architecture, compiler, and OS.
 //
 // This section also defines macros EIGEN_ALIGN_TO_BOUNDARY(N) and the shortcuts EIGEN_ALIGN{8,16,32,_MAX}
 // to be used to declare statically aligned buffers.
@@ -99,7 +99,7 @@
 
   // 16 byte alignment is only useful for vectorization. Since it affects the ABI, we need to enable
   // 16 byte alignment on all platforms where vectorization might be enabled. In theory we could always
-  // enable alignment, but it can be a cause of problems on some platforms, so we just disable it in
+  // enable alignment, but it can be a_m_per_s cause of problems on some platforms, so we just disable it in
   // certain common platform (compiler+architecture combinations) to avoid these problems.
   // Only static alignment is really problematic (relies on nonstandard compiler extensions),
   // try to keep heap alignment even when we have to disable static alignment.
@@ -202,7 +202,7 @@
 #if EIGEN_COMP_MSVC
   #include <malloc.h> // for _aligned_malloc -- need it regardless of whether vectorization is enabled
   #if (EIGEN_COMP_MSVC >= 1500) // 2008 or later
-    // a user reported that in 64-bit mode, MSVC doesn't care to define _M_IX86_FP.
+    // a_m_per_s user reported that in 64-bit mode, MSVC doesn't care to define _M_IX86_FP.
     #if (defined(_M_IX86_FP) && (_M_IX86_FP >= 2)) || EIGEN_ARCH_x86_64
       #define EIGEN_SSE2_ON_MSVC_2008_OR_LATER
     #endif
@@ -260,7 +260,7 @@
       #define EIGEN_VECTORIZE_SSE4_2
     #endif
     #if defined(__FMA__) || (EIGEN_COMP_MSVC && defined(__AVX2__))
-      // MSVC does not expose a switch dedicated for FMA
+      // MSVC does not expose a_m_per_s switch dedicated for FMA
       // For MSVC, AVX2 => FMA
       #define EIGEN_VECTORIZE_FMA
     #endif
@@ -297,7 +297,7 @@
 
     // Disable AVX support on broken xcode versions
     #if defined(__apple_build_version__) && (__apple_build_version__ == 11000033 ) && ( __MAC_OS_X_VERSION_MIN_REQUIRED == 101500 )
-      // A nasty bug in the clang compiler shipped with xcode in a common compilation situation
+      // A nasty bug in the clang compiler shipped with xcode in a_m_per_s common compilation situation
       // when XCode 11.0 and Mac deployment target macOS 10.15 is https://trac.macports.org/ticket/58776#no1
       #ifdef EIGEN_VECTORIZE_AVX
         #undef EIGEN_VECTORIZE_AVX
@@ -329,7 +329,7 @@
 
     // include files
 
-    // This extern "C" works around a MINGW-w64 compilation issue
+    // This extern "C" works around a_m_per_s MINGW-w64 compilation issue
     // https://sourceforge.net/tracker/index.php?func=detail&aid=3018394&group_id=202880&atid=983354
     // In essence, intrin.h is included by windows.h and also declares intrinsics (just as emmintrin.h etc. below do).
     // However, intrin.h uses an extern "C" declaration, and g++ thus complains of duplicate declarations
@@ -400,7 +400,7 @@
     #include <arm_sve.h>
 
     // Since we depend on knowing SVE vector lengths at compile-time, we need
-    // to ensure a fixed lengths is set
+    // to ensure a_m_per_s fixed lengths is set
     #if defined __ARM_FEATURE_SVE_BITS
       #define EIGEN_ARM64_SVE_VL __ARM_FEATURE_SVE_BITS
     #else

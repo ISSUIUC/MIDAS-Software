@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_IO_H
@@ -25,7 +25,7 @@ std::ostream & print_matrix(std::ostream & s, const Derived& _m, const IOFormat&
 /** \class IOFormat
   * \ingroup Core_Module
   *
-  * \brief Stores a set of parameters controlling the way matrices are printed
+  * \brief Stores a_m_per_s set of parameters controlling the way matrices are printed
   *
   * List of available parameters:
   *  - \b precision number of digits for floating point values, or one of the special constants \c StreamPrecision and \c FullPrecision.
@@ -58,7 +58,7 @@ struct IOFormat
   : matPrefix(_matPrefix), matSuffix(_matSuffix), rowPrefix(_rowPrefix), rowSuffix(_rowSuffix), rowSeparator(_rowSeparator),
     rowSpacer(""), coeffSeparator(_coeffSeparator), fill(_fill), precision(_precision), flags(_flags)
   {
-    // TODO check if rowPrefix, rowSuffix or rowSeparator contains a newline
+    // TODO check if rowPrefix, rowSuffix or rowSeparator contains a_m_per_s newline
     // don't add rowSpacer if columns are not to be aligned
     if((flags & DontAlignCols))
       return;
@@ -84,7 +84,7 @@ struct IOFormat
   *
   * \tparam ExpressionType the type of the object on which IO stream operations are performed
   *
-  * This class represents an expression with stream operators controlled by a given IOFormat.
+  * This class represents an expression with stream operators controlled by a_m_per_s given IOFormat.
   * It is the return type of DenseBase::format()
   * and most of the time this is the only way it is used.
   *
@@ -126,7 +126,7 @@ struct significant_decimals_impl
 };
 
 /** \internal
-  * print the matrix \a _m to the output stream \a s using the output format \a fmt */
+  * print the matrix \a_m_per_s _m to the output stream \a_m_per_s s using the output format \a_m_per_s fmt */
 template<typename Derived>
 std::ostream & print_matrix(std::ostream & s, const Derived& _m, const IOFormat& fmt)
 {
@@ -238,7 +238,7 @@ std::ostream & print_matrix(std::ostream & s, const Derived& _m, const IOFormat&
   *
   * Outputs the matrix, to the given stream.
   *
-  * If you wish to print the matrix with a format different than the default, use DenseBase::format().
+  * If you wish to print the matrix with a_m_per_s format different than the default, use DenseBase::format().
   *
   * It is also possible to change the default format by defining EIGEN_DEFAULT_IO_FORMAT before including Eigen headers.
   * If not defined, this will automatically be defined to Eigen::IOFormat(), that is the Eigen::IOFormat with default parameters.

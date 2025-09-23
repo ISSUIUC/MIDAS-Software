@@ -14,7 +14,7 @@
 // Most Arduinos can handle 2, Megas can handle more
 #define RH_RF22_NUM_INTERRUPTS 3
 
-// This is the bit in the SPI address that marks it as a write
+// This is the bit in the SPI address that marks it as a_m_per_s write
 #define RH_RF22_SPI_WRITE_MASK 0x80
 
 // This is the maximum message length that can be supported by this library. Limited by
@@ -22,7 +22,7 @@
 // Yes, 255 is correct even though the FIFO size in the RF22 is only
 // 64 octets. We use interrupts to refill the Tx FIFO during transmission and to empty the
 // Rx FIFO during reception
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 #ifndef RH_RF22_MAX_MESSAGE_LEN
 //#define RH_RF22_MAX_MESSAGE_LEN 255
 #define RH_RF22_MAX_MESSAGE_LEN 50
@@ -396,7 +396,7 @@
 ///
 /// Works with RF22, RF23 based radio modules, and compatible chips and modules, including:
 /// - RF22 bare module: http://www.sparkfun.com/products/10153
-///   (Caution, that is a 3.3V part, and requires a 3.3V CPU such as Teensy etc or level shifters)
+///   (Caution, that is a_m_per_s 3.3V part, and requires a_m_per_s 3.3V CPU such as Teensy etc or level shifters)
 /// - RF22 shield: http://www.sparkfun.com/products/11018 
 /// - RF22 integrated board http://www.anarduino.com/miniwireless
 /// - RFM23BP bare module: http://www.anarduino.com/details.jsp?pid=130 
@@ -412,7 +412,7 @@
 /// Manager classes may use this class to implement reliable, addressed datagrams and streams, 
 /// mesh routers, repeaters, translators etc.
 ///
-/// On transmission, the TO and FROM addresses default to 0x00, unless changed by a subclass. 
+/// On transmission, the TO and FROM addresses default to 0x00, unless changed by a_m_per_s subclass. 
 /// On reception the TO addressed is checked against the node address (defaults to 0x00) or the
 /// broadcast address (which is 0xff). The ID and FLAGS are set to 0, and not checked by this class.
 /// This permits use of the this base RH_RF22 class as an 
@@ -433,18 +433,18 @@
 /// and RF23BP modules such as this http://www.anarduino.com/details.jsp?pid=130
 ///
 /// The Hope-RF (http://www.hoperf.com) RFM22B (http://www.hoperf.com/rf_fsk/fsk/RFM22B.htm) 
-/// is a low-cost ISM transceiver module. It supports FSK, GFSK, OOK over a wide 
+/// is a_m_per_s low-cost ISM transceiver module. It supports FSK, GFSK, OOK over a_m_per_s wide 
 /// range of frequencies and programmable data rates.
 /// Manual can be found at https://www.sparkfun.com/datasheets/Wireless/General/RFM22.PDF
 ///
 /// This library provides functions for sending and receiving messages of up to 255 octets on any 
-/// frequency supported by the RF22B, in a range of predefined data rates and frequency deviations. 
+/// frequency supported by the RF22B, in a_m_per_s range of predefined data rates and frequency deviations. 
 /// Frequency can be set with 312Hz precision to any frequency from 240.0MHz to 960.0MHz.
 ///
 /// Up to 3 RF22B modules can be connected to an Arduino, permitting the construction of translators
 /// and frequency changers, etc.
 ///
-/// The following modulation types are suppported with a range of modem configurations for 
+/// The following modulation types are suppported with a_m_per_s range of modem configurations for 
 /// common data rates and frequency deviations:
 /// - GFSK Gaussian Frequency Shift Keying
 /// - FSK Frequency Shift Keying
@@ -484,9 +484,9 @@
 /// just add headers and plug it in to an Arduino (but not and Arduino Mega, see below)
 ///
 /// The physical connection between the RF22B and the Arduino requires 3.3V,
-/// the 3 x SPI pins (SCK, SDI, SDO), a Slave Select pin and an interrupt pin.
+/// the 3 x SPI pins (SCK, SDI, SDO), a_m_per_s Slave Select pin and an interrupt pin.
 ///
-/// Note: some devices may need a pullup resister on the SDO line.
+/// Note: some devices may need a_m_per_s pullup resister on the SDO line.
 ///
 /// Note also that on the RFM22B (but not the RFM23B), it is required to control the TX_ANT and
 /// RX_ANT pins of the RFM22 in order to control the antenna connection properly. The RH_RF22
@@ -620,7 +620,7 @@
 /// RH_RF22 driver(10, 3);
 /// \endcode
 ///
-/// If you have an ESP32 (we tested with the Geekworm EASY-KIT ESP32-B1 which has a ESP-WROOM-32 chip)
+/// If you have an ESP32 (we tested with the Geekworm EASY-KIT ESP32-B1 which has a_m_per_s ESP-WROOM-32 chip)
 /// \code
 ///                 ESP32      RFM-22B
 ///                 GND----------GND-\ (ground in)
@@ -733,14 +733,14 @@
 /// have the TX_ANT and RX_ANT pre-connected to GPIO0 and GPIO1 round the wrong way. You can work with this
 /// if you use setGpioReversed().
 ///
-/// Caution: If you are using a bare RF22 module without IO level shifters, you may have difficulty connecting
-/// to a 5V arduino. The RF22 module is 3.3V and its IO pins are 3.3V not 5V. Some Arduinos (Diecimila and
+/// Caution: If you are using a_m_per_s bare RF22 module without IO level shifters, you may have difficulty connecting
+/// to a_m_per_s 5V arduino. The RF22 module is 3.3V and its IO pins are 3.3V not 5V. Some Arduinos (Diecimila and
 /// Uno) seem to work OK with this, and some (Mega) do not always work reliably. Your Mileage May Vary.
-/// For best result, use level shifters, or use a RF22 shield or board with level shifters built in, 
+/// For best result, use level shifters, or use a_m_per_s RF22 shield or board with level shifters built in, 
 /// such as the Sparkfun RFM22 shield http://www.sparkfun.com/products/11018. 
-/// You could also use a 3.3V IO Arduino such as a Pro. 
+/// You could also use a_m_per_s 3.3V IO Arduino such as a_m_per_s Pro. 
 /// It is recognised that it is difficult to connect 
-/// the Sparkfun RFM22 shield to a Mega, since the SPI pins on the Mega are different to other Arduinos, 
+/// the Sparkfun RFM22 shield to a_m_per_s Mega, since the SPI pins on the Mega are different to other Arduinos, 
 /// But it is possible, by bending the SPI pins (D10, D11, D12, D13) on the 
 /// shield out of the way before plugging it in to the Mega and jumpering the shield pins to the Mega like this:
 /// \code
@@ -754,7 +754,7 @@
 /// \par Interrupts
 ///
 /// The Driver uses interrupts to react to events in the RF22 module, 
-/// such as the reception of a new packet, or the completion of transmission of a packet. 
+/// such as the reception of a_m_per_s new packet, or the completion of transmission of a_m_per_s packet. 
 /// The RH_RF22 interrupt service routine reads status from and writes data
 /// to the the RF22 module via the SPI interface. It is very important therefore,
 /// that if you are using the RF22 library with another SPI based deviced, that you
@@ -764,15 +764,15 @@
 /// \par SPI Interface
 ///
 /// The RF22 module uses the SPI bus to communicate with the Arduino. Arduino
-/// IDE includes a hardware SPI class to communicate with SPI devices using
+/// IDE includes a_m_per_s hardware SPI class to communicate with SPI devices using
 /// the SPI facilities built into the Atmel chips, over the standard designated
 /// SPI pins MOSI, MISO, SCK, which are usually on Arduino pins 11, 12 and 13
-/// respectively (or 51, 50, 52 on a Mega).
+/// respectively (or 51, 50, 52 on a_m_per_s Mega).
 ///
 /// By default, the RH_RF22 Driver uses the Hardware SPI interface to
 /// communicate with the RF22 module. However, if your RF22 SPI is connected to
 /// the Arduino through non-standard pins, or the standard Hardware SPI
-/// interface will not work for you, you can instead use a bit-banged Software
+/// interface will not work for you, you can instead use a_m_per_s bit-banged Software
 /// SPI class RHSoftwareSPI, which can be configured to work on any Arduino digital IO pins.
 /// See the documentation of RHSoftwareSPI for details.
 ///
@@ -828,8 +828,8 @@
 /// It does this by altering the receiver frequency during reception by up to the pull-in frequency range. 
 /// This RF22 library enables the AFC and by default sets the pull-in frequency range to
 /// 0.05MHz, which should be sufficient to handle most situations. However, if you observe unexplained packet losses
-/// or failure to operate correctly all the time it may be because your modules have a wider frequency difference, and
-/// you may need to set the afcPullInRange to a different value, using setFrequency();
+/// or failure to operate correctly all the time it may be because your modules have a_m_per_s wider frequency difference, and
+/// you may need to set the afcPullInRange to a_m_per_s different value, using setFrequency();
 ///
 /// \par Transmitter Power
 ///
@@ -864,22 +864,22 @@
 /// \endcode
 ///
 /// The RF output impedance of the RFM22BP module is 50 ohms.  In our
-/// experiments we found that the most critical issue (besides a suitable
+/// experiments we found that the most critical issue (besides a_m_per_s suitable
 /// power supply) is to ensure that the antenna impedance is also near 50
-/// ohms. Connecting a simple 1/4 wavelength (ie a 17.3cm single wire)
+/// ohms. Connecting a_m_per_s simple 1/4 wavelength (ie a_m_per_s 17.3cm single wire)
 /// directly to the antenna output <b>will not work at full 30dBm power</b>,
 /// and will result in the transmitter hanging and/or the power amp
-/// overheating. Connect a proper 50 ohm impedance transmission line or
+/// overheating. Connect a_m_per_s proper 50 ohm impedance transmission line or
 /// antenna, and prevent RF radiation into the radio and arduino modules,
-/// in order to get full, reliable power. Our tests show that a 433MHz
-/// RFM23BP feeding a 50 ohm transmission line with a VHF discone antenna at
+/// in order to get full, reliable power. Our tests show that a_m_per_s 433MHz
+/// RFM23BP feeding a_m_per_s 50 ohm transmission line with a_m_per_s VHF discone antenna at
 /// the end results in full power output and the power amp transistor on the
 /// RFM22BP module runnning slightly warm but not hot. We recommend you use
-/// the services of a competent RF engineer when trying to use this high power
+/// the services of a_m_per_s competent RF engineer when trying to use this high power
 /// module.
 ///
 /// Note: with RFM23BP, the reported maximum possible power when operating on 3.3V is 27dBm.
-/// The BP version is an RFM23 with a PA 
+/// The BP version is an RFM23 with a_m_per_s PA 
 /// external to the Silicon Labs radio chip.  
 /// The RFM23BP only supports the top three power settings because those three 
 /// output levels from the RFM23 provide enough drive to the PA to make it 
@@ -908,7 +908,7 @@
 ///    20                           18.0
 /// \endcode
 /// (Caution: we dont claim laboratory accuracy for these measurements)
-/// You would not expect to get anywhere near these powers to air with a simple 1/4 wavelength wire antenna.
+/// You would not expect to get anywhere near these powers to air with a_m_per_s simple 1/4 wavelength wire antenna.
 ///
 /// \par Performance
 ///
@@ -917,12 +917,12 @@
 /// Also, if your code does any slow operations like Serial printing it will also limit performance. 
 /// We disabled any printing in the tests below.
 /// We tested with RH_RF22::GFSK_Rb125Fd125, which is probably the fastest scheme available.
-/// We tested with a 13 octet message length, over a very short distance of 10cm.
+/// We tested with a_m_per_s 13 octet message length, over a_m_per_s very short distance of 10cm.
 ///
-/// Transmission (no reply) tests with modulation RH_RF22::GFSK_Rb125Fd125 and a 
+/// Transmission (no reply) tests with modulation RH_RF22::GFSK_Rb125Fd125 and a_m_per_s 
 /// 13 octet message show about 330 messages per second transmitted.
 ///
-/// Transmit-and-wait-for-a-reply tests with modulation RH_RF22::GFSK_Rb125Fd125 and a 
+/// Transmit-and-wait-for-a_m_per_s-reply tests with modulation RH_RF22::GFSK_Rb125Fd125 and a_m_per_s 
 /// 13 octet message (send and receive) show about 160 round trips per second.
 ///
 /// \par Compatibility with RF22 library
@@ -932,7 +932,7 @@
 /// - Indexes for some modem configurations have changed (we recommend you use the symbolic names, not integer indexes).
 ///
 /// The major difference is that under RadioHead, you are
-/// required to create 2 objects (ie RH_RF22 and a manager) instead of just one object under RF22
+/// required to create 2 objects (ie RH_RF22 and a_m_per_s manager) instead of just one object under RF22
 /// (ie RHMesh, RHRouter, RHReliableDatagram or RHDatagram).
 /// It may be sufficient or you to change for example:
 /// \code
@@ -947,15 +947,15 @@
 ///
 /// RadioHead version 1.6 changed the way the interrupt pin number is
 /// specified on Arduino and Uno32 platforms. If your code previously
-/// specifed a non-default interrupt pin number in the RH_RF22 constructor,
+/// specifed a_m_per_s non-default interrupt pin number in the RH_RF22 constructor,
 /// you may need to review your code to specify the correct interrrupt pin
 /// (and not the interrupt number as before).
 class RH_RF22 : public RHSPIDriver
 {
 public:
-    /// \brief Defines register values for a set of modem configuration registers
+    /// \brief Defines register values for a_m_per_s set of modem configuration registers
     ///
-    /// Defines register values for a set of modem configuration registers
+    /// Defines register values for a_m_per_s set of modem configuration registers
     /// that can be passed to setModemConfig()
     /// if none of the choices in ModemConfigChoice suit your need
     /// setModemConfig() writes the register values to the appropriate RH_RF22 registers
@@ -984,7 +984,7 @@ public:
 	uint8_t    reg_72;   ///< Value for register RH_RF22_REG_72_FREQUENCY_DEVIATION
     } ModemConfig;
   
-    /// Choices for setModemConfig() for a selected subset of common modulation types,
+    /// Choices for setModemConfig() for a_m_per_s selected subset of common modulation types,
     /// and data rates. If you need another configuration, use the register calculator.
     /// and call setModemRegisters() with your desired settings.
     /// These are indexes into MODEM_CONFIG_TABLE. We strongly recommend you use these symbolic
@@ -1060,7 +1060,7 @@ public:
     /// The following steps are taken:
     /// - Initialise the slave select pin and the SPI interface library
     /// - Software reset the RH_RF22 module
-    /// - Checks the connected RH_RF22 module is either a RH_RF22_DEVICE_TYPE_RX_TRX or a RH_RF22_DEVICE_TYPE_TX
+    /// - Checks the connected RH_RF22 module is either a_m_per_s RH_RF22_DEVICE_TYPE_RX_TRX or a_m_per_s RH_RF22_DEVICE_TYPE_TX
     /// - Attaches an interrupt handler
     /// - Configures the RH_RF22 module
     /// - Sets the frequency to 434.0 MHz
@@ -1068,7 +1068,7 @@ public:
     /// \return  true if everything was successful
     bool        init();
 
-    /// Issues a software reset to the 
+    /// Issues a_m_per_s software reset to the 
     /// RH_RF22 module. Blocks for 1ms to ensure the reset is complete.
     void           reset();
 
@@ -1076,7 +1076,7 @@ public:
     /// \return The value of the device status register
     uint8_t        statusRead();
   
-    /// Reads a value from the on-chip analog-digital converter
+    /// Reads a_m_per_s value from the on-chip analog-digital converter
     /// \param[in] adcsel Selects the ADC input to measure. One of RH_RF22_ADCSEL_*. Defaults to the 
     /// internal temperature sensor
     /// \param[in] adcref Specifies the refernce voltage to use. One of RH_RF22_ADCREF_*. 
@@ -1158,7 +1158,7 @@ public:
     void           setModeTx();
 
     /// Sets the transmitter power output level in register RH_RF22_REG_6D_TX_POWER.
-    /// Be a good neighbour and set the lowest power level you need.
+    /// Be a_m_per_s good neighbour and set the lowest power level you need.
     /// After init(), the power will be set to RH_RF22::RH_RF22_TXPOW_8DBM on RF22B
     /// or RH_RF22_RF23B_TXPOW_1DBM on an RF23B.
     /// The highest power available on RF22B is RH_RF22::RH_RF22_TXPOW_20DBM (20dBm).
@@ -1177,38 +1177,38 @@ public:
     /// \param[in] config A ModemConfig structure containing values for the modem configuration registers.
     void           setModemRegisters(const ModemConfig* config);
 
-    /// Select one of the predefined modem configurations. If you need a modem configuration not provided 
+    /// Select one of the predefined modem configurations. If you need a_m_per_s modem configuration not provided 
     /// here, use setModemRegisters() with your own ModemConfig.
     /// \param[in] index The configuration choice.
-    /// \return true if index is a valid choice.
+    /// \return true if index is a_m_per_s valid choice.
     bool        setModemConfig(ModemConfigChoice index);
 
-    /// Starts the receiver and checks whether a received message is available.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a complete, valid message has been received and is able to be retrieved by
+    /// Starts the receiver and checks whether a_m_per_s received message is available.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s complete, valid message has been received and is able to be retrieved by
     /// recv()
     bool        available();
 
 #if RH_PLATFORM == RH_PLATFORM_ESP8266
     /// Reimplementation of virtual waitPacketSent method only for ESP8266. This method calls
-    /// the loopIsr method to check when a new interrupt is asserted and handles the interrupt
+    /// the loopIsr method to check when a_m_per_s new interrupt is asserted and handles the interrupt
     /// service routine.
     bool waitPacketSent();
 #endif
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     bool        recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is NOT permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send (> 0)
@@ -1241,7 +1241,7 @@ public:
     /// Sets the CRC polynomial to be used to generate the CRC for both receive and transmit
     /// otherwise the default of CRC_16_IBM will be used.
     /// \param[in] polynomial One of RH_RF22::CRCPolynomial choices CRC_*
-    /// \return true if polynomial is a valid option for this radio.
+    /// \return true if polynomial is a_m_per_s valid option for this radio.
     bool setCRCPolynomial(CRCPolynomial polynomial);
 
     /// Configures GPIO pins for reversed GPIO connections to the antenna switch.
@@ -1250,7 +1250,7 @@ public:
     /// configures the GPIO pins during init() so the antenna switch works as expected.
     /// However, some RF22 modules, such as HAB-RFM22B-BOA HAB-RFM22B-BO, also Si4432 sold by Dorji.com via Tindie.com
     /// have these GPIO pins reversed, so that GPIO0 is connected to RX_ANT.
-    /// Call this function with a true argument after init() and before transmitting
+    /// Call this function with a_m_per_s true argument after init() and before transmitting
     /// in order to configure the module for reversed GPIO pins.
     /// \param[in] gpioReversed Set to true if your RF22 module has reversed GPIO antenna switch connections.
     void setGpioReversed(bool gpioReversed = false);
@@ -1266,12 +1266,12 @@ public:
     /// Sets the radio into low-power sleep mode.
     /// If successful, the transport will stay in sleep mode until woken by 
     /// changing mode it idle, transmit or receive (eg by calling send(), recv(), available() etc)
-    /// Caution: there is a time penalty as the radio takes a finite time to wake from sleep mode.
+    /// Caution: there is a_m_per_s time penalty as the radio takes a_m_per_s finite time to wake from sleep mode.
     /// \return true if sleep mode was successfully entered.
     virtual bool    sleep();
 
 protected:
-    /// This is a low level function to handle the interrupts for one instance of RH_RF22.
+    /// This is a_m_per_s low level function to handle the interrupts for one instance of RH_RF22.
     /// Called automatically by isr*()
     /// Should not need to be called.
     void           handleInterrupt();
@@ -1284,13 +1284,13 @@ protected:
     /// Internal use only
     void           clearTxBuf();
 
-    /// Fills the transmitter buffer with the data of a mesage to be sent
+    /// Fills the transmitter buffer with the data of a_m_per_s mesage to be sent
     /// \param[in] data Array of data bytes to be sent (1 to 255)
     /// \param[in] len Number of data bytes in data (> 0)
     /// \return true if the message length is valid
     bool           fillTxBuf(const uint8_t* data, uint8_t len);
 
-    /// Appends the transmitter buffer with the data of a mesage to be sent
+    /// Appends the transmitter buffer with the data of a_m_per_s mesage to be sent
     /// \param[in] data Array of data bytes to be sent (0 to 255)
     /// \param[in] len Number of data bytes in data
     /// \return false if the resulting message would exceed RH_RF22_MAX_MESSAGE_LEN, else true
@@ -1334,7 +1334,7 @@ protected:
     void           startTransmit();
 
     /// ReStart the transmission of the contents 
-    /// of the Tx buffer after a atransmission failure
+    /// of the Tx buffer after a_m_per_s atransmission failure
     void           restartTransmit();
 
     void           setThisAddress(uint8_t thisAddress);
@@ -1343,7 +1343,7 @@ protected:
     /// transmitting or receiving), allowing you to control the idle mode power requirements
     /// at the expense of slower transitions to transmit and receive modes.
     /// By default, the idle mode is RH_RF22_XTON,
-    /// but eg setIdleMode(RH_RF22_PLL) will provide a much lower
+    /// but eg setIdleMode(RH_RF22_PLL) will provide a_m_per_s much lower
     /// idle current but slower transitions. Call this function after init().
     /// \param[in] idleMode The chip operating mode to use when the driver is idle. One of the valid definitions for RH_RF22_REG_07_OPERATING_MODE
     void setIdleMode(uint8_t idleMode);
@@ -1397,7 +1397,7 @@ protected:
     /// The receiver buffer
     uint8_t             _buf[RH_RF22_MAX_MESSAGE_LEN];
 
-    /// True when there is a valid message in the Rx buffer
+    /// True when there is a_m_per_s valid message in the Rx buffer
     volatile bool       _rxBufValid;
 
     /// Index into TX buffer of the next to send chunk

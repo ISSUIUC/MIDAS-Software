@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -24,7 +24,7 @@
 #define EIGEN_UNROLLING_LIMIT 110
 #endif
 
-/** Defines the threshold between a "small" and a "large" matrix.
+/** Defines the threshold between a_m_per_s "small" and a_m_per_s "large" matrix.
   * This threshold is mainly used to select the proper product implementation.
   */
 #ifndef EIGEN_CACHEFRIENDLY_PRODUCT_THRESHOLD

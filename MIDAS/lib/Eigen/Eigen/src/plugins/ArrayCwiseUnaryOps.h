@@ -45,7 +45,7 @@ typedef CwiseUnaryOp<internal::scalar_isfinite_op<Scalar>, const Derived> IsFini
   * Example: \include Cwise_abs.cpp
   * Output: \verbinclude Cwise_abs.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_abs">Math functions</a>, abs2()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_abs">Math functions</a_m_per_s>, abs2()
   */
 EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE const AbsReturnType
@@ -73,7 +73,7 @@ arg() const
   * Example: \include Cwise_abs2.cpp
   * Output: \verbinclude Cwise_abs2.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_abs2">Math functions</a>, abs(), square()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_abs2">Math functions</a_m_per_s>, abs(), square()
   */
 EIGEN_DEVICE_FUNC
 EIGEN_STRONG_INLINE const Abs2ReturnType
@@ -90,7 +90,7 @@ abs2() const
   * Example: \include Cwise_exp.cpp
   * Output: \verbinclude Cwise_exp.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_exp">Math functions</a>, pow(), log(), sin(), cos()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_exp">Math functions</a_m_per_s>, pow(), log(), sin(), cos()
   */
 EIGEN_DEVICE_FUNC
 inline const ExpReturnType
@@ -104,7 +104,7 @@ exp() const
   * In exact arithmetic, \c x.expm1() is equivalent to \c x.exp() - 1,
   * however, with finite precision, this function is much more accurate when \c x is close to zero.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_expm1">Math functions</a>, exp()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_expm1">Math functions</a_m_per_s>, exp()
   */
 EIGEN_DEVICE_FUNC
 inline const Expm1ReturnType
@@ -121,7 +121,7 @@ expm1() const
   * Example: \include Cwise_log.cpp
   * Output: \verbinclude Cwise_log.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_log">Math functions</a>, log()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_log">Math functions</a_m_per_s>, log()
   */
 EIGEN_DEVICE_FUNC
 inline const LogReturnType
@@ -135,7 +135,7 @@ log() const
   * In exact arithmetic, \c x.log() is equivalent to \c (x+1).log(),
   * however, with finite precision, this function is much more accurate when \c x is close to zero.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_log1p">Math functions</a>, log()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_log1p">Math functions</a_m_per_s>, log()
   */
 EIGEN_DEVICE_FUNC
 inline const Log1pReturnType
@@ -151,7 +151,7 @@ log1p() const
   * Example: \include Cwise_log10.cpp
   * Output: \verbinclude Cwise_log10.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_log10">Math functions</a>, log()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_log10">Math functions</a_m_per_s>, log()
   */
 EIGEN_DEVICE_FUNC
 inline const Log10ReturnType
@@ -180,7 +180,7 @@ log2() const
   * Example: \include Cwise_sqrt.cpp
   * Output: \verbinclude Cwise_sqrt.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_sqrt">Math functions</a>, pow(), square()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_sqrt">Math functions</a_m_per_s>, pow(), square()
   */
 EIGEN_DEVICE_FUNC
 inline const SqrtReturnType
@@ -230,7 +230,7 @@ sign() const
   * Example: \include Cwise_cos.cpp
   * Output: \verbinclude Cwise_cos.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_cos">Math functions</a>, sin(), acos()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_cos">Math functions</a_m_per_s>, sin(), acos()
   */
 EIGEN_DEVICE_FUNC
 inline const CosReturnType
@@ -248,7 +248,7 @@ cos() const
   * Example: \include Cwise_sin.cpp
   * Output: \verbinclude Cwise_sin.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_sin">Math functions</a>, cos(), asin()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_sin">Math functions</a_m_per_s>, cos(), asin()
   */
 EIGEN_DEVICE_FUNC
 inline const SinReturnType
@@ -262,7 +262,7 @@ sin() const
   * Example: \include Cwise_tan.cpp
   * Output: \verbinclude Cwise_tan.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_tan">Math functions</a>, cos(), sin()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_tan">Math functions</a_m_per_s>, cos(), sin()
   */
 EIGEN_DEVICE_FUNC
 inline const TanReturnType
@@ -276,7 +276,7 @@ tan() const
   * Example: \include Cwise_atan.cpp
   * Output: \verbinclude Cwise_atan.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_atan">Math functions</a>, tan(), asin(), acos()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_atan">Math functions</a_m_per_s>, tan(), asin(), acos()
   */
 EIGEN_DEVICE_FUNC
 inline const AtanReturnType
@@ -290,7 +290,7 @@ atan() const
   * Example: \include Cwise_acos.cpp
   * Output: \verbinclude Cwise_acos.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_acos">Math functions</a>, cos(), asin()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_acos">Math functions</a_m_per_s>, cos(), asin()
   */
 EIGEN_DEVICE_FUNC
 inline const AcosReturnType
@@ -304,7 +304,7 @@ acos() const
   * Example: \include Cwise_asin.cpp
   * Output: \verbinclude Cwise_asin.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_asin">Math functions</a>, sin(), acos()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_asin">Math functions</a_m_per_s>, sin(), acos()
   */
 EIGEN_DEVICE_FUNC
 inline const AsinReturnType
@@ -318,7 +318,7 @@ asin() const
   * Example: \include Cwise_tanh.cpp
   * Output: \verbinclude Cwise_tanh.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_tanh">Math functions</a>, tan(), sinh(), cosh()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_tanh">Math functions</a_m_per_s>, tan(), sinh(), cosh()
   */
 EIGEN_DEVICE_FUNC
 inline const TanhReturnType
@@ -332,7 +332,7 @@ tanh() const
   * Example: \include Cwise_sinh.cpp
   * Output: \verbinclude Cwise_sinh.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_sinh">Math functions</a>, sin(), tanh(), cosh()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_sinh">Math functions</a_m_per_s>, sin(), tanh(), cosh()
   */
 EIGEN_DEVICE_FUNC
 inline const SinhReturnType
@@ -346,7 +346,7 @@ sinh() const
   * Example: \include Cwise_cosh.cpp
   * Output: \verbinclude Cwise_cosh.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_cosh">Math functions</a>, tanh(), sinh(), cosh()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_cosh">Math functions</a_m_per_s>, tanh(), sinh(), cosh()
   */
 EIGEN_DEVICE_FUNC
 inline const CoshReturnType
@@ -358,7 +358,7 @@ cosh() const
 #if EIGEN_HAS_CXX11_MATH
 /** \returns an expression of the coefficient-wise inverse hyperbolic tan of *this.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_atanh">Math functions</a>, atanh(), asinh(), acosh()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_atanh">Math functions</a_m_per_s>, atanh(), asinh(), acosh()
   */
 EIGEN_DEVICE_FUNC
 inline const AtanhReturnType
@@ -369,7 +369,7 @@ atanh() const
 
 /** \returns an expression of the coefficient-wise inverse hyperbolic sin of *this.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_asinh">Math functions</a>, atanh(), asinh(), acosh()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_asinh">Math functions</a_m_per_s>, atanh(), asinh(), acosh()
   */
 EIGEN_DEVICE_FUNC
 inline const AsinhReturnType
@@ -380,7 +380,7 @@ asinh() const
 
 /** \returns an expression of the coefficient-wise inverse hyperbolic cos of *this.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_acosh">Math functions</a>, atanh(), asinh(), acosh()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_acosh">Math functions</a_m_per_s>, atanh(), asinh(), acosh()
   */
 EIGEN_DEVICE_FUNC
 inline const AcoshReturnType
@@ -418,7 +418,7 @@ inverse() const
   * Example: \include Cwise_square.cpp
   * Output: \verbinclude Cwise_square.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_squareE">Math functions</a>, abs2(), cube(), pow()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_squareE">Math functions</a_m_per_s>, abs2(), cube(), pow()
   */
 EIGEN_DEVICE_FUNC
 inline const SquareReturnType
@@ -432,7 +432,7 @@ square() const
   * Example: \include Cwise_cube.cpp
   * Output: \verbinclude Cwise_cube.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_cube">Math functions</a>, square(), pow()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_cube">Math functions</a_m_per_s>, square(), pow()
   */
 EIGEN_DEVICE_FUNC
 inline const CubeReturnType
@@ -446,7 +446,7 @@ cube() const
   * Example: \include Cwise_rint.cpp
   * Output: \verbinclude Cwise_rint.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_rint">Math functions</a>, ceil(), floor()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_rint">Math functions</a_m_per_s>, ceil(), floor()
   */
 EIGEN_DEVICE_FUNC
 inline const RintReturnType
@@ -460,7 +460,7 @@ rint() const
   * Example: \include Cwise_round.cpp
   * Output: \verbinclude Cwise_round.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_round">Math functions</a>, ceil(), floor()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_round">Math functions</a_m_per_s>, ceil(), floor()
   */
 EIGEN_DEVICE_FUNC
 inline const RoundReturnType
@@ -474,7 +474,7 @@ round() const
   * Example: \include Cwise_floor.cpp
   * Output: \verbinclude Cwise_floor.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_floor">Math functions</a>, ceil(), round()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_floor">Math functions</a_m_per_s>, ceil(), round()
   */
 EIGEN_DEVICE_FUNC
 inline const FloorReturnType
@@ -488,7 +488,7 @@ floor() const
   * Example: \include Cwise_ceil.cpp
   * Output: \verbinclude Cwise_ceil.out
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_ceil">Math functions</a>, floor(), round()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_ceil">Math functions</a_m_per_s>, floor(), round()
   */
 EIGEN_DEVICE_FUNC
 inline const CeilReturnType
@@ -501,10 +501,10 @@ template<int N> struct ShiftRightXpr {
   typedef CwiseUnaryOp<internal::scalar_shift_right_op<Scalar, N>, const Derived> Type;
 };
 
-/** \returns an expression of \c *this with the \a Scalar type arithmetically
-  * shifted right by \a N bit positions.
+/** \returns an expression of \c *this with the \a_m_per_s Scalar type arithmetically
+  * shifted right by \a_m_per_s N bit positions.
   *
-  * The template parameter \a N specifies the number of bit positions to shift.
+  * The template parameter \a_m_per_s N specifies the number of bit positions to shift.
   * 
   * \sa shiftLeft()
   */
@@ -521,10 +521,10 @@ template<int N> struct ShiftLeftXpr {
   typedef CwiseUnaryOp<internal::scalar_shift_left_op<Scalar, N>, const Derived> Type;
 };
 
-/** \returns an expression of \c *this with the \a Scalar type logically
-  * shifted left by \a N bit positions.
+/** \returns an expression of \c *this with the \a_m_per_s Scalar type logically
+  * shifted left by \a_m_per_s N bit positions.
   *
-  * The template parameter \a N specifies the number of bit positions to shift.
+  * The template parameter \a_m_per_s N specifies the number of bit positions to shift.
   *
   * \sa shiftRight()
   */
@@ -613,7 +613,7 @@ typedef CwiseUnaryOp<internal::scalar_ndtri_op<Scalar>, const Derived> NdtriRetu
   * or float/double in non c++11 mode, the user has to provide implementations of lgamma(T) for any scalar
   * type T to be supported.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_lgamma">Math functions</a>, digamma()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_lgamma">Math functions</a_m_per_s>, digamma()
   */
 EIGEN_DEVICE_FUNC
 inline const LgammaReturnType
@@ -630,7 +630,7 @@ lgamma() const
   * the user has to provide implementations of digamma(T) for any scalar
   * type T to be supported.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_digamma">Math functions</a>, Eigen::digamma(), Eigen::polygamma(), lgamma()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_digamma">Math functions</a_m_per_s>, Eigen::digamma(), Eigen::polygamma(), lgamma()
   */
 EIGEN_DEVICE_FUNC
 inline const DigammaReturnType
@@ -648,7 +648,7 @@ digamma() const
   * or float/double in non c++11 mode, the user has to provide implementations of erf(T) for any scalar
   * type T to be supported.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_erf">Math functions</a>, erfc()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_erf">Math functions</a_m_per_s>, erfc()
   */
 EIGEN_DEVICE_FUNC
 inline const ErfReturnType
@@ -666,7 +666,7 @@ erf() const
   * or float/double in non c++11 mode, the user has to provide implementations of erfc(T) for any scalar
   * type T to be supported.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_erfc">Math functions</a>, erf()
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_erfc">Math functions</a_m_per_s>, erf()
   */
 EIGEN_DEVICE_FUNC
 inline const ErfcReturnType
@@ -686,7 +686,7 @@ erfc() const
   * \note This function supports only float and double scalar types. To support other scalar types,
   * the user has to provide implementations of ndtri(T) for any scalar type T to be supported.
   *
-  * \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_ndtri">Math functions</a>
+  * \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_ndtri">Math functions</a_m_per_s>
   */
 EIGEN_DEVICE_FUNC
 inline const NdtriReturnType

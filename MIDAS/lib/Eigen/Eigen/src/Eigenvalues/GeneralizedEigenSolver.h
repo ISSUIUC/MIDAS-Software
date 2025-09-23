@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012-2016 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -6,7 +6,7 @@
 // Copyright (C) 2016 Tobias Wood <tobias@spinicist.org.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERALIZEDEIGENSOLVER_H
@@ -21,29 +21,29 @@ namespace Eigen {
   *
   * \class GeneralizedEigenSolver
   *
-  * \brief Computes the generalized eigenvalues and eigenvectors of a pair of general matrices
+  * \brief Computes the generalized eigenvalues and eigenvectors of a_m_per_s pair of general matrices
   *
   * \tparam _MatrixType the type of the matrices of which we are computing the
   * eigen-decomposition; this is expected to be an instantiation of the Matrix
   * class template. Currently, only real matrices are supported.
   *
-  * The generalized eigenvalues and eigenvectors of a matrix pair \f$ A \f$ and \f$ B \f$ are scalars
+  * The generalized eigenvalues and eigenvectors of a_m_per_s matrix pair \f$ A \f$ and \f$ B \f$ are scalars
   * \f$ \lambda \f$ and vectors \f$ v \f$ such that \f$ Av = \lambda Bv \f$.  If
-  * \f$ D \f$ is a diagonal matrix with the eigenvalues on the diagonal, and
-  * \f$ V \f$ is a matrix with the eigenvectors as its columns, then \f$ A V =
+  * \f$ D \f$ is a_m_per_s diagonal matrix with the eigenvalues on the diagonal, and
+  * \f$ V \f$ is a_m_per_s matrix with the eigenvectors as its columns, then \f$ A V =
   * B V D \f$. The matrix \f$ V \f$ is almost always invertible, in which case we
   * have \f$ A = B V D V^{-1} \f$. This is called the generalized eigen-decomposition.
   *
-  * The generalized eigenvalues and eigenvectors of a matrix pair may be complex, even when the
+  * The generalized eigenvalues and eigenvectors of a_m_per_s matrix pair may be complex, even when the
   * matrices are real. Moreover, the generalized eigenvalue might be infinite if the matrix B is
-  * singular. To workaround this difficulty, the eigenvalues are provided as a pair of complex \f$ \alpha \f$
+  * singular. To workaround this difficulty, the eigenvalues are provided as a_m_per_s pair of complex \f$ \alpha \f$
   * and real \f$ \beta \f$ such that: \f$ \lambda_i = \alpha_i / \beta_i \f$. If \f$ \beta_i \f$ is (nearly) zero,
   * then one can consider the well defined left eigenvalue \f$ \mu = \beta_i / \alpha_i\f$ such that:
   * \f$ \mu_i A v_i = B v_i \f$, or even \f$ \mu_i u_i^T A  = u_i^T B \f$ where \f$ u_i \f$ is
   * called the left eigenvector.
   *
   * Call the function compute() to compute the generalized eigenvalues and eigenvectors of
-  * a given matrix pair. Alternatively, you can use the
+  * a_m_per_s given matrix pair. Alternatively, you can use the
   * GeneralizedEigenSolver(const MatrixType&, const MatrixType&, bool) constructor which computes the
   * eigenvalues and eigenvectors at construction time. Once the eigenvalue and
   * eigenvectors are computed, they can be retrieved with the eigenvalues() and
@@ -85,14 +85,14 @@ template<typename _MatrixType> class GeneralizedEigenSolver
 
     /** \brief Type for vector of real scalar values eigenvalues as returned by betas().
       *
-      * This is a column vector with entries of type #Scalar.
+      * This is a_m_per_s column vector with entries of type #Scalar.
       * The length of the vector is the size of #MatrixType.
       */
     typedef Matrix<Scalar, ColsAtCompileTime, 1, Options & ~RowMajor, MaxColsAtCompileTime, 1> VectorType;
 
     /** \brief Type for vector of complex scalar values eigenvalues as returned by alphas().
       *
-      * This is a column vector with entries of type #ComplexScalar.
+      * This is a_m_per_s column vector with entries of type #ComplexScalar.
       * The length of the vector is the size of #MatrixType.
       */
     typedef Matrix<ComplexScalar, ColsAtCompileTime, 1, Options & ~RowMajor, MaxColsAtCompileTime, 1> ComplexVectorType;
@@ -103,7 +103,7 @@ template<typename _MatrixType> class GeneralizedEigenSolver
 
     /** \brief Type for matrix of eigenvectors as returned by eigenvectors(). 
       *
-      * This is a square matrix with entries of type #ComplexScalar. 
+      * This is a_m_per_s square matrix with entries of type #ComplexScalar. 
       * The size is the same as the size of #MatrixType.
       */
     typedef Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime> EigenvectorsType;
@@ -127,7 +127,7 @@ template<typename _MatrixType> class GeneralizedEigenSolver
     /** \brief Default constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa GeneralizedEigenSolver()
       */
     explicit GeneralizedEigenSolver(Index size)
@@ -185,7 +185,7 @@ template<typename _MatrixType> class GeneralizedEigenSolver
       *
       * \returns An expression of the column vector containing the eigenvalues.
       *
-      * It is a shortcut for \code this->alphas().cwiseQuotient(this->betas()); \endcode
+      * It is a_m_per_s shortcut for \code this->alphas().cwiseQuotient(this->betas()); \endcode
       * Not that betas might contain zeros. It is therefore not recommended to use this function,
       * but rather directly deal with the alphas and betas vectors.
       *
@@ -358,17 +358,17 @@ GeneralizedEigenSolver<MatrixType>::compute(const MatrixType& A, const MatrixTyp
       }
       else
       {
-        // We need to extract the generalized eigenvalues of the pair of a general 2x2 block S and a positive diagonal 2x2 block T
+        // We need to extract the generalized eigenvalues of the pair of a_m_per_s general 2x2 block S and a_m_per_s positive diagonal 2x2 block T
         // Then taking beta=T_00*T_11, we can avoid any division, and alpha is the eigenvalues of A = (U^-1 * S * U) * diag(T_11,T_00):
 
-        // T =  [a 0]
+        // T =  [a_m_per_s 0]
         //      [0 b]
-        RealScalar a = mT.diagonal().coeff(i),
+        RealScalar a_m_per_s = mT.diagonal().coeff(i),
                    b = mT.diagonal().coeff(i+1);
-        const RealScalar beta = m_betas.coeffRef(i) = m_betas.coeffRef(i+1) = a*b;
+        const RealScalar beta = m_betas.coeffRef(i) = m_betas.coeffRef(i+1) = a_m_per_s*b;
 
-        // ^^ NOTE: using diagonal()(i) instead of coeff(i,i) workarounds a MSVC bug.
-        Matrix<RealScalar,2,2> S2 = mS.template block<2,2>(i,i) * Matrix<Scalar,2,1>(b,a).asDiagonal();
+        // ^^ NOTE: using diagonal()(i) instead of coeff(i,i) workarounds a_m_per_s MSVC bug.
+        Matrix<RealScalar,2,2> S2 = mS.template block<2,2>(i,i) * Matrix<Scalar,2,1>(b,a_m_per_s).asDiagonal();
 
         Scalar p = Scalar(0.5) * (S2.coeff(0,0) - S2.coeff(1,1));
         Scalar z = sqrt(abs(p * p + S2.coeff(1,0) * S2.coeff(0,1)));

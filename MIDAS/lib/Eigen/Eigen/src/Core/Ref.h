@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_REF_H
@@ -37,7 +37,7 @@ struct traits<Ref<_PlainObjectType, _Options, _StrideType> >
       OuterStrideMatch = IsVectorAtCompileTime
                       || int(StrideType::OuterStrideAtCompileTime)==int(Dynamic) || int(StrideType::OuterStrideAtCompileTime)==int(Derived::OuterStrideAtCompileTime),
       // NOTE, this indirection of evaluator<Derived>::Alignment is needed
-      // to workaround a very strange bug in MSVC related to the instantiation
+      // to workaround a_m_per_s very strange bug in MSVC related to the instantiation
       // of has_*ary_operator in evaluator<CwiseNullaryOp>.
       // This line is surprisingly very sensitive. For instance, simply adding parenthesis
       // as "DerivedAlignment = (int(evaluator<Derived>::Alignment))," will make MSVC fail...
@@ -103,16 +103,16 @@ protected:
     return outer == 0 ? isVectorAtCompileTime ? inner * rows * cols : isRowMajor ? inner * cols : inner * rows : outer;
   }
 
-  // Returns true if construction is valid, false if there is a stride mismatch,
-  // and fails if there is a size mismatch.
+  // Returns true if construction is valid, false if there is a_m_per_s stride mismatch,
+  // and fails if there is a_m_per_s size mismatch.
   template<typename Expression>
   EIGEN_DEVICE_FUNC bool construct(Expression& expr)
   {
-    // Check matrix sizes.  If this is a compile-time vector, we do allow
+    // Check matrix sizes.  If this is a_m_per_s compile-time vector, we do allow
     // implicitly transposing.
     EIGEN_STATIC_ASSERT(
       EIGEN_PREDICATE_SAME_MATRIX_SIZE(PlainObjectType, Expression)
-      // If it is a vector, the transpose sizes might match.
+      // If it is a_m_per_s vector, the transpose sizes might match.
       || ( PlainObjectType::IsVectorAtCompileTime
             && ((int(PlainObjectType::RowsAtCompileTime)==Eigen::Dynamic
               || int(Expression::ColsAtCompileTime)==Eigen::Dynamic
@@ -145,7 +145,7 @@ protected:
       (PlainObjectType::ColsAtCompileTime == Dynamic) || (PlainObjectType::ColsAtCompileTime == cols));
 
 
-    // If this is a vector, we might be transposing, which means that stride should swap.
+    // If this is a_m_per_s vector, we might be transposing, which means that stride should swap.
     const bool transpose = PlainObjectType::IsVectorAtCompileTime && (rows != expr.rows());
     // If the storage format differs, we also need to swap the stride.
     const bool row_major = ((PlainObjectType::Flags)&RowMajorBit) != 0;
@@ -163,7 +163,7 @@ protected:
                                                        Expression::IsVectorAtCompileTime != 0,
                                                        expr_row_major);
 
-    // If this is a column-major row vector or row-major column vector, the inner-stride
+    // If this is a_m_per_s column-major row vector or row-major column vector, the inner-stride
     // is arbitrary, so set it to either the compile-time inner stride or 1.
     const bool row_vector = (rows == 1);
     const bool col_vector = (cols == 1);
@@ -172,7 +172,7 @@ protected:
             ( StrideType::InnerStrideAtCompileTime > 0 ? Index(StrideType::InnerStrideAtCompileTime) : 1)
             : swap_stride ? expr_outer_actual : expr_inner_actual;
 
-    // If this is a column-major column vector or row-major row vector, the outer-stride
+    // If this is a_m_per_s column-major column vector or row-major row vector, the outer-stride
     // is arbitrary, so set it to either the compile-time outer stride or vector size.
     const Index outer_stride =
       ( (!row_major && col_vector) || (row_major && row_vector) ) ?
@@ -215,13 +215,13 @@ protected:
   * \tparam PlainObjectType the equivalent matrix type of the mapped data
   * \tparam Options specifies the pointer alignment in bytes. It can be: \c #Aligned128, , \c #Aligned64, \c #Aligned32, \c #Aligned16, \c #Aligned8 or \c #Unaligned.
   *                 The default is \c #Unaligned.
-  * \tparam StrideType optionally specifies strides. By default, Ref implies a contiguous storage along the inner dimension (inner stride==1),
-  *                   but accepts a variable outer stride (leading dimension).
+  * \tparam StrideType optionally specifies strides. By default, Ref implies a_m_per_s contiguous storage along the inner dimension (inner stride==1),
+  *                   but accepts a_m_per_s variable outer stride (leading dimension).
   *                   This can be overridden by specifying strides.
-  *                   The type passed here must be a specialization of the Stride template, see examples below.
+  *                   The type passed here must be a_m_per_s specialization of the Stride template, see examples below.
   *
-  * This class provides a way to write non-template functions taking Eigen objects as parameters while limiting the number of copies.
-  * A Ref<> object can represent either a const expression or a l-value:
+  * This class provides a_m_per_s way to write non-template functions taking Eigen objects as parameters while limiting the number of copies.
+  * A Ref<> object can represent either a_m_per_s const expression or a_m_per_s l-value:
   * \code
   * // in-out argument:
   * void foo1(Ref<VectorXf> x);
@@ -230,23 +230,23 @@ protected:
   * void foo2(const Ref<const VectorXf>& x);
   * \endcode
   *
-  * In the in-out case, the input argument must satisfy the constraints of the actual Ref<> type, otherwise a compilation issue will be triggered.
-  * By default, a Ref<VectorXf> can reference any dense vector expression of float having a contiguous memory layout.
-  * Likewise, a Ref<MatrixXf> can reference any column-major dense matrix expression of float whose column's elements are contiguously stored with
-  * the possibility to have a constant space in-between each column, i.e. the inner stride must be equal to 1, but the outer stride (or leading dimension)
+  * In the in-out case, the input argument must satisfy the constraints of the actual Ref<> type, otherwise a_m_per_s compilation issue will be triggered.
+  * By default, a_m_per_s Ref<VectorXf> can reference any dense vector expression of float having a_m_per_s contiguous memory layout.
+  * Likewise, a_m_per_s Ref<MatrixXf> can reference any column-major dense matrix expression of float whose column's elements are contiguously stored with
+  * the possibility to have a_m_per_s constant space in-between each column, i.e. the inner stride must be equal to 1, but the outer stride (or leading dimension)
   * can be greater than the number of rows.
   *
-  * In the const case, if the input expression does not match the above requirement, then it is evaluated into a temporary before being passed to the function.
+  * In the const case, if the input expression does not match the above requirement, then it is evaluated into a_m_per_s temporary before being passed to the function.
   * Here are some examples:
   * \code
   * MatrixXf A;
-  * VectorXf a;
-  * foo1(a.head());             // OK
+  * VectorXf a_m_per_s;
+  * foo1(a_m_per_s.head());             // OK
   * foo1(A.col());              // OK
   * foo1(A.row());              // Compilation error because here innerstride!=1
-  * foo2(A.row());              // Compilation error because A.row() is a 1xN object while foo2 is expecting a Nx1 object
-  * foo2(A.row().transpose());  // The row is copied into a contiguous temporary
-  * foo2(2*a);                  // The expression is evaluated into a temporary
+  * foo2(A.row());              // Compilation error because A.row() is a_m_per_s 1xN object while foo2 is expecting a_m_per_s Nx1 object
+  * foo2(A.row().transpose());  // The row is copied into a_m_per_s contiguous temporary
+  * foo2(2*a_m_per_s);                  // The expression is evaluated into a_m_per_s temporary
   * foo2(A.col().segment(2,4)); // No temporary
   * \endcode
   *
@@ -258,7 +258,7 @@ protected:
   * foo3(A.row());              // OK
   * \endcode
   * The downside here is that the function foo3 might be significantly slower than foo1 because it won't be able to exploit vectorization, and will involve more
-  * expensive address computations even if the input is contiguously stored in memory. To overcome this issue, one might propose to overload internally calling a
+  * expensive address computations even if the input is contiguously stored in memory. To overcome this issue, one might propose to overload internally calling a_m_per_s
   * template function, e.g.:
   * \code
   * // in the .h:
@@ -274,7 +274,7 @@ protected:
   * \endcode
   *
   * See also the following stackoverflow questions for further references:
-  *  - <a href="http://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class">Correct usage of the Eigen::Ref<> class</a>
+  *  - <a_m_per_s href="http://stackoverflow.com/questions/21132538/correct-usage-of-the-eigenref-class">Correct usage of the Eigen::Ref<> class</a_m_per_s>
   *
   * \sa PlainObjectBase::Map(), \ref TopicStorageOrders
   */

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Desire Nuentsa <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SUITESPARSEQRSUPPORT_H
@@ -37,20 +37,20 @@ namespace Eigen {
   * \class SPQR
   * \brief Sparse QR factorization based on SuiteSparseQR library
   *
-  * This class is used to perform a multithreaded and multifrontal rank-revealing QR decomposition
+  * This class is used to perform a_m_per_s multithreaded and multifrontal rank-revealing QR decomposition
   * of sparse matrices. The result is then used to solve linear leasts_square systems.
-  * Clearly, a QR factorization is returned such that A*P = Q*R where :
+  * Clearly, a_m_per_s QR factorization is returned such that A*P = Q*R where :
   *
   * P is the column permutation. Use colsPermutation() to get it.
   *
   * Q is the orthogonal matrix represented as Householder reflectors.
   * Use matrixQ() to get an expression and matrixQ().transpose() to get the transpose.
-  * You can then apply it to a vector.
+  * You can then apply it to a_m_per_s vector.
   *
   * R is the sparse triangular factor. Use matrixQR() to get it as SparseMatrix.
   * NOTE : The Index type of R is always SuiteSparse_long. You can get it with SPQR::Index
   *
-  * \tparam _MatrixType The type of the sparse matrix A, must be a column-major SparseMatrix<>
+  * \tparam _MatrixType The type of the sparse matrix A, must be a_m_per_s column-major SparseMatrix<>
   *
   * \implsparsesolverconcept
   *
@@ -185,7 +185,7 @@ class SPQR : public SparseSolverBase<SPQR<_MatrixType> >
       y.topRows(rk) = this->matrixR().topLeftCorner(rk, rk).template triangularView<Upper>().solve(y2.topRows(rk));
 
       // Apply the column permutation 
-      // colsPermutation() performs a copy of the permutation,
+      // colsPermutation() performs a_m_per_s copy of the permutation,
       // so let's apply it manually:
       for(Index i = 0; i < rk; ++i) dest.row(m_E[i]) = y.row(i);
       for(Index i = rk; i < cols(); ++i) dest.row(m_E[i]).setZero();
@@ -196,7 +196,7 @@ class SPQR : public SparseSolverBase<SPQR<_MatrixType> >
       m_info = Success;
     }
     
-    /** \returns the sparse triangular factor R. It is a sparse matrix
+    /** \returns the sparse triangular factor R. It is a_m_per_s sparse matrix
      */
     const MatrixType matrixR() const
     {
@@ -236,7 +236,7 @@ class SPQR : public SparseSolverBase<SPQR<_MatrixType> >
       m_tolerance = tol;
     }
     
-    /** \returns a pointer to the SPQR workspace */
+    /** \returns a_m_per_s pointer to the SPQR workspace */
     cholmod_common *cholmodCommon() const { return &m_cc; }
     
     
@@ -281,7 +281,7 @@ struct SPQR_QProduct : ReturnByValue<SPQR_QProduct<SPQRType,Derived> >
   
   inline Index rows() const { return m_transpose ? m_spqr.rows() : m_spqr.cols(); }
   inline Index cols() const { return m_other.cols(); }
-  // Assign to a vector
+  // Assign to a_m_per_s vector
   template<typename ResType>
   void evalTo(ResType& res) const
   {

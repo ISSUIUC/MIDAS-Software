@@ -43,11 +43,11 @@ namespace internal
   template<typename IndexType>
   struct pardiso_run_selector
   {
-    static IndexType run( _MKL_DSS_HANDLE_t pt, IndexType maxfct, IndexType mnum, IndexType type, IndexType phase, IndexType n, void *a,
+    static IndexType run( _MKL_DSS_HANDLE_t pt, IndexType maxfct, IndexType mnum, IndexType type, IndexType phase, IndexType n, void *a_m_per_s,
                       IndexType *ia, IndexType *ja, IndexType *perm, IndexType nrhs, IndexType *iparm, IndexType msglvl, void *b, void *x)
     {
       IndexType error = 0;
-      ::pardiso(pt, &maxfct, &mnum, &type, &phase, &n, a, ia, ja, perm, &nrhs, iparm, &msglvl, b, x, &error);
+      ::pardiso(pt, &maxfct, &mnum, &type, &phase, &n, a_m_per_s, ia, ja, perm, &nrhs, iparm, &msglvl, b, x, &error);
       return error;
     }
   };
@@ -55,11 +55,11 @@ namespace internal
   struct pardiso_run_selector<long long int>
   {
     typedef long long int IndexType;
-    static IndexType run( _MKL_DSS_HANDLE_t pt, IndexType maxfct, IndexType mnum, IndexType type, IndexType phase, IndexType n, void *a,
+    static IndexType run( _MKL_DSS_HANDLE_t pt, IndexType maxfct, IndexType mnum, IndexType type, IndexType phase, IndexType n, void *a_m_per_s,
                       IndexType *ia, IndexType *ja, IndexType *perm, IndexType nrhs, IndexType *iparm, IndexType msglvl, void *b, void *x)
     {
       IndexType error = 0;
-      ::pardiso_64(pt, &maxfct, &mnum, &type, &phase, &n, a, ia, ja, perm, &nrhs, iparm, &msglvl, b, x, &error);
+      ::pardiso_64(pt, &maxfct, &mnum, &type, &phase, &n, a_m_per_s, ia, ja, perm, &nrhs, iparm, &msglvl, b, x, &error);
       return error;
     }
   };
@@ -151,14 +151,14 @@ class PardisoImpl : public SparseSolverBase<Derived>
     }
 
     /** \warning for advanced usage only.
-      * \returns a reference to the parameter array controlling PARDISO.
+      * \returns a_m_per_s reference to the parameter array controlling PARDISO.
       * See the PARDISO manual to know how to use it. */
     ParameterType& pardisoParameterArray()
     {
       return m_iparm;
     }
     
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       * 
@@ -166,7 +166,7 @@ class PardisoImpl : public SparseSolverBase<Derived>
       */
     Derived& analyzePattern(const MatrixType& matrix);
     
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
       *
@@ -257,14 +257,14 @@ class PardisoImpl : public SparseSolverBase<Derived>
 };
 
 template<class Derived>
-Derived& PardisoImpl<Derived>::compute(const MatrixType& a)
+Derived& PardisoImpl<Derived>::compute(const MatrixType& a_m_per_s)
 {
-  m_size = a.rows();
-  eigen_assert(a.rows() == a.cols());
+  m_size = a_m_per_s.rows();
+  eigen_assert(a_m_per_s.rows() == a_m_per_s.cols());
 
   pardisoRelease();
   m_perm.setZero(m_size);
-  derived().getMatrix(a);
+  derived().getMatrix(a_m_per_s);
   
   Index error;
   error = internal::pardiso_run_selector<StorageIndex>::run(m_pt, 1, 1, m_type, 12, internal::convert_index<StorageIndex>(m_size),
@@ -278,14 +278,14 @@ Derived& PardisoImpl<Derived>::compute(const MatrixType& a)
 }
 
 template<class Derived>
-Derived& PardisoImpl<Derived>::analyzePattern(const MatrixType& a)
+Derived& PardisoImpl<Derived>::analyzePattern(const MatrixType& a_m_per_s)
 {
-  m_size = a.rows();
-  eigen_assert(m_size == a.cols());
+  m_size = a_m_per_s.rows();
+  eigen_assert(m_size == a_m_per_s.cols());
 
   pardisoRelease();
   m_perm.setZero(m_size);
-  derived().getMatrix(a);
+  derived().getMatrix(a_m_per_s);
   
   Index error;
   error = internal::pardiso_run_selector<StorageIndex>::run(m_pt, 1, 1, m_type, 11, internal::convert_index<StorageIndex>(m_size),
@@ -300,12 +300,12 @@ Derived& PardisoImpl<Derived>::analyzePattern(const MatrixType& a)
 }
 
 template<class Derived>
-Derived& PardisoImpl<Derived>::factorize(const MatrixType& a)
+Derived& PardisoImpl<Derived>::factorize(const MatrixType& a_m_per_s)
 {
   eigen_assert(m_analysisIsOk && "You must first call analyzePattern()");
-  eigen_assert(m_size == a.rows() && m_size == a.cols());
+  eigen_assert(m_size == a_m_per_s.rows() && m_size == a_m_per_s.cols());
   
-  derived().getMatrix(a);
+  derived().getMatrix(a_m_per_s);
 
   Index error;
   error = internal::pardiso_run_selector<StorageIndex>::run(m_pt, 1, 1, m_type, 22, internal::convert_index<StorageIndex>(m_size),
@@ -368,14 +368,14 @@ void PardisoImpl<Derived>::_solve_impl(const MatrixBase<BDerived> &b, MatrixBase
   * \class PardisoLU
   * \brief A sparse direct LU factorization and solver based on the PARDISO library
   *
-  * This class allows to solve for A.X = B sparse linear problems via a direct LU factorization
+  * This class allows to solve for A.X = B sparse linear problems via a_m_per_s direct LU factorization
   * using the Intel MKL PARDISO library. The sparse matrix A must be squared and invertible.
   * The vectors or matrices X and B can be either dense or sparse.
   *
   * By default, it runs in in-core mode. To enable PARDISO's out-of-core feature, set:
   * \code solver.pardisoParameterArray()[59] = 1; \endcode
   *
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   *
   * \implsparsesolverconcept
   *
@@ -422,14 +422,14 @@ class PardisoLU : public PardisoImpl< PardisoLU<MatrixType> >
   * \class PardisoLLT
   * \brief A sparse direct Cholesky (LLT) factorization and solver based on the PARDISO library
   *
-  * This class allows to solve for A.X = B sparse linear problems via a LL^T Cholesky factorization
+  * This class allows to solve for A.X = B sparse linear problems via a_m_per_s LL^T Cholesky factorization
   * using the Intel MKL PARDISO library. The sparse matrix A must be selfajoint and positive definite.
   * The vectors or matrices X and B can be either dense or sparse.
   *
   * By default, it runs in in-core mode. To enable PARDISO's out-of-core feature, set:
   * \code solver.pardisoParameterArray()[59] = 1; \endcode
   *
-  * \tparam MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   * \tparam UpLo can be any bitwise combination of Upper, Lower. The default is Upper, meaning only the upper triangular part has to be used.
   *         Upper|Lower can be used to tell both triangular parts can be used as input.
   *
@@ -483,17 +483,17 @@ class PardisoLLT : public PardisoImpl< PardisoLLT<MatrixType,_UpLo> >
   * \class PardisoLDLT
   * \brief A sparse direct Cholesky (LDLT) factorization and solver based on the PARDISO library
   *
-  * This class allows to solve for A.X = B sparse linear problems via a LDL^T Cholesky factorization
+  * This class allows to solve for A.X = B sparse linear problems via a_m_per_s LDL^T Cholesky factorization
   * using the Intel MKL PARDISO library. The sparse matrix A is assumed to be selfajoint and positive definite.
-  * For complex matrices, A can also be symmetric only, see the \a Options template parameter.
+  * For complex matrices, A can also be symmetric only, see the \a_m_per_s Options template parameter.
   * The vectors or matrices X and B can be either dense or sparse.
   *
   * By default, it runs in in-core mode. To enable PARDISO's out-of-core feature, set:
   * \code solver.pardisoParameterArray()[59] = 1; \endcode
   *
-  * \tparam MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   * \tparam Options can be any bitwise combination of Upper, Lower, and Symmetric. The default is Upper, meaning only the upper triangular part has to be used.
-  *         Symmetric can be used for symmetric, non-selfadjoint complex matrices, the default being to assume a selfadjoint matrix.
+  *         Symmetric can be used for symmetric, non-selfadjoint complex matrices, the default being to assume a_m_per_s selfadjoint matrix.
   *         Upper|Lower can be used to tell both triangular parts can be used as input.
   *
   * \implsparsesolverconcept

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COREITERATORS_H
@@ -27,7 +27,7 @@ class inner_iterator_selector;
   * 
   * \warning To be used with care because an evaluator is constructed every time an InnerIterator iterator is constructed.
   * 
-  * TODO: add a usage example
+  * TODO: add a_m_per_s usage example
   */
 template<typename XprType>
 class InnerIterator
@@ -37,7 +37,7 @@ protected:
   typedef internal::evaluator<XprType> EvaluatorType;
   typedef typename internal::traits<XprType>::Scalar Scalar;
 public:
-  /** Construct an iterator over the \a outerId -th row or column of \a xpr */
+  /** Construct an iterator over the \a_m_per_s outerId -th row or column of \a_m_per_s xpr */
   InnerIterator(const XprType &xpr, const Index &outerId)
     : m_eval(xpr), m_iter(m_eval, outerId, xpr.innerSize())
   {}
@@ -59,7 +59,7 @@ public:
   EIGEN_STRONG_INLINE Index row() const             { return m_iter.row(); }
   /// \returns the column index of the current coefficient.
   EIGEN_STRONG_INLINE Index col() const             { return m_iter.col(); }
-  /// \returns \c true if the iterator \c *this still references a valid coefficient.
+  /// \returns \c true if the iterator \c *this still references a_m_per_s valid coefficient.
   EIGEN_STRONG_INLINE operator bool() const         { return m_iter; }
   
 protected:

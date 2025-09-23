@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011 Benoit Jacob <jacob.benoit.1@gmail.com>
@@ -6,7 +6,7 @@
 // Copyright (C) 2011-2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -44,7 +44,7 @@ template<> struct storage_kind_to_shape<TranspositionsStorage>  { typedef Transp
 // - ternary_evaluator   for expression taking three arguments (CwiseTernaryOp)
 // - product_evaluator  for linear algebra products (Product); special case of binary_evaluator because it requires additional tags for dispatching.
 // - mapbase_evaluator  for Map, Block, Ref
-// - block_evaluator    for Block (special dispatching to a mapbase_evaluator or unary_evaluator)
+// - block_evaluator    for Block (special dispatching to a_m_per_s mapbase_evaluator or unary_evaluator)
 
 template< typename T,
           typename Arg1Kind   = typename evaluator_traits<typename T::Arg1>::Kind,
@@ -85,7 +85,7 @@ struct evaluator_assume_aliasing {
   static const bool value = false;
 };
 
-// By default, we assume a unary expression:
+// By default, we assume a_m_per_s unary expression:
 template<typename T>
 struct evaluator : public unary_evaluator<T>
 {
@@ -127,9 +127,9 @@ private:
 
 // -------------------- Matrix and Array --------------------
 //
-// evaluator<PlainObjectBase> is a common base class for the
+// evaluator<PlainObjectBase> is a_m_per_s common base class for the
 // Matrix and Array evaluators.
-// Here we directly specialize evaluator. This is not really a unary expression, and it is, by definition, dense,
+// Here we directly specialize evaluator. This is not really a_m_per_s unary expression, and it is, by definition, dense,
 // so no need for more sophisticated dispatching.
 
 // this helper permits to completely eliminate m_outerStride if it is known at compiletime.
@@ -376,7 +376,7 @@ protected:
 };
 
 // -------------------- CwiseNullaryOp --------------------
-// Like Matrix and Array, this is not really a unary expression, so we directly specialize evaluator.
+// Like Matrix and Array, this is not really a_m_per_s unary expression, so we directly specialize evaluator.
 // Likewise, there is not need to more sophisticated dispatching here.
 
 template<typename Scalar,typename NullaryOp,
@@ -410,8 +410,8 @@ struct nullary_wrapper<Scalar,NullaryOp,false,false,true>
   template <typename T, typename IndexType> EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE T packetOp(const NullaryOp& op, IndexType i, IndexType j=0) const { return op.template packetOp<T>(i,j); }
 };
 
-// We need the following specialization for vector-only functors assigned to a runtime vector,
-// for instance, using linspace and assigning a RowVectorXd to a MatrixXd or even a row of a MatrixXd.
+// We need the following specialization for vector-only functors assigned to a_m_per_s runtime vector,
+// for instance, using linspace and assigning a_m_per_s RowVectorXd to a_m_per_s MatrixXd or even a_m_per_s row of a_m_per_s MatrixXd.
 // In this case, i==0 and j is used for the actual iteration.
 template<typename Scalar,typename NullaryOp>
 struct nullary_wrapper<Scalar,NullaryOp,false,true,false>
@@ -440,7 +440,7 @@ struct nullary_wrapper<Scalar,NullaryOp,false,false,false> {};
 // but this piece of code might still become handly if some other weird compilation
 // erros pop up again.
 
-// MSVC exhibits a weird compilation error when
+// MSVC exhibits a_m_per_s weird compilation error when
 // compiling:
 //    Eigen::MatrixXf A = MatrixXf::Random(3,3);
 //    Ref<const MatrixXf> R = 2.f*A;
@@ -451,7 +451,7 @@ struct nullary_wrapper<Scalar,NullaryOp,false,false,false> {};
 // The trick is thus to defer the proper instantiation of nullary_wrapper when coeff(),
 // and packet() are really instantiated as implemented below:
 
-// This is a simple wrapper around Index to enforce the re-instantiation of
+// This is a_m_per_s simple wrapper around Index to enforce the re-instantiation of
 // has_*ary_operator when needed.
 template<typename T> struct nullary_wrapper_workaround_msvc {
   nullary_wrapper_workaround_msvc(const T&);
@@ -621,7 +621,7 @@ protected:
 
 // -------------------- CwiseTernaryOp --------------------
 
-// this is a ternary expression
+// this is a_m_per_s ternary expression
 template<typename TernaryOp, typename Arg1, typename Arg2, typename Arg3>
 struct evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> >
   : public ternary_evaluator<CwiseTernaryOp<TernaryOp, Arg1, Arg2, Arg3> >
@@ -717,7 +717,7 @@ protected:
 
 // -------------------- CwiseBinaryOp --------------------
 
-// this is a binary expression
+// this is a_m_per_s binary expression
 template<typename BinaryOp, typename Lhs, typename Rhs>
 struct evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >
   : public binary_evaluator<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >
@@ -1082,7 +1082,7 @@ struct evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel> >
   }
 };
 
-// no direct-access => dispatch to a unary evaluator
+// no direct-access => dispatch to a_m_per_s unary evaluator
 template<typename ArgType, int BlockRows, int BlockCols, bool InnerPanel>
 struct block_evaluator<ArgType, BlockRows, BlockCols, InnerPanel, /*HasDirectAccess*/ false>
   : unary_evaluator<Block<ArgType, BlockRows, BlockCols, InnerPanel> >
@@ -1229,7 +1229,7 @@ struct block_evaluator<ArgType, BlockRows, BlockCols, InnerPanel, /* HasDirectAc
 
 
 // -------------------- Select --------------------
-// NOTE shall we introduce a ternary_evaluator?
+// NOTE shall we introduce a_m_per_s ternary_evaluator?
 
 // TODO enable vectorization for Select
 template<typename ConditionMatrixType, typename ThenMatrixType, typename ElseMatrixType>
@@ -1316,7 +1316,7 @@ struct unary_evaluator<Replicate<ArgType, RowFactor, ColFactor> >
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
   CoeffReturnType coeff(Index row, Index col) const
   {
-    // try to avoid using modulo; this is a pure optimization strategy
+    // try to avoid using modulo; this is a_m_per_s pure optimization strategy
     const Index actual_row = internal::traits<XprType>::RowsAtCompileTime==1 ? 0
                            : RowFactor==1 ? row
                            : row % m_rows.value();
@@ -1330,7 +1330,7 @@ struct unary_evaluator<Replicate<ArgType, RowFactor, ColFactor> >
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
   CoeffReturnType coeff(Index index) const
   {
-    // try to avoid using modulo; this is a pure optimization strategy
+    // try to avoid using modulo; this is a_m_per_s pure optimization strategy
     const Index actual_index = internal::traits<XprType>::RowsAtCompileTime==1
                                   ? (ColFactor==1 ?  index : index%m_cols.value())
                                   : (RowFactor==1 ?  index : index%m_rows.value());
@@ -1372,7 +1372,7 @@ protected:
 
 // -------------------- MatrixWrapper and ArrayWrapper --------------------
 //
-// evaluator_wrapper_base<T> is a common base class for the
+// evaluator_wrapper_base<T> is a_m_per_s common base class for the
 // MatrixWrapper and ArrayWrapper evaluators.
 
 template<typename XprType>
@@ -1506,7 +1506,7 @@ struct unary_evaluator<Reverse<ArgType, Direction> >
 
     Flags = int(Flags0) & (HereditaryBits | PacketAccessBit | LinearAccess),
 
-    Alignment = 0 // FIXME in some rare cases, Alignment could be preserved, like a Vector4f.
+    Alignment = 0 // FIXME in some rare cases, Alignment could be preserved, like a_m_per_s Vector4f.
   };
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
@@ -1668,7 +1668,7 @@ private:
 
 // -------------------- EvalToTemp --------------------
 
-// expression class for evaluating nested expression to a temporary
+// expression class for evaluating nested expression to a_m_per_s temporary
 
 template<typename ArgType> class EvalToTemp;
 

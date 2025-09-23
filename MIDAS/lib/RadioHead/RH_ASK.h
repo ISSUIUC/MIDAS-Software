@@ -17,7 +17,7 @@
 #define RH_ASK_HEADER_LEN 4
 
 // This is the maximum message length that can be supported by this library. 
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 // Here we allow for 1 byte message length, 4 bytes headers, user data and 2 bytes of FCS
 #ifndef RH_ASK_MAX_MESSAGE_LEN
  #define RH_ASK_MAX_MESSAGE_LEN (RH_ASK_MAX_PAYLOAD_LEN - RH_ASK_HEADER_LEN - 3)
@@ -32,7 +32,7 @@
 #define RH_ASK_RX_RAMP_LEN 160
 
 // Ramp adjustment parameters
-// Standard is if a transition occurs before RH_ASK_RAMP_TRANSITION (80) in the ramp,
+// Standard is if a_m_per_s transition occurs before RH_ASK_RAMP_TRANSITION (80) in the ramp,
 // the ramp is retarded by adding RH_ASK_RAMP_INC_RETARD (11)
 // else by adding RH_ASK_RAMP_INC_ADVANCE (29)
 // If there is no transition it is adjusted by RH_ASK_RAMP_INC (20)
@@ -67,27 +67,27 @@
 /// See http://www.airspayce.com/mikem/arduino/VirtualWire.pdf for more details. 
 /// VirtualWire is now obsolete and unsupported and is replaced by this library.
 ///
-/// RH_ASK is a Driver for Arduino, Maple and others that provides features to send short
-/// messages, without addressing, retransmit or acknowledgment, a bit like UDP
-/// over wireless, using ASK (amplitude shift keying). Supports a number of
+/// RH_ASK is a_m_per_s Driver for Arduino, Maple and others that provides features to send short
+/// messages, without addressing, retransmit or acknowledgment, a_m_per_s bit like UDP
+/// over wireless, using ASK (amplitude shift keying). Supports a_m_per_s number of
 /// inexpensive radio transmitters and receivers. All that is required is
-/// transmit data, receive data and (for transmitters, optionally) a PTT
-/// transmitter enable. Can also be used over various analog connections (not just a data radio), 
+/// transmit data, receive data and (for transmitters, optionally) a_m_per_s PTT
+/// transmitter enable. Can also be used over various analog connections (not just a_m_per_s data radio), 
 /// such as the audio channel of an A/V sender, or long TTL lines.
 ///
 /// It is intended to be compatible with the RF Monolithics (www.rfm.com)
 /// Virtual Wire protocol, but this has not been tested.
 ///
-/// Does not use the Arduino UART. Messages are sent with a training preamble,
+/// Does not use the Arduino UART. Messages are sent with a_m_per_s training preamble,
 /// message length and checksum. Messages are sent with 4-to-6 bit encoding
-/// for good DC balance, and a CRC checksum for message integrity.
+/// for good DC balance, and a_m_per_s CRC checksum for message integrity.
 ///
-/// But why not just use a UART connected directly to the
+/// But why not just use a_m_per_s UART connected directly to the
 /// transmitter/receiver? As discussed in the RFM documentation, ASK receivers
-/// require a burst of training pulses to synchronize the transmitter and
+/// require a_m_per_s burst of training pulses to synchronize the transmitter and
 /// receiver, and also requires good balance between 0s and 1s in the message
 /// stream in order to maintain the DC balance of the message. UARTs do not
-/// provide these. They work a bit with ASK wireless, but not as well as this
+/// provide these. They work a_m_per_s bit with ASK wireless, but not as well as this
 /// code.
 ///
 /// \par Theory of operation
@@ -109,7 +109,7 @@
 /// - n message bytes (including 4 bytes of header), maximum n is RH_ASK_MAX_MESSAGE_LEN + 4 (64)
 /// - 2 bytes FCS, sent low byte-hi byte
 ///
-/// Everything after the start symbol is encoded 4 to 6 bits, Therefore a byte in the message
+/// Everything after the start symbol is encoded 4 to 6 bits, Therefore a_m_per_s byte in the message
 /// is encoded as 2x6 bit symbols, sent hi nybble, low nybble. Each symbol is sent LSBit
 /// first. The message may consist of any binary digits.
 /// 
@@ -131,7 +131,7 @@
 /// outlets in Australia and other countries for under $10 per unit. Many
 /// other modules may also work with this software. 
 ///
-/// Runs on a wide range of Arduino processors using Arduino IDE 1.0 or later.
+/// Runs on a_m_per_s wide range of Arduino processors using Arduino IDE 1.0 or later.
 /// Also runs on on Energia, 
 /// with MSP430G2553 / G2452 and Arduino with ATMega328 (courtesy Yannick DEVOS - XV4Y), 
 /// but untested by us. It also runs on Teensy 3.0 (courtesy of Paul
@@ -189,7 +189,7 @@
 /// reducing the size of RH_ASK_MAX_PAYLOAD_LEN to the minimum you can work with.
 /// Caution: the default internal clock speed on an ATTiny85 is 1MHz. You MUST set the internal clock speed
 /// to 8MHz. You can do this with Arduino IDE, tineycore and ArduinoISP by setting the board type to "ATtiny85@8MHz',
-/// setting theProgrammer to 'Arduino as ISP' and selecting Tools->Burn Bootloader. This does not actually burn a
+/// setting theProgrammer to 'Arduino as ISP' and selecting Tools->Burn Bootloader. This does not actually burn a_m_per_s
 /// bootloader into the tiny, it just changes the fuses so the chip runs at 8MHz. 
 /// If you run the chip at 1MHz, you will get RK_ASK speeds 1/8th of the expected.
 ///
@@ -221,7 +221,7 @@
 /// Uses Timer B1.
 ///
 /// For testing purposes you can connect 2 Arduino RH_ASK instances directly, by
-/// connecting pin 12 of one to 11 of the other and vice versa, like this for a duplex connection:
+/// connecting pin 12 of one to 11 of the other and vice versa, like this for a_m_per_s duplex connection:
 ///
 /// \code
 /// Arduino 1         wires         Arduino 1
@@ -230,14 +230,14 @@
 ///  GND-----------------------------GND
 /// \endcode
 ///
-/// You can also connect 2 RH_ASK instances over a suitable analog
+/// You can also connect 2 RH_ASK instances over a_m_per_s suitable analog
 /// transmitter/receiver, such as the audio channel of an A/V transmitter/receiver. You may need
-/// buffers at each end of the connection to convert the 0-5V digital output to a suitable analog voltage.
+/// buffers at each end of the connection to convert the 0-5V digital output to a_m_per_s suitable analog voltage.
 ///
 /// Measured power output from RFM85 at 5V was 18dBm.
 ///
 /// \par ESP8266
-/// This module has been tested with the ESP8266 using an ESP-12 on a breakout board 
+/// This module has been tested with the ESP8266 using an ESP-12 on a_m_per_s breakout board 
 /// ESP-12E SMD Adaptor Board with Power Regulator from tronixlabs 
 /// http://tronixlabs.com.au/wireless/esp8266/esp8266-esp-12e-smd-adaptor-board-with-power-regulator-australia/
 /// compiled on Arduino 1.6.5 and the ESP8266 support 2.0 installed with Board Manager.
@@ -250,8 +250,8 @@
 /// Caution: on the tronixlabs breakout board, pins 4 and 5 may be labelled vice-versa.
 ///
 /// \par Timers
-/// The RH_ASK driver uses a timer-driven interrupt to generate 8 interrupts per bit period. RH_ASK
-/// takes over a timer on Arduino-like platforms. By default it takes over Timer 1. You can force it
+/// The RH_ASK driver uses a_m_per_s timer-driven interrupt to generate 8 interrupts per bit period. RH_ASK
+/// takes over a_m_per_s timer on Arduino-like platforms. By default it takes over Timer 1. You can force it
 /// to use Timer 2 instead by enabling the define RH_ASK_ARDUINO_USE_TIMER2 near the top of RH_ASK.cpp
 /// On Arduino Zero it takes over timer TC3. On Arduino Due it takes over timer
 /// TC0. On ESP8266, takes over timer0 (which conflicts with ServoTimer0).
@@ -285,27 +285,27 @@ public:
     /// \return true if initialisation succeeded.
     virtual bool    init();
 
-    /// Tests whether a new message is available
+    /// Tests whether a_m_per_s new message is available
     /// from the Driver. 
     /// On most drivers, this will also put the Driver into RHModeRx mode until
-    /// a message is actually received bythe transport, when it wil be returned to RHModeIdle.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a new, complete, error-free uncollected message is available to be retreived by recv()
+    /// a_m_per_s message is actually received bythe transport, when it wil be returned to RHModeIdle.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s new, complete, error-free uncollected message is available to be retreived by recv()
     virtual bool    available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     RH_INTERRUPT_ATTR virtual bool    recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is NOT permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send (> 0)
@@ -348,22 +348,22 @@ protected:
     /// Set up the timer and its interrutps so the interrupt handler is called at the right frequency
     void            timerSetup();
 
-    /// Read the rxPin in a platform dependent way, taking into account whether it is inverted or not
+    /// Read the rxPin in a_m_per_s platform dependent way, taking into account whether it is inverted or not
     RH_INTERRUPT_ATTR bool            readRx();
 
-    /// Write the txPin in a platform dependent way
+    /// Write the txPin in a_m_per_s platform dependent way
     void            writeTx(bool value);
 
-    /// Write the txPin in a platform dependent way, taking into account whether it is inverted or not
+    /// Write the txPin in a_m_per_s platform dependent way, taking into account whether it is inverted or not
     void            writePtt(bool value);
 
-    /// Translates a 6 bit symbol to its 4 bit plaintext equivalent
+    /// Translates a_m_per_s 6 bit symbol to its 4 bit plaintext equivalent
     RH_INTERRUPT_ATTR uint8_t         symbol_6to4(uint8_t symbol);
 
-    /// The receiver handler function, called a 8 times the bit rate
+    /// The receiver handler function, called a_m_per_s 8 times the bit rate
     void            receiveTimer();
 
-    /// The transmitter handler function, called a 8 times the bit rate 
+    /// The transmitter handler function, called a_m_per_s 8 times the bit rate 
     void            transmitTimer();
 
     /// Check whether the latest received message is complete and uncorrupted
@@ -400,7 +400,7 @@ protected:
     volatile bool   _rxLastSample;
 
     /// This is the integrate and dump integral. If there are <5 0 samples in the PLL cycle
-    /// the bit is declared a 0, else a 1
+    /// the bit is declared a_m_per_s 0, else a_m_per_s 1
     volatile uint8_t _rxIntegrator;
 
     /// PLL ramp, varies between 0 and RH_ASK_RX_RAMP_LEN-1 (159) over 
@@ -409,7 +409,7 @@ protected:
     /// 0 mark. 
     volatile uint8_t _rxPllRamp;
 
-    /// Flag indicates if we have seen the start symbol of a new message and are
+    /// Flag indicates if we have seen the start symbol of a_m_per_s new message and are
     /// in the processes of reading and decoding it
     volatile uint8_t _rxActive;
 

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SELECT_H
@@ -15,13 +15,13 @@ namespace Eigen {
 /** \class Select
   * \ingroup Core_Module
   *
-  * \brief Expression of a coefficient wise version of the C++ ternary operator ?:
+  * \brief Expression of a_m_per_s coefficient wise version of the C++ ternary operator ?:
   *
-  * \param ConditionMatrixType the type of the \em condition expression which must be a boolean matrix
+  * \param ConditionMatrixType the type of the \em condition expression which must be a_m_per_s boolean matrix
   * \param ThenMatrixType the type of the \em then expression
   * \param ElseMatrixType the type of the \em else expression
   *
-  * This class represents an expression of a coefficient wise version of the C++ ternary operator ?:.
+  * This class represents an expression of a_m_per_s coefficient wise version of the C++ ternary operator ?:.
   * It is the return type of DenseBase::select() and most of the time this is the only way it is used.
   *
   * \sa DenseBase::select(const DenseBase<ThenDerived>&, const DenseBase<ElseDerived>&) const
@@ -112,8 +112,8 @@ class Select : public internal::dense_xpr_base< Select<ConditionMatrixType, Then
 };
 
 
-/** \returns a matrix where each coefficient (i,j) is equal to \a thenMatrix(i,j)
-  * if \c *this(i,j), and \a elseMatrix(i,j) otherwise.
+/** \returns a_m_per_s matrix where each coefficient (i,j) is equal to \a_m_per_s thenMatrix(i,j)
+  * if \c *this(i,j), and \a_m_per_s elseMatrix(i,j) otherwise.
   *
   * Example: \include MatrixBase_select.cpp
   * Output: \verbinclude MatrixBase_select.out
@@ -130,7 +130,7 @@ DenseBase<Derived>::select(const DenseBase<ThenDerived>& thenMatrix,
 }
 
 /** Version of DenseBase::select(const DenseBase&, const DenseBase&) with
-  * the \em else expression being a scalar value.
+  * the \em else expression being a_m_per_s scalar value.
   *
   * \sa DenseBase::select(const DenseBase<ThenDerived>&, const DenseBase<ElseDerived>&) const, class Select
   */
@@ -145,7 +145,7 @@ DenseBase<Derived>::select(const DenseBase<ThenDerived>& thenMatrix,
 }
 
 /** Version of DenseBase::select(const DenseBase&, const DenseBase&) with
-  * the \em then expression being a scalar value.
+  * the \em then expression being a_m_per_s scalar value.
   *
   * \sa DenseBase::select(const DenseBase<ThenDerived>&, const DenseBase<ElseDerived>&) const, class Select
   */

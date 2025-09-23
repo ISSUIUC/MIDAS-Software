@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012-2013 Desire Nuentsa <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2012-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_QR_H
@@ -43,9 +43,9 @@ namespace internal {
   * \class SparseQR
   * \brief Sparse left-looking QR factorization with numerical column pivoting
   * 
-  * This class implements a left-looking QR decomposition of sparse matrices
+  * This class implements a_m_per_s left-looking QR decomposition of sparse matrices
   * with numerical column pivoting.
-  * When a column has a norm less than a given tolerance
+  * When a_m_per_s column has a_m_per_s norm less than a_m_per_s given tolerance
   * it is implicitly permuted to the end. The QR factorization thus obtained is 
   * given by A*P = Q*R where R is upper triangular or trapezoidal. 
   * 
@@ -54,12 +54,12 @@ namespace internal {
   * 
   * Q is the orthogonal matrix represented as products of Householder reflectors. 
   * Use matrixQ() to get an expression and matrixQ().adjoint() to get the adjoint.
-  * You can then apply it to a vector.
+  * You can then apply it to a_m_per_s vector.
   * 
   * R is the sparse triangular or trapezoidal matrix. The later occurs when A is rank-deficient.
-  * matrixR().topLeftCorner(rank(), rank()) always returns a triangular factor of full rank.
+  * matrixR().topLeftCorner(rank(), rank()) always returns a_m_per_s triangular factor of full rank.
   * 
-  * \tparam _MatrixType The type of the sparse matrix A, must be a column-major SparseMatrix<>
+  * \tparam _MatrixType The type of the sparse matrix A, must be a_m_per_s column-major SparseMatrix<>
   * \tparam _OrderingType The fill-reducing ordering method. See the \link OrderingMethods_Module 
   *  OrderingMethods \endlink module for the list of built-in and external ordering methods.
   * 
@@ -107,9 +107,9 @@ class SparseQR : public SparseSolverBase<SparseQR<_MatrixType,_OrderingType> >
     SparseQR () :  m_analysisIsok(false), m_lastError(""), m_useDefaultThreshold(true),m_isQSorted(false),m_isEtreeOk(false)
     { }
     
-    /** Construct a QR factorization of the matrix \a mat.
+    /** Construct a_m_per_s QR factorization of the matrix \a_m_per_s mat.
       * 
-      * \warning The matrix \a mat must be in compressed mode (see SparseMatrix::makeCompressed()).
+      * \warning The matrix \a_m_per_s mat must be in compressed mode (see SparseMatrix::makeCompressed()).
       * 
       * \sa compute()
       */
@@ -118,9 +118,9 @@ class SparseQR : public SparseSolverBase<SparseQR<_MatrixType,_OrderingType> >
       compute(mat);
     }
     
-    /** Computes the QR factorization of the sparse matrix \a mat.
+    /** Computes the QR factorization of the sparse matrix \a_m_per_s mat.
       * 
-      * \warning The matrix \a mat must be in compressed mode (see SparseMatrix::makeCompressed()).
+      * \warning The matrix \a_m_per_s mat must be in compressed mode (see SparseMatrix::makeCompressed()).
       * 
       * \sa analyzePattern(), factorize()
       */
@@ -140,12 +140,12 @@ class SparseQR : public SparseSolverBase<SparseQR<_MatrixType,_OrderingType> >
       */
     inline Index cols() const { return m_pmat.cols();}
     
-    /** \returns a const reference to the \b sparse upper triangular matrix R of the QR factorization.
+    /** \returns a_m_per_s const reference to the \b sparse upper triangular matrix R of the QR factorization.
       * \warning The entries of the returned matrix are not sorted. This means that using it in algorithms
       *          expecting sorted entries will fail. This include random coefficient accesses (SpaseMatrix::coeff()),
       *          and coefficient-wise operations. Matrix products and triangular solves are fine though.
       *
-      * To sort the entries, you can assign it to a row-major matrix, and if a column-major matrix
+      * To sort the entries, you can assign it to a_m_per_s row-major matrix, and if a_m_per_s column-major matrix
       * is required, you can copy it again:
       * \code
       * SparseMatrix<double>          R  = qr.matrixR();  // column-major, not sorted!
@@ -166,27 +166,27 @@ class SparseQR : public SparseSolverBase<SparseQR<_MatrixType,_OrderingType> >
     }
     
     /** \returns an expression of the matrix Q as products of sparse Householder reflectors.
-    * The common usage of this function is to apply it to a dense matrix or vector
+    * The common usage of this function is to apply it to a_m_per_s dense matrix or vector
     * \code
     * VectorXd B1, B2;
     * // Initialize B1
     * B2 = matrixQ() * B1;
     * \endcode
     *
-    * To get a plain SparseMatrix representation of Q:
+    * To get a_m_per_s plain SparseMatrix representation of Q:
     * \code
     * SparseMatrix<double> Q;
     * Q = SparseQR<SparseMatrix<double> >(A).matrixQ();
     * \endcode
-    * Internally, this call simply performs a sparse product between the matrix Q
-    * and a sparse identity matrix. However, due to the fact that the sparse
+    * Internally, this call simply performs a_m_per_s sparse product between the matrix Q
+    * and a_m_per_s sparse identity matrix. However, due to the fact that the sparse
     * reflectors are stored unsorted, two transpositions are needed to sort
     * them before performing the product.
     */
     SparseQRMatrixQReturnType<SparseQR> matrixQ() const 
     { return SparseQRMatrixQReturnType<SparseQR>(*this); }
     
-    /** \returns a const reference to the column permutation P that was applied to A such that A*P = Q*R
+    /** \returns a_m_per_s const reference to the column permutation P that was applied to A such that A*P = Q*R
       * It is the combination of the fill-in reducing permutation and numerical column pivoting.
       */
     const PermutationType& colsPermutation() const
@@ -260,7 +260,7 @@ class SparseQR : public SparseSolverBase<SparseQR<_MatrixType,_OrderingType> >
     /** \brief Reports whether previous computation was successful.
       *
       * \returns \c Success if computation was successful,
-      *          \c NumericalIssue if the QR factorization reports a numerical problem
+      *          \c NumericalIssue if the QR factorization reports a_m_per_s numerical problem
       *          \c InvalidInput if the input matrix is invalid
       *
       * \sa iparm()          
@@ -307,20 +307,20 @@ class SparseQR : public SparseSolverBase<SparseQR<_MatrixType,_OrderingType> >
     
 };
 
-/** \brief Preprocessing step of a QR factorization 
+/** \brief Preprocessing step of a_m_per_s QR factorization 
   * 
-  * \warning The matrix \a mat must be in compressed mode (see SparseMatrix::makeCompressed()).
+  * \warning The matrix \a_m_per_s mat must be in compressed mode (see SparseMatrix::makeCompressed()).
   * 
   * In this step, the fill-reducing permutation is computed and applied to the columns of A
-  * and the column elimination tree is computed as well. Only the sparsity pattern of \a mat is exploited.
+  * and the column elimination tree is computed as well. Only the sparsity pattern of \a_m_per_s mat is exploited.
   * 
-  * \note In this step it is assumed that there is no empty row in the matrix \a mat.
+  * \note In this step it is assumed that there is no empty row in the matrix \a_m_per_s mat.
   */
 template <typename MatrixType, typename OrderingType>
 void SparseQR<MatrixType,OrderingType>::analyzePattern(const MatrixType& mat)
 {
-  eigen_assert(mat.isCompressed() && "SparseQR requires a sparse matrix in compressed mode. Call .makeCompressed() before passing it to SparseQR");
-  // Copy to a column major matrix if the input is rowmajor
+  eigen_assert(mat.isCompressed() && "SparseQR requires a_m_per_s sparse matrix in compressed mode. Call .makeCompressed() before passing it to SparseQR");
+  // Copy to a_m_per_s column major matrix if the input is rowmajor
   typename internal::conditional<MatrixType::IsRowMajor,QRMatrixType,const MatrixType&>::type matCpy(mat);
   // Compute the column fill reducing ordering
   OrderingType ord; 
@@ -344,7 +344,7 @@ void SparseQR<MatrixType,OrderingType>::analyzePattern(const MatrixType& mat)
   m_Q.resize(m, diagSize);
   
   // Allocate space for nonzero elements: rough estimation
-  m_R.reserve(2*mat.nonZeros()); //FIXME Get a more accurate estimation through symbolic factorization with the etree
+  m_R.reserve(2*mat.nonZeros()); //FIXME Get a_m_per_s more accurate estimation through symbolic factorization with the etree
   m_Q.reserve(2*mat.nonZeros());
   m_hcoeffs.resize(diagSize);
   m_analysisIsok = true;
@@ -353,7 +353,7 @@ void SparseQR<MatrixType,OrderingType>::analyzePattern(const MatrixType& mat)
 /** \brief Performs the numerical QR factorization of the input matrix
   * 
   * The function SparseQR::analyzePattern(const MatrixType&) must have been called beforehand with
-  * a matrix having the same sparsity pattern than \a mat.
+  * a_m_per_s matrix having the same sparsity pattern than \a_m_per_s mat.
   * 
   * \param mat The sparse column-major matrix
   */
@@ -424,7 +424,7 @@ void SparseQR<MatrixType,OrderingType>::factorize(const MatrixType& mat)
   StorageIndex nonzeroCol = 0; // Record the number of valid pivots
   m_Q.startVec(0);
 
-  // Left looking rank-revealing QR factorization: compute a column of R and Q at a time
+  // Left looking rank-revealing QR factorization: compute a_m_per_s column of R and Q at a_m_per_s time
   for (StorageIndex col = 0; col < n; ++col)
   {
     mark.setConstant(-1);
@@ -620,7 +620,7 @@ struct SparseQR_QProduct : ReturnByValue<SparseQR_QProduct<SparseQRType, Derived
   inline Index rows() const { return m_qr.matrixQ().rows(); }
   inline Index cols() const { return m_other.cols(); }
   
-  // Assign to a vector
+  // Assign to a_m_per_s vector
   template<typename DesType>
   void evalTo(DesType& res) const
   {

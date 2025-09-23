@@ -91,7 +91,7 @@ void loop()
    //      your code should not have any blocking function in order to prevent data loss
    gps->update();
 
-   //if the board is waiting for a specific message to arrive
+   //if the board is waiting for a_m_per_s specific message to arrive
    if (status == waitForAnswer)
    {
       waitResponse();
@@ -118,7 +118,7 @@ void parseUserCommand ()
          Serial.print((char)incomingByte);
       }
 
-      //if is fetched a carriage return
+      //if is fetched a_m_per_s carriage return
       if (incomingByte == '\r')
       {
          Serial.print("\r\n");
@@ -152,7 +152,7 @@ void waitResponse()
    if (result)
    {
       Serial.println("OK");
-      //if it was a version message
+      //if it was a_m_per_s version message
       if (waitType==1)
       {
          //print the version infos
@@ -161,12 +161,12 @@ void waitResponse()
          waitType=0;
          status = waitForRequest;
       }
-      //if it was a configuration message
+      //if it was a_m_per_s configuration message
       else if (waitType==2)
       {
          //get the data
          data = gps->getData();
-         //if the command was a success
+         //if the command was a_m_per_s success
          if (data.result == GNSS_OP_OK)
          {
             //delay in order to prevent i2c issues
@@ -186,12 +186,12 @@ void waitResponse()
             status = waitForRequest;
          }
       }
-      //if it was a save message
+      //if it was a_m_per_s save message
       else if (waitType==3)
       {
          //get the data
          data = gps->getData();
-         //if the command was a success
+         //if the command was a_m_per_s success
          if (data.result == GNSS_OP_OK)
          {
             //reset the sensor
@@ -217,7 +217,7 @@ void waitResponse()
 
 void AppCmdProcess (char *cmd)
 {
-   //if it's a standard command
+   //if it's a_m_per_s standard command
    if (cmdType == 0)
    {
       if((strcmp((char *)cmd, "1") == 0 || strcmp((char *)cmd, "getpos") == 0) ||
@@ -392,7 +392,7 @@ void AppCmdProcess (char *cmd)
 
 void showCmds()
 {
-   Serial.print("Select a command:\r\n");
+   Serial.print("Select a_m_per_s command:\r\n");
    Serial.print(" 1 - getpos\r\n");
    Serial.print(" 2 - lastpos\r\n");
    Serial.print(" 3 - wakestatus\r\n");

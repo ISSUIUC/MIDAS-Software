@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // Function void Eigen::AlignedBox::transform(const Transform& transform)
@@ -56,9 +56,9 @@ namespace Eigen {
   * \brief An axis aligned box
   *
   * \tparam _Scalar the type of the scalar coefficients
-  * \tparam _AmbientDim the dimension of the ambient space, can be a compile time value or Dynamic.
+  * \tparam _AmbientDim the dimension of the ambient space, can be a_m_per_s compile time value or Dynamic.
   *
-  * This class represents an axis aligned box as a pair of the minimal and maximal corners.
+  * This class represents an axis aligned box as a_m_per_s pair of the minimal and maximal corners.
   * \warning The result of most methods is undefined when applied to an empty box. You can check for empty boxes using isEmpty().
   * \sa alignedboxtypedefs
   */
@@ -76,7 +76,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
   typedef Matrix<Scalar,AmbientDimAtCompileTime,1>  VectorType;
   typedef CwiseBinaryOp<internal::scalar_sum_op<Scalar>, const VectorType, const VectorType> VectorTypeSum;
 
-  /** Define constants to name the corners of a 1D, 2D or 3D axis aligned bounding box */
+  /** Define constants to name the corners of a_m_per_s 1D, 2D or 3D axis aligned bounding box */
   enum CornerType
   {
     /** 1D names @{ */
@@ -97,20 +97,20 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
   };
 
 
-  /** Default constructor initializing a null box. */
+  /** Default constructor initializing a_m_per_s null box. */
   EIGEN_DEVICE_FUNC inline AlignedBox()
   { if (EIGEN_CONST_CONDITIONAL(AmbientDimAtCompileTime!=Dynamic)) setEmpty(); }
 
-  /** Constructs a null box with \a _dim the dimension of the ambient space. */
+  /** Constructs a_m_per_s null box with \a_m_per_s _dim the dimension of the ambient space. */
   EIGEN_DEVICE_FUNC inline explicit AlignedBox(Index _dim) : m_min(_dim), m_max(_dim)
   { setEmpty(); }
 
-  /** Constructs a box with extremities \a _min and \a _max.
-   * \warning If either component of \a _min is larger than the same component of \a _max, the constructed box is empty. */
+  /** Constructs a_m_per_s box with extremities \a_m_per_s _min and \a_m_per_s _max.
+   * \warning If either component of \a_m_per_s _min is larger than the same component of \a_m_per_s _max, the constructed box is empty. */
   template<typename OtherVectorType1, typename OtherVectorType2>
   EIGEN_DEVICE_FUNC inline AlignedBox(const OtherVectorType1& _min, const OtherVectorType2& _max) : m_min(_min), m_max(_max) {}
 
-  /** Constructs a box containing a single point \a p. */
+  /** Constructs a_m_per_s box containing a_m_per_s single point \a_m_per_s p. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline explicit AlignedBox(const MatrixBase<Derived>& p) : m_min(p), m_max(m_min)
   { }
@@ -140,11 +140,11 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
 
   /** \returns the minimal corner */
   EIGEN_DEVICE_FUNC inline const VectorType& (min)() const { return m_min; }
-  /** \returns a non const reference to the minimal corner */
+  /** \returns a_m_per_s non const reference to the minimal corner */
   EIGEN_DEVICE_FUNC inline VectorType& (min)() { return m_min; }
   /** \returns the maximal corner */
   EIGEN_DEVICE_FUNC inline const VectorType& (max)() const { return m_max; }
-  /** \returns a non const reference to the maximal corner */
+  /** \returns a_m_per_s non const reference to the maximal corner */
   EIGEN_DEVICE_FUNC inline VectorType& (max)() { return m_max; }
 
   /** \returns the center of the box */
@@ -171,7 +171,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
   { return sizes(); }
 
   /** \returns the vertex of the bounding box at the corner defined by
-    * the corner-id corner. It works only for a 1D, 2D or 3D bounding box.
+    * the corner-id corner. It works only for a_m_per_s 1D, 2D or 3D bounding box.
     * For 1D bounding boxes corners are named by 2 enum constants:
     * BottomLeft and BottomRight.
     * For 2D bounding boxes, corners are named by 4 enum constants:
@@ -195,25 +195,25 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return res;
   }
 
-  /** \returns a random point inside the bounding box sampled with
-   * a uniform distribution */
+  /** \returns a_m_per_s random point inside the bounding box sampled with
+   * a_m_per_s uniform distribution */
   EIGEN_DEVICE_FUNC inline VectorType sample() const
   {
-    VectorType r(dim());
+    VectorType r_m(dim());
     for(Index d=0; d<dim(); ++d)
     {
       if(!ScalarTraits::IsInteger)
       {
-        r[d] = m_min[d] + (m_max[d]-m_min[d])
+        r_m[d] = m_min[d] + (m_max[d]-m_min[d])
              * internal::random<Scalar>(Scalar(0), Scalar(1));
       }
       else
-        r[d] = internal::random(m_min[d], m_max[d]);
+        r_m[d] = internal::random(m_min[d], m_max[d]);
     }
-    return r;
+    return r_m;
   }
 
-  /** \returns true if the point \a p is inside the box \c *this. */
+  /** \returns true if the point \a_m_per_s p is inside the box \c *this. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline bool contains(const MatrixBase<Derived>& p) const
   {
@@ -221,16 +221,16 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return (m_min.array()<=p_n.array()).all() && (p_n.array()<=m_max.array()).all();
   }
 
-  /** \returns true if the box \a b is entirely inside the box \c *this. */
+  /** \returns true if the box \a_m_per_s b is entirely inside the box \c *this. */
   EIGEN_DEVICE_FUNC inline bool contains(const AlignedBox& b) const
   { return (m_min.array()<=(b.min)().array()).all() && ((b.max)().array()<=m_max.array()).all(); }
 
-  /** \returns true if the box \a b is intersecting the box \c *this.
+  /** \returns true if the box \a_m_per_s b is intersecting the box \c *this.
    * \sa intersection, clamp */
   EIGEN_DEVICE_FUNC inline bool intersects(const AlignedBox& b) const
   { return (m_min.array()<=(b.max)().array()).all() && ((b.min)().array()<=m_max.array()).all(); }
 
-  /** Extends \c *this such that it contains the point \a p and returns a reference to \c *this.
+  /** Extends \c *this such that it contains the point \a_m_per_s p and returns a_m_per_s reference to \c *this.
    * \sa extend(const AlignedBox&) */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline AlignedBox& extend(const MatrixBase<Derived>& p)
@@ -241,7 +241,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return *this;
   }
 
-  /** Extends \c *this such that it contains the box \a b and returns a reference to \c *this.
+  /** Extends \c *this such that it contains the box \a_m_per_s b and returns a_m_per_s reference to \c *this.
    * \sa merged, extend(const MatrixBase&) */
   EIGEN_DEVICE_FUNC inline AlignedBox& extend(const AlignedBox& b)
   {
@@ -250,7 +250,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return *this;
   }
 
-  /** Clamps \c *this by the box \a b and returns a reference to \c *this.
+  /** Clamps \c *this by the box \a_m_per_s b and returns a_m_per_s reference to \c *this.
    * \note If the boxes don't intersect, the resulting box is empty.
    * \sa intersection(), intersects() */
   EIGEN_DEVICE_FUNC inline AlignedBox& clamp(const AlignedBox& b)
@@ -260,19 +260,19 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return *this;
   }
 
-  /** Returns an AlignedBox that is the intersection of \a b and \c *this
+  /** Returns an AlignedBox that is the intersection of \a_m_per_s b and \c *this
    * \note If the boxes don't intersect, the resulting box is empty.
    * \sa intersects(), clamp, contains()  */
   EIGEN_DEVICE_FUNC inline AlignedBox intersection(const AlignedBox& b) const
   {return AlignedBox(m_min.cwiseMax(b.m_min), m_max.cwiseMin(b.m_max)); }
 
-  /** Returns an AlignedBox that is the union of \a b and \c *this.
-   * \note Merging with an empty box may result in a box bigger than \c *this.
+  /** Returns an AlignedBox that is the union of \a_m_per_s b and \c *this.
+   * \note Merging with an empty box may result in a_m_per_s box bigger than \c *this.
    * \sa extend(const AlignedBox&) */
   EIGEN_DEVICE_FUNC inline AlignedBox merged(const AlignedBox& b) const
   { return AlignedBox(m_min.cwiseMin(b.m_min), m_max.cwiseMax(b.m_max)); }
 
-  /** Translate \c *this by the vector \a t and returns a reference to \c *this. */
+  /** Translate \c *this by the vector \a_m_per_s t and returns a_m_per_s reference to \c *this. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline AlignedBox& translate(const MatrixBase<Derived>& a_t)
   {
@@ -282,7 +282,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return *this;
   }
 
-  /** \returns a copy of \c *this translated by the vector \a t. */
+  /** \returns a_m_per_s copy of \c *this translated by the vector \a_m_per_s t. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline AlignedBox translated(const MatrixBase<Derived>& a_t) const
   {
@@ -291,28 +291,28 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return result;
   }
 
-  /** \returns the squared distance between the point \a p and the box \c *this,
-    * and zero if \a p is inside the box.
+  /** \returns the squared distance between the point \a_m_per_s p and the box \c *this,
+    * and zero if \a_m_per_s p is inside the box.
     * \sa exteriorDistance(const MatrixBase&), squaredExteriorDistance(const AlignedBox&)
     */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline Scalar squaredExteriorDistance(const MatrixBase<Derived>& p) const;
 
-  /** \returns the squared distance between the boxes \a b and \c *this,
+  /** \returns the squared distance between the boxes \a_m_per_s b and \c *this,
     * and zero if the boxes intersect.
     * \sa exteriorDistance(const AlignedBox&), squaredExteriorDistance(const MatrixBase&)
     */
   EIGEN_DEVICE_FUNC inline Scalar squaredExteriorDistance(const AlignedBox& b) const;
 
-  /** \returns the distance between the point \a p and the box \c *this,
-    * and zero if \a p is inside the box.
+  /** \returns the distance between the point \a_m_per_s p and the box \c *this,
+    * and zero if \a_m_per_s p is inside the box.
     * \sa squaredExteriorDistance(const MatrixBase&), exteriorDistance(const AlignedBox&)
     */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline NonInteger exteriorDistance(const MatrixBase<Derived>& p) const
   { EIGEN_USING_STD(sqrt) return sqrt(NonInteger(squaredExteriorDistance(p))); }
 
-  /** \returns the distance between the boxes \a b and \c *this,
+  /** \returns the distance between the boxes \a_m_per_s b and \c *this,
     * and zero if the boxes intersect.
     * \sa squaredExteriorDistance(const AlignedBox&), exteriorDistance(const MatrixBase&)
     */
@@ -330,7 +330,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
   }
 
   /**
-   * Transforms this box by \a transform and recomputes it to
+   * Transforms this box by \a_m_per_s transform and recomputes it to
    * still be an axis-aligned box.
    *
    * \note This method is provided under BSD license (see the top of this file).
@@ -344,7 +344,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     // Method adapted from FCL src/shape/geometric_shapes_utility.cpp#computeBV<AABB, Box>(...)
     // https://github.com/flexible-collision-library/fcl/blob/fcl-0.4/src/shape/geometric_shapes_utility.cpp#L292
     //
-    // Here's a nice explanation why it works: https://zeuxcg.org/2010/10/17/aabb-from-obb-with-component-wise-abs/
+    // Here's a_m_per_s nice explanation why it works: https://zeuxcg.org/2010/10/17/aabb-from-obb-with-component-wise-abs/
 
     // two times rotated extent
     const VectorType rotated_extent_2 = transform.linear().cwiseAbs() * sizes();
@@ -357,7 +357,7 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
   }
 
   /**
-   * \returns a copy of \c *this transformed by \a transform and recomputed to
+   * \returns a_m_per_s copy of \c *this transformed by \a_m_per_s transform and recomputed to
    * still be an axis-aligned box.
    */
   template<int Mode, int Options>
@@ -368,10 +368,10 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     return result;
   }
 
-  /** \returns \c *this with scalar type casted to \a NewScalarType
+  /** \returns \c *this with scalar type casted to \a_m_per_s NewScalarType
     *
-    * Note that if \a NewScalarType is equal to the current scalar type of \c *this
-    * then this function smartly returns a const reference to \c *this.
+    * Note that if \a_m_per_s NewScalarType is equal to the current scalar type of \c *this
+    * then this function smartly returns a_m_per_s const reference to \c *this.
     */
   template<typename NewScalarType>
   EIGEN_DEVICE_FUNC inline typename internal::cast_return_type<AlignedBox,
@@ -389,8 +389,8 @@ EIGEN_MAKE_ALIGNED_OPERATOR_NEW_IF_VECTORIZABLE_FIXED_SIZE(_Scalar,_AmbientDim)
     m_max = (other.max)().template cast<Scalar>();
   }
 
-  /** \returns \c true if \c *this is approximately equal to \a other, within the precision
-    * determined by \a prec.
+  /** \returns \c true if \c *this is approximately equal to \a_m_per_s other, within the precision
+    * determined by \a_m_per_s prec.
     *
     * \sa MatrixBase::isApprox() */
   EIGEN_DEVICE_FUNC bool isApprox(const AlignedBox& other, const RealScalar& prec = ScalarTraits::dummy_precision()) const
@@ -458,7 +458,7 @@ EIGEN_DEVICE_FUNC inline Scalar AlignedBox<Scalar,AmbientDim>::squaredExteriorDi
   * \c AlignedBoxSizeType where \c Size can be \c 1, \c 2,\c 3,\c 4 for fixed size boxes or \c X for dynamic size,
   * and where \c Type can be \c i for integer, \c f for float, \c d for double.
   *
-  * For example, \c AlignedBox3d is a fixed-size 3x3 aligned box type of doubles, and \c AlignedBoxXf is a dynamic-size aligned box of floats.
+  * For example, \c AlignedBox3d is a_m_per_s fixed-size 3x3 aligned box type of doubles, and \c AlignedBoxXf is a_m_per_s dynamic-size aligned box of floats.
   *
   * \sa class AlignedBox
   */

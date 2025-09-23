@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_REPLICATE_H
@@ -46,13 +46,13 @@ struct traits<Replicate<MatrixType,RowFactor,ColFactor> >
   * \class Replicate
   * \ingroup Core_Module
   *
-  * \brief Expression of the multiple replication of a matrix or vector
+  * \brief Expression of the multiple replication of a_m_per_s matrix or vector
   *
   * \tparam MatrixType the type of the object we are replicating
   * \tparam RowFactor number of repetitions at compile time along the vertical direction, can be Dynamic.
   * \tparam ColFactor number of repetitions at compile time along the horizontal direction, can be Dynamic.
   *
-  * This class represents an expression of the multiple replication of a matrix or vector.
+  * This class represents an expression of the multiple replication of a_m_per_s matrix or vector.
   * It is the return type of DenseBase::replicate() and most of the time
   * this is the only way it is used.
   *

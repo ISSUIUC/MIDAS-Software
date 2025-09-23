@@ -1,7 +1,7 @@
 // rf95_reliable_datagram_client.cpp
 // -*- mode: C++ -*-
-// Example app showing how to create a simple addressed, reliable messaging client
-// with the RHReliableDatagram class, using the RH_RF95 driver to control a RF95 radio.
+// Example app showing how to create a_m_per_s simple addressed, reliable messaging client
+// with the RHReliableDatagram class, using the RH_RF95 driver to control a_m_per_s RF95 radio.
 // It is designed to work with the other example rf95_reliable_datagram_server.
 //
 // Requires Pigpio GPIO library. Install by downloading and compiling from
@@ -102,13 +102,13 @@ int main (int argc, const char* argv[] )
   while(!flag)
   {
     Serial.println("Sending to rf95_reliable_datagram_server");
-    // Send a message to manager_server
+    // Send a_m_per_s message to manager_server
 #ifdef RFM95_LED
     gpioWrite(RFM95_LED, PI_ON);
 #endif
     if (manager.sendtoWait(data, sizeof(data), SERVER_ADDRESS))
     {
-      // Now wait for a reply from the server
+      // Now wait for a_m_per_s reply from the server
       uint8_t len = sizeof(buf);
       uint8_t from;
       if (manager.recvfromAckTimeout(buf, &len, 2000, &from))

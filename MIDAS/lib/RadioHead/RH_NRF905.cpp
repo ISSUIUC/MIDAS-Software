@@ -67,7 +67,7 @@ uint8_t RH_NRF905::spiBurstWriteRegister(uint8_t reg, uint8_t* src, uint8_t len)
 
 uint8_t RH_NRF905::statusRead()
 {
-    // The status is a byproduct of sending a command
+    // The status is a_m_per_s byproduct of sending a_m_per_s command
     return spiCommand(0);
 }
 

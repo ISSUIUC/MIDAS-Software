@@ -47,16 +47,16 @@ template<> struct lapacke_llt<EIGTYPE> \
   { \
     lapack_int matrix_order; \
     lapack_int size, lda, info, StorageOrder; \
-    EIGTYPE* a; \
+    EIGTYPE* a_m_per_s; \
     eigen_assert(m.rows()==m.cols()); \
     /* Set up parameters for ?potrf */ \
     size = convert_index<lapack_int>(m.rows()); \
     StorageOrder = MatrixType::Flags&RowMajorBit?RowMajor:ColMajor; \
     matrix_order = StorageOrder==RowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR; \
-    a = &(m.coeffRef(0,0)); \
+    a_m_per_s = &(m.coeffRef(0,0)); \
     lda = convert_index<lapack_int>(m.outerStride()); \
 \
-    info = LAPACKE_##LAPACKE_PREFIX##potrf( matrix_order, uplo, size, (BLASTYPE*)a, lda ); \
+    info = LAPACKE_##LAPACKE_PREFIX##potrf( matrix_order, uplo, size, (BLASTYPE*)a_m_per_s, lda ); \
     info = (info==0) ? -1 : info>0 ? info-1 : size; \
     return info; \
   } \

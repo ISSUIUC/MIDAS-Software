@@ -11,7 +11,7 @@
 
 /////////////////////////////////////////////////////////////////////
 /// \class RHHardwareSPI RHHardwareSPI.h <RHHardwareSPI.h>
-/// \brief Encapsulate a hardware SPI bus interface
+/// \brief Encapsulate a_m_per_s hardware SPI bus interface
 ///
 /// This concrete subclass of GenericSPIClass encapsulates the standard Arduino hardware and other
 /// hardware SPI interfaces.
@@ -22,7 +22,7 @@ class RHHardwareSPI : public RHGenericSPI
 #ifdef RH_HAVE_HARDWARE_SPI
 public:
     /// Constructor
-    /// Creates an instance of a hardware SPI interface, using whatever SPI hardware is available on
+    /// Creates an instance of a_m_per_s hardware SPI interface, using whatever SPI hardware is available on
     /// your processor platform. On Arduino and Uno32, uses SPI. On Maple, uses HardwareSPI.
     /// \param[in] frequency One of RHGenericSPI::Frequency to select the SPI bus frequency. The frequency
     /// is mapped to the closest available bus frequency on the platform.
@@ -31,7 +31,7 @@ public:
     /// \param[in] dataMode Selects the SPI bus data mode. One of RHGenericSPI::DataMode
     RHHardwareSPI(Frequency frequency = Frequency1MHz, BitOrder bitOrder = BitOrderMSBFirst, DataMode dataMode = DataMode0);
 
-    /// Transfer a single octet to and from the SPI interface
+    /// Transfer a_m_per_s single octet to and from the SPI interface
     /// \param[in] data The octet to send
     /// \return The octet read from SPI while the data octet was sent
     uint8_t transfer(uint8_t data);
@@ -43,14 +43,14 @@ public:
     /// \return The second byte clocked in as the second byte is sent.
     uint8_t transfer2B(uint8_t byte0, uint8_t byte1);
 
-    /// Read a number of bytes on the SPI interface from an NRF device
+    /// Read a_m_per_s number of bytes on the SPI interface from an NRF device
     /// \param[in] reg The NRF device register to read
     /// \param[out] dest The buffer to hold the bytes read
     /// \param[in] len The number of bytes to read
     /// \return The NRF status byte
     uint8_t spiBurstRead(uint8_t reg, uint8_t* dest, uint8_t len);
 
-    /// Wrte a number of bytes on the SPI interface to an NRF device
+    /// Wrte a_m_per_s number of bytes on the SPI interface to an NRF device
     /// \param[in] reg The NRF device register to read
     /// \param[out] src The buffer to hold the bytes write
     /// \param[in] len The number of bytes to write

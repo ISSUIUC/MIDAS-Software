@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CWISE_BINARY_OP_H
@@ -57,16 +57,16 @@ class CwiseBinaryOpImpl;
 /** \class CwiseBinaryOp
   * \ingroup Core_Module
   *
-  * \brief Generic expression where a coefficient-wise binary operator is applied to two expressions
+  * \brief Generic expression where a_m_per_s coefficient-wise binary operator is applied to two expressions
   *
   * \tparam BinaryOp template functor implementing the operator
   * \tparam LhsType the type of the left-hand side
   * \tparam RhsType the type of the right-hand side
   *
-  * This class represents an expression  where a coefficient-wise binary operator is applied to two expressions.
+  * This class represents an expression  where a_m_per_s coefficient-wise binary operator is applied to two expressions.
   * It is the return type of binary operators, by which we mean only those binary operators where
   * both the left-hand side and the right-hand side are Eigen expressions.
-  * For example, the return type of matrix1+matrix2 is a CwiseBinaryOp.
+  * For example, the return type of matrix1+matrix2 is a_m_per_s CwiseBinaryOp.
   *
   * Most of the time, this is the only way that it is used, so you typically don't have to name
   * CwiseBinaryOp types explicitly.
@@ -152,9 +152,9 @@ public:
   typedef typename internal::generic_xpr_base<CwiseBinaryOp<BinaryOp, Lhs, Rhs> >::type Base;
 };
 
-/** replaces \c *this by \c *this - \a other.
+/** replaces \c *this by \c *this - \a_m_per_s other.
   *
-  * \returns a reference to \c *this
+  * \returns a_m_per_s reference to \c *this
   */
 template<typename Derived>
 template<typename OtherDerived>
@@ -165,9 +165,9 @@ MatrixBase<Derived>::operator-=(const MatrixBase<OtherDerived> &other)
   return derived();
 }
 
-/** replaces \c *this by \c *this + \a other.
+/** replaces \c *this by \c *this + \a_m_per_s other.
   *
-  * \returns a reference to \c *this
+  * \returns a_m_per_s reference to \c *this
   */
 template<typename Derived>
 template<typename OtherDerived>

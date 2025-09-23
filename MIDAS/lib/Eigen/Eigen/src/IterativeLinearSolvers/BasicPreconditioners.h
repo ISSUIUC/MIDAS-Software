@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_BASIC_PRECONDITIONERS_H
@@ -15,7 +15,7 @@ namespace Eigen {
 /** \ingroup IterativeLinearSolvers_Module
   * \brief A preconditioner based on the digonal entries
   *
-  * This class allows to approximately solve for A.x = b problems assuming A is a diagonal matrix.
+  * This class allows to approximately solve for A.x = b problems assuming A is a_m_per_s diagonal matrix.
   * In other words, this preconditioner neglects all off diagonal entries and, in Eigen's language, solves for:
     \code
     A.diagonal().asDiagonal() . x = b
@@ -26,7 +26,7 @@ namespace Eigen {
   * \implsparsesolverconcept
   *
   * This preconditioner is suitable for both selfadjoint and general problems.
-  * The diagonal entries are pre-inverted and stored into a dense vector.
+  * The diagonal entries are pre-inverted and stored into a_m_per_s dense vector.
   *
   * \note A variant that has yet to be implemented would attempt to preserve the norm of each column.
   *
@@ -110,7 +110,7 @@ class DiagonalPreconditioner
 /** \ingroup IterativeLinearSolvers_Module
   * \brief Jacobi preconditioner for LeastSquaresConjugateGradient
   *
-  * This class allows to approximately solve for A' A x  = A' b problems assuming A' A is a diagonal matrix.
+  * This class allows to approximately solve for A' A x  = A' b problems assuming A' A is a_m_per_s diagonal matrix.
   * In other words, this preconditioner neglects all off diagonal entries and, in Eigen's language, solves for:
     \code
     (A.adjoint() * A).diagonal().asDiagonal() * x = b
@@ -120,7 +120,7 @@ class DiagonalPreconditioner
   *
   * \implsparsesolverconcept
   *
-  * The diagonal entries are pre-inverted and stored into a dense vector.
+  * The diagonal entries are pre-inverted and stored into a_m_per_s dense vector.
   *
   * \sa class LeastSquaresConjugateGradient, class DiagonalPreconditioner
   */

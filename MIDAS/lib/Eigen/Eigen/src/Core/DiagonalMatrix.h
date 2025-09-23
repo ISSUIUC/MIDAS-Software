@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2007-2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_DIAGONALMATRIX_H
@@ -114,7 +114,7 @@ class DiagonalBase : public EigenBase<Derived>
 /** \class DiagonalMatrix
   * \ingroup Core_Module
   *
-  * \brief Represents a diagonal matrix with its storage
+  * \brief Represents a_m_per_s diagonal matrix with its storage
   *
   * \param _Scalar the type of coefficients
   * \param SizeAtCompileTime the dimension of the matrix, or Dynamic
@@ -158,7 +158,7 @@ class DiagonalMatrix
     /** const version of diagonal(). */
     EIGEN_DEVICE_FUNC
     inline const DiagonalVectorType& diagonal() const { return m_diagonal; }
-    /** \returns a reference to the stored vector of diagonal coefficients. */
+    /** \returns a_m_per_s reference to the stored vector of diagonal coefficients. */
     EIGEN_DEVICE_FUNC
     inline DiagonalVectorType& diagonal() { return m_diagonal; }
 
@@ -166,7 +166,7 @@ class DiagonalMatrix
     EIGEN_DEVICE_FUNC
     inline DiagonalMatrix() {}
 
-    /** Constructs a diagonal matrix with given dimension  */
+    /** Constructs a_m_per_s diagonal matrix with given dimension  */
     EIGEN_DEVICE_FUNC
     explicit inline DiagonalMatrix(Index dim) : m_diagonal(dim) {}
 
@@ -179,11 +179,11 @@ class DiagonalMatrix
     inline DiagonalMatrix(const Scalar& x, const Scalar& y, const Scalar& z) : m_diagonal(x,y,z) {}
 
     #if EIGEN_HAS_CXX11
-    /** \brief Construct a diagonal matrix with fixed size from an arbitrary number of coefficients. \cpp11
+    /** \brief Construct a_m_per_s diagonal matrix with fixed size from an arbitrary number of coefficients. \cpp11
       * 
       * There exists C++98 anologue constructors for fixed-size diagonal matrices having 2 or 3 coefficients.
       * 
-      * \warning To construct a diagonal matrix of fixed size, the number of values passed to this 
+      * \warning To construct a_m_per_s diagonal matrix of fixed size, the number of values passed to this 
       * constructor must match the fixed dimension of \c *this.
       * 
       * \sa DiagonalMatrix(const Scalar&, const Scalar&)
@@ -194,7 +194,7 @@ class DiagonalMatrix
     DiagonalMatrix(const Scalar& a0, const Scalar& a1, const Scalar& a2, const ArgTypes&... args)
       : m_diagonal(a0, a1, a2, args...) {}
 
-    /** \brief Constructs a DiagonalMatrix and initializes it by elements given by an initializer list of initializer
+    /** \brief Constructs a_m_per_s DiagonalMatrix and initializes it by elements given by an initializer list of initializer
       * lists \cpp11
       */
     EIGEN_DEVICE_FUNC
@@ -208,7 +208,7 @@ class DiagonalMatrix
     inline DiagonalMatrix(const DiagonalBase<OtherDerived>& other) : m_diagonal(other.diagonal()) {}
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** copy constructor. prevent a default copy constructor from hiding the other templated constructor */
+    /** copy constructor. prevent a_m_per_s default copy constructor from hiding the other templated constructor */
     inline DiagonalMatrix(const DiagonalMatrix& other) : m_diagonal(other.diagonal()) {}
     #endif
 
@@ -228,8 +228,8 @@ class DiagonalMatrix
     }
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** This is a special case of the templated operator=. Its purpose is to
-      * prevent a default operator= from hiding the templated operator=.
+    /** This is a_m_per_s special case of the templated operator=. Its purpose is to
+      * prevent a_m_per_s default operator= from hiding the templated operator=.
       */
     EIGEN_DEVICE_FUNC
     DiagonalMatrix& operator=(const DiagonalMatrix& other)
@@ -259,11 +259,11 @@ class DiagonalMatrix
 /** \class DiagonalWrapper
   * \ingroup Core_Module
   *
-  * \brief Expression of a diagonal matrix
+  * \brief Expression of a_m_per_s diagonal matrix
   *
   * \param _DiagonalVectorType the type of the vector of diagonal coefficients
   *
-  * This class is an expression of a diagonal matrix, but not storing its own vector of diagonal coefficients,
+  * This class is an expression of a_m_per_s diagonal matrix, but not storing its own vector of diagonal coefficients,
   * instead wrapping an existing vector expression. It is the return type of MatrixBase::asDiagonal()
   * and most of the time this is the only way that it is used.
   *
@@ -303,7 +303,7 @@ class DiagonalWrapper
     EIGEN_DEVICE_FUNC
     explicit inline DiagonalWrapper(DiagonalVectorType& a_diagonal) : m_diagonal(a_diagonal) {}
 
-    /** \returns a const reference to the wrapped expression of diagonal coefficients. */
+    /** \returns a_m_per_s const reference to the wrapped expression of diagonal coefficients. */
     EIGEN_DEVICE_FUNC
     const DiagonalVectorType& diagonal() const { return m_diagonal; }
 
@@ -311,7 +311,7 @@ class DiagonalWrapper
     typename DiagonalVectorType::Nested m_diagonal;
 };
 
-/** \returns a pseudo-expression of a diagonal matrix with *this as vector of diagonal coefficients
+/** \returns a_m_per_s pseudo-expression of a_m_per_s diagonal matrix with *this as vector of diagonal coefficients
   *
   * \only_for_vectors
   *
@@ -327,8 +327,8 @@ MatrixBase<Derived>::asDiagonal() const
   return DiagonalWrapper<const Derived>(derived());
 }
 
-/** \returns true if *this is approximately equal to a diagonal matrix,
-  *          within the precision given by \a prec.
+/** \returns true if *this is approximately equal to a_m_per_s diagonal matrix,
+  *          within the precision given by \a_m_per_s prec.
   *
   * Example: \include MatrixBase_isDiagonal.cpp
   * Output: \verbinclude MatrixBase_isDiagonal.out

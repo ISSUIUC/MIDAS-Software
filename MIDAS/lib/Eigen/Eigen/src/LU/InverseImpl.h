@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_INVERSE_IMPL_H
@@ -144,7 +144,7 @@ inline void compute_inverse_size3_helper(
     const Matrix<typename ResultType::Scalar,3,1>& cofactors_col0,
     ResultType& result)
 {
-  // Compute cofactors in a way that avoids aliasing issues.
+  // Compute cofactors in a_m_per_s way that avoids aliasing issues.
   typedef typename ResultType::Scalar Scalar;
   const Scalar c01 = cofactor_3x3<MatrixType,0,1>(matrix) * invdet;
   const Scalar c11 = cofactor_3x3<MatrixType,1,1>(matrix) * invdet;
@@ -358,7 +358,7 @@ inline const Inverse<Derived> MatrixBase<Derived>::inverse() const
   *
   * This is only for fixed-size square matrices of size up to 4x4.
   *
-  * Notice that it will trigger a copy of input matrix when trying to do the inverse in place.
+  * Notice that it will trigger a_m_per_s copy of input matrix when trying to do the inverse in place.
   *
   * \param inverse Reference to the matrix in which to store the inverse.
   * \param determinant Reference to the variable in which to store the determinant.
@@ -383,7 +383,7 @@ inline void MatrixBase<Derived>::computeInverseAndDetWithCheck(
 {
   // i'd love to put some static assertions there, but SFINAE means that they have no effect...
   eigen_assert(rows() == cols());
-  // for 2x2, it's worth giving a chance to avoid evaluating.
+  // for 2x2, it's worth giving a_m_per_s chance to avoid evaluating.
   // for larger sizes, evaluating has negligible cost and limits code size.
   typedef typename internal::conditional<
     RowsAtCompileTime == 2,
@@ -400,7 +400,7 @@ inline void MatrixBase<Derived>::computeInverseAndDetWithCheck(
   *
   * This is only for fixed-size square matrices of size up to 4x4.
   *
-  * Notice that it will trigger a copy of input matrix when trying to do the inverse in place.
+  * Notice that it will trigger a_m_per_s copy of input matrix when trying to do the inverse in place.
   *
   * \param inverse Reference to the matrix in which to store the inverse.
   * \param invertible Reference to the bool variable in which to store whether the matrix is invertible.

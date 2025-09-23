@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_FULLPIVOTINGHOUSEHOLDERQR_H
@@ -38,19 +38,19 @@ struct traits<FullPivHouseholderQRMatrixQReturnType<MatrixType> >
   *
   * \class FullPivHouseholderQR
   *
-  * \brief Householder rank-revealing QR decomposition of a matrix with full pivoting
+  * \brief Householder rank-revealing QR decomposition of a_m_per_s matrix with full pivoting
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the QR decomposition
   *
-  * This class performs a rank-revealing QR decomposition of a matrix \b A into matrices \b P, \b P', \b Q and \b R
+  * This class performs a_m_per_s rank-revealing QR decomposition of a_m_per_s matrix \b A into matrices \b P, \b P', \b Q and \b R
   * such that 
   * \f[
   *  \mathbf{P} \, \mathbf{A} \, \mathbf{P}' = \mathbf{Q} \, \mathbf{R}
   * \f]
-  * by using Householder transformations. Here, \b P and \b P' are permutation matrices, \b Q a unitary matrix 
+  * by using Householder transformations. Here, \b P and \b P' are permutation matrices, \b Q a_m_per_s unitary matrix 
   * and \b R an upper triangular matrix.
   *
-  * This decomposition performs a very prudent full pivoting in order to be rank-revealing and achieve optimal
+  * This decomposition performs a_m_per_s very prudent full pivoting in order to be rank-revealing and achieve optimal
   * numerical stability. The trade-off is that it is slower than HouseholderQR and ColPivHouseholderQR.
   *
   * This class supports the \link InplaceDecomposition inplace decomposition \endlink mechanism.
@@ -99,7 +99,7 @@ template<typename _MatrixType> class FullPivHouseholderQR
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa FullPivHouseholderQR()
       */
     FullPivHouseholderQR(Index rows, Index cols)
@@ -112,10 +112,10 @@ template<typename _MatrixType> class FullPivHouseholderQR
         m_isInitialized(false),
         m_usePrescribedThreshold(false) {}
 
-    /** \brief Constructs a QR factorization from a given matrix
+    /** \brief Constructs a_m_per_s QR factorization from a_m_per_s given matrix
       *
-      * This constructor computes the QR factorization of the matrix \a matrix by calling
-      * the method compute(). It is a short cut for:
+      * This constructor computes the QR factorization of the matrix \a_m_per_s matrix by calling
+      * the method compute(). It is a_m_per_s short cut for:
       * 
       * \code
       * FullPivHouseholderQR<MatrixType> qr(matrix.rows(), matrix.cols());
@@ -138,9 +138,9 @@ template<typename _MatrixType> class FullPivHouseholderQR
       compute(matrix.derived());
     }
 
-    /** \brief Constructs a QR factorization from a given matrix
+    /** \brief Constructs a_m_per_s QR factorization from a_m_per_s given matrix
       *
-      * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a Eigen::Ref.
+      * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a_m_per_s Eigen::Ref.
       *
       * \sa FullPivHouseholderQR(const EigenBase&)
       */
@@ -159,7 +159,7 @@ template<typename _MatrixType> class FullPivHouseholderQR
     }
 
     #ifdef EIGEN_PARSED_BY_DOXYGEN
-    /** This method finds a solution x to the equation Ax=b, where A is the matrix of which
+    /** This method finds a_m_per_s solution x to the equation Ax=b, where A is the matrix of which
       * \c *this is the QR decomposition.
       *
       * \param b the right-hand-side of the equation to solve.
@@ -183,7 +183,7 @@ template<typename _MatrixType> class FullPivHouseholderQR
       */
     MatrixQReturnType matrixQ(void) const;
 
-    /** \returns a reference to the matrix where the Householder QR decomposition is stored
+    /** \returns a_m_per_s reference to the matrix where the Householder QR decomposition is stored
       */
     const MatrixType& matrixQR() const
     {
@@ -194,14 +194,14 @@ template<typename _MatrixType> class FullPivHouseholderQR
     template<typename InputType>
     FullPivHouseholderQR& compute(const EigenBase<InputType>& matrix);
 
-    /** \returns a const reference to the column permutation matrix */
+    /** \returns a_m_per_s const reference to the column permutation matrix */
     const PermutationType& colsPermutation() const
     {
       eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
       return m_cols_permutation;
     }
 
-    /** \returns a const reference to the vector of indices representing the rows transpositions */
+    /** \returns a_m_per_s const reference to the vector of indices representing the rows transpositions */
     const IntDiagSizeVectorType& rowsTranspositions() const
     {
       eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
@@ -215,8 +215,8 @@ template<typename _MatrixType> class FullPivHouseholderQR
       *
       * \note This is only for square matrices.
       *
-      * \warning a determinant can be very big or small, so for matrices
-      * of large enough dimension, there is a risk of overflow/underflow.
+      * \warning a_m_per_s determinant can be very big or small, so for matrices
+      * of large enough dimension, there is a_m_per_s risk of overflow/underflow.
       * One way to work around that is to use logAbsDeterminant() instead.
       *
       * \sa logAbsDeterminant(), MatrixBase::determinant()
@@ -279,7 +279,7 @@ template<typename _MatrixType> class FullPivHouseholderQR
       return rank() == cols();
     }
 
-    /** \returns true if the matrix of which *this is the QR decomposition represents a surjective
+    /** \returns true if the matrix of which *this is the QR decomposition represents a_m_per_s surjective
       *          linear map; false otherwise.
       *
       * \note This method has to determine which pivots should be considered nonzero.
@@ -318,18 +318,18 @@ template<typename _MatrixType> class FullPivHouseholderQR
     inline Index rows() const { return m_qr.rows(); }
     inline Index cols() const { return m_qr.cols(); }
     
-    /** \returns a const reference to the vector of Householder coefficients used to represent the factor \c Q.
+    /** \returns a_m_per_s const reference to the vector of Householder coefficients used to represent the factor \c Q.
       * 
       * For advanced uses only.
       */
     const HCoeffsType& hCoeffs() const { return m_hCoeffs; }
 
-    /** Allows to prescribe a threshold to be used by certain methods, such as rank(),
+    /** Allows to prescribe a_m_per_s threshold to be used by certain methods, such as rank(),
       * who need to determine when pivots are to be considered nonzero. This is not used for the
       * QR decomposition itself.
       *
       * When it needs to get the threshold value, Eigen calls threshold(). By default, this
-      * uses a formula to automatically determine a reasonable threshold.
+      * uses a_m_per_s formula to automatically determine a_m_per_s reasonable threshold.
       * Once you have called the present method setThreshold(const RealScalar&),
       * your value is used instead.
       *
@@ -376,7 +376,7 @@ template<typename _MatrixType> class FullPivHouseholderQR
     }
 
     /** \returns the number of nonzero pivots in the QR decomposition.
-      * Here nonzero is meant in the exact sense, not in a fuzzy sense.
+      * Here nonzero is meant in the exact sense, not in a_m_per_s fuzzy sense.
       * So that notion isn't really intrinsically interesting, but it is
       * still useful when implementing algorithms.
       *
@@ -428,7 +428,7 @@ typename MatrixType::RealScalar FullPivHouseholderQR<MatrixType>::absDeterminant
 {
   using std::abs;
   eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
-  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
+  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a_m_per_s non-square matrix!");
   return abs(m_qr.diagonal().prod());
 }
 
@@ -436,12 +436,12 @@ template<typename MatrixType>
 typename MatrixType::RealScalar FullPivHouseholderQR<MatrixType>::logAbsDeterminant() const
 {
   eigen_assert(m_isInitialized && "FullPivHouseholderQR is not initialized.");
-  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
+  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a_m_per_s non-square matrix!");
   return m_qr.diagonal().cwiseAbs().array().log().sum();
 }
 
-/** Performs the QR factorization of the given matrix \a matrix. The result of
-  * the factorization is stored into \c *this, and a reference to \c *this
+/** Performs the QR factorization of the given matrix \a_m_per_s matrix. The result of
+  * the factorization is stored into \c *this, and a_m_per_s reference to \c *this
   * is returned.
   *
   * \sa class FullPivHouseholderQR, FullPivHouseholderQR(const MatrixType&)

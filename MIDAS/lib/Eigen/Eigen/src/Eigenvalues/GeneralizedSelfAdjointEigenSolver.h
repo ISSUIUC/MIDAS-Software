@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERALIZEDSELFADJOINTEIGENSOLVER_H
@@ -33,7 +33,7 @@ namespace Eigen {
   * Only the \b lower \b triangular \b part of the input matrix is referenced.
   *
   * Call the function compute() to compute the eigenvalues and eigenvectors of
-  * a given matrix. Alternatively, you can use the
+  * a_m_per_s given matrix. Alternatively, you can use the
   * GeneralizedSelfAdjointEigenSolver(const MatrixType&, const MatrixType&, int)
   * constructor which computes the eigenvalues and eigenvectors at construction time.
   * Once the eigenvalue and eigenvectors are computed, they can be retrieved with the eigenvalues()
@@ -56,7 +56,7 @@ class GeneralizedSelfAdjointEigenSolver : public SelfAdjointEigenSolver<_MatrixT
       *
       * The default constructor is useful in cases in which the user intends to
       * perform decompositions via compute(). This constructor
-      * can only be used if \p _MatrixType is a fixed-size matrix; use
+      * can only be used if \p _MatrixType is a_m_per_s fixed-size matrix; use
       * GeneralizedSelfAdjointEigenSolver(Index) for dynamic-size matrices.
       */
     GeneralizedSelfAdjointEigenSolver() : Base() {}
@@ -68,7 +68,7 @@ class GeneralizedSelfAdjointEigenSolver : public SelfAdjointEigenSolver<_MatrixT
       *
       * This constructor is useful for dynamic-size matrices, when the user
       * intends to perform decompositions via compute(). The \p size
-      * parameter is only used as a hint. It is not an error to give a wrong
+      * parameter is only used as a_m_per_s hint. It is not an error to give a_m_per_s wrong
       * \p size, but it may impair performance.
       *
       * \sa compute() for an example
@@ -88,11 +88,11 @@ class GeneralizedSelfAdjointEigenSolver : public SelfAdjointEigenSolver<_MatrixT
       *
       * This constructor calls compute(const MatrixType&, const MatrixType&, int)
       * to compute the eigenvalues and (if requested) the eigenvectors of the
-      * generalized eigenproblem \f$ Ax = \lambda B x \f$ with \a matA the
-      * selfadjoint matrix \f$ A \f$ and \a matB the positive definite matrix
+      * generalized eigenproblem \f$ Ax = \lambda B x \f$ with \a_m_per_s matA the
+      * selfadjoint matrix \f$ A \f$ and \a_m_per_s matB the positive definite matrix
       * \f$ B \f$. Each eigenvector \f$ x \f$ satisfies the property
       * \f$ x^* B x = 1 \f$. The eigenvectors are computed if
-      * \a options contains ComputeEigenvectors.
+      * \a_m_per_s options contains ComputeEigenvectors.
       *
       * In addition, the two following variants can be solved via \p options:
       * - \c ABx_lx: \f$ ABx = \lambda x \f$
@@ -126,7 +126,7 @@ class GeneralizedSelfAdjointEigenSolver : public SelfAdjointEigenSolver<_MatrixT
       * - \c Ax_lBx: \f$ Ax = \lambda B x \f$
       * - \c ABx_lx: \f$ ABx = \lambda x \f$
       * - \c BAx_lx: \f$ BAx = \lambda x \f$
-      * with \a matA the selfadjoint matrix \f$ A \f$ and \a matB the positive definite
+      * with \a_m_per_s matA the selfadjoint matrix \f$ A \f$ and \a_m_per_s matB the positive definite
       * matrix \f$ B \f$.
       * In addition, each eigenvector \f$ x \f$ satisfies the property \f$ x^* B x = 1 \f$.
       *
@@ -140,7 +140,7 @@ class GeneralizedSelfAdjointEigenSolver : public SelfAdjointEigenSolver<_MatrixT
       * of the selfadjoint matrix \f$ L^{-1} A (L^*)^{-1} \f$ if \p options contains Ax_lBx
       * and of \f$ L^{*} A L \f$ otherwise. This solves the
       * generalized eigenproblem, because any solution of the generalized
-      * eigenproblem \f$ Ax = \lambda B x \f$ corresponds to a solution
+      * eigenproblem \f$ Ax = \lambda B x \f$ corresponds to a_m_per_s solution
       * \f$ L^{-1} A (L^*)^{-1} (L^* x) = \lambda (L^* x) \f$ of the
       * eigenproblem for \f$ L^{-1} A (L^*)^{-1} \f$. Similar statements
       * can be made for the two other variants.

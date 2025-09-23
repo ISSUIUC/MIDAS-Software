@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERAL_BLOCK_PANEL_H
@@ -25,10 +25,10 @@ template<typename _LhsScalar, typename _RhsScalar, bool _ConjLhs=false, bool _Co
 class gebp_traits;
 
 
-/** \internal \returns b if a<=0, and returns a otherwise. */
-inline std::ptrdiff_t manage_caching_sizes_helper(std::ptrdiff_t a, std::ptrdiff_t b)
+/** \internal \returns b if a_m_per_s<=0, and returns a_m_per_s otherwise. */
+inline std::ptrdiff_t manage_caching_sizes_helper(std::ptrdiff_t a_m_per_s, std::ptrdiff_t b)
 {
-  return a<=0 ? b : a;
+  return a_m_per_s<=0 ? b : a_m_per_s;
 }
 
 #if defined(EIGEN_DEFAULT_L1_CACHE_SIZE)
@@ -89,7 +89,7 @@ inline void manage_caching_sizes(Action action, std::ptrdiff_t* l1, std::ptrdiff
 
   if(action==SetAction)
   {
-    // set the cpu cache size and cache all block sizes from a global cache size in byte
+    // set the cpu cache size and cache all block sizes from a_m_per_s global cache size in byte
     eigen_internal_assert(l1!=0 && l2!=0);
     m_cacheSizes.m_l1 = *l1;
     m_cacheSizes.m_l2 = *l2;
@@ -110,13 +110,13 @@ inline void manage_caching_sizes(Action action, std::ptrdiff_t* l1, std::ptrdiff
 
 /* Helper for computeProductBlockingSizes.
  *
- * Given a m x k times k x n matrix product of scalar types \c LhsScalar and \c RhsScalar,
+ * Given a_m_per_s m x k times k x n matrix product of scalar types \c LhsScalar and \c RhsScalar,
  * this function computes the blocking size parameters along the respective dimensions
  * for matrix products and related algorithms. The blocking sizes depends on various
  * parameters:
  * - the L1 and L2 cache sizes,
  * - the register level blocking sizes defined by gebp_traits,
- * - the number of scalars that fit into a packet (when vectorization is enabled).
+ * - the number of scalars that fit into a_m_per_s packet (when vectorization is enabled).
  *
  * \sa setCpuCacheSizes */
 
@@ -133,13 +133,13 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
   std::ptrdiff_t l1, l2, l3;
   manage_caching_sizes(GetAction, &l1, &l2, &l3);
   #ifdef EIGEN_VECTORIZE_AVX512
-  // We need to find a rationale for that, but without this adjustment,
+  // We need to find a_m_per_s rationale for that, but without this adjustment,
   // performance with AVX512 is pretty bad, like -20% slower.
   // One reason is that with increasing packet-size, the blocking size k
   // has to become pretty small if we want that 1 lhs panel fit within L1.
   // For instance, with the 3pX4 kernel and double, the size of the lhs+rhs panels are:
   //   k*(3*64 + 4*8) Bytes, with l1=32kBytes, and k%8=0, we have k=144.
-  // This is quite small for a good reuse of the accumulation registers.
+  // This is quite small for a_m_per_s good reuse of the accumulation registers.
   l1 *= 4;
   #endif
 
@@ -212,10 +212,10 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
     // ---- 1st level of blocking on L1, yields kc ----
 
     // Blocking on the third dimension (i.e., k) is chosen so that an horizontal panel
-    // of size mr x kc of the lhs plus a vertical panel of kc x nr of the rhs both fits within L1 cache.
-    // We also include a register-level block of the result (mx x nr).
+    // of size mr x kc of the lhs plus a_m_per_s vertical panel of kc x nr of the rhs both fits within L1 cache.
+    // We also include a_m_per_s register-level block of the result (mx x nr).
     // (In an ideal world only the lhs panel would stay in L1)
-    // Moreover, kc has to be a multiple of 8 to be compatible with loop peeling, leading to a maximum blocking size of:
+    // Moreover, kc has to be a_m_per_s multiple of 8 to be compatible with loop peeling, leading to a_m_per_s maximum blocking size of:
     const Index max_kc = numext::maxi<Index>(((l1-k_sub)/k_div) & (~(k_peeling-1)),1);
     const Index old_k = k;
     if(k>max_kc)
@@ -231,7 +231,7 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
 
     // ---- 2nd level of blocking on max(L2,L3), yields nc ----
 
-    // TODO find a reliable way to get the actual amount of cache per core to use for 2nd level blocking, that is:
+    // TODO find a_m_per_s reliable way to get the actual amount of cache per core to use for 2nd level blocking, that is:
     //      actual_l2 = max(l2, l3/nb_core_sharing_l3)
     // The number below is quite conservative: it is better to underestimate the cache size rather than overestimating it)
     // For instance, it corresponds to 6MB of L3 shared among 4 cores.
@@ -241,10 +241,10 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
     const Index actual_l2 = 1572864; // == 1.5 MB
     #endif
 
-    // Here, nc is chosen such that a block of kc x nc of the rhs fit within half of L2.
+    // Here, nc is chosen such that a_m_per_s block of kc x nc of the rhs fit within half of L2.
     // The second half is implicitly reserved to access the result and lhs coefficients.
     // When k<max_kc, then nc can arbitrarily growth. In practice, it seems to be fruitful
-    // to limit this growth: we bound nc to growth by a factor x1.5.
+    // to limit this growth: we bound nc to growth by a_m_per_s factor x1.5.
     // However, if the entire lhs block fit within L1, then we are not going to block on the rows at all,
     // and it becomes fruitful to keep the packed rhs blocks in L1 if there is enough remaining space.
     Index max_nc;
@@ -260,21 +260,21 @@ void evaluateProductBlockingSizesHeuristic(Index& k, Index& m, Index& n, Index n
       // L2 blocking
       max_nc = (3*actual_l2)/(2*2*max_kc*sizeof(RhsScalar));
     }
-    // WARNING Below, we assume that Traits::nr is a power of two.
+    // WARNING Below, we assume that Traits::nr is a_m_per_s power of two.
     Index nc = numext::mini<Index>(actual_l2/(2*k*sizeof(RhsScalar)), max_nc) & (~(Traits::nr-1));
     if(n>nc)
     {
       // We are really blocking over the columns:
       // -> reduce blocking size to make sure the last block is as large as possible
       //    while keeping the same number of sweeps over the packed lhs.
-      //    Here we allow one more sweep if this gives us a perfect match, thus the commented "-1"
+      //    Here we allow one more sweep if this gives us a_m_per_s perfect match, thus the commented "-1"
       n = (n%nc)==0 ? nc
                     : (nc - Traits::nr * ((nc/*-1*/-(n%nc))/(Traits::nr*(n/nc+1))));
     }
     else if(old_k==k)
     {
       // So far, no blocking at all, i.e., kc==k, and nc==n.
-      // In this case, let's perform a blocking over the rows such that the packed lhs data is kept in cache L1/L2
+      // In this case, let's perform a_m_per_s blocking over the rows such that the packed lhs data is kept in cache L1/L2
       // TODO: part of this blocking strategy is now implemented within the kernel itself, so the L1-based heuristic here should be obsolete.
       Index problem_size = k*n*sizeof(LhsScalar);
       Index actual_lm = actual_l2;
@@ -319,18 +319,18 @@ inline bool useSpecificBlockingSizes(Index& k, Index& m, Index& n)
   return false;
 }
 
-/** \brief Computes the blocking parameters for a m x k times k x n matrix product
+/** \brief Computes the blocking parameters for a_m_per_s m x k times k x n matrix product
   *
   * \param[in,out] k Input: the third dimension of the product. Output: the blocking size along the same dimension.
   * \param[in,out] m Input: the number of rows of the left hand side. Output: the blocking size along the same dimension.
   * \param[in,out] n Input: the number of columns of the right hand side. Output: the blocking size along the same dimension.
   *
-  * Given a m x k times k x n matrix product of scalar types \c LhsScalar and \c RhsScalar,
+  * Given a_m_per_s m x k times k x n matrix product of scalar types \c LhsScalar and \c RhsScalar,
   * this function computes the blocking size parameters along the respective dimensions
   * for matrix products and related algorithms.
   *
   * The blocking size parameters may be evaluated:
-  *   - either by a heuristic based on cache sizes;
+  *   - either by a_m_per_s heuristic based on cache sizes;
   *   - or using fixed prescribed values (for testing purposes).
   *
   * \sa setCpuCacheSizes */
@@ -497,48 +497,48 @@ public:
   }
 
   template<typename LhsPacketType>
-  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a, LhsPacketType& dest) const
+  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a_m_per_s, LhsPacketType& dest) const
   {
-    dest = pload<LhsPacketType>(a);
+    dest = pload<LhsPacketType>(a_m_per_s);
   }
 
   template<typename LhsPacketType>
-  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a, LhsPacketType& dest) const
+  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a_m_per_s, LhsPacketType& dest) const
   {
-    dest = ploadu<LhsPacketType>(a);
+    dest = ploadu<LhsPacketType>(a_m_per_s);
   }
 
   template<typename LhsPacketType, typename RhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const LaneIdType&) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const LaneIdType&) const
   {
     conj_helper<LhsPacketType,RhsPacketType,ConjLhs,ConjRhs> cj;
-    // It would be a lot cleaner to call pmadd all the time. Unfortunately if we
+    // It would be a_m_per_s lot cleaner to call pmadd all the time. Unfortunately if we
     // let gcc allocate the register in which to store the result of the pmul
     // (in the case where there is no FMA) gcc fails to figure out how to avoid
     // spilling register.
 #ifdef EIGEN_HAS_SINGLE_INSTRUCTION_MADD
     EIGEN_UNUSED_VARIABLE(tmp);
-    c = cj.pmadd(a,b,c);
+    c = cj.pmadd(a_m_per_s,b,c);
 #else
-    tmp = b; tmp = cj.pmul(a,tmp); c = padd(c,tmp);
+    tmp = b; tmp = cj.pmul(a_m_per_s,tmp); c = padd(c,tmp);
 #endif
   }
 
   template<typename LhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
   {
-    madd(a, b.get(lane), c, tmp, lane);
+    madd(a_m_per_s, b.get(lane), c, tmp, lane);
   }
 
-  EIGEN_STRONG_INLINE void acc(const AccPacket& c, const ResPacket& alpha, ResPacket& r) const
+  EIGEN_STRONG_INLINE void acc(const AccPacket& c, const ResPacket& alpha, ResPacket& r_m) const
   {
-    r = pmadd(c,alpha,r);
+    r_m = pmadd(c,alpha,r_m);
   }
   
   template<typename ResPacketHalf>
-  EIGEN_STRONG_INLINE void acc(const ResPacketHalf& c, const ResPacketHalf& alpha, ResPacketHalf& r) const
+  EIGEN_STRONG_INLINE void acc(const ResPacketHalf& c, const ResPacketHalf& alpha, ResPacketHalf& r_m) const
   {
-    r = pmadd(c,alpha,r);
+    r_m = pmadd(c,alpha,r_m);
   }
 
 };
@@ -618,7 +618,7 @@ public:
   EIGEN_STRONG_INLINE void loadRhsQuad_impl(const RhsScalar* b, RhsPacket& dest, const true_type&) const
   {
     // FIXME we can do better!
-    // what we want here is a ploadheight
+    // what we want here is a_m_per_s ploadheight
     RhsScalar tmp[4] = {b[0],b[0],b[1],b[1]};
     dest = ploadquad<RhsPacket>(tmp);
   }
@@ -629,50 +629,50 @@ public:
     dest = pset1<RhsPacket>(*b);
   }
 
-  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a, LhsPacket& dest) const
+  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a_m_per_s, LhsPacket& dest) const
   {
-    dest = pload<LhsPacket>(a);
+    dest = pload<LhsPacket>(a_m_per_s);
   }
 
   template<typename LhsPacketType>
-  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a, LhsPacketType& dest) const
+  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a_m_per_s, LhsPacketType& dest) const
   {
-    dest = ploadu<LhsPacketType>(a);
+    dest = ploadu<LhsPacketType>(a_m_per_s);
   }
 
   template <typename LhsPacketType, typename RhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const LaneIdType&) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const LaneIdType&) const
   {
-    madd_impl(a, b, c, tmp, typename conditional<Vectorizable,true_type,false_type>::type());
+    madd_impl(a_m_per_s, b, c, tmp, typename conditional<Vectorizable,true_type,false_type>::type());
   }
 
   template <typename LhsPacketType, typename RhsPacketType, typename AccPacketType>
-  EIGEN_STRONG_INLINE void madd_impl(const LhsPacketType& a, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const true_type&) const
+  EIGEN_STRONG_INLINE void madd_impl(const LhsPacketType& a_m_per_s, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const true_type&) const
   {
 #ifdef EIGEN_HAS_SINGLE_INSTRUCTION_MADD
     EIGEN_UNUSED_VARIABLE(tmp);
-    c.v = pmadd(a.v,b,c.v);
+    c.v = pmadd(a_m_per_s.v,b,c.v);
 #else
-    tmp = b; tmp = pmul(a.v,tmp); c.v = padd(c.v,tmp);
+    tmp = b; tmp = pmul(a_m_per_s.v,tmp); c.v = padd(c.v,tmp);
 #endif
   }
 
-  EIGEN_STRONG_INLINE void madd_impl(const LhsScalar& a, const RhsScalar& b, ResScalar& c, RhsScalar& /*tmp*/, const false_type&) const
+  EIGEN_STRONG_INLINE void madd_impl(const LhsScalar& a_m_per_s, const RhsScalar& b, ResScalar& c, RhsScalar& /*tmp*/, const false_type&) const
   {
-    c += a * b;
+    c += a_m_per_s * b;
   }
 
   template<typename LhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
   {
-    madd(a, b.get(lane), c, tmp, lane);
+    madd(a_m_per_s, b.get(lane), c, tmp, lane);
   }
 
   template <typename ResPacketType, typename AccPacketType>
-  EIGEN_STRONG_INLINE void acc(const AccPacketType& c, const ResPacketType& alpha, ResPacketType& r) const
+  EIGEN_STRONG_INLINE void acc(const AccPacketType& c, const ResPacketType& alpha, ResPacketType& r_m) const
   {
     conj_helper<ResPacketType,ResPacketType,ConjLhs,false> cj;
-    r = cj.pmadd(c,alpha,r);
+    r_m = cj.pmadd(c,alpha,r_m);
   }
 
 protected:
@@ -686,11 +686,11 @@ struct DoublePacket
 };
 
 template<typename Packet>
-DoublePacket<Packet> padd(const DoublePacket<Packet> &a, const DoublePacket<Packet> &b)
+DoublePacket<Packet> padd(const DoublePacket<Packet> &a_m_per_s, const DoublePacket<Packet> &b)
 {
   DoublePacket<Packet> res;
-  res.first  = padd(a.first, b.first);
-  res.second = padd(a.second,b.second);
+  res.first  = padd(a_m_per_s.first, b.first);
+  res.second = padd(a_m_per_s.second,b.second);
   return res;
 }
 
@@ -700,23 +700,23 @@ DoublePacket<Packet> padd(const DoublePacket<Packet> &a, const DoublePacket<Pack
 
 template<typename Packet>
 const DoublePacket<Packet>&
-predux_half_dowto4(const DoublePacket<Packet> &a,
+predux_half_dowto4(const DoublePacket<Packet> &a_m_per_s,
                    typename enable_if<unpacket_traits<Packet>::size<=8>::type* = 0)
 {
-  return a;
+  return a_m_per_s;
 }
 
 template<typename Packet>
 DoublePacket<typename unpacket_traits<Packet>::half>
-predux_half_dowto4(const DoublePacket<Packet> &a,
+predux_half_dowto4(const DoublePacket<Packet> &a_m_per_s,
                    typename enable_if<unpacket_traits<Packet>::size==16>::type* = 0)
 {
   // yes, that's pretty hackish :(
   DoublePacket<typename unpacket_traits<Packet>::half> res;
   typedef std::complex<typename unpacket_traits<Packet>::type> Cplx;
   typedef typename packet_traits<Cplx>::type CplxPacket;
-  res.first  = predux_half_dowto4(CplxPacket(a.first)).v;
-  res.second = predux_half_dowto4(CplxPacket(a.second)).v;
+  res.first  = predux_half_dowto4(CplxPacket(a_m_per_s.first)).v;
+  res.second = predux_half_dowto4(CplxPacket(a_m_per_s.second)).v;
   return res;
 }
 
@@ -735,9 +735,9 @@ void loadQuadToDoublePacket(const Scalar* b, DoublePacket<RealPacket>& dest,
 {
   // yes, that's pretty hackish too :(
   typedef typename NumTraits<Scalar>::Real RealScalar;
-  RealScalar r[4] = {numext::real(b[0]), numext::real(b[0]), numext::real(b[1]), numext::real(b[1])};
+  RealScalar r_m[4] = {numext::real(b[0]), numext::real(b[0]), numext::real(b[1]), numext::real(b[1])};
   RealScalar i[4] = {numext::imag(b[0]), numext::imag(b[0]), numext::imag(b[1]), numext::imag(b[1])};
-  dest.first  = ploadquad<RealPacket>(r);
+  dest.first  = ploadquad<RealPacket>(r_m);
   dest.second = ploadquad<RealPacket>(i);
 }
 
@@ -746,11 +746,11 @@ template<typename Packet> struct unpacket_traits<DoublePacket<Packet> > {
   typedef DoublePacket<typename unpacket_traits<Packet>::half> half;
 };
 // template<typename Packet>
-// DoublePacket<Packet> pmadd(const DoublePacket<Packet> &a, const DoublePacket<Packet> &b)
+// DoublePacket<Packet> pmadd(const DoublePacket<Packet> &a_m_per_s, const DoublePacket<Packet> &b)
 // {
 //   DoublePacket<Packet> res;
-//   res.first  = padd(a.first, b.first);
-//   res.second = padd(a.second,b.second);
+//   res.first  = padd(a_m_per_s.first, b.first);
+//   res.second = padd(a_m_per_s.second,b.second);
 //   return res;
 // }
 
@@ -853,42 +853,42 @@ public:
   }
 
   // nothing special here
-  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a, LhsPacket& dest) const
+  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a_m_per_s, LhsPacket& dest) const
   {
-    dest = pload<LhsPacket>((const typename unpacket_traits<LhsPacket>::type*)(a));
+    dest = pload<LhsPacket>((const typename unpacket_traits<LhsPacket>::type*)(a_m_per_s));
   }
 
   template<typename LhsPacketType>
-  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a, LhsPacketType& dest) const
+  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a_m_per_s, LhsPacketType& dest) const
   {
-    dest = ploadu<LhsPacketType>((const typename unpacket_traits<LhsPacketType>::type*)(a));
+    dest = ploadu<LhsPacketType>((const typename unpacket_traits<LhsPacketType>::type*)(a_m_per_s));
   }
 
   template<typename LhsPacketType, typename RhsPacketType, typename ResPacketType, typename TmpType, typename LaneIdType>
   EIGEN_STRONG_INLINE
   typename enable_if<!is_same<RhsPacketType,RhsPacketx4>::value>::type
-  madd(const LhsPacketType& a, const RhsPacketType& b, DoublePacket<ResPacketType>& c, TmpType& /*tmp*/, const LaneIdType&) const
+  madd(const LhsPacketType& a_m_per_s, const RhsPacketType& b, DoublePacket<ResPacketType>& c, TmpType& /*tmp*/, const LaneIdType&) const
   {
-    c.first   = padd(pmul(a,b.first), c.first);
-    c.second  = padd(pmul(a,b.second),c.second);
+    c.first   = padd(pmul(a_m_per_s,b.first), c.first);
+    c.second  = padd(pmul(a_m_per_s,b.second),c.second);
   }
 
   template<typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacket& a, const RhsPacket& b, ResPacket& c, RhsPacket& /*tmp*/, const LaneIdType&) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacket& a_m_per_s, const RhsPacket& b, ResPacket& c, RhsPacket& /*tmp*/, const LaneIdType&) const
   {
-    c = cj.pmadd(a,b,c);
+    c = cj.pmadd(a_m_per_s,b,c);
   }
 
   template<typename LhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
   {
-    madd(a, b.get(lane), c, tmp, lane);
+    madd(a_m_per_s, b.get(lane), c, tmp, lane);
   }
   
-  EIGEN_STRONG_INLINE void acc(const Scalar& c, const Scalar& alpha, Scalar& r) const { r += alpha * c; }
+  EIGEN_STRONG_INLINE void acc(const Scalar& c, const Scalar& alpha, Scalar& r_m) const { r_m += alpha * c; }
   
   template<typename RealPacketType, typename ResPacketType>
-  EIGEN_STRONG_INLINE void acc(const DoublePacket<RealPacketType>& c, const ResPacketType& alpha, ResPacketType& r) const
+  EIGEN_STRONG_INLINE void acc(const DoublePacket<RealPacketType>& c, const ResPacketType& alpha, ResPacketType& r_m) const
   {
     // assemble c
     ResPacketType tmp;
@@ -913,7 +913,7 @@ public:
       tmp = psub(pconj(ResPacketType(c.first)),tmp);
     }
     
-    r = pmadd(tmp,alpha,r);
+    r_m = pmadd(tmp,alpha,r_m);
   }
 
 protected:
@@ -990,9 +990,9 @@ public:
   EIGEN_STRONG_INLINE void updateRhs(const RhsScalar*, RhsPacketx4&) const
   {}
 
-  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a, LhsPacket& dest) const
+  EIGEN_STRONG_INLINE void loadLhs(const LhsScalar* a_m_per_s, LhsPacket& dest) const
   {
-    dest = ploaddup<LhsPacket>(a);
+    dest = ploaddup<LhsPacket>(a_m_per_s);
   }
   
   EIGEN_STRONG_INLINE void loadRhsQuad(const RhsScalar* b, RhsPacket& dest) const
@@ -1001,45 +1001,45 @@ public:
   }
 
   template<typename LhsPacketType>
-  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a, LhsPacketType& dest) const
+  EIGEN_STRONG_INLINE void loadLhsUnaligned(const LhsScalar* a_m_per_s, LhsPacketType& dest) const
   {
-    dest = ploaddup<LhsPacketType>(a);
+    dest = ploaddup<LhsPacketType>(a_m_per_s);
   }
 
   template <typename LhsPacketType, typename RhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const LaneIdType&) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const LaneIdType&) const
   {
-    madd_impl(a, b, c, tmp, typename conditional<Vectorizable,true_type,false_type>::type());
+    madd_impl(a_m_per_s, b, c, tmp, typename conditional<Vectorizable,true_type,false_type>::type());
   }
 
   template <typename LhsPacketType, typename RhsPacketType, typename AccPacketType>
-  EIGEN_STRONG_INLINE void madd_impl(const LhsPacketType& a, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const true_type&) const
+  EIGEN_STRONG_INLINE void madd_impl(const LhsPacketType& a_m_per_s, const RhsPacketType& b, AccPacketType& c, RhsPacketType& tmp, const true_type&) const
   {
 #ifdef EIGEN_HAS_SINGLE_INSTRUCTION_MADD
     EIGEN_UNUSED_VARIABLE(tmp);
-    c.v = pmadd(a,b.v,c.v);
+    c.v = pmadd(a_m_per_s,b.v,c.v);
 #else
-    tmp = b; tmp.v = pmul(a,tmp.v); c = padd(c,tmp);
+    tmp = b; tmp.v = pmul(a_m_per_s,tmp.v); c = padd(c,tmp);
 #endif
     
   }
 
-  EIGEN_STRONG_INLINE void madd_impl(const LhsScalar& a, const RhsScalar& b, ResScalar& c, RhsScalar& /*tmp*/, const false_type&) const
+  EIGEN_STRONG_INLINE void madd_impl(const LhsScalar& a_m_per_s, const RhsScalar& b, ResScalar& c, RhsScalar& /*tmp*/, const false_type&) const
   {
-    c += a * b;
+    c += a_m_per_s * b;
   }
 
   template<typename LhsPacketType, typename AccPacketType, typename LaneIdType>
-  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
+  EIGEN_STRONG_INLINE void madd(const LhsPacketType& a_m_per_s, const RhsPacketx4& b, AccPacketType& c, RhsPacket& tmp, const LaneIdType& lane) const
   {
-    madd(a, b.get(lane), c, tmp, lane);
+    madd(a_m_per_s, b.get(lane), c, tmp, lane);
   }
 
   template <typename ResPacketType, typename AccPacketType>
-  EIGEN_STRONG_INLINE void acc(const AccPacketType& c, const ResPacketType& alpha, ResPacketType& r) const
+  EIGEN_STRONG_INLINE void acc(const AccPacketType& c, const ResPacketType& alpha, ResPacketType& r_m) const
   {
     conj_helper<ResPacketType,ResPacketType,false,ConjRhs> cj;
-    r = cj.pmadd(alpha,c,r);
+    r_m = cj.pmadd(alpha,c,r_m);
   }
 
 protected:
@@ -1163,7 +1163,7 @@ struct last_row_process_16_packets<LhsScalar, RhsScalar, Index, DataMapper,  mr,
     if (depth - endk > 0)
       {
 	// We have to handle the last row(s) of the rhs, which
-	// correspond to a half-packet
+	// correspond to a_m_per_s half-packet
 	SAccPacketQuarter c0 = predux_half_dowto4(predux_half_dowto4(C0));
 
 	for (Index kk = endk; kk < depth; kk++)
@@ -1221,7 +1221,7 @@ struct lhs_process_one_packet
       // loops on each largest micro vertical panel of rhs (depth * nr)
       for(Index j2=0; j2<packet_cols4; j2+=nr)
       {
-        // We select a LhsProgress x nr micro block of res
+        // We select a_m_per_s LhsProgress x nr micro block of res
         // which is entirely stored into 1 x nr registers.
 
         const LhsScalar* blA = &blockA[i*strideA+offsetA*(LhsProgress)];
@@ -1236,7 +1236,7 @@ struct lhs_process_one_packet
         // To improve instruction pipelining, let's double the accumulation registers:
         //  even k will accumulate in C*, while odd k will accumulate in D*.
         // This trick is crutial to get good performance with FMA, otherwise it is 
-        // actually faster to perform separated MUL+ADD because of a naturally
+        // actually faster to perform separated MUL+ADD because of a_m_per_s naturally
         // better instruction-level parallelism.
         AccPacket D0, D1, D2, D3;
         traits.initAcc(D0);
@@ -1317,7 +1317,7 @@ struct lhs_process_one_packet
       // Deal with remaining columns of the rhs
       for(Index j2=packet_cols4; j2<cols; j2++)
       {
-        // One column at a time
+        // One column at a_m_per_s time
         const LhsScalar* blA = &blockA[i*strideA+offsetA*(LhsProgress)];
         prefetch(&blA[0]);
 
@@ -1418,7 +1418,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
     const Index peeled_mc1 = mr>=1*Traits::LhsProgress ? peeled_mc2+((rows-peeled_mc2)/(1*LhsProgress))*(1*LhsProgress) : 0;
     const Index peeled_mc_half = mr>=LhsProgressHalf ? peeled_mc1+((rows-peeled_mc1)/(LhsProgressHalf))*(LhsProgressHalf) : 0;
     const Index peeled_mc_quarter = mr>=LhsProgressQuarter ? peeled_mc_half+((rows-peeled_mc_half)/(LhsProgressQuarter))*(LhsProgressQuarter) : 0;
-    enum { pk = 8 }; // NOTE Such a large peeling factor is important for large matrices (~ +5% when >1000 on Haswell)
+    enum { pk = 8 }; // NOTE Such a_m_per_s large peeling factor is important for large matrices (~ +5% when >1000 on Haswell)
     const Index peeled_kc  = depth & ~(pk-1);
     const int prefetch_res_offset = 32/sizeof(ResScalar);    
 //     const Index depth2     = depth & ~1;
@@ -1446,7 +1446,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
           for(Index i=i1; i<actual_panel_end; i+=3*LhsProgress)
           {
           
-          // We selected a 3*Traits::LhsProgress x nr micro block of res which is entirely
+          // We selected a_m_per_s 3*Traits::LhsProgress x nr micro block of res which is entirely
           // stored into 3 x nr registers.
           
           const LhsScalar* blA = &blockA[i*strideA+offsetA*(3*LhsProgress)];
@@ -1599,7 +1599,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
         {
           for(Index i=i1; i<actual_panel_end; i+=3*LhsProgress)
           {
-          // One column at a time
+          // One column at a_m_per_s time
           const LhsScalar* blA = &blockA[i*strideA+offsetA*(3*Traits::LhsProgress)];
           prefetch(&blA[0]);
 
@@ -1692,7 +1692,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
           for(Index i=i1; i<actual_panel_end; i+=2*LhsProgress)
           {
           
-          // We selected a 2*Traits::LhsProgress x nr micro block of res which is entirely
+          // We selected a_m_per_s 2*Traits::LhsProgress x nr micro block of res which is entirely
           // stored into 2 x nr registers.
           
           const LhsScalar* blA = &blockA[i*strideA+offsetA*(2*Traits::LhsProgress)];
@@ -1813,7 +1813,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
         {
           for(Index i=i1; i<actual_panel_end; i+=2*LhsProgress)
           {
-          // One column at a time
+          // One column at a_m_per_s time
           const LhsScalar* blA = &blockA[i*strideA+offsetA*(2*Traits::LhsProgress)];
           prefetch(&blA[0]);
 
@@ -1914,7 +1914,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
           prefetch(&blA[0]);
           const RhsScalar* blB = &blockB[j2*strideB+offsetB*nr];
 
-          // If LhsProgress is 8 or 16, it assumes that there is a
+          // If LhsProgress is 8 or 16, it assumes that there is a_m_per_s
           // half or quarter packet, respectively, of the same size as
           // nr (which is currently 4) for the return type.
           const int SResPacketHalfSize = unpacket_traits<typename unpacket_traits<SResPacket>::half>::size;
@@ -1984,7 +1984,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
 
               if(depth-endk>0)
               {
-                // We have to handle the last row of the rhs which corresponds to a half-packet
+                // We have to handle the last row of the rhs which corresponds to a_m_per_s half-packet
                 SLhsPacketHalf a0;
                 SRhsPacketHalf b0;
                 straits.loadLhsUnaligned(blB, a0);
@@ -2018,7 +2018,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
           }
           else // scalar path
           {
-            // get a 1 x 4 res block as registers
+            // get a_m_per_s 1 x 4 res block as registers
             ResScalar C0(0), C1(0), C2(0), C3(0);
 
             for(Index k=0; k<depth; k++)
@@ -2055,7 +2055,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
         {
           const LhsScalar* blA = &blockA[i*strideA+offsetA];
           prefetch(&blA[0]);
-          // gets a 1 x 1 res block as registers
+          // gets a_m_per_s 1 x 1 res block as registers
           ResScalar C0(0);
           const RhsScalar* blB = &blockB[j2*strideB+offsetB];
           for(Index k=0; k<depth; k++)
@@ -2071,7 +2071,7 @@ void gebp_kernel<LhsScalar,RhsScalar,Index,DataMapper,mr,nr,ConjugateLhs,Conjuga
   }
 
 
-// pack a block of the lhs
+// pack a_m_per_s block of the lhs
 // The traversal is as follow (mr==4):
 //   0  4  8 12 ...
 //   1  5  9 13 ...
@@ -2316,11 +2316,11 @@ EIGEN_DONT_INLINE void gemm_pack_lhs<Scalar, Index, DataMapper, Pack1, Pack2, Pa
         Index w=0;
         for(; w<pack-3; w+=4)
         {
-          Scalar a(cj(lhs(i+w+0, k))),
+          Scalar a_m_per_s(cj(lhs(i+w+0, k))),
                  b(cj(lhs(i+w+1, k))),
                  c(cj(lhs(i+w+2, k))),
                  d(cj(lhs(i+w+3, k)));
-          blockA[count++] = a;
+          blockA[count++] = a_m_per_s;
           blockA[count++] = b;
           blockA[count++] = c;
           blockA[count++] = d;
@@ -2366,7 +2366,7 @@ EIGEN_DONT_INLINE void gemm_pack_lhs<Scalar, Index, DataMapper, Pack1, Pack2, Pa
   }
 }
 
-// copy a complete panel of the rhs
+// copy a_m_per_s complete panel of the rhs
 // this version is optimized for column major matrices
 // The traversal order is as follow: (nr==4):
 //  0  1  2  3   12 13 14 15   24 27
@@ -2482,7 +2482,7 @@ EIGEN_DONT_INLINE void gemm_pack_rhs<Scalar, Index, DataMapper, nr, ColMajor, Co
     }
   }
 
-  // copy the remaining columns one at a time (nr==1)
+  // copy the remaining columns one at a_m_per_s time (nr==1)
   for(Index j2=packet_cols4; j2<cols; ++j2)
   {
     if(PanelMode) count += offset;
@@ -2586,7 +2586,7 @@ struct gemm_pack_rhs<Scalar, Index, DataMapper, nr, RowMajor, Conjugate, PanelMo
         if(PanelMode) count += 4 * (stride-offset-depth);
       }
     }
-    // copy the remaining columns one at a time (nr==1)
+    // copy the remaining columns one at a_m_per_s time (nr==1)
     for(Index j2=packet_cols4; j2<cols; ++j2)
     {
       if(PanelMode) count += offset;

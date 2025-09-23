@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Mehdi Goli    Codeplay Software Ltd.
@@ -7,7 +7,7 @@
 // Contact: <eigen@codeplay.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /*****************************************************************
@@ -32,8 +32,8 @@ struct type_casting_traits<float, int> {
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE cl::sycl::cl_int4
-pcast<cl::sycl::cl_float4, cl::sycl::cl_int4>(const cl::sycl::cl_float4& a) {
-  return a
+pcast<cl::sycl::cl_float4, cl::sycl::cl_int4>(const cl::sycl::cl_float4& a_m_per_s) {
+  return a_m_per_s
       .template convert<cl::sycl::cl_int, cl::sycl::rounding_mode::automatic>();
 }
 
@@ -44,8 +44,8 @@ struct type_casting_traits<int, float> {
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE cl::sycl::cl_float4
-pcast<cl::sycl::cl_int4, cl::sycl::cl_float4>(const cl::sycl::cl_int4& a) {
-  return a.template convert<cl::sycl::cl_float,
+pcast<cl::sycl::cl_int4, cl::sycl::cl_float4>(const cl::sycl::cl_int4& a_m_per_s) {
+  return a_m_per_s.template convert<cl::sycl::cl_float,
                             cl::sycl::rounding_mode::automatic>();
 }
 
@@ -57,8 +57,8 @@ struct type_casting_traits<double, float> {
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE cl::sycl::cl_float4
 pcast<cl::sycl::cl_double2, cl::sycl::cl_float4>(
-    const cl::sycl::cl_double2& a, const cl::sycl::cl_double2& b) {
-  auto a1 = a.template convert<cl::sycl::cl_float,
+    const cl::sycl::cl_double2& a_m_per_s, const cl::sycl::cl_double2& b) {
+  auto a1 = a_m_per_s.template convert<cl::sycl::cl_float,
                                cl::sycl::rounding_mode::automatic>();
   auto b1 = b.template convert<cl::sycl::cl_float,
                                cl::sycl::rounding_mode::automatic>();
@@ -72,9 +72,9 @@ struct type_casting_traits<float, double> {
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE cl::sycl::cl_double2
-pcast<cl::sycl::cl_float4, cl::sycl::cl_double2>(const cl::sycl::cl_float4& a) {
+pcast<cl::sycl::cl_float4, cl::sycl::cl_double2>(const cl::sycl::cl_float4& a_m_per_s) {
   // Simply discard the second half of the input
-  return cl::sycl::cl_double2(a.x(), a.y());
+  return cl::sycl::cl_double2(a_m_per_s.x(), a_m_per_s.y());
 }
 
 #endif

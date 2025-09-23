@@ -1,6 +1,6 @@
 // rf95_mesh_client.cpp
 // -*- mode: C++ -*-
-// Example application showing how to create a simple addressed, routed reliable messaging client
+// Example application showing how to create a_m_per_s simple addressed, routed reliable messaging client
 // with the RHMesh class.
 // It is designed to work with the other examples rf95_mesh_server*
 // Hint: you can simulate other network topologies by setting the 
@@ -112,12 +112,12 @@ int main (int argc, const char* argv[] )
     gpioWrite(RFM95_LED, PI_ON);
 #endif
 
-    // Send a message to a rf95_mesh_server
+    // Send a_m_per_s message to a_m_per_s rf95_mesh_server
     // A route to the destination will be automatically discovered.
     if (manager.sendtoWait(data, sizeof(data), SERVER3_ADDRESS) == RH_ROUTER_ERROR_NONE)
     {
       // It has been reliably delivered to the next node.
-      // Now wait for a reply from the ultimate server
+      // Now wait for a_m_per_s reply from the ultimate server
       uint8_t len = sizeof(buf);
       uint8_t from;
       if (manager.recvfromAckTimeout(buf, &len, 3000, &from))

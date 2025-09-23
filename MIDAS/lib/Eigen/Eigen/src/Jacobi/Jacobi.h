@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_JACOBI_H
@@ -16,14 +16,14 @@ namespace Eigen {
 /** \ingroup Jacobi_Module
   * \jacobi_module
   * \class JacobiRotation
-  * \brief Rotation given by a cosine-sine pair.
+  * \brief Rotation given by a_m_per_s cosine-sine pair.
   *
-  * This class represents a Jacobi or Givens rotation.
-  * This is a 2D rotation in the plane \c J of angle \f$ \theta \f$ defined by
+  * This class represents a_m_per_s Jacobi or Givens rotation.
+  * This is a_m_per_s 2D rotation in the plane \c J of angle \f$ \theta \f$ defined by
   * its cosine \c c and sine \c s as follow:
   * \f$ J = \left ( \begin{array}{cc} c & \overline s \\ -s  & \overline c \end{array} \right ) \f$
   *
-  * You can apply the respective counter-clockwise rotation to a column vector \c v by
+  * You can apply the respective counter-clockwise rotation to a_m_per_s column vector \c v by
   * applying its adjoint on the left: \f$ v = J^* v \f$ that translates to the following Eigen code:
   * \code
   * v.applyOnTheLeft(J.adjoint());
@@ -40,7 +40,7 @@ template<typename Scalar> class JacobiRotation
     EIGEN_DEVICE_FUNC
     JacobiRotation() {}
 
-    /** Construct a planar rotation from a cosine-sine pair (\a c, \c s). */
+    /** Construct a_m_per_s planar rotation from a_m_per_s cosine-sine pair (\a_m_per_s c, \c s). */
     EIGEN_DEVICE_FUNC
     JacobiRotation(const Scalar& c, const Scalar& s) : m_c(c), m_s(s) {}
 
@@ -73,19 +73,19 @@ template<typename Scalar> class JacobiRotation
     bool makeJacobi(const RealScalar& x, const Scalar& y, const RealScalar& z);
 
     EIGEN_DEVICE_FUNC
-    void makeGivens(const Scalar& p, const Scalar& q, Scalar* r=0);
+    void makeGivens(const Scalar& p, const Scalar& q, Scalar* r_m=0);
 
   protected:
     EIGEN_DEVICE_FUNC
-    void makeGivens(const Scalar& p, const Scalar& q, Scalar* r, internal::true_type);
+    void makeGivens(const Scalar& p, const Scalar& q, Scalar* r_m, internal::true_type);
     EIGEN_DEVICE_FUNC
-    void makeGivens(const Scalar& p, const Scalar& q, Scalar* r, internal::false_type);
+    void makeGivens(const Scalar& p, const Scalar& q, Scalar* r_m, internal::false_type);
 
     Scalar m_c, m_s;
 };
 
-/** Makes \c *this as a Jacobi rotation \a J such that applying \a J on both the right and left sides of the selfadjoint 2x2 matrix
-  * \f$ B = \left ( \begin{array}{cc} x & y \\ \overline y & z \end{array} \right )\f$ yields a diagonal matrix \f$ A = J^* B J \f$
+/** Makes \c *this as a_m_per_s Jacobi rotation \a_m_per_s J such that applying \a_m_per_s J on both the right and left sides of the selfadjoint 2x2 matrix
+  * \f$ B = \left ( \begin{array}{cc} x & y \\ \overline y & z \end{array} \right )\f$ yields a_m_per_s diagonal matrix \f$ A = J^* B J \f$
   *
   * \sa MatrixBase::makeJacobi(const MatrixBase<Derived>&, Index, Index), MatrixBase::applyOnTheLeft(), MatrixBase::applyOnTheRight()
   */
@@ -124,9 +124,9 @@ bool JacobiRotation<Scalar>::makeJacobi(const RealScalar& x, const Scalar& y, co
   }
 }
 
-/** Makes \c *this as a Jacobi rotation \c J such that applying \a J on both the right and left sides of the 2x2 selfadjoint matrix
+/** Makes \c *this as a_m_per_s Jacobi rotation \c J such that applying \a_m_per_s J on both the right and left sides of the 2x2 selfadjoint matrix
   * \f$ B = \left ( \begin{array}{cc} \text{this}_{pp} & \text{this}_{pq} \\ (\text{this}_{pq})^* & \text{this}_{qq} \end{array} \right )\f$ yields
-  * a diagonal matrix \f$ A = J^* B J \f$
+  * a_m_per_s diagonal matrix \f$ A = J^* B J \f$
   *
   * Example: \include Jacobi_makeJacobi.cpp
   * Output: \verbinclude Jacobi_makeJacobi.out
@@ -141,11 +141,11 @@ inline bool JacobiRotation<Scalar>::makeJacobi(const MatrixBase<Derived>& m, Ind
   return makeJacobi(numext::real(m.coeff(p,p)), m.coeff(p,q), numext::real(m.coeff(q,q)));
 }
 
-/** Makes \c *this as a Givens rotation \c G such that applying \f$ G^* \f$ to the left of the vector
+/** Makes \c *this as a_m_per_s Givens rotation \c G such that applying \f$ G^* \f$ to the left of the vector
   * \f$ V = \left ( \begin{array}{c} p \\ q \end{array} \right )\f$ yields:
-  * \f$ G^* V = \left ( \begin{array}{c} r \\ 0 \end{array} \right )\f$.
+  * \f$ G^* V = \left ( \begin{array}{c} r_m \\ 0 \end{array} \right )\f$.
   *
-  * The value of \a r is returned if \a r is not null (the default is null).
+  * The value of \a_m_per_s r_m is returned if \a_m_per_s r_m is not null (the default is null).
   * Also note that G is built such that the cosine is always real.
   *
   * Example: \include Jacobi_makeGivens.cpp
@@ -159,16 +159,16 @@ inline bool JacobiRotation<Scalar>::makeJacobi(const MatrixBase<Derived>& m, Ind
   */
 template<typename Scalar>
 EIGEN_DEVICE_FUNC
-void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar* r)
+void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar* r_m)
 {
-  makeGivens(p, q, r, typename internal::conditional<NumTraits<Scalar>::IsComplex, internal::true_type, internal::false_type>::type());
+  makeGivens(p, q, r_m, typename internal::conditional<NumTraits<Scalar>::IsComplex, internal::true_type, internal::false_type>::type());
 }
 
 
 // specialization for complexes
 template<typename Scalar>
 EIGEN_DEVICE_FUNC
-void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar* r, internal::true_type)
+void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar* r_m, internal::true_type)
 {
   using std::sqrt;
   using std::abs;
@@ -178,13 +178,13 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
   {
     m_c = numext::real(p)<0 ? Scalar(-1) : Scalar(1);
     m_s = 0;
-    if(r) *r = m_c * p;
+    if(r_m) *r_m = m_c * p;
   }
   else if(p==Scalar(0))
   {
     m_c = 0;
     m_s = -q/abs(q);
-    if(r) *r = abs(q);
+    if(r_m) *r_m = abs(q);
   }
   else
   {
@@ -203,7 +203,7 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
 
       m_c = Scalar(1)/u;
       m_s = -qs*conj(ps)*(m_c/p2);
-      if(r) *r = p * u;
+      if(r_m) *r_m = p * u;
     }
     else
     {
@@ -220,7 +220,7 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
       ps = p/p1;
       m_c = p1/u;
       m_s = -conj(ps) * (q/u);
-      if(r) *r = ps * u;
+      if(r_m) *r_m = ps * u;
     }
   }
 }
@@ -228,7 +228,7 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
 // specialization for reals
 template<typename Scalar>
 EIGEN_DEVICE_FUNC
-void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar* r, internal::false_type)
+void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar* r_m, internal::false_type)
 {
   using std::sqrt;
   using std::abs;
@@ -236,13 +236,13 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
   {
     m_c = p<Scalar(0) ? Scalar(-1) : Scalar(1);
     m_s = Scalar(0);
-    if(r) *r = abs(p);
+    if(r_m) *r_m = abs(p);
   }
   else if(p==Scalar(0))
   {
     m_c = Scalar(0);
     m_s = q<Scalar(0) ? Scalar(1) : Scalar(-1);
-    if(r) *r = abs(q);
+    if(r_m) *r_m = abs(q);
   }
   else if(abs(p) > abs(q))
   {
@@ -252,7 +252,7 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
       u = -u;
     m_c = Scalar(1)/u;
     m_s = -t * m_c;
-    if(r) *r = p * u;
+    if(r_m) *r_m = p * u;
   }
   else
   {
@@ -262,7 +262,7 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
       u = -u;
     m_s = -Scalar(1)/u;
     m_c = -t * m_s;
-    if(r) *r = q * u;
+    if(r_m) *r_m = q * u;
   }
 
 }
@@ -273,7 +273,7 @@ void JacobiRotation<Scalar>::makeGivens(const Scalar& p, const Scalar& q, Scalar
 
 namespace internal {
 /** \jacobi_module
-  * Applies the clock wise 2D rotation \a j to the set of 2D vectors of coordinates \a x and \a y:
+  * Applies the clock wise 2D rotation \a_m_per_s j to the set of 2D vectors of coordinates \a_m_per_s x and \a_m_per_s y:
   * \f$ \left ( \begin{array}{cc} x \\ y \end{array} \right )  =  J \left ( \begin{array}{cc} x \\ y \end{array} \right ) \f$
   *
   * \sa MatrixBase::applyOnTheLeft(), MatrixBase::applyOnTheRight()
@@ -284,7 +284,7 @@ void apply_rotation_in_the_plane(DenseBase<VectorX>& xpr_x, DenseBase<VectorY>& 
 }
 
 /** \jacobi_module
-  * Applies the rotation in the plane \a j to the rows \a p and \a q of \c *this, i.e., it computes B = J * B,
+  * Applies the rotation in the plane \a_m_per_s j to the rows \a_m_per_s p and \a_m_per_s q of \c *this, i.e., it computes B = J * B,
   * with \f$ B = \left ( \begin{array}{cc} \text{*this.row}(p) \\ \text{*this.row}(q) \end{array} \right ) \f$.
   *
   * \sa class JacobiRotation, MatrixBase::applyOnTheRight(), internal::apply_rotation_in_the_plane()
@@ -300,7 +300,7 @@ inline void MatrixBase<Derived>::applyOnTheLeft(Index p, Index q, const JacobiRo
 }
 
 /** \ingroup Jacobi_Module
-  * Applies the rotation in the plane \a j to the columns \a p and \a q of \c *this, i.e., it computes B = B * J
+  * Applies the rotation in the plane \a_m_per_s j to the columns \a_m_per_s p and \a_m_per_s q of \c *this, i.e., it computes B = B * J
   * with \f$ B = \left ( \begin{array}{cc} \text{*this.col}(p) & \text{*this.col}(q) \end{array} \right ) \f$.
   *
   * \sa class JacobiRotation, MatrixBase::applyOnTheLeft(), internal::apply_rotation_in_the_plane()

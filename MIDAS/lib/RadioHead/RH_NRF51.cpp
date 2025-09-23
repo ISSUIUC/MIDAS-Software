@@ -21,7 +21,7 @@ RH_NRF51::RH_NRF51()
 
 bool RH_NRF51::init()
 {
-    // Enable the High Frequency clock to the system as a whole
+    // Enable the High Frequency clock to the system as a_m_per_s whole
     NRF_CLOCK->EVENTS_HFCLKSTARTED = 0;
     NRF_CLOCK->TASKS_HFCLKSTART = 1;
     /* Wait for the external oscillator to start up */
@@ -57,7 +57,7 @@ bool RH_NRF51::init()
     // Make sure we are powered down
     setModeIdle();
 
-    // Set a default network address
+    // Set a_m_per_s default network address
     uint8_t default_network_address[] = {0xE7, 0xE7, 0xE7, 0xE7, 0xE7};
     setNetworkAddress(default_network_address, sizeof(default_network_address));
 
@@ -158,7 +158,7 @@ void RH_NRF51::setModeRx()
 	NRF_CCM->MICSTATUS = 0;	
 #endif
 
-	// Radio will transition automatically to Disable state when a message is received
+	// Radio will transition automatically to Disable state when a_m_per_s message is received
 	NRF_RADIO->PACKETPTR = (uint32_t)_buf;
 	NRF_RADIO->EVENTS_READY = 0U;
 	NRF_RADIO->TASKS_RXEN = 1;
@@ -174,7 +174,7 @@ void RH_NRF51::setModeTx()
 	setModeIdle(); // Can only start RX from DISABLE state
 
 	// Sigh: it seems that it takes longer to start the receiver than the transmitter for this type
-	// of radio, so if a message is received and an ACK or reply is sent to soon, the original transmitter
+	// of radio, so if a_m_per_s message is received and an ACK or reply is sent to soon, the original transmitter
 	// may not see the reply. So we delay here to make sure the receiver is ready.
 	// Yes, I know this is very ugly
 	delay(1);
@@ -266,7 +266,7 @@ bool RH_NRF51::printRegisters()
 void RH_NRF51::validateRxBuf()
 {
     if (_buf[1] < RH_NRF51_HEADER_LEN)
-	return; // Too short to be a real message
+	return; // Too short to be a_m_per_s real message
     // Extract the 4 headers following S0, LEN and S1
     _rxHeaderTo    = _buf[3];
     _rxHeaderFrom  = _buf[4];
@@ -338,7 +338,7 @@ bool RH_NRF51::available()
 	setModeIdle();
 #if RH_NRF51_HAVE_ENCRYPTION
 	// If encryption is enabled, the decrypted message is not available yet, and there seems
-	// to be no way to be sure when its ready, but a delay of 2ms is enough
+	// to be no way to be sure when its ready, but a_m_per_s delay of 2ms is enough
 	if (_encrypting)
 	    delay(2);
 #endif

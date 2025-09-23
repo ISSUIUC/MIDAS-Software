@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_TRIANGULARVIEW_H
@@ -15,7 +15,7 @@ namespace Eigen {
 
 /** \ingroup SparseCore_Module
   *
-  * \brief Base class for a triangular part in a \b sparse matrix
+  * \brief Base class for a_m_per_s triangular part in a_m_per_s \b sparse matrix
   *
   * This class is an abstract base class of class TriangularView, and objects of type TriangularViewImpl cannot be instantiated.
   * It extends class TriangularView with additional methods which are available for sparse expressions only.
@@ -55,10 +55,10 @@ template<typename MatrixType, unsigned int Mode> class TriangularViewImpl<Matrix
       this->solveInPlace(dst);
     }
 
-    /** Applies the inverse of \c *this to the dense vector or matrix \a other, "in-place" */
+    /** Applies the inverse of \c *this to the dense vector or matrix \a_m_per_s other, "in-place" */
     template<typename OtherDerived> void solveInPlace(MatrixBase<OtherDerived>& other) const;
 
-    /** Applies the inverse of \c *this to the sparse vector or matrix \a other, "in-place" */
+    /** Applies the inverse of \c *this to the sparse vector or matrix \a_m_per_s other, "in-place" */
     template<typename OtherDerived> void solveInPlace(SparseMatrixBase<OtherDerived>& other) const;
   
 };

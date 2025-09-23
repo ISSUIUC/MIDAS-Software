@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2007 Julien Pommier
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* The sin and cos and functions of this file come from
@@ -77,7 +77,7 @@ Packet4f pcos<Packet4f>(const Packet4f& _x)
 
 // Functions for sqrt.
 // The EIGEN_FAST_MATH version uses the _mm_rsqrt_ps approximation and one step
-// of Newton's method, at a cost of 1-2 bits of precision as opposed to the
+// of Newton's method, at a_m_per_s cost of 1-2 bits of precision as opposed to the
 // exact solution. It does not handle +inf, or denormalized numbers correctly.
 // The main advantage of this approach is not just speed, but also the fact that
 // it can be inlined and pipelined with other computations, further reducing its
@@ -93,7 +93,7 @@ Packet4f psqrt<Packet4f>(const Packet4f& _x)
 
   // Compute approximate reciprocal sqrt.
   Packet4f x = _mm_rsqrt_ps(_x);
-  // Do a single step of Newton's iteration.
+  // Do a_m_per_s single step of Newton's iteration.
   x = pmul(x, pmadd(minus_half_x, pmul(x,x), pset1<Packet4f>(1.5f)));
   // Flush results for denormals to zero.
   return pandnot(pmul(_x,x), denormal_mask);
@@ -131,7 +131,7 @@ Packet4f prsqrt<Packet4f>(const Packet4f& _x) {
   // Compute an approximate result using the rsqrt intrinsic.
   Packet4f y_approx = _mm_rsqrt_ps(_x);
 
-  // Do a single step of Newton-Raphson iteration to improve the approximation.
+  // Do a_m_per_s single step of Newton-Raphson iteration to improve the approximation.
   // This uses the formula y_{n+1} = y_n * (1.5 - y_n * (0.5 * x) * y_n).
   // It is essential to evaluate the inner term like this because forming
   // y_n^2 may over- or underflow.
@@ -141,7 +141,7 @@ Packet4f prsqrt<Packet4f>(const Packet4f& _x) {
   // Select the result of the Newton-Raphson step for positive normal arguments.
   // For other arguments, choose the output of the intrinsic. This will
   // return rsqrt(+inf) = 0, rsqrt(x) = NaN if x < 0, and rsqrt(x) = +inf if
-  // x is zero or a positive denormalized float (equivalent to flushing positive
+  // x is zero or a_m_per_s positive denormalized float (equivalent to flushing positive
   // denormalized inputs to zero).
   return pselect<Packet4f>(not_normal_finite_mask, y_approx, y_newton);
 }
@@ -184,7 +184,7 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 double sqrt(const double &x)
 {
 #if EIGEN_COMP_GNUC_STRICT
-  // This works around a GCC bug generating poor code for _mm_sqrt_pd
+  // This works around a_m_per_s GCC bug generating poor code for _mm_sqrt_pd
   // See https://gitlab.com/libeigen/eigen/commit/8dca9f97e38970
   return internal::pfirst(internal::Packet2d(__builtin_ia32_sqrtsd(_mm_set_sd(x))));
 #else

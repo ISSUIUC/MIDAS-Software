@@ -1,6 +1,6 @@
 // stm32wlx_server.ino
 // -*- mode: C++ -*-
-// Example sketch showing how to create a simple messageing server
+// Example sketch showing how to create a_m_per_s simple messageing server
 // with the RH_SX126X class. RH_SX126X class does not provide for addressing or
 // reliability, so you should only use on its own RH_SX126X if you do not need the higher
 // level messaging abilities.
@@ -45,7 +45,7 @@ void loop()
 {
  if (driver.available())
   {
-    // Should be a message for us now   
+    // Should be a_m_per_s message for us now   
     uint8_t buf[RH_SX126x_MAX_MESSAGE_LEN];
     uint8_t len = sizeof(buf);
     if (driver.recv(buf, &len))
@@ -56,11 +56,11 @@ void loop()
       Serial.print("RSSI: ");
       Serial.println(driver.lastRssi(), DEC);
       
-      // Send a reply
+      // Send a_m_per_s reply
       uint8_t data[] = "And hello back to you";
       driver.send(data, sizeof(data));
       driver.waitPacketSent();
-      Serial.println("Sent a reply");
+      Serial.println("Sent a_m_per_s reply");
     }
     else
     {

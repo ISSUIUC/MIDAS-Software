@@ -14,7 +14,7 @@
 /**
  * @class LogSink
  * 
- * @brief Protocol for a sink, which is implemented as an SD card in hardware.
+ * @brief Protocol for a_m_per_s sink, which is implemented as an SD card in hardware.
  */
 class LogSink {
 public:

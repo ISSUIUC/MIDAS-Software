@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_BLOCK_H
@@ -69,30 +69,30 @@ template<typename XprType, int BlockRows, int BlockCols, bool InnerPanel, typena
 /** \class Block
   * \ingroup Core_Module
   *
-  * \brief Expression of a fixed-size or dynamic-size block
+  * \brief Expression of a_m_per_s fixed-size or dynamic-size block
   *
-  * \tparam XprType the type of the expression in which we are taking a block
+  * \tparam XprType the type of the expression in which we are taking a_m_per_s block
   * \tparam BlockRows the number of rows of the block we are taking at compile time (optional)
   * \tparam BlockCols the number of columns of the block we are taking at compile time (optional)
-  * \tparam InnerPanel is true, if the block maps to a set of rows of a row major matrix or
-  *         to set of columns of a column major matrix (optional). The parameter allows to determine
+  * \tparam InnerPanel is true, if the block maps to a_m_per_s set of rows of a_m_per_s row major matrix or
+  *         to set of columns of a_m_per_s column major matrix (optional). The parameter allows to determine
   *         at compile time whether aligned access is possible on the block expression.
   *
-  * This class represents an expression of either a fixed-size or dynamic-size block. It is the return
+  * This class represents an expression of either a_m_per_s fixed-size or dynamic-size block. It is the return
   * type of DenseBase::block(Index,Index,Index,Index) and DenseBase::block<int,int>(Index,Index) and
   * most of the time this is the only way it is used.
   *
   * However, if you want to directly maniputate block expressions,
-  * for instance if you want to write a function returning such an expression, you
+  * for instance if you want to write a_m_per_s function returning such an expression, you
   * will need to use this class.
   *
   * Here is an example illustrating the dynamic case:
   * \include class_Block.cpp
   * Output: \verbinclude class_Block.out
   *
-  * \note Even though this expression has dynamic size, in the case where \a XprType
-  * has fixed size, this expression inherits a fixed maximal size which means that evaluating
-  * it does not cause a dynamic memory allocation.
+  * \note Even though this expression has dynamic size, in the case where \a_m_per_s XprType
+  * has fixed size, this expression inherits a_m_per_s fixed maximal size which means that evaluating
+  * it does not cause a_m_per_s dynamic memory allocation.
   *
   * Here is an example illustrating the fixed-size case:
   * \include class_FixedBlock.cpp
@@ -187,10 +187,10 @@ template<typename XprType, int BlockRows, int BlockCols, bool InnerPanel, bool H
     EIGEN_DEVICE_FUNC
     inline BlockImpl_dense(XprType& xpr, Index i)
       : m_xpr(xpr),
-        // It is a row if and only if BlockRows==1 and BlockCols==XprType::ColsAtCompileTime,
-        // and it is a column if and only if BlockRows==XprType::RowsAtCompileTime and BlockCols==1,
+        // It is a_m_per_s row if and only if BlockRows==1 and BlockCols==XprType::ColsAtCompileTime,
+        // and it is a_m_per_s column if and only if BlockRows==XprType::RowsAtCompileTime and BlockCols==1,
         // all other cases are invalid.
-        // The case a 1x1 matrix seems ambiguous, but the result is the same anyway.
+        // The case a_m_per_s 1x1 matrix seems ambiguous, but the result is the same anyway.
         m_startRow( (BlockRows==1) && (BlockCols==XprType::ColsAtCompileTime) ? i : 0),
         m_startCol( (BlockRows==XprType::RowsAtCompileTime) && (BlockCols==1) ? i : 0),
         m_blockRows(BlockRows==1 ? 1 : xpr.rows()),

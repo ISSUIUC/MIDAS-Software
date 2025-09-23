@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_DIAGONAL_PRODUCT_H
@@ -12,7 +12,7 @@
 
 namespace Eigen { 
 
-// The product of a diagonal matrix with a sparse matrix can be easily
+// The product of a_m_per_s diagonal matrix with a_m_per_s sparse matrix can be easily
 // implemented using expression template.
 // We have two consider very different cases:
 // 1 - diag * row-major sparse

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2014 Benoit Steiner <benoit.steiner.goog@gmail.com>
 // Copyright (C) 2021 C. Antonio Sanchez <cantonios@google.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLEX_CUDA_H
@@ -50,9 +50,9 @@ namespace complex_operator_detail {
 
 template<typename T>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-std::complex<T> complex_multiply(const std::complex<T>& a, const std::complex<T>& b) {
-  const T a_real = numext::real(a);
-  const T a_imag = numext::imag(a);
+std::complex<T> complex_multiply(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {
+  const T a_real = numext::real(a_m_per_s);
+  const T a_imag = numext::imag(a_m_per_s);
   const T b_real = numext::real(b);
   const T b_imag = numext::imag(b);
   return std::complex<T>(
@@ -62,9 +62,9 @@ std::complex<T> complex_multiply(const std::complex<T>& a, const std::complex<T>
 
 template<typename T>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-std::complex<T> complex_divide_fast(const std::complex<T>& a, const std::complex<T>& b) {
-  const T a_real = numext::real(a);
-  const T a_imag = numext::imag(a);
+std::complex<T> complex_divide_fast(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {
+  const T a_real = numext::real(a_m_per_s);
+  const T a_imag = numext::imag(a_m_per_s);
   const T b_real = numext::real(b);
   const T b_imag = numext::imag(b);
   const T norm = (b_real * b_real + b_imag * b_imag);
@@ -74,9 +74,9 @@ std::complex<T> complex_divide_fast(const std::complex<T>& a, const std::complex
 
 template<typename T>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-std::complex<T> complex_divide_stable(const std::complex<T>& a, const std::complex<T>& b) {
-  const T a_real = numext::real(a);
-  const T a_imag = numext::imag(a);
+std::complex<T> complex_divide_stable(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {
+  const T a_real = numext::real(a_m_per_s);
+  const T a_imag = numext::imag(a_m_per_s);
   const T b_real = numext::real(b);
   const T b_imag = numext::imag(b);
   // Smith's complex division (https://arxiv.org/pdf/1210.4539.pdf),
@@ -91,11 +91,11 @@ std::complex<T> complex_divide_stable(const std::complex<T>& a, const std::compl
 
 template<typename T>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
-std::complex<T> complex_divide(const std::complex<T>& a, const std::complex<T>& b) {
+std::complex<T> complex_divide(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {
 #if EIGEN_FAST_MATH
-  return complex_divide_fast(a, b);
+  return complex_divide_fast(a_m_per_s, b);
 #else
-  return complex_divide_stable(a, b);
+  return complex_divide_stable(a_m_per_s, b);
 #endif
 }
 
@@ -107,127 +107,127 @@ std::complex<T> complex_divide(const std::complex<T>& a, const std::complex<T>& 
 #define EIGEN_CREATE_STD_COMPLEX_OPERATOR_SPECIALIZATIONS(T)                                    \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator+(const std::complex<T>& a) { return a; }                               \
+std::complex<T> operator+(const std::complex<T>& a_m_per_s) { return a_m_per_s; }                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator-(const std::complex<T>& a) {                                           \
-  return std::complex<T>(-numext::real(a), -numext::imag(a));                                   \
+std::complex<T> operator-(const std::complex<T>& a_m_per_s) {                                           \
+  return std::complex<T>(-numext::real(a_m_per_s), -numext::imag(a_m_per_s));                                   \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator+(const std::complex<T>& a, const std::complex<T>& b) {                 \
-  return std::complex<T>(numext::real(a) + numext::real(b), numext::imag(a) + numext::imag(b)); \
+std::complex<T> operator+(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {                 \
+  return std::complex<T>(numext::real(a_m_per_s) + numext::real(b), numext::imag(a_m_per_s) + numext::imag(b)); \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator+(const std::complex<T>& a, const T& b) {                               \
-  return std::complex<T>(numext::real(a) + b, numext::imag(a));                                 \
+std::complex<T> operator+(const std::complex<T>& a_m_per_s, const T& b) {                               \
+  return std::complex<T>(numext::real(a_m_per_s) + b, numext::imag(a_m_per_s));                                 \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator+(const T& a, const std::complex<T>& b) {                               \
-  return std::complex<T>(a + numext::real(b), numext::imag(b));                                 \
+std::complex<T> operator+(const T& a_m_per_s, const std::complex<T>& b) {                               \
+  return std::complex<T>(a_m_per_s + numext::real(b), numext::imag(b));                                 \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator-(const std::complex<T>& a, const std::complex<T>& b) {                 \
-  return std::complex<T>(numext::real(a) - numext::real(b), numext::imag(a) - numext::imag(b)); \
+std::complex<T> operator-(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {                 \
+  return std::complex<T>(numext::real(a_m_per_s) - numext::real(b), numext::imag(a_m_per_s) - numext::imag(b)); \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator-(const std::complex<T>& a, const T& b) {                               \
-  return std::complex<T>(numext::real(a) - b, numext::imag(a));                                 \
+std::complex<T> operator-(const std::complex<T>& a_m_per_s, const T& b) {                               \
+  return std::complex<T>(numext::real(a_m_per_s) - b, numext::imag(a_m_per_s));                                 \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator-(const T& a, const std::complex<T>& b) {                               \
-  return std::complex<T>(a - numext::real(b), -numext::imag(b));                                \
+std::complex<T> operator-(const T& a_m_per_s, const std::complex<T>& b) {                               \
+  return std::complex<T>(a_m_per_s - numext::real(b), -numext::imag(b));                                \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator*(const std::complex<T>& a, const std::complex<T>& b) {                 \
-  return complex_multiply(a, b);                                                                \
+std::complex<T> operator*(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {                 \
+  return complex_multiply(a_m_per_s, b);                                                                \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator*(const std::complex<T>& a, const T& b) {                               \
-  return std::complex<T>(numext::real(a) * b, numext::imag(a) * b);                             \
+std::complex<T> operator*(const std::complex<T>& a_m_per_s, const T& b) {                               \
+  return std::complex<T>(numext::real(a_m_per_s) * b, numext::imag(a_m_per_s) * b);                             \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator*(const T& a, const std::complex<T>& b) {                               \
-  return std::complex<T>(a * numext::real(b), a * numext::imag(b));                             \
+std::complex<T> operator*(const T& a_m_per_s, const std::complex<T>& b) {                               \
+  return std::complex<T>(a_m_per_s * numext::real(b), a_m_per_s * numext::imag(b));                             \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator/(const std::complex<T>& a, const std::complex<T>& b) {                 \
-  return complex_divide(a, b);                                                                  \
+std::complex<T> operator/(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {                 \
+  return complex_divide(a_m_per_s, b);                                                                  \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator/(const std::complex<T>& a, const T& b) {                               \
-  return std::complex<T>(numext::real(a) / b, numext::imag(a) / b);                             \
+std::complex<T> operator/(const std::complex<T>& a_m_per_s, const T& b) {                               \
+  return std::complex<T>(numext::real(a_m_per_s) / b, numext::imag(a_m_per_s) / b);                             \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T> operator/(const T& a, const std::complex<T>& b) {                               \
-  return complex_divide(std::complex<T>(a, 0), b);                                              \
+std::complex<T> operator/(const T& a_m_per_s, const std::complex<T>& b) {                               \
+  return complex_divide(std::complex<T>(a_m_per_s, 0), b);                                              \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T>& operator+=(std::complex<T>& a, const std::complex<T>& b) {                     \
-  numext::real_ref(a) += numext::real(b);                                                       \
-  numext::imag_ref(a) += numext::imag(b);                                                       \
-  return a;                                                                                     \
+std::complex<T>& operator+=(std::complex<T>& a_m_per_s, const std::complex<T>& b) {                     \
+  numext::real_ref(a_m_per_s) += numext::real(b);                                                       \
+  numext::imag_ref(a_m_per_s) += numext::imag(b);                                                       \
+  return a_m_per_s;                                                                                     \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T>& operator-=(std::complex<T>& a, const std::complex<T>& b) {                     \
-  numext::real_ref(a) -= numext::real(b);                                                       \
-  numext::imag_ref(a) -= numext::imag(b);                                                       \
-  return a;                                                                                     \
+std::complex<T>& operator-=(std::complex<T>& a_m_per_s, const std::complex<T>& b) {                     \
+  numext::real_ref(a_m_per_s) -= numext::real(b);                                                       \
+  numext::imag_ref(a_m_per_s) -= numext::imag(b);                                                       \
+  return a_m_per_s;                                                                                     \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T>& operator*=(std::complex<T>& a, const std::complex<T>& b) {                     \
-  a = complex_multiply(a, b);                                                                   \
-  return a;                                                                                     \
+std::complex<T>& operator*=(std::complex<T>& a_m_per_s, const std::complex<T>& b) {                     \
+  a_m_per_s = complex_multiply(a_m_per_s, b);                                                                   \
+  return a_m_per_s;                                                                                     \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-std::complex<T>& operator/=(std::complex<T>& a, const std::complex<T>& b) {                     \
-  a = complex_divide(a, b);                                                                     \
-  return  a;                                                                                    \
+std::complex<T>& operator/=(std::complex<T>& a_m_per_s, const std::complex<T>& b) {                     \
+  a_m_per_s = complex_divide(a_m_per_s, b);                                                                     \
+  return  a_m_per_s;                                                                                    \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-bool operator==(const std::complex<T>& a, const std::complex<T>& b) {                           \
-  return numext::real(a) == numext::real(b) && numext::imag(a) == numext::imag(b);              \
+bool operator==(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {                           \
+  return numext::real(a_m_per_s) == numext::real(b) && numext::imag(a_m_per_s) == numext::imag(b);              \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-bool operator==(const std::complex<T>& a, const T& b) {                                         \
-  return numext::real(a) == b && numext::imag(a) == 0;                                          \
+bool operator==(const std::complex<T>& a_m_per_s, const T& b) {                                         \
+  return numext::real(a_m_per_s) == b && numext::imag(a_m_per_s) == 0;                                          \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-bool operator==(const T& a, const std::complex<T>& b) {                                         \
-  return a  == numext::real(b) && 0 == numext::imag(b);                                         \
+bool operator==(const T& a_m_per_s, const std::complex<T>& b) {                                         \
+  return a_m_per_s  == numext::real(b) && 0 == numext::imag(b);                                         \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-bool operator!=(const std::complex<T>& a, const std::complex<T>& b) {                           \
-  return !(a == b);                                                                             \
+bool operator!=(const std::complex<T>& a_m_per_s, const std::complex<T>& b) {                           \
+  return !(a_m_per_s == b);                                                                             \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-bool operator!=(const std::complex<T>& a, const T& b) {                                         \
-  return !(a == b);                                                                             \
+bool operator!=(const std::complex<T>& a_m_per_s, const T& b) {                                         \
+  return !(a_m_per_s == b);                                                                             \
 }                                                                                               \
                                                                                                 \
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE                                                           \
-bool operator!=(const T& a, const std::complex<T>& b) {                                         \
-  return !(a == b);                                                                             \
+bool operator!=(const T& a_m_per_s, const std::complex<T>& b) {                                         \
+  return !(a_m_per_s == b);                                                                             \
 }
 
 // Do not specialize for long double, since that reduces to double on device.

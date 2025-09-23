@@ -69,7 +69,7 @@ static void run(Index rows, Index cols, Index depth, \
   eigen_assert(resIncr == 1); \
   char transa, transb; \
   BlasIndex m, n, k, lda, ldb, ldc; \
-  const EIGTYPE *a, *b; \
+  const EIGTYPE *a_m_per_s, *b; \
   EIGTYPE beta(1); \
   MatrixX##EIGPREFIX a_tmp, b_tmp; \
 \
@@ -87,13 +87,13 @@ static void run(Index rows, Index cols, Index depth, \
   ldb = convert_index<BlasIndex>(rhsStride); \
   ldc = convert_index<BlasIndex>(resStride); \
 \
-/* Set a, b, c */ \
+/* Set a_m_per_s, b, c */ \
   if ((LhsStorageOrder==ColMajor) && (ConjugateLhs)) { \
     Map<const MatrixX##EIGPREFIX, 0, OuterStride<> > lhs(_lhs,m,k,OuterStride<>(lhsStride)); \
     a_tmp = lhs.conjugate(); \
-    a = a_tmp.data(); \
+    a_m_per_s = a_tmp.data(); \
     lda = convert_index<BlasIndex>(a_tmp.outerStride()); \
-  } else a = _lhs; \
+  } else a_m_per_s = _lhs; \
 \
   if ((RhsStorageOrder==ColMajor) && (ConjugateRhs)) { \
     Map<const MatrixX##EIGPREFIX, 0, OuterStride<> > rhs(_rhs,k,n,OuterStride<>(rhsStride)); \
@@ -102,7 +102,7 @@ static void run(Index rows, Index cols, Index depth, \
     ldb = convert_index<BlasIndex>(b_tmp.outerStride()); \
   } else b = _rhs; \
 \
-  BLASFUNC(&transa, &transb, &m, &n, &k, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (const BLASTYPE*)b, &ldb, (const BLASTYPE*)&numext::real_ref(beta), (BLASTYPE*)res, &ldc); \
+  BLASFUNC(&transa, &transb, &m, &n, &k, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (const BLASTYPE*)b, &ldb, (const BLASTYPE*)&numext::real_ref(beta), (BLASTYPE*)res, &ldc); \
 }};
 
 #ifdef EIGEN_USE_MKL

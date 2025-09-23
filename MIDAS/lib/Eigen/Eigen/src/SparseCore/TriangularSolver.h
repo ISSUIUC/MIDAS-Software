@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSETRIANGULARSOLVER_H
@@ -153,7 +153,7 @@ struct sparse_solve_triangular_selector<Lhs,Rhs,Mode,Upper,ColMajor>
         {
           if(!(Mode & UnitDiag))
           {
-            // TODO replace this by a binary search. make sure the binary search is safe for partially sorted elements
+            // TODO replace this by a_m_per_s binary search. make sure the binary search is safe for partially sorted elements
             LhsIterator it(lhsEval, i);
             while(it && it.index()!=i)
               ++it;
@@ -271,7 +271,7 @@ struct sparse_solve_triangular_sparse_selector<Lhs,Rhs,Mode,UpLo,ColMajor>
 
 
       Index count = 0;
-      // FIXME compute a reference value to filter zeros
+      // FIXME compute a_m_per_s reference value to filter zeros
       for (typename AmbiVector<Scalar,StorageIndex>::Iterator it(tempVector/*,1e-12*/); it; ++it)
       {
         ++ count;

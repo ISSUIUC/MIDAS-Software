@@ -1,11 +1,11 @@
 
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ARCH_CONJ_HELPER_H
@@ -80,7 +80,7 @@ struct conj_helper<LhsScalar, RhsScalar, true, true> {
   pmadd(const LhsScalar& x, const RhsScalar& y, const ResultType& c) const
   { return this->pmul(x, y) + c; }
 
-  // We save a conjuation by using the identity conj(a)*conj(b) = conj(a*b).
+  // We save a_m_per_s conjuation by using the identity conj(a_m_per_s)*conj(b) = conj(a_m_per_s*b).
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE ResultType
   pmul(const LhsScalar& x, const RhsScalar& y) const
   { return numext::conj(x * y); }
@@ -106,7 +106,7 @@ struct conj_helper<Packet, Packet, true, true>
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet pmadd(const Packet& x, const Packet& y, const Packet& c) const
   { return Eigen::internal::pmadd(pconj(x), pconj(y), c); }
-  // We save a conjuation by using the identity conj(a)*conj(b) = conj(a*b).
+  // We save a_m_per_s conjuation by using the identity conj(a_m_per_s)*conj(b) = conj(a_m_per_s*b).
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Packet pmul(const Packet& x, const Packet& y) const
   { return pconj(Eigen::internal::pmul(x, y)); }
 };

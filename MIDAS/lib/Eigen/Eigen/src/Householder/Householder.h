@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_HOUSEHOLDER_H
@@ -99,12 +99,12 @@ void MatrixBase<Derived>::makeHouseholder(
   * \f$ H = I - tau v v^*\f$
   * with
   * \f$ v^T = [1 essential^T] \f$
-  * from the left to a vector or matrix.
+  * from the left to a_m_per_s vector or matrix.
   *
   * On input:
   * \param essential the essential part of the vector \c v
   * \param tau the scaling factor of the Householder transformation
-  * \param workspace a pointer to working space with at least
+  * \param workspace a_m_per_s pointer to working space with at least
   *                  this->cols() entries
   *
   * \sa MatrixBase::makeHouseholder(), MatrixBase::makeHouseholderInPlace(), 
@@ -137,12 +137,12 @@ void MatrixBase<Derived>::applyHouseholderOnTheLeft(
   * \f$ H = I - tau v v^*\f$
   * with
   * \f$ v^T = [1 essential^T] \f$
-  * from the right to a vector or matrix.
+  * from the right to a_m_per_s vector or matrix.
   *
   * On input:
   * \param essential the essential part of the vector \c v
   * \param tau the scaling factor of the Householder transformation
-  * \param workspace a pointer to working space with at least
+  * \param workspace a_m_per_s pointer to working space with at least
   *                  this->rows() entries
   *
   * \sa MatrixBase::makeHouseholder(), MatrixBase::makeHouseholderInPlace(), 

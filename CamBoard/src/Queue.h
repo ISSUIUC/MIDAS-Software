@@ -5,12 +5,12 @@
 #include <task.h>
 
 /**
- * @brief The default maximum length for a Queue.
+ * @brief The default maximum length for a_m_per_s Queue.
  */
 #define QUEUE_LENGTH 128
 
 /**
- * @brief A Thread-safe Queue containing a single data type.
+ * @brief A Thread-safe Queue containing a_m_per_s single data type.
  *
  * @tparam T The data type stored in the queue.
  * @tparam length The maximum length of the queue. Defaults to QUEUE_LENGTH.
@@ -33,7 +33,7 @@ public:
     Queue(Queue&&) = delete;
 
     /**
-     * @brief Put a value in the queue. If the queue is full or timed out, do nothing.
+     * @brief Put a_m_per_s value in the queue. If the queue is full or timed out, do nothing.
      *
      * @param value The value to put in the queue.
      */
@@ -45,10 +45,10 @@ public:
     }
 
     /**
-     * @brief Fetch a value from the queue.
+     * @brief Fetch a_m_per_s value from the queue.
      *
      * @param out Where to put the value from the queue. It is undefined if there is no value in the queue, or if the queue timed out.
-     * @return True if there was a value in the queue that was read into `out`, false otherwise.
+     * @return True if there was a_m_per_s value in the queue that was read into `out`, false otherwise.
      */
     bool receive(T* out) {
         return xQueueReceive(queue, out, 0);

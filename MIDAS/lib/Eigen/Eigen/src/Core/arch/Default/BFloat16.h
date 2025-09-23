@@ -2,7 +2,7 @@
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+You may obtain a_m_per_s copy of the License at
 
     http://www.apache.org/licenses/LICENSE-2.0
 
@@ -126,7 +126,7 @@ struct numeric_limits<Eigen::bfloat16> {
 // If std::numeric_limits<T> is specialized, should also specialize
 // std::numeric_limits<const T>, std::numeric_limits<volatile T>, and
 // std::numeric_limits<const volatile T>
-// https://stackoverflow.com/a/16519653/
+// https://stackoverflow.com/a_m_per_s/16519653/
 template<>
 struct numeric_limits<const Eigen::bfloat16> : numeric_limits<Eigen::bfloat16> {};
 template<>
@@ -158,80 +158,80 @@ namespace bfloat16_impl {
 // Definitions for CPUs, mostly working through conversion
 // to/from fp32.
 
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator + (const bfloat16& a, const bfloat16& b) {
-  return bfloat16(float(a) + float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator + (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return bfloat16(float(a_m_per_s) + float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator + (const bfloat16& a, const int& b) {
-  return bfloat16(float(a) + static_cast<float>(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator + (const bfloat16& a_m_per_s, const int& b) {
+  return bfloat16(float(a_m_per_s) + static_cast<float>(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator + (const int& a, const bfloat16& b) {
-  return bfloat16(static_cast<float>(a) + float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator + (const int& a_m_per_s, const bfloat16& b) {
+  return bfloat16(static_cast<float>(a_m_per_s) + float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator * (const bfloat16& a, const bfloat16& b) {
-  return bfloat16(float(a) * float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator * (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return bfloat16(float(a_m_per_s) * float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator - (const bfloat16& a, const bfloat16& b) {
-  return bfloat16(float(a) - float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator - (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return bfloat16(float(a_m_per_s) - float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator / (const bfloat16& a, const bfloat16& b) {
-  return bfloat16(float(a) / float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator / (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return bfloat16(float(a_m_per_s) / float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator - (const bfloat16& a) {
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator - (const bfloat16& a_m_per_s) {
   bfloat16 result;
-  result.value = a.value ^ 0x8000;
+  result.value = a_m_per_s.value ^ 0x8000;
   return result;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator += (bfloat16& a, const bfloat16& b) {
-  a = bfloat16(float(a) + float(b));
-  return a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator += (bfloat16& a_m_per_s, const bfloat16& b) {
+  a_m_per_s = bfloat16(float(a_m_per_s) + float(b));
+  return a_m_per_s;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator *= (bfloat16& a, const bfloat16& b) {
-  a = bfloat16(float(a) * float(b));
-  return a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator *= (bfloat16& a_m_per_s, const bfloat16& b) {
+  a_m_per_s = bfloat16(float(a_m_per_s) * float(b));
+  return a_m_per_s;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator -= (bfloat16& a, const bfloat16& b) {
-  a = bfloat16(float(a) - float(b));
-  return a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator -= (bfloat16& a_m_per_s, const bfloat16& b) {
+  a_m_per_s = bfloat16(float(a_m_per_s) - float(b));
+  return a_m_per_s;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator /= (bfloat16& a, const bfloat16& b) {
-  a = bfloat16(float(a) / float(b));
-  return a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16& operator /= (bfloat16& a_m_per_s, const bfloat16& b) {
+  a_m_per_s = bfloat16(float(a_m_per_s) / float(b));
+  return a_m_per_s;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator++(bfloat16& a) {
-  a += bfloat16(1);
-  return a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator++(bfloat16& a_m_per_s) {
+  a_m_per_s += bfloat16(1);
+  return a_m_per_s;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator--(bfloat16& a) {
-  a -= bfloat16(1);
-  return a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator--(bfloat16& a_m_per_s) {
+  a_m_per_s -= bfloat16(1);
+  return a_m_per_s;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator++(bfloat16& a, int) {
-  bfloat16 original_value = a;
-  ++a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator++(bfloat16& a_m_per_s, int) {
+  bfloat16 original_value = a_m_per_s;
+  ++a_m_per_s;
   return original_value;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator--(bfloat16& a, int) {
-  bfloat16 original_value = a;
-  --a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator--(bfloat16& a_m_per_s, int) {
+  bfloat16 original_value = a_m_per_s;
+  --a_m_per_s;
   return original_value;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator == (const bfloat16& a, const bfloat16& b) {
-  return numext::equal_strict(float(a),float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator == (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return numext::equal_strict(float(a_m_per_s),float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator != (const bfloat16& a, const bfloat16& b) {
-  return numext::not_equal_strict(float(a), float(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator != (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return numext::not_equal_strict(float(a_m_per_s), float(b));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator < (const bfloat16& a, const bfloat16& b) {
-  return float(a) < float(b);
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator < (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return float(a_m_per_s) < float(b);
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator <= (const bfloat16& a, const bfloat16& b) {
-  return float(a) <= float(b);
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator <= (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return float(a_m_per_s) <= float(b);
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator > (const bfloat16& a, const bfloat16& b) {
-  return float(a) > float(b);
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator > (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return float(a_m_per_s) > float(b);
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator >= (const bfloat16& a, const bfloat16& b) {
-  return float(a) >= float(b);
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator >= (const bfloat16& a_m_per_s, const bfloat16& b) {
+  return float(a_m_per_s) >= float(b);
 }
 
 #if EIGEN_COMP_CLANG && defined(EIGEN_CUDACC)
@@ -241,8 +241,8 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool operator >= (const bfloat16& a, const
 
 // Division by an index. Do it in full float precision to avoid accuracy
 // issues in converting the denominator to bfloat16.
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator / (const bfloat16& a, Index b) {
-  return bfloat16(static_cast<float>(a) / static_cast<float>(b));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 operator / (const bfloat16& a_m_per_s, Index b) {
+  return bfloat16(static_cast<float>(a_m_per_s) / static_cast<float>(b));
 }
 
 EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw truncate_to_bfloat16(const float v) {
@@ -278,19 +278,19 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
   __bfloat16_raw output;
 
   if (Eigen::numext::isnan EIGEN_NOT_A_MACRO(ff)) {
-    // If the value is a NaN, squash it to a qNaN with msb of fraction set,
+    // If the value is a_m_per_s NaN, squash it to a_m_per_s qNaN with msb of fraction set,
     // this makes sure after truncation we don't end up with an inf.
     //
     // qNaN magic: All exponent bits set + most significant bit of fraction
     // set.
     output.value = std::signbit(ff) ? 0xFFC0: 0x7FC0;
   } else {
-    // Fast rounding algorithm that rounds a half value to nearest even. This
-    // reduces expected error when we convert a large number of floats. Here
+    // Fast rounding algorithm that rounds a_m_per_s half value to nearest even. This
+    // reduces expected error when we convert a_m_per_s large number of floats. Here
     // is how it works:
     //
     // Definitions:
-    // To convert a float 32 to bfloat16, a float 32 can be viewed as 32 bits
+    // To convert a_m_per_s float 32 to bfloat16, a_m_per_s float 32 can be viewed as 32 bits
     // with the following tags:
     //
     // Sign |  Exp (8 bits) | Frac (23 bits)
@@ -322,7 +322,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //   - Rounding bias: 0x7fff + 0 = 0x7fff
     //   - Adding rounding bias to input may create any carry, depending on
     //   whether there is any value set to 1 in T bits.
-    //   - R may be set to 1 if there is a carry.
+    //   - R may be set to 1 if there is a_m_per_s carry.
     //   - L remains 0.
     //   - Note that this case also handles Inf and -Inf, where all fraction
     //   bits, including L, R and Ts are all 0. The output remains Inf after
@@ -344,7 +344,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //   Algorithm:
     //   - Rounding bias: 0x7fff + 0 = 0x7fff
     //   - Adding rounding bias to input sets all sticky bits to 1, but
-    //   doesn't create a carry.
+    //   doesn't create a_m_per_s carry.
     //   - R remains 1.
     //   - L remains 0.
     //
@@ -355,13 +355,13 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //   Algorithm:
     //   - Rounding bias: 0x7fff + 1 = 0x8000
     //   - Adding rounding bias to input doesn't change sticky bits, but
-    //   creates a carry from rounding bit.
+    //   creates a_m_per_s carry from rounding bit.
     //   - The carry sets L to 0, creates another carry bit and propagate
     //   forward to F bits.
-    //   - If all the F bits are 1, a carry then propagates to the exponent
+    //   - If all the F bits are 1, a_m_per_s carry then propagates to the exponent
     //   bits, which then creates the minimum value with the next exponent
     //   value. Note that we won't have the case where exponents are all 1,
-    //   since that's either a NaN (handled in the other if condition) or inf
+    //   since that's either a_m_per_s NaN (handled in the other if condition) or inf
     //   (handled in case 1).
     //
     // 5. L = 0, R = 1, any of T is 1:
@@ -369,7 +369,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //
     //   Algorithm:
     //   - Rounding bias: 0x7fff + 0 = 0x7fff
-    //   - Adding rounding bias to input creates a carry from sticky bits,
+    //   - Adding rounding bias to input creates a_m_per_s carry from sticky bits,
     //   sets rounding bit to 0, then create another carry.
     //   - The second carry sets L to 1.
     //
@@ -395,7 +395,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //     S     E E E E E E E E      F F F F F F L     RTTTTTTTTTTTTTTT
     //     0     0 0 0 0 0 0 0 0      0 0 0 0 0 0 1     1000000000000000
     //
-    //     This falls into case 4. We create a carry from R and T,
+    //     This falls into case 4. We create a_m_per_s carry from R and T,
     //     which then propagates into L and F:
     //
     //    Output:
@@ -410,7 +410,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //     S     E E E E E E E E      F F F F F F L     RTTTTTTTTTTTTTTT
     //     0     0 0 0 0 0 0 0 0      1 1 1 1 1 1 1     1111111111111111
     //
-    //     This falls into case 4. We create a carry from R and T,
+    //     This falls into case 4. We create a_m_per_s carry from R and T,
     //     propagate into L and F, which then propagates into exponent
     //     bits:
     //
@@ -425,7 +425,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //     S     E E E E E E E E      F F F F F F L     RTTTTTTTTTTTTTTT
     //     0     1 1 1 1 1 1 1 0      1 1 1 1 1 1 1     1111111111111111
     //
-    //     This falls into case 4. We create a carry from R and T,
+    //     This falls into case 4. We create a_m_per_s carry from R and T,
     //     propagate into L and F, which then propagates into exponent
     //     bits:
     //
@@ -433,7 +433,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
     //     S     E E E E E E E E      F F F F F F L
     //     0     1 1 1 1 1 1 1 1      0 0 0 0 0 0 0
 
-    // At this point, ff must be either a normal float, or +/-infinity.
+    // At this point, ff must be either a_m_per_s normal float, or +/-infinity.
     output = float_to_bfloat16_rtne<true>(ff);
   }
   return output;
@@ -441,7 +441,7 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC __bfloat16_raw float_to_bfloat16_rtne<fals
 }
 
 // float_to_bfloat16_rtne template specialization that assumes that its function
-// argument (ff) is either a normal floating point number, or +/-infinity, or
+// argument (ff) is either a_m_per_s normal floating point number, or +/-infinity, or
 // zero. Used to improve the runtime performance of conversion from an integer
 // type to bfloat16.
 template <>
@@ -473,119 +473,119 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC float bfloat16_to_float(__bfloat16_raw h) 
 }
 // --- standard functions ---
 
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isinf)(const bfloat16& a) {
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isinf)(const bfloat16& a_m_per_s) {
   EIGEN_USING_STD(isinf);
-  return (isinf)(float(a));
+  return (isinf)(float(a_m_per_s));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isnan)(const bfloat16& a) {
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isnan)(const bfloat16& a_m_per_s) {
   EIGEN_USING_STD(isnan);
-  return (isnan)(float(a));
+  return (isnan)(float(a_m_per_s));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isfinite)(const bfloat16& a) {
-  return !(isinf EIGEN_NOT_A_MACRO (a)) && !(isnan EIGEN_NOT_A_MACRO (a));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool (isfinite)(const bfloat16& a_m_per_s) {
+  return !(isinf EIGEN_NOT_A_MACRO (a_m_per_s)) && !(isnan EIGEN_NOT_A_MACRO (a_m_per_s));
 }
 
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 abs(const bfloat16& a) {
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 abs(const bfloat16& a_m_per_s) {
   bfloat16 result;
-  result.value = a.value & 0x7FFF;
+  result.value = a_m_per_s.value & 0x7FFF;
   return result;
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 exp(const bfloat16& a) {
-   return bfloat16(::expf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 exp(const bfloat16& a_m_per_s) {
+   return bfloat16(::expf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 expm1(const bfloat16& a) {
-  return bfloat16(numext::expm1(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 expm1(const bfloat16& a_m_per_s) {
+  return bfloat16(numext::expm1(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log(const bfloat16& a) {
-  return bfloat16(::logf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log(const bfloat16& a_m_per_s) {
+  return bfloat16(::logf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log1p(const bfloat16& a) {
-  return bfloat16(numext::log1p(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log1p(const bfloat16& a_m_per_s) {
+  return bfloat16(numext::log1p(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log10(const bfloat16& a) {
-  return bfloat16(::log10f(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log10(const bfloat16& a_m_per_s) {
+  return bfloat16(::log10f(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log2(const bfloat16& a) {
-  return bfloat16(static_cast<float>(EIGEN_LOG2E) * ::logf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 log2(const bfloat16& a_m_per_s) {
+  return bfloat16(static_cast<float>(EIGEN_LOG2E) * ::logf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 sqrt(const bfloat16& a) {
-    return bfloat16(::sqrtf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 sqrt(const bfloat16& a_m_per_s) {
+    return bfloat16(::sqrtf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 pow(const bfloat16& a, const bfloat16& b) {
-  return bfloat16(::powf(float(a), float(b)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 pow(const bfloat16& a_m_per_s, const bfloat16& b) {
+  return bfloat16(::powf(float(a_m_per_s), float(b)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 sin(const bfloat16& a) {
-  return bfloat16(::sinf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 sin(const bfloat16& a_m_per_s) {
+  return bfloat16(::sinf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 cos(const bfloat16& a) {
-  return bfloat16(::cosf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 cos(const bfloat16& a_m_per_s) {
+  return bfloat16(::cosf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 tan(const bfloat16& a) {
-  return bfloat16(::tanf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 tan(const bfloat16& a_m_per_s) {
+  return bfloat16(::tanf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 asin(const bfloat16& a) {
-  return bfloat16(::asinf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 asin(const bfloat16& a_m_per_s) {
+  return bfloat16(::asinf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 acos(const bfloat16& a) {
-  return bfloat16(::acosf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 acos(const bfloat16& a_m_per_s) {
+  return bfloat16(::acosf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 atan(const bfloat16& a) {
-  return bfloat16(::atanf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 atan(const bfloat16& a_m_per_s) {
+  return bfloat16(::atanf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 sinh(const bfloat16& a) {
-  return bfloat16(::sinhf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 sinh(const bfloat16& a_m_per_s) {
+  return bfloat16(::sinhf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 cosh(const bfloat16& a) {
-  return bfloat16(::coshf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 cosh(const bfloat16& a_m_per_s) {
+  return bfloat16(::coshf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 tanh(const bfloat16& a) {
-  return bfloat16(::tanhf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 tanh(const bfloat16& a_m_per_s) {
+  return bfloat16(::tanhf(float(a_m_per_s)));
 }
 #if EIGEN_HAS_CXX11_MATH
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 asinh(const bfloat16& a) {
-  return bfloat16(::asinhf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 asinh(const bfloat16& a_m_per_s) {
+  return bfloat16(::asinhf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 acosh(const bfloat16& a) {
-  return bfloat16(::acoshf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 acosh(const bfloat16& a_m_per_s) {
+  return bfloat16(::acoshf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 atanh(const bfloat16& a) {
-  return bfloat16(::atanhf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 atanh(const bfloat16& a_m_per_s) {
+  return bfloat16(::atanhf(float(a_m_per_s)));
 }
 #endif
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 floor(const bfloat16& a) {
-  return bfloat16(::floorf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 floor(const bfloat16& a_m_per_s) {
+  return bfloat16(::floorf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 ceil(const bfloat16& a) {
-  return bfloat16(::ceilf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 ceil(const bfloat16& a_m_per_s) {
+  return bfloat16(::ceilf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 rint(const bfloat16& a) {
-  return bfloat16(::rintf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 rint(const bfloat16& a_m_per_s) {
+  return bfloat16(::rintf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 round(const bfloat16& a) {
-  return bfloat16(::roundf(float(a)));
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 round(const bfloat16& a_m_per_s) {
+  return bfloat16(::roundf(float(a_m_per_s)));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmod(const bfloat16& a, const bfloat16& b) {
-  return bfloat16(::fmodf(float(a), float(b)));
-}
-
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 (min)(const bfloat16& a, const bfloat16& b) {
-  const float f1 = static_cast<float>(a);
-  const float f2 = static_cast<float>(b);
-  return f2 < f1 ? b : a;
-}
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 (max)(const bfloat16& a, const bfloat16& b) {
-  const float f1 = static_cast<float>(a);
-  const float f2 = static_cast<float>(b);
-  return f1 < f2 ? b : a;
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmod(const bfloat16& a_m_per_s, const bfloat16& b) {
+  return bfloat16(::fmodf(float(a_m_per_s), float(b)));
 }
 
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmin(const bfloat16& a, const bfloat16& b) {
-  const float f1 = static_cast<float>(a);
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 (min)(const bfloat16& a_m_per_s, const bfloat16& b) {
+  const float f1 = static_cast<float>(a_m_per_s);
+  const float f2 = static_cast<float>(b);
+  return f2 < f1 ? b : a_m_per_s;
+}
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 (max)(const bfloat16& a_m_per_s, const bfloat16& b) {
+  const float f1 = static_cast<float>(a_m_per_s);
+  const float f2 = static_cast<float>(b);
+  return f1 < f2 ? b : a_m_per_s;
+}
+
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmin(const bfloat16& a_m_per_s, const bfloat16& b) {
+  const float f1 = static_cast<float>(a_m_per_s);
   const float f2 = static_cast<float>(b);
   return bfloat16(::fminf(f1, f2));
 }
-EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmax(const bfloat16& a, const bfloat16& b) {
-  const float f1 = static_cast<float>(a);
+EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bfloat16 fmax(const bfloat16& a_m_per_s, const bfloat16& b) {
+  const float f1 = static_cast<float>(a_m_per_s);
   const float f2 = static_cast<float>(b);
   return bfloat16(::fmaxf(f1, f2));
 }
@@ -689,8 +689,8 @@ EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC uint16_t bit_cast<uint16_t, Eigen::bfloat1
 namespace std {
 template <>
 struct hash<Eigen::bfloat16> {
-  EIGEN_STRONG_INLINE std::size_t operator()(const Eigen::bfloat16& a) const {
-    return static_cast<std::size_t>(Eigen::numext::bit_cast<Eigen::numext::uint16_t>(a));
+  EIGEN_STRONG_INLINE std::size_t operator()(const Eigen::bfloat16& a_m_per_s) const {
+    return static_cast<std::size_t>(Eigen::numext::bit_cast<Eigen::numext::uint16_t>(a_m_per_s));
   }
 };
 } // namespace std

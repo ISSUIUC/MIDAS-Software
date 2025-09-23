@@ -1,8 +1,8 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATH_FUNCTIONS_NEON_H
@@ -45,16 +45,16 @@ BF16_PACKET_FUNCTION(Packet4f, Packet4bf, pexp)
 BF16_PACKET_FUNCTION(Packet4f, Packet4bf, ptanh)
 
 template <>
-EIGEN_STRONG_INLINE Packet4bf pfrexp(const Packet4bf& a, Packet4bf& exponent) {
+EIGEN_STRONG_INLINE Packet4bf pfrexp(const Packet4bf& a_m_per_s, Packet4bf& exponent) {
   Packet4f fexponent;
-  const Packet4bf out = F32ToBf16(pfrexp<Packet4f>(Bf16ToF32(a), fexponent));
+  const Packet4bf out = F32ToBf16(pfrexp<Packet4f>(Bf16ToF32(a_m_per_s), fexponent));
   exponent = F32ToBf16(fexponent);
   return out;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet4bf pldexp(const Packet4bf& a, const Packet4bf& exponent) {
-  return F32ToBf16(pldexp<Packet4f>(Bf16ToF32(a), Bf16ToF32(exponent)));
+EIGEN_STRONG_INLINE Packet4bf pldexp(const Packet4bf& a_m_per_s, const Packet4bf& exponent) {
+  return F32ToBf16(pldexp<Packet4f>(Bf16ToF32(a_m_per_s), Bf16ToF32(exponent)));
 }
 
 //---------- double ----------

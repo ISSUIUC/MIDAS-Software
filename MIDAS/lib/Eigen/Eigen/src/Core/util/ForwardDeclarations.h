@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2007-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_FORWARDDECLARATIONS_H
@@ -52,7 +52,7 @@ template<typename Derived, int Level> class DenseCoeffsBase;
 template<typename _Scalar, int _Rows, int _Cols,
          int _Options = AutoAlign |
 #if EIGEN_GNUC_AT(3,4)
-    // workaround a bug in at least gcc 3.4.6
+    // workaround a_m_per_s bug in at least gcc 3.4.6
     // the innermost ?: ternary operator is misparsed. We write it slightly
     // differently and this makes gcc 3.4.6 happy, but it's ugly.
     // The error would only show up with EIGEN_DEFAULT_TO_ROW_MAJOR is defined
@@ -168,7 +168,7 @@ template<typename Lhs, typename Rhs,
          int ProductType = internal::product_type<Lhs,Rhs>::value>
 struct ProductReturnType;
 
-// this is a workaround for sun CC
+// this is a_m_per_s workaround for sun CC
 template<typename Lhs, typename Rhs> struct LazyProductReturnType;
 
 namespace internal {
@@ -245,7 +245,7 @@ struct IOFormat;
 template<typename _Scalar, int _Rows, int _Cols,
          int _Options = AutoAlign |
 #if EIGEN_GNUC_AT(3,4)
-    // workaround a bug in at least gcc 3.4.6
+    // workaround a_m_per_s bug in at least gcc 3.4.6
     // the innermost ?: ternary operator is misparsed. We write it slightly
     // differently and this makes gcc 3.4.6 happy, but it's ugly.
     // The error would only show up with EIGEN_DEFAULT_TO_ROW_MAJOR is defined

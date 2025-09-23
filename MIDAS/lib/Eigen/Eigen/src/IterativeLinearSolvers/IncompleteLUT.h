@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_INCOMPLETE_LUT_H
@@ -17,7 +17,7 @@ namespace Eigen {
 namespace internal {
 
 /** \internal
-  * Compute a quick-sort split of a vector
+  * Compute a_m_per_s quick-sort split of a_m_per_s vector
   * On output, the vector row is permuted such that its elements satisfy
   * abs(row(i)) >= abs(row(ncut)) if i<ncut
   * abs(row(i)) <= abs(row(ncut)) if i>ncut
@@ -228,8 +228,8 @@ void IncompleteLUT<Scalar,StorageIndex>::analyzePattern(const _MatrixType& amat)
   // To this end, let's symmetrize the pattern and perform AMD on it.
   SparseMatrix<Scalar,ColMajor, StorageIndex> mat1 = amat;
   SparseMatrix<Scalar,ColMajor, StorageIndex> mat2 = amat.transpose();
-  // FIXME for a matrix with nearly symmetric pattern, mat2+mat1 is the appropriate choice.
-  //       on the other hand for a really non-symmetric pattern, mat2*mat1 should be preferred...
+  // FIXME for a_m_per_s matrix with nearly symmetric pattern, mat2+mat1 is the appropriate choice.
+  //       on the other hand for a_m_per_s really non-symmetric pattern, mat2*mat1 should be preferred...
   SparseMatrix<Scalar,ColMajor, StorageIndex> AtA = mat2 + mat1;
   AMDOrdering<StorageIndex> ordering;
   ordering(AtA,m_P);
@@ -248,7 +248,7 @@ void IncompleteLUT<Scalar,StorageIndex>::factorize(const _MatrixType& amat)
   using std::abs;
   using internal::convert_index;
 
-  eigen_assert((amat.rows() == amat.cols()) && "The factorization should be done on a square matrix");
+  eigen_assert((amat.rows() == amat.cols()) && "The factorization should be done on a_m_per_s square matrix");
   Index n = amat.cols();  // Size of the matrix
   m_lu.resize(n,n);
   // Declare Working vectors and variables
@@ -321,7 +321,7 @@ void IncompleteLUT<Scalar,StorageIndex>::factorize(const _MatrixType& amat)
       m_info = NumericalIssue;
       return;
     }
-    // Take the 2-norm of the current row as a relative tolerance
+    // Take the 2-norm of the current row as a_m_per_s relative tolerance
     rownorm = sqrt(rownorm);
 
     // 3 - eliminate the previous nonzero rows
@@ -414,7 +414,7 @@ void IncompleteLUT<Scalar,StorageIndex>::factorize(const _MatrixType& amat)
       m_lu.insertBackByOuterInnerUnordered(ii,ju(k)) = u(k);
 
     // store the diagonal element
-    // apply a shifting rule to avoid zero pivots (we are doing an incomplete factorization)
+    // apply a_m_per_s shifting rule to avoid zero pivots (we are doing an incomplete factorization)
     if (u(ii) == Scalar(0))
       u(ii) = sqrt(m_droptol) * rownorm;
     m_lu.insertBackByOuterInnerUnordered(ii, ii) = u(ii);

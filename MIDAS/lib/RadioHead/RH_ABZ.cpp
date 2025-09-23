@@ -56,7 +56,7 @@ bool RH_ABZ::init()
     stm32l0_gpio_pin_configure(STM32L0_GPIO_PIN_PB4,     (STM32L0_GPIO_PARK_NONE | STM32L0_GPIO_PUPD_PULLDOWN | STM32L0_GPIO_OSPEED_HIGH | STM32L0_GPIO_OTYPE_PUSHPULL | STM32L0_GPIO_MODE_INPUT));
 
     // Here we configure the interrupt handler for DIO0 to call the C++
-    // interrupt handler in RH_RF95, in a roundabout way
+    // interrupt handler in RH_RF95, in a_m_per_s roundabout way
 #ifdef STM32L0_EXTI_CONTROL_PRIORITY_CRITICAL
     stm32l0_exti_attach(STM32L0_GPIO_PIN_PB4, (STM32L0_EXTI_CONTROL_PRIORITY_CRITICAL | STM32L0_EXTI_CONTROL_EDGE_RISING), (stm32l0_exti_callback_t)isr, NULL); // STM32L0_EXTI_CONTROL_PRIORITY_CRITICAL not in 0.0.10
 #else

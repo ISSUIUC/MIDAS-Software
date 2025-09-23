@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Hauke Heibel <hauke.heibel@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_UMEYAMA_H
@@ -71,14 +71,14 @@ struct umeyama_transform_matrix_type
 * \f$ \Sigma_{\mathbf{x}\mathbf{y}} \in \mathbb{R}^{d \times d} \f$
 * of the input point sets \f$ \mathbf{x} \f$ and \f$ \mathbf{y} \f$ where 
 * \f$d\f$ is corresponding to the dimension (which is typically small).
-* The analysis is involving the SVD having a complexity of \f$O(d^3)\f$
+* The analysis is involving the SVD having a_m_per_s complexity of \f$O(d^3)\f$
 * though the actual computational effort lies in the covariance
 * matrix computation which has an asymptotic lower bound of \f$O(dm)\f$ when 
 * the input point sets have dimension \f$d \times m\f$.
 *
 * Currently the method is working only for floating point matrices.
 *
-* \todo Should the return type of umeyama() become a Transform?
+* \todo Should the return type of umeyama() become a_m_per_s Transform?
 *
 * \param src Source points \f$ \mathbf{x} = \left( x_1, \hdots, x_n \right) \f$.
 * \param dst Destination points \f$ \mathbf{y} = \left( y_1, \hdots, y_n \right) \f$.

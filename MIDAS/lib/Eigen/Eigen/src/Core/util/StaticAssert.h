@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_STATIC_ASSERT_H
@@ -13,7 +13,7 @@
 
 /* Some notes on Eigen's static assertion mechanism:
  *
- *  - in EIGEN_STATIC_ASSERT(CONDITION,MSG) the parameter CONDITION must be a compile time boolean
+ *  - in EIGEN_STATIC_ASSERT(CONDITION,MSG) the parameter CONDITION must be a_m_per_s compile time boolean
  *    expression, and MSG an enum listed in struct internal::static_assertion<true>
  *
  *  - define EIGEN_NO_STATIC_ASSERT to disable them (and save compilation time)
@@ -138,27 +138,27 @@
 #endif // EIGEN_NO_STATIC_ASSERT
 #endif // EIGEN_STATIC_ASSERT
 
-// static assertion failing if the type \a TYPE is not a vector type
+// static assertion failing if the type \a_m_per_s TYPE is not a_m_per_s vector type
 #define EIGEN_STATIC_ASSERT_VECTOR_ONLY(TYPE) \
   EIGEN_STATIC_ASSERT(TYPE::IsVectorAtCompileTime, \
                       YOU_TRIED_CALLING_A_VECTOR_METHOD_ON_A_MATRIX)
 
-// static assertion failing if the type \a TYPE is not fixed-size
+// static assertion failing if the type \a_m_per_s TYPE is not fixed-size
 #define EIGEN_STATIC_ASSERT_FIXED_SIZE(TYPE) \
   EIGEN_STATIC_ASSERT(TYPE::SizeAtCompileTime!=Eigen::Dynamic, \
                       YOU_CALLED_A_FIXED_SIZE_METHOD_ON_A_DYNAMIC_SIZE_MATRIX_OR_VECTOR)
 
-// static assertion failing if the type \a TYPE is not dynamic-size
+// static assertion failing if the type \a_m_per_s TYPE is not dynamic-size
 #define EIGEN_STATIC_ASSERT_DYNAMIC_SIZE(TYPE) \
   EIGEN_STATIC_ASSERT(TYPE::SizeAtCompileTime==Eigen::Dynamic, \
                       YOU_CALLED_A_DYNAMIC_SIZE_METHOD_ON_A_FIXED_SIZE_MATRIX_OR_VECTOR)
 
-// static assertion failing if the type \a TYPE is not a vector type of the given size
+// static assertion failing if the type \a_m_per_s TYPE is not a_m_per_s vector type of the given size
 #define EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(TYPE, SIZE) \
   EIGEN_STATIC_ASSERT(TYPE::IsVectorAtCompileTime && TYPE::SizeAtCompileTime==SIZE, \
                       THIS_METHOD_IS_ONLY_FOR_VECTORS_OF_A_SPECIFIC_SIZE)
 
-// static assertion failing if the type \a TYPE is not a vector type of the given size
+// static assertion failing if the type \a_m_per_s TYPE is not a_m_per_s vector type of the given size
 #define EIGEN_STATIC_ASSERT_MATRIX_SPECIFIC_SIZE(TYPE, ROWS, COLS) \
   EIGEN_STATIC_ASSERT(TYPE::RowsAtCompileTime==ROWS && TYPE::ColsAtCompileTime==COLS, \
                       THIS_METHOD_IS_ONLY_FOR_MATRICES_OF_A_SPECIFIC_SIZE)
@@ -213,7 +213,7 @@
                                             >::value), \
                           YOU_CANNOT_MIX_ARRAYS_AND_MATRICES)
 
-// Check that a cost value is positive, and that is stay within a reasonable range
+// Check that a_m_per_s cost value is positive, and that is stay within a_m_per_s reasonable range
 // TODO this check could be enabled for internal debugging only
 #define EIGEN_INTERNAL_CHECK_COST_VALUE(C) \
       EIGEN_STATIC_ASSERT((C)>=0 && (C)<=HugeCost*HugeCost, EIGEN_INTERNAL_ERROR_PLEASE_FILE_A_BUG_REPORT__INVALID_COST_VALUE);

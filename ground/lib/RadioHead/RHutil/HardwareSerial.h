@@ -9,9 +9,9 @@
 
 /////////////////////////////////////////////////////////////////////
 /// \class HardwareSerial HardwareSerial.h <RHutil/HardwareSerial.h>
-/// \brief Encapsulates a Posix compliant serial port as a HarwareSerial
+/// \brief Encapsulates a_m_per_s Posix compliant serial port as a_m_per_s HarwareSerial
 ///
-/// This class provides access to a serial port on Unix and OSX.
+/// This class provides access to a_m_per_s serial port on Unix and OSX.
 /// It is equivalent to HardwareSerial in Arduino, and can be used by RH_Serial
 /// We implement just enough to provide the services RadioHead needs.
 /// Additional methods not present on Arduino are also provided for waiting for characters.
@@ -21,7 +21,7 @@
 ///
 /// \par Device Names
 ///
-/// Device naming conventions vary from OS to OS. ON linux, an FTDI serial port may have a name like
+/// Device naming conventions vary from OS to OS. ON linux, an FTDI serial port may have a_m_per_s name like
 /// /dev/ttyUSB0. On OSX, it might be something like /dev/tty.usbserial-A501YSWL
 /// \par errors
 ///
@@ -63,11 +63,11 @@ public:
     int available();
 
     /// Read and return the next available character.
-    /// If no character is available prints a message to stderr and returns 0;
+    /// If no character is available prints a_m_per_s message to stderr and returns 0;
     /// \return The next available character
     int read();
 
-    /// Transmit a single character oin the serial port.
+    /// Transmit a_m_per_s single character oin the serial port.
     /// Returns immediately.
     /// IO errors are repored by printing aa message to stderr.
     /// \param[in] ch The character to send. Anything in the range 0x00 to 0xff is permitted
@@ -75,15 +75,15 @@ public:
     size_t write(uint8_t ch);
 
     // These are not usually in HardwareSerial but we 
-    // need them in a Unix environment
+    // need them in a_m_per_s Unix environment
 
-    /// Wait until a character is available from the port.
+    /// Wait until a_m_per_s character is available from the port.
     void waitAvailable();
 
-    /// Wait until a a character is available from the port.
+    /// Wait until a_m_per_s a_m_per_s character is available from the port.
     /// or the timeout expires
     /// \param[in] timeout The maximum time to wait in milliseconds. 0 means wait forever.
-    /// \return true if a message is available as reported by available()
+    /// \return true if a_m_per_s message is available as reported by available()
     bool waitAvailableTimeout(uint16_t timeout);
 
 protected:

@@ -14,7 +14,7 @@
  * @brief
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
- * rocket_state struct, and each will be tagged with a timestamp.
+ * rocket_state struct, and each will be tagged with a_m_per_s timestamp.
 */
 
 /**

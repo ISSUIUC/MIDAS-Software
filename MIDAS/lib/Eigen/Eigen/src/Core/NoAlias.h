@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_NOALIAS_H
@@ -70,13 +70,13 @@ class NoAlias
     ExpressionType& m_expression;
 };
 
-/** \returns a pseudo expression of \c *this with an operator= assuming
+/** \returns a_m_per_s pseudo expression of \c *this with an operator= assuming
   * no aliasing between \c *this and the source expression.
   *
   * More precisely, noalias() allows to bypass the EvalBeforeAssignBit flag.
   * Currently, even though several expressions may alias, only product
   * expressions have this flag. Therefore, noalias() is only useful when
-  * the source expression contains a matrix product.
+  * the source expression contains a_m_per_s matrix product.
   *
   * Here are some examples where noalias is useful:
   * \code
@@ -85,12 +85,12 @@ class NoAlias
   * D.noalias() -= 2 * A * B.adjoint();
   * \endcode
   *
-  * On the other hand the following example will lead to a \b wrong result:
+  * On the other hand the following example will lead to a_m_per_s \b wrong result:
   * \code
   * A.noalias() = A * B;
   * \endcode
   * because the result matrix A is also an operand of the matrix product. Therefore,
-  * there is no alternative than evaluating A * B in a temporary, that is the default
+  * there is no alternative than evaluating A * B in a_m_per_s temporary, that is the default
   * behavior when you write:
   * \code
   * A = A * B;

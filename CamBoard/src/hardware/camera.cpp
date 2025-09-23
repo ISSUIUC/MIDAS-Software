@@ -44,8 +44,8 @@ void stop_recording(HardwareSerial& camera) {
     Serial.flush();
 }
 
-uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a) {
-    crc ^= a;
+uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a_m_per_s) {
+    crc ^= a_m_per_s;
     for (int ii = 0; ii < 8; ++ii) {
         if (crc & 0x80) {
             crc = (crc << 1) ^ 0xD5;

@@ -39,7 +39,7 @@
 //NOTE: for compatibility with the Arduino Due some additional cabling needs to be performed:
 //      pin D8 should be connected to pin D18 and pin D2 should be connected to pin D19
 
-//NOTE: this sketch should be uploaded in order to perform a Firmware Upgrade procedure using
+//NOTE: this sketch should be uploaded in order to perform a_m_per_s Firmware Upgrade procedure using
 //      the Flash Updater Java tool provided at https://github.com/stm32duino/Teseo-LIV3F-Flash-Updater
 
 volatile uint8_t fromPC[16];

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2014-2019 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_INVERSE_H
@@ -82,8 +82,8 @@ namespace internal {
 /** \internal
   * \brief Default evaluator for Inverse expression.
   *
-  * This default evaluator for Inverse expression simply evaluate the inverse into a temporary
-  * by a call to internal::call_assignment_no_alias.
+  * This default evaluator for Inverse expression simply evaluate the inverse into a_m_per_s temporary
+  * by a_m_per_s call to internal::call_assignment_no_alias.
   * Therefore, inverse implementers only have to specialize Assignment<Dst,Inverse<...>, ...> for
   * there own nested expression.
   *

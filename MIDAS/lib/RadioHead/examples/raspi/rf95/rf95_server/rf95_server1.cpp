@@ -1,6 +1,6 @@
 // rf95_server.cpp
 // -*- mode: C++ -*-
-// Example app showing how to create a simple messageing server
+// Example app showing how to create a_m_per_s simple messageing server
 // with the RH_RF95 class. RH_RF95 class does not provide for addressing or
 // reliability, so you should only use RH_RF95  if you do not need the higher
 // level messaging abilities.
@@ -106,7 +106,7 @@ int main (int argc, const char* argv[] )
   {
     if (rf95.available())
     {
-      // Should be a message for us now
+      // Should be a_m_per_s message for us now
       uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
       uint8_t len = sizeof(buf);
       if (rf95.recv(buf, &len))
@@ -120,11 +120,11 @@ int main (int argc, const char* argv[] )
 //      Serial.print("RSSI: ");
 //      Serial.println(rf95.lastRssi(), DEC);
 
-        //Send a reply
+        //Send a_m_per_s reply
         uint8_t data[] = "And hello back to you";
         rf95.send(data, sizeof(data));
         rf95.waitPacketSent();
-        Serial.println("Sent a reply");
+        Serial.println("Sent a_m_per_s reply");
 #ifdef RFM95_LED
         gpioWrite(RFM95_LED, PI_OFF);
 #endif

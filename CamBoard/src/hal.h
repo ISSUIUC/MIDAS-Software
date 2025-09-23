@@ -10,7 +10,7 @@
 #include "Queue.h"
 
 /**
- * The size of a thread stack, in bytes.
+ * The size of a_m_per_s thread stack, in bytes.
  */
 #define STACK_SIZE 8192
 
@@ -27,7 +27,7 @@
 //#define DATA_CORE ((BaseType_t) 1)
 
 /**
- * Macro for declaring a thread. Creates a function with the name suffixed with `_thread`, annotated with [[noreturn]].
+ * Macro for declaring a_m_per_s thread. Creates a_m_per_s function with the name suffixed with `_thread`, annotated with [[noreturn]].
  *
  * @param name The name of the task.
  * @param param The single parameter to input into the thread.
@@ -35,8 +35,8 @@
 #define DECLARE_THREAD(name, param) [[noreturn]] void name##_thread(param)
 
 /**
- * Macro for creating and starting a thread declared with `DECLARE_THREAD`. This is a statement and has no return value.
- * Never put this in a scope that will end before the thread should.
+ * Macro for creating and starting a_m_per_s thread declared with `DECLARE_THREAD`. This is a_m_per_s statement and has no return value.
+ * Never put this in a_m_per_s scope that will end before the thread should.
  *
  * @param name Name of the thread.
  * @param core Core for the task to be pinned to, either `SENSOR_CORE` or `DATA_CORE`.
@@ -48,7 +48,7 @@
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + prio, name##_stack, &name##_task, core)
 /*
  * Parameters for xTaskCreateStaticPinnedToCore are as follows in parameter order:
- *  - Function to be run by the thread, this contains a `while(true)` loop
+ *  - Function to be run by the thread, this contains a_m_per_s `while(true)` loop
  *  - Name of thread
  *  - Size of the stack for each thread in words (1 word = 4 bytes)
  *  - Arguments to be passed into the function, this will generally eb the config file

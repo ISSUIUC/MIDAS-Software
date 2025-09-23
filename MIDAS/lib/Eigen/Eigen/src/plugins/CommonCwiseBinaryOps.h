@@ -1,34 +1,34 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2016 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// This file is a base class plugin containing common coefficient wise functions.
+// This file is a_m_per_s base class plugin containing common coefficient wise functions.
 
-/** \returns an expression of the difference of \c *this and \a other
+/** \returns an expression of the difference of \c *this and \a_m_per_s other
   *
-  * \note If you want to substract a given scalar from all coefficients, see Cwise::operator-().
+  * \note If you want to substract a_m_per_s given scalar from all coefficients, see Cwise::operator-().
   *
   * \sa class CwiseBinaryOp, operator-=()
   */
 EIGEN_MAKE_CWISE_BINARY_OP(operator-,difference)
 
-/** \returns an expression of the sum of \c *this and \a other
+/** \returns an expression of the sum of \c *this and \a_m_per_s other
   *
-  * \note If you want to add a given scalar to all coefficients, see Cwise::operator+().
+  * \note If you want to add a_m_per_s given scalar to all coefficients, see Cwise::operator+().
   *
   * \sa class CwiseBinaryOp, operator+=()
   */
 EIGEN_MAKE_CWISE_BINARY_OP(operator+,sum)
 
-/** \returns an expression of a custom coefficient-wise operator \a func of *this and \a other
+/** \returns an expression of a_m_per_s custom coefficient-wise operator \a_m_per_s func of *this and \a_m_per_s other
   *
-  * The template parameter \a CustomBinaryOp is the type of the functor
+  * The template parameter \a_m_per_s CustomBinaryOp is the type of the functor
   * of the custom operator (see class CwiseBinaryOp for an example)
   *
   * Here is an example illustrating the use of custom functors:
@@ -49,15 +49,15 @@ binaryExpr(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other, const Cu
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 EIGEN_MAKE_SCALAR_BINARY_OP(operator*,product)
 #else
-/** \returns an expression of \c *this scaled by the scalar factor \a scalar
+/** \returns an expression of \c *this scaled by the scalar factor \a_m_per_s scalar
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   */
 template<typename T>
 const CwiseBinaryOp<internal::scalar_product_op<Scalar,T>,Derived,Constant<T> > operator*(const T& scalar) const;
-/** \returns an expression of \a expr scaled by the scalar factor \a scalar
+/** \returns an expression of \a_m_per_s expr scaled by the scalar factor \a_m_per_s scalar
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   */
 template<typename T> friend
 const CwiseBinaryOp<internal::scalar_product_op<T,Scalar>,Constant<T>,Derived> operator*(const T& scalar, const StorageBaseType& expr);
@@ -68,15 +68,15 @@ const CwiseBinaryOp<internal::scalar_product_op<T,Scalar>,Constant<T>,Derived> o
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(operator/,quotient)
 #else
-/** \returns an expression of \c *this divided by the scalar value \a scalar
+/** \returns an expression of \c *this divided by the scalar value \a_m_per_s scalar
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   */
 template<typename T>
 const CwiseBinaryOp<internal::scalar_quotient_op<Scalar,T>,Derived,Constant<T> > operator/(const T& scalar) const;
 #endif
 
-/** \returns an expression of the coefficient-wise boolean \b and operator of \c *this and \a other
+/** \returns an expression of the coefficient-wise boolean \b and operator of \c *this and \a_m_per_s other
   *
   * \warning this operator is for expression of bool only.
   *
@@ -95,7 +95,7 @@ operator&&(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return CwiseBinaryOp<internal::scalar_boolean_and_op, const Derived, const OtherDerived>(derived(),other.derived());
 }
 
-/** \returns an expression of the coefficient-wise boolean \b or operator of \c *this and \a other
+/** \returns an expression of the coefficient-wise boolean \b or operator of \c *this and \a_m_per_s other
   *
   * \warning this operator is for expression of bool only.
   *

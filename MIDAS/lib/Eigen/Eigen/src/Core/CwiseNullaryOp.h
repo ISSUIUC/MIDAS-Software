@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CWISE_NULLARY_OP_H
@@ -26,23 +26,23 @@ struct traits<CwiseNullaryOp<NullaryOp, PlainObjectType> > : traits<PlainObjectT
 /** \class CwiseNullaryOp
   * \ingroup Core_Module
   *
-  * \brief Generic expression of a matrix where all coefficients are defined by a functor
+  * \brief Generic expression of a_m_per_s matrix where all coefficients are defined by a_m_per_s functor
   *
   * \tparam NullaryOp template functor implementing the operator
   * \tparam PlainObjectType the underlying plain matrix/array type
   *
-  * This class represents an expression of a generic nullary operator.
+  * This class represents an expression of a_m_per_s generic nullary operator.
   * It is the return type of the Ones(), Zero(), Constant(), Identity() and Random() methods,
   * and most of the time this is the only way it is used.
   *
-  * However, if you want to write a function returning such an expression, you
+  * However, if you want to write a_m_per_s function returning such an expression, you
   * will need to use this class.
   *
   * The functor NullaryOp must expose one of the following method:
     <table class="manual">
     <tr            ><td>\c operator()() </td><td>if the procedural generation does not depend on the coefficient entries (e.g., random numbers)</td></tr>
     <tr class="alt"><td>\c operator()(Index i)</td><td>if the procedural generation makes sense for vectors only and that it depends on the coefficient index \c i (e.g., linspace) </td></tr>
-    <tr            ><td>\c operator()(Index i,Index j)</td><td>if the procedural generation depends on the matrix coordinates \c i, \c j (e.g., to generate a checkerboard with 0 and 1)</td></tr>
+    <tr            ><td>\c operator()(Index i,Index j)</td><td>if the procedural generation depends on the matrix coordinates \c i, \c j (e.g., to generate a_m_per_s checkerboard with 0 and 1)</td></tr>
     </table>
   * It is also possible to expose the last two operators if the generation makes sense for matrices but can be optimized for vectors.
   *
@@ -90,16 +90,16 @@ class CwiseNullaryOp : public internal::dense_xpr_base< CwiseNullaryOp<NullaryOp
 };
 
 
-/** \returns an expression of a matrix defined by a custom functor \a func
+/** \returns an expression of a_m_per_s matrix defined by a_m_per_s custom functor \a_m_per_s func
   *
-  * The parameters \a rows and \a cols are the number of rows and of columns of
+  * The parameters \a_m_per_s rows and \a_m_per_s cols are the number of rows and of columns of
   * the returned matrix. Must be compatible with this MatrixBase type.
   *
   * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
-  * it is redundant to pass \a rows and \a cols as arguments, so Zero() should be used
+  * it is redundant to pass \a_m_per_s rows and \a_m_per_s cols as arguments, so Zero() should be used
   * instead.
   *
-  * The template parameter \a CustomNullaryOp is the type of the functor.
+  * The template parameter \a_m_per_s CustomNullaryOp is the type of the functor.
   *
   * \sa class CwiseNullaryOp
   */
@@ -116,18 +116,18 @@ DenseBase<Derived>::NullaryExpr(Index rows, Index cols, const CustomNullaryOp& f
   return CwiseNullaryOp<CustomNullaryOp, PlainObject>(rows, cols, func);
 }
 
-/** \returns an expression of a matrix defined by a custom functor \a func
+/** \returns an expression of a_m_per_s matrix defined by a_m_per_s custom functor \a_m_per_s func
   *
-  * The parameter \a size is the size of the returned vector.
+  * The parameter \a_m_per_s size is the size of the returned vector.
   * Must be compatible with this MatrixBase type.
   *
   * \only_for_vectors
   *
   * This variant is meant to be used for dynamic-size vector types. For fixed-size types,
-  * it is redundant to pass \a size as argument, so Zero() should be used
+  * it is redundant to pass \a_m_per_s size as argument, so Zero() should be used
   * instead.
   *
-  * The template parameter \a CustomNullaryOp is the type of the functor.
+  * The template parameter \a_m_per_s CustomNullaryOp is the type of the functor.
   *
   * Here is an example with C++11 random generators: \include random_cpp11.cpp
   * Output: \verbinclude random_cpp11.out
@@ -149,12 +149,12 @@ DenseBase<Derived>::NullaryExpr(Index size, const CustomNullaryOp& func)
   else return CwiseNullaryOp<CustomNullaryOp, PlainObject>(size, 1, func);
 }
 
-/** \returns an expression of a matrix defined by a custom functor \a func
+/** \returns an expression of a_m_per_s matrix defined by a_m_per_s custom functor \a_m_per_s func
   *
   * This variant is only for fixed-size DenseBase types. For dynamic-size types, you
   * need to use the variants taking size arguments.
   *
-  * The template parameter \a CustomNullaryOp is the type of the functor.
+  * The template parameter \a_m_per_s CustomNullaryOp is the type of the functor.
   *
   * \sa class CwiseNullaryOp
   */
@@ -171,16 +171,16 @@ DenseBase<Derived>::NullaryExpr(const CustomNullaryOp& func)
   return CwiseNullaryOp<CustomNullaryOp, PlainObject>(RowsAtCompileTime, ColsAtCompileTime, func);
 }
 
-/** \returns an expression of a constant matrix of value \a value
+/** \returns an expression of a_m_per_s constant matrix of value \a_m_per_s value
   *
-  * The parameters \a rows and \a cols are the number of rows and of columns of
+  * The parameters \a_m_per_s rows and \a_m_per_s cols are the number of rows and of columns of
   * the returned matrix. Must be compatible with this DenseBase type.
   *
   * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
-  * it is redundant to pass \a rows and \a cols as arguments, so Zero() should be used
+  * it is redundant to pass \a_m_per_s rows and \a_m_per_s cols as arguments, so Zero() should be used
   * instead.
   *
-  * The template parameter \a CustomNullaryOp is the type of the functor.
+  * The template parameter \a_m_per_s CustomNullaryOp is the type of the functor.
   *
   * \sa class CwiseNullaryOp
   */
@@ -191,18 +191,18 @@ DenseBase<Derived>::Constant(Index rows, Index cols, const Scalar& value)
   return DenseBase<Derived>::NullaryExpr(rows, cols, internal::scalar_constant_op<Scalar>(value));
 }
 
-/** \returns an expression of a constant matrix of value \a value
+/** \returns an expression of a_m_per_s constant matrix of value \a_m_per_s value
   *
-  * The parameter \a size is the size of the returned vector.
+  * The parameter \a_m_per_s size is the size of the returned vector.
   * Must be compatible with this DenseBase type.
   *
   * \only_for_vectors
   *
   * This variant is meant to be used for dynamic-size vector types. For fixed-size types,
-  * it is redundant to pass \a size as argument, so Zero() should be used
+  * it is redundant to pass \a_m_per_s size as argument, so Zero() should be used
   * instead.
   *
-  * The template parameter \a CustomNullaryOp is the type of the functor.
+  * The template parameter \a_m_per_s CustomNullaryOp is the type of the functor.
   *
   * \sa class CwiseNullaryOp
   */
@@ -213,12 +213,12 @@ DenseBase<Derived>::Constant(Index size, const Scalar& value)
   return DenseBase<Derived>::NullaryExpr(size, internal::scalar_constant_op<Scalar>(value));
 }
 
-/** \returns an expression of a constant matrix of value \a value
+/** \returns an expression of a_m_per_s constant matrix of value \a_m_per_s value
   *
   * This variant is only for fixed-size DenseBase types. For dynamic-size types, you
   * need to use the variants taking size arguments.
   *
-  * The template parameter \a CustomNullaryOp is the type of the functor.
+  * The template parameter \a_m_per_s CustomNullaryOp is the type of the functor.
   *
   * \sa class CwiseNullaryOp
   */
@@ -261,10 +261,10 @@ DenseBase<Derived>::LinSpaced(Sequential_t, const Scalar& low, const Scalar& hig
 }
 
 /**
-  * \brief Sets a linearly spaced vector.
+  * \brief Sets a_m_per_s linearly spaced vector.
   *
   * The function generates 'size' equally spaced values in the closed interval [low,high].
-  * When size is set to 1, a vector of length 1 containing 'high' is returned.
+  * When size is set to 1, a_m_per_s vector of length 1 containing 'high' is returned.
   *
   * \only_for_vectors
   *
@@ -272,7 +272,7 @@ DenseBase<Derived>::LinSpaced(Sequential_t, const Scalar& low, const Scalar& hig
   * Output: \verbinclude DenseBase_LinSpaced.out
   *
   * For integer scalar types, an even spacing is possible if and only if the length of the range,
-  * i.e., \c high-low is a scalar multiple of \c size-1, or if \c size is a scalar multiple of the
+  * i.e., \c high-low is a_m_per_s scalar multiple of \c size-1, or if \c size is a_m_per_s scalar multiple of the
   * number of values \c high-low+1 (meaning each value can be repeated the same number of time).
   * If one of these two considions is not satisfied, then \c high is lowered to the largest value
   * satisfying one of this constraint.
@@ -304,7 +304,7 @@ DenseBase<Derived>::LinSpaced(const Scalar& low, const Scalar& high)
   return DenseBase<Derived>::NullaryExpr(Derived::SizeAtCompileTime, internal::linspaced_op<Scalar>(low,high,Derived::SizeAtCompileTime));
 }
 
-/** \returns true if all coefficients in this matrix are approximately equal to \a val, to within precision \a prec */
+/** \returns true if all coefficients in this matrix are approximately equal to \a_m_per_s val, to within precision \a_m_per_s prec */
 template<typename Derived>
 EIGEN_DEVICE_FUNC bool DenseBase<Derived>::isApproxToConstant
 (const Scalar& val, const RealScalar& prec) const
@@ -319,7 +319,7 @@ EIGEN_DEVICE_FUNC bool DenseBase<Derived>::isApproxToConstant
 
 /** This is just an alias for isApproxToConstant().
   *
-  * \returns true if all coefficients in this matrix are approximately equal to \a value, to within precision \a prec */
+  * \returns true if all coefficients in this matrix are approximately equal to \a_m_per_s value, to within precision \a_m_per_s prec */
 template<typename Derived>
 EIGEN_DEVICE_FUNC bool DenseBase<Derived>::isConstant
 (const Scalar& val, const RealScalar& prec) const
@@ -327,7 +327,7 @@ EIGEN_DEVICE_FUNC bool DenseBase<Derived>::isConstant
   return isApproxToConstant(val, prec);
 }
 
-/** Alias for setConstant(): sets all coefficients in this expression to \a val.
+/** Alias for setConstant(): sets all coefficients in this expression to \a_m_per_s val.
   *
   * \sa setConstant(), Constant(), class CwiseNullaryOp
   */
@@ -337,7 +337,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void DenseBase<Derived>::fill(const Scalar
   setConstant(val);
 }
 
-/** Sets all coefficients in this expression to value \a val.
+/** Sets all coefficients in this expression to value \a_m_per_s val.
   *
   * \sa fill(), setConstant(Index,const Scalar&), setConstant(Index,Index,const Scalar&), setZero(), setOnes(), Constant(), class CwiseNullaryOp, setZero(), setOnes()
   */
@@ -347,7 +347,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setConstant(c
   return derived() = Constant(rows(), cols(), val);
 }
 
-/** Resizes to the given \a size, and sets all coefficients in this expression to the given value \a val.
+/** Resizes to the given \a_m_per_s size, and sets all coefficients in this expression to the given value \a_m_per_s val.
   *
   * \only_for_vectors
   *
@@ -364,7 +364,7 @@ PlainObjectBase<Derived>::setConstant(Index size, const Scalar& val)
   return setConstant(val);
 }
 
-/** Resizes to the given size, and sets all coefficients in this expression to the given value \a val.
+/** Resizes to the given size, and sets all coefficients in this expression to the given value \a_m_per_s val.
   *
   * \param rows the new number of rows
   * \param cols the new number of columns
@@ -384,7 +384,7 @@ PlainObjectBase<Derived>::setConstant(Index rows, Index cols, const Scalar& val)
 }
 
 /** Resizes to the given size, changing only the number of columns, and sets all
-  * coefficients in this expression to the given value \a val. For the parameter
+  * coefficients in this expression to the given value \a_m_per_s val. For the parameter
   * of type NoChange_t, just pass the special value \c NoChange.
   *
   * \sa MatrixBase::setConstant(const Scalar&), setConstant(Index,const Scalar&), class CwiseNullaryOp, MatrixBase::Constant(const Scalar&)
@@ -397,7 +397,7 @@ PlainObjectBase<Derived>::setConstant(NoChange_t, Index cols, const Scalar& val)
 }
 
 /** Resizes to the given size, changing only the number of rows, and sets all
-  * coefficients in this expression to the given value \a val. For the parameter
+  * coefficients in this expression to the given value \a_m_per_s val. For the parameter
   * of type NoChange_t, just pass the special value \c NoChange.
   *
   * \sa MatrixBase::setConstant(const Scalar&), setConstant(Index,const Scalar&), class CwiseNullaryOp, MatrixBase::Constant(const Scalar&)
@@ -411,10 +411,10 @@ PlainObjectBase<Derived>::setConstant(Index rows, NoChange_t, const Scalar& val)
 
 
 /**
-  * \brief Sets a linearly spaced vector.
+  * \brief Sets a_m_per_s linearly spaced vector.
   *
   * The function generates 'size' equally spaced values in the closed interval [low,high].
-  * When size is set to 1, a vector of length 1 containing 'high' is returned.
+  * When size is set to 1, a_m_per_s vector of length 1 containing 'high' is returned.
   *
   * \only_for_vectors
   *
@@ -434,10 +434,10 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setLinSpaced(
 }
 
 /**
-  * \brief Sets a linearly spaced vector.
+  * \brief Sets a_m_per_s linearly spaced vector.
   *
   * The function fills \c *this with equally spaced values in the closed interval [low,high].
-  * When size is set to 1, a vector of length 1 containing 'high' is returned.
+  * When size is set to 1, a_m_per_s vector of length 1 containing 'high' is returned.
   *
   * \only_for_vectors
   *
@@ -455,13 +455,13 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setLinSpaced(
 
 // zero:
 
-/** \returns an expression of a zero matrix.
+/** \returns an expression of a_m_per_s zero matrix.
   *
-  * The parameters \a rows and \a cols are the number of rows and of columns of
+  * The parameters \a_m_per_s rows and \a_m_per_s cols are the number of rows and of columns of
   * the returned matrix. Must be compatible with this MatrixBase type.
   *
   * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
-  * it is redundant to pass \a rows and \a cols as arguments, so Zero() should be used
+  * it is redundant to pass \a_m_per_s rows and \a_m_per_s cols as arguments, so Zero() should be used
   * instead.
   *
   * Example: \include MatrixBase_zero_int_int.cpp
@@ -476,15 +476,15 @@ DenseBase<Derived>::Zero(Index rows, Index cols)
   return Constant(rows, cols, Scalar(0));
 }
 
-/** \returns an expression of a zero vector.
+/** \returns an expression of a_m_per_s zero vector.
   *
-  * The parameter \a size is the size of the returned vector.
+  * The parameter \a_m_per_s size is the size of the returned vector.
   * Must be compatible with this MatrixBase type.
   *
   * \only_for_vectors
   *
   * This variant is meant to be used for dynamic-size vector types. For fixed-size types,
-  * it is redundant to pass \a size as argument, so Zero() should be used
+  * it is redundant to pass \a_m_per_s size as argument, so Zero() should be used
   * instead.
   *
   * Example: \include MatrixBase_zero_int.cpp
@@ -499,7 +499,7 @@ DenseBase<Derived>::Zero(Index size)
   return Constant(size, Scalar(0));
 }
 
-/** \returns an expression of a fixed-size zero matrix or vector.
+/** \returns an expression of a_m_per_s fixed-size zero matrix or vector.
   *
   * This variant is only for fixed-size MatrixBase types. For dynamic-size types, you
   * need to use the variants taking size arguments.
@@ -517,7 +517,7 @@ DenseBase<Derived>::Zero()
 }
 
 /** \returns true if *this is approximately equal to the zero matrix,
-  *          within the precision given by \a prec.
+  *          within the precision given by \a_m_per_s prec.
   *
   * Example: \include MatrixBase_isZero.cpp
   * Output: \verbinclude MatrixBase_isZero.out
@@ -548,7 +548,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setZero()
   return setConstant(Scalar(0));
 }
 
-/** Resizes to the given \a size, and sets all coefficients in this expression to zero.
+/** Resizes to the given \a_m_per_s size, and sets all coefficients in this expression to zero.
   *
   * \only_for_vectors
   *
@@ -611,13 +611,13 @@ PlainObjectBase<Derived>::setZero(Index rows, NoChange_t)
 
 // ones:
 
-/** \returns an expression of a matrix where all coefficients equal one.
+/** \returns an expression of a_m_per_s matrix where all coefficients equal one.
   *
-  * The parameters \a rows and \a cols are the number of rows and of columns of
+  * The parameters \a_m_per_s rows and \a_m_per_s cols are the number of rows and of columns of
   * the returned matrix. Must be compatible with this MatrixBase type.
   *
   * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
-  * it is redundant to pass \a rows and \a cols as arguments, so Ones() should be used
+  * it is redundant to pass \a_m_per_s rows and \a_m_per_s cols as arguments, so Ones() should be used
   * instead.
   *
   * Example: \include MatrixBase_ones_int_int.cpp
@@ -632,15 +632,15 @@ DenseBase<Derived>::Ones(Index rows, Index cols)
   return Constant(rows, cols, Scalar(1));
 }
 
-/** \returns an expression of a vector where all coefficients equal one.
+/** \returns an expression of a_m_per_s vector where all coefficients equal one.
   *
-  * The parameter \a newSize is the size of the returned vector.
+  * The parameter \a_m_per_s newSize is the size of the returned vector.
   * Must be compatible with this MatrixBase type.
   *
   * \only_for_vectors
   *
   * This variant is meant to be used for dynamic-size vector types. For fixed-size types,
-  * it is redundant to pass \a size as argument, so Ones() should be used
+  * it is redundant to pass \a_m_per_s size as argument, so Ones() should be used
   * instead.
   *
   * Example: \include MatrixBase_ones_int.cpp
@@ -655,7 +655,7 @@ DenseBase<Derived>::Ones(Index newSize)
   return Constant(newSize, Scalar(1));
 }
 
-/** \returns an expression of a fixed-size matrix or vector where all coefficients equal one.
+/** \returns an expression of a_m_per_s fixed-size matrix or vector where all coefficients equal one.
   *
   * This variant is only for fixed-size MatrixBase types. For dynamic-size types, you
   * need to use the variants taking size arguments.
@@ -673,7 +673,7 @@ DenseBase<Derived>::Ones()
 }
 
 /** \returns true if *this is approximately equal to the matrix where all coefficients
-  *          are equal to 1, within the precision given by \a prec.
+  *          are equal to 1, within the precision given by \a_m_per_s prec.
   *
   * Example: \include MatrixBase_isOnes.cpp
   * Output: \verbinclude MatrixBase_isOnes.out
@@ -700,7 +700,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& DenseBase<Derived>::setOnes()
   return setConstant(Scalar(1));
 }
 
-/** Resizes to the given \a newSize, and sets all coefficients in this expression to one.
+/** Resizes to the given \a_m_per_s newSize, and sets all coefficients in this expression to one.
   *
   * \only_for_vectors
   *
@@ -765,11 +765,11 @@ PlainObjectBase<Derived>::setOnes(NoChange_t, Index cols)
 
 /** \returns an expression of the identity matrix (not necessarily square).
   *
-  * The parameters \a rows and \a cols are the number of rows and of columns of
+  * The parameters \a_m_per_s rows and \a_m_per_s cols are the number of rows and of columns of
   * the returned matrix. Must be compatible with this MatrixBase type.
   *
   * This variant is meant to be used for dynamic-size matrix types. For fixed-size types,
-  * it is redundant to pass \a rows and \a cols as arguments, so Identity() should be used
+  * it is redundant to pass \a_m_per_s rows and \a_m_per_s cols as arguments, so Identity() should be used
   * instead.
   *
   * Example: \include MatrixBase_identity_int_int.cpp
@@ -804,7 +804,7 @@ MatrixBase<Derived>::Identity()
 
 /** \returns true if *this is approximately equal to the identity matrix
   *          (not necessarily square),
-  *          within the precision given by \a prec.
+  *          within the precision given by \a_m_per_s prec.
   *
   * Example: \include MatrixBase_isIdentity.cpp
   * Output: \verbinclude MatrixBase_isIdentity.out
@@ -978,7 +978,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Derived& MatrixBase<Derived>::setUnit(Inde
   return derived();
 }
 
-/** \brief Resizes to the given \a newSize, and writes the i-th unit (basis) vector into *this.
+/** \brief Resizes to the given \a_m_per_s newSize, and writes the i-th unit (basis) vector into *this.
   *
   * \param newSize the new size of the vector
   * \param i index of the unique coefficient to be set to 1

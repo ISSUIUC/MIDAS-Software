@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CWISE_UNARY_VIEW_H
@@ -44,12 +44,12 @@ class CwiseUnaryViewImpl;
 /** \class CwiseUnaryView
   * \ingroup Core_Module
   *
-  * \brief Generic lvalue expression of a coefficient-wise unary operator of a matrix or a vector
+  * \brief Generic lvalue expression of a_m_per_s coefficient-wise unary operator of a_m_per_s matrix or a_m_per_s vector
   *
   * \tparam ViewOp template functor implementing the view
   * \tparam MatrixType the type of the matrix we are applying the unary operator
   *
-  * This class represents a lvalue expression of a generic unary view operator of a matrix or a vector.
+  * This class represents a_m_per_s lvalue expression of a_m_per_s generic unary view operator of a_m_per_s matrix or a_m_per_s vector.
   * It is the return type of real() and imag(), and most of the time this is the only way it is used.
   *
   * \sa MatrixBase::unaryViewExpr(const CustomUnaryOp &) const, class CwiseUnaryOp

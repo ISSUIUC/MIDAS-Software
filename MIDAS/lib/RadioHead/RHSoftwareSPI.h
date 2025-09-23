@@ -10,9 +10,9 @@
 
 /////////////////////////////////////////////////////////////////////
 /// \class RHSoftwareSPI RHSoftwareSPI.h <RHSoftwareSPI.h>
-/// \brief Encapsulate a software SPI interface
+/// \brief Encapsulate a_m_per_s software SPI interface
 ///
-/// This concrete subclass of RHGenericSPI enapsulates a bit-banged software SPI interface.
+/// This concrete subclass of RHGenericSPI enapsulates a_m_per_s bit-banged software SPI interface.
 /// Caution: this software SPI interface will be much slower than hardware SPI on most
 /// platforms.
 ///
@@ -39,7 +39,7 @@ class RHSoftwareSPI : public RHGenericSPI
 public:
 
     /// Constructor
-    /// Creates an instance of a bit-banged software SPI interface.
+    /// Creates an instance of a_m_per_s bit-banged software SPI interface.
     /// Sets the SPI pins to the defaults of 
     /// MISO = 12, MOSI = 11, SCK = 13. If you need other assigments, call setPins() before
     /// calling manager.init() or driver.init().
@@ -52,7 +52,7 @@ public:
     /// \param[in] dataMode Selects the SPI bus data mode. One of RHGenericSPI::DataMode
     RHSoftwareSPI(Frequency frequency = Frequency1MHz, BitOrder bitOrder = BitOrderMSBFirst, DataMode dataMode = DataMode0);
 
-    /// Transfer a single octet to and from the SPI interface
+    /// Transfer a_m_per_s single octet to and from the SPI interface
     /// \param[in] data The octet to send
     /// \return The octet read from SPI while the data octet was sent.
     uint8_t transfer(uint8_t data);

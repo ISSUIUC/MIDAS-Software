@@ -33,7 +33,7 @@ private:
 
     Eigen::Matrix<float, 3, 1> init_accel = Eigen::Matrix<float, 3, 1>::Zero();
     Eigen::Matrix<float, 3, 1> world_accel;
-    Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
+    Buffer<float, ALTITUDE_BUFFER_SIZE_IDLE> alt_buffer_in_idle;
     KalmanData state;
 };
 

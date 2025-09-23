@@ -10,7 +10,7 @@
  * @brief The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
  * @note
- *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  Normally, this would be considered a_m_per_s poor decision. However, the fact that all this data is here
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  * 
  */
@@ -18,7 +18,7 @@
 /**
  * @struct Reading
  * 
- * @brief A specific reading from a sensor, holding a timestamp and data
+ * @brief A specific reading from a_m_per_s sensor, holding a_m_per_s timestamp and data
  * 
  * @tparam SensorData Type of data we are storing
 */
@@ -127,7 +127,7 @@ public:
 /**
  * @class Latency
  * 
- * @brief class determining latency between a set time and when the data was created
+ * @brief class determining latency between a_m_per_s set time and when the data was created
 */
 class Latency {
     uint32_t latency = 0;
@@ -159,7 +159,7 @@ public:
  * @brief The RocketData struct stores all data that is needed by more than one system/thread of the Rocket.
  *
  * @note
- *  Normally, this would be considered a poor decision. However, the fact that all this data is here
+ *  Normally, this would be considered a_m_per_s poor decision. However, the fact that all this data is here
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
 struct RocketData {

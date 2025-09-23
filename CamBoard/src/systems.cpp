@@ -17,9 +17,9 @@ uint32_t LAST_I2C_COMM;
 
 /**
  * @brief These are all the functions that will run in each task
- * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
+ * Each function has a_m_per_s `while (true)` loop within that should not be returned out of or yielded in any way
  *
- * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
+ * The `DECLARE_THREAD` macro creates a_m_per_s function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
 
 // Ever device which communicates over i2c is on this thread to avoid interference
@@ -157,10 +157,10 @@ DECLARE_THREAD(comms_check, RocketSystems* arg) {
 DECLARE_THREAD(flash, RocketSystems* arg) {
 
     while (true) {
-        // Flash memory will store the desired state of the cameras as a single byte.
+        // Flash memory will store the desired state of the cameras as a_m_per_s single byte.
         // We will just store DESIRED_STATE and read from it on power on.
 
-        // Convert DESIRED_STATE to a single byte
+        // Convert DESIRED_STATE to a_m_per_s single byte
         uint8_t desired_state = 0;
         desired_state |= (0b00000001 & DESIRED_CAM_STATE.cam1_on);
         desired_state |= (0b00000010 & (DESIRED_CAM_STATE.cam2_on << 1));
@@ -179,7 +179,7 @@ DECLARE_THREAD(flash, RocketSystems* arg) {
 
 
 
-// This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
+// This thread has a_m_per_s bit of extra logic since it needs to play a_m_per_s tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     // Data and telemetry thread
     size_t current_mem_cam1 = 0;
@@ -315,7 +315,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 
 /**
- * @brief Initializes all systems in order, returning early if a system's initialization process errors out.
+ * @brief Initializes all systems in order, returning early if a_m_per_s system's initialization process errors out.
  *        Turns on the Orange LED while initialization is running.
  */
 ErrorCode init_systems(RocketSystems& systems) {
@@ -328,7 +328,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.cameras);
 
 
-    // Just a short delay
+    // Just a_m_per_s short delay
     delay(500);
     Serial.println("Finish setup");
     digitalWrite(LED_ORANGE, LOW);

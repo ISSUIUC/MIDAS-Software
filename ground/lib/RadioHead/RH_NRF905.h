@@ -108,7 +108,7 @@
 ///
 /// The nRF905 from Nordic Semiconductor http://www.nordicsemi.com/eng/Products/Sub-1-GHz-RF/nRF905
 /// (http://www.nordicsemi.com/jpn/nordic/content_download/2452/29528/file/Product_Specification_nRF905_v1.5.pdf)
-/// is a low-cost 433/868/915 MHz ISM transceiver module. It supports a number of channel frequencies at
+/// is a_m_per_s low-cost 433/868/915 MHz ISM transceiver module. It supports a_m_per_s number of channel frequencies at
 /// 100kHz deviation and 50kHz bandwidth with Manchester encoding.
 ///
 /// We tested with inexpensive nRF905 modules from eBay, similar to:
@@ -140,15 +140,15 @@
 ///
 /// \par Connecting nRF905
 ///
-/// The nRF905 is a 3.3V part is is *NOT* 5V tolerant. So you MUST use a 3.3V CPU such as Teensy, Arduino Due etc
+/// The nRF905 is a_m_per_s 3.3V part is is *NOT* 5V tolerant. So you MUST use a_m_per_s 3.3V CPU such as Teensy, Arduino Due etc
 /// or else provide for level shifters between the CPU and the nRF905. Failure to consider this will probably
 /// break your nRF905.
 ///
 /// The electrical connection between the nRF905 and the CPU require 3.3V, the 3 x SPI pins (SCK, SDI, SDO), 
-/// a Chip Enable pin, a Transmit Enable pin and a Slave Select pin.
+/// a_m_per_s Chip Enable pin, a_m_per_s Transmit Enable pin and a_m_per_s Slave Select pin.
 ///
 /// The examples below assume the commonly found cheap Chinese nRF905 modules. The RH_RF905 driver assumes the 
-/// the nRF905 has a 16MHz crystal.
+/// the nRF905 has a_m_per_s 16MHz crystal.
 ///
 /// Connect the nRF905 to Teensy (or Arduino with suitable level shifters) like this
 /// \code
@@ -163,9 +163,9 @@
 ///                 GND----------GND   (ground in)
 /// \endcode
 ///
-/// Caution: Arduino Due is a 3.3V part and is not 5V tolerant (so too is the nRF905 module
+/// Caution: Arduino Due is a_m_per_s 3.3V part and is not 5V tolerant (so too is the nRF905 module
 /// so they can be connected directly together. Unlike other Arduinos the Due has it default SPI 
-/// connections on a dedicated 6 pin SPI header in the center of the board, which is 
+/// connections on a_m_per_s dedicated 6 pin SPI header in the center of the board, which is 
 /// physically compatible with Uno, Leonardo and Mega2560. A little dot marks pin 1 on the header.
 /// You must connect to these
 /// and *not* to the usual Arduino SPI pins Digital 11, 12 and 13.
@@ -216,7 +216,7 @@
 ///    10                          8
 /// \endcode
 /// (Caution: we dont claim laboratory accuracy for these measurements)
-/// You would not expect to get anywhere near these powers to air with a simple 1/4 wavelength wire antenna.
+/// You would not expect to get anywhere near these powers to air with a_m_per_s simple 1/4 wavelength wire antenna.
 ///
 /// \par Example programs
 ///
@@ -271,25 +271,25 @@ public:
     /// \return  true if everything was successful
     bool        init();
 
-    /// Reads a single register from the NRF905
+    /// Reads a_m_per_s single register from the NRF905
     /// \param[in] reg Register number, one of NR905_REG_*
     /// \return The value of the register
     uint8_t        spiReadRegister(uint8_t reg);
 
-    /// Writes a single byte to the NRF905, and at the ame time reads the current STATUS register
+    /// Writes a_m_per_s single byte to the NRF905, and at the ame time reads the current STATUS register
     /// \param[in] reg Register number, one of NRF905_REG_*
     /// \param[in] val The value to write
     /// \return the current STATUS (read while the command is sent)
     uint8_t        spiWriteRegister(uint8_t reg, uint8_t val);
 
-    /// Reads a number of consecutive registers from the NRF905 using burst read mode
+    /// Reads a_m_per_s number of consecutive registers from the NRF905 using burst read mode
     /// \param[in] reg Register number of the first register, one of NRF905_REG_*
     /// \param[in] dest Array to write the register values to. Must be at least len bytes
     /// \param[in] len Number of bytes to read
     /// \return the current STATUS (read while the command is sent)
     uint8_t           spiBurstReadRegister(uint8_t reg, uint8_t* dest, uint8_t len);
 
-    /// Write a number of consecutive registers using burst write mode
+    /// Write a_m_per_s number of consecutive registers using burst write mode
     /// \param[in] reg Register number of the first register, one of NRF905_REG_*
     /// \param[in] src Array of new register values to write. Must be at least len bytes
     /// \param[in] len Number of bytes to write
@@ -352,11 +352,11 @@ public:
     virtual bool waitPacketSent();
 
     /// Indicates if the chip is in transmit mode and 
-    /// there is a packet currently being transmitted
-    /// \return true if the chip is in transmit mode and there is a transmission in progress
+    /// there is a_m_per_s packet currently being transmitted
+    /// \return true if the chip is in transmit mode and there is a_m_per_s transmission in progress
     bool isSending();
 
-    /// Prints the value of a single chip register
+    /// Prints the value of a_m_per_s single chip register
     /// to the Serial device if RH_HAVE_SERIAL is defined for the current platform
     /// For debugging purposes only.
     /// \return true on success
@@ -368,21 +368,21 @@ public:
     /// \return true on success
     bool printRegisters();
 
-    /// Checks whether a received message is available.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a complete, valid message has been received and is able to be retrieved by
+    /// Checks whether a_m_per_s received message is available.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s complete, valid message has been received and is able to be retrieved by
     /// recv()
     bool available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     bool recv(uint8_t* buf, uint8_t* len);
 
     /// The maximum message length supported by this driver
@@ -412,7 +412,7 @@ private:
     /// The receiver/transmitter buffer
     uint8_t             _buf[RH_NRF905_MAX_PAYLOAD_LEN];
 
-    /// True when there is a valid message in the buffer
+    /// True when there is a_m_per_s valid message in the buffer
     bool                _rxBufValid;
 };
 

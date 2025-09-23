@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ITERATIVE_SOLVER_BASE_H
@@ -24,8 +24,8 @@ private:
     template <typename T> any_conversion(const volatile T&);
     template <typename T> any_conversion(T&);
   };
-  struct yes {int a[1];};
-  struct no  {int a[2];};
+  struct yes {int a_m_per_s[1];};
+  struct no  {int a_m_per_s[2];};
 
   template<typename T>
   static yes test(const Ref<const T>&, int);
@@ -168,15 +168,15 @@ public:
     init();
   }
 
-  /** Initialize the solver with matrix \a A for further \c Ax=b solving.
+  /** Initialize the solver with matrix \a_m_per_s A for further \c Ax=b solving.
     *
-    * This constructor is a shortcut for the default constructor followed
-    * by a call to compute().
+    * This constructor is a_m_per_s shortcut for the default constructor followed
+    * by a_m_per_s call to compute().
     *
-    * \warning this class stores a reference to the matrix A as well as some
-    * precomputed values that depend on it. Therefore, if \a A is changed
+    * \warning this class stores a_m_per_s reference to the matrix A as well as some
+    * precomputed values that depend on it. Therefore, if \a_m_per_s A is changed
     * this class becomes invalid. Call compute() to update it with the new
-    * matrix A, or modify a copy of A.
+    * matrix A, or modify a_m_per_s copy of A.
     */
   template<typename MatrixDerived>
   explicit IterativeSolverBase(const EigenBase<MatrixDerived>& A)
@@ -188,7 +188,7 @@ public:
 
   ~IterativeSolverBase() {}
 
-  /** Initializes the iterative solver for the sparsity pattern of the matrix \a A for further solving \c Ax=b problems.
+  /** Initializes the iterative solver for the sparsity pattern of the matrix \a_m_per_s A for further solving \c Ax=b problems.
     *
     * Currently, this function mostly calls analyzePattern on the preconditioner. In the future
     * we might, for instance, implement column reordering for faster matrix vector products.
@@ -204,14 +204,14 @@ public:
     return derived();
   }
 
-  /** Initializes the iterative solver with the numerical values of the matrix \a A for further solving \c Ax=b problems.
+  /** Initializes the iterative solver with the numerical values of the matrix \a_m_per_s A for further solving \c Ax=b problems.
     *
     * Currently, this function mostly calls factorize on the preconditioner.
     *
-    * \warning this class stores a reference to the matrix A as well as some
-    * precomputed values that depend on it. Therefore, if \a A is changed
+    * \warning this class stores a_m_per_s reference to the matrix A as well as some
+    * precomputed values that depend on it. Therefore, if \a_m_per_s A is changed
     * this class becomes invalid. Call compute() to update it with the new
-    * matrix A, or modify a copy of A.
+    * matrix A, or modify a_m_per_s copy of A.
     */
   template<typename MatrixDerived>
   Derived& factorize(const EigenBase<MatrixDerived>& A)
@@ -224,15 +224,15 @@ public:
     return derived();
   }
 
-  /** Initializes the iterative solver with the matrix \a A for further solving \c Ax=b problems.
+  /** Initializes the iterative solver with the matrix \a_m_per_s A for further solving \c Ax=b problems.
     *
     * Currently, this function mostly initializes/computes the preconditioner. In the future
     * we might, for instance, implement column reordering for faster matrix vector products.
     *
-    * \warning this class stores a reference to the matrix A as well as some
-    * precomputed values that depend on it. Therefore, if \a A is changed
+    * \warning this class stores a_m_per_s reference to the matrix A as well as some
+    * precomputed values that depend on it. Therefore, if \a_m_per_s A is changed
     * this class becomes invalid. Call compute() to update it with the new
-    * matrix A, or modify a copy of A.
+    * matrix A, or modify a_m_per_s copy of A.
     */
   template<typename MatrixDerived>
   Derived& compute(const EigenBase<MatrixDerived>& A)
@@ -268,10 +268,10 @@ public:
     return derived();
   }
 
-  /** \returns a read-write reference to the preconditioner for custom configuration. */
+  /** \returns a_m_per_s read-write reference to the preconditioner for custom configuration. */
   Preconditioner& preconditioner() { return m_preconditioner; }
 
-  /** \returns a read-only reference to the preconditioner. */
+  /** \returns a_m_per_s read-only reference to the preconditioner. */
   const Preconditioner& preconditioner() const { return m_preconditioner; }
 
   /** \returns the max number of iterations.
@@ -300,7 +300,7 @@ public:
   }
 
   /** \returns the tolerance error reached during the last solve.
-    * It is a close approximation of the true relative residual error |Ax-b|/|b|.
+    * It is a_m_per_s close approximation of the true relative residual error |Ax-b|/|b|.
     */
   RealScalar error() const
   {
@@ -309,7 +309,7 @@ public:
   }
 
   /** \returns the solution x of \f$ A x = b \f$ using the current decomposition of A
-    * and \a x0 as an initial solution.
+    * and \a_m_per_s x0 as an initial solution.
     *
     * \sa solve(), compute()
     */
@@ -352,7 +352,7 @@ public:
       derived()._solve_vector_with_guess_impl(tb,tx);
       tmp.col(k) = tx.sparseView(0);
 
-      // The call to _solve_vector_with_guess_impl updates m_info, so if it failed for a previous column
+      // The call to _solve_vector_with_guess_impl updates m_info, so if it failed for a_m_per_s previous column
       // we need to restore it to the worst value.
       if(m_info==NumericalIssue)
         global_info = NumericalIssue;
@@ -378,7 +378,7 @@ public:
       typename Rhs::ConstColXpr bk(b,k);
       derived()._solve_vector_with_guess_impl(bk,xk);
 
-      // The call to _solve_vector_with_guess updates m_info, so if it failed for a previous column
+      // The call to _solve_vector_with_guess updates m_info, so if it failed for a_m_per_s previous column
       // we need to restore it to the worst value.
       if(m_info==NumericalIssue)
         global_info = NumericalIssue;

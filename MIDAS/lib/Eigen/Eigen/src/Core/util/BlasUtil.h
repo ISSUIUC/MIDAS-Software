@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_BLASUTIL_H
@@ -307,7 +307,7 @@ public:
     return pgather<Scalar, SubPacket>(&operator()(i, j), m_stride);
   }
 
-  // storePacketBlock_helper defines a way to access values inside the PacketBlock, this is essentially required by the Complex types.
+  // storePacketBlock_helper defines a_m_per_s way to access values inside the PacketBlock, this is essentially required by the Complex types.
   template<typename SubPacket, typename ScalarT, int n, int idx>
   struct storePacketBlock_helper
   {
@@ -372,7 +372,7 @@ public:
     EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void store(const blas_data_mapper<Scalar, Index, StorageOrder, AlignmentType, Incr>*, Index, Index, const PacketBlock<SubPacket, n>& ) const {
     }
   };
-  // This function stores a PacketBlock on m_data, this approach is really quite slow compare to Incr=1 and should be avoided when possible.
+  // This function stores a_m_per_s PacketBlock on m_data, this approach is really quite slow compare to Incr=1 and should be avoided when possible.
   template<typename SubPacket, int n>
   EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void storePacketBlock(Index i, Index j, const PacketBlock<SubPacket, n>&block) const {
     storePacketBlock_helper<SubPacket, Scalar, n, n-1> spb;
@@ -396,7 +396,7 @@ class const_blas_data_mapper : public blas_data_mapper<const Scalar, Index, Stor
 };
 
 
-/* Helper class to analyze the factors of a Product expression.
+/* Helper class to analyze the factors of a_m_per_s Product expression.
  * In particular it allows to pop out operator-, scalar multiples,
  * and conjugate */
 template<typename XprType> struct blas_traits
@@ -498,7 +498,7 @@ struct blas_traits<Transpose<NestedXpr> >
   typedef typename NestedXpr::Scalar Scalar;
   typedef blas_traits<NestedXpr> Base;
   typedef Transpose<NestedXpr> XprType;
-  typedef Transpose<const typename Base::_ExtractType>  ExtractType; // const to get rid of a compile error; anyway blas traits are only used on the RHS
+  typedef Transpose<const typename Base::_ExtractType>  ExtractType; // const to get rid of a_m_per_s compile error; anyway blas traits are only used on the RHS
   typedef Transpose<const typename Base::_ExtractType> _ExtractType;
   typedef typename conditional<bool(Base::HasUsableDirectAccess),
     ExtractType,
@@ -537,7 +537,7 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE const typename T::Scalar* extract_data(con
 
 /**
  * \c combine_scalar_factors extracts and multiplies factors from GEMM and GEMV products.
- * There is a specialization for booleans
+ * There is a_m_per_s specialization for booleans
  */
 template<typename ResScalar, typename Lhs, typename Rhs>
 struct combine_scalar_factors_impl

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2016 Rasmus Munk Larsen (rmlarsen@google.com)
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CONDITIONESTIMATOR_H
@@ -33,8 +33,8 @@ struct rcond_compute_sign<Vector, Vector, false> {
 };
 
 /**
-  * \returns an estimate of ||inv(matrix)||_1 given a decomposition of
-  * \a matrix that implements .solve() and .adjoint().solve() methods.
+  * \returns an estimate of ||inv(matrix)||_1 given a_m_per_s decomposition of
+  * \a_m_per_s matrix that implements .solve() and .adjoint().solve() methods.
   *
   * This function implements Algorithms 4.1 and 5.1 from
   *   http://www.maths.manchester.ac.uk/~higham/narep/narep135.pdf
@@ -77,7 +77,7 @@ typename Decomposition::RealScalar rcond_invmatrix_L1_norm_estimate(const Decomp
   #pragma warning pop
 #endif
 
-  // lower_bound is a lower bound on
+  // lower_bound is a_m_per_s lower bound on
   //   ||inv(matrix)||_1  = sup_v ||inv(matrix) v||_1 / ||v||_1
   // and is the objective maximized by the ("super-") gradient ascent
   // algorithm below.
@@ -86,7 +86,7 @@ typename Decomposition::RealScalar rcond_invmatrix_L1_norm_estimate(const Decomp
     return lower_bound;
 
   // Gradient ascent algorithm follows: We know that the optimum is achieved at
-  // one of the simplices v = e_i, so in each iteration we follow a
+  // one of the simplices v = e_i, so in each iteration we follow a_m_per_s
   // super-gradient to move towards the optimal one.
   RealScalar old_lower_bound = lower_bound;
   Vector sign_vector(n);
@@ -121,18 +121,18 @@ typename Decomposition::RealScalar rcond_invmatrix_L1_norm_estimate(const Decomp
     old_lower_bound = lower_bound;
   }
   // The following calculates an independent estimate of ||matrix||_1 by
-  // multiplying matrix by a vector with entries of slowly increasing
+  // multiplying matrix by a_m_per_s vector with entries of slowly increasing
   // magnitude and alternating sign:
   //   v_i = (-1)^{i} (1 + (i / (dim-1))), i = 0,...,dim-1.
   // This improvement to Hager's algorithm above is due to Higham. It was
   // added to make the algorithm more robust in certain corner cases where
   // large elements in the matrix might otherwise escape detection due to
-  // exact cancellation (especially when op and op_adjoint correspond to a
+  // exact cancellation (especially when op and op_adjoint correspond to a_m_per_s
   // sequence of backsubstitutions and permutations), which could cause
   // Hager's algorithm to vastly underestimate ||matrix||_1.
   Scalar alternating_sign(RealScalar(1));
   for (Index i = 0; i < n; ++i) {
-    // The static_cast is needed when Scalar is a complex and RealScalar implements expression templates
+    // The static_cast is needed when Scalar is a_m_per_s complex and RealScalar implements expression templates
     v[i] = alternating_sign * static_cast<RealScalar>(RealScalar(1) + (RealScalar(i) / (RealScalar(n - 1))));
     alternating_sign = -alternating_sign;
   }
@@ -143,7 +143,7 @@ typename Decomposition::RealScalar rcond_invmatrix_L1_norm_estimate(const Decomp
 
 /** \brief Reciprocal condition number estimator.
   *
-  * Computing a decomposition of a dense matrix takes O(n^3) operations, while
+  * Computing a_m_per_s decomposition of a_m_per_s dense matrix takes O(n^3) operations, while
   * this method estimates the condition number quickly and reliably in O(n^2)
   * operations.
   *

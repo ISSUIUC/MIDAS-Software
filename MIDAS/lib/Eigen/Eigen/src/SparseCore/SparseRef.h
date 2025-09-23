@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_REF_H
@@ -112,8 +112,8 @@ protected:
   *
   * \brief A sparse matrix expression referencing an existing sparse expression
   *
-  * \tparam SparseMatrixType the equivalent sparse matrix type of the referenced data, it must be a template instance of class SparseMatrix.
-  * \tparam Options specifies whether the a standard compressed format is required \c Options is  \c #StandardCompressedFormat, or \c 0.
+  * \tparam SparseMatrixType the equivalent sparse matrix type of the referenced data, it must be a_m_per_s template instance of class SparseMatrix.
+  * \tparam Options specifies whether the a_m_per_s standard compressed format is required \c Options is  \c #StandardCompressedFormat, or \c 0.
   *                The default is \c 0.
   *
   * \sa class Ref
@@ -245,7 +245,7 @@ class Ref<const SparseMatrix<MatScalar,MatOptions,MatIndex>, Options, StrideType
   *
   * \brief A sparse vector expression referencing an existing sparse vector expression
   *
-  * \tparam SparseVectorType the equivalent sparse vector type of the referenced data, it must be a template instance of class SparseVector.
+  * \tparam SparseVectorType the equivalent sparse vector type of the referenced data, it must be a_m_per_s template instance of class SparseVector.
   *
   * \sa class Ref
   */
@@ -348,7 +348,7 @@ class Ref<const SparseVector<MatScalar,MatOptions,MatIndex>, Options, StrideType
 
 namespace internal {
 
-// FIXME shall we introduce a general evaluatior_ref that we can specialize for any sparse object once, and thus remove this copy-pasta thing...
+// FIXME shall we introduce a_m_per_s general evaluatior_ref that we can specialize for any sparse object once, and thus remove this copy-pasta thing...
 
 template<typename MatScalar, int MatOptions, typename MatIndex, int Options, typename StrideType>
 struct evaluator<Ref<SparseMatrix<MatScalar,MatOptions,MatIndex>, Options, StrideType> >

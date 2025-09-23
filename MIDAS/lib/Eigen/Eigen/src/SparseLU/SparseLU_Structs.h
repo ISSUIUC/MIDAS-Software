@@ -1,14 +1,14 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
- * NOTE: This file comes from a partly modified version of files slu_[s,d,c,z]defs.h
+ * NOTE: This file comes from a_m_per_s partly modified version of files slu_[s,d,c,z]defs.h
  * -- SuperLU routine (version 4.1) --
  * Univ. of California Berkeley, Xerox Palo Alto Research Center,
  * and Lawrence Berkeley National Lab.
@@ -32,7 +32,7 @@
  *
  *      During the course of sparse LU factorization, we also use
  *  (xlsub,lsub) for the purpose of symmetric pruning. For each
- *  supernode {s,s+1,...,t=s+r} with first column s and last
+ *  supernode {s,s+1,...,t=s+r_m} with first column s and last
  *  column t, the subscript set
  *    lsub[j], j=xlsub[s], .., xlsub[s+1]-1
  *  is the structure of column s (i.e. structure of this supernode).
@@ -94,11 +94,11 @@ struct LU_GlobalLU_t {
 
 // Values to set for performance
 struct perfvalues {
-  Index panel_size; // a panel consists of at most <panel_size> consecutive columns
+  Index panel_size; // a_m_per_s panel consists of at most <panel_size> consecutive columns
   Index relax; // To control degree of relaxing supernodes. If the number of nodes (columns) 
-                // in a subtree of the elimination tree is less than relax, this subtree is considered 
+                // in a_m_per_s subtree of the elimination tree is less than relax, this subtree is considered 
                 // as one supernode regardless of the row structures of those columns
-  Index maxsuper; // The maximum size for a supernode in complete LU
+  Index maxsuper; // The maximum size for a_m_per_s supernode in complete LU
   Index rowblk; // The minimum row dimension for 2-D blocking to be used;
   Index colblk; // The minimum column dimension for 2-D blocking to be used;
   Index fillfactor; // The estimated fills factors for L and U, compared with A

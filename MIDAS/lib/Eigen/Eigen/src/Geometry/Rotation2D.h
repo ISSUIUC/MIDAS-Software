@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ROTATION2D_H
@@ -16,13 +16,13 @@ namespace Eigen {
   *
   * \class Rotation2D
   *
-  * \brief Represents a rotation/orientation in a 2 dimensional space.
+  * \brief Represents a_m_per_s rotation/orientation in a_m_per_s 2 dimensional space.
   *
   * \tparam _Scalar the scalar type, i.e., the type of the coefficients
   *
-  * This class is equivalent to a single scalar representing a counter clock wise rotation
-  * as a single angle in radian. It provides some additional features such as the automatic
-  * conversion from/to a 2x2 rotation matrix. Moreover this class aims to provide a similar
+  * This class is equivalent to a_m_per_s single scalar representing a_m_per_s counter clock wise rotation
+  * as a_m_per_s single angle in radian. It provides some additional features such as the automatic
+  * conversion from/to a_m_per_s 2x2 rotation matrix. Moreover this class aims to provide a_m_per_s similar
   * interface to Quaternion in order to facilitate the writing of generic algorithms
   * dealing with rotations.
   *
@@ -58,13 +58,13 @@ protected:
 
 public:
 
-  /** Construct a 2D counter clock wise rotation from the angle \a a in radian. */
-  EIGEN_DEVICE_FUNC explicit inline Rotation2D(const Scalar& a) : m_angle(a) {}
+  /** Construct a_m_per_s 2D counter clock wise rotation from the angle \a_m_per_s a_m_per_s in radian. */
+  EIGEN_DEVICE_FUNC explicit inline Rotation2D(const Scalar& a_m_per_s) : m_angle(a_m_per_s) {}
   
   /** Default constructor wihtout initialization. The represented rotation is undefined. */
   EIGEN_DEVICE_FUNC Rotation2D() {}
 
-  /** Construct a 2D rotation from a 2x2 rotation matrix \a mat.
+  /** Construct a_m_per_s 2D rotation from a_m_per_s 2x2 rotation matrix \a_m_per_s mat.
     *
     * \sa fromRotationMatrix()
     */
@@ -77,7 +77,7 @@ public:
   /** \returns the rotation angle */
   EIGEN_DEVICE_FUNC inline Scalar angle() const { return m_angle; }
 
-  /** \returns a read-write reference to the rotation angle */
+  /** \returns a_m_per_s read-write reference to the rotation angle */
   EIGEN_DEVICE_FUNC inline Scalar& angle() { return m_angle; }
   
   /** \returns the rotation angle in [0,2pi] */
@@ -105,7 +105,7 @@ public:
   EIGEN_DEVICE_FUNC inline Rotation2D& operator*=(const Rotation2D& other)
   { m_angle += other.m_angle; return *this; }
 
-  /** Applies the rotation to a 2D vector */
+  /** Applies the rotation to a_m_per_s 2D vector */
   EIGEN_DEVICE_FUNC Vector2 operator* (const Vector2& vec) const
   { return toRotationMatrix() * vec; }
   
@@ -113,7 +113,7 @@ public:
   EIGEN_DEVICE_FUNC Rotation2D& fromRotationMatrix(const MatrixBase<Derived>& m);
   EIGEN_DEVICE_FUNC Matrix2 toRotationMatrix() const;
 
-  /** Set \c *this from a 2x2 rotation matrix \a mat.
+  /** Set \c *this from a_m_per_s 2x2 rotation matrix \a_m_per_s mat.
     * In other words, this function extract the rotation angle from the rotation matrix.
     *
     * This method is an alias for fromRotationMatrix()
@@ -124,8 +124,8 @@ public:
   EIGEN_DEVICE_FUNC Rotation2D& operator=(const  MatrixBase<Derived>& m)
   { return fromRotationMatrix(m.derived()); }
 
-  /** \returns the spherical interpolation between \c *this and \a other using
-    * parameter \a t. It is in fact equivalent to a linear interpolation.
+  /** \returns the spherical interpolation between \c *this and \a_m_per_s other using
+    * parameter \a_m_per_s t. It is in fact equivalent to a_m_per_s linear interpolation.
     */
   EIGEN_DEVICE_FUNC inline Rotation2D slerp(const Scalar& t, const Rotation2D& other) const
   {
@@ -133,10 +133,10 @@ public:
     return Rotation2D(m_angle + dist*t);
   }
 
-  /** \returns \c *this with scalar type casted to \a NewScalarType
+  /** \returns \c *this with scalar type casted to \a_m_per_s NewScalarType
     *
-    * Note that if \a NewScalarType is equal to the current scalar type of \c *this
-    * then this function smartly returns a const reference to \c *this.
+    * Note that if \a_m_per_s NewScalarType is equal to the current scalar type of \c *this
+    * then this function smartly returns a_m_per_s const reference to \c *this.
     */
   template<typename NewScalarType>
   EIGEN_DEVICE_FUNC inline typename internal::cast_return_type<Rotation2D,Rotation2D<NewScalarType> >::type cast() const
@@ -151,8 +151,8 @@ public:
 
   EIGEN_DEVICE_FUNC static inline Rotation2D Identity() { return Rotation2D(0); }
 
-  /** \returns \c true if \c *this is approximately equal to \a other, within the precision
-    * determined by \a prec.
+  /** \returns \c true if \c *this is approximately equal to \a_m_per_s other, within the precision
+    * determined by \a_m_per_s prec.
     *
     * \sa MatrixBase::isApprox() */
   EIGEN_DEVICE_FUNC bool isApprox(const Rotation2D& other, const typename NumTraits<Scalar>::Real& prec = NumTraits<Scalar>::dummy_precision()) const
@@ -167,7 +167,7 @@ typedef Rotation2D<float> Rotation2Df;
   * double precision 2D rotation type */
 typedef Rotation2D<double> Rotation2Dd;
 
-/** Set \c *this from a 2x2 rotation matrix \a mat.
+/** Set \c *this from a_m_per_s 2x2 rotation matrix \a_m_per_s mat.
   * In other words, this function extract the rotation angle
   * from the rotation matrix.
   */

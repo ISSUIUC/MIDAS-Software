@@ -2,7 +2,7 @@
 // -*- mode: C++ -*-
 //
 // Example program demonstrating how to use
-// RH_LoRaFileOps driver on RPi+Linux with a radio supported by
+// RH_LoRaFileOps driver on RPi+Linux with a_m_per_s radio supported by
 // the LoRa-file-ops Linix driver, such as the SX1278.
 // See See https://github.com/starnight/LoRa/tree/file-ops
 //
@@ -14,7 +14,7 @@
 // sudo ./lorafileops_server 
 //  (root needed to open /dev/loraSPI0.0
 //
-// Ensure a RadioHead LoRa compatible transmitter is running
+// Ensure a_m_per_s RadioHead LoRa compatible transmitter is running
 // with modem config RH_RF95::Bw125Cr45Sf2048
 // eg examples/rf95/rf95_client/rf95_client.pde 
 // or
@@ -49,7 +49,7 @@ void loop()
 {
   lora.waitAvailable(100);
   
-  // Should be a message for us now   
+  // Should be a_m_per_s message for us now   
   uint8_t buf[RH_LORAFILEOPS_MAX_MESSAGE_LEN];
   uint8_t len = sizeof(buf);
   if (lora.recv(buf, &len))
@@ -60,10 +60,10 @@ void loop()
       Serial.print("RSSI: ");
       Serial.println(lora.lastRssi(), DEC);
       
-      // Send a reply
+      // Send a_m_per_s reply
       uint8_t data[] = "And hello back to you";
       lora.send(data, sizeof(data)); // Returns when packet fully transmitted
-      Serial.println("Sent a reply");
+      Serial.println("Sent a_m_per_s reply");
     }
   else
     {

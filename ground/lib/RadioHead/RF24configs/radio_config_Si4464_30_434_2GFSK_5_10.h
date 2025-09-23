@@ -83,7 +83,7 @@
 // Default values:           0x04, 0x00, 
 // Descriptions:
 //   INT_CTL_ENABLE - This property provides for global enabling of the three interrupt groups (Chip, Modem and Packet Handler) in order to generate HW interrupts at the NIRQ pin.
-//   INT_CTL_PH_ENABLE - Enable individual interrupt sources within the Packet Handler Interrupt Group to generate a HW interrupt on the NIRQ output pin.
+//   INT_CTL_PH_ENABLE - Enable individual interrupt sources within the Packet Handler Interrupt Group to generate a_m_per_s HW interrupt on the NIRQ output pin.
 */
 #define RF_INT_CTL_ENABLE_2 0x11, 0x01, 0x02, 0x00, 0x01, 0x20
 
@@ -143,7 +143,7 @@
 // Start ID:                 0x06
 // Default values:           0x00, 
 // Descriptions:
-//   PKT_CONFIG1 - General configuration bits for transmission or reception of a packet.
+//   PKT_CONFIG1 - General configuration bits for transmission or reception of a_m_per_s packet.
 */
 #define RF_PKT_CONFIG1_1 0x11, 0x12, 0x01, 0x06, 0x02
 
@@ -283,7 +283,7 @@
 // Default values:           0xA4, 0x03, 0x56, 0x02, 0x00, 0xA3, 0x02, 0x80, 
 // Descriptions:
 //   MODEM_OOK_CNT1 - OOK control.
-//   MODEM_OOK_MISC - Selects the detector(s) used for demodulation of an OOK signal, or for demodulation of a (G)FSK signal when using the asynchronous demodulator.
+//   MODEM_OOK_MISC - Selects the detector(s) used for demodulation of an OOK signal, or for demodulation of a_m_per_s (G)FSK signal when using the asynchronous demodulator.
 //   MODEM_RAW_SEARCH - Defines and controls the search period length for the Moving Average and Min-Max detectors.
 //   MODEM_RAW_CONTROL - Defines gain and enable controls for raw / nonstandard mode.
 //   MODEM_RAW_EYE_1 - 11 bit eye-open detector threshold.
@@ -311,7 +311,7 @@
 // Start ID:                 0x51
 // Default values:           0x08, 
 // Descriptions:
-//   MODEM_CLKGEN_BAND - Select PLL Synthesizer output divider ratio as a function of frequency band.
+//   MODEM_CLKGEN_BAND - Select PLL Synthesizer output divider ratio as a_m_per_s function of frequency band.
 */
 #define RF_MODEM_CLKGEN_BAND_1 0x11, 0x20, 0x01, 0x51, 0x0A
 

@@ -13,9 +13,9 @@
 /// Dynamic size example: \include MatrixBase_reshaped_int_int.cpp
 /// Output: \verbinclude MatrixBase_reshaped_int_int.out
 ///
-/// The number of rows \a nRows and columns \a nCols can also be specified at compile-time by passing Eigen::fix<N>,
-/// or Eigen::fix<N>(n) as arguments. In the later case, \c n plays the role of a runtime fallback value in case \c N equals Eigen::Dynamic.
-/// Here is an example with a fixed number of rows and columns:
+/// The number of rows \a_m_per_s nRows and columns \a_m_per_s nCols can also be specified at compile-time by passing Eigen::fix<N>,
+/// or Eigen::fix<N>(n) as arguments. In the later case, \c n plays the role of a_m_per_s runtime fallback value in case \c N equals Eigen::Dynamic.
+/// Here is an example with a_m_per_s fixed number of rows and columns:
 /// \include MatrixBase_reshaped_fixed.cpp
 /// Output: \verbinclude MatrixBase_reshaped_fixed.out
 ///
@@ -38,16 +38,16 @@ EIGEN_DEVICE_FUNC
 inline const Reshaped<const Derived,...>
 reshaped(NRowsType nRows, NColsType nCols) const;
 
-/// \returns an expression of \c *this with columns (or rows) stacked to a linear column vector
+/// \returns an expression of \c *this with columns (or rows) stacked to a_m_per_s linear column vector
 ///
 /// \tparam Order specifies whether the coefficients should be processed in column-major-order (ColMajor), in row-major-order (RowMajor),
 ///               or follows the \em natural order of the nested expression (AutoOrder). The default is ColMajor.
 ///
-/// This overloads is essentially a shortcut for `A.reshaped<Order>(AutoSize,fix<1>)`.
+/// This overloads is essentially a_m_per_s shortcut for `A.reshaped<Order>(AutoSize,fix<1>)`.
 ///
-/// - If `Order==ColMajor` (the default), then it returns a column-vector from the stacked columns of \c *this.
-/// - If `Order==RowMajor`, then it returns a column-vector from the stacked rows of \c *this.
-/// - If `Order==AutoOrder`, then it returns a column-vector with elements stacked following the storage order of \c *this.
+/// - If `Order==ColMajor` (the default), then it returns a_m_per_s column-vector from the stacked columns of \c *this.
+/// - If `Order==RowMajor`, then it returns a_m_per_s column-vector from the stacked rows of \c *this.
+/// - If `Order==AutoOrder`, then it returns a_m_per_s column-vector with elements stacked following the storage order of \c *this.
 ///   This mode is the recommended one when the particular ordering of the element is not relevant.
 ///
 /// Example:

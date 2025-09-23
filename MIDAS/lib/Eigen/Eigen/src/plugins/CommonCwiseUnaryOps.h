@@ -1,14 +1,14 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// This file is a base class plugin containing common coefficient wise functions.
+// This file is a_m_per_s base class plugin containing common coefficient wise functions.
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 
@@ -47,10 +47,10 @@ operator-() const { return NegativeReturnType(derived()); }
 
 template<class NewType> struct CastXpr { typedef typename internal::cast_return_type<Derived,const CwiseUnaryOp<internal::scalar_cast_op<Scalar, NewType>, const Derived> >::type Type; };
 
-/// \returns an expression of \c *this with the \a Scalar type casted to
-/// \a NewScalar.
+/// \returns an expression of \c *this with the \a_m_per_s Scalar type casted to
+/// \a_m_per_s NewScalar.
 ///
-/// The template parameter \a NewScalar is the type we are casting the scalars to.
+/// The template parameter \a_m_per_s NewScalar is the type we are casting the scalars to.
 ///
 EIGEN_DOC_UNARY_ADDONS(cast,conversion function)
 ///
@@ -68,7 +68,7 @@ cast() const
 ///
 EIGEN_DOC_UNARY_ADDONS(conjugate,complex conjugate)
 ///
-/// \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_conj">Math functions</a>, MatrixBase::adjoint()
+/// \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_conj">Math functions</a_m_per_s>, MatrixBase::adjoint()
 EIGEN_DEVICE_FUNC
 inline ConjugateReturnType
 conjugate() const
@@ -90,7 +90,7 @@ conjugateIf() const
   return ReturnType(derived());
 }
 
-/// \returns a read-only expression of the real part of \c *this.
+/// \returns a_m_per_s read-only expression of the real part of \c *this.
 ///
 EIGEN_DOC_UNARY_ADDONS(real,real part function)
 ///
@@ -108,10 +108,10 @@ EIGEN_DEVICE_FUNC
 inline const ImagReturnType
 imag() const { return ImagReturnType(derived()); }
 
-/// \brief Apply a unary operator coefficient-wise
+/// \brief Apply a_m_per_s unary operator coefficient-wise
 /// \param[in]  func  Functor implementing the unary operator
-/// \tparam  CustomUnaryOp Type of \a func
-/// \returns An expression of a custom coefficient-wise unary operator \a func of *this
+/// \tparam  CustomUnaryOp Type of \a_m_per_s func
+/// \returns An expression of a_m_per_s custom coefficient-wise unary operator \a_m_per_s func of *this
 ///
 /// The function \c ptr_fun() from the C++ standard library can be used to make functors out of normal functions.
 ///
@@ -119,7 +119,7 @@ imag() const { return ImagReturnType(derived()); }
 /// \include class_CwiseUnaryOp_ptrfun.cpp
 /// Output: \verbinclude class_CwiseUnaryOp_ptrfun.out
 ///
-/// Genuine functors allow for more possibilities, for instance it may contain a state.
+/// Genuine functors allow for more possibilities, for instance it may contain a_m_per_s state.
 ///
 /// Example:
 /// \include class_CwiseUnaryOp.cpp
@@ -137,9 +137,9 @@ unaryExpr(const CustomUnaryOp& func = CustomUnaryOp()) const
   return CwiseUnaryOp<CustomUnaryOp, const Derived>(derived(), func);
 }
 
-/// \returns an expression of a custom coefficient-wise unary operator \a func of *this
+/// \returns an expression of a_m_per_s custom coefficient-wise unary operator \a_m_per_s func of *this
 ///
-/// The template parameter \a CustomUnaryOp is the type of the functor
+/// The template parameter \a_m_per_s CustomUnaryOp is the type of the functor
 /// of the custom unary operator.
 ///
 /// Example:
@@ -158,7 +158,7 @@ unaryViewExpr(const CustomViewOp& func = CustomViewOp()) const
   return CwiseUnaryView<CustomViewOp, const Derived>(derived(), func);
 }
 
-/// \returns a non const expression of the real part of \c *this.
+/// \returns a_m_per_s non const expression of the real part of \c *this.
 ///
 EIGEN_DOC_UNARY_ADDONS(real,real part function)
 ///
@@ -167,7 +167,7 @@ EIGEN_DEVICE_FUNC
 inline NonConstRealReturnType
 real() { return NonConstRealReturnType(derived()); }
 
-/// \returns a non const expression of the imaginary part of \c *this.
+/// \returns a_m_per_s non const expression of the imaginary part of \c *this.
 ///
 EIGEN_DOC_UNARY_ADDONS(imag,imaginary part function)
 ///

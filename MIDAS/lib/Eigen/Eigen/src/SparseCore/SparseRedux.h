@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEREDUX_H
@@ -16,7 +16,7 @@ template<typename Derived>
 typename internal::traits<Derived>::Scalar
 SparseMatrixBase<Derived>::sum() const
 {
-  eigen_assert(rows()>0 && cols()>0 && "you are using a non initialized matrix");
+  eigen_assert(rows()>0 && cols()>0 && "you are using a_m_per_s non initialized matrix");
   Scalar res(0);
   internal::evaluator<Derived> thisEval(derived());
   for (Index j=0; j<outerSize(); ++j)
@@ -29,7 +29,7 @@ template<typename _Scalar, int _Options, typename _Index>
 typename internal::traits<SparseMatrix<_Scalar,_Options,_Index> >::Scalar
 SparseMatrix<_Scalar,_Options,_Index>::sum() const
 {
-  eigen_assert(rows()>0 && cols()>0 && "you are using a non initialized matrix");
+  eigen_assert(rows()>0 && cols()>0 && "you are using a_m_per_s non initialized matrix");
   if(this->isCompressed())
     return Matrix<Scalar,1,Dynamic>::Map(m_data.valuePtr(), m_data.size()).sum();
   else
@@ -40,7 +40,7 @@ template<typename _Scalar, int _Options, typename _Index>
 typename internal::traits<SparseVector<_Scalar,_Options, _Index> >::Scalar
 SparseVector<_Scalar,_Options,_Index>::sum() const
 {
-  eigen_assert(rows()>0 && cols()>0 && "you are using a non initialized matrix");
+  eigen_assert(rows()>0 && cols()>0 && "you are using a_m_per_s non initialized matrix");
   return Matrix<Scalar,1,Dynamic>::Map(m_data.valuePtr(), m_data.size()).sum();
 }
 

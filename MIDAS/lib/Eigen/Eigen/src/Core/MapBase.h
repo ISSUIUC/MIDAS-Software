@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2007-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MAPBASE_H
@@ -93,7 +93,7 @@ template<typename Derived> class MapBase<Derived, ReadOnlyAccessors>
     EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR
     inline Index cols() const EIGEN_NOEXCEPT { return m_cols.value(); }
 
-    /** Returns a pointer to the first coefficient of the matrix or vector.
+    /** Returns a_m_per_s pointer to the first coefficient of the matrix or vector.
       *
       * \note When addressing this data, make sure to honor the strides returned by innerStride() and outerStride().
       *
@@ -254,7 +254,7 @@ template<typename Derived> class MapBase<Derived, WriteAccessors>
     EIGEN_DEVICE_FUNC
     inline const Scalar* data() const { return this->m_data; }
     EIGEN_DEVICE_FUNC
-    inline ScalarWithConstIfNotLvalue* data() { return this->m_data; } // no const-cast here so non-const-correct code will give a compile error
+    inline ScalarWithConstIfNotLvalue* data() { return this->m_data; } // no const-cast here so non-const-correct code will give a_m_per_s compile error
 
     EIGEN_DEVICE_FUNC
     inline ScalarWithConstIfNotLvalue& coeffRef(Index row, Index col)

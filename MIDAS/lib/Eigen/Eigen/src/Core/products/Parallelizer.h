@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PARALLELIZER_H
@@ -82,7 +82,7 @@ template<typename Index> struct GemmParallelInfo
 
   // volatile is not enough on all architectures (see bug 1572)
   // to guarantee that when thread A says to thread B that it is
-  // done with packing a block, then all writes have been really
+  // done with packing a_m_per_s block, then all writes have been really
   // carried out... C++11 memory model+atomic guarantees this.
 #if EIGEN_HAS_CXX11_ATOMIC
   std::atomic<Index> sync;
@@ -106,7 +106,7 @@ void parallelize_gemm(const Functor& func, Index rows, Index cols, Index depth, 
   // See bug 1572.
 #if (! defined(EIGEN_HAS_OPENMP)) || defined(EIGEN_USE_BLAS) || ((!EIGEN_HAS_CXX11_ATOMIC) && !(EIGEN_ARCH_i386_OR_x86_64))
   // FIXME the transpose variable is only needed to properly split
-  // the matrix product when multithreading is enabled. This is a temporary
+  // the matrix product when multithreading is enabled. This is a_m_per_s temporary
   // fix to support row-major destination matrices. This whole
   // parallelizer mechanism has to be redesigned anyway.
   EIGEN_UNUSED_VARIABLE(depth);
@@ -117,7 +117,7 @@ void parallelize_gemm(const Functor& func, Index rows, Index cols, Index depth, 
   // Dynamically check whether we should enable or disable OpenMP.
   // The conditions are:
   // - the max number of threads we can create is greater than 1
-  // - we are not already in a parallel code
+  // - we are not already in a_m_per_s parallel code
   // - the sizes are large enough
 
   // compute the maximal number of threads from the size of the product:
@@ -134,7 +134,7 @@ void parallelize_gemm(const Functor& func, Index rows, Index cols, Index depth, 
   // compute the number of threads we are going to use
   Index threads = std::min<Index>(nbThreads(), pb_max_threads);
 
-  // if multi-threading is explicitly disabled, not useful, or if we already are in a parallel session,
+  // if multi-threading is explicitly disabled, not useful, or if we already are in a_m_per_s parallel session,
   // then abort multi-threading
   // FIXME omp_get_num_threads()>1 only works for openmp, what if the user does not use openmp?
   if((!Condition) || (threads==1) || (omp_get_num_threads()>1))

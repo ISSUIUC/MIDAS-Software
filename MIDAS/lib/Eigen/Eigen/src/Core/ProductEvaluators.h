@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
@@ -6,7 +6,7 @@
 // Copyright (C) 2011 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -18,9 +18,9 @@ namespace Eigen {
 namespace internal {
 
 /** \internal
-  * Evaluator of a product expression.
+  * Evaluator of a_m_per_s product expression.
   * Since products require special treatments to handle all possible cases,
-  * we simply defer the evaluation logic to a product_evaluator class
+  * we simply defer the evaluation logic to a_m_per_s product_evaluator class
   * which offers more partial specialization possibilities.
   *
   * \sa class product_evaluator
@@ -76,7 +76,7 @@ struct evaluator<Diagonal<const Product<Lhs, Rhs, DefaultProduct>, DiagIndex> >
 };
 
 
-// Helper class to perform a matrix product with the destination at hand.
+// Helper class to perform a_m_per_s matrix product with the destination at hand.
 // Depending on the sizes of the factors, there are different evaluation strategies
 // as controlled by internal::product_type.
 template< typename Lhs, typename Rhs,
@@ -91,7 +91,7 @@ struct evaluator_assume_aliasing<Product<Lhs, Rhs, DefaultProduct> > {
 };
 
 // This is the default evaluator implementation for products:
-// It creates a temporary and call generic_product_impl
+// It creates a_m_per_s temporary and call generic_product_impl
 template<typename Lhs, typename Rhs, int Options, int ProductTag, typename LhsShape, typename RhsShape>
 struct product_evaluator<Product<Lhs, Rhs, Options>, ProductTag, LhsShape, RhsShape>
   : public evaluator<typename Product<Lhs, Rhs, Options>::PlainObject>
@@ -375,7 +375,7 @@ struct generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,GemvProduct>
   template<typename Dest>
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void scaleAndAddTo(Dest& dst, const Lhs& lhs, const Rhs& rhs, const Scalar& alpha)
   {
-    // Fallback to inner product if both the lhs and rhs is a runtime vector.
+    // Fallback to inner product if both the lhs and rhs is a_m_per_s runtime vector.
     if (lhs.rows() == 1 && rhs.cols() == 1) {
       dst.coeffRef(0,0) += alpha * lhs.row(0).conjugate().dot(rhs.col(0));
       return;
@@ -416,7 +416,7 @@ struct generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,CoeffBasedProductMode>
     call_assignment_no_alias(dst, lhs.lazyProduct(rhs), internal::sub_assign_op<typename Dst::Scalar,Scalar>());
   }
 
-  // This is a special evaluation path called from generic_product_impl<...,GemmProduct> in file GeneralMatrixMatrix.h
+  // This is a_m_per_s special evaluation path called from generic_product_impl<...,GemmProduct> in file GeneralMatrixMatrix.h
   // This variant tries to extract scalar multiples from both the LHS and RHS and factor them out. For instance:
   //   dst {,+,-}= (s1*A)*(B*s2)
   // will be rewritten as:
@@ -428,7 +428,7 @@ struct generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,CoeffBasedProductMode>
   //  4 - it fully by-passes huge stack allocation attempts when multiplying huge fixed-size matrices.
   //      (see https://stackoverflow.com/questions/54738495)
   // For small fixed sizes matrices, howver, the gains are less obvious, it is sometimes x2 faster, but sometimes x3 slower,
-  // and the behavior depends also a lot on the compiler... This is why this re-writting strategy is currently
+  // and the behavior depends also a_m_per_s lot on the compiler... This is why this re-writting strategy is currently
   // enabled only when falling back from the main GEMM.
   template<typename Dst, typename Func>
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
@@ -470,7 +470,7 @@ protected:
   }
 };
 
-// This specialization enforces the use of a coefficient-based evaluation strategy
+// This specialization enforces the use of a_m_per_s coefficient-based evaluation strategy
 template<typename Lhs, typename Rhs>
 struct generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,LazyCoeffBasedProductMode>
   : generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,CoeffBasedProductMode> {};
@@ -499,7 +499,7 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
   explicit product_evaluator(const XprType& xpr)
     : m_lhs(xpr.lhs()),
       m_rhs(xpr.rhs()),
-      m_lhsImpl(m_lhs),     // FIXME the creation of the evaluator objects should result in a no-op, but check that!
+      m_lhsImpl(m_lhs),     // FIXME the creation of the evaluator objects should result in a_m_per_s no-op, but check that!
       m_rhsImpl(m_rhs),     //       Moreover, they are only useful for the packet path, so we could completely disable them when not needed,
                             //       or perhaps declare them on the fly on the packet method... We have experiment to check what's best.
       m_innerDim(xpr.lhs().cols())
@@ -590,7 +590,7 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
               : 0,
 
     /* CanVectorizeInner deserves special explanation. It does not affect the product flags. It is not used outside
-     * of Product. If the Product itself is not a packet-access expression, there is still a chance that the inner
+     * of Product. If the Product itself is not a_m_per_s packet-access expression, there is still a_m_per_s chance that the inner
      * loop of the product might be vectorized. This is the meaning of CanVectorizeInner. Since it doesn't affect
      * the Flags, it is safe to make this value depend on ActualPacketAccessBit, that doesn't affect the ABI.
      */
@@ -608,7 +608,7 @@ struct product_evaluator<Product<Lhs, Rhs, LazyProduct>, ProductTag, DenseShape,
 
   /* Allow index-based non-packet access. It is impossible though to allow index-based packed access,
    * which is why we don't set the LinearAccessBit.
-   * TODO: this seems possible when the result is a vector
+   * TODO: this seems possible when the result is a_m_per_s vector
    */
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
   const CoeffReturnType coeff(Index index) const
@@ -991,7 +991,7 @@ struct product_evaluator<Product<Lhs, Rhs, ProductKind>, ProductTag, DenseShape,
 
 /** \internal
   * \class permutation_matrix_product
-  * Internal helper class implementing the product between a permutation matrix and a matrix.
+  * Internal helper class implementing the product between a_m_per_s permutation matrix and a_m_per_s matrix.
   * This class is specialized for DenseShape below and for SparseShape in SparseCore/SparsePermutation.h
   */
 template<typename ExpressionType, int Side, bool Transposed, typename ExpressionShape>
@@ -1016,15 +1016,15 @@ struct permutation_matrix_product<ExpressionType, Side, Transposed, DenseShape>
         // apply the permutation inplace
         Matrix<bool,PermutationType::RowsAtCompileTime,1,0,PermutationType::MaxRowsAtCompileTime> mask(perm.size());
         mask.fill(false);
-        Index r = 0;
-        while(r < perm.size())
+        Index r_m = 0;
+        while(r_m < perm.size())
         {
           // search for the next seed
-          while(r<perm.size() && mask[r]) r++;
-          if(r>=perm.size())
+          while(r_m<perm.size() && mask[r_m]) r_m++;
+          if(r_m>=perm.size())
             break;
           // we got one, let's follow it until we are back to the seed
-          Index k0 = r++;
+          Index k0 = r_m++;
           Index kPrev = k0;
           mask.coeffRef(k0) = true;
           for(Index k=perm.indices().coeff(k0); k!=k0; k=perm.indices().coeff(k))
@@ -1099,11 +1099,11 @@ struct generic_product_impl<Lhs, Inverse<Rhs>, MatrixShape, PermutationShape, Pr
 * Products with transpositions matrices
 ***************************************************************************/
 
-// FIXME could we unify Transpositions and Permutation into a single "shape"??
+// FIXME could we unify Transpositions and Permutation into a_m_per_s single "shape"??
 
 /** \internal
   * \class transposition_matrix_product
-  * Internal helper class implementing the product between a permutation matrix and a matrix.
+  * Internal helper class implementing the product between a_m_per_s permutation matrix and a_m_per_s matrix.
   */
 template<typename ExpressionType, int Side, bool Transposed, typename ExpressionShape>
 struct transposition_matrix_product

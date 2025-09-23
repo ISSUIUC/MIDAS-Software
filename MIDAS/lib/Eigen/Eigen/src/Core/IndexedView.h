@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_INDEXED_VIEW_H
@@ -70,13 +70,13 @@ class IndexedViewImpl;
 /** \class IndexedView
   * \ingroup Core_Module
   *
-  * \brief Expression of a non-sequential sub-matrix defined by arbitrary sequences of row and column indices
+  * \brief Expression of a_m_per_s non-sequential sub-matrix defined by arbitrary sequences of row and column indices
   *
   * \tparam XprType the type of the expression in which we are taking the intersections of sub-rows and sub-columns
   * \tparam RowIndices the type of the object defining the sequence of row indices
   * \tparam ColIndices the type of the object defining the sequence of column indices
   *
-  * This class represents an expression of a sub-matrix (or sub-vector) defined as the intersection
+  * This class represents an expression of a_m_per_s sub-matrix (or sub-vector) defined as the intersection
   * of sub-sets of rows and columns, that are themself defined by generic sequences of row indices \f$ \{r_0,r_1,..r_{m-1}\} \f$
   * and column indices \f$ \{c_0,c_1,..c_{n-1} \}\f$. Let \f$ A \f$  be the nested matrix, then the resulting matrix \f$ B \f$ has \c m
   * rows and \c n columns, and its entries are given by: \f$ B(i,j) = A(r_i,c_j) \f$.
@@ -135,10 +135,10 @@ public:
   typename internal::remove_reference<XprType>::type&
   nestedExpression() { return m_xpr; }
 
-  /** \returns a const reference to the object storing/generating the row indices */
+  /** \returns a_m_per_s const reference to the object storing/generating the row indices */
   const RowIndices& rowIndices() const { return m_rowIndices; }
 
-  /** \returns a const reference to the object storing/generating the column indices */
+  /** \returns a_m_per_s const reference to the object storing/generating the column indices */
   const ColIndices& colIndices() const { return m_colIndices; }
 
 protected:

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERAL_MATRIX_MATRIX_H
@@ -16,7 +16,7 @@ namespace internal {
 
 template<typename _LhsScalar, typename _RhsScalar> class level3_blocking;
 
-/* Specialization for a row-major destination matrix => simple transposition of the product */
+/* Specialization for a_m_per_s row-major destination matrix => simple transposition of the product */
 template<
   typename Index,
   typename LhsScalar, int LhsStorageOrder, bool ConjugateLhs,
@@ -45,7 +45,7 @@ struct general_matrix_matrix_product<Index,LhsScalar,LhsStorageOrder,ConjugateLh
   }
 };
 
-/*  Specialization for a col-major destination matrix
+/*  Specialization for a_m_per_s col-major destination matrix
  *    => Blocking algorithm following Goto's paper */
 template<
   typename Index,
@@ -99,11 +99,11 @@ static void run(Index rows, Index cols, Index depth,
     {
       const Index actual_kc = (std::min)(k+kc,depth)-k; // => rows of B', and cols of the A'
 
-      // In order to reduce the chance that a thread has to wait for the other,
+      // In order to reduce the chance that a_m_per_s thread has to wait for the other,
       // let's start by packing B'.
       pack_rhs(blockB, rhs.getSubMapper(k,0), actual_kc, nc);
 
-      // Pack A_k to A' in a parallel fashion:
+      // Pack A_k to A' in a_m_per_s parallel fashion:
       // each thread packs the sub block A_k,i to A'_i where i is the thread id.
 
       // However, before copying to A'_i, we have to make sure that no other thread is still using it,
@@ -123,7 +123,7 @@ static void run(Index rows, Index cols, Index depth,
         int i = (tid+shift)%threads;
 
         // At this point we have to make sure that A'_i has been updated by the thread i,
-        // we use testAndSetOrdered to mimic a volatile access.
+        // we use testAndSetOrdered to mimic a_m_per_s volatile access.
         // However, no need to wait for the B' part which has been updated by the current thread!
         if (shift>0) {
           while(info[i].sync!=k) {
@@ -178,9 +178,9 @@ static void run(Index rows, Index cols, Index depth,
         const Index actual_kc = (std::min)(k2+kc,depth)-k2;
 
         // OK, here we have selected one horizontal panel of rhs and one vertical panel of lhs.
-        // => Pack lhs's panel into a sequential chunk of memory (L2/L3 caching)
+        // => Pack lhs's panel into a_m_per_s sequential chunk of memory (L2/L3 caching)
         // Note that this panel will be read as many times as the number of blocks in the rhs's
-        // horizontal panel which is, in practice, a very low number.
+        // horizontal panel which is, in practice, a_m_per_s very low number.
         pack_lhs(blockA, lhs.getSubMapper(i2,k2), actual_kc, actual_mc);
 
         // For each kc x nc block of the rhs's horizontal panel...
@@ -188,8 +188,8 @@ static void run(Index rows, Index cols, Index depth,
         {
           const Index actual_nc = (std::min)(j2+nc,cols)-j2;
 
-          // We pack the rhs's block into a sequential chunk of memory (L2 caching)
-          // Note that this block will be read a very high number of times, which is equal to the number of
+          // We pack the rhs's block into a_m_per_s sequential chunk of memory (L2 caching)
+          // Note that this block will be read a_m_per_s very high number of times, which is equal to the number of
           // micro horizontal panel of the large rhs's panel (e.g., rows/12 times).
           if((!pack_rhs_once) || i2==0)
             pack_rhs(blockB, rhs.getSubMapper(k2,j2), actual_kc, actual_nc);
@@ -431,10 +431,10 @@ struct generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,GemmProduct>
   template<typename Dst>
   static void evalTo(Dst& dst, const Lhs& lhs, const Rhs& rhs)
   {
-    // See http://eigen.tuxfamily.org/bz/show_bug.cgi?id=404 for a discussion and helper program
+    // See http://eigen.tuxfamily.org/bz/show_bug.cgi?id=404 for a_m_per_s discussion and helper program
     // to determine the following heuristic.
     // EIGEN_GEMM_TO_COEFFBASED_THRESHOLD is typically defined to 20 in GeneralProduct.h,
-    // unless it has been specialized by the user or for a given architecture.
+    // unless it has been specialized by the user or for a_m_per_s given architecture.
     // Note that the condition rhs.rows()>0 was required because lazy product is (was?) not happy with empty inputs.
     // I'm not sure it is still required.
     if((rhs.rows()+dst.rows()+dst.cols())<EIGEN_GEMM_TO_COEFFBASED_THRESHOLD && rhs.rows()>0)
@@ -473,14 +473,14 @@ struct generic_product_impl<Lhs,Rhs,DenseShape,DenseShape,GemmProduct>
 
     if (dst.cols() == 1)
     {
-      // Fallback to GEMV if either the lhs or rhs is a runtime vector
+      // Fallback to GEMV if either the lhs or rhs is a_m_per_s runtime vector
       typename Dest::ColXpr dst_vec(dst.col(0));
       return internal::generic_product_impl<Lhs,typename Rhs::ConstColXpr,DenseShape,DenseShape,GemvProduct>
         ::scaleAndAddTo(dst_vec, a_lhs, a_rhs.col(0), alpha);
     }
     else if (dst.rows() == 1)
     {
-      // Fallback to GEMV if either the lhs or rhs is a runtime vector
+      // Fallback to GEMV if either the lhs or rhs is a_m_per_s runtime vector
       typename Dest::RowXpr dst_vec(dst.row(0));
       return internal::generic_product_impl<typename Lhs::ConstRowXpr,Rhs,DenseShape,DenseShape,GemvProduct>
         ::scaleAndAddTo(dst_vec, a_lhs.row(0), a_rhs, alpha);

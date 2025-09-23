@@ -7,12 +7,12 @@
 
 #if RH_PLATFORM == RH_PLATFORM_ESP8266
 // This voltatile array is used in the ESP8266 platform to manage the interrupt
-// service routines in a main loop, avoiding SPI calls inside the isr functions.
+// service routines in a_m_per_s main loop, avoiding SPI calls inside the isr functions.
 volatile bool flagIsr[3] = {false, false, false};
 #endif
 
 // Interrupt vectors for the 2 Arduino interrupt pins
-// Each interrupt can be handled by a different instance of RH_RF22, allowing you to have
+// Each interrupt can be handled by a_m_per_s different instance of RH_RF22, allowing you to have
 // 2 RH_RF22s per Arduino
 RH_RF22* RH_RF22::_deviceForInterrupt[RH_RF22_NUM_INTERRUPTS] = {0, 0, 0};
 uint8_t RH_RF22::_interruptCount = 0; // Index into _deviceForInterrupt for next device
@@ -103,7 +103,7 @@ bool RH_RF22::init()
     reset();
 
     // Get the device type and check it
-    // This also tests whether we are really connected to a device
+    // This also tests whether we are really connected to a_m_per_s device
     _deviceType = spiRead(RH_RF22_REG_00_DEVICE_TYPE);
     if (   _deviceType != RH_RF22_DEVICE_TYPE_RX_TRX
         && _deviceType != RH_RF22_DEVICE_TYPE_TX)
@@ -130,8 +130,8 @@ bool RH_RF22::init()
     spiWrite(RH_RF22_REG_06_INTERRUPT_ENABLE2, RH_RF22_ENPREAVAL);
 
     // Set up interrupt handler
-    // Since there are a limited number of interrupt glue functions isr*() available,
-    // we can only support a limited number of devices simultaneously
+    // Since there are a_m_per_s limited number of interrupt glue functions isr*() available,
+    // we can only support a_m_per_s limited number of devices simultaneously
     // On some devices, notably most Arduinos, the interrupt pin passed in is actually the 
     // interrupt number. You have to figure out the interruptnumber-to-interruptpin mapping
     // yourself based on knowledge of what Arduino board you are running on.
@@ -236,7 +236,7 @@ void RH_RF22::handleInterrupt()
 	    clearRxBuf();
 //	Serial.println("IFFERROR");  
     }
-    // Caution, any delay here may cause a FF underflow or overflow
+    // Caution, any delay here may cause a_m_per_s FF underflow or overflow
     if (_lastInterruptFlags[0] & RH_RF22_ITXFFAEM)
     {
 	// See if more data has to be loaded into the Tx FIFO 
@@ -245,7 +245,7 @@ void RH_RF22::handleInterrupt()
     }
     if (_lastInterruptFlags[0] & RH_RF22_IRXFFAFULL)
     {
-	// Caution, any delay here may cause a FF overflow
+	// Caution, any delay here may cause a_m_per_s FF overflow
 	// Read some data from the Rx FIFO
 	readNextFragment();
 //	Serial.println("IRXFFAFULL"); 
@@ -278,7 +278,7 @@ void RH_RF22::handleInterrupt()
 
 	// May have already read one or more fragments
 	// Get any remaining unread octets, based on the expected length
-	// First make sure we dont overflow the buffer in the case of a stupid length
+	// First make sure we dont overflow the buffer in the case of a_m_per_s stupid length
 	// or partial bad receives
 	if (   len >  RH_RF22_MAX_MESSAGE_LEN
 	    || len < _bufLen)
@@ -416,7 +416,7 @@ uint16_t RH_RF22::wutRead()
     return ((uint16_t)buf[0] << 8) | buf[1]; // Dont rely on byte order
 }
 
-// RFM-22 doc appears to be wrong: WUT for wtm = 10000, r, = 0, d = 0 is about 1 sec
+// RFM-22 doc appears to be wrong: WUT for wtm = 10000, r_m, = 0, d = 0 is about 1 sec
 void RH_RF22::setWutPeriod(uint16_t wtm, uint8_t wtr, uint8_t wtd)
 {
     uint8_t period[3];
@@ -531,7 +531,7 @@ void RH_RF22::setModeTx()
     {
 	setOpMode(_idleMode | RH_RF22_TXON);
 	// Hmmm, if you dont clear the RX FIFO here, then it appears that going
-	// to transmit mode in the middle of a receive can corrupt the
+	// to transmit mode in the middle of a_m_per_s receive can corrupt the
 	// RX FIFO
 	resetRxFifo();
 	_mode = RHModeTx;
@@ -543,7 +543,7 @@ void RH_RF22::setTxPower(uint8_t power)
     spiWrite(RH_RF22_REG_6D_TX_POWER, power | RH_RF22_LNA_SW); // On RF23, LNA_SW must be set.
 }
 
-// Sets registers from a canned modem configuration structure
+// Sets registers from a_m_per_s canned modem configuration structure
 void RH_RF22::setModemRegisters(const ModemConfig* config)
 {
     spiWrite(RH_RF22_REG_1C_IF_FILTER_BANDWIDTH,                    config->reg_1c);
@@ -556,7 +556,7 @@ void RH_RF22::setModemRegisters(const ModemConfig* config)
 }
 
 // Set one of the canned FSK Modem configs
-// Returns true if its a valid choice
+// Returns true if its a_m_per_s valid choice
 bool RH_RF22::setModemConfig(ModemConfigChoice index)
 {
     if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))
@@ -649,7 +649,7 @@ void RH_RF22::startTransmit()
     setModeTx(); // Start the transmitter, turns off the receiver
 }
 
-// Restart the transmission of a packet that had a problem
+// Restart the transmission of a_m_per_s packet that had a_m_per_s problem
 void RH_RF22::restartTransmit()
 {
     _mode = RHModeIdle;
@@ -717,7 +717,7 @@ void RH_RF22::sendNextFragment()
 }
 
 // Assumption: there are at least RH_RF22_RXFFAFULL_THRESHOLD in the RX FIFO
-// That means it should only be called after a RXFFAFULL interrupt
+// That means it should only be called after a_m_per_s RXFFAFULL interrupt
 void RH_RF22::readNextFragment()
 {
     if (((uint16_t)_bufLen + RH_RF22_RXFFAFULL_THRESHOLD) > RH_RF22_MAX_MESSAGE_LEN)

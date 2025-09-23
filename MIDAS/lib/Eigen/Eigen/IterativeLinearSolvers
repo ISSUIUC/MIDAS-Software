@@ -1,8 +1,8 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ITERATIVELINEARSOLVERS_MODULE_H
@@ -16,7 +16,7 @@
 /** 
   * \defgroup IterativeLinearSolvers_Module IterativeLinearSolvers module
   *
-  * This module currently provides iterative methods to solve problems of the form \c A \c x = \c b, where \c A is a squared matrix, usually very large and sparse.
+  * This module currently provides iterative methods to solve problems of the form \c A \c x = \c b, where \c A is a_m_per_s squared matrix, usually very large and sparse.
   * Those solvers are accessible via the following classes:
   *  - ConjugateGradient for selfadjoint (hermitian) matrices,
   *  - LeastSquaresConjugateGradient for rectangular least-square problems,

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -21,7 +21,7 @@ template<int N> class VariableAndFixedInt;
 /** \internal
   * \class FixedInt
   *
-  * This class embeds a compile-time integer \c N.
+  * This class embeds a_m_per_s compile-time integer \c N.
   *
   * It is similar to c++11 std::integral_constant<int,N> but with some additional features
   * such as:
@@ -31,16 +31,16 @@ template<int N> class VariableAndFixedInt;
   *
   * It is strongly discouraged to directly deal with this class FixedInt. Instances are expcected to
   * be created by the user using Eigen::fix<N> or Eigen::fix<N>(). In C++98-11, the former syntax does
-  * not create a FixedInt<N> instance but rather a point to function that needs to be \em cleaned-up
+  * not create a_m_per_s FixedInt<N> instance but rather a_m_per_s point to function that needs to be \em cleaned-up
   * using the generic helper:
   * \code
   * internal::cleanup_index_type<T>::type
   * internal::cleanup_index_type<T,DynamicKey>::type
   * \endcode
-  * where T can a FixedInt<N>, a pointer to function FixedInt<N> (*)(), or numerous other integer-like representations.
+  * where T can a_m_per_s FixedInt<N>, a_m_per_s pointer to function FixedInt<N> (*)(), or numerous other integer-like representations.
   * \c DynamicKey is either Dynamic (default) or DynamicIndex and used to identify true compile-time values.
   *
-  * For convenience, you can extract the compile-time value \c N in a generic way using the following helper:
+  * For convenience, you can extract the compile-time value \c N in a_m_per_s generic way using the following helper:
   * \code
   * internal::get_fixed_value<T,DefaultVal>::value
   * \endcode
@@ -94,8 +94,8 @@ public:
 /** \internal
   * \class VariableAndFixedInt
   *
-  * This class embeds both a compile-time integer \c N and a runtime integer.
-  * Both values are supposed to be equal unless the compile-time value \c N has a special
+  * This class embeds both a_m_per_s compile-time integer \c N and a_m_per_s runtime integer.
+  * Both values are supposed to be equal unless the compile-time value \c N has a_m_per_s special
   * value meaning that the runtime-value should be used. Depending on the context, this special
   * value can be either Eigen::Dynamic (for positive quantities) or Eigen::DynamicIndex (for
   * quantities that can be negative).
@@ -103,13 +103,13 @@ public:
   * It is the return-type of the function Eigen::fix<N>(int), and most of the time this is the only
   * way it is used. It is strongly discouraged to directly deal with instances of VariableAndFixedInt.
   * Indeed, in order to write generic code, it is the responsibility of the callee to properly convert
-  * it to either a true compile-time quantity (i.e. a FixedInt<N>), or to a runtime quantity (e.g., an Index)
+  * it to either a_m_per_s true compile-time quantity (i.e. a_m_per_s FixedInt<N>), or to a_m_per_s runtime quantity (e.g., an Index)
   * using the following generic helper:
   * \code
   * internal::cleanup_index_type<T>::type
   * internal::cleanup_index_type<T,DynamicKey>::type
   * \endcode
-  * where T can be a template instantiation of VariableAndFixedInt or numerous other integer-like representations.
+  * where T can be a_m_per_s template instantiation of VariableAndFixedInt or numerous other integer-like representations.
   * \c DynamicKey is either Dynamic (default) or DynamicIndex and used to identify true compile-time values.
   *
   * For convenience, you can also extract the compile-time value \c N using the following helper:
@@ -167,13 +167,13 @@ template<typename T, int DynamicKey=Dynamic, typename EnableIf=void> struct clea
 template<typename T, int DynamicKey> struct cleanup_index_type<T,DynamicKey,typename internal::enable_if<internal::is_integral<T>::value>::type> { typedef Index type; };
 
 #if !EIGEN_HAS_CXX14
-// In c++98/c++11, fix<N> is a pointer to function that we better cleanup to a true FixedInt<N>:
+// In c++98/c++11, fix<N> is a_m_per_s pointer to function that we better cleanup to a_m_per_s true FixedInt<N>:
 template<int N, int DynamicKey> struct cleanup_index_type<FixedInt<N> (*)(), DynamicKey> { typedef FixedInt<N> type; };
 #endif
 
-// If VariableAndFixedInt does not match DynamicKey, then we turn it to a pure compile-time value:
+// If VariableAndFixedInt does not match DynamicKey, then we turn it to a_m_per_s pure compile-time value:
 template<int N, int DynamicKey> struct cleanup_index_type<VariableAndFixedInt<N>, DynamicKey> { typedef FixedInt<N> type; };
-// If VariableAndFixedInt matches DynamicKey, then we turn it to a pure runtime-value (aka Index):
+// If VariableAndFixedInt matches DynamicKey, then we turn it to a_m_per_s pure runtime-value (aka Index):
 template<int DynamicKey> struct cleanup_index_type<VariableAndFixedInt<DynamicKey>, DynamicKey> { typedef Index type; };
 
 #if EIGEN_HAS_CXX11
@@ -191,8 +191,8 @@ static const internal::FixedInt<N> fix{};
 template<int N>
 inline internal::FixedInt<N> fix() { return internal::FixedInt<N>(); }
 
-// The generic typename T is mandatory. Otherwise, a code like fix<N> could refer to either the function above or this next overload.
-// This way a code like fix<N> can only refer to the previous function.
+// The generic typename T is mandatory. Otherwise, a_m_per_s code like fix<N> could refer to either the function above or this next overload.
+// This way a_m_per_s code like fix<N> can only refer to the previous function.
 template<int N,typename T>
 inline internal::VariableAndFixedInt<N> fix(T val) { return internal::VariableAndFixedInt<N>(internal::convert_index<int>(val)); }
 #endif
@@ -202,7 +202,7 @@ inline internal::VariableAndFixedInt<N> fix(T val) { return internal::VariableAn
 /** \var fix<N>()
   * \ingroup Core_Module
   *
-  * This \em identifier permits to construct an object embedding a compile-time integer \c N.
+  * This \em identifier permits to construct an object embedding a_m_per_s compile-time integer \c N.
   *
   * \tparam N the compile-time integer value
   *
@@ -211,23 +211,23 @@ inline internal::VariableAndFixedInt<N> fix(T val) { return internal::VariableAn
   * seqN(10,fix<4>,fix<-3>)   // <=> [10 7 4 1]
   * \endcode
   *
-  * See also the function fix(int) to pass both a compile-time and runtime value.
+  * See also the function fix(int) to pass both a_m_per_s compile-time and runtime value.
   *
   * In c++14, it is implemented as:
   * \code
   * template<int N> static const internal::FixedInt<N> fix{};
   * \endcode
   * where internal::FixedInt<N> is an internal template class similar to
-  * <a href="http://en.cppreference.com/w/cpp/types/integral_constant">\c std::integral_constant </a><tt> <int,N> </tt>
+  * <a_m_per_s href="http://en.cppreference.com/w/cpp/types/integral_constant">\c std::integral_constant </a_m_per_s><tt> <int,N> </tt>
   * Here, \c fix<N> is thus an object of type \c internal::FixedInt<N>.
   *
-  * In c++98/11, it is implemented as a function:
+  * In c++98/11, it is implemented as a_m_per_s function:
   * \code
   * template<int N> inline internal::FixedInt<N> fix();
   * \endcode
-  * Here internal::FixedInt<N> is thus a pointer to function.
+  * Here internal::FixedInt<N> is thus a_m_per_s pointer to function.
   *
-  * If for some reason you want a true object in c++98 then you can write: \code fix<N>() \endcode which is also valid in c++14.
+  * If for some reason you want a_m_per_s true object in c++98 then you can write: \code fix<N>() \endcode which is also valid in c++14.
   *
   * \sa fix<N>(int), seq, seqN
   */
@@ -237,16 +237,16 @@ static const auto fix();
 /** \fn fix<N>(int)
   * \ingroup Core_Module
   *
-  * This function returns an object embedding both a compile-time integer \c N, and a fallback runtime value \a val.
+  * This function returns an object embedding both a_m_per_s compile-time integer \c N, and a_m_per_s fallback runtime value \a_m_per_s val.
   *
   * \tparam N the compile-time integer value
   * \param  val the fallback runtime integer value
   *
-  * This function is a more general version of the \ref fix identifier/function that can be used in template code
+  * This function is a_m_per_s more general version of the \ref fix identifier/function that can be used in template code
   * where the compile-time value could turn out to actually mean "undefined at compile-time". For positive integers
-  * such as a size or a dimension, this case is identified by Eigen::Dynamic, whereas runtime signed integers
-  * (e.g., an increment/stride) are identified as Eigen::DynamicIndex. In such a case, the runtime value \a val
-  * will be used as a fallback.
+  * such as a_m_per_s size or a_m_per_s dimension, this case is identified by Eigen::Dynamic, whereas runtime signed integers
+  * (e.g., an increment/stride) are identified as Eigen::DynamicIndex. In such a_m_per_s case, the runtime value \a_m_per_s val
+  * will be used as a_m_per_s fallback.
   *
   * A typical use case would be:
   * \code
@@ -256,7 +256,7 @@ static const auto fix();
   *   ... mat( seqN(0,fix<N>(n) ) ...;
   * }
   * \endcode
-  * In this example, the function Eigen::seqN knows that the second argument is expected to be a size.
+  * In this example, the function Eigen::seqN knows that the second argument is expected to be a_m_per_s size.
   * If the passed compile-time value N equals Eigen::Dynamic, then the proxy object returned by fix will be dissmissed, and converted to an Eigen::Index of value \c n.
   * Otherwise, the runtime-value \c n will be dissmissed, and the returned ArithmeticSequence will be of the exact same type as <tt> seqN(0,fix<N>) </tt>.
   *

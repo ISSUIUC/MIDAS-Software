@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_HESSENBERGDECOMPOSITION_H
@@ -29,20 +29,20 @@ struct traits<HessenbergDecompositionMatrixHReturnType<MatrixType> >
   *
   * \class HessenbergDecomposition
   *
-  * \brief Reduces a square matrix to Hessenberg form by an orthogonal similarity transformation
+  * \brief Reduces a_m_per_s square matrix to Hessenberg form by an orthogonal similarity transformation
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the Hessenberg decomposition
   *
-  * This class performs an Hessenberg decomposition of a matrix \f$ A \f$. In
+  * This class performs an Hessenberg decomposition of a_m_per_s matrix \f$ A \f$. In
   * the real case, the Hessenberg decomposition consists of an orthogonal
-  * matrix \f$ Q \f$ and a Hessenberg matrix \f$ H \f$ such that \f$ A = Q H
-  * Q^T \f$. An orthogonal matrix is a matrix whose inverse equals its
+  * matrix \f$ Q \f$ and a_m_per_s Hessenberg matrix \f$ H \f$ such that \f$ A = Q H
+  * Q^T \f$. An orthogonal matrix is a_m_per_s matrix whose inverse equals its
   * transpose (\f$ Q^{-1} = Q^T \f$). A Hessenberg matrix has zeros below the
   * subdiagonal, so it is almost upper triangular. The Hessenberg decomposition
-  * of a complex matrix is \f$ A = Q H Q^* \f$ with \f$ Q \f$ unitary (that is,
+  * of a_m_per_s complex matrix is \f$ A = Q H Q^* \f$ with \f$ Q \f$ unitary (that is,
   * \f$ Q^{-1} = Q^* \f$).
   *
-  * Call the function compute() to compute the Hessenberg decomposition of a
+  * Call the function compute() to compute the Hessenberg decomposition of a_m_per_s
   * given matrix. Alternatively, you can use the
   * HessenbergDecomposition(const MatrixType&) constructor which computes the
   * Hessenberg decomposition at construction time. Once the decomposition is
@@ -76,7 +76,7 @@ template<typename _MatrixType> class HessenbergDecomposition
     /** \brief Type for vector of Householder coefficients.
       *
       * This is column vector with entries of type #Scalar. The length of the
-      * vector is one less than the size of #MatrixType, if it is a fixed-side
+      * vector is one less than the size of #MatrixType, if it is a_m_per_s fixed-side
       * type.
       */
     typedef Matrix<Scalar, SizeMinusOne, 1, Options & ~RowMajor, MaxSizeMinusOne, 1> CoeffVectorType;
@@ -92,7 +92,7 @@ template<typename _MatrixType> class HessenbergDecomposition
       *
       * The default constructor is useful in cases in which the user intends to
       * perform decompositions via compute().  The \p size parameter is only
-      * used as a hint. It is not an error to give a wrong \p size, but it may
+      * used as a_m_per_s hint. It is not an error to give a_m_per_s wrong \p size, but it may
       * impair performance.
       *
       * \sa compute() for an example.
@@ -165,11 +165,11 @@ template<typename _MatrixType> class HessenbergDecomposition
 
     /** \brief Returns the Householder coefficients.
       *
-      * \returns a const reference to the vector of Householder coefficients
+      * \returns a_m_per_s const reference to the vector of Householder coefficients
       *
       * \pre Either the constructor HessenbergDecomposition(const MatrixType&)
       * or the member function compute(const MatrixType&) has been called
-      * before to compute the Hessenberg decomposition of a matrix.
+      * before to compute the Hessenberg decomposition of a_m_per_s matrix.
       *
       * The Householder coefficients allow the reconstruction of the matrix
       * \f$ Q \f$ in the Hessenberg decomposition from the packed data.
@@ -184,12 +184,12 @@ template<typename _MatrixType> class HessenbergDecomposition
 
     /** \brief Returns the internal representation of the decomposition
       *
-      *	\returns a const reference to a matrix with the internal representation
+      *	\returns a_m_per_s const reference to a_m_per_s matrix with the internal representation
       *	         of the decomposition.
       *
       * \pre Either the constructor HessenbergDecomposition(const MatrixType&)
       * or the member function compute(const MatrixType&) has been called
-      * before to compute the Hessenberg decomposition of a matrix.
+      * before to compute the Hessenberg decomposition of a_m_per_s matrix.
       *
       * The returned matrix contains the following information:
       *  - the upper part and lower sub-diagonal represent the Hessenberg matrix H
@@ -223,11 +223,11 @@ template<typename _MatrixType> class HessenbergDecomposition
       *
       * \pre Either the constructor HessenbergDecomposition(const MatrixType&)
       * or the member function compute(const MatrixType&) has been called
-      * before to compute the Hessenberg decomposition of a matrix.
+      * before to compute the Hessenberg decomposition of a_m_per_s matrix.
       *
-      * This function returns a light-weight object of template class
-      * HouseholderSequence. You can either apply it directly to a matrix or
-      * you can convert it to a matrix of type #MatrixType.
+      * This function returns a_m_per_s light-weight object of template class
+      * HouseholderSequence. You can either apply it directly to a_m_per_s matrix or
+      * you can convert it to a_m_per_s matrix of type #MatrixType.
       *
       * \sa matrixH() for an example, class HouseholderSequence
       */
@@ -245,10 +245,10 @@ template<typename _MatrixType> class HessenbergDecomposition
       *
       * \pre Either the constructor HessenbergDecomposition(const MatrixType&)
       * or the member function compute(const MatrixType&) has been called
-      * before to compute the Hessenberg decomposition of a matrix.
+      * before to compute the Hessenberg decomposition of a_m_per_s matrix.
       *
       * The object returned by this function constructs the Hessenberg matrix H
-      * when it is assigned to a matrix or otherwise evaluated. The matrix H is
+      * when it is assigned to a_m_per_s matrix or otherwise evaluated. The matrix H is
       * constructed from the packed matrix as returned by packedMatrix(): The
       * upper part (including the subdiagonal) of the packed matrix contains
       * the matrix H. It may sometimes be better to directly use the packed
@@ -279,12 +279,12 @@ template<typename _MatrixType> class HessenbergDecomposition
 };
 
 /** \internal
-  * Performs a tridiagonal decomposition of \a matA in place.
+  * Performs a_m_per_s tridiagonal decomposition of \a_m_per_s matA in place.
   *
   * \param matA the input selfadjoint matrix
   * \param hCoeffs returned Householder coefficients
   *
-  * The result is written in the lower triangular part of \a matA.
+  * The result is written in the lower triangular part of \a_m_per_s matA.
   *
   * Implemented from Golub's "%Matrix Computations", algorithm 8.3.1.
   *
@@ -329,7 +329,7 @@ namespace internal {
   * \tparam MatrixType type of matrix in the Hessenberg decomposition
   *
   * Objects of this type represent the Hessenberg matrix in the Hessenberg
-  * decomposition of some matrix. The object holds a reference to the
+  * decomposition of some matrix. The object holds a_m_per_s reference to the
   * HessenbergDecomposition class until the it is assigned or evaluated for
   * some other reason (the reference should remain valid during the life time
   * of this object). This class is the return type of
