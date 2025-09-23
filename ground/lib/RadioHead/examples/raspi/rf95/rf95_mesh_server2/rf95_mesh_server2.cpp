@@ -1,6 +1,6 @@
 // rf95_mesh_server2.cpp
 // -*- mode: C++ -*-
-// Example sketch showing how to create a simple addressed, routed reliable messaging server
+// Example sketch showing how to create a_m_per_s simple addressed, routed reliable messaging server
 // with the RHMesh class.
 // It is designed to work with the other examples rf95_mesh_*
 // Hint: you can simulate other network topologies by setting the
@@ -118,7 +118,7 @@ int main (int argc, const char* argv[] )
       Serial.print(": ");
       Serial.println((char*)buf);
 
-      // Send a reply back to the originator client
+      // Send a_m_per_s reply back to the originator client
       if (manager.sendtoWait(data, sizeof(data), from) != RH_ROUTER_ERROR_NONE)
         Serial.println("sendtoWait failed");
 #ifdef RFM95_LED

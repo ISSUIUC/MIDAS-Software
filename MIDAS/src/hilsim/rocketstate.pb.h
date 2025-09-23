@@ -29,7 +29,7 @@ extern "C" {
 
 /* Struct field encoding specification for nanopb */
 #define RocketState_FIELDLIST(X, a) \
-X(a, STATIC,   REQUIRED, INT32,    rocket_state,      1)
+X(a_m_per_s, STATIC,   REQUIRED, INT32,    rocket_state,      1)
 #define RocketState_CALLBACK NULL
 #define RocketState_DEFAULT NULL
 

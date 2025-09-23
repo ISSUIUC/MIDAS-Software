@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SIMPLICIAL_CHOLESKY_H
@@ -41,11 +41,11 @@ namespace internal {
 /** \ingroup SparseCholesky_Module
   * \brief A base class for direct sparse Cholesky factorizations
   *
-  * This is a base class for LL^T and LDL^T Cholesky factorizations of sparse matrices that are
+  * This is a_m_per_s base class for LL^T and LDL^T Cholesky factorizations of sparse matrices that are
   * selfadjoint and positive definite. These factorizations allow for solving A.X = B where
   * X and B can be either dense or sparse.
   * 
-  * In order to reduce the fill-in, a symmetric permutation P is applied prior to the factorization
+  * In order to reduce the fill-in, a_m_per_s symmetric permutation P is applied prior to the factorization
   * such that the factorized matrix is P A P^-1.
   *
   * \tparam Derived the type of the derived class, that is the actual factorization type.
@@ -131,11 +131,11 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived>
     /** Sets the shift parameters that will be used to adjust the diagonal coefficients during the numerical factorization.
       *
       * During the numerical factorization, the diagonal coefficients are transformed by the following linear model:\n
-      * \c d_ii = \a offset + \a scale * \c d_ii
+      * \c d_ii = \a_m_per_s offset + \a_m_per_s scale * \c d_ii
       *
-      * The default is the identity transformation with \a offset=0, and \a scale=1.
+      * The default is the identity transformation with \a_m_per_s offset=0, and \a_m_per_s scale=1.
       *
-      * \returns a reference to \c *this.
+      * \returns a_m_per_s reference to \c *this.
       */
     Derived& setShift(const RealScalar& offset, const RealScalar& scale = 1)
     {
@@ -163,7 +163,7 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived>
     template<typename Rhs,typename Dest>
     void _solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest> &dest) const
     {
-      eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for solving, you must first call either compute() or symbolic()/numeric()");
+      eigen_assert(m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for solving, you must first call either compute() or symbolic()/numeric()");
       eigen_assert(m_matrix.rows()==b.rows());
 
       if(m_info!=Success)
@@ -197,7 +197,7 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived>
 
   protected:
     
-    /** Computes the sparse Cholesky decomposition of \a matrix */
+    /** Computes the sparse Cholesky decomposition of \a_m_per_s matrix */
     template<bool DoLDLT>
     void compute(const MatrixType& matrix)
     {
@@ -211,21 +211,21 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived>
     }
     
     template<bool DoLDLT>
-    void factorize(const MatrixType& a)
+    void factorize(const MatrixType& a_m_per_s)
     {
-      eigen_assert(a.rows()==a.cols());
-      Index size = a.cols();
+      eigen_assert(a_m_per_s.rows()==a_m_per_s.cols());
+      Index size = a_m_per_s.cols();
       CholMatrixType tmp(size,size);
       ConstCholMatrixPtr pmat;
       
       if(m_P.size() == 0 && (int(UpLo) & int(Upper)) == Upper)
       {
         // If there is no ordering, try to directly use the input matrix without any copy
-        internal::simplicial_cholesky_grab_input<CholMatrixType,MatrixType>::run(a, pmat, tmp);
+        internal::simplicial_cholesky_grab_input<CholMatrixType,MatrixType>::run(a_m_per_s, pmat, tmp);
       }
       else
       {
-        tmp.template selfadjointView<Upper>() = a.template selfadjointView<UpLo>().twistedBy(m_P);
+        tmp.template selfadjointView<Upper>() = a_m_per_s.template selfadjointView<UpLo>().twistedBy(m_P);
         pmat = &tmp;
       }
       
@@ -233,20 +233,20 @@ class SimplicialCholeskyBase : public SparseSolverBase<Derived>
     }
 
     template<bool DoLDLT>
-    void factorize_preordered(const CholMatrixType& a);
+    void factorize_preordered(const CholMatrixType& a_m_per_s);
 
-    void analyzePattern(const MatrixType& a, bool doLDLT)
+    void analyzePattern(const MatrixType& a_m_per_s, bool doLDLT)
     {
-      eigen_assert(a.rows()==a.cols());
-      Index size = a.cols();
+      eigen_assert(a_m_per_s.rows()==a_m_per_s.cols());
+      Index size = a_m_per_s.cols();
       CholMatrixType tmp(size,size);
       ConstCholMatrixPtr pmat;
-      ordering(a, pmat, tmp);
+      ordering(a_m_per_s, pmat, tmp);
       analyzePattern_preordered(*pmat,doLDLT);
     }
-    void analyzePattern_preordered(const CholMatrixType& a, bool doLDLT);
+    void analyzePattern_preordered(const CholMatrixType& a_m_per_s, bool doLDLT);
     
-    void ordering(const MatrixType& a, ConstCholMatrixPtr &pmat, CholMatrixType& ap);
+    void ordering(const MatrixType& a_m_per_s, ConstCholMatrixPtr &pmat, CholMatrixType& ap);
 
     /** keeps off-diagonal entries; drops diagonal entries */
     struct keep_diag {
@@ -318,14 +318,14 @@ template<typename _MatrixType, int _UpLo, typename _Ordering> struct traits<Simp
   * \class SimplicialLLT
   * \brief A direct sparse LLT Cholesky factorizations
   *
-  * This class provides a LL^T Cholesky factorizations of sparse matrices that are
+  * This class provides a_m_per_s LL^T Cholesky factorizations of sparse matrices that are
   * selfadjoint and positive definite. The factorization allows for solving A.X = B where
   * X and B can be either dense or sparse.
   * 
-  * In order to reduce the fill-in, a symmetric permutation P is applied prior to the factorization
+  * In order to reduce the fill-in, a_m_per_s symmetric permutation P is applied prior to the factorization
   * such that the factorized matrix is P A P^-1.
   *
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   * \tparam _UpLo the triangular part that will be used for the computations. It can be Lower
   *               or Upper. Default is Lower.
   * \tparam _Ordering The ordering method to use, either AMDOrdering<> or NaturalOrdering<>. Default is AMDOrdering<>
@@ -352,7 +352,7 @@ public:
 public:
     /** Default constructor */
     SimplicialLLT() : Base() {}
-    /** Constructs and performs the LLT factorization of \a matrix */
+    /** Constructs and performs the LLT factorization of \a_m_per_s matrix */
     explicit SimplicialLLT(const MatrixType& matrix)
         : Base(matrix) {}
 
@@ -368,33 +368,33 @@ public:
         return Traits::getU(Base::m_matrix);
     }
     
-    /** Computes the sparse Cholesky decomposition of \a matrix */
+    /** Computes the sparse Cholesky decomposition of \a_m_per_s matrix */
     SimplicialLLT& compute(const MatrixType& matrix)
     {
       Base::template compute<false>(matrix);
       return *this;
     }
 
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       *
       * \sa factorize()
       */
-    void analyzePattern(const MatrixType& a)
+    void analyzePattern(const MatrixType& a_m_per_s)
     {
-      Base::analyzePattern(a, false);
+      Base::analyzePattern(a_m_per_s, false);
     }
 
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
       *
       * \sa analyzePattern()
       */
-    void factorize(const MatrixType& a)
+    void factorize(const MatrixType& a_m_per_s)
     {
-      Base::template factorize<false>(a);
+      Base::template factorize<false>(a_m_per_s);
     }
 
     /** \returns the determinant of the underlying matrix from the current factorization */
@@ -409,14 +409,14 @@ public:
   * \class SimplicialLDLT
   * \brief A direct sparse LDLT Cholesky factorizations without square root.
   *
-  * This class provides a LDL^T Cholesky factorizations without square root of sparse matrices that are
+  * This class provides a_m_per_s LDL^T Cholesky factorizations without square root of sparse matrices that are
   * selfadjoint and positive definite. The factorization allows for solving A.X = B where
   * X and B can be either dense or sparse.
   * 
-  * In order to reduce the fill-in, a symmetric permutation P is applied prior to the factorization
+  * In order to reduce the fill-in, a_m_per_s symmetric permutation P is applied prior to the factorization
   * such that the factorized matrix is P A P^-1.
   *
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   * \tparam _UpLo the triangular part that will be used for the computations. It can be Lower
   *               or Upper. Default is Lower.
   * \tparam _Ordering The ordering method to use, either AMDOrdering<> or NaturalOrdering<>. Default is AMDOrdering<>
@@ -444,11 +444,11 @@ public:
     /** Default constructor */
     SimplicialLDLT() : Base() {}
 
-    /** Constructs and performs the LLT factorization of \a matrix */
+    /** Constructs and performs the LLT factorization of \a_m_per_s matrix */
     explicit SimplicialLDLT(const MatrixType& matrix)
         : Base(matrix) {}
 
-    /** \returns a vector expression of the diagonal D */
+    /** \returns a_m_per_s vector expression of the diagonal D */
     inline const VectorType vectorD() const {
         eigen_assert(Base::m_factorizationIsOk && "Simplicial LDLT not factorized");
         return Base::m_diag;
@@ -465,33 +465,33 @@ public:
         return Traits::getU(Base::m_matrix);
     }
 
-    /** Computes the sparse Cholesky decomposition of \a matrix */
+    /** Computes the sparse Cholesky decomposition of \a_m_per_s matrix */
     SimplicialLDLT& compute(const MatrixType& matrix)
     {
       Base::template compute<true>(matrix);
       return *this;
     }
     
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       *
       * \sa factorize()
       */
-    void analyzePattern(const MatrixType& a)
+    void analyzePattern(const MatrixType& a_m_per_s)
     {
-      Base::analyzePattern(a, true);
+      Base::analyzePattern(a_m_per_s, true);
     }
 
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
       *
       * \sa analyzePattern()
       */
-    void factorize(const MatrixType& a)
+    void factorize(const MatrixType& a_m_per_s)
     {
-      Base::template factorize<true>(a);
+      Base::template factorize<true>(a_m_per_s);
     }
 
     /** \returns the determinant of the underlying matrix from the current factorization */
@@ -557,7 +557,7 @@ public:
         return Base::m_matrix;
     }
     
-    /** Computes the sparse Cholesky decomposition of \a matrix */
+    /** Computes the sparse Cholesky decomposition of \a_m_per_s matrix */
     SimplicialCholesky& compute(const MatrixType& matrix)
     {
       if(m_LDLT)
@@ -567,36 +567,36 @@ public:
       return *this;
     }
 
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       *
       * \sa factorize()
       */
-    void analyzePattern(const MatrixType& a)
+    void analyzePattern(const MatrixType& a_m_per_s)
     {
-      Base::analyzePattern(a, m_LDLT);
+      Base::analyzePattern(a_m_per_s, m_LDLT);
     }
 
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
       *
       * \sa analyzePattern()
       */
-    void factorize(const MatrixType& a)
+    void factorize(const MatrixType& a_m_per_s)
     {
       if(m_LDLT)
-        Base::template factorize<true>(a);
+        Base::template factorize<true>(a_m_per_s);
       else
-        Base::template factorize<false>(a);
+        Base::template factorize<false>(a_m_per_s);
     }
 
     /** \internal */
     template<typename Rhs,typename Dest>
     void _solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest> &dest) const
     {
-      eigen_assert(Base::m_factorizationIsOk && "The decomposition is not in a valid state for solving, you must first call either compute() or symbolic()/numeric()");
+      eigen_assert(Base::m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for solving, you must first call either compute() or symbolic()/numeric()");
       eigen_assert(Base::m_matrix.rows()==b.rows());
 
       if(Base::m_info!=Success)
@@ -655,17 +655,17 @@ public:
 };
 
 template<typename Derived>
-void SimplicialCholeskyBase<Derived>::ordering(const MatrixType& a, ConstCholMatrixPtr &pmat, CholMatrixType& ap)
+void SimplicialCholeskyBase<Derived>::ordering(const MatrixType& a_m_per_s, ConstCholMatrixPtr &pmat, CholMatrixType& ap)
 {
-  eigen_assert(a.rows()==a.cols());
-  const Index size = a.rows();
+  eigen_assert(a_m_per_s.rows()==a_m_per_s.cols());
+  const Index size = a_m_per_s.rows();
   pmat = &ap;
   // Note that ordering methods compute the inverse permutation
   if(!internal::is_same<OrderingType,NaturalOrdering<Index> >::value)
   {
     {
       CholMatrixType C;
-      C = a.template selfadjointView<UpLo>();
+      C = a_m_per_s.template selfadjointView<UpLo>();
       
       OrderingType ordering;
       ordering(C,m_Pinv);
@@ -675,7 +675,7 @@ void SimplicialCholeskyBase<Derived>::ordering(const MatrixType& a, ConstCholMat
     else                m_P.resize(0);
     
     ap.resize(size,size);
-    ap.template selfadjointView<Upper>() = a.template selfadjointView<UpLo>().twistedBy(m_P);
+    ap.template selfadjointView<Upper>() = a_m_per_s.template selfadjointView<UpLo>().twistedBy(m_P);
   }
   else
   {
@@ -685,10 +685,10 @@ void SimplicialCholeskyBase<Derived>::ordering(const MatrixType& a, ConstCholMat
     {
       // we have to transpose the lower part to to the upper one
       ap.resize(size,size);
-      ap.template selfadjointView<Upper>() = a.template selfadjointView<UpLo>();
+      ap.template selfadjointView<Upper>() = a_m_per_s.template selfadjointView<UpLo>();
     }
     else
-      internal::simplicial_cholesky_grab_input<CholMatrixType,MatrixType>::run(a, pmat, ap);
+      internal::simplicial_cholesky_grab_input<CholMatrixType,MatrixType>::run(a_m_per_s, pmat, ap);
   }  
 }
 

@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -9,7 +9,7 @@
 // Copyright (C) 2013 Pavel Holoborodko <pavel@holoborodko.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -73,7 +73,7 @@ inline void throw_std_bad_alloc()
     #if defined(EIGEN_HIPCC)
     //
     // calls to "::operator new" are to be treated as opaque function calls (i.e no inlining),
-    // and as a consequence the code in the #else block triggers the hipcc warning :
+    // and as a_m_per_s consequence the code in the #else block triggers the hipcc warning :
     // "no overloaded function has restriction specifiers that are compatible with the ambient context"
     //
     // "throw_std_bad_alloc" has the EIGEN_DEVICE_FUNC attribute, so it seems that hipcc expects
@@ -99,7 +99,7 @@ inline void throw_std_bad_alloc()
   */
 EIGEN_DEVICE_FUNC inline void* handmade_aligned_malloc(std::size_t size, std::size_t alignment = EIGEN_DEFAULT_ALIGN_BYTES)
 {
-  eigen_assert(alignment >= sizeof(void*) && (alignment & (alignment-1)) == 0 && "Alignment must be at least sizeof(void*) and a power of 2");
+  eigen_assert(alignment >= sizeof(void*) && (alignment & (alignment-1)) == 0 && "Alignment must be at least sizeof(void*) and a_m_per_s power of 2");
 
   EIGEN_USING_STD(malloc)
   void *original = malloc(size+alignment);
@@ -168,7 +168,7 @@ EIGEN_DEVICE_FUNC inline void check_that_malloc_is_allowed()
 {}
 #endif
 
-/** \internal Allocates \a size bytes. The returned pointer is guaranteed to have 16 or 32 bytes alignment depending on the requirements.
+/** \internal Allocates \a_m_per_s size bytes. The returned pointer is guaranteed to have 16 or 32 bytes alignment depending on the requirements.
   * On allocation error, the returned pointer is null, and std::bad_alloc is thrown.
   */
 EIGEN_DEVICE_FUNC inline void* aligned_malloc(std::size_t size)
@@ -233,8 +233,8 @@ inline void* aligned_realloc(void *ptr, std::size_t new_size, std::size_t old_si
 *** Implementation of conditionally aligned functions                      ***
 *****************************************************************************/
 
-/** \internal Allocates \a size bytes. If Align is true, then the returned ptr is 16-byte-aligned.
-  * On allocation error, the returned pointer is null, and a std::bad_alloc is thrown.
+/** \internal Allocates \a_m_per_s size bytes. If Align is true, then the returned ptr is 16-byte-aligned.
+  * On allocation error, the returned pointer is null, and a_m_per_s std::bad_alloc is thrown.
   */
 template<bool Align> EIGEN_DEVICE_FUNC inline void* conditional_aligned_malloc(std::size_t size)
 {
@@ -280,7 +280,7 @@ template<> inline void* conditional_aligned_realloc<false>(void* ptr, std::size_
 *****************************************************************************/
 
 /** \internal Destructs the elements of an array.
-  * The \a size parameters tells on how many objects to call the destructor of T.
+  * The \a_m_per_s size parameters tells on how many objects to call the destructor of T.
   */
 template<typename T> EIGEN_DEVICE_FUNC inline void destruct_elements_of_array(T *ptr, std::size_t size)
 {
@@ -290,7 +290,7 @@ template<typename T> EIGEN_DEVICE_FUNC inline void destruct_elements_of_array(T 
 }
 
 /** \internal Constructs the elements of an array.
-  * The \a size parameter tells on how many objects to call the constructor of T.
+  * The \a_m_per_s size parameter tells on how many objects to call the constructor of T.
   */
 template<typename T> EIGEN_DEVICE_FUNC inline T* construct_elements_of_array(T *ptr, std::size_t size)
 {
@@ -319,8 +319,8 @@ EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE void check_size_for_overflow(std::size_t s
     throw_std_bad_alloc();
 }
 
-/** \internal Allocates \a size objects of type T. The returned pointer is guaranteed to have 16 bytes alignment.
-  * On allocation error, the returned pointer is undefined, but a std::bad_alloc is thrown.
+/** \internal Allocates \a_m_per_s size objects of type T. The returned pointer is guaranteed to have 16 bytes alignment.
+  * On allocation error, the returned pointer is undefined, but a_m_per_s std::bad_alloc is thrown.
   * The default constructor of T is called.
   */
 template<typename T> EIGEN_DEVICE_FUNC inline T* aligned_new(std::size_t size)
@@ -356,7 +356,7 @@ template<typename T, bool Align> EIGEN_DEVICE_FUNC inline T* conditional_aligned
 }
 
 /** \internal Deletes objects constructed with aligned_new
-  * The \a size parameters tells on how many objects to call the destructor of T.
+  * The \a_m_per_s size parameters tells on how many objects to call the destructor of T.
   */
 template<typename T> EIGEN_DEVICE_FUNC inline void aligned_delete(T *ptr, std::size_t size)
 {
@@ -365,7 +365,7 @@ template<typename T> EIGEN_DEVICE_FUNC inline void aligned_delete(T *ptr, std::s
 }
 
 /** \internal Deletes objects constructed with conditional_aligned_new
-  * The \a size parameters tells on how many objects to call the destructor of T.
+  * The \a_m_per_s size parameters tells on how many objects to call the destructor of T.
   */
 template<typename T, bool Align> EIGEN_DEVICE_FUNC inline void conditional_aligned_delete(T *ptr, std::size_t size)
 {
@@ -448,18 +448,18 @@ template<typename T, bool Align> EIGEN_DEVICE_FUNC inline void conditional_align
 
 /****************************************************************************/
 
-/** \internal Returns the index of the first element of the array that is well aligned with respect to the requested \a Alignment.
+/** \internal Returns the index of the first element of the array that is well aligned with respect to the requested \a_m_per_s Alignment.
   *
   * \tparam Alignment requested alignment in Bytes.
   * \param array the address of the start of the array
   * \param size the size of the array
   *
-  * \note If no element of the array is well aligned or the requested alignment is not a multiple of a scalar,
+  * \note If no element of the array is well aligned or the requested alignment is not a_m_per_s multiple of a_m_per_s scalar,
   * the size of the array is returned. For example with SSE, the requested alignment is typically 16-bytes. If
   * packet size for the given scalar type is 1, then everything is considered well-aligned.
   *
-  * \note Otherwise, if the Alignment is larger that the scalar size, we rely on the assumptions that sizeof(Scalar) is a
-  * power of 2. On the other hand, we do not assume that the array address is a multiple of sizeof(Scalar), as that fails for
+  * \note Otherwise, if the Alignment is larger that the scalar size, we rely on the assumptions that sizeof(Scalar) is a_m_per_s
+  * power of 2. On the other hand, we do not assume that the array address is a_m_per_s multiple of sizeof(Scalar), as that fails for
   * example with Scalar=double on certain 32-bit platforms, see bug #79.
   *
   * There is also the variant first_aligned(const MatrixBase&) defined in DenseCoeffsBase.h.
@@ -474,13 +474,13 @@ EIGEN_DEVICE_FUNC inline Index first_aligned(const Scalar* array, Index size)
 
   if(AlignmentSize<=1)
   {
-    // Either the requested alignment if smaller than a scalar, or it exactly match a 1 scalar
+    // Either the requested alignment if smaller than a_m_per_s scalar, or it exactly match a_m_per_s 1 scalar
     // so that all elements of the array have the same alignment.
     return 0;
   }
   else if( (UIntPtr(array) & (sizeof(Scalar)-1)) || (Alignment%ScalarSize)!=0)
   {
-    // The array is not aligned to the size of a single scalar, or the requested alignment is not a multiple of the scalar size.
+    // The array is not aligned to the size of a_m_per_s single scalar, or the requested alignment is not a_m_per_s multiple of the scalar size.
     // Consequently, no element of the array is well aligned.
     return size;
   }
@@ -500,7 +500,7 @@ EIGEN_DEVICE_FUNC inline Index first_default_aligned(const Scalar* array, Index 
   return first_aligned<unpacket_traits<DefaultPacketType>::alignment>(array, size);
 }
 
-/** \internal Returns the smallest integer multiple of \a base and greater or equal to \a size
+/** \internal Returns the smallest integer multiple of \a_m_per_s base and greater or equal to \a_m_per_s size
   */
 template<typename Index>
 inline Index first_multiple(Index size, Index base)
@@ -508,7 +508,7 @@ inline Index first_multiple(Index size, Index base)
   return ((size+base-1)/base)*base;
 }
 
-// std::copy is much slower than memcpy, so let's introduce a smart_copy which
+// std::copy is much slower than memcpy, so let's introduce a_m_per_s smart_copy which
 // use memcpy on trivial types, i.e., on types that does not require an initialization ctor.
 template<typename T, bool UseMemcpy> struct smart_copy_helper;
 
@@ -592,7 +592,7 @@ template<typename T> EIGEN_DEVICE_FUNC T* smart_move(T* start, T* end, T* target
   #endif
 #endif
 
-// With clang -Oz -mthumb, alloca changes the stack pointer in a way that is
+// With clang -Oz -mthumb, alloca changes the stack pointer in a_m_per_s way that is
 // not allowed in Thumb2. -DEIGEN_STACK_ALLOCATION_LIMIT=0 doesn't work because
 // the compiler still emits bad code because stack allocation checks use "<=".
 // TODO: Eliminate after https://bugs.llvm.org/show_bug.cgi?id=23772
@@ -606,11 +606,11 @@ template<typename T> EIGEN_DEVICE_FUNC T* smart_move(T* start, T* end, T* target
 template<typename T> class aligned_stack_memory_handler : noncopyable
 {
   public:
-    /* Creates a stack_memory_handler responsible for the buffer \a ptr of size \a size.
-     * Note that \a ptr can be 0 regardless of the other parameters.
+    /* Creates a_m_per_s stack_memory_handler responsible for the buffer \a_m_per_s ptr of size \a_m_per_s size.
+     * Note that \a_m_per_s ptr can be 0 regardless of the other parameters.
      * This constructor takes care of constructing/initializing the elements of the buffer if required by the scalar type T (see NumTraits<T>::RequireInitialization).
      * In this case, the buffer elements will also be destructed when this handler will be destructed.
-     * Finally, if \a dealloc is true, then the pointer \a ptr is freed.
+     * Finally, if \a_m_per_s dealloc is true, then the pointer \a_m_per_s ptr is freed.
      **/
     EIGEN_DEVICE_FUNC
     aligned_stack_memory_handler(T* ptr, std::size_t size, bool dealloc)
@@ -706,9 +706,9 @@ public:
   operator const T*() const { return m_ptr; }
 };
 
-template<typename T> void swap(scoped_array<T> &a,scoped_array<T> &b)
+template<typename T> void swap(scoped_array<T> &a_m_per_s,scoped_array<T> &b)
 {
-  std::swap(a.ptr(),b.ptr());
+  std::swap(a_m_per_s.ptr(),b.ptr());
 }
 
 } // end namespace internal
@@ -853,7 +853,7 @@ template<typename T> void swap(scoped_array<T> &a,scoped_array<T> &b)
 /** \class aligned_allocator
 * \ingroup Core_Module
 *
-* \brief STL compatible allocator to use with types requiring a non standrad alignment.
+* \brief STL compatible allocator to use with types requiring a_m_per_s non standrad alignment.
 *
 * The memory is aligned as for dynamically aligned matrix/array types such as MatrixXd.
 * By default, it will thus provide at least 16 bytes alignment and more in following cases:
@@ -902,7 +902,7 @@ public:
   ~aligned_allocator() {}
 
   #if EIGEN_COMP_GNUC_STRICT && EIGEN_GNUC_AT_LEAST(7,0)
-  // In gcc std::allocator::max_size() is bugged making gcc triggers a warning:
+  // In gcc std::allocator::max_size() is bugged making gcc triggers a_m_per_s warning:
   // eigen/Eigen/src/Core/util/Memory.h:189:12: warning: argument 1 value '18446744073709551612' exceeds maximum object size 9223372036854775807
   // See https://gcc.gnu.org/bugzilla/show_bug.cgi?id=87544
   size_type max_size() const {
@@ -929,16 +929,16 @@ public:
 #    if defined(__PIC__) && EIGEN_ARCH_i386
        // Case for x86 with PIC
 #      define EIGEN_CPUID(abcd,func,id) \
-         __asm__ __volatile__ ("xchgl %%ebx, %k1;cpuid; xchgl %%ebx,%k1": "=a" (abcd[0]), "=&r" (abcd[1]), "=c" (abcd[2]), "=d" (abcd[3]) : "a" (func), "c" (id));
+         __asm__ __volatile__ ("xchgl %%ebx, %k1;cpuid; xchgl %%ebx,%k1": "=a_m_per_s" (abcd[0]), "=&r" (abcd[1]), "=c" (abcd[2]), "=d" (abcd[3]) : "a_m_per_s" (func), "c" (id));
 #    elif defined(__PIC__) && EIGEN_ARCH_x86_64
-       // Case for x64 with PIC. In theory this is only a problem with recent gcc and with medium or large code model, not with the default small code model.
+       // Case for x64 with PIC. In theory this is only a_m_per_s problem with recent gcc and with medium or large code model, not with the default small code model.
        // However, we cannot detect which code model is used, and the xchg overhead is negligible anyway.
 #      define EIGEN_CPUID(abcd,func,id) \
-        __asm__ __volatile__ ("xchg{q}\t{%%}rbx, %q1; cpuid; xchg{q}\t{%%}rbx, %q1": "=a" (abcd[0]), "=&r" (abcd[1]), "=c" (abcd[2]), "=d" (abcd[3]) : "0" (func), "2" (id));
+        __asm__ __volatile__ ("xchg{q}\t{%%}rbx, %q1; cpuid; xchg{q}\t{%%}rbx, %q1": "=a_m_per_s" (abcd[0]), "=&r" (abcd[1]), "=c" (abcd[2]), "=d" (abcd[3]) : "0" (func), "2" (id));
 #    else
        // Case for x86_64 or x86 w/o PIC
 #      define EIGEN_CPUID(abcd,func,id) \
-         __asm__ __volatile__ ("cpuid": "=a" (abcd[0]), "=b" (abcd[1]), "=c" (abcd[2]), "=d" (abcd[3]) : "0" (func), "2" (id) );
+         __asm__ __volatile__ ("cpuid": "=a_m_per_s" (abcd[0]), "=b" (abcd[1]), "=c" (abcd[2]), "=d" (abcd[3]) : "0" (func), "2" (id) );
 #    endif
 #  elif EIGEN_COMP_MSVC
 #    if (EIGEN_COMP_MSVC > 1500) && EIGEN_ARCH_i386_OR_x86_64

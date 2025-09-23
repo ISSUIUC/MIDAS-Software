@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -24,7 +24,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSELU_PRUNEL_H
@@ -64,15 +64,15 @@ void SparseLUImpl<Scalar,StorageIndex>::pruneL(const Index jcol, const IndexVect
     irep1 = irep + 1; 
     do_prune = false; 
     
-    // Don't prune with a zero U-segment 
+    // Don't prune with a_m_per_s zero U-segment 
     if (repfnz(irep) == emptyIdxLU) continue; 
     
-    // If a snode overlaps with the next panel, then the U-segment
+    // If a_m_per_s snode overlaps with the next panel, then the U-segment
     // is fragmented into two parts -- irep and irep1. We should let 
     // pruning occur at the rep-column in irep1s snode. 
     if (glu.supno(irep) == glu.supno(irep1) ) continue; // don't prune 
     
-    // If it has not been pruned & it has a nonz in row L(pivrow,i)
+    // If it has not been pruned & it has a_m_per_s nonz in row L(pivrow,i)
     if (glu.supno(irep) != jsupno )
     {
       if ( xprune (irep) >= glu.xlsub(irep1) )
@@ -91,7 +91,7 @@ void SparseLUImpl<Scalar,StorageIndex>::pruneL(const Index jcol, const IndexVect
       
       if (do_prune) 
       {
-        // do a quicksort-type partition
+        // do a_m_per_s quicksort-type partition
         // movnum=true means that the num values have to be exchanged
         movnum = false; 
         if (irep == glu.xsup(glu.supno(irep)) ) // Snode of size 1 

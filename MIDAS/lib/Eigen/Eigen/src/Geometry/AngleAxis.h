@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ANGLEAXIS_H
@@ -16,7 +16,7 @@ namespace Eigen {
   *
   * \class AngleAxis
   *
-  * \brief Represents a 3D rotation as a rotation angle around an arbitrary 3D axis
+  * \brief Represents a_m_per_s 3D rotation as a_m_per_s rotation angle around an arbitrary 3D axis
   *
   * \param _Scalar the scalar type, i.e., the type of the coefficients.
   *
@@ -31,7 +31,7 @@ namespace Eigen {
   * \include AngleAxis_mimic_euler.cpp
   * Output: \verbinclude AngleAxis_mimic_euler.out
   *
-  * \note This class is not aimed to be used to store a rotation transformation,
+  * \note This class is not aimed to be used to store a_m_per_s rotation transformation,
   * but rather to make easier the creation of other rotation (Quaternion, rotation Matrix)
   * and transformation objects.
   *
@@ -70,33 +70,33 @@ public:
 
   /** Default constructor without initialization. */
   EIGEN_DEVICE_FUNC AngleAxis() {}
-  /** Constructs and initialize the angle-axis rotation from an \a angle in radian
-    * and an \a axis which \b must \b be \b normalized.
+  /** Constructs and initialize the angle-axis rotation from an \a_m_per_s angle in radian
+    * and an \a_m_per_s axis which \b must \b be \b normalized.
     *
-    * \warning If the \a axis vector is not normalized, then the angle-axis object
+    * \warning If the \a_m_per_s axis vector is not normalized, then the angle-axis object
     *          represents an invalid rotation. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC 
   inline AngleAxis(const Scalar& angle, const MatrixBase<Derived>& axis) : m_axis(axis), m_angle(angle) {}
-  /** Constructs and initialize the angle-axis rotation from a quaternion \a q.
-    * This function implicitly normalizes the quaternion \a q.
+  /** Constructs and initialize the angle-axis rotation from a_m_per_s quaternion \a_m_per_s q.
+    * This function implicitly normalizes the quaternion \a_m_per_s q.
     */
   template<typename QuatDerived> 
   EIGEN_DEVICE_FUNC inline explicit AngleAxis(const QuaternionBase<QuatDerived>& q) { *this = q; }
-  /** Constructs and initialize the angle-axis rotation from a 3x3 rotation matrix. */
+  /** Constructs and initialize the angle-axis rotation from a_m_per_s 3x3 rotation matrix. */
   template<typename Derived>
   EIGEN_DEVICE_FUNC inline explicit AngleAxis(const MatrixBase<Derived>& m) { *this = m; }
 
   /** \returns the value of the rotation angle in radian */
   EIGEN_DEVICE_FUNC Scalar angle() const { return m_angle; }
-  /** \returns a read-write reference to the stored angle in radian */
+  /** \returns a_m_per_s read-write reference to the stored angle in radian */
   EIGEN_DEVICE_FUNC Scalar& angle() { return m_angle; }
 
   /** \returns the rotation axis */
   EIGEN_DEVICE_FUNC const Vector3& axis() const { return m_axis; }
-  /** \returns a read-write reference to the stored rotation axis.
+  /** \returns a_m_per_s read-write reference to the stored rotation axis.
     *
-    * \warning The rotation axis must remain a \b unit vector.
+    * \warning The rotation axis must remain a_m_per_s \b unit vector.
     */
   EIGEN_DEVICE_FUNC Vector3& axis() { return m_axis; }
 
@@ -109,8 +109,8 @@ public:
   { return QuaternionType(*this) * other; }
 
   /** Concatenates two rotations */
-  friend EIGEN_DEVICE_FUNC inline QuaternionType operator* (const QuaternionType& a, const AngleAxis& b)
-  { return a * QuaternionType(b); }
+  friend EIGEN_DEVICE_FUNC inline QuaternionType operator* (const QuaternionType& a_m_per_s, const AngleAxis& b)
+  { return a_m_per_s * QuaternionType(b); }
 
   /** \returns the inverse rotation, i.e., an angle-axis with opposite rotation angle */
   EIGEN_DEVICE_FUNC AngleAxis inverse() const
@@ -125,10 +125,10 @@ public:
   EIGEN_DEVICE_FUNC AngleAxis& fromRotationMatrix(const MatrixBase<Derived>& m);
   EIGEN_DEVICE_FUNC Matrix3 toRotationMatrix(void) const;
 
-  /** \returns \c *this with scalar type casted to \a NewScalarType
+  /** \returns \c *this with scalar type casted to \a_m_per_s NewScalarType
     *
-    * Note that if \a NewScalarType is equal to the current scalar type of \c *this
-    * then this function smartly returns a const reference to \c *this.
+    * Note that if \a_m_per_s NewScalarType is equal to the current scalar type of \c *this
+    * then this function smartly returns a_m_per_s const reference to \c *this.
     */
   template<typename NewScalarType>
   EIGEN_DEVICE_FUNC inline typename internal::cast_return_type<AngleAxis,AngleAxis<NewScalarType> >::type cast() const
@@ -144,8 +144,8 @@ public:
 
   EIGEN_DEVICE_FUNC static inline const AngleAxis Identity() { return AngleAxis(Scalar(0), Vector3::UnitX()); }
 
-  /** \returns \c true if \c *this is approximately equal to \a other, within the precision
-    * determined by \a prec.
+  /** \returns \c true if \c *this is approximately equal to \a_m_per_s other, within the precision
+    * determined by \a_m_per_s prec.
     *
     * \sa MatrixBase::isApprox() */
   EIGEN_DEVICE_FUNC bool isApprox(const AngleAxis& other, const typename NumTraits<Scalar>::Real& prec = NumTraits<Scalar>::dummy_precision()) const
@@ -159,11 +159,11 @@ typedef AngleAxis<float> AngleAxisf;
   * double precision angle-axis type */
 typedef AngleAxis<double> AngleAxisd;
 
-/** Set \c *this from a \b unit quaternion.
+/** Set \c *this from a_m_per_s \b unit quaternion.
   *
   * The resulting axis is normalized, and the computed angle is in the [0,pi] range.
   * 
-  * This function implicitly normalizes the quaternion \a q.
+  * This function implicitly normalizes the quaternion \a_m_per_s q.
   */
 template<typename Scalar>
 template<typename QuatDerived>
@@ -190,19 +190,19 @@ EIGEN_DEVICE_FUNC AngleAxis<Scalar>& AngleAxis<Scalar>::operator=(const Quaterni
   return *this;
 }
 
-/** Set \c *this from a 3x3 rotation matrix \a mat.
+/** Set \c *this from a_m_per_s 3x3 rotation matrix \a_m_per_s mat.
   */
 template<typename Scalar>
 template<typename Derived>
 EIGEN_DEVICE_FUNC AngleAxis<Scalar>& AngleAxis<Scalar>::operator=(const MatrixBase<Derived>& mat)
 {
-  // Since a direct conversion would not be really faster,
+  // Since a_m_per_s direct conversion would not be really faster,
   // let's use the robust Quaternion implementation:
   return *this = QuaternionType(mat);
 }
 
 /**
-* \brief Sets \c *this from a 3x3 rotation matrix.
+* \brief Sets \c *this from a_m_per_s 3x3 rotation matrix.
 **/
 template<typename Scalar>
 template<typename Derived>

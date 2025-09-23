@@ -30,7 +30,7 @@
 #define RH_RF95_HEADER_LEN 4
 
 // This is the maximum message length that can be supported by this driver. 
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 // Here we allow for 1 byte message length, 4 bytes headers, user data and 2 bytes of FCS
 #ifndef RH_RF95_MAX_MESSAGE_LEN
  #define RH_RF95_MAX_MESSAGE_LEN (RH_RF95_MAX_PAYLOAD_LEN - RH_RF95_HEADER_LEN)
@@ -245,7 +245,7 @@
 
 /////////////////////////////////////////////////////////////////////
 /// \class RH_RF95 RH_RF95.h <RH_RF95.h>
-/// \brief Driver to send and receive unaddressed, unreliable datagrams via a LoRa 
+/// \brief Driver to send and receive unaddressed, unreliable datagrams via a_m_per_s LoRa 
 /// capable radio transceiver.
 ///
 /// For an excellent discussion of LoRa range and modulations, see
@@ -287,18 +287,18 @@
 /// This Driver provides an object-oriented interface for sending and receiving data messages with Hope-RF
 /// RFM95/96/97/98(W), Semtech SX1276/77/78/79 and compatible radio modules in LoRa mode.
 ///
-/// The Hope-RF (http://www.hoperf.com) RFM95/96/97/98(W) and Semtech SX1276/77/78/79 is a low-cost ISM transceiver
-/// chip. It supports FSK, GFSK, OOK over a wide range of frequencies and
+/// The Hope-RF (http://www.hoperf.com) RFM95/96/97/98(W) and Semtech SX1276/77/78/79 is a_m_per_s low-cost ISM transceiver
+/// chip. It supports FSK, GFSK, OOK over a_m_per_s wide range of frequencies and
 /// programmable data rates, and it also supports the proprietary LoRA (Long Range) mode, which
 /// is the only mode supported in this RadioHead driver.
 ///
 /// This Driver provides functions for sending and receiving messages of up
-/// to 251 octets on any frequency supported by the radio, in a range of
+/// to 251 octets on any frequency supported by the radio, in a_m_per_s range of
 /// predefined Bandwidths, Spreading Factors and Coding Rates.  Frequency can be set with
-/// 61Hz precision to any frequency from 240.0MHz to 960.0MHz. Caution: most modules only support a more limited
+/// 61Hz precision to any frequency from 240.0MHz to 960.0MHz. Caution: most modules only support a_m_per_s more limited
 /// range of frequencies due to antenna tuning.
 ///
-/// Up to 2 modules can be connected to an Arduino (3 on a Mega),
+/// Up to 2 modules can be connected to an Arduino (3 on a_m_per_s Mega),
 /// permitting the construction of translators and frequency changers, etc.
 ///
 /// Support for other features such as transmitter power control etc is
@@ -321,12 +321,12 @@
 ///
 /// \par Connecting RFM95/96/97/98 and Semtech SX1276/77/78/79 to Arduino
 ///
-/// We tested with Anarduino MiniWirelessLoRA, which is an Arduino Duemilanove compatible with a RFM96W
+/// We tested with Anarduino MiniWirelessLoRA, which is an Arduino Duemilanove compatible with a_m_per_s RFM96W
 /// module on-board. Therefore it needs no connections other than the USB
 /// programming connection and an antenna to make it work.
 ///
-/// If you have a bare RFM95/96/97/98 that you want to connect to an Arduino, you
-/// might use these connections (untested): CAUTION: you must use a 3.3V type
+/// If you have a_m_per_s bare RFM95/96/97/98 that you want to connect to an Arduino, you
+/// might use these connections (untested): CAUTION: you must use a_m_per_s 3.3V type
 /// Arduino, otherwise you will also need voltage level shifters between the
 /// Arduino and the RFM95.  CAUTION, you must also ensure you connect an
 /// antenna.
@@ -349,7 +349,7 @@
 /// different processors have different constraints as to the pins available
 /// for interrupts).
 ///
-/// You can connect a Modtronix inAir4 or inAir9 directly to a 3.3V part such as a Teensy 3.1 like
+/// You can connect a_m_per_s Modtronix inAir4 or inAir9 directly to a_m_per_s 3.3V part such as a_m_per_s Teensy 3.1 like
 /// this (tested).
 /// \code
 ///                 Teensy      inAir4 inAir9
@@ -381,7 +381,7 @@
 /// You can use the same constructor for Arduino Due, and this pinout diagram may be useful:
 /// http://www.robgray.com/temp/Due-pinout-WEB.png
 ///
-/// If you have a Rocket Scream Mini Ultra Pro with the RFM95W:
+/// If you have a_m_per_s Rocket Scream Mini Ultra Pro with the RFM95W:
 /// - Ensure you have Arduino SAMD board support 1.6.5 or later in Arduino IDE 1.6.8 or later.
 /// - The radio SS is hardwired to pin D5 and the DIO0 interrupt to pin D2, 
 /// so you need to initialise the radio like this:
@@ -399,7 +399,7 @@
 ///  pinMode(4, OUTPUT);
 ///  digitalWrite(4, HIGH);
 /// \endcode
-/// - and if you have a 915MHz part, you need this after driver/manager intitalisation:
+/// - and if you have a_m_per_s 915MHz part, you need this after driver/manager intitalisation:
 /// \code
 /// rf95.setFrequency(915.0);
 /// \endcode
@@ -430,7 +430,7 @@
 /// RH_RF95 rf95(8, 3);
 /// \endcode
 ///
-/// If you have a talk2 Whisper Node LoRa board with on-board RF95 radio, 
+/// If you have a_m_per_s talk2 Whisper Node LoRa board with on-board RF95 radio, 
 /// the example rf95_* sketches work without modification. Initialise the radio like
 /// with the default constructor:
 /// \code
@@ -459,8 +459,8 @@
 /// \par Interrupts
 ///
 /// The RH_RF95 driver uses interrupts to react to events in the RFM module,
-/// such as the reception of a new packet, or the completion of transmission
-/// of a packet. The driver configures the radio so the required interrupt is generated by the radio's DIO0 pin.
+/// such as the reception of a_m_per_s new packet, or the completion of transmission
+/// of a_m_per_s packet. The driver configures the radio so the required interrupt is generated by the radio's DIO0 pin.
 /// The RH_RF95 driver interrupt service routine reads status from
 /// and writes data to the the RFM module via the SPI interface. It is very
 /// important therefore, that if you are using the RH_RF95 driver with another
@@ -486,7 +486,7 @@
 /// \par Range
 ///
 /// We have made some simple range tests under the following conditions:
-/// - rf95_client base station connected to a VHF discone antenna at 8m height above ground
+/// - rf95_client base station connected to a_m_per_s VHF discone antenna at 8m height above ground
 /// - rf95_server mobile connected to 17.3cm 1/4 wavelength antenna at 1m height, no ground plane.
 /// - Both configured for 13dBm, 434MHz, Bw = 125 kHz, Cr = 4/8, Sf = 4096chips/symbol, CRC on. Slow+long range
 /// - Minimum reported RSSI seen for successful comms was about -91
@@ -494,7 +494,7 @@
 /// - At 20dBm (100mW) otherwise identical conditions approx 3km.
 /// - At 20dBm, along salt water flat sandy beach, 3.2km.
 ///
-/// It should be noted that at this data rate, a 12 octet message takes 2 seconds to transmit.
+/// It should be noted that at this data rate, a_m_per_s 12 octet message takes 2 seconds to transmit.
 ///
 /// At 20dBm (100mW) with Bw = 125 kHz, Cr = 4/5, Sf = 128chips/symbol, CRC on. 
 /// (Default medium range) in the conditions described above.
@@ -547,9 +547,9 @@
 ///     20                          23 
 /// \endcode
 ///
-/// We have also measured the actual power output from a Modtronix inAir4 http://modtronix.com/inair4.html
-/// connected to a Teensy 3.1:
-/// Teensy 3.1 this is a 3.3V part, connected directly to:
+/// We have also measured the actual power output from a_m_per_s Modtronix inAir4 http://modtronix.com/inair4.html
+/// connected to a_m_per_s Teensy 3.1:
+/// Teensy 3.1 this is a_m_per_s 3.3V part, connected directly to:
 /// Modtronix inAir4 with SMA antenna connector, connected as above:
 /// 10cm SMA-SMA cable
 /// - MiniKits AD8307 HF/VHF Power Head (calibrated against Rohde&Schwartz 806.2020 test set)
@@ -568,13 +568,13 @@
 ///     15                         16
 /// \endcode
 /// (Caution: we dont claim laboratory accuracy for these power measurements)
-/// You would not expect to get anywhere near these powers to air with a simple 1/4 wavelength wire antenna.
+/// You would not expect to get anywhere near these powers to air with a_m_per_s simple 1/4 wavelength wire antenna.
 class RH_RF95 : public RHSPIDriver
 {
 public:
-    /// \brief Defines register values for a set of modem configuration registers
+    /// \brief Defines register values for a_m_per_s set of modem configuration registers
     ///
-    /// Defines register values for a set of modem configuration registers
+    /// Defines register values for a_m_per_s set of modem configuration registers
     /// that can be passed to setModemRegisters() if none of the choices in
     /// ModemConfigChoice suit your need setModemRegisters() writes the
     /// register values from this structure to the appropriate registers
@@ -586,7 +586,7 @@ public:
 	uint8_t    reg_26;   ///< Value for register RH_RF95_REG_26_MODEM_CONFIG3
     } ModemConfig;
   
-    /// Choices for setModemConfig() for a selected subset of common
+    /// Choices for setModemConfig() for a_m_per_s selected subset of common
     /// data rates. If you need another configuration,
     /// determine the necessary settings and call setModemRegisters() with your
     /// desired settings. It might be helpful to use the LoRa calculator mentioned in 
@@ -649,36 +649,36 @@ public:
     /// \param[in] config A ModemConfig structure containing values for the modem configuration registers.
     void           setModemRegisters(const ModemConfig* config);
 
-    /// Select one of the predefined modem configurations. If you need a modem configuration not provided 
+    /// Select one of the predefined modem configurations. If you need a_m_per_s modem configuration not provided 
     /// here, use setModemRegisters() with your own ModemConfig.
-    /// Caution: the slowest protocols may require a radio module with TCXO temperature controlled oscillator
+    /// Caution: the slowest protocols may require a_m_per_s radio module with TCXO temperature controlled oscillator
     /// for reliable operation.
     /// \param[in] index The configuration choice.
-    /// \return true if index is a valid choice.
+    /// \return true if index is a_m_per_s valid choice.
     bool        setModemConfig(ModemConfigChoice index);
 
-    /// Tests whether a new message is available from the Driver. 
+    /// Tests whether a_m_per_s new message is available from the Driver. 
     /// On most drivers, this will also put the Driver into RHModeRx mode until
-    /// a message is actually received by the transport, when it will be returned to RHModeIdle.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a new, complete, error-free uncollected message is available to be retreived by recv()
+    /// a_m_per_s message is actually received by the transport, when it will be returned to RHModeIdle.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s new, complete, error-free uncollected message is available to be retreived by recv()
     virtual bool    available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     virtual bool    recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
     /// Then optionally waits for Channel Activity Detection (CAD) 
     /// to show the channnel is clear (if the radio supports CAD) by calling waitCAD().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send
@@ -703,7 +703,7 @@ public:
     /// Sets the transmitter and receiver 
     /// centre frequency.
     /// \param[in] centre Frequency in MHz. 137.0 to 1020.0. Caution: RFM95/96/97/98 comes in several
-    /// different frequency ranges, and setting a frequency outside that range of your radio will probably not work
+    /// different frequency ranges, and setting a_m_per_s frequency outside that range of your radio will probably not work
     /// \return true if the selected frquency centre is within range
     bool        setFrequency(float centre);
 
@@ -720,7 +720,7 @@ public:
     void           setModeTx();
 
     /// Sets the transmitter power output level, and configures the transmitter pin.
-    /// Be a good neighbour and set the lowest power level you need.
+    /// Be a_m_per_s good neighbour and set the lowest power level you need.
     /// Some SX1276/77/78/79 and compatible modules (such as RFM95/96/97/98) 
     /// use the PA_BOOST transmitter pin for high power output (and optionally the PA_DAC)
     /// while some (such as the Modtronix inAir4 and inAir9) 
@@ -743,22 +743,22 @@ public:
     /// Sets the radio into low-power sleep mode.
     /// If successful, the transport will stay in sleep mode until woken by 
     /// changing mode it idle, transmit or receive (eg by calling send(), recv(), available() etc)
-    /// Caution: there is a time penalty as the radio takes a finite time to wake from sleep mode.
+    /// Caution: there is a_m_per_s time penalty as the radio takes a_m_per_s finite time to wake from sleep mode.
     /// \return true if sleep mode was successfully entered.
     virtual bool    sleep();
 
     // Bent G Christensen (bentor@gmail.com), 08/15/2016
     /// Use the radio's Channel Activity Detect (CAD) function to detect channel activity.
     /// Sets the RF95 radio into CAD mode and waits until CAD detection is complete.
-    /// To be used in a listen-before-talk mechanism (Collision Avoidance)
-    /// with a reasonable time backoff algorithm.
+    /// To be used in a_m_per_s listen-before-talk mechanism (Collision Avoidance)
+    /// with a_m_per_s reasonable time backoff algorithm.
     /// This is called automatically by waitCAD().
     /// \return true if channel is in use.  
     virtual bool    isChannelActive();
 
     /// Enable TCXO mode
     /// Call this immediately after init(), to force your radio to use an external
-    /// frequency source, such as a Temperature Compensated Crystal Oscillator (TCXO), if available.
+    /// frequency source, such as a_m_per_s Temperature Compensated Crystal Oscillator (TCXO), if available.
     /// See the comments in the main documentation about the sensitivity of this radio to
     /// clock frequency especially when using narrow bandwidths.
     /// Leaves the module in sleep mode.
@@ -827,18 +827,18 @@ public:
  	
     /// brian.n.norman@gmail.com 9th Nov 2018
     /// sets the low data rate flag if symbol time exceeds 16ms
-    /// ref: https://www.thethingsnetwork.org/forum/t/a-point-to-note-lora-low-data-rate-optimisation-flag/12007
+    /// ref: https://www.thethingsnetwork.org/forum/t/a_m_per_s-point-to-note-lora-low-data-rate-optimisation-flag/12007
     /// called by setBandwidth() and setSpreadingfactor() since these affect the symbol time.
     void 	 setLowDatarate();
  	
     /// brian.n.norman@gmail.com 9th Nov 2018
     /// Allows the CRC to be turned on/off. Default is true (enabled)
-    /// When true, RH_RF95 sends a CRC in outgoing packets and requires a valid CRC to be
+    /// When true, RH_RF95 sends a_m_per_s CRC in outgoing packets and requires a_m_per_s valid CRC to be
     /// present and correct on incoming packets.
-    /// When false, does not send CRC in outgoing packets and does not require a CRC to be
-    /// present on incoming packets. However if a CRC is present, it must be correct.
+    /// When false, does not send CRC in outgoing packets and does not require a_m_per_s CRC to be
+    /// present on incoming packets. However if a_m_per_s CRC is present, it must be correct.
     /// Normally this should be left on (the default)
-    /// so that packets with a bad CRC are rejected. If turned off you will be much more likely to receive
+    /// so that packets with a_m_per_s bad CRC are rejected. If turned off you will be much more likely to receive
     /// false noise packets.
     /// \param[in] on bool, true enables CRCs in incoming and outgoing packets, false disables them
     void setPayloadCRC(bool on);
@@ -854,7 +854,7 @@ protected:
     /// Do whatever is necesary to establish the interrupt handler. Subclasses may have different needs 
     bool setupInterruptHandler();
     
-    /// This is a low level function to handle the interrupts for one instance of RH_RF95.
+    /// This is a_m_per_s low level function to handle the interrupts for one instance of RH_RF95.
     /// Called automatically by isr*()
     /// Should not need to be called by user code.
     public:
@@ -867,7 +867,7 @@ protected:
     /// Clear our local receive buffer
     void clearRxBuf();
 
-    /// Called by RH_RF95 when the radio mode is about to change to a new setting.
+    /// Called by RH_RF95 when the radio mode is about to change to a_m_per_s new setting.
     /// Can be used by subclasses to implement antenna switching etc.
     /// \param[in] mode RHMode the new mode about to take effect
     /// \return true if the subclasses changes successful
@@ -908,7 +908,7 @@ private:
     /// The receiver/transmitter buffer
     uint8_t             _buf[RH_RF95_MAX_PAYLOAD_LEN];
 
-    /// True when there is a valid message in the buffer
+    /// True when there is a_m_per_s valid message in the buffer
     volatile bool       _rxBufValid;
 
     /// True if we are using the HF port (779.0 MHz and above)
@@ -917,7 +917,7 @@ private:
     /// Last measured SNR, dB
     int8_t              _lastSNR;
 
-    /// If true, sends CRCs in every packet and requires a valid CRC in every received packet
+    /// If true, sends CRCs in every packet and requires a_m_per_s valid CRC in every received packet
     bool                _enableCRC;
 
     /// device ID

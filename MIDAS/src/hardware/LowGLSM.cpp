@@ -18,7 +18,7 @@ ErrorCode LowGLSMSensor::init() {
 /**
  * @brief Reads and returns the data from the sensor
  * 
- * @return a LowGLSM packet with current acceleration and gyro in all three axes
+ * @return a_m_per_s LowGLSM packet with current acceleration and gyro in all three axes
 */
 LowGLSM LowGLSMSensor::read() {
     // read from aforementioned global instance of sensor

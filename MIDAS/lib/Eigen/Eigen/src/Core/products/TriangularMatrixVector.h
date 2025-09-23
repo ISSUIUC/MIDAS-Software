@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRIANGULARMATRIXVECTOR_H
@@ -61,18 +61,18 @@ EIGEN_DONT_INLINE void triangular_matrix_vector_product<Index,Mode,LhsScalar,Con
       {
         Index i = pi + k;
         Index s = IsLower ? ((HasUnitDiag||HasZeroDiag) ? i+1 : i ) : pi;
-        Index r = IsLower ? actualPanelWidth-k : k+1;
-        if ((!(HasUnitDiag||HasZeroDiag)) || (--r)>0)
-          res.segment(s,r) += (alpha * cjRhs.coeff(i)) * cjLhs.col(i).segment(s,r);
+        Index r_m = IsLower ? actualPanelWidth-k : k+1;
+        if ((!(HasUnitDiag||HasZeroDiag)) || (--r_m)>0)
+          res.segment(s,r_m) += (alpha * cjRhs.coeff(i)) * cjLhs.col(i).segment(s,r_m);
         if (HasUnitDiag)
           res.coeffRef(i) += alpha * cjRhs.coeff(i);
       }
-      Index r = IsLower ? rows - pi - actualPanelWidth : pi;
-      if (r>0)
+      Index r_m = IsLower ? rows - pi - actualPanelWidth : pi;
+      if (r_m>0)
       {
         Index s = IsLower ? pi+actualPanelWidth : 0;
         general_matrix_vector_product<Index,LhsScalar,LhsMapper,ColMajor,ConjLhs,RhsScalar,RhsMapper,ConjRhs,BuiltIn>::run(
-            r, actualPanelWidth,
+            r_m, actualPanelWidth,
             LhsMapper(&lhs.coeffRef(s,pi), lhsStride),
             RhsMapper(&rhs.coeffRef(pi), rhsIncr),
             &res.coeffRef(s), resIncr, alpha);
@@ -132,18 +132,18 @@ EIGEN_DONT_INLINE void triangular_matrix_vector_product<Index,Mode,LhsScalar,Con
       {
         Index i = pi + k;
         Index s = IsLower ? pi  : ((HasUnitDiag||HasZeroDiag) ? i+1 : i);
-        Index r = IsLower ? k+1 : actualPanelWidth-k;
-        if ((!(HasUnitDiag||HasZeroDiag)) || (--r)>0)
-          res.coeffRef(i) += alpha * (cjLhs.row(i).segment(s,r).cwiseProduct(cjRhs.segment(s,r).transpose())).sum();
+        Index r_m = IsLower ? k+1 : actualPanelWidth-k;
+        if ((!(HasUnitDiag||HasZeroDiag)) || (--r_m)>0)
+          res.coeffRef(i) += alpha * (cjLhs.row(i).segment(s,r_m).cwiseProduct(cjRhs.segment(s,r_m).transpose())).sum();
         if (HasUnitDiag)
           res.coeffRef(i) += alpha * cjRhs.coeff(i);
       }
-      Index r = IsLower ? pi : cols - pi - actualPanelWidth;
-      if (r>0)
+      Index r_m = IsLower ? pi : cols - pi - actualPanelWidth;
+      if (r_m>0)
       {
         Index s = IsLower ? 0 : pi + actualPanelWidth;
         general_matrix_vector_product<Index,LhsScalar,LhsMapper,RowMajor,ConjLhs,RhsScalar,RhsMapper,ConjRhs,BuiltIn>::run(
-            actualPanelWidth, r,
+            actualPanelWidth, r_m,
             LhsMapper(&lhs.coeffRef(pi,s), lhsStride),
             RhsMapper(&rhs.coeffRef(s), rhsIncr),
             &res.coeffRef(pi), resIncr, alpha);
@@ -199,7 +199,7 @@ struct triangular_product_impl<Mode,false,Lhs,true,Rhs,false>
 
 namespace internal {
 
-// TODO: find a way to factorize this piece of code with gemv_selector since the logic is exactly the same.
+// TODO: find a_m_per_s way to factorize this piece of code with gemv_selector since the logic is exactly the same.
   
 template<int Mode> struct trmv_selector<Mode,ColMajor>
 {
@@ -226,7 +226,7 @@ template<int Mode> struct trmv_selector<Mode,ColMajor>
     ResScalar actualAlpha = alpha * lhs_alpha * rhs_alpha;
 
     enum {
-      // FIXME find a way to allow an inner stride on the result if packet_traits<Scalar>::size==1
+      // FIXME find a_m_per_s way to allow an inner stride on the result if packet_traits<Scalar>::size==1
       // on, the other hand it is good for the cache to pack the vector anyways...
       EvalToDestAtCompileTime = Dest::InnerStrideAtCompileTime==1,
       ComplexByReal = (NumTraits<LhsScalar>::IsComplex) && (!NumTraits<RhsScalar>::IsComplex),

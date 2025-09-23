@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2018 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLEX_AVX512_H
@@ -18,7 +18,7 @@ namespace internal {
 struct Packet8cf
 {
   EIGEN_STRONG_INLINE Packet8cf() {}
-  EIGEN_STRONG_INLINE explicit Packet8cf(const __m512& a) : v(a) {}
+  EIGEN_STRONG_INLINE explicit Packet8cf(const __m512& a_m_per_s) : v(a_m_per_s) {}
   __m512  v;
 };
 
@@ -59,35 +59,35 @@ template<> struct unpacket_traits<Packet8cf> {
   };
 };
 
-template<> EIGEN_STRONG_INLINE Packet8cf ptrue<Packet8cf>(const Packet8cf& a) { return Packet8cf(ptrue(Packet16f(a.v))); }
-template<> EIGEN_STRONG_INLINE Packet8cf padd<Packet8cf>(const Packet8cf& a, const Packet8cf& b) { return Packet8cf(_mm512_add_ps(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet8cf psub<Packet8cf>(const Packet8cf& a, const Packet8cf& b) { return Packet8cf(_mm512_sub_ps(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet8cf pnegate(const Packet8cf& a)
+template<> EIGEN_STRONG_INLINE Packet8cf ptrue<Packet8cf>(const Packet8cf& a_m_per_s) { return Packet8cf(ptrue(Packet16f(a_m_per_s.v))); }
+template<> EIGEN_STRONG_INLINE Packet8cf padd<Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b) { return Packet8cf(_mm512_add_ps(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet8cf psub<Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b) { return Packet8cf(_mm512_sub_ps(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet8cf pnegate(const Packet8cf& a_m_per_s)
 {
-  return Packet8cf(pnegate(a.v));
+  return Packet8cf(pnegate(a_m_per_s.v));
 }
-template<> EIGEN_STRONG_INLINE Packet8cf pconj(const Packet8cf& a)
+template<> EIGEN_STRONG_INLINE Packet8cf pconj(const Packet8cf& a_m_per_s)
 {
   const __m512 mask = _mm512_castsi512_ps(_mm512_setr_epi32(
     0x00000000,0x80000000,0x00000000,0x80000000,0x00000000,0x80000000,0x00000000,0x80000000,
     0x00000000,0x80000000,0x00000000,0x80000000,0x00000000,0x80000000,0x00000000,0x80000000));
-  return Packet8cf(pxor(a.v,mask));
+  return Packet8cf(pxor(a_m_per_s.v,mask));
 }
 
-template<> EIGEN_STRONG_INLINE Packet8cf pmul<Packet8cf>(const Packet8cf& a, const Packet8cf& b)
+template<> EIGEN_STRONG_INLINE Packet8cf pmul<Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b)
 {
-  __m512 tmp2 = _mm512_mul_ps(_mm512_movehdup_ps(a.v), _mm512_permute_ps(b.v, _MM_SHUFFLE(2,3,0,1)));
-  return Packet8cf(_mm512_fmaddsub_ps(_mm512_moveldup_ps(a.v), b.v, tmp2));
+  __m512 tmp2 = _mm512_mul_ps(_mm512_movehdup_ps(a_m_per_s.v), _mm512_permute_ps(b.v, _MM_SHUFFLE(2,3,0,1)));
+  return Packet8cf(_mm512_fmaddsub_ps(_mm512_moveldup_ps(a_m_per_s.v), b.v, tmp2));
 }
 
-template<> EIGEN_STRONG_INLINE Packet8cf pand   <Packet8cf>(const Packet8cf& a, const Packet8cf& b) { return Packet8cf(pand(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet8cf por    <Packet8cf>(const Packet8cf& a, const Packet8cf& b) { return Packet8cf(por(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet8cf pxor   <Packet8cf>(const Packet8cf& a, const Packet8cf& b) { return Packet8cf(pxor(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet8cf pandnot<Packet8cf>(const Packet8cf& a, const Packet8cf& b) { return Packet8cf(pandnot(a.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet8cf pand   <Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b) { return Packet8cf(pand(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet8cf por    <Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b) { return Packet8cf(por(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet8cf pxor   <Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b) { return Packet8cf(pxor(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet8cf pandnot<Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b) { return Packet8cf(pandnot(a_m_per_s.v,b.v)); }
 
 template <>
-EIGEN_STRONG_INLINE Packet8cf pcmp_eq(const Packet8cf& a, const Packet8cf& b) {
-  __m512 eq = pcmp_eq<Packet16f>(a.v, b.v);
+EIGEN_STRONG_INLINE Packet8cf pcmp_eq(const Packet8cf& a_m_per_s, const Packet8cf& b) {
+  __m512 eq = pcmp_eq<Packet16f>(a_m_per_s.v, b.v);
   return Packet8cf(pand(eq, _mm512_permute_ps(eq, 0xB1)));
 }
 
@@ -122,42 +122,42 @@ template<> EIGEN_DEVICE_FUNC inline void pscatter<std::complex<float>, Packet8cf
   pscatter((double*)(void*)to, _mm512_castps_pd(from.v), stride);
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<float>  pfirst<Packet8cf>(const Packet8cf& a)
+template<> EIGEN_STRONG_INLINE std::complex<float>  pfirst<Packet8cf>(const Packet8cf& a_m_per_s)
 {
-  return pfirst(Packet2cf(_mm512_castps512_ps128(a.v)));
+  return pfirst(Packet2cf(_mm512_castps512_ps128(a_m_per_s.v)));
 }
 
-template<> EIGEN_STRONG_INLINE Packet8cf preverse(const Packet8cf& a) {
+template<> EIGEN_STRONG_INLINE Packet8cf preverse(const Packet8cf& a_m_per_s) {
   return Packet8cf(_mm512_castsi512_ps(
             _mm512_permutexvar_epi64( _mm512_set_epi32(0, 0, 0, 1, 0, 2, 0, 3, 0, 4, 0, 5, 0, 6, 0, 7),
-                                      _mm512_castps_si512(a.v))));
+                                      _mm512_castps_si512(a_m_per_s.v))));
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<float> predux<Packet8cf>(const Packet8cf& a)
+template<> EIGEN_STRONG_INLINE std::complex<float> predux<Packet8cf>(const Packet8cf& a_m_per_s)
 {
-  return predux(padd(Packet4cf(extract256<0>(a.v)),
-                     Packet4cf(extract256<1>(a.v))));
+  return predux(padd(Packet4cf(extract256<0>(a_m_per_s.v)),
+                     Packet4cf(extract256<1>(a_m_per_s.v))));
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<float> predux_mul<Packet8cf>(const Packet8cf& a)
+template<> EIGEN_STRONG_INLINE std::complex<float> predux_mul<Packet8cf>(const Packet8cf& a_m_per_s)
 {
-  return predux_mul(pmul(Packet4cf(extract256<0>(a.v)),
-                         Packet4cf(extract256<1>(a.v))));
+  return predux_mul(pmul(Packet4cf(extract256<0>(a_m_per_s.v)),
+                         Packet4cf(extract256<1>(a_m_per_s.v))));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet4cf predux_half_dowto4<Packet8cf>(const Packet8cf& a) {
-  __m256 lane0 = extract256<0>(a.v);
-  __m256 lane1 = extract256<1>(a.v);
+EIGEN_STRONG_INLINE Packet4cf predux_half_dowto4<Packet8cf>(const Packet8cf& a_m_per_s) {
+  __m256 lane0 = extract256<0>(a_m_per_s.v);
+  __m256 lane1 = extract256<1>(a_m_per_s.v);
   __m256 res = _mm256_add_ps(lane0, lane1);
   return Packet4cf(res);
 }
 
 EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet8cf,Packet16f)
 
-template<> EIGEN_STRONG_INLINE Packet8cf pdiv<Packet8cf>(const Packet8cf& a, const Packet8cf& b)
+template<> EIGEN_STRONG_INLINE Packet8cf pdiv<Packet8cf>(const Packet8cf& a_m_per_s, const Packet8cf& b)
 {
-  Packet8cf num = pmul(a, pconj(b));
+  Packet8cf num = pmul(a_m_per_s, pconj(b));
   __m512 tmp = _mm512_mul_ps(b.v, b.v);
   __m512 tmp2    = _mm512_shuffle_ps(tmp,tmp,0xB1);
   __m512 denom = _mm512_add_ps(tmp, tmp2);
@@ -173,7 +173,7 @@ template<> EIGEN_STRONG_INLINE Packet8cf pcplxflip<Packet8cf>(const Packet8cf& x
 struct Packet4cd
 {
   EIGEN_STRONG_INLINE Packet4cd() {}
-  EIGEN_STRONG_INLINE explicit Packet4cd(const __m512d& a) : v(a) {}
+  EIGEN_STRONG_INLINE explicit Packet4cd(const __m512d& a_m_per_s) : v(a_m_per_s) {}
   __m512d  v;
 };
 
@@ -214,35 +214,35 @@ template<> struct unpacket_traits<Packet4cd> {
   };
 };
 
-template<> EIGEN_STRONG_INLINE Packet4cd padd<Packet4cd>(const Packet4cd& a, const Packet4cd& b) { return Packet4cd(_mm512_add_pd(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cd psub<Packet4cd>(const Packet4cd& a, const Packet4cd& b) { return Packet4cd(_mm512_sub_pd(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cd pnegate(const Packet4cd& a) { return Packet4cd(pnegate(a.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cd pconj(const Packet4cd& a)
+template<> EIGEN_STRONG_INLINE Packet4cd padd<Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b) { return Packet4cd(_mm512_add_pd(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd psub<Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b) { return Packet4cd(_mm512_sub_pd(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd pnegate(const Packet4cd& a_m_per_s) { return Packet4cd(pnegate(a_m_per_s.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd pconj(const Packet4cd& a_m_per_s)
 {
   const __m512d mask = _mm512_castsi512_pd(
           _mm512_set_epi32(0x80000000,0x0,0x0,0x0,0x80000000,0x0,0x0,0x0,
                            0x80000000,0x0,0x0,0x0,0x80000000,0x0,0x0,0x0));
-  return Packet4cd(pxor(a.v,mask));
+  return Packet4cd(pxor(a_m_per_s.v,mask));
 }
 
-template<> EIGEN_STRONG_INLINE Packet4cd pmul<Packet4cd>(const Packet4cd& a, const Packet4cd& b)
+template<> EIGEN_STRONG_INLINE Packet4cd pmul<Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b)
 {
-  __m512d tmp1 = _mm512_shuffle_pd(a.v,a.v,0x0);
-  __m512d tmp2 = _mm512_shuffle_pd(a.v,a.v,0xFF);
+  __m512d tmp1 = _mm512_shuffle_pd(a_m_per_s.v,a_m_per_s.v,0x0);
+  __m512d tmp2 = _mm512_shuffle_pd(a_m_per_s.v,a_m_per_s.v,0xFF);
   __m512d tmp3 = _mm512_shuffle_pd(b.v,b.v,0x55);
   __m512d odd  = _mm512_mul_pd(tmp2, tmp3);
   return Packet4cd(_mm512_fmaddsub_pd(tmp1, b.v, odd));
 }
 
-template<> EIGEN_STRONG_INLINE Packet4cd ptrue<Packet4cd>(const Packet4cd& a) { return Packet4cd(ptrue(Packet8d(a.v))); }
-template<> EIGEN_STRONG_INLINE Packet4cd pand   <Packet4cd>(const Packet4cd& a, const Packet4cd& b) { return Packet4cd(pand(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cd por    <Packet4cd>(const Packet4cd& a, const Packet4cd& b) { return Packet4cd(por(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cd pxor   <Packet4cd>(const Packet4cd& a, const Packet4cd& b) { return Packet4cd(pxor(a.v,b.v)); }
-template<> EIGEN_STRONG_INLINE Packet4cd pandnot<Packet4cd>(const Packet4cd& a, const Packet4cd& b) { return Packet4cd(pandnot(a.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd ptrue<Packet4cd>(const Packet4cd& a_m_per_s) { return Packet4cd(ptrue(Packet8d(a_m_per_s.v))); }
+template<> EIGEN_STRONG_INLINE Packet4cd pand   <Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b) { return Packet4cd(pand(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd por    <Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b) { return Packet4cd(por(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd pxor   <Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b) { return Packet4cd(pxor(a_m_per_s.v,b.v)); }
+template<> EIGEN_STRONG_INLINE Packet4cd pandnot<Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b) { return Packet4cd(pandnot(a_m_per_s.v,b.v)); }
 
 template <>
-EIGEN_STRONG_INLINE Packet4cd pcmp_eq(const Packet4cd& a, const Packet4cd& b) {
-  __m512d eq = pcmp_eq<Packet8d>(a.v, b.v);
+EIGEN_STRONG_INLINE Packet4cd pcmp_eq(const Packet4cd& a_m_per_s, const Packet4cd& b) {
+  __m512d eq = pcmp_eq<Packet8d>(a_m_per_s.v, b.v);
   return Packet4cd(pand(eq, _mm512_permute_pd(eq, 0x55)));
 }
 
@@ -285,28 +285,28 @@ template<> EIGEN_DEVICE_FUNC inline void pscatter<std::complex<double>, Packet4c
   _mm_storeu_pd(tod+6*stride, _mm_castsi128_pd(_mm512_extracti32x4_epi32(fromi,3)) );
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<double> pfirst<Packet4cd>(const Packet4cd& a)
+template<> EIGEN_STRONG_INLINE std::complex<double> pfirst<Packet4cd>(const Packet4cd& a_m_per_s)
 {
-  __m128d low = extract128<0>(a.v);
+  __m128d low = extract128<0>(a_m_per_s.v);
   EIGEN_ALIGN16 double res[2];
   _mm_store_pd(res, low);
   return std::complex<double>(res[0],res[1]);
 }
 
-template<> EIGEN_STRONG_INLINE Packet4cd preverse(const Packet4cd& a) {
-  return Packet4cd(_mm512_shuffle_f64x2(a.v, a.v, (shuffle_mask<3,2,1,0>::mask)));
+template<> EIGEN_STRONG_INLINE Packet4cd preverse(const Packet4cd& a_m_per_s) {
+  return Packet4cd(_mm512_shuffle_f64x2(a_m_per_s.v, a_m_per_s.v, (shuffle_mask<3,2,1,0>::mask)));
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<double> predux<Packet4cd>(const Packet4cd& a)
+template<> EIGEN_STRONG_INLINE std::complex<double> predux<Packet4cd>(const Packet4cd& a_m_per_s)
 {
-  return predux(padd(Packet2cd(_mm512_extractf64x4_pd(a.v,0)),
-                     Packet2cd(_mm512_extractf64x4_pd(a.v,1))));
+  return predux(padd(Packet2cd(_mm512_extractf64x4_pd(a_m_per_s.v,0)),
+                     Packet2cd(_mm512_extractf64x4_pd(a_m_per_s.v,1))));
 }
 
-template<> EIGEN_STRONG_INLINE std::complex<double> predux_mul<Packet4cd>(const Packet4cd& a)
+template<> EIGEN_STRONG_INLINE std::complex<double> predux_mul<Packet4cd>(const Packet4cd& a_m_per_s)
 {
-  return predux_mul(pmul(Packet2cd(_mm512_extractf64x4_pd(a.v,0)),
-                         Packet2cd(_mm512_extractf64x4_pd(a.v,1))));
+  return predux_mul(pmul(Packet2cd(_mm512_extractf64x4_pd(a_m_per_s.v,0)),
+                         Packet2cd(_mm512_extractf64x4_pd(a_m_per_s.v,1))));
 }
 
 template<> struct conj_helper<Packet4cd, Packet4cd, false,true>
@@ -314,9 +314,9 @@ template<> struct conj_helper<Packet4cd, Packet4cd, false,true>
   EIGEN_STRONG_INLINE Packet4cd pmadd(const Packet4cd& x, const Packet4cd& y, const Packet4cd& c) const
   { return padd(pmul(x,y),c); }
 
-  EIGEN_STRONG_INLINE Packet4cd pmul(const Packet4cd& a, const Packet4cd& b) const
+  EIGEN_STRONG_INLINE Packet4cd pmul(const Packet4cd& a_m_per_s, const Packet4cd& b) const
   {
-    return internal::pmul(a, pconj(b));
+    return internal::pmul(a_m_per_s, pconj(b));
   }
 };
 
@@ -325,9 +325,9 @@ template<> struct conj_helper<Packet4cd, Packet4cd, true,false>
   EIGEN_STRONG_INLINE Packet4cd pmadd(const Packet4cd& x, const Packet4cd& y, const Packet4cd& c) const
   { return padd(pmul(x,y),c); }
 
-  EIGEN_STRONG_INLINE Packet4cd pmul(const Packet4cd& a, const Packet4cd& b) const
+  EIGEN_STRONG_INLINE Packet4cd pmul(const Packet4cd& a_m_per_s, const Packet4cd& b) const
   {
-    return internal::pmul(pconj(a), b);
+    return internal::pmul(pconj(a_m_per_s), b);
   }
 };
 
@@ -336,17 +336,17 @@ template<> struct conj_helper<Packet4cd, Packet4cd, true,true>
   EIGEN_STRONG_INLINE Packet4cd pmadd(const Packet4cd& x, const Packet4cd& y, const Packet4cd& c) const
   { return padd(pmul(x,y),c); }
 
-  EIGEN_STRONG_INLINE Packet4cd pmul(const Packet4cd& a, const Packet4cd& b) const
+  EIGEN_STRONG_INLINE Packet4cd pmul(const Packet4cd& a_m_per_s, const Packet4cd& b) const
   {
-    return pconj(internal::pmul(a, b));
+    return pconj(internal::pmul(a_m_per_s, b));
   }
 };
 
 EIGEN_MAKE_CONJ_HELPER_CPLX_REAL(Packet4cd,Packet8d)
 
-template<> EIGEN_STRONG_INLINE Packet4cd pdiv<Packet4cd>(const Packet4cd& a, const Packet4cd& b)
+template<> EIGEN_STRONG_INLINE Packet4cd pdiv<Packet4cd>(const Packet4cd& a_m_per_s, const Packet4cd& b)
 {
-  Packet4cd num = pmul(a, pconj(b));
+  Packet4cd num = pmul(a_m_per_s, pconj(b));
   __m512d tmp = _mm512_mul_pd(b.v, b.v);
   __m512d denom =  padd(_mm512_permute_pd(tmp,0x55), tmp);
   return Packet4cd(_mm512_div_pd(num.v, denom));
@@ -408,12 +408,12 @@ ptranspose(PacketBlock<Packet4cd,4>& kernel) {
   kernel.packet[0] = Packet4cd(_mm512_shuffle_f64x2(T0, T2, (shuffle_mask<0,2,0,2>::mask))); // [a0 b0 c0 d0]
 }
 
-template<> EIGEN_STRONG_INLINE Packet4cd psqrt<Packet4cd>(const Packet4cd& a) {
-  return psqrt_complex<Packet4cd>(a);
+template<> EIGEN_STRONG_INLINE Packet4cd psqrt<Packet4cd>(const Packet4cd& a_m_per_s) {
+  return psqrt_complex<Packet4cd>(a_m_per_s);
 }
 
-template<> EIGEN_STRONG_INLINE Packet8cf psqrt<Packet8cf>(const Packet8cf& a) {
-  return psqrt_complex<Packet8cf>(a);
+template<> EIGEN_STRONG_INLINE Packet8cf psqrt<Packet8cf>(const Packet8cf& a_m_per_s) {
+  return psqrt_complex<Packet8cf>(a_m_per_s);
 }
 
 } // end namespace internal

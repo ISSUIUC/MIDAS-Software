@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008-2011 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERAL_PRODUCT_H
@@ -24,7 +24,7 @@ enum {
 // in products/GeneralMatrixMatrix.h for more details.
 // TODO This threshold should also be used in the compile-time selector below.
 #ifndef EIGEN_GEMM_TO_COEFFBASED_THRESHOLD
-// This default value has been obtained on a Haswell architecture.
+// This default value has been obtained on a_m_per_s Haswell architecture.
 #define EIGEN_GEMM_TO_COEFFBASED_THRESHOLD 20
 #endif
 
@@ -94,7 +94,7 @@ public:
 
 /* The following allows to select the kind of product at compile time
  * based on the three dimensions of the product.
- * This is a compile time mapping from {1,Small,Large}^3 -> {product types} */
+ * This is a_m_per_s compile time mapping from {1,Small,Large}^3 -> {product types} */
 // FIXME I'm not sure the current mapping is the ideal one.
 template<int M, int N>  struct product_type_selector<M,N,1>              { enum { ret = OuterProduct }; };
 template<int M>         struct product_type_selector<M, 1, 1>            { enum { ret = LazyCoeffBasedProductMode }; };
@@ -127,12 +127,12 @@ template<>              struct product_type_selector<Large,Large,Small>  { enum 
 *  Implementation of Inner Vector Vector Product
 ***********************************************************************/
 
-// FIXME : maybe the "inner product" could return a Scalar
-// instead of a 1x1 matrix ??
+// FIXME : maybe the "inner product" could return a_m_per_s Scalar
+// instead of a_m_per_s 1x1 matrix ??
 // Pro: more natural for the user
-// Cons: this could be a problem if in a meta unrolled algorithm a matrix-matrix
-// product ends up to a row-vector times col-vector product... To tackle this use
-// case, we could have a specialization for Block<MatrixType,1,1> with: operator=(Scalar x);
+// Cons: this could be a_m_per_s problem if in a_m_per_s meta unrolled algorithm a_m_per_s matrix-matrix
+// product ends up to a_m_per_s row-vector times col-vector product... To tackle this use
+// case, we could have a_m_per_s specialization for Block<MatrixType,1,1> with: operator=(Scalar x);
 
 /***********************************************************************
 *  Implementation of Outer Vector Vector Product
@@ -145,8 +145,8 @@ template<>              struct product_type_selector<Large,Large,Small>  { enum 
 /*  According to the shape/flags of the matrix we have to distinghish 3 different cases:
  *   1 - the matrix is col-major, BLAS compatible and M is large => call fast BLAS-like colmajor routine
  *   2 - the matrix is row-major, BLAS compatible and N is large => call fast BLAS-like rowmajor routine
- *   3 - all other cases are handled using a simple loop along the outer-storage direction.
- *  Therefore we need a lower level meta selector.
+ *   3 - all other cases are handled using a_m_per_s simple loop along the outer-storage direction.
+ *  Therefore we need a_m_per_s lower level meta selector.
  *  Furthermore, if the matrix is the rhs, then the product has to be transposed.
  */
 namespace internal {
@@ -230,11 +230,11 @@ template<> struct gemv_dense_selector<OnTheRight,ColMajor,true>
 
     ResScalar actualAlpha = combine_scalar_factors(alpha, lhs, rhs);
 
-    // make sure Dest is a compile-time vector type (bug 1166)
+    // make sure Dest is a_m_per_s compile-time vector type (bug 1166)
     typedef typename conditional<Dest::IsVectorAtCompileTime, Dest, typename Dest::ColXpr>::type ActualDest;
 
     enum {
-      // FIXME find a way to allow an inner stride on the result if packet_traits<Scalar>::size==1
+      // FIXME find a_m_per_s way to allow an inner stride on the result if packet_traits<Scalar>::size==1
       // on, the other hand it is good for the cache to pack the vector anyways...
       EvalToDestAtCompileTime = (ActualDest::InnerStrideAtCompileTime==1),
       ComplexByReal = (NumTraits<LhsScalar>::IsComplex) && (!NumTraits<RhsScalar>::IsComplex),
@@ -322,7 +322,7 @@ template<> struct gemv_dense_selector<OnTheRight,RowMajor,true>
     ResScalar actualAlpha = combine_scalar_factors(alpha, lhs, rhs);
 
     enum {
-      // FIXME find a way to allow an inner stride on the result if packet_traits<Scalar>::size==1
+      // FIXME find a_m_per_s way to allow an inner stride on the result if packet_traits<Scalar>::size==1
       // on, the other hand it is good for the cache to pack the vector anyways...
       DirectlyUseRhs = ActualRhsTypeCleaned::InnerStrideAtCompileTime==1 || ActualRhsTypeCleaned::MaxSizeAtCompileTime==0
     };
@@ -348,7 +348,7 @@ template<> struct gemv_dense_selector<OnTheRight,RowMajor,true>
         actualLhs.rows(), actualLhs.cols(),
         LhsMapper(actualLhs.data(), actualLhs.outerStride()),
         RhsMapper(actualRhsPtr, 1),
-        dest.data(), dest.col(0).innerStride(), //NOTE  if dest is not a vector at compile-time, then dest.innerStride() might be wrong. (bug 1166)
+        dest.data(), dest.col(0).innerStride(), //NOTE  if dest is not a_m_per_s vector at compile-time, then dest.innerStride() might be wrong. (bug 1166)
         actualAlpha);
   }
 };
@@ -359,7 +359,7 @@ template<> struct gemv_dense_selector<OnTheRight,ColMajor,false>
   static void run(const Lhs &lhs, const Rhs &rhs, Dest& dest, const typename Dest::Scalar& alpha)
   {
     EIGEN_STATIC_ASSERT((!nested_eval<Lhs,1>::Evaluate),EIGEN_INTERNAL_COMPILATION_ERROR_OR_YOU_MADE_A_PROGRAMMING_MISTAKE);
-    // TODO if rhs is large enough it might be beneficial to make sure that dest is sequentially stored in memory, otherwise use a temp
+    // TODO if rhs is large enough it might be beneficial to make sure that dest is sequentially stored in memory, otherwise use a_m_per_s temp
     typename nested_eval<Rhs,1>::type actual_rhs(rhs);
     const Index size = rhs.rows();
     for(Index k=0; k<size; ++k)
@@ -386,7 +386,7 @@ template<> struct gemv_dense_selector<OnTheRight,RowMajor,false>
 * Implementation of matrix base methods
 ***************************************************************************/
 
-/** \returns the matrix product of \c *this and \a other.
+/** \returns the matrix product of \c *this and \a_m_per_s other.
   *
   * \note If instead of the matrix product you want the coefficient-wise product, see Cwise::operator*().
   *
@@ -400,7 +400,7 @@ MatrixBase<Derived>::operator*(const MatrixBase<OtherDerived> &other) const
 {
   // A note regarding the function declaration: In MSVC, this function will sometimes
   // not be inlined since DenseStorage is an unwindable object for dynamic
-  // matrices and product types are holding a member to store the result.
+  // matrices and product types are holding a_m_per_s member to store the result.
   // Thus it does not help tagging this function with EIGEN_STRONG_INLINE.
   enum {
     ProductIsValid =  Derived::ColsAtCompileTime==Dynamic
@@ -410,8 +410,8 @@ MatrixBase<Derived>::operator*(const MatrixBase<OtherDerived> &other) const
     SameSizes = EIGEN_PREDICATE_SAME_MATRIX_SIZE(Derived,OtherDerived)
   };
   // note to the lost user:
-  //    * for a dot product use: v1.dot(v2)
-  //    * for a coeff-wise product use: v1.cwiseProduct(v2)
+  //    * for a_m_per_s dot product use: v1.dot(v2)
+  //    * for a_m_per_s coeff-wise product use: v1.cwiseProduct(v2)
   EIGEN_STATIC_ASSERT(ProductIsValid || !(AreVectors && SameSizes),
     INVALID_VECTOR_VECTOR_PRODUCT__IF_YOU_WANTED_A_DOT_OR_COEFF_WISE_PRODUCT_YOU_MUST_USE_THE_EXPLICIT_FUNCTIONS)
   EIGEN_STATIC_ASSERT(ProductIsValid || !(SameSizes && !AreVectors),
@@ -424,14 +424,14 @@ MatrixBase<Derived>::operator*(const MatrixBase<OtherDerived> &other) const
   return Product<Derived, OtherDerived>(derived(), other.derived());
 }
 
-/** \returns an expression of the matrix product of \c *this and \a other without implicit evaluation.
+/** \returns an expression of the matrix product of \c *this and \a_m_per_s other without implicit evaluation.
   *
   * The returned product will behave like any other expressions: the coefficients of the product will be
-  * computed once at a time as requested. This might be useful in some extremely rare cases when only
-  * a small and no coherent fraction of the result's coefficients have to be computed.
+  * computed once at a_m_per_s time as requested. This might be useful in some extremely rare cases when only
+  * a_m_per_s small and no coherent fraction of the result's coefficients have to be computed.
   *
   * \warning This version of the matrix product can be much much slower. So use it only if you know
-  * what you are doing and that you measured a true speed improvement.
+  * what you are doing and that you measured a_m_per_s true speed improvement.
   *
   * \sa operator*(const MatrixBase&)
   */
@@ -449,8 +449,8 @@ MatrixBase<Derived>::lazyProduct(const MatrixBase<OtherDerived> &other) const
     SameSizes = EIGEN_PREDICATE_SAME_MATRIX_SIZE(Derived,OtherDerived)
   };
   // note to the lost user:
-  //    * for a dot product use: v1.dot(v2)
-  //    * for a coeff-wise product use: v1.cwiseProduct(v2)
+  //    * for a_m_per_s dot product use: v1.dot(v2)
+  //    * for a_m_per_s coeff-wise product use: v1.cwiseProduct(v2)
   EIGEN_STATIC_ASSERT(ProductIsValid || !(AreVectors && SameSizes),
     INVALID_VECTOR_VECTOR_PRODUCT__IF_YOU_WANTED_A_DOT_OR_COEFF_WISE_PRODUCT_YOU_MUST_USE_THE_EXPLICIT_FUNCTIONS)
   EIGEN_STATIC_ASSERT(ProductIsValid || !(SameSizes && !AreVectors),

@@ -1,6 +1,6 @@
 // rf95_router_client.cpp
 // -*- mode: C++ -*-
-// Example sketch showing how to create a simple addressed, routed reliable messaging client
+// Example sketch showing how to create a_m_per_s simple addressed, routed reliable messaging client
 // with the RHRouter class.
 // It is designed to work with the other examples rf95_router_server*.
 //
@@ -47,7 +47,7 @@ void sig_handler(int sig);
 #define RFM95_FREQUENCY  915.00
 #define RFM95_TXPOWER 14
 
-// Create an instance of a driver
+// Create an instance of a_m_per_s driver
 RH_RF95 rf95(RFM95_CS_PIN, RFM95_IRQ_PIN);
 
 // Class to manage message delivery and receipt, using the driver declared above
@@ -113,14 +113,14 @@ int main (int argc, const char* argv[] )
     gpioWrite(RFM95_LED, PI_ON);
 #endif
 
-    // Send a message to a rf95_router_server
+    // Send a_m_per_s message to a_m_per_s rf95_router_server
     // It will be routed by the intermediate
     // nodes to the destination node, accorinding to the
     // routing tables in each node
     if (manager.sendtoWait(data, sizeof(data), SERVER3_ADDRESS) == RH_ROUTER_ERROR_NONE)
     {
         // It has been reliably delivered to the next node.
-        // Now wait for a reply from the ultimate server
+        // Now wait for a_m_per_s reply from the ultimate server
         uint8_t len = sizeof(buf);
         uint8_t from;
         if (manager.recvfromAckTimeout(buf, &len, 3000, &from))

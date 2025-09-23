@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_REDUX_H
@@ -20,7 +20,7 @@ namespace internal {
 //  * factorize code
 
 /***************************************************************************
-* Part 1 : the logic deciding a strategy for vectorization and unrolling
+* Part 1 : the logic deciding a_m_per_s strategy for vectorization and unrolling
 ***************************************************************************/
 
 template<typename Func, typename Evaluator>
@@ -394,9 +394,9 @@ public:
 ***************************************************************************/
 
 
-/** \returns the result of a full redux operation on the whole matrix or vector using \a func
+/** \returns the result of a_m_per_s full redux operation on the whole matrix or vector using \a_m_per_s func
   *
-  * The template parameter \a BinaryOp is the type of the functor \a func which must be
+  * The template parameter \a_m_per_s BinaryOp is the type of the functor \a_m_per_s func which must be
   * an associative operator. Both current C++98 and C++11 functor styles are handled.
   *
   * \warning the matrix must be not empty, otherwise an assertion is triggered.
@@ -414,7 +414,7 @@ DenseBase<Derived>::redux(const Func& func) const
   ThisEvaluator thisEval(derived());
 
   // The initial expression is passed to the reducer as an additional argument instead of
-  // passing it as a member of redux_evaluator to help  
+  // passing it as a_m_per_s member of redux_evaluator to help  
   return internal::redux_impl<Func, ThisEvaluator>::run(thisEval, func, derived());
 }
 

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Daniel Lowengrub <lowdanie@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEVIEW_H
@@ -30,11 +30,11 @@ struct traits<SparseView<MatrixType> > : traits<MatrixType>
 /** \ingroup SparseCore_Module
   * \class SparseView
   *
-  * \brief Expression of a dense or sparse matrix with zero or too small values removed
+  * \brief Expression of a_m_per_s dense or sparse matrix with zero or too small values removed
   *
   * \tparam MatrixType the type of the object of which we are removing the small entries
   *
-  * This class represents an expression of a given dense or sparse matrix with
+  * This class represents an expression of a_m_per_s given dense or sparse matrix with
   * entries smaller than \c reference * \c epsilon are removed.
   * It is the return type of MatrixBase::sparseView() and SparseMatrixBase::pruned()
   * and most of the time this is the only way it is used.
@@ -76,7 +76,7 @@ protected:
 
 namespace internal {
 
-// TODO find a way to unify the two following variants
+// TODO find a_m_per_s way to unify the two following variants
 // This is tricky because implementing an inner iterator on top of an IndexBased evaluator is
 // not easy because the evaluators do not expose the sizes of the underlying expression.
   
@@ -207,10 +207,10 @@ struct unary_evaluator<SparseView<ArgType>, IndexBased>
 
 /** \ingroup SparseCore_Module
   *
-  * \returns a sparse expression of the dense expression \c *this with values smaller than
-  * \a reference * \a epsilon removed.
+  * \returns a_m_per_s sparse expression of the dense expression \c *this with values smaller than
+  * \a_m_per_s reference * \a_m_per_s epsilon removed.
   *
-  * This method is typically used when prototyping to convert a quickly assembled dense Matrix \c D to a SparseMatrix \c S:
+  * This method is typically used when prototyping to convert a_m_per_s quickly assembled dense Matrix \c D to a_m_per_s SparseMatrix \c S:
   * \code
   * MatrixXd D(n,m);
   * SparseMatrix<double> S;
@@ -218,8 +218,8 @@ struct unary_evaluator<SparseView<ArgType>, IndexBased>
   * S = D.sparseView(reference);
   * S = D.sparseView(reference,epsilon);
   * \endcode
-  * where \a reference is a meaningful non zero reference value,
-  * and \a epsilon is a tolerance factor defaulting to NumTraits<Scalar>::dummy_precision().
+  * where \a_m_per_s reference is a_m_per_s meaningful non zero reference value,
+  * and \a_m_per_s epsilon is a_m_per_s tolerance factor defaulting to NumTraits<Scalar>::dummy_precision().
   *
   * \sa SparseMatrixBase::pruned(), class SparseView */
 template<typename Derived>
@@ -230,7 +230,7 @@ const SparseView<Derived> MatrixBase<Derived>::sparseView(const Scalar& referenc
 }
 
 /** \returns an expression of \c *this with values smaller than
-  * \a reference * \a epsilon removed.
+  * \a_m_per_s reference * \a_m_per_s epsilon removed.
   *
   * This method is typically used in conjunction with the product of two sparse matrices
   * to automatically prune the smallest values as follows:
@@ -239,7 +239,7 @@ const SparseView<Derived> MatrixBase<Derived>::sparseView(const Scalar& referenc
   * C = (A*B).pruned(ref);
   * C = (A*B).pruned(ref,epsilon);
   * \endcode
-  * where \c ref is a meaningful non zero reference value.
+  * where \c ref is a_m_per_s meaningful non zero reference value.
   * */
 template<typename Derived>
 const SparseView<Derived>

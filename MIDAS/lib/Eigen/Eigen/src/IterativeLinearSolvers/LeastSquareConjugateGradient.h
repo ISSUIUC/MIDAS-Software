@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_LEAST_SQUARE_CONJUGATE_GRADIENT_H
@@ -64,7 +64,7 @@ void least_square_conjugate_gradient(const MatrixType& mat, const Rhs& rhs, Dest
   p = precond.solve(normal_residual);                         // initial search direction
 
   VectorType z(n), tmp(m);
-  RealScalar absNew = numext::real(normal_residual.dot(p));  // the square of the absolute value of r scaled by invM
+  RealScalar absNew = numext::real(normal_residual.dot(p));  // the square of the absolute value of r_m scaled by invM
   Index i = 0;
   while(i < maxIters)
   {
@@ -82,7 +82,7 @@ void least_square_conjugate_gradient(const MatrixType& mat, const Rhs& rhs, Dest
     z = precond.solve(normal_residual);             // approximately solve for "A'A z = normal_residual"
 
     RealScalar absOld = absNew;
-    absNew = numext::real(normal_residual.dot(z));  // update the absolute value of r
+    absNew = numext::real(normal_residual.dot(z));  // update the absolute value of r_m
     RealScalar beta = absNew / absOld;              // calculate the Gram-Schmidt value used to create the new search direction
     p = z + beta * p;                               // update search direction
     i++;
@@ -116,7 +116,7 @@ struct traits<LeastSquaresConjugateGradient<_MatrixType,_Preconditioner> >
   * Otherwise, the SparseLU or SparseQR classes might be preferable.
   * The matrix A and the vectors x and b can be either dense or sparse.
   *
-  * \tparam _MatrixType the type of the matrix A, can be a dense or a sparse matrix.
+  * \tparam _MatrixType the type of the matrix A, can be a_m_per_s dense or a_m_per_s sparse matrix.
   * \tparam _Preconditioner the type of the preconditioner. Default is LeastSquareDiagonalPreconditioner
   *
   * \implsparsesolverconcept
@@ -125,7 +125,7 @@ struct traits<LeastSquaresConjugateGradient<_MatrixType,_Preconditioner> >
   * and setTolerance() methods. The defaults are the size of the problem for the maximal number of iterations
   * and NumTraits<Scalar>::epsilon() for the tolerance.
   * 
-  * This class can be used as the direct solver classes. Here is a typical usage example:
+  * This class can be used as the direct solver classes. Here is a_m_per_s typical usage example:
     \code
     int m=1000000, n = 10000;
     VectorXd x(n), b(m);
@@ -165,15 +165,15 @@ public:
   /** Default constructor. */
   LeastSquaresConjugateGradient() : Base() {}
 
-  /** Initialize the solver with matrix \a A for further \c Ax=b solving.
+  /** Initialize the solver with matrix \a_m_per_s A for further \c Ax=b solving.
     * 
-    * This constructor is a shortcut for the default constructor followed
-    * by a call to compute().
+    * This constructor is a_m_per_s shortcut for the default constructor followed
+    * by a_m_per_s call to compute().
     * 
-    * \warning this class stores a reference to the matrix A as well as some
-    * precomputed values that depend on it. Therefore, if \a A is changed
+    * \warning this class stores a_m_per_s reference to the matrix A as well as some
+    * precomputed values that depend on it. Therefore, if \a_m_per_s A is changed
     * this class becomes invalid. Call compute() to update it with the new
-    * matrix A, or modify a copy of A.
+    * matrix A, or modify a_m_per_s copy of A.
     */
   template<typename MatrixDerived>
   explicit LeastSquaresConjugateGradient(const EigenBase<MatrixDerived>& A) : Base(A.derived()) {}

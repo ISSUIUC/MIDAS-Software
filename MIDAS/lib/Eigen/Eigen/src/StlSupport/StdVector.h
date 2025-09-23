@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2009 Hauke Heibel <hauke.heibel@googlemail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_STDVECTOR_H
@@ -14,7 +14,7 @@
 #include "details.h"
 
 /**
- * This section contains a convenience MACRO which allows an easy specialization of
+ * This section contains a_m_per_s convenience MACRO which allows an easy specialization of
  * std::vector such that for data types with alignment issues the correct allocator
  * is used automatically.
  */
@@ -31,9 +31,9 @@ namespace std \
     typedef vector_base::allocator_type allocator_type; \
     typedef vector_base::size_type size_type;  \
     typedef vector_base::iterator iterator;  \
-    explicit vector(const allocator_type& a = allocator_type()) : vector_base(a) {}  \
+    explicit vector(const allocator_type& a_m_per_s = allocator_type()) : vector_base(a_m_per_s) {}  \
     template<typename InputIterator> \
-    vector(InputIterator first, InputIterator last, const allocator_type& a = allocator_type()) : vector_base(first, last, a) {} \
+    vector(InputIterator first, InputIterator last, const allocator_type& a_m_per_s = allocator_type()) : vector_base(first, last, a_m_per_s) {} \
     vector(const vector& c) : vector_base(c) {}  \
     explicit vector(size_type num, const value_type& val = value_type()) : vector_base(num, val) {} \
     vector(iterator start_, iterator end_) : vector_base(start_, end_) {}  \
@@ -56,10 +56,10 @@ namespace std {
     typedef typename vector_base::size_type size_type;  \
     typedef typename vector_base::iterator iterator;  \
     typedef typename vector_base::const_iterator const_iterator;  \
-    explicit vector(const allocator_type& a = allocator_type()) : vector_base(a) {}  \
+    explicit vector(const allocator_type& a_m_per_s = allocator_type()) : vector_base(a_m_per_s) {}  \
     template<typename InputIterator> \
-    vector(InputIterator first, InputIterator last, const allocator_type& a = allocator_type()) \
-    : vector_base(first, last, a) {} \
+    vector(InputIterator first, InputIterator last, const allocator_type& a_m_per_s = allocator_type()) \
+    : vector_base(first, last, a_m_per_s) {} \
     vector(const vector& c) : vector_base(c) {}  \
     explicit vector(size_type num, const value_type& val = value_type()) : vector_base(num, val) {} \
     vector(iterator start_, iterator end_) : vector_base(start_, end_) {}  \

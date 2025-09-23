@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEPRODUCT_H
@@ -13,15 +13,15 @@
 namespace Eigen { 
 
 /** \returns an expression of the product of two sparse matrices.
-  * By default a conservative product preserving the symbolic non zeros is performed.
+  * By default a_m_per_s conservative product preserving the symbolic non zeros is performed.
   * The automatic pruning of the small values can be achieved by calling the pruned() function
-  * in which case a totally different product algorithm is employed:
+  * in which case a_m_per_s totally different product algorithm is employed:
   * \code
   * C = (A*B).pruned();             // suppress numerical zeros (exact)
   * C = (A*B).pruned(ref);
   * C = (A*B).pruned(ref,epsilon);
   * \endcode
-  * where \c ref is a meaningful non zero reference value.
+  * where \c ref is a_m_per_s meaningful non zero reference value.
   * */
 template<typename Derived>
 template<typename OtherDerived>

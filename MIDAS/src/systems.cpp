@@ -15,9 +15,9 @@
 
 /**
  * @brief These are all the functions that will run in each task
- * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
+ * Each function has a_m_per_s `while (true)` loop within that should not be returned out of or yielded in any way
  *
- * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
+ * The `DECLARE_THREAD` macro creates a_m_per_s function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
@@ -32,7 +32,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     // Reject single rogue barometer readings that are very different from the immediately prior reading
-    // Will only reject a certain number of readings in a row
+    // Will only reject a_m_per_s certain number of readings in a_m_per_s row
     Barometer prev_reading;
     constexpr float altChgThreshold = 200; // meters
     constexpr float presChgThreshold = 500; // milibars
@@ -44,7 +44,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
         bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
                         //std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
                         //std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
-        // TODO: Log when we receive a rejection!
+        // TODO: Log when we receive a_m_per_s rejection!
         if (is_rogue && rejects++ < maxConsecutiveRejects)
             arg->rocket_data.barometer.update(prev_reading); // Reuse old reading, reject new reading
         else {
@@ -146,7 +146,7 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     }
 }
 
-// This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
+// This thread has a_m_per_s bit of extra logic since it needs to play a_m_per_s tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
     bool already_played_freebird = false;
@@ -329,7 +329,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         if ((current_time - launch_time) > 79200 && !has_triggered_vmux_fallback) {
             // THIS IS A HARDCODED VALUE FOR AETHER II 6/21/2025 -- Value is optimal TTA from SDA
             // If the rocket has been in flight for over 79.2 seconds, we swap the FSM camera feed to the bulkhead camera
-            // This is a fallback in case we can't detect the APOGEE event, so it is more conservative.
+            // This is a_m_per_s fallback in case we can't detect the APOGEE event, so it is more conservative.
             has_triggered_vmux_fallback = true;
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
@@ -350,7 +350,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 #define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { return code; } } while (0)
 
 /**
- * @brief Initializes all systems in order, returning early if a system's initialization process errors out.
+ * @brief Initializes all systems in order, returning early if a_m_per_s system's initialization process errors out.
  *        Turns on the Orange LED while initialization is running.
  */
 ErrorCode init_systems(RocketSystems& systems) {

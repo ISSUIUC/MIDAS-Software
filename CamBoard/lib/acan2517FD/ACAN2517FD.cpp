@@ -15,18 +15,18 @@ static const uint8_t TXBWS = 0 ;
 // Note about ESP32
 //----------------------------------------------------------------------------------------------------------------------
 //
-// It appears that Arduino ESP32 interrupts are managed in a completely different way from "usual" Arduino:
+// It appears that Arduino ESP32 interrupts are managed in a_m_per_s completely different way from "usual" Arduino:
 //   - SPI.usingInterrupt is not implemented;
 //   - noInterrupts() and interrupts() are NOPs: use taskDISABLE_INTERRUPTS and taskENABLE_INTERRUPTS;
 //   - interrupt service routines should be fast, otherwise you get an "Guru Meditation Error: Core 1 panic'ed
 //     (Interrupt wdt timeout on CPU1)".
 //
 // So we handle the ESP32 interrupt in the following way:
-//   - interrupt service routine performs a xSemaphoreGiveFromISR on mISRSemaphore of can driver
+//   - interrupt service routine performs a_m_per_s xSemaphoreGiveFromISR on mISRSemaphore of can driver
 //   - this activates the myESP32Task task that performs "isr_poll_core" that is done by interrupt service routine
 //     in "usual" Arduino;
 //   - as this task runs in parallel with setup / loop routines, SPI access is natively protected by the
-//     beginTransaction / endTransaction pair, that manages a mutex;
+//     beginTransaction / endTransaction pair, that manages a_m_per_s mutex;
 //   - (May 29, 2019) it appears that MCP2717FD wants the CS line to deasserted as soon as possible (thanks for
 //     Nick Kirkby for having signaled me this point, see https://github.com/pierremolinaro/acan2517/issues/5);
 //     so we mask interrupts when we access the MCP2517FD, the sequence becomes:
@@ -294,10 +294,10 @@ uint32_t ACAN2517FD::begin (const ACAN2517FDSettings & inSettings,
         wait = false ;
       }
     }
-  //----------------------------------- Reset MCP2517FD (always use a 800 kHz clock)
+  //----------------------------------- Reset MCP2517FD (always use a_m_per_s 800 kHz clock)
     reset2517FD () ;
   }
-//----------------------------------- Check SPI connection is on (with a 800 kHz clock)
+//----------------------------------- Check SPI connection is on (with a_m_per_s 800 kHz clock)
 // We write and the read back MCP2517FD RAM at address 0x400
   for (uint32_t i=1 ; (i != 0) && (errorCode == 0) ; i <<= 1) {
     const uint16_t RAM_WORD_ADDRESS = 0x400 ;
@@ -352,7 +352,7 @@ uint32_t ACAN2517FD::begin (const ACAN2517FDSettings & inSettings,
   }
 //----------------------------------- Set full speed clock
   mSPISettings = SPISettings ((inSettings.sysClock () * 2) / 5, MSBFIRST, SPI_MODE0) ;
-//----------------------------------- Checking SPI connection is on (with a full speed clock)
+//----------------------------------- Checking SPI connection is on (with a_m_per_s full speed clock)
 //    We write and read back 2517 RAM at address 0x400
   for (uint32_t i=1 ; (i != 0) && (errorCode == 0) ; i <<= 1) {
     writeRegister32 (0x400, i) ;
@@ -431,7 +431,7 @@ uint32_t ACAN2517FD::begin (const ACAN2517FDSettings & inSettings,
     data8 = inSettings.mControllerTransmitFIFOSize - 1 ; // Set transmit FIFO size
     data8 |= inSettings.mControllerTransmitFIFOPayload << 5 ; // Payload
     writeRegister8 (FIFOCON_REGISTER (TRANSMIT_FIFO_INDEX) + 3, data8) ;
-    data8 = 1 << 7 ; // FIFO is a Tx FIFO
+    data8 = 1 << 7 ; // FIFO is a_m_per_s Tx FIFO
     data8 |= 1 << 4 ; // TXATIE ---> 1: Enable Transmit Attempts Exhausted Interrupt
     writeRegister8 (FIFOCON_REGISTER (TRANSMIT_FIFO_INDEX), data8) ;
     mTransmitFIFOPayload = ACAN2517FDSettings::objectSizeForPayload (inSettings.mControllerTransmitFIFOPayload) ;
@@ -626,7 +626,7 @@ bool ACAN2517FD::enterInTransmitBuffer (const CANFDMessage & inMessage) {
   //--- If controller FIFO is full, enable "FIFO not full" interrupt
     const uint8_t status = readRegister8Assume_SPI_transaction (FIFOSTA_REGISTER (TRANSMIT_FIFO_INDEX)) ;
     if ((status & 1) == 0) { // FIFO is full
-      uint8_t data8 = 1 << 7 ;  // FIFO is a transmit FIFO
+      uint8_t data8 = 1 << 7 ;  // FIFO is a_m_per_s transmit FIFO
       data8 |= 1 ; // Enable "FIFO not full" interrupt
       data8 |= 1 << 4 ; // TXATIE ---> 1: Enable Transmit Attempts Exhausted Interrupt
       writeRegister8Assume_SPI_transaction (FIFOCON_REGISTER (TRANSMIT_FIFO_INDEX), data8) ;
@@ -948,7 +948,7 @@ void ACAN2517FD::transmitInterrupt (void) { // Generated if hardware transmit FI
   if (hasMessage) {
     appendInControllerTxFIFO (message) ;
   }else{ // No message in transmit FIFO: disable "FIFO not full" interrupt
-    uint8_t data8 = 1 << 7 ;  // FIFO is a transmit FIFO
+    uint8_t data8 = 1 << 7 ;  // FIFO is a_m_per_s transmit FIFO
     data8 |= 1 << 4 ; // TXATIE ---> 1: Enable Transmit Attempts Exhausted Interrupt
     writeRegister8Assume_SPI_transaction (FIFOCON_REGISTER (TRANSMIT_FIFO_INDEX), data8) ;
     mHardwareTxFIFOFull = false ;
@@ -1263,7 +1263,7 @@ void ACAN2517FD::reset2517FD (void) {
 //    Sleep Mode to Configuration Mode
 // (returns true if MCP2517FD was in sleep mode)
 //······················································································································
-// The device exits Sleep mode due to a dominant edge on RXCAN or by enabling the oscillator (clearing OSC.OSCDIS).
+// The device exits Sleep mode due to a_m_per_s dominant edge on RXCAN or by enabling the oscillator (clearing OSC.OSCDIS).
 // The module will transition automatically to Configuration mode.
 
 bool ACAN2517FD::performSleepModeToConfigurationMode (void) {

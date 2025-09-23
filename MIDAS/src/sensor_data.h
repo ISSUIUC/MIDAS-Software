@@ -12,7 +12,7 @@
  * @brief
  * This header provides all the implementation for the data that comes from all of the sensors/
  * These structs will be individual packets of data passed between the sensor and the 
- * rocket_state struct, and each will be tagged with a timestamp.
+ * rocket_state struct, and each will be tagged with a_m_per_s timestamp.
 */
 
 /**
@@ -119,7 +119,7 @@ struct Barometer {
     float altitude = 0; // Altitude in meters (above sea level?)
 
     Barometer() = default;
-    Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
+    Barometer(float t, float p, float a_m_per_s) : temperature(t), pressure(p), altitude(a_m_per_s) {}
 };
 
 /**

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_HYPERPLANE_H
@@ -19,15 +19,15 @@ namespace Eigen {
   *
   * \brief A hyperplane
   *
-  * A hyperplane is an affine subspace of dimension n-1 in a space of dimension n.
-  * For example, a hyperplane in a plane is a line; a hyperplane in 3-space is a plane.
+  * A hyperplane is an affine subspace of dimension n-1 in a_m_per_s space of dimension n.
+  * For example, a_m_per_s hyperplane in a_m_per_s plane is a_m_per_s line; a_m_per_s hyperplane in 3-space is a_m_per_s plane.
   *
   * \tparam _Scalar the scalar type, i.e., the type of the coefficients
-  * \tparam _AmbientDim the dimension of the ambient space, can be a compile time value or Dynamic.
+  * \tparam _AmbientDim the dimension of the ambient space, can be a_m_per_s compile time value or Dynamic.
   *             Notice that the dimension of the hyperplane is _AmbientDim-1.
   *
   * This class represents an hyperplane as the zero set of the implicit equation
-  * \f$ n \cdot x + d = 0 \f$ where \f$ n \f$ is a unit normal vector of the plane (linear part)
+  * \f$ n \cdot x + d = 0 \f$ where \f$ n \f$ is a_m_per_s unit normal vector of the plane (linear part)
   * and \f$ d \f$ is the distance (offset) to the origin.
   */
 template <typename _Scalar, int _AmbientDim, int _Options>
@@ -57,11 +57,11 @@ public:
    : m_coeffs(other.coeffs())
   {}
 
-  /** Constructs a dynamic-size hyperplane with \a _dim the dimension
+  /** Constructs a_m_per_s dynamic-size hyperplane with \a_m_per_s _dim the dimension
     * of the ambient space */
   EIGEN_DEVICE_FUNC inline explicit Hyperplane(Index _dim) : m_coeffs(_dim+1) {}
 
-  /** Construct a plane from its normal \a n and a point \a e onto the plane.
+  /** Construct a_m_per_s plane from its normal \a_m_per_s n and a_m_per_s point \a_m_per_s e onto the plane.
     * \warning the vector normal is assumed to be normalized.
     */
   EIGEN_DEVICE_FUNC inline Hyperplane(const VectorType& n, const VectorType& e)
@@ -71,7 +71,7 @@ public:
     offset() = -n.dot(e);
   }
 
-  /** Constructs a plane from its normal \a n and distance to the origin \a d
+  /** Constructs a_m_per_s plane from its normal \a_m_per_s n and distance to the origin \a_m_per_s d
     * such that the algebraic equation of the plane is \f$ n \cdot x + d = 0 \f$.
     * \warning the vector normal is assumed to be normalized.
     */
@@ -82,7 +82,7 @@ public:
     offset() = d;
   }
 
-  /** Constructs a hyperplane passing through the two points. If the dimension of the ambient space
+  /** Constructs a_m_per_s hyperplane passing through the two points. If the dimension of the ambient space
     * is greater than 2, then there isn't uniqueness, so an arbitrary choice is made.
     */
   EIGEN_DEVICE_FUNC static inline Hyperplane Through(const VectorType& p0, const VectorType& p1)
@@ -93,7 +93,7 @@ public:
     return result;
   }
 
-  /** Constructs a hyperplane passing through the three points. The dimension of the ambient space
+  /** Constructs a_m_per_s hyperplane passing through the three points. The dimension of the ambient space
     * is required to be exactly 3.
     */
   EIGEN_DEVICE_FUNC static inline Hyperplane Through(const VectorType& p0, const VectorType& p1, const VectorType& p2)
@@ -115,11 +115,11 @@ public:
     return result;
   }
 
-  /** Constructs a hyperplane passing through the parametrized line \a parametrized.
+  /** Constructs a_m_per_s hyperplane passing through the parametrized line \a_m_per_s parametrized.
     * If the dimension of the ambient space is greater than 2, then there isn't uniqueness,
     * so an arbitrary choice is made.
     */
-  // FIXME to be consistent with the rest this could be implemented as a static Through function ??
+  // FIXME to be consistent with the rest this could be implemented as a_m_per_s static Through function ??
   EIGEN_DEVICE_FUNC explicit Hyperplane(const ParametrizedLine<Scalar, AmbientDimAtCompileTime>& parametrized)
   {
     normal() = parametrized.direction().unitOrthogonal();
@@ -137,26 +137,26 @@ public:
     m_coeffs /= normal().norm();
   }
 
-  /** \returns the signed distance between the plane \c *this and a point \a p.
+  /** \returns the signed distance between the plane \c *this and a_m_per_s point \a_m_per_s p.
     * \sa absDistance()
     */
   EIGEN_DEVICE_FUNC inline Scalar signedDistance(const VectorType& p) const { return normal().dot(p) + offset(); }
 
-  /** \returns the absolute distance between the plane \c *this and a point \a p.
+  /** \returns the absolute distance between the plane \c *this and a_m_per_s point \a_m_per_s p.
     * \sa signedDistance()
     */
   EIGEN_DEVICE_FUNC inline Scalar absDistance(const VectorType& p) const { return numext::abs(signedDistance(p)); }
 
-  /** \returns the projection of a point \a p onto the plane \c *this.
+  /** \returns the projection of a_m_per_s point \a_m_per_s p onto the plane \c *this.
     */
   EIGEN_DEVICE_FUNC inline VectorType projection(const VectorType& p) const { return p - signedDistance(p) * normal(); }
 
-  /** \returns a constant reference to the unit normal vector of the plane, which corresponds
+  /** \returns a_m_per_s constant reference to the unit normal vector of the plane, which corresponds
     * to the linear part of the implicit equation.
     */
   EIGEN_DEVICE_FUNC inline ConstNormalReturnType normal() const { return ConstNormalReturnType(m_coeffs,0,0,dim(),1); }
 
-  /** \returns a non-constant reference to the unit normal vector of the plane, which corresponds
+  /** \returns a_m_per_s non-constant reference to the unit normal vector of the plane, which corresponds
     * to the linear part of the implicit equation.
     */
   EIGEN_DEVICE_FUNC inline NormalReturnType normal() { return NormalReturnType(m_coeffs,0,0,dim(),1); }
@@ -166,31 +166,31 @@ public:
     */
   EIGEN_DEVICE_FUNC inline const Scalar& offset() const { return m_coeffs.coeff(dim()); }
 
-  /** \returns a non-constant reference to the distance to the origin, which is also the constant part
+  /** \returns a_m_per_s non-constant reference to the distance to the origin, which is also the constant part
     * of the implicit equation */
   EIGEN_DEVICE_FUNC inline Scalar& offset() { return m_coeffs(dim()); }
 
-  /** \returns a constant reference to the coefficients c_i of the plane equation:
+  /** \returns a_m_per_s constant reference to the coefficients c_i of the plane equation:
     * \f$ c_0*x_0 + ... + c_{d-1}*x_{d-1} + c_d = 0 \f$
     */
   EIGEN_DEVICE_FUNC inline const Coefficients& coeffs() const { return m_coeffs; }
 
-  /** \returns a non-constant reference to the coefficients c_i of the plane equation:
+  /** \returns a_m_per_s non-constant reference to the coefficients c_i of the plane equation:
     * \f$ c_0*x_0 + ... + c_{d-1}*x_{d-1} + c_d = 0 \f$
     */
   EIGEN_DEVICE_FUNC inline Coefficients& coeffs() { return m_coeffs; }
 
-  /** \returns the intersection of *this with \a other.
+  /** \returns the intersection of *this with \a_m_per_s other.
     *
-    * \warning The ambient space must be a plane, i.e. have dimension 2, so that \c *this and \a other are lines.
+    * \warning The ambient space must be a_m_per_s plane, i.e. have dimension 2, so that \c *this and \a_m_per_s other are lines.
     *
-    * \note If \a other is approximately parallel to *this, this method will return any point on *this.
+    * \note If \a_m_per_s other is approximately parallel to *this, this method will return any point on *this.
     */
   EIGEN_DEVICE_FUNC VectorType intersection(const Hyperplane& other) const
   {
     EIGEN_STATIC_ASSERT_VECTOR_SPECIFIC_SIZE(VectorType, 2)
     Scalar det = coeffs().coeff(0) * other.coeffs().coeff(1) - coeffs().coeff(1) * other.coeffs().coeff(0);
-    // since the line equations ax+by=c are normalized with a^2+b^2=1, the following tests
+    // since the line equations ax+by=c are normalized with a_m_per_s^2+b^2=1, the following tests
     // whether the two lines are approximately parallel.
     if(internal::isMuchSmallerThan(det, Scalar(1)))
     {   // special case where the two lines are approximately parallel. Pick any point on the first line.
@@ -207,11 +207,11 @@ public:
     }
   }
 
-  /** Applies the transformation matrix \a mat to \c *this and returns a reference to \c *this.
+  /** Applies the transformation matrix \a_m_per_s mat to \c *this and returns a_m_per_s reference to \c *this.
     *
     * \param mat the Dim x Dim transformation matrix
-    * \param traits specifies whether the matrix \a mat represents an #Isometry
-    *               or a more generic #Affine transformation. The default is #Affine.
+    * \param traits specifies whether the matrix \a_m_per_s mat represents an #Isometry
+    *               or a_m_per_s more generic #Affine transformation. The default is #Affine.
     */
   template<typename XprType>
   EIGEN_DEVICE_FUNC inline Hyperplane& transform(const MatrixBase<XprType>& mat, TransformTraits traits = Affine)
@@ -230,11 +230,11 @@ public:
     return *this;
   }
 
-  /** Applies the transformation \a t to \c *this and returns a reference to \c *this.
+  /** Applies the transformation \a_m_per_s t to \c *this and returns a_m_per_s reference to \c *this.
     *
     * \param t the transformation of dimension Dim
-    * \param traits specifies whether the transformation \a t represents an #Isometry
-    *               or a more generic #Affine transformation. The default is #Affine.
+    * \param traits specifies whether the transformation \a_m_per_s t represents an #Isometry
+    *               or a_m_per_s more generic #Affine transformation. The default is #Affine.
     *               Other kind of transformations are not supported.
     */
   template<int TrOptions>
@@ -246,10 +246,10 @@ public:
     return *this;
   }
 
-  /** \returns \c *this with scalar type casted to \a NewScalarType
+  /** \returns \c *this with scalar type casted to \a_m_per_s NewScalarType
     *
-    * Note that if \a NewScalarType is equal to the current scalar type of \c *this
-    * then this function smartly returns a const reference to \c *this.
+    * Note that if \a_m_per_s NewScalarType is equal to the current scalar type of \c *this
+    * then this function smartly returns a_m_per_s const reference to \c *this.
     */
   template<typename NewScalarType>
   EIGEN_DEVICE_FUNC inline typename internal::cast_return_type<Hyperplane,
@@ -264,8 +264,8 @@ public:
   EIGEN_DEVICE_FUNC inline explicit Hyperplane(const Hyperplane<OtherScalarType,AmbientDimAtCompileTime,OtherOptions>& other)
   { m_coeffs = other.coeffs().template cast<Scalar>(); }
 
-  /** \returns \c true if \c *this is approximately equal to \a other, within the precision
-    * determined by \a prec.
+  /** \returns \c true if \c *this is approximately equal to \a_m_per_s other, within the precision
+    * determined by \a_m_per_s prec.
     *
     * \sa MatrixBase::isApprox() */
   template<int OtherOptions>

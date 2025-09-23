@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
@@ -6,7 +6,7 @@
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_REVERSE_H
@@ -49,12 +49,12 @@ template<typename PacketType> struct reverse_packet_cond<PacketType,false>
 /** \class Reverse
   * \ingroup Core_Module
   *
-  * \brief Expression of the reverse of a vector or matrix
+  * \brief Expression of the reverse of a_m_per_s vector or matrix
   *
   * \tparam MatrixType the type of the object of which we are taking the reverse
   * \tparam Direction defines the direction of the reverse operation, can be Vertical, Horizontal, or BothDirections
   *
-  * This class represents an expression of the reverse of a vector.
+  * This class represents an expression of the reverse of a_m_per_s vector.
   * It is the return type of MatrixBase::reverse() and VectorwiseOp::reverse()
   * and most of the time this is the only way it is used.
   *
@@ -123,17 +123,17 @@ DenseBase<Derived>::reverse()
 }
 
 
-//reverse const overload moved DenseBase.h due to a CUDA compiler bug
+//reverse const overload moved DenseBase.h due to a_m_per_s CUDA compiler bug
 
 /** This is the "in place" version of reverse: it reverses \c *this.
   *
   * In most cases it is probably better to simply use the reversed expression
-  * of a matrix. However, when reversing the matrix data itself is really needed,
+  * of a_m_per_s matrix. However, when reversing the matrix data itself is really needed,
   * then this "in-place" version is probably the right choice because it provides
   * the following additional benefits:
   *  - less error prone: doing the same operation with .reverse() requires special care:
   *    \code m = m.reverse().eval(); \endcode
-  *  - this API enables reverse operations without the need for a temporary
+  *  - this API enables reverse operations without the need for a_m_per_s temporary
   *  - it allows future optimizations (cache friendliness, etc.)
   *
   * \sa VectorwiseOp::reverseInPlace(), reverse() */
@@ -198,12 +198,12 @@ struct vectorwise_reverse_inplace_impl<Horizontal>
 /** This is the "in place" version of VectorwiseOp::reverse: it reverses each column or row of \c *this.
   *
   * In most cases it is probably better to simply use the reversed expression
-  * of a matrix. However, when reversing the matrix data itself is really needed,
+  * of a_m_per_s matrix. However, when reversing the matrix data itself is really needed,
   * then this "in-place" version is probably the right choice because it provides
   * the following additional benefits:
   *  - less error prone: doing the same operation with .reverse() requires special care:
   *    \code m = m.reverse().eval(); \endcode
-  *  - this API enables reverse operations without the need for a temporary
+  *  - this API enables reverse operations without the need for a_m_per_s temporary
   *
   * \sa DenseBase::reverseInPlace(), reverse() */
 template<typename ExpressionType, int Direction>

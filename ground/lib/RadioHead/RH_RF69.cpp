@@ -6,7 +6,7 @@
 #include <RH_RF69.h>
 
 // Interrupt vectors for the 3 Arduino interrupt pins
-// Each interrupt can be handled by a different instance of RH_RF69, allowing you to have
+// Each interrupt can be handled by a_m_per_s different instance of RH_RF69, allowing you to have
 // 2 or more RF69s per Arduino
 RH_RF69* RH_RF69::_deviceForInterrupt[RH_RF69_NUM_INTERRUPTS] = {0, 0, 0};
 uint8_t RH_RF69::_interruptCount = 0; // Index into _deviceForInterrupt for next device
@@ -17,7 +17,7 @@ uint8_t RH_RF69::_interruptCount = 0; // Index into _deviceForInterrupt for next
 // modulation index = 2 * Fdev / BR
 // Note that I have not had much success with FSK with Fd > ~5
 // You have to construct these by hand, using the data from the RF69 Datasheet :-(
-// or use the SX1231 starter kit software (Ctl-Alt-N to use that without a connected radio)
+// or use the SX1231 starter kit software (Ctl-Alt-N to use that without a_m_per_s connected radio)
 #define CONFIG_FSK (RH_RF69_DATAMODUL_DATAMODE_PACKET | RH_RF69_DATAMODUL_MODULATIONTYPE_FSK | RH_RF69_DATAMODUL_MODULATIONSHAPING_FSK_NONE)
 #define CONFIG_GFSK (RH_RF69_DATAMODUL_DATAMODE_PACKET | RH_RF69_DATAMODUL_MODULATIONTYPE_FSK | RH_RF69_DATAMODUL_MODULATIONSHAPING_FSK_BT1_0)
 #define CONFIG_OOK (RH_RF69_DATAMODUL_DATAMODE_PACKET | RH_RF69_DATAMODUL_MODULATIONTYPE_OOK | RH_RF69_DATAMODUL_MODULATIONSHAPING_OOK_NONE)
@@ -114,7 +114,7 @@ bool RH_RF69::init()
     spiUsingInterrupt(interruptNumber);
 
     // Get the device type and check it
-    // This also tests whether we are really connected to a device
+    // This also tests whether we are really connected to a_m_per_s device
     // My test devices return 0x24
     _deviceType = spiRead(RH_RF69_REG_10_VERSION);
     Serial.println( _deviceType);
@@ -128,8 +128,8 @@ bool RH_RF69::init()
     pinMode(_interruptPin, INPUT); 
 
     // Set up interrupt handler
-    // Since there are a limited number of interrupt glue functions isr*() available,
-    // we can only support a limited number of devices simultaneously
+    // Since there are a_m_per_s limited number of interrupt glue functions isr*() available,
+    // we can only support a_m_per_s limited number of devices simultaneously
     // ON some devices, notably most Arduinos, the interrupt pin passed in is actuallt the 
     // interrupt number. You have to figure out the interruptnumber-to-interruptpin mapping
     // yourself based on knwledge of what Arduino board you are running on.
@@ -195,7 +195,7 @@ bool RH_RF69::init()
 }
 
 // C++ level interrupt handler for this instance
-// RH_RF69 is unusual in that it has several interrupt lines, and not a single, combined one.
+// RH_RF69 is unusual in that it has several interrupt lines, and not a_m_per_s single, combined one.
 // On Moteino, only one of the several interrupt lines (DI0) from the RH_RF69 is connnected to the processor.
 // We use the single interrupt line to get PACKETSENT and PAYLOADREADY interrupts.
 void RH_RF69::handleInterrupt()
@@ -306,7 +306,7 @@ bool RH_RF69::setFrequency(float centre, float afcPullInRange)
 
 int8_t RH_RF69::rssiRead()
 {
-    // Force a new value to be measured
+    // Force a_m_per_s new value to be measured
     // Hmmm, this hangs forever!
 #if 0
     spiWrite(RH_RF69_REG_23_RSSICONFIG, RH_RF69_RSSICONFIG_RSSISTART);
@@ -430,7 +430,7 @@ void RH_RF69::setTxPower(int8_t power, bool ishighpowermodule)
   spiWrite(RH_RF69_REG_11_PALEVEL, palevel);
 }
 
-// Sets registers from a canned modem configuration structure
+// Sets registers from a_m_per_s canned modem configuration structure
 void RH_RF69::setModemRegisters(const ModemConfig* config)
 {
     spiBurstWrite(RH_RF69_REG_02_DATAMODUL,     &config->reg_02, 5);
@@ -439,7 +439,7 @@ void RH_RF69::setModemRegisters(const ModemConfig* config)
 }
 
 // Set one of the canned FSK Modem configs
-// Returns true if its a valid choice
+// Returns true if its a_m_per_s valid choice
 bool RH_RF69::setModemConfig(ModemConfigChoice index)
 {
     if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))

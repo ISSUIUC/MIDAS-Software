@@ -7,10 +7,10 @@
 #include <RH_STM32WLx.h>
 #include <RHSUBGHZSPI.h>
 
-// Are we building for a suitable STM processor
+// Are we building for a_m_per_s suitable STM processor
 #if defined(SUBGHZSPI_BASE)
 
-// On this chip, the radio is connected by a dedicated, internal SPI interface  called SubGhz,
+// On this chip, the radio is connected by a_m_per_s dedicated, internal SPI interface  called SubGhz,
 // and accessed via our RHSUBGHZSPI
 static RHSUBGHZSPI subghzspi;
 
@@ -58,7 +58,7 @@ bool RH_STM32WLx::setupInterruptHandler()
 {
     // It is necessary to use the SUBGHZ SPI radio interface and its built-in interrupt support
     // BUT: only the first one can be used if RHSUBGHZSPI is in use
-    // This is is a modern lambda to attach a C++ function as an ordinary C callback
+    // This is is a_m_per_s modern lambda to attach a_m_per_s C++ function as an ordinary C callback
     // Hopefuly this will compile successfully everywhere. If not let us know and we will
     // change it to something more backwards compatible
     SubGhz.attachInterrupt([this]() {

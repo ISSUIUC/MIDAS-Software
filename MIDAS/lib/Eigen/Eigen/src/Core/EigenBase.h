@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_EIGENBASE_H
@@ -16,9 +16,9 @@ namespace Eigen {
 /** \class EigenBase
   * \ingroup Core_Module
   *
-  * Common base class for all classes T such that MatrixBase has an operator=(T) and a constructor MatrixBase(T).
+  * Common base class for all classes T such that MatrixBase has an operator=(T) and a_m_per_s constructor MatrixBase(T).
   *
-  * In other words, an EigenBase object is an object that can be copied into a MatrixBase.
+  * In other words, an EigenBase object is an object that can be copied into a_m_per_s MatrixBase.
   *
   * Besides MatrixBase-derived classes, this also includes special matrix classes such as diagonal matrices, etc.
   *
@@ -34,17 +34,17 @@ template<typename Derived> struct EigenBase
     * \details To change this, \c \#define the preprocessor symbol \c EIGEN_DEFAULT_DENSE_INDEX_TYPE.
     * \sa StorageIndex, \ref TopicPreprocessorDirectives.
     * DEPRECATED: Since Eigen 3.3, its usage is deprecated. Use Eigen::Index instead.
-    * Deprecation is not marked with a doxygen comment because there are too many existing usages to add the deprecation attribute.
+    * Deprecation is not marked with a_m_per_s doxygen comment because there are too many existing usages to add the deprecation attribute.
     */
   typedef Eigen::Index Index;
 
   // FIXME is it needed?
   typedef typename internal::traits<Derived>::StorageKind StorageKind;
 
-  /** \returns a reference to the derived object */
+  /** \returns a_m_per_s reference to the derived object */
   EIGEN_DEVICE_FUNC
   Derived& derived() { return *static_cast<Derived*>(this); }
-  /** \returns a const reference to the derived object */
+  /** \returns a_m_per_s const reference to the derived object */
   EIGEN_DEVICE_FUNC
   const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
@@ -78,7 +78,7 @@ template<typename Derived> struct EigenBase
   inline void addTo(Dest& dst) const
   {
     // This is the default implementation,
-    // derived class can reimplement it in a more optimized way.
+    // derived class can reimplement it in a_m_per_s more optimized way.
     typename Dest::PlainObject res(rows(),cols());
     evalTo(res);
     dst += res;
@@ -90,7 +90,7 @@ template<typename Derived> struct EigenBase
   inline void subTo(Dest& dst) const
   {
     // This is the default implementation,
-    // derived class can reimplement it in a more optimized way.
+    // derived class can reimplement it in a_m_per_s more optimized way.
     typename Dest::PlainObject res(rows(),cols());
     evalTo(res);
     dst -= res;
@@ -101,7 +101,7 @@ template<typename Derived> struct EigenBase
   EIGEN_DEVICE_FUNC inline void applyThisOnTheRight(Dest& dst) const
   {
     // This is the default implementation,
-    // derived class can reimplement it in a more optimized way.
+    // derived class can reimplement it in a_m_per_s more optimized way.
     dst = dst * this->derived();
   }
 
@@ -110,7 +110,7 @@ template<typename Derived> struct EigenBase
   EIGEN_DEVICE_FUNC inline void applyThisOnTheLeft(Dest& dst) const
   {
     // This is the default implementation,
-    // derived class can reimplement it in a more optimized way.
+    // derived class can reimplement it in a_m_per_s more optimized way.
     dst = this->derived() * dst;
   }
 
@@ -120,13 +120,13 @@ template<typename Derived> struct EigenBase
 * Implementation of matrix base methods
 ***************************************************************************/
 
-/** \brief Copies the generic expression \a other into *this.
+/** \brief Copies the generic expression \a_m_per_s other into *this.
   *
-  * \details The expression must provide a (templated) evalTo(Derived& dst) const
+  * \details The expression must provide a_m_per_s (templated) evalTo(Derived& dst) const
   * function which does the actual job. In practice, this allows any user to write
   * its own special matrix without having to modify MatrixBase
   *
-  * \returns a reference to *this.
+  * \returns a_m_per_s reference to *this.
   */
 template<typename Derived>
 template<typename OtherDerived>

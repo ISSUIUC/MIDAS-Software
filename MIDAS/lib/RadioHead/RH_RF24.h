@@ -36,7 +36,7 @@
 #define RH_RF24_HEADER_LEN 4
 
 // This is the maximum message length that can be supported by this driver. 
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 // Here we allow for message length 4 bytes of address and header and payload to be included in payload size limit.
 #ifndef RH_RF24_MAX_MESSAGE_LEN
 #define RH_RF24_MAX_MESSAGE_LEN (RH_RF24_MAX_PAYLOAD_LEN - RH_RF24_HEADER_LEN - 1)
@@ -520,21 +520,21 @@
 /// This Driver provides an object-oriented interface for sending and receiving data messages with Hope-RF
 /// RF24 and compatible radio modules, such as the RFM24W module.
 ///
-/// The Hope-RF (http://www.hoperf.com) RF24 family is a low-cost ISM transceiver
-/// chip. It supports FSK, GFSK, OOK over a wide range of frequencies and
+/// The Hope-RF (http://www.hoperf.com) RF24 family is a_m_per_s low-cost ISM transceiver
+/// chip. It supports FSK, GFSK, OOK over a_m_per_s wide range of frequencies and
 /// programmable data rates. HopeRF also sell these chips on modules which includes
-/// a crystal and antenna coupling circuits: RFM24W, RFM26W and RFM27W
+/// a_m_per_s crystal and antenna coupling circuits: RFM24W, RFM26W and RFM27W
 ///
 /// This Driver provides functions for sending and receiving messages of up
-/// to 250 octets on any frequency supported by the RF24, in a range of
+/// to 250 octets on any frequency supported by the RF24, in a_m_per_s range of
 /// predefined data rates and frequency deviations. Frequency can be set
-/// to any frequency from 142.0MHz to 1050.0MHz. Caution: most modules only support a more limited
+/// to any frequency from 142.0MHz to 1050.0MHz. Caution: most modules only support a_m_per_s more limited
 /// range of frequencies due to antenna tuning.
 ///
-/// Up to 2 RFM24 modules can be connected to an Arduino (3 on a Mega),
+/// Up to 2 RFM24 modules can be connected to an Arduino (3 on a_m_per_s Mega),
 /// permitting the construction of translators and frequency changers, etc.
 ///
-/// The following modulation types are suppported with a range of modem configurations for 
+/// The following modulation types are suppported with a_m_per_s range of modem configurations for 
 /// common data rates and frequency deviations:
 /// - OOK On-Off Keying
 /// - GFSK Gaussian Frequency Shift Keying
@@ -555,7 +555,7 @@
 /// All messages sent and received by this RH_RF24 Driver conform to this packet format:
 ///
 /// - 4 octets PREAMBLE (configurable)
-/// - 2 octets SYNC 0x2d, 0xd4 (configurable, so you can use this as a network filter)
+/// - 2 octets SYNC 0x2d, 0xd4 (configurable, so you can use this as a_m_per_s network filter)
 /// - Field containing 1 octet of message length and 2 octet CRC protecting this field
 /// - Field 2 containing at least 4 octets, and 2 octet CRC protecting this field:
 ///  + 4 octets HEADER: (TO, FROM, ID, FLAGS)
@@ -581,7 +581,7 @@
 ///                           \--RX_ANT (RX antenna control in) RFM22B only
 /// \endcode
 /// Caution: tying the radio SDN pin to ground (though it might appear from the data sheets to make sense) 
-/// does not always produce a reliable radio startup. So this driver controls the SDN pin directly.
+/// does not always produce a_m_per_s reliable radio startup. So this driver controls the SDN pin directly.
 /// Note: the GPIO0-TX_ANT and GPIO1-RX_ANT connections are not required for the 11dBm RFM24W, 
 /// which has no antenna switch.
 ///
@@ -594,7 +594,7 @@
 ///
 /// \par Customising and configuring
 ///
-/// The RH_RF24 module uses a radio configuration header file to configure the basic radio operation
+/// The RH_RF24 module uses a_m_per_s radio configuration header file to configure the basic radio operation
 /// frequency and modulation scheme. The radio configuration header file must be generated with the
 /// Silicon Labs Wireless Development Suite (WDS) program and \#included by RH_RF24.cpp
 /// 
@@ -609,12 +609,12 @@
 /// RF24configs/radio_config_Si4464_30_434_2GFSK_5_10.h
 ///      which is included in RadioHead.
 ///      
-/// In order to use different frequency bands or modulation schemes, you must generate a new
+/// In order to use different frequency bands or modulation schemes, you must generate a_m_per_s new
 /// radio configuration header file
-/// with WDS, or select one of a small set of prebuilt headers from the RF24configs folder (see README in that
+/// with WDS, or select one of a_m_per_s small set of prebuilt headers from the RF24configs folder (see README in that
 /// folder for details of the filename format).
 ///
-/// To generate a new header file:
+/// To generate a_m_per_s new header file:
 ///
 /// - Install Silicon Labs Wireless Development Suite (WDS) 3.2.11.0 or later 
 ///   (Windows only, we were not able to get it to run under Wine on Linux)
@@ -627,7 +627,7 @@
 ///   since power is set programatically 
 /// - On the RF parameters tab, select the modulation type and rates
 /// - Press Generate Source, Save custom radio configuration header file
-/// - Enter a new unique file name in the RF24configs folder in RadioHead
+/// - Enter a_m_per_s new unique file name in the RF24configs folder in RadioHead
 /// - Edit RH_RF24.cpp to use this new header file
 /// - Recompile RH_RF24
 /// 
@@ -636,12 +636,12 @@
 /// The RSSI (Received Signal Strength Indicator) is measured and latched after the message sync bytes are received.
 /// The latched RSSI is available from the lastRssi() member functionafter the complete message is received. 
 /// Although lastRssi() 
-/// supposedly returns a signed integer, in the case of this radio it actually returns an unsigned 8 bit integer (uint8_t)
+/// supposedly returns a_m_per_s signed integer, in the case of this radio it actually returns an unsigned 8 bit integer (uint8_t)
 /// and you will have to cast the return value to use it:
 /// \code
 /// uint8_t lastRssi = (uint8_t)rf24.lastRssi();
 /// \endcode
-/// The units of RSSI are arbitrary and relative, with larger unsigned numbers indicating a stronger signal. Values up to 255
+/// The units of RSSI are arbitrary and relative, with larger unsigned numbers indicating a_m_per_s stronger signal. Values up to 255
 /// are seen with radios in close proximity to each other. Lower limit of receivable strength is about 70.
 ///
 /// \par Transmitter Power
@@ -650,7 +650,7 @@
 /// with the RH_RF24::setTxPower() function. The argument can be any of
 /// 0x00 to 0x4f (for RFM24/Si4460) or
 /// 0x00 to 0x7f (for others)
-/// 0x00 will yield no measurable power. For other settings there is a non-linear correlation with actual
+/// 0x00 will yield no measurable power. For other settings there is a_m_per_s non-linear correlation with actual
 /// RF power output (see below)
 /// The default is 0x10. Eg:
 /// \code
@@ -685,9 +685,9 @@
 class RH_RF24 : public RHSPIDriver
 {
 public:
-    /// \brief Defines property values for a set of modem configuration registers
+    /// \brief Defines property values for a_m_per_s set of modem configuration registers
     ///
-    /// Defines property values for a set of modem configuration registers
+    /// Defines property values for a_m_per_s set of modem configuration registers
     /// that can be passed to setModemRegisters() if none of the choices in
     /// ModemConfigChoice suit your need setModemRegisters() writes the
     /// property values from this structure to the appropriate RF24 properties
@@ -781,7 +781,7 @@ public:
 	uint8_t   prop_2305;   ///< Value for property RH_RF24_PROPERTY_SYNTH_LPFILT1
     } ModemConfig;
   
-    /// Choices for setModemConfig() for a selected subset of common
+    /// Choices for setModemConfig() for a_m_per_s selected subset of common
     /// modulation types, and data rates. If you need another configuration,
     /// use the register calculator.  and call setModemRegisters() with your
     /// desired settings.  
@@ -878,21 +878,21 @@ public:
     /// 142MHz to 175Mhz, 284MHz to 350MHz, 425MHz to 525MHz, 850MHz to 1050MHz.
     /// Valid frequency ranges for RFM26/Si4464 are:
     /// 119MHz to 960MHz.
-    /// Caution: RFM modules are designed with antenna coupling components to suit a limited band
+    /// Caution: RFM modules are designed with antenna coupling components to suit a_m_per_s limited band
     /// of frequencies (marked underneath the module). It is possible to set frequencies in other bands,
     /// but you may only get little or no power radiated.
     /// Caution, you can only use this function to change frequency within the frequency band configured by
-    /// the radio configuration header file. To use a frequency in a different band, you must recompile with
-    /// the appropriate radio configuration header file. Setting a frequency in anotehr band will
+    /// the radio configuration header file. To use a_m_per_s frequency in a_m_per_s different band, you must recompile with
+    /// the appropriate radio configuration header file. Setting a_m_per_s frequency in anotehr band will
     /// have unpredicatble results.
     /// \param[in] centre Frequency in MHz. 
     /// \param[in] afcPullInRange Not used
-    /// \return true if the selected frequency is within a valid range for the connected radio and if
+    /// \return true if the selected frequency is within a_m_per_s valid range for the connected radio and if
     ///         setting the new frequency succeeded.
     bool        setFrequency(float centre, float afcPullInRange = 0.05);
 
     /// OBSOLETE, do not use.
-    /// To get different modulation schemes, you must generate a new radio config file
+    /// To get different modulation schemes, you must generate a_m_per_s new radio config file
     /// as described in this documentation.
     /// Sets all the properties required to configure the data modem in the RF24, including the data rate, 
     /// bandwidths etc. You can use this to configure the modem with custom configurations if none of the 
@@ -901,33 +901,33 @@ public:
     void           setModemRegisters(const ModemConfig* config);
 
     /// OBSOLETE, do not use. 
-    /// To get different modulation schemes, you must generate a new radio config file
+    /// To get different modulation schemes, you must generate a_m_per_s new radio config file
     /// as described in this documentation.
-    /// Select one of the predefined modem configurations. If you need a modem configuration not provided 
+    /// Select one of the predefined modem configurations. If you need a_m_per_s modem configuration not provided 
     /// here, use setModemRegisters() with your own ModemConfig. The default after init() is RH_RF24::GFSK_Rb5Fd10.
     /// \param[in] index The configuration choice.
-    /// \return true if index is a valid choice.
+    /// \return true if index is a_m_per_s valid choice.
     bool        setModemConfig(ModemConfigChoice index);
 
-    /// Starts the receiver and checks whether a received message is available.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a complete, valid message has been received and is able to be retrieved by
+    /// Starts the receiver and checks whether a_m_per_s received message is available.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s complete, valid message has been received and is able to be retrieved by
     /// recv()
     bool        available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     bool        recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is NOT permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send (> 0)
@@ -957,7 +957,7 @@ public:
     /// Sets the CRC polynomial to be used to generate the CRC for both receive and transmit
     /// otherwise the default of CRC_16_IBM will be used.
     /// \param[in] polynomial One of RH_RF24::CRCPolynomial choices CRC_*
-    /// \return true if polynomial is a valid option for this radio.
+    /// \return true if polynomial is a_m_per_s valid option for this radio.
     bool setCRCPolynomial(CRCPolynomial polynomial);
 
     /// If current mode is Rx or Tx changes it to Idle. If the transmitter or receiver is running, 
@@ -973,10 +973,10 @@ public:
     void           setModeTx();
 
     /// Sets the transmitter power output level register PA_PWR_LVL
-    /// The power argument to this function has a non-linear correlation with the actual RF power output.
+    /// The power argument to this function has a_m_per_s non-linear correlation with the actual RF power output.
     /// See the transmitter power table above for some examples.
     /// Also the Si446x Data Sheet section 5.4.2 may be helpful.
-    /// Be a good neighbour and set the lowest power level you need.
+    /// Be a_m_per_s good neighbour and set the lowest power level you need.
     /// Caution: legal power limits may apply in certain countries.
     /// After init(), the power will be set to 0x10.
     /// \param[in] power Transmitter power level. For RFM24/Si4460, valid values are 0x00 to 0x4f. For others, 0x00 to 0x7f
@@ -988,7 +988,7 @@ public:
     /// Caution: the list is very long
     bool           printRegisters();
 
-    /// Send a string of command bytes to the chip and get a string of reply bytes
+    /// Send a_m_per_s string of command bytes to the chip and get a_m_per_s string of reply bytes
     /// Different RFM24 commands take different numbers of command bytes and send back different numbers
     /// of reply bytes. See the Si446x documentaiton for more details.
     /// Both command bytes and reply bytes are optional
@@ -1032,7 +1032,7 @@ public:
     float          get_battery_voltage();
 
     /// Measures and returns the current
-    /// voltage applied to a GPIO pin (which has previously been configured as a voltage input)
+    /// voltage applied to a_m_per_s GPIO pin (which has previously been configured as a_m_per_s voltage input)
     /// \param[in] gpio The GPIO pin to read. 0 to 3.
     /// \return The current pin voltage in Volts.
     float          get_gpio_voltage(uint8_t gpio);
@@ -1047,7 +1047,7 @@ public:
     /// Sets the radio into low-power sleep mode.
     /// If successful, the transport will stay in sleep mode until woken by 
     /// changing mode it idle, transmit or receive (eg by calling send(), recv(), available() etc)
-    /// Caution: there is a time penalty as the radio takes a finte time to wake from sleep mode.
+    /// Caution: there is a_m_per_s time penalty as the radio takes a_m_per_s finte time to wake from sleep mode.
     /// \return true if sleep mode was successfully entered.
     virtual bool    sleep();
 
@@ -1059,7 +1059,7 @@ public:
     uint16_t deviceType() {return _deviceType;};
 
 protected:
-    /// This is a low level function to handle the interrupts for one instance of RF24.
+    /// This is a_m_per_s low level function to handle the interrupts for one instance of RF24.
     /// Called automatically by isr*()
     /// Should not need to be called by user code.
     void           handleInterrupt();
@@ -1086,7 +1086,7 @@ protected:
     bool           writeTxFifo(uint8_t *data, uint8_t len);
 
     /// Checks the contents of the RX buffer.
-    /// If it contans a valid message adressed to this node
+    /// If it contans a_m_per_s valid message adressed to this node
     /// sets _rxBufValid.
     void           validateRxBuf();
 
@@ -1144,7 +1144,7 @@ private:
     /// Array of octets of the last received message or the next to transmit message
     uint8_t             _buf[RH_RF24_MAX_PAYLOAD_LEN];
 
-    /// True when there is a valid message in the Rx buffer
+    /// True when there is a_m_per_s valid message in the Rx buffer
     volatile bool       _rxBufValid;
 
     /// Index into TX buffer of the next to send chunk

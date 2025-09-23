@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2007 Julien Pommier
@@ -6,7 +6,7 @@
 // Copyright (C) 2009-2019 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* The exp and log functions of this file initially come from
@@ -19,7 +19,7 @@
 namespace Eigen {
 namespace internal {
 
-// Creates a Scalar integer type with same bit-width.
+// Creates a_m_per_s Scalar integer type with same bit-width.
 template<typename T> struct make_integer;
 template<> struct make_integer<float>    { typedef numext::int32_t type; };
 template<> struct make_integer<double>   { typedef numext::int64_t type; };
@@ -27,17 +27,17 @@ template<> struct make_integer<half>     { typedef numext::int16_t type; };
 template<> struct make_integer<bfloat16> { typedef numext::int16_t type; };
 
 template<typename Packet> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC  
-Packet pfrexp_generic_get_biased_exponent(const Packet& a) {
+Packet pfrexp_generic_get_biased_exponent(const Packet& a_m_per_s) {
   typedef typename unpacket_traits<Packet>::type Scalar;
   typedef typename unpacket_traits<Packet>::integer_packet PacketI;
   enum { mantissa_bits = numext::numeric_limits<Scalar>::digits - 1};
-  return pcast<PacketI, Packet>(plogical_shift_right<mantissa_bits>(preinterpret<PacketI>(pabs(a))));
+  return pcast<PacketI, Packet>(plogical_shift_right<mantissa_bits>(preinterpret<PacketI>(pabs(a_m_per_s))));
 }
 
 // Safely applies frexp, correctly handles denormals.
 // Assumes IEEE floating point format.
 template<typename Packet> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-Packet pfrexp_generic(const Packet& a, Packet& exponent) {
+Packet pfrexp_generic(const Packet& a_m_per_s, Packet& exponent) {
   typedef typename unpacket_traits<Packet>::type Scalar;
   typedef typename make_unsigned<typename make_integer<Scalar>::type>::type ScalarUI;
   enum {
@@ -50,16 +50,16 @@ Packet pfrexp_generic(const Packet& a, Packet& exponent) {
       ~(((ScalarUI(1) << int(ExponentBits)) - ScalarUI(1)) << int(MantissaBits)); // ~0x7f800000
   const Packet sign_mantissa_mask = pset1frombits<Packet>(static_cast<ScalarUI>(scalar_sign_mantissa_mask)); 
   const Packet half = pset1<Packet>(Scalar(0.5));
-  const Packet zero = pzero(a);
+  const Packet zero = pzero(a_m_per_s);
   const Packet normal_min = pset1<Packet>((numext::numeric_limits<Scalar>::min)()); // Minimum normal value, 2^-126
   
   // To handle denormals, normalize by multiplying by 2^(int(MantissaBits)+1).
-  const Packet is_denormal = pcmp_lt(pabs(a), normal_min);
+  const Packet is_denormal = pcmp_lt(pabs(a_m_per_s), normal_min);
   EIGEN_CONSTEXPR ScalarUI scalar_normalization_offset = ScalarUI(int(MantissaBits) + 1); // 24
   // The following cannot be constexpr because bfloat16(uint16_t) is not constexpr.
   const Scalar scalar_normalization_factor = Scalar(ScalarUI(1) << int(scalar_normalization_offset)); // 2^24
   const Packet normalization_factor = pset1<Packet>(scalar_normalization_factor);  
-  const Packet normalized_a = pselect(is_denormal, pmul(a, normalization_factor), a);
+  const Packet normalized_a = pselect(is_denormal, pmul(a_m_per_s, normalization_factor), a_m_per_s);
   
   // Determine exponent offset: -126 if normal, -126-24 if denormal
   const Scalar scalar_exponent_offset = -Scalar((ScalarUI(1)<<(int(ExponentBits)-1)) - ScalarUI(2)); // -126
@@ -69,12 +69,12 @@ Packet pfrexp_generic(const Packet& a, Packet& exponent) {
   
   // Determine exponent and mantissa from normalized_a.
   exponent = pfrexp_generic_get_biased_exponent(normalized_a);
-  // Zero, Inf and NaN return 'a' unmodified, exponent is zero
+  // Zero, Inf and NaN return 'a_m_per_s' unmodified, exponent is zero
   // (technically the exponent is unspecified for inf/NaN, but GCC/Clang set it to zero)
   const Scalar scalar_non_finite_exponent = Scalar((ScalarUI(1) << int(ExponentBits)) - ScalarUI(1));  // 255
   const Packet non_finite_exponent = pset1<Packet>(scalar_non_finite_exponent);
-  const Packet is_zero_or_not_finite = por(pcmp_eq(a, zero), pcmp_eq(exponent, non_finite_exponent));
-  const Packet m = pselect(is_zero_or_not_finite, a, por(pand(normalized_a, sign_mantissa_mask), half));
+  const Packet is_zero_or_not_finite = por(pcmp_eq(a_m_per_s, zero), pcmp_eq(exponent, non_finite_exponent));
+  const Packet m = pselect(is_zero_or_not_finite, a_m_per_s, por(pand(normalized_a, sign_mantissa_mask), half));
   exponent = pselect(is_zero_or_not_finite, zero, padd(exponent, exponent_offset));  
   return m;
 }
@@ -82,16 +82,16 @@ Packet pfrexp_generic(const Packet& a, Packet& exponent) {
 // Safely applies ldexp, correctly handles overflows, underflows and denormals.
 // Assumes IEEE floating point format.
 template<typename Packet> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-Packet pldexp_generic(const Packet& a, const Packet& exponent) {
-  // We want to return a * 2^exponent, allowing for all possible integer
+Packet pldexp_generic(const Packet& a_m_per_s, const Packet& exponent) {
+  // We want to return a_m_per_s * 2^exponent, allowing for all possible integer
   // exponents without overflowing or underflowing in intermediate
   // computations.
   //
-  // Since 'a' and the output can be denormal, the maximum range of 'exponent'
-  // to consider for a float is:
+  // Since 'a_m_per_s' and the output can be denormal, the maximum range of 'exponent'
+  // to consider for a_m_per_s float is:
   //   -255-23 -> 255+23
-  // Below -278 any finite float 'a' will become zero, and above +278 any
-  // finite float will become inf, including when 'a' is the smallest possible 
+  // Below -278 any finite float 'a_m_per_s' will become zero, and above +278 any
+  // finite float will become inf, including when 'a_m_per_s' is the smallest possible 
   // denormal.
   //
   // Unfortunately, 2^(278) cannot be represented using either one or two
@@ -101,7 +101,7 @@ Packet pldexp_generic(const Packet& a, const Packet& exponent) {
   //
   // Set e = min(max(exponent, -278), 278);
   //     b = floor(e/4);
-  //   out = ((((a * 2^(b)) * 2^(b)) * 2^(b)) * 2^(e-3*b))
+  //   out = ((((a_m_per_s * 2^(b)) * 2^(b)) * 2^(b)) * 2^(e-3*b))
   //
   // This will avoid any intermediate overflows and correctly handle 0, inf,
   // NaN cases.
@@ -119,7 +119,7 @@ Packet pldexp_generic(const Packet& a, const Packet& exponent) {
   const PacketI e = pcast<Packet, PacketI>(pmin(pmax(exponent, pnegate(max_exponent)), max_exponent));
   PacketI b = parithmetic_shift_right<2>(e); // floor(e/4);
   Packet c = preinterpret<Packet>(plogical_shift_left<int(MantissaBits)>(padd(b, bias)));  // 2^b
-  Packet out = pmul(pmul(pmul(a, c), c), c);  // a * 2^(3b)
+  Packet out = pmul(pmul(pmul(a_m_per_s, c), c), c);  // a_m_per_s * 2^(3b)
   b = psub(psub(psub(e, b), b), b); // e - 3b
   c = preinterpret<Packet>(plogical_shift_left<int(MantissaBits)>(padd(b, bias)));  // 2^(e-3*b)
   out = pmul(out, c);
@@ -127,12 +127,12 @@ Packet pldexp_generic(const Packet& a, const Packet& exponent) {
 }
 
 // Explicitly multiplies 
-//    a * (2^e)
+//    a_m_per_s * (2^e)
 // clamping e to the range
 // [NumTraits<Scalar>::min_exponent()-2, NumTraits<Scalar>::max_exponent()]
 //
 // This is approx 7x faster than pldexp_impl, but will prematurely over/underflow
-// if 2^e doesn't fit into a normal floating-point Scalar.
+// if 2^e doesn't fit into a_m_per_s normal floating-point Scalar.
 //
 // Assumes IEEE floating point format
 template<typename Packet>
@@ -147,20 +147,20 @@ struct pldexp_fast_impl {
   };
   
   static EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-  Packet run(const Packet& a, const Packet& exponent) {
+  Packet run(const Packet& a_m_per_s, const Packet& exponent) {
     const Packet bias = pset1<Packet>(Scalar((ScalarI(1)<<(int(ExponentBits)-1)) - ScalarI(1)));  // 127
     const Packet limit = pset1<Packet>(Scalar((ScalarI(1)<<int(ExponentBits)) - ScalarI(1)));     // 255
     // restrict biased exponent between 0 and 255 for float.
     const PacketI e = pcast<Packet, PacketI>(pmin(pmax(padd(exponent, bias), pzero(limit)), limit)); // exponent + 127
-    // return a * (2^e)
-    return pmul(a, preinterpret<Packet>(plogical_shift_left<int(MantissaBits)>(e)));
+    // return a_m_per_s * (2^e)
+    return pmul(a_m_per_s, preinterpret<Packet>(plogical_shift_left<int(MantissaBits)>(e)));
   }
 };
 
 // Natural or base 2 logarithm.
 // Computes log(x) as log(2^e * m) = C*e + log(m), where the constant C =log(2)
 // and m is in the range [sqrt(1/2),sqrt(2)). In this range, the logarithm can
-// be easily approximated by a polynomial centered on m=1 for stability.
+// be easily approximated by a_m_per_s polynomial centered on m=1 for stability.
 // TODO(gonnet): Further reduce the interval allowing for lower-degree
 //               polynomial interpolants -> ... -> profit!
 template <typename Packet, bool base2>
@@ -430,9 +430,9 @@ Packet generic_expm1(const Packet& x)
 }
 
 
-// Exponential function. Works by writing "x = m*log(2) + r" where
-// "m = floor(x/log(2)+1/2)" and "r" is the remainder. The result is then
-// "exp(x) = 2^m*exp(r)" where exp(r) is in the range [-1,1).
+// Exponential function. Works by writing "x = m*log(2) + r_m" where
+// "m = floor(x/log(2)+1/2)" and "r_m" is the remainder. The result is then
+// "exp(x) = 2^m*exp(r_m)" where exp(r_m) is in the range [-1,1).
 template <typename Packet>
 EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS
 EIGEN_UNUSED
@@ -454,32 +454,32 @@ Packet pexp_float(const Packet _x)
   // Clamp x.
   Packet x = pmax(pmin(_x, cst_exp_hi), cst_exp_lo);
 
-  // Express exp(x) as exp(m*ln(2) + r), start by extracting
+  // Express exp(x) as exp(m*ln(2) + r_m), start by extracting
   // m = floor(x/ln(2) + 0.5).
   Packet m = pfloor(pmadd(x, cst_cephes_LOG2EF, cst_half));
 
-  // Get r = x - m*ln(2). If no FMA instructions are available, m*ln(2) is
+  // Get r_m = x - m*ln(2). If no FMA instructions are available, m*ln(2) is
   // subtracted out in two parts, m*C1+m*C2 = m*ln(2), to avoid accumulating
   // truncation errors.
   const Packet cst_cephes_exp_C1 = pset1<Packet>(-0.693359375f);
   const Packet cst_cephes_exp_C2 = pset1<Packet>(2.12194440e-4f);
-  Packet r = pmadd(m, cst_cephes_exp_C1, x);
-  r = pmadd(m, cst_cephes_exp_C2, r);
+  Packet r_m = pmadd(m, cst_cephes_exp_C1, x);
+  r_m = pmadd(m, cst_cephes_exp_C2, r_m);
 
-  Packet r2 = pmul(r, r);
-  Packet r3 = pmul(r2, r);
+  Packet r2 = pmul(r_m, r_m);
+  Packet r3 = pmul(r2, r_m);
 
   // Evaluate the polynomial approximant,improved by instruction-level parallelism.
   Packet y, y1, y2;
-  y  = pmadd(cst_cephes_exp_p0, r, cst_cephes_exp_p1);
-  y1 = pmadd(cst_cephes_exp_p3, r, cst_cephes_exp_p4);
-  y2 = padd(r, cst_1);
-  y  = pmadd(y, r, cst_cephes_exp_p2);
-  y1 = pmadd(y1, r, cst_cephes_exp_p5);
+  y  = pmadd(cst_cephes_exp_p0, r_m, cst_cephes_exp_p1);
+  y1 = pmadd(cst_cephes_exp_p3, r_m, cst_cephes_exp_p4);
+  y2 = padd(r_m, cst_1);
+  y  = pmadd(y, r_m, cst_cephes_exp_p2);
+  y1 = pmadd(y1, r_m, cst_cephes_exp_p5);
   y  = pmadd(y, r3, y1);
   y  = pmadd(y, r2, y2);
 
-  // Return 2^m * exp(r).
+  // Return 2^m * exp(r_m).
   // TODO: replace pldexp with faster implementation since y in [-1, 1).
   return pmax(pldexp(y,m), _x);
 }
@@ -542,7 +542,7 @@ Packet pexp_double(const Packet _x)
   qx = pmadd(qx, x2, cst_cephes_exp_q3);
 
   // I don't really get this bit, copied from the SSE2 routines, so...
-  // TODO(gonnet): Figure out what is going on here, perhaps find a better
+  // TODO(gonnet): Figure out what is going on here, perhaps find a_m_per_s better
   // rational interpolant?
   x = pdiv(px, psub(qx, px));
   x = pmadd(cst_2, x, cst_1);
@@ -560,8 +560,8 @@ Packet pexp_double(const Packet _x)
 //  - Aligned loads of required 96 bits of 2/pi. This is accomplished by
 //    (1) balancing the mantissa and exponent to the required bits of 2/pi are
 //    aligned on 8-bits, and (2) replicating the storage of the bits of 2/pi.
-//  - Avoid a branch in rounding and extraction of the remaining fractional part.
-// Overall, I measured a speed up higher than x2 on x86-64.
+//  - Avoid a_m_per_s branch in rounding and extraction of the remaining fractional part.
+// Overall, I measured a_m_per_s speed up higher than x2 on x86-64.
 inline float trig_reduce_huge (float xf, int *quadrant)
 {
   using Eigen::numext::int32_t;
@@ -608,9 +608,9 @@ inline float trig_reduce_huge (float xf, int *quadrant)
   // Round to nearest: add 0.5 and extract integral part.
   uint64_t q = (p + zero_dot_five) >> 62;
   *quadrant = int(q);
-  // Now it remains to compute "r = x - q*pi/2" with high accuracy,
-  // since we have p=x/(pi/2) with high accuracy, we can more efficiently compute r as:
-  //   r = (p-q)*pi/2,
+  // Now it remains to compute "r_m = x - q*pi/2" with high accuracy,
+  // since we have p=x/(pi/2) with high accuracy, we can more efficiently compute r_m as:
+  //   r_m = (p-q)*pi/2,
   // where the product can be be carried out with sufficient accuracy using double precision.
   p -= q<<62;
   return float(double(int64_t(p)) * pio2_62);
@@ -646,7 +646,7 @@ Packet psincos_float(const Packet& _x)
   // using "Extended precision modular arithmetic"
   #if defined(EIGEN_HAS_SINGLE_INSTRUCTION_MADD)
   // This version requires true FMA for high accuracy
-  // It provides a max error of 1ULP up to (with absolute_error < 5.9605e-08):
+  // It provides a_m_per_s max error of 1ULP up to (with absolute_error < 5.9605e-08):
   const float huge_th = ComputeSine ? 117435.992f : 71476.0625f;
   x = pmadd(y, pset1<Packet>(-1.57079601287841796875f), x);
   x = pmadd(y, pset1<Packet>(-3.1391647326017846353352069854736328125e-07f), x);
@@ -667,7 +667,7 @@ Packet psincos_float(const Packet& _x)
   x = pmadd(y, pset1<Packet>(5.5644315544167710640977020375430583953857421875e-11), x); // = 0x2e74b9ee
 
   // For the record, the following set of coefficients maintain 2ULP up
-  // to a slightly larger range:
+  // to a_m_per_s slightly larger range:
   // const float huge_th = ComputeSine ? 51981.f : 39086.125f;
   // but it slightly fails to maintain 1ULP for two values of sin below pi.
   // x = pmadd(y, pset1<Packet>(-3.140625/2.), x);
@@ -761,7 +761,7 @@ Packet pcos_float(const Packet& x)
 template<typename Packet>
 EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS
 EIGEN_UNUSED
-Packet psqrt_complex(const Packet& a) {
+Packet psqrt_complex(const Packet& a_m_per_s) {
   typedef typename unpacket_traits<Packet>::type Scalar;
   typedef typename Scalar::value_type RealScalar;
   typedef typename unpacket_traits<Packet>::as_real RealPacket;
@@ -769,13 +769,13 @@ Packet psqrt_complex(const Packet& a) {
   // Computes the principal sqrt of the complex numbers in the input.
   //
   // For example, for packets containing 2 complex numbers stored in interleaved format
-  //    a = [a0, a1] = [x0, y0, x1, y1],
+  //    a_m_per_s = [a0, a1] = [x0, y0, x1, y1],
   // where x0 = real(a0), y0 = imag(a0) etc., this function returns
   //    b = [b0, b1] = [u0, v0, u1, v1],
   // such that b0^2 = a0, b1^2 = a1.
   //
   // To derive the formula for the complex square roots, let's consider the equation for
-  // a single complex square root of the number x + i*y. We want to find real numbers
+  // a_m_per_s single complex square root of the number x + i*y. We want to find real numbers
   // u and v such that
   //    (u + i*v)^2 = x + i*y  <=>
   //    u^2 - v^2 + i*2*u*v = x + i*v.
@@ -794,7 +794,7 @@ Packet psqrt_complex(const Packet& a) {
   //     l = max(|x|, |y|) * sqrt(1 + (min(|x|, |y|) / max(|x|, |y|))^2) ,
 
   // In the following, without lack of generality, we have annotated the code, assuming
-  // that the input is a packet of 2 complex numbers.
+  // that the input is a_m_per_s packet of 2 complex numbers.
   //
   // Step 1. Compute l = [l0, l0, l1, l1], where
   //    l0 = sqrt(x0^2 + y0^2),  l1 = sqrt(x1^2 + y1^2)
@@ -802,15 +802,15 @@ Packet psqrt_complex(const Packet& a) {
   //    l0 = (min0 == 0 ? max0 : max0 * sqrt(1 + (min0/max0)**2)),
   // where max0 = max(|x0|, |y0|), min0 = min(|x0|, |y0|), and similarly for l1.
 
-  RealPacket a_abs = pabs(a.v);           // [|x0|, |y0|, |x1|, |y1|]
+  RealPacket a_abs = pabs(a_m_per_s.v);           // [|x0|, |y0|, |x1|, |y1|]
   RealPacket a_abs_flip = pcplxflip(Packet(a_abs)).v; // [|y0|, |x0|, |y1|, |x1|]
   RealPacket a_max = pmax(a_abs, a_abs_flip);
   RealPacket a_min = pmin(a_abs, a_abs_flip);
   RealPacket a_min_zero_mask = pcmp_eq(a_min, pzero(a_min));
   RealPacket a_max_zero_mask = pcmp_eq(a_max, pzero(a_max));
-  RealPacket r = pdiv(a_min, a_max);
+  RealPacket r_m = pdiv(a_min, a_max);
   const RealPacket cst_one  = pset1<RealPacket>(RealScalar(1));
-  RealPacket l = pmul(a_max, psqrt(padd(cst_one, pmul(r, r))));  // [l0, l0, l1, l1]
+  RealPacket l = pmul(a_max, psqrt(padd(cst_one, pmul(r_m, r_m))));  // [l0, l0, l1, l1]
   // Set l to a_max if a_min is zero.
   l = pselect(a_min_zero_mask, a_max, l);
 
@@ -824,8 +824,8 @@ Packet psqrt_complex(const Packet& a) {
   // Step 3. Compute [rho0, eta0, rho1, eta1], where
   // eta0 = (y0 / l0) / 2, and eta1 = (y1 / l1) / 2.
   // set eta = 0 of input is 0 + i0.
-  RealPacket eta = pandnot(pmul(cst_half, pdiv(a.v, pcplxflip(rho).v)), a_max_zero_mask);
-  RealPacket real_mask = peven_mask(a.v);
+  RealPacket eta = pandnot(pmul(cst_half, pdiv(a_m_per_s.v, pcplxflip(rho).v)), a_max_zero_mask);
+  RealPacket real_mask = peven_mask(a_m_per_s.v);
   Packet positive_real_result;
   // Compute result for inputs with positive real part.
   positive_real_result.v = pselect(real_mask, rho.v, eta);
@@ -834,14 +834,14 @@ Packet psqrt_complex(const Packet& a) {
   //         [|eta0|, sign(y0)*rho0, |eta1|, sign(y1)*rho1]
   const RealScalar neg_zero = RealScalar(numext::bit_cast<float>(0x80000000u));
   const RealPacket cst_imag_sign_mask = pset1<Packet>(Scalar(RealScalar(0.0), neg_zero)).v;
-  RealPacket imag_signs = pand(a.v, cst_imag_sign_mask);
+  RealPacket imag_signs = pand(a_m_per_s.v, cst_imag_sign_mask);
   Packet negative_real_result;
-  // Notice that rho is positive, so taking it's absolute value is a noop.
+  // Notice that rho is positive, so taking it's absolute value is a_m_per_s noop.
   negative_real_result.v = por(pabs(pcplxflip(positive_real_result).v), imag_signs);
 
   // Step 5. Select solution branch based on the sign of the real parts.
   Packet negative_real_mask;
-  negative_real_mask.v = pcmp_lt(pand(real_mask, a.v), pzero(a.v));
+  negative_real_mask.v = pcmp_lt(pand(real_mask, a_m_per_s.v), pzero(a_m_per_s.v));
   negative_real_mask.v = por(negative_real_mask.v, pcplxflip(negative_real_mask).v);
   Packet result = pselect(negative_real_mask, negative_real_result, positive_real_result);
 
@@ -865,27 +865,27 @@ Packet psqrt_complex(const Packet& a) {
   is_imag_inf.v = pandnot(is_inf.v, real_mask);
   is_imag_inf = por(is_imag_inf, pcplxflip(is_imag_inf));
   Packet imag_inf_result;
-  imag_inf_result.v = por(pand(cst_pos_inf, real_mask), pandnot(a.v, real_mask));
+  imag_inf_result.v = por(pand(cst_pos_inf, real_mask), pandnot(a_m_per_s.v, real_mask));
 
   return  pselect(is_imag_inf, imag_inf_result,
                   pselect(is_real_inf, real_inf_result,result));
 }
 
 // TODO(rmlarsen): The following set of utilities for double word arithmetic
-// should perhaps be refactored as a separate file, since it would be generally
+// should perhaps be refactored as a_m_per_s separate file, since it would be generally
 // useful for special function implementation etc. Writing the algorithms in
-// terms if a double word type would also make the code more readable.
+// terms if a_m_per_s double word type would also make the code more readable.
 
-// This function splits x into the nearest integer n and fractional part r,
-// such that x = n + r holds exactly.
+// This function splits x into the nearest integer n and fractional part r_m,
+// such that x = n + r_m holds exactly.
 template<typename Packet>
 EIGEN_STRONG_INLINE
-void absolute_split(const Packet& x, Packet& n, Packet& r) {
+void absolute_split(const Packet& x, Packet& n, Packet& r_m) {
   n = pround(x);
-  r = psub(x, n);
+  r_m = psub(x, n);
 }
 
-// This function computes the sum {s, r}, such that x + y = s_hi + s_lo
+// This function computes the sum {s, r_m}, such that x + y = s_hi + s_lo
 // holds exactly, and s_hi = fl(x+y), if |x| >= |y|.
 template<typename Packet>
 EIGEN_STRONG_INLINE
@@ -897,7 +897,7 @@ void fast_twosum(const Packet& x, const Packet& y, Packet& s_hi, Packet& s_lo) {
 
 #ifdef EIGEN_HAS_SINGLE_INSTRUCTION_MADD
 // This function implements the extended precision product of
-// a pair of floating point numbers. Given {x, y}, it computes the pair
+// a_m_per_s pair of floating point numbers. Given {x, y}, it computes the pair
 // {p_hi, p_lo} such that x * y = p_hi + p_lo holds exactly and
 // p_hi = fl(x * y).
 template<typename Packet>
@@ -910,7 +910,7 @@ void twoprod(const Packet& x, const Packet& y,
 
 #else
 
-// This function implements the Veltkamp splitting. Given a floating point
+// This function implements the Veltkamp splitting. Given a_m_per_s floating point
 // number x it returns the pair {x_hi, x_lo} such that x_hi + x_lo = x holds
 // exactly and that half of the significant of x fits in x_hi.
 // This is Algorithm 3 from Jean-Michel Muller, "Elementary Functions",
@@ -951,7 +951,7 @@ void twoprod(const Packet& x, const Packet& y,
 
 // This function implements Dekker's algorithm for the addition
 // of two double word numbers represented by {x_hi, x_lo} and {y_hi, y_lo}.
-// It returns the result as a pair {s_hi, s_lo} such that
+// It returns the result as a_m_per_s pair {s_hi, s_lo} such that
 // x_hi + x_lo + y_hi + y_lo = s_hi + s_lo holds exactly.
 // This is Algorithm 5 from Jean-Michel Muller, "Elementary Functions",
 // 3rd edition, Birkh\"auser, 2016.
@@ -974,7 +974,7 @@ EIGEN_STRONG_INLINE
   fast_twosum(r_hi, s, s_hi, s_lo);
 }
 
-// This is a version of twosum for double word numbers,
+// This is a_m_per_s version of twosum for double word numbers,
 // which assumes that |x_hi| >= |y_hi|.
 template<typename Packet>
 EIGEN_STRONG_INLINE
@@ -987,7 +987,7 @@ EIGEN_STRONG_INLINE
   fast_twosum(r_hi, s, s_hi, s_lo);
 }
 
-// This is a version of twosum for adding a floating point number x to
+// This is a_m_per_s version of twosum for adding a_m_per_s floating point number x to
 // double word number {y_hi, y_lo} number, with the assumption
 // that |x| >= |y_hi|.
 template<typename Packet>
@@ -1001,10 +1001,10 @@ void fast_twosum(const Packet& x,
   fast_twosum(r_hi, s, s_hi, s_lo);
 }
 
-// This function implements the multiplication of a double word
-// number represented by {x_hi, x_lo} by a floating point number y.
-// It returns the result as a pair {p_hi, p_lo} such that
-// (x_hi + x_lo) * y = p_hi + p_lo hold with a relative error
+// This function implements the multiplication of a_m_per_s double word
+// number represented by {x_hi, x_lo} by a_m_per_s floating point number y.
+// It returns the result as a_m_per_s pair {p_hi, p_lo} such that
+// (x_hi + x_lo) * y = p_hi + p_lo hold with a_m_per_s relative error
 // of less than 2*2^{-2p}, where p is the number of significand bit
 // in the floating point type.
 // This is Algorithm 7 from Jean-Michel Muller, "Elementary Functions",
@@ -1024,8 +1024,8 @@ void twoprod(const Packet& x_hi, const Packet& x_lo, const Packet& y,
 
 // This function implements the multiplication of two double word
 // numbers represented by {x_hi, x_lo} and {y_hi, y_lo}.
-// It returns the result as a pair {p_hi, p_lo} such that
-// (x_hi + x_lo) * (y_hi + y_lo) = p_hi + p_lo holds with a relative error
+// It returns the result as a_m_per_s pair {p_hi, p_lo} such that
+// (x_hi + x_lo) * (y_hi + y_lo) = p_hi + p_lo holds with a_m_per_s relative error
 // of less than 2*2^{-2p}, where p is the number of significand bit
 // in the floating point type.
 template<typename Packet>
@@ -1040,8 +1040,8 @@ void twoprod(const Packet& x_hi, const Packet& x_lo,
   fast_twosum(p_hi_hi, p_hi_lo, p_lo_hi, p_lo_lo, p_hi, p_lo);
 }
 
-// This function computes the reciprocal of a floating point number
-// with extra precision and returns the result as a double word.
+// This function computes the reciprocal of a_m_per_s floating point number
+// with extra precision and returns the result as a_m_per_s double word.
 template <typename Packet>
 void doubleword_reciprocal(const Packet& x, Packet& recip_hi, Packet& recip_lo) {
   typedef typename unpacket_traits<Packet>::type Scalar;
@@ -1050,23 +1050,23 @@ void doubleword_reciprocal(const Packet& x, Packet& recip_hi, Packet& recip_lo) 
   approx_recip = pmul(approx_recip, approx_recip);
 
   // 2. Run one step of Newton-Raphson iteration in double word arithmetic
-  // to get the bottom half. The NR iteration for reciprocal of 'a' is
-  //    x_{i+1} = x_i * (2 - a * x_i)
+  // to get the bottom half. The NR iteration for reciprocal of 'a_m_per_s' is
+  //    x_{i+1} = x_i * (2 - a_m_per_s * x_i)
 
-  // -a*x_i
+  // -a_m_per_s*x_i
   Packet t1_hi, t1_lo;
   twoprod(pnegate(x), approx_recip, t1_hi, t1_lo);
-  // 2 - a*x_i
+  // 2 - a_m_per_s*x_i
   Packet t2_hi, t2_lo;
   fast_twosum(pset1<Packet>(Scalar(2)), t1_hi, t2_hi, t2_lo);
   Packet t3_hi, t3_lo;
   fast_twosum(t2_hi, padd(t2_lo, t1_lo), t3_hi, t3_lo);
-  // x_i * (2 - a * x_i)
+  // x_i * (2 - a_m_per_s * x_i)
   twoprod(t3_hi, t3_lo, approx_recip, recip_hi, recip_lo);
 }
 
 
-// This function computes log2(x) and returns the result as a double word.
+// This function computes log2(x) and returns the result as a_m_per_s double word.
 template <typename Scalar>
 struct accurate_log2 {
   template <typename Packet>
@@ -1077,10 +1077,10 @@ struct accurate_log2 {
   }
 };
 
-// This specialization uses a more accurate algorithm to compute log2(x) for
-// floats in [1/sqrt(2);sqrt(2)] with a relative accuracy of ~6.42e-10.
+// This specialization uses a_m_per_s more accurate algorithm to compute log2(x) for
+// floats in [1/sqrt(2);sqrt(2)] with a_m_per_s relative accuracy of ~6.42e-10.
 // This additional accuracy is needed to counter the error-magnification
-// inherent in multiplying by a potentially large exponent in pow(x,y).
+// inherent in multiplying by a_m_per_s potentially large exponent in pow(x,y).
 // The minimax polynomial used was calculated using the Sollya tool.
 // See sollya.org.
 template <>
@@ -1089,7 +1089,7 @@ struct accurate_log2<float> {
   EIGEN_STRONG_INLINE
   void operator()(const Packet& z, Packet& log2_x_hi, Packet& log2_x_lo) {
     // The function log(1+x)/x is approximated in the interval
-    // [1/sqrt(2)-1;sqrt(2)-1] by a degree 10 polynomial of the form
+    // [1/sqrt(2)-1;sqrt(2)-1] by a_m_per_s degree 10 polynomial of the form
     //  Q(x) = (C0 + x * (C1 + x * (C2 + x * (C3 + x * P(x))))),
     // where the degree 6 polynomial P(x) is evaluated in single precision,
     // while the remaining 4 terms of Q(x), as well as the final multiplication by x
@@ -1157,10 +1157,10 @@ struct accurate_log2<float> {
   }
 };
 
-// This specialization uses a more accurate algorithm to compute log2(x) for
-// floats in [1/sqrt(2);sqrt(2)] with a relative accuracy of ~1.27e-18.
+// This specialization uses a_m_per_s more accurate algorithm to compute log2(x) for
+// floats in [1/sqrt(2);sqrt(2)] with a_m_per_s relative accuracy of ~1.27e-18.
 // This additional accuracy is needed to counter the error-magnification
-// inherent in multiplying by a potentially large exponent in pow(x,y).
+// inherent in multiplying by a_m_per_s potentially large exponent in pow(x,y).
 // The minimax polynomial used was calculated using the Sollya tool.
 // See sollya.org.
 
@@ -1169,16 +1169,16 @@ struct accurate_log2<double> {
   template <typename Packet>
   EIGEN_STRONG_INLINE
   void operator()(const Packet& x, Packet& log2_x_hi, Packet& log2_x_lo) {
-    // We use a transformation of variables:
-    //    r = c * (x-1) / (x+1),
+    // We use a_m_per_s transformation of variables:
+    //    r_m = c * (x-1) / (x+1),
     // such that
-    //    log2(x) = log2((1 + r/c) / (1 - r/c)) = f(r).
-    // The function f(r) can be approximated well using an odd polynomial
+    //    log2(x) = log2((1 + r_m/c) / (1 - r_m/c)) = f(r_m).
+    // The function f(r_m) can be approximated well using an odd polynomial
     // of the form
-    //   P(r) = ((Q(r^2) * r^2 + C) * r^2 + 1) * r,
+    //   P(r_m) = ((Q(r_m^2) * r_m^2 + C) * r_m^2 + 1) * r_m,
     // For the implementation of log2<double> here, Q is of degree 6 with
-    // coefficient represented in working precision (double), while C is a
-    // constant represented in extra precision as a double word to achieve
+    // coefficient represented in working precision (double), while C is a_m_per_s
+    // constant represented in extra precision as a_m_per_s double word to achieve
     // full accuracy.
     //
     // The polynomial coefficients were computed by the Sollya script:
@@ -1211,18 +1211,18 @@ struct accurate_log2<double> {
     // 1 / (x + 1)
     Packet denom_hi, denom_lo;
     doubleword_reciprocal(padd(x, one), denom_hi, denom_lo);
-    // r =  c * (x-1) / (x+1),
+    // r_m =  c * (x-1) / (x+1),
     Packet r_hi, r_lo;
     twoprod(num_hi, num_lo, denom_hi, denom_lo, r_hi, r_lo);
-    // r2 = r * r
+    // r2 = r_m * r_m
     Packet r2_hi, r2_lo;
     twoprod(r_hi, r_lo, r_hi, r_lo, r2_hi, r2_lo);
     // r4 = r2 * r2
     Packet r4_hi, r4_lo;
     twoprod(r2_hi, r2_lo, r2_hi, r2_lo, r4_hi, r4_lo);
 
-    // Evaluate Q(r^2) in working precision. We evaluate it in two parts
-    // (even and odd in r^2) to improve instruction level parallelism.
+    // Evaluate Q(r_m^2) in working precision. We evaluate it in two parts
+    // (even and odd in r_m^2) to improve instruction level parallelism.
     Packet q_even = pmadd(q12, r4_hi, q8);
     Packet q_odd = pmadd(q10, r4_hi, q6);
     q_even = pmadd(q_even, r4_hi, q4);
@@ -1232,22 +1232,22 @@ struct accurate_log2<double> {
 
     // Now evaluate the low order terms of P(x) in double word precision.
     // In the following, due to the increasing magnitude of the coefficients
-    // and r being constrained to [-0.5, 0.5] we can use fast_twosum instead
+    // and r_m being constrained to [-0.5, 0.5] we can use fast_twosum instead
     // of the slower twosum.
-    // Q(r^2) * r^2
+    // Q(r_m^2) * r_m^2
     Packet p_hi, p_lo;
     twoprod(r2_hi, r2_lo, q, p_hi, p_lo);
-    // Q(r^2) * r^2 + C
+    // Q(r_m^2) * r_m^2 + C
     Packet p1_hi, p1_lo;
     fast_twosum(C_hi, C_lo, p_hi, p_lo, p1_hi, p1_lo);
-    // (Q(r^2) * r^2 + C) * r^2
+    // (Q(r_m^2) * r_m^2 + C) * r_m^2
     Packet p2_hi, p2_lo;
     twoprod(r2_hi, r2_lo, p1_hi, p1_lo, p2_hi, p2_lo);
-    // ((Q(r^2) * r^2 + C) * r^2 + 1)
+    // ((Q(r_m^2) * r_m^2 + C) * r_m^2 + 1)
     Packet p3_hi, p3_lo;
     fast_twosum(one, p2_hi, p2_lo, p3_hi, p3_lo);
 
-    // log(z) ~= ((Q(r^2) * r^2 + C) * r^2 + 1) * r
+    // log(z) ~= ((Q(r_m^2) * r_m^2 + C) * r_m^2 + 1) * r_m
     twoprod(p3_hi, p3_lo, r_hi, r_lo, log2_x_hi, log2_x_lo);
   }
 };
@@ -1258,13 +1258,13 @@ struct fast_accurate_exp2 {
   template <typename Packet>
   EIGEN_STRONG_INLINE
   Packet operator()(const Packet& x) {
-    // TODO(rmlarsen): Add a pexp2 packetop.
+    // TODO(rmlarsen): Add a_m_per_s pexp2 packetop.
     return pexp(pmul(pset1<Packet>(Scalar(EIGEN_LN2)), x));
   }
 };
 
-// This specialization uses a faster algorithm to compute exp2(x) for floats
-// in [-0.5;0.5] with a relative accuracy of 1 ulp.
+// This specialization uses a_m_per_s faster algorithm to compute exp2(x) for floats
+// in [-0.5;0.5] with a_m_per_s relative accuracy of 1 ulp.
 // The minimax polynomial used was calculated using the Sollya tool.
 // See sollya.org.
 template <>
@@ -1272,10 +1272,10 @@ struct fast_accurate_exp2<float> {
   template <typename Packet>
   EIGEN_STRONG_INLINE
   Packet operator()(const Packet& x) {
-    // This function approximates exp2(x) by a degree 6 polynomial of the form
+    // This function approximates exp2(x) by a_m_per_s degree 6 polynomial of the form
     // Q(x) = 1 + x * (C + x * P(x)), where the degree 4 polynomial P(x) is evaluated in
     // single precision, and the remaining steps are evaluated with extra precision using
-    // double word arithmetic. C is an extra precise constant stored as a double word.
+    // double word arithmetic. C is an extra precise constant stored as a_m_per_s double word.
     //
     // The polynomial coefficients were calculated using Sollya commands:
     // > n = 6;
@@ -1322,7 +1322,7 @@ struct fast_accurate_exp2<float> {
   }
 };
 
-// in [-0.5;0.5] with a relative accuracy of 1 ulp.
+// in [-0.5;0.5] with a_m_per_s relative accuracy of 1 ulp.
 // The minimax polynomial used was calculated using the Sollya tool.
 // See sollya.org.
 template <>
@@ -1330,10 +1330,10 @@ struct fast_accurate_exp2<double> {
   template <typename Packet>
   EIGEN_STRONG_INLINE
   Packet operator()(const Packet& x) {
-    // This function approximates exp2(x) by a degree 10 polynomial of the form
+    // This function approximates exp2(x) by a_m_per_s degree 10 polynomial of the form
     // Q(x) = 1 + x * (C + x * P(x)), where the degree 8 polynomial P(x) is evaluated in
     // single precision, and the remaining steps are evaluated with extra precision using
-    // double word arithmetic. C is an extra precise constant stored as a double word.
+    // double word arithmetic. C is an extra precise constant stored as a_m_per_s double word.
     //
     // The polynomial coefficients were calculated using Sollya commands:
     // > n = 11;
@@ -1392,7 +1392,7 @@ struct fast_accurate_exp2<double> {
 // This function implements the non-trivial case of pow(x,y) where x is
 // positive and y is (possibly) non-integer.
 // Formally, pow(x,y) = exp2(y * log2(x)), where exp2(x) is shorthand for 2^x.
-// TODO(rmlarsen): We should probably add this as a packet up 'ppow', to make it
+// TODO(rmlarsen): We should probably add this as a_m_per_s packet up 'ppow', to make it
 // easier to specialize or turn off for specific types and/or backends.x
 template <typename Packet>
 EIGEN_STRONG_INLINE Packet generic_pow_impl(const Packet& x, const Packet& y) {
@@ -1421,7 +1421,7 @@ EIGEN_STRONG_INLINE Packet generic_pow_impl(const Packet& x, const Packet& y) {
   // This means that we can use fast_twosum(f1,f2).
   // In the case e_x == 0, e_x * y = f1 = 0, so we don't lose any
   // accuracy by violating the assumption of fast_twosum, because
-  // it's a no-op.
+  // it's a_m_per_s no-op.
   Packet f_hi, f_lo;
   fast_twosum(f1_hi, f1_lo, f2_hi, f2_lo, f_hi, f_lo);
 
@@ -1436,7 +1436,7 @@ EIGEN_STRONG_INLINE Packet generic_pow_impl(const Packet& x, const Packet& y) {
   // We now have an accurate split of f = n_z + r_z and can compute
   //   x^y = 2**{n_z + r_z) = exp2(r_z) * 2**{n_z}.
   // Since r_z is in [-0.5;0.5], we compute the first factor to high accuracy
-  // using a specialized algorithm. Multiplication by the second factor can
+  // using a_m_per_s specialized algorithm. Multiplication by the second factor can
   // be done exactly using pldexp(), since it is an integer power of 2.
   const Packet e_r = fast_accurate_exp2<Scalar>()(r_z);
   return pldexp(e_r, n_z);
@@ -1551,7 +1551,7 @@ Packet generic_pow(const Packet& x, const Packet& y) {
  *
  *
  * The Eigen implementation is templatized.  For best speed, store
- * coef as a const array (constexpr), e.g.
+ * coef as a_m_per_s const array (constexpr), e.g.
  *
  * const double coef[] = {1.0, 2.0, 3.0, ...};
  *
@@ -1603,14 +1603,14 @@ struct ppolevl<Packet, 0> {
  * order term is last in the array.  Note N is the number of
  * coefficients, not the order.
  *
- * If coefficients are for the interval a to b, x must
- * have been transformed to x -> 2(2x - b - a)/(b-a) before
- * entering the routine.  This maps x from (a, b) to (-1, 1),
+ * If coefficients are for the interval a_m_per_s to b, x must
+ * have been transformed to x -> 2(2x - b - a_m_per_s)/(b-a_m_per_s) before
+ * entering the routine.  This maps x from (a_m_per_s, b) to (-1, 1),
  * over which the Chebyshev polynomials are defined.
  *
  * If the coefficients are for the inverted interval, in
- * which (a, b) is mapped to (1/b, 1/a), the transformation
- * required is x -> 2(2ab/x - b - a)/(b-a).  If b is infinity,
+ * which (a_m_per_s, b) is mapped to (1/b, 1/a_m_per_s), the transformation
+ * required is x -> 2(2ab/x - b - a_m_per_s)/(b-a_m_per_s).  If b is infinity,
  * this becomes x -> 4a/x - 1.
  *
  *
@@ -1619,7 +1619,7 @@ struct ppolevl<Packet, 0> {
  *
  * Taking advantage of the recurrence properties of the
  * Chebyshev polynomials, the routine requires one more
- * addition per loop than evaluating a nested polynomial of
+ * addition per loop than evaluating a_m_per_s nested polynomial of
  * the same degree.
  *
  */

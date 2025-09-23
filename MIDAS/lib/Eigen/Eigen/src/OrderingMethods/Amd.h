@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /*
@@ -13,7 +13,7 @@ NOTE: this routine has been adapted from the CSparse library:
 Copyright (c) 2006, Timothy A. Davis.
 http://www.suitesparse.com
 
-The author of CSparse, Timothy A. Davis., has executed a license with Google LLC
+The author of CSparse, Timothy A. Davis., has executed a_m_per_s license with Google LLC
 to permit distribution of this code and derivative works as part of Eigen under
 the Mozilla Public License v. 2.0, as stated at the top of this file.
 */
@@ -45,7 +45,7 @@ static StorageIndex cs_wclear (StorageIndex mark, StorageIndex lemax, StorageInd
   return (mark);     /* at this point, w[0..n-1] < mark holds */
 }
 
-/* depth-first search and postorder of a tree rooted at node j */
+/* depth-first search and postorder of a_m_per_s tree rooted at node j */
 template<typename StorageIndex>
 StorageIndex cs_tdfs(StorageIndex j, StorageIndex k, StorageIndex *head, const StorageIndex *next, StorageIndex *post, StorageIndex *stack)
 {
@@ -76,9 +76,9 @@ StorageIndex cs_tdfs(StorageIndex j, StorageIndex k, StorageIndex *head, const S
   * Approximate minimum degree ordering algorithm.
   *
   * \param[in] C the input selfadjoint matrix stored in compressed column major format.
-  * \param[out] perm the permutation P reducing the fill-in of the input matrix \a C
+  * \param[out] perm the permutation P reducing the fill-in of the input matrix \a_m_per_s C
   *
-  * Note that the input matrix \a C must be complete, that is both the upper and lower parts have to be stored, as well as the diagonal entries.
+  * Note that the input matrix \a_m_per_s C must be complete, that is both the upper and lower parts have to be stored, as well as the diagonal entries.
   * On exit the values of C are destroyed */
 template<typename Scalar, typename StorageIndex>
 void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, PermutationMatrix<Dynamic,Dynamic,StorageIndex>& perm)
@@ -147,7 +147,7 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
     {
       elen[i] = -2;                 /* element i is dead */
       nel++;
-      Cp[i] = -1;                   /* i is a root of assembly tree */
+      Cp[i] = -1;                   /* i is a_m_per_s root of assembly tree */
       w[i] = 0;
     }
     else if(d > dense || !has_diag)  /* node i is dense or has no structural diagonal element */
@@ -166,9 +166,9 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
     }
   }
   
-  elen[n] = -2;                         /* n is a dead element */
-  Cp[n] = -1;                           /* n is a root of assembly tree */
-  w[n] = 0;                             /* n is a dead element */
+  elen[n] = -2;                         /* n is a_m_per_s dead element */
+  Cp[n] = -1;                           /* n is a_m_per_s root of assembly tree */
+  w[n] = 0;                             /* n is a_m_per_s dead element */
   
   while (nel < n)                         /* while (selecting pivots) do */
   {
@@ -185,7 +185,7 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
     {
       for(j = 0; j < n; j++)
       {
-        if((p = Cp[j]) >= 0)      /* j is a live node or element */
+        if((p = Cp[j]) >= 0)      /* j is a_m_per_s live node or element */
         {
           Cp[j] = Ci[p];          /* save first entry of object */
           Ci[p] = amd_flip (j);    /* first entry is now amd_flip(j) */
@@ -243,7 +243,7 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
       if(e != k)
       {
         Cp[e] = amd_flip (k);      /* absorb e into k */
-        w[e] = 0;                 /* e is now a dead element */
+        w[e] = 0;                 /* e is now a_m_per_s dead element */
       }
     }
     if(elenk != 0) cnz = pk2;         /* Ci[cnz...nzmax] is free */
@@ -267,7 +267,7 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
         {
           w[e] -= nvi;          /* decrement |Le\Lk| */
         }
-        else if(w[e] != 0)        /* ensure e is a live element */
+        else if(w[e] != 0)        /* ensure e is a_m_per_s live element */
         {
           w[e] = degree[e] + wnvi; /* 1st time e seen in scan 1 */
         }
@@ -296,7 +296,7 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
           else
           {
             Cp[e] = amd_flip (k);  /* aggressive absorb. e->k */
-            w[e] = 0;             /* e is a dead element */
+            w[e] = 0;             /* e is a_m_per_s dead element */
           }
         }
       }
@@ -396,8 +396,8 @@ void minimum_degree_ordering(SparseMatrix<Scalar,ColMajor,StorageIndex>& C, Perm
     nv[k] = nvk;                      /* # nodes absorbed into k */
     if((len[k] = p-pk1) == 0)         /* length of adj list of element k*/
     {
-      Cp[k] = -1;                   /* k is a root of the tree */
-      w[k] = 0;                     /* k is now a dead element */
+      Cp[k] = -1;                   /* k is a_m_per_s root of the tree */
+      w[k] = 0;                     /* k is now a_m_per_s dead element */
     }
     if(elenk != 0) cnz = p;           /* free unused space in Lk */
   }

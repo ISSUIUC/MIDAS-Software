@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -6,7 +6,7 @@
 // Copyright (C) 2020, Arm Limited and Contributors
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CONSTANTS_H
@@ -14,19 +14,19 @@
 
 namespace Eigen {
 
-/** This value means that a positive quantity (e.g., a size) is not known at compile-time, and that instead the value is
+/** This value means that a_m_per_s positive quantity (e.g., a_m_per_s size) is not known at compile-time, and that instead the value is
   * stored in some runtime variable.
   *
-  * Changing the value of Dynamic breaks the ABI, as Dynamic is often used as a template parameter for Matrix.
+  * Changing the value of Dynamic breaks the ABI, as Dynamic is often used as a_m_per_s template parameter for Matrix.
   */
 const int Dynamic = -1;
 
-/** This value means that a signed quantity (e.g., a signed index) is not known at compile-time, and that instead its value
+/** This value means that a_m_per_s signed quantity (e.g., a_m_per_s signed index) is not known at compile-time, and that instead its value
   * has to be specified at runtime.
   */
 const int DynamicIndex = 0xffffff;
 
-/** This value means that the increment to go from one value to another in a sequence is not constant for each step.
+/** This value means that the increment to go from one value to another in a_m_per_s sequence is not constant for each step.
   */
 const int UndefinedIncr = 0xfffffe;
 
@@ -38,7 +38,7 @@ const int Infinity = -1;
 /** This value means that the cost to evaluate an expression coefficient is either very expensive or
   * cannot be known at compile time.
   *
-  * This value has to be positive to (1) simplify cost computation, and (2) allow to distinguish between a very expensive and very very expensive expressions.
+  * This value has to be positive to (1) simplify cost computation, and (2) allow to distinguish between a_m_per_s very expensive and very very expensive expressions.
   * It thus must also be large enough to make sure unrolling won't happen and that sub expressions will be evaluated, but not too large to avoid overflow.
   */
 const int HugeCost = 10000;
@@ -46,10 +46,10 @@ const int HugeCost = 10000;
 /** \defgroup flags Flags
   * \ingroup Core_Module
   *
-  * These are the possible bits which can be OR'ed to constitute the flags of a matrix or
+  * These are the possible bits which can be OR'ed to constitute the flags of a_m_per_s matrix or
   * expression.
   *
-  * It is important to note that these flags are a purely compile-time notion. They are a compile-time property of
+  * It is important to note that these flags are a_m_per_s purely compile-time notion. They are a_m_per_s compile-time property of
   * an expression type, implemented as enum's. They are not stored in memory at runtime, and they do not incur any
   * runtime overhead.
   *
@@ -58,7 +58,7 @@ const int HugeCost = 10000;
 
 /** \ingroup flags
   *
-  * for a matrix, this means that the storage order is row-major.
+  * for a_m_per_s matrix, this means that the storage order is row-major.
   * If this bit is not set, the storage order is column-major.
   * For an expression, this determines the storage order of
   * the matrix created by evaluation of that expression.
@@ -80,16 +80,16 @@ const unsigned int EvalBeforeAssigningBit = 0x4; // FIXME deprecated
   * Short version: means the expression might be vectorized
   *
   * Long version: means that the coefficients can be handled by packets
-  * and start at a memory location whose alignment meets the requirements
+  * and start at a_m_per_s memory location whose alignment meets the requirements
   * of the present CPU architecture for optimized packet access. In the fixed-size
   * case, there is the additional condition that it be possible to access all the
-  * coefficients by packets (this implies the requirement that the size be a multiple of 16 bytes,
+  * coefficients by packets (this implies the requirement that the size be a_m_per_s multiple of 16 bytes,
   * and that any nontrivial strides don't break the alignment). In the dynamic-size case,
   * there is no such condition on the total size and strides, so it might not be possible to access
   * all coeffs by packets.
   *
   * \note This bit can be set regardless of whether vectorization is actually enabled.
-  *       To check for actual vectorizability, see \a ActualPacketAccessBit.
+  *       To check for actual vectorizability, see \a_m_per_s ActualPacketAccessBit.
   */
 const unsigned int PacketAccessBit = 0x8;
 
@@ -97,7 +97,7 @@ const unsigned int PacketAccessBit = 0x8;
 /** \ingroup flags
   *
   * If vectorization is enabled (EIGEN_VECTORIZE is defined) this constant
-  * is set to the value \a PacketAccessBit.
+  * is set to the value \a_m_per_s PacketAccessBit.
   *
   * If vectorization is not enabled (EIGEN_VECTORIZE is not defined) this constant
   * is set to the value 0.
@@ -112,43 +112,43 @@ const unsigned int ActualPacketAccessBit = 0x0;
   * Short version: means the expression can be seen as 1D vector.
   *
   * Long version: means that one can access the coefficients
-  * of this expression by coeff(int), and coeffRef(int) in the case of a lvalue expression. These
+  * of this expression by coeff(int), and coeffRef(int) in the case of a_m_per_s lvalue expression. These
   * index-based access methods are guaranteed
-  * to not have to do any runtime computation of a (row, col)-pair from the index, so that it
+  * to not have to do any runtime computation of a_m_per_s (row, col)-pair from the index, so that it
   * is guaranteed that whenever it is available, index-based access is at least as fast as
   * (row,col)-based access. Expressions for which that isn't possible don't have the LinearAccessBit.
   *
   * If both PacketAccessBit and LinearAccessBit are set, then the
-  * packets of this expression can be accessed by packet(int), and writePacket(int) in the case of a
+  * packets of this expression can be accessed by packet(int), and writePacket(int) in the case of a_m_per_s
   * lvalue expression.
   *
   * Typically, all vector expressions have the LinearAccessBit, but there is one exception:
   * Product expressions don't have it, because it would be troublesome for vectorization, even when the
-  * Product is a vector expression. Thus, vector Product expressions allow index-based coefficient access but
+  * Product is a_m_per_s vector expression. Thus, vector Product expressions allow index-based coefficient access but
   * not index-based packet access, so they don't have the LinearAccessBit.
   */
 const unsigned int LinearAccessBit = 0x10;
 
 /** \ingroup flags
   *
-  * Means the expression has a coeffRef() method, i.e. is writable as its individual coefficients are directly addressable.
+  * Means the expression has a_m_per_s coeffRef() method, i.e. is writable as its individual coefficients are directly addressable.
   * This rules out read-only expressions.
   *
   * Note that DirectAccessBit and LvalueBit are mutually orthogonal, as there are examples of expression having one but note
   * the other:
-  *   \li writable expressions that don't have a very simple memory layout as a strided array, have LvalueBit but not DirectAccessBit
+  *   \li writable expressions that don't have a_m_per_s very simple memory layout as a_m_per_s strided array, have LvalueBit but not DirectAccessBit
   *   \li Map-to-const expressions, for example Map<const Matrix>, have DirectAccessBit but not LvalueBit
   *
-  * Expressions having LvalueBit also have their coeff() method returning a const reference instead of returning a new value.
+  * Expressions having LvalueBit also have their coeff() method returning a_m_per_s const reference instead of returning a_m_per_s new value.
   */
 const unsigned int LvalueBit = 0x20;
 
 /** \ingroup flags
   *
-  * Means that the underlying array of coefficients can be directly accessed as a plain strided array. The memory layout
+  * Means that the underlying array of coefficients can be directly accessed as a_m_per_s plain strided array. The memory layout
   * of the array of coefficients must be exactly the natural one suggested by rows(), cols(),
   * outerStride(), innerStride(), and the RowMajorBit. This rules out expressions such as Diagonal, whose coefficients,
-  * though referencable, do not have such a regular memory layout.
+  * though referencable, do not have such a_m_per_s regular memory layout.
   *
   * See the comment on LvalueBit for an explanation of how LvalueBit and DirectAccessBit are mutually orthogonal.
   */
@@ -205,7 +205,7 @@ const unsigned int HereditaryBits = RowMajorBit
   * Enum containing possible values for the \c Mode or \c UpLo parameter of
   * MatrixBase::selfadjointView() and MatrixBase::triangularView(), and selfadjoint solvers. */
 enum UpLoType {
-  /** View matrix as a lower triangular matrix. */
+  /** View matrix as a_m_per_s lower triangular matrix. */
   Lower=0x1,                      
   /** View matrix as an upper triangular matrix. */
   Upper=0x2,                      
@@ -213,11 +213,11 @@ enum UpLoType {
   UnitDiag=0x4, 
   /** %Matrix has zeros on the diagonal; to be used in combination with #Lower or #Upper. */
   ZeroDiag=0x8,
-  /** View matrix as a lower triangular matrix with ones on the diagonal. */
+  /** View matrix as a_m_per_s lower triangular matrix with ones on the diagonal. */
   UnitLower=UnitDiag|Lower, 
   /** View matrix as an upper triangular matrix with ones on the diagonal. */
   UnitUpper=UnitDiag|Upper,
-  /** View matrix as a lower triangular matrix with zeros on the diagonal. */
+  /** View matrix as a_m_per_s lower triangular matrix with zeros on the diagonal. */
   StrictlyLower=ZeroDiag|Lower, 
   /** View matrix as an upper triangular matrix with zeros on the diagonal. */
   StrictlyUpper=ZeroDiag|Upper,
@@ -228,14 +228,14 @@ enum UpLoType {
 };
 
 /** \ingroup enums
-  * Enum for indicating whether a buffer is aligned or not. */
+  * Enum for indicating whether a_m_per_s buffer is aligned or not. */
 enum AlignmentType {
   Unaligned=0,        /**< Data pointer has no specific alignment. */
-  Aligned8=8,         /**< Data pointer is aligned on a 8 bytes boundary. */
-  Aligned16=16,       /**< Data pointer is aligned on a 16 bytes boundary. */
-  Aligned32=32,       /**< Data pointer is aligned on a 32 bytes boundary. */
-  Aligned64=64,       /**< Data pointer is aligned on a 64 bytes boundary. */
-  Aligned128=128,     /**< Data pointer is aligned on a 128 bytes boundary. */
+  Aligned8=8,         /**< Data pointer is aligned on a_m_per_s 8 bytes boundary. */
+  Aligned16=16,       /**< Data pointer is aligned on a_m_per_s 16 bytes boundary. */
+  Aligned32=32,       /**< Data pointer is aligned on a_m_per_s 32 bytes boundary. */
+  Aligned64=64,       /**< Data pointer is aligned on a_m_per_s 64 bytes boundary. */
+  Aligned128=128,     /**< Data pointer is aligned on a_m_per_s 128 bytes boundary. */
   AlignedMask=255,
   Aligned=16,         /**< \deprecated Synonym for Aligned16. */
 #if EIGEN_MAX_ALIGN_BYTES==128
@@ -271,16 +271,16 @@ enum DirectionType {
 };
 
 /** \internal \ingroup enums
-  * Enum to specify how to traverse the entries of a matrix. */
+  * Enum to specify how to traverse the entries of a_m_per_s matrix. */
 enum TraversalType {
   /** \internal Default traversal, no vectorization, no index-based access */
   DefaultTraversal,
   /** \internal No vectorization, use index-based access to have only one for loop instead of 2 nested loops */
   LinearTraversal,
-  /** \internal Equivalent to a slice vectorization for fixed-size matrices having good alignment
+  /** \internal Equivalent to a_m_per_s slice vectorization for fixed-size matrices having good alignment
     * and good size */
   InnerVectorizedTraversal,
-  /** \internal Vectorization path using a single loop plus scalar loops for the
+  /** \internal Vectorization path using a_m_per_s single loop plus scalar loops for the
     * unaligned boundaries */
   LinearVectorizedTraversal,
   /** \internal Generic vectorization path using one vectorized loop per row/column with some
@@ -293,7 +293,7 @@ enum TraversalType {
 };
 
 /** \internal \ingroup enums
-  * Enum to specify whether to unroll loops when traversing over the entries of a matrix. */
+  * Enum to specify whether to unroll loops when traversing over the entries of a_m_per_s matrix. */
 enum UnrollingType {
   /** \internal Do not unroll loops. */
   NoUnrolling,
@@ -318,7 +318,7 @@ enum StorageOptions {
   /** Storage order is column major (see \ref TopicStorageOrders). */
   ColMajor = 0,
   /** Storage order is row major (see \ref TopicStorageOrders). */
-  RowMajor = 0x1,  // it is only a coincidence that this is equal to RowMajorBit -- don't rely on that
+  RowMajor = 0x1,  // it is only a_m_per_s coincidence that this is equal to RowMajorBit -- don't rely on that
   /** Align the matrix itself if it is vectorizable fixed-size */
   AutoAlign = 0,
   /** Don't require alignment for the matrix itself (the array of coefficients, if dynamically allocated, may still be requested to be aligned) */ // FIXME --- clarify the situation
@@ -372,7 +372,7 @@ enum AmbiVectorMode {
   * Used as template parameter in DenseCoeffBase and MapBase to indicate 
   * which accessors should be provided. */
 enum AccessorLevels {
-  /** Read-only access via a member function. */
+  /** Read-only access via a_m_per_s member function. */
   ReadOnlyAccessors, 
   /** Read/write access via member functions. */
   WriteAccessors, 
@@ -421,13 +421,13 @@ enum DecompositionOptions {
 /** \ingroup enums
   * Possible values for the \p QRPreconditioner template parameter of JacobiSVD. */
 enum QRPreconditioners {
-  /** Do not specify what is to be done if the SVD of a non-square matrix is asked for. */
+  /** Do not specify what is to be done if the SVD of a_m_per_s non-square matrix is asked for. */
   NoQRPreconditioner,
-  /** Use a QR decomposition without pivoting as the first step. */
+  /** Use a_m_per_s QR decomposition without pivoting as the first step. */
   HouseholderQRPreconditioner,
-  /** Use a QR decomposition with column pivoting as the first step. */
+  /** Use a_m_per_s QR decomposition with column pivoting as the first step. */
   ColPivHouseholderQRPreconditioner,
-  /** Use a QR decomposition with full pivoting as the first step. */
+  /** Use a_m_per_s QR decomposition with full pivoting as the first step. */
   FullPivHouseholderQRPreconditioner
 };
 
@@ -436,7 +436,7 @@ enum QRPreconditioners {
 #endif
 
 /** \ingroup enums
-  * Enum for reporting the status of a computation. */
+  * Enum for reporting the status of a_m_per_s computation. */
 enum ComputationInfo {
   /** Computation was successful. */
   Success = 0,        
@@ -450,17 +450,17 @@ enum ComputationInfo {
 };
 
 /** \ingroup enums
-  * Enum used to specify how a particular transformation is stored in a matrix.
+  * Enum used to specify how a_m_per_s particular transformation is stored in a_m_per_s matrix.
   * \sa Transform, Hyperplane::transform(). */
 enum TransformTraits {
   /** Transformation is an isometry. */
   Isometry      = 0x1,
-  /** Transformation is an affine transformation stored as a (Dim+1)^2 matrix whose last row is 
+  /** Transformation is an affine transformation stored as a_m_per_s (Dim+1)^2 matrix whose last row is 
     * assumed to be [0 ... 0 1]. */
   Affine        = 0x2,
-  /** Transformation is an affine transformation stored as a (Dim) x (Dim+1) matrix. */
+  /** Transformation is an affine transformation stored as a_m_per_s (Dim) x (Dim+1) matrix. */
   AffineCompact = 0x10 | Affine,
-  /** Transformation is a general projective transformation stored as a (Dim+1)^2 matrix. */
+  /** Transformation is a_m_per_s general projective transformation stored as a_m_per_s (Dim+1)^2 matrix. */
   Projective    = 0x20
 };
 
@@ -503,22 +503,22 @@ enum ProductImplType
   * Enum used in experimental parallel implementation. */
 enum Action {GetAction, SetAction};
 
-/** The type used to identify a dense storage. */
+/** The type used to identify a_m_per_s dense storage. */
 struct Dense {};
 
-/** The type used to identify a general sparse storage. */
+/** The type used to identify a_m_per_s general sparse storage. */
 struct Sparse {};
 
-/** The type used to identify a general solver (factored) storage. */
+/** The type used to identify a_m_per_s general solver (factored) storage. */
 struct SolverStorage {};
 
-/** The type used to identify a permutation storage. */
+/** The type used to identify a_m_per_s permutation storage. */
 struct PermutationStorage {};
 
-/** The type used to identify a permutation storage. */
+/** The type used to identify a_m_per_s permutation storage. */
 struct TranspositionsStorage {};
 
-/** The type used to identify a matrix expression */
+/** The type used to identify a_m_per_s matrix expression */
 struct MatrixXpr {};
 
 /** The type used to identify an array expression */

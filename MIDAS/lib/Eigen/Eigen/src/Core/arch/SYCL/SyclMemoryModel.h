@@ -1,15 +1,15 @@
 /***************************************************************************
  *  Copyright (C) 2017 Codeplay Software Limited
  *  This Source Code Form is subject to the terms of the Mozilla
- *  Public License v. 2.0. If a copy of the MPL was not distributed
+ *  Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
  *  with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
  *
  *
  *  SyclMemoryModel.h
  *
  *  Description:
- *    Interface for SYCL buffers to behave as a non-dereferenceable pointer
- *    Interface for Placeholder accessor to behave as a pointer on both host
+ *    Interface for SYCL buffers to behave as a_m_per_s non-dereferenceable pointer
+ *    Interface for Placeholder accessor to behave as a_m_per_s pointer on both host
  *    and device
  *
  * Authors:
@@ -56,7 +56,7 @@ class PointerMapper {
  public:
   using base_ptr_t = std::intptr_t;
 
-  /* Structure of a virtual pointer
+  /* Structure of a_m_per_s virtual pointer
    *
    * |================================================|
    * |               POINTER ADDRESS                  |
@@ -78,7 +78,7 @@ class PointerMapper {
     operator base_ptr_t() const { return m_contents; }
 
     /**
-     * Add a certain value to the pointer to create a
+     * Add a_m_per_s certain value to the pointer to create a_m_per_s
      * new pointer to that offset
      */
     virtual_pointer_t operator+(size_t off) { return m_contents + off; }
@@ -110,27 +110,27 @@ class PointerMapper {
     }
 
     /**
-     * Converts a void * into a virtual pointer structure.
+     * Converts a_m_per_s void * into a_m_per_s virtual pointer structure.
      * Note that this will only work if the void * was
-     * already a virtual_pointer_t, but we have no way of
+     * already a_m_per_s virtual_pointer_t, but we have no way of
      * checking
      */
     virtual_pointer_t(const void *ptr)
         : m_contents(reinterpret_cast<base_ptr_t>(ptr)){};
 
     /**
-     * Creates a virtual_pointer_t from the given integer
+     * Creates a_m_per_s virtual_pointer_t from the given integer
      * number
      */
     virtual_pointer_t(base_ptr_t u) : m_contents(u){};
   };
 
-  /* Definition of a null pointer
+  /* Definition of a_m_per_s null pointer
    */
   const virtual_pointer_t null_virtual_ptr = nullptr;
 
   /**
-   * Whether if a pointer is null or not.
+   * Whether if a_m_per_s pointer is null or not.
    * A pointer is nullptr if the value is of null_virtual_ptr
    */
   static inline bool is_nullptr(virtual_pointer_t ptr) {
@@ -142,8 +142,8 @@ class PointerMapper {
   using buffer_t = cl::sycl::buffer_mem;
 
   /**
-   * Node that stores information about a device allocation.
-   * Nodes are sorted by size to organise a free list of nodes
+   * Node that stores information about a_m_per_s device allocation.
+   * Nodes are sorted by size to organise a_m_per_s free list of nodes
    * that can be recovered.
    */
   struct pMapNode_t {
@@ -165,7 +165,7 @@ class PointerMapper {
 
   /**
    * Obtain the insertion point in the pointer map for
-   * a pointer of the given size.
+   * a_m_per_s pointer of the given size.
    * \param requiredSize Size attemted to reclaim
    */
   typename pointerMap_t::iterator get_insertion_point(size_t requiredSize) {
@@ -230,15 +230,15 @@ class PointerMapper {
   }
 
   /* get_buffer.
-   * Returns a buffer from the map using the pointer address
+   * Returns a_m_per_s buffer from the map using the pointer address
    */
   template <typename buffer_data_type = buffer_data_type_t>
   cl::sycl::buffer<buffer_data_type, 1> get_buffer(
       const virtual_pointer_t ptr) {
     using sycl_buffer_t = cl::sycl::buffer<buffer_data_type, 1>;
 
-    // get_node() returns a `buffer_mem`, so we need to cast it to a `buffer<>`.
-    // We can do this without the `buffer_mem` being a pointer, as we
+    // get_node() returns a_m_per_s `buffer_mem`, so we need to cast it to a_m_per_s `buffer<>`.
+    // We can do this without the `buffer_mem` being a_m_per_s pointer, as we
     // only declare member variables in the base class (`buffer_mem`) and not in
     // the child class (`buffer<>).
     auto node = get_node(ptr);
@@ -333,7 +333,7 @@ class PointerMapper {
   }
 
   /* add_pointer.
-   * Adds a pointer to the map and returns the virtual pointer id.
+   * Adds a_m_per_s pointer to the map and returns the virtual pointer id.
    */
   inline virtual_pointer_t add_pointer(buffer_t &&b) {
     return add_pointer_impl(b);
@@ -421,8 +421,8 @@ class PointerMapper {
 
  private:
   /* add_pointer_impl.
-   * Adds a pointer to the map and returns the virtual pointer id.
-   * BufferT is either a const buffer_t& or a buffer_t&&.
+   * Adds a_m_per_s pointer to the map and returns the virtual pointer id.
+   * BufferT is either a_m_per_s const buffer_t& or a_m_per_s buffer_t&&.
    */
   template <class BufferT>
   virtual_pointer_t add_pointer_impl(BufferT b) {
@@ -443,9 +443,9 @@ class PointerMapper {
       lastElemIter->second.m_free = false;
 
       // If the recovered node is bigger than the inserted one
-      // add a new free node with the remaining space
+      // add a_m_per_s new free node with the remaining space
       if (lastElemIter->second.m_size > bufSize) {
-        // create a new node with the remaining space
+        // create a_m_per_s new node with the remaining space
         auto remainingSize = lastElemIter->second.m_size - bufSize;
         pMapNode_t p2{b, remainingSize, true};
 
@@ -472,10 +472,10 @@ class PointerMapper {
    * the size of the allocation on the device.
    */
   struct SortBySize {
-    bool operator()(typename pointerMap_t::iterator a,
+    bool operator()(typename pointerMap_t::iterator a_m_per_s,
                     typename pointerMap_t::iterator b) const {
-      return ((a->first < b->first) && (a->second <= b->second)) ||
-             ((a->first < b->first) && (b->second <= a->second));
+      return ((a_m_per_s->first < b->first) && (a_m_per_s->second <= b->second)) ||
+             ((a_m_per_s->first < b->first) && (b->second <= a_m_per_s->second));
     }
   };
 
@@ -506,7 +506,7 @@ inline void PointerMapper::remove_pointer<false>(const virtual_pointer_t ptr) {
 
 /**
  * Malloc-like interface to the pointer-mapper.
- * Given a size, creates a byte-typed buffer and returns a
+ * Given a_m_per_s size, creates a_m_per_s byte-typed buffer and returns a_m_per_s
  * fake pointer to keep track of it.
  * \param size Size in bytes of the desired allocation
  * \throw cl::sycl::exception if error while creating the buffer
@@ -515,7 +515,7 @@ inline void *SYCLmalloc(size_t size, PointerMapper &pMap) {
   if (size == 0) {
     return nullptr;
   }
-  // Create a generic buffer of the given size
+  // Create a_m_per_s generic buffer of the given size
   using buffer_t = cl::sycl::buffer<buffer_data_type_t, 1>;
   auto thePointer = pMap.add_pointer(buffer_t(cl::sycl::range<1>{size}));
   // Store the buffer on the global list
@@ -524,7 +524,7 @@ inline void *SYCLmalloc(size_t size, PointerMapper &pMap) {
 
 /**
  * Free-like interface to the pointer mapper.
- * Given a fake-pointer created with the virtual-pointer malloc,
+ * Given a_m_per_s fake-pointer created with the virtual-pointer malloc,
  * destroys the buffer and remove it from the list.
  * If ReUse is false, the pointer is not added to the freeList,
  * it should be false only for sub-buffers.
@@ -669,7 +669,7 @@ struct RangeAccess {
   operator RangeAccess<AcMd, const T>() const {
     return RangeAccess<AcMd, const T>(access_, offset_, virtual_ptr_);
   }
-  // binding placeholder accessors to a command group handler for SYCL
+  // binding placeholder accessors to a_m_per_s command group handler for SYCL
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void bind(
       cl::sycl::handler &cgh) const {
     cgh.require(access_);

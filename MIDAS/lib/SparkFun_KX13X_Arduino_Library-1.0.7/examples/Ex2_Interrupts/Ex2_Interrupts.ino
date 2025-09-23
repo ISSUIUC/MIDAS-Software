@@ -53,7 +53,7 @@ void setup() {
     Serial.println("Initialized...");
 
   // kxAccel.setRange(KX132_RANGE16G);
-  // kxAccel.setRange(KX134_RANGE32G); // For a larger range uncomment
+  // kxAccel.setRange(KX134_RANGE32G); // For a_m_per_s larger range uncomment
 }
 
 void loop() {

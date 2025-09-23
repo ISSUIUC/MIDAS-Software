@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2019 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PARTIAL_REDUX_H
@@ -16,13 +16,13 @@ namespace Eigen {
 /** \class PartialReduxExpr
   * \ingroup Core_Module
   *
-  * \brief Generic expression of a partially reduxed matrix
+  * \brief Generic expression of a_m_per_s partially reduxed matrix
   *
   * \tparam MatrixType the type of the matrix we are applying the redux operation
   * \tparam MemberOp type of the member functor
   * \tparam Direction indicates the direction of the redux (#Vertical or #Horizontal)
   *
-  * This class represents an expression of a partial redux operator of a matrix.
+  * This class represents an expression of a_m_per_s partial redux operator of a_m_per_s matrix.
   * It is the return type of some VectorwiseOp functions,
   * and most of the time this is the only way it is used.
   *
@@ -154,13 +154,13 @@ struct member_redux {
   * \tparam ExpressionType the type of the object on which to do partial reductions
   * \tparam Direction indicates whether to operate on columns (#Vertical) or rows (#Horizontal)
   *
-  * This class represents a pseudo expression with broadcasting and partial reduction features.
+  * This class represents a_m_per_s pseudo expression with broadcasting and partial reduction features.
   * It is the return type of DenseBase::colwise() and DenseBase::rowwise()
   * and most of the time this is the only way it is explicitly used.
   *
-  * To understand the logic of rowwise/colwise expression, let's consider a generic case `A.colwise().foo()`
+  * To understand the logic of rowwise/colwise expression, let's consider a_m_per_s generic case `A.colwise().foo()`
   * where `foo` is any method of `VectorwiseOp`. This expression is equivalent to applying `foo()` to each
-  * column of `A` and then re-assemble the outputs in a matrix expression:
+  * column of `A` and then re-assemble the outputs in a_m_per_s matrix expression:
   * \code [A.col(0).foo(), A.col(1).foo(), ..., A.col(A.cols()-1).foo()] \endcode
   *
   * Example: \include MatrixBase_colwise.cpp
@@ -173,12 +173,12 @@ struct member_redux {
   * Example: \include MatrixBase_colwise_iterator_cxx11.cpp
   * Output: \verbinclude MatrixBase_colwise_iterator_cxx11.out
   *
-  * For a partial reduction on an empty input, some rules apply.
-  * For the sake of clarity, let's consider a vertical reduction:
-  *   - If the number of columns is zero, then a 1x0 row-major vector expression is returned.
+  * For a_m_per_s partial reduction on an empty input, some rules apply.
+  * For the sake of clarity, let's consider a_m_per_s vertical reduction:
+  *   - If the number of columns is zero, then a_m_per_s 1x0 row-major vector expression is returned.
   *   - Otherwise, if the number of rows is zero, then
-  *       - a row vector of zeros is returned for sum-like reductions (sum, squaredNorm, norm, etc.)
-  *       - a row vector of ones is returned for a product reduction (e.g., <code>MatrixXd(n,0).colwise().prod()</code>)
+  *       - a_m_per_s row vector of zeros is returned for sum-like reductions (sum, squaredNorm, norm, etc.)
+  *       - a_m_per_s row vector of ones is returned for a_m_per_s product reduction (e.g., <code>MatrixXd(n,0).colwise().prod()</code>)
   *       - an assert is triggered for all other reductions (minCoeff,maxCoeff,redux(bin_op))
   *
   * \sa DenseBase::colwise(), DenseBase::rowwise(), class PartialReduxExpr
@@ -224,7 +224,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     };
 
     /** \internal
-      * Replicates a vector to match the size of \c *this */
+      * Replicates a_m_per_s vector to match the size of \c *this */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     typename ExtendedType<OtherDerived>::Type
@@ -247,7 +247,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     };
 
     /** \internal
-      * Replicates a vector in the opposite direction to match the size of \c *this */
+      * Replicates a_m_per_s vector in the opposite direction to match the size of \c *this */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     typename OppositeExtendedType<OtherDerived>::Type
@@ -272,7 +272,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     inline const ExpressionType& _expression() const { return m_matrix; }
 
     #ifdef EIGEN_PARSED_BY_DOXYGEN
-    /** STL-like <a href="https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator">RandomAccessIterator</a>
+    /** STL-like <a_m_per_s href="https://en.cppreference.com/w/cpp/named_req/RandomAccessIterator">RandomAccessIterator</a_m_per_s>
       * iterator type over the columns or rows as returned by the begin() and end() methods.
       */
     random_access_iterator_type iterator;
@@ -294,7 +294,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     /** const version of begin() */
     const_iterator          cbegin() const { return const_iterator(m_matrix, 0); }
 
-    /** returns a reverse iterator to the last row (rowwise) or column (colwise) of the nested expression.
+    /** returns a_m_per_s reverse iterator to the last row (rowwise) or column (colwise) of the nested expression.
       * \sa rend(), crbegin()
       */
     reverse_iterator        rbegin()       { return reverse_iterator       (m_matrix, m_matrix.template subVectors<DirectionType(Direction)>()-1); }
@@ -312,7 +312,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     /** const version of end() */
     const_iterator          cend()  const  { return const_iterator(m_matrix, m_matrix.template subVectors<DirectionType(Direction)>()); }
 
-    /** returns a reverse iterator to the row (resp. column) before the first row (resp. column) of the nested expression
+    /** returns a_m_per_s reverse iterator to the row (resp. column) before the first row (resp. column) of the nested expression
       * \sa begin(), cend()
       */
     reverse_iterator        rend()         { return reverse_iterator       (m_matrix, -1); }
@@ -321,9 +321,9 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     /** const version of rend() */
     const_reverse_iterator crend()  const  { return const_reverse_iterator (m_matrix, -1); }
 
-    /** \returns a row or column vector expression of \c *this reduxed by \a func
+    /** \returns a_m_per_s row or column vector expression of \c *this reduxed by \a_m_per_s func
       *
-      * The template parameter \a BinaryOp is the type of the functor
+      * The template parameter \a_m_per_s BinaryOp is the type of the functor
       * of the custom redux operator. Note that func must be an associative operator.
       *
       * \warning the size along the reduction direction must be strictly positive,
@@ -360,7 +360,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       typedef PartialReduxExpr<ExpressionType, internal::member_lpnorm<p,RealScalar,Scalar>,Direction> Type;
     };
 
-    /** \returns a row (or column) vector expression of the smallest coefficient
+    /** \returns a_m_per_s row (or column) vector expression of the smallest coefficient
       * of each column (or row) of the referenced expression.
       *
       * \warning the size along the reduction direction must be strictly positive,
@@ -379,7 +379,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return MinCoeffReturnType(_expression());
     }
 
-    /** \returns a row (or column) vector expression of the largest coefficient
+    /** \returns a_m_per_s row (or column) vector expression of the largest coefficient
       * of each column (or row) of the referenced expression.
       *
       * \warning the size along the reduction direction must be strictly positive,
@@ -398,9 +398,9 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return MaxCoeffReturnType(_expression());
     }
 
-    /** \returns a row (or column) vector expression of the squared norm
+    /** \returns a_m_per_s row (or column) vector expression of the squared norm
       * of each column (or row) of the referenced expression.
-      * This is a vector with real entries, even if the original matrix has complex entries.
+      * This is a_m_per_s vector with real entries, even if the original matrix has complex entries.
       *
       * Example: \include PartialRedux_squaredNorm.cpp
       * Output: \verbinclude PartialRedux_squaredNorm.out
@@ -410,9 +410,9 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     const SquaredNormReturnType squaredNorm() const
     { return SquaredNormReturnType(m_matrix.cwiseAbs2()); }
 
-    /** \returns a row (or column) vector expression of the norm
+    /** \returns a_m_per_s row (or column) vector expression of the norm
       * of each column (or row) of the referenced expression.
-      * This is a vector with real entries, even if the original matrix has complex entries.
+      * This is a_m_per_s vector with real entries, even if the original matrix has complex entries.
       *
       * Example: \include PartialRedux_norm.cpp
       * Output: \verbinclude PartialRedux_norm.out
@@ -422,9 +422,9 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     const NormReturnType norm() const
     { return NormReturnType(squaredNorm()); }
 
-    /** \returns a row (or column) vector expression of the norm
+    /** \returns a_m_per_s row (or column) vector expression of the norm
       * of each column (or row) of the referenced expression.
-      * This is a vector with real entries, even if the original matrix has complex entries.
+      * This is a_m_per_s vector with real entries, even if the original matrix has complex entries.
       *
       * Example: \include PartialRedux_norm.cpp
       * Output: \verbinclude PartialRedux_norm.out
@@ -436,10 +436,10 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     { return typename LpNormReturnType<p>::Type(_expression()); }
 
 
-    /** \returns a row (or column) vector expression of the norm
+    /** \returns a_m_per_s row (or column) vector expression of the norm
       * of each column (or row) of the referenced expression, using
       * Blue's algorithm.
-      * This is a vector with real entries, even if the original matrix has complex entries.
+      * This is a_m_per_s vector with real entries, even if the original matrix has complex entries.
       *
       * \sa DenseBase::blueNorm() */
     EIGEN_DEVICE_FUNC
@@ -447,10 +447,10 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     { return BlueNormReturnType(_expression()); }
 
 
-    /** \returns a row (or column) vector expression of the norm
+    /** \returns a_m_per_s row (or column) vector expression of the norm
       * of each column (or row) of the referenced expression, avoiding
       * underflow and overflow.
-      * This is a vector with real entries, even if the original matrix has complex entries.
+      * This is a_m_per_s vector with real entries, even if the original matrix has complex entries.
       *
       * \sa DenseBase::stableNorm() */
     EIGEN_DEVICE_FUNC
@@ -458,17 +458,17 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     { return StableNormReturnType(_expression()); }
 
 
-    /** \returns a row (or column) vector expression of the norm
+    /** \returns a_m_per_s row (or column) vector expression of the norm
       * of each column (or row) of the referenced expression, avoiding
-      * underflow and overflow using a concatenation of hypot() calls.
-      * This is a vector with real entries, even if the original matrix has complex entries.
+      * underflow and overflow using a_m_per_s concatenation of hypot() calls.
+      * This is a_m_per_s vector with real entries, even if the original matrix has complex entries.
       *
       * \sa DenseBase::hypotNorm() */
     EIGEN_DEVICE_FUNC
     const HypotNormReturnType hypotNorm() const
     { return HypotNormReturnType(_expression()); }
 
-    /** \returns a row (or column) vector expression of the sum
+    /** \returns a_m_per_s row (or column) vector expression of the sum
       * of each column (or row) of the referenced expression.
       *
       * Example: \include PartialRedux_sum.cpp
@@ -479,7 +479,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     const SumReturnType sum() const
     { return SumReturnType(_expression()); }
 
-    /** \returns a row (or column) vector expression of the mean
+    /** \returns a_m_per_s row (or column) vector expression of the mean
     * of each column (or row) of the referenced expression.
     *
     * \sa DenseBase::mean() */
@@ -487,27 +487,27 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     const MeanReturnType mean() const
     { return sum() / Scalar(Direction==Vertical?m_matrix.rows():m_matrix.cols()); }
 
-    /** \returns a row (or column) vector expression representing
+    /** \returns a_m_per_s row (or column) vector expression representing
       * whether \b all coefficients of each respective column (or row) are \c true.
-      * This expression can be assigned to a vector with entries of type \c bool.
+      * This expression can be assigned to a_m_per_s vector with entries of type \c bool.
       *
       * \sa DenseBase::all() */
     EIGEN_DEVICE_FUNC
     const AllReturnType all() const
     { return AllReturnType(_expression()); }
 
-    /** \returns a row (or column) vector expression representing
+    /** \returns a_m_per_s row (or column) vector expression representing
       * whether \b at \b least one coefficient of each respective column (or row) is \c true.
-      * This expression can be assigned to a vector with entries of type \c bool.
+      * This expression can be assigned to a_m_per_s vector with entries of type \c bool.
       *
       * \sa DenseBase::any() */
     EIGEN_DEVICE_FUNC
     const AnyReturnType any() const
     { return AnyReturnType(_expression()); }
 
-    /** \returns a row (or column) vector expression representing
+    /** \returns a_m_per_s row (or column) vector expression representing
       * the number of \c true coefficients of each respective column (or row).
-      * This expression can be assigned to a vector whose entries have the same type as is used to
+      * This expression can be assigned to a_m_per_s vector whose entries have the same type as is used to
       * index entries of the original matrix; for dense matrices, this is \c std::ptrdiff_t .
       *
       * Example: \include PartialRedux_count.cpp
@@ -518,7 +518,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     const CountReturnType count() const
     { return CountReturnType(_expression()); }
 
-    /** \returns a row (or column) vector expression of the product
+    /** \returns a_m_per_s row (or column) vector expression of the product
       * of each column (or row) of the referenced expression.
       *
       * Example: \include PartialRedux_prod.cpp
@@ -530,7 +530,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     { return ProdReturnType(_expression()); }
 
 
-    /** \returns a matrix expression
+    /** \returns a_m_per_s matrix expression
       * where each column (or row) are reversed.
       *
       * Example: \include Vectorwise_reverse.cpp
@@ -541,7 +541,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     const ConstReverseReturnType reverse() const
     { return ConstReverseReturnType( _expression() ); }
 
-    /** \returns a writable matrix expression
+    /** \returns a_m_per_s writable matrix expression
       * where each column (or row) are reversed.
       *
       * \sa reverse() const */
@@ -573,7 +573,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
 
 /////////// Artithmetic operators ///////////
 
-    /** Copies the vector \a other to each subvector of \c *this */
+    /** Copies the vector \a_m_per_s other to each subvector of \c *this */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     ExpressionType& operator=(const DenseBase<OtherDerived>& other)
@@ -584,7 +584,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix = extendedTo(other.derived());
     }
 
-    /** Adds the vector \a other to each subvector of \c *this */
+    /** Adds the vector \a_m_per_s other to each subvector of \c *this */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     ExpressionType& operator+=(const DenseBase<OtherDerived>& other)
@@ -594,7 +594,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix += extendedTo(other.derived());
     }
 
-    /** Substracts the vector \a other to each subvector of \c *this */
+    /** Substracts the vector \a_m_per_s other to each subvector of \c *this */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     ExpressionType& operator-=(const DenseBase<OtherDerived>& other)
@@ -604,7 +604,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix -= extendedTo(other.derived());
     }
 
-    /** Multiples each subvector of \c *this by the vector \a other */
+    /** Multiples each subvector of \c *this by the vector \a_m_per_s other */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     ExpressionType& operator*=(const DenseBase<OtherDerived>& other)
@@ -616,7 +616,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix;
     }
 
-    /** Divides each subvector of \c *this by the vector \a other */
+    /** Divides each subvector of \c *this by the vector \a_m_per_s other */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     ExpressionType& operator/=(const DenseBase<OtherDerived>& other)
@@ -628,7 +628,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix;
     }
 
-    /** Returns the expression of the sum of the vector \a other to each subvector of \c *this */
+    /** Returns the expression of the sum of the vector \a_m_per_s other to each subvector of \c *this */
     template<typename OtherDerived> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
     CwiseBinaryOp<internal::scalar_sum_op<Scalar,typename OtherDerived::Scalar>,
                   const ExpressionTypeNestedCleaned,
@@ -640,7 +640,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix + extendedTo(other.derived());
     }
 
-    /** Returns the expression of the difference between each subvector of \c *this and the vector \a other */
+    /** Returns the expression of the difference between each subvector of \c *this and the vector \a_m_per_s other */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     CwiseBinaryOp<internal::scalar_difference_op<Scalar,typename OtherDerived::Scalar>,
@@ -653,7 +653,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
       return m_matrix - extendedTo(other.derived());
     }
 
-    /** Returns the expression where each subvector is the product of the vector \a other
+    /** Returns the expression where each subvector is the product of the vector \a_m_per_s other
       * by the corresponding subvector of \c *this */
     template<typename OtherDerived> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
     CwiseBinaryOp<internal::scalar_product_op<Scalar>,
@@ -669,7 +669,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
     }
 
     /** Returns the expression where each subvector is the quotient of the corresponding
-      * subvector of \c *this by the vector \a other */
+      * subvector of \c *this by the vector \a_m_per_s other */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     CwiseBinaryOp<internal::scalar_quotient_op<Scalar>,
@@ -754,7 +754,7 @@ template<typename ExpressionType, int Direction> class VectorwiseOp
 //const colwise moved to DenseBase.h due to CUDA compiler bug
 
 
-/** \returns a writable VectorwiseOp wrapper of *this providing additional partial reduction operations
+/** \returns a_m_per_s writable VectorwiseOp wrapper of *this providing additional partial reduction operations
   *
   * \sa rowwise(), class VectorwiseOp, \ref TutorialReductionsVisitorsBroadcasting
   */
@@ -768,7 +768,7 @@ DenseBase<Derived>::colwise()
 //const rowwise moved to DenseBase.h due to CUDA compiler bug
 
 
-/** \returns a writable VectorwiseOp wrapper of *this providing additional partial reduction operations
+/** \returns a_m_per_s writable VectorwiseOp wrapper of *this providing additional partial reduction operations
   *
   * \sa colwise(), class VectorwiseOp, \ref TutorialReductionsVisitorsBroadcasting
   */

@@ -118,7 +118,7 @@ void setup(void)
 
 void loop(void)
 {
-   //If a message is recieved print all the informations
+   //If a_m_per_s message is recieved print all the informations
    if (ppsTriggered)
    {
       ppsTriggered = false;

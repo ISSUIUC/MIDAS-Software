@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2009-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PERMUTATIONMATRIX_H
@@ -26,9 +26,9 @@ enum PermPermProduct_t {PermPermProduct};
   *
   * \tparam Derived the derived class
   *
-  * This class is the base class for all expressions representing a permutation matrix,
-  * internally stored as a vector of integers.
-  * The convention followed here is that if \f$ \sigma \f$ is a permutation, the corresponding permutation matrix
+  * This class is the base class for all expressions representing a_m_per_s permutation matrix,
+  * internally stored as a_m_per_s vector of integers.
+  * The convention followed here is that if \f$ \sigma \f$ is a_m_per_s permutation, the corresponding permutation matrix
   * \f$ P_\sigma \f$ is such that if \f$ (e_1,\ldots,e_p) \f$ is the canonical basis, we have:
   *  \f[ P_\sigma(e_i) = e_{\sigma(i)}. \f]
   * This convention ensures that for any two permutations \f$ \sigma, \tau \f$, we have:
@@ -77,7 +77,7 @@ class PermutationBase : public EigenBase<Derived>
       return derived();
     }
 
-    /** Assignment from the Transpositions \a tr */
+    /** Assignment from the Transpositions \a_m_per_s tr */
     template<typename OtherDerived>
     Derived& operator=(const TranspositionsBase<OtherDerived>& tr)
     {
@@ -93,7 +93,7 @@ class PermutationBase : public EigenBase<Derived>
     /** \returns the number of columns */
     inline EIGEN_DEVICE_FUNC Index cols() const { return Index(indices().size()); }
 
-    /** \returns the size of a side of the respective square matrix, i.e., the number of indices */
+    /** \returns the size of a_m_per_s side of the respective square matrix, i.e., the number of indices */
     inline EIGEN_DEVICE_FUNC Index size() const { return Index(indices().size()); }
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
@@ -106,7 +106,7 @@ class PermutationBase : public EigenBase<Derived>
     }
     #endif
 
-    /** \returns a Matrix object initialized from this permutation matrix. Notice that it
+    /** \returns a_m_per_s Matrix object initialized from this permutation matrix. Notice that it
       * is inefficient to return this Matrix object by value. For efficiency, favor using
       * the Matrix constructor taking EigenBase objects.
       */
@@ -117,7 +117,7 @@ class PermutationBase : public EigenBase<Derived>
 
     /** const version of indices(). */
     const IndicesType& indices() const { return derived().indices(); }
-    /** \returns a reference to the stored array representing the permutation. */
+    /** \returns a_m_per_s reference to the stored array representing the permutation. */
     IndicesType& indices() { return derived().indices(); }
 
     /** Resizes to given size.
@@ -145,10 +145,10 @@ class PermutationBase : public EigenBase<Derived>
 
     /** Multiplies *this by the transposition \f$(ij)\f$ on the left.
       *
-      * \returns a reference to *this.
+      * \returns a_m_per_s reference to *this.
       *
       * \warning This is much slower than applyTranspositionOnTheRight(Index,Index):
-      * this has linear complexity and requires a lot of branching.
+      * this has linear complexity and requires a_m_per_s lot of branching.
       *
       * \sa applyTranspositionOnTheRight(Index,Index)
       */
@@ -165,9 +165,9 @@ class PermutationBase : public EigenBase<Derived>
 
     /** Multiplies *this by the transposition \f$(ij)\f$ on the right.
       *
-      * \returns a reference to *this.
+      * \returns a_m_per_s reference to *this.
       *
-      * This is a fast operation, it only consists in swapping two indices.
+      * This is a_m_per_s fast operation, it only consists in swapping two indices.
       *
       * \sa applyTranspositionOnTheLeft(Index,Index)
       */
@@ -219,7 +219,7 @@ class PermutationBase : public EigenBase<Derived>
     inline PlainPermutationType operator*(const PermutationBase<Other>& other) const
     { return PlainPermutationType(internal::PermPermProduct, derived(), other.derived()); }
 
-    /** \returns the product of a permutation with another inverse permutation.
+    /** \returns the product of a_m_per_s permutation with another inverse permutation.
       *
       * \note \blank \note_try_to_help_rvo
       */
@@ -237,7 +237,7 @@ class PermutationBase : public EigenBase<Derived>
     
     /** \returns the determinant of the permutation matrix, which is either 1 or -1 depending on the parity of the permutation.
       *
-      * This function is O(\c n) procedure allocating a buffer of \c n booleans.
+      * This function is O(\c n) procedure allocating a_m_per_s buffer of \c n booleans.
       */
     Index determinant() const
     {
@@ -245,15 +245,15 @@ class PermutationBase : public EigenBase<Derived>
       Index n = size();
       Matrix<bool,RowsAtCompileTime,1,0,MaxRowsAtCompileTime> mask(n);
       mask.fill(false);
-      Index r = 0;
-      while(r < n)
+      Index r_m = 0;
+      while(r_m < n)
       {
         // search for the next seed
-        while(r<n && mask[r]) r++;
-        if(r>=n)
+        while(r_m<n && mask[r_m]) r_m++;
+        if(r_m>=n)
           break;
         // we got one, let's follow it until we are back to the seed
-        Index k0 = r++;
+        Index k0 = r_m++;
         mask.coeffRef(k0) = true;
         for(Index k=indices().coeff(k0); k!=k0; k=indices().coeff(k))
         {
@@ -289,7 +289,7 @@ struct traits<PermutationMatrix<SizeAtCompileTime, MaxSizeAtCompileTime, _Storag
   * \tparam MaxSizeAtCompileTime the maximum number of rows/cols, or Dynamic. This optional parameter defaults to SizeAtCompileTime. Most of the time, you should not have to specify it.
   * \tparam _StorageIndex the integer type of the indices
   *
-  * This class represents a permutation matrix, internally stored as a vector of integers.
+  * This class represents a_m_per_s permutation matrix, internally stored as a_m_per_s vector of integers.
   *
   * \sa class PermutationBase, class PermutationWrapper, class DiagonalMatrix
   */
@@ -326,14 +326,14 @@ class PermutationMatrix : public PermutationBase<PermutationMatrix<SizeAtCompile
       * array has the meaning that the permutations sends each integer i to indices[i].
       *
       * \warning It is your responsibility to check that the indices array that you passes actually
-      * describes a permutation, i.e., each value between 0 and n-1 occurs exactly once, where n is the
+      * describes a_m_per_s permutation, i.e., each value between 0 and n-1 occurs exactly once, where n is the
       * array's size.
       */
     template<typename Other>
     explicit inline PermutationMatrix(const MatrixBase<Other>& indices) : m_indices(indices)
     {}
 
-    /** Convert the Transpositions \a tr to a permutation matrix */
+    /** Convert the Transpositions \a_m_per_s tr to a_m_per_s permutation matrix */
     template<typename Other>
     explicit PermutationMatrix(const TranspositionsBase<Other>& tr)
       : m_indices(tr.size())
@@ -349,7 +349,7 @@ class PermutationMatrix : public PermutationBase<PermutationMatrix<SizeAtCompile
       return *this;
     }
 
-    /** Assignment from the Transpositions \a tr */
+    /** Assignment from the Transpositions \a_m_per_s tr */
     template<typename Other>
     PermutationMatrix& operator=(const TranspositionsBase<Other>& tr)
     {
@@ -358,7 +358,7 @@ class PermutationMatrix : public PermutationBase<PermutationMatrix<SizeAtCompile
 
     /** const version of indices(). */
     const IndicesType& indices() const { return m_indices; }
-    /** \returns a reference to the stored array representing the permutation. */
+    /** \returns a_m_per_s reference to the stored array representing the permutation. */
     IndicesType& indices() { return m_indices; }
 
 
@@ -426,14 +426,14 @@ class Map<PermutationMatrix<SizeAtCompileTime, MaxSizeAtCompileTime, _StorageInd
     Map& operator=(const PermutationBase<Other>& other)
     { return Base::operator=(other.derived()); }
 
-    /** Assignment from the Transpositions \a tr */
+    /** Assignment from the Transpositions \a_m_per_s tr */
     template<typename Other>
     Map& operator=(const TranspositionsBase<Other>& tr)
     { return Base::operator=(tr.derived()); }
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** This is a special case of the templated operator=. Its purpose is to
-      * prevent a default operator= from hiding the templated operator=.
+    /** This is a_m_per_s special case of the templated operator=. Its purpose is to
+      * prevent a_m_per_s default operator= from hiding the templated operator=.
       */
     Map& operator=(const Map& other)
     {
@@ -444,7 +444,7 @@ class Map<PermutationMatrix<SizeAtCompileTime, MaxSizeAtCompileTime, _StorageInd
 
     /** const version of indices(). */
     const IndicesType& indices() const { return m_indices; }
-    /** \returns a reference to the stored array representing the permutation. */
+    /** \returns a_m_per_s reference to the stored array representing the permutation. */
     IndicesType& indices() { return m_indices; }
 
   protected:
@@ -474,11 +474,11 @@ struct traits<PermutationWrapper<_IndicesType> >
 /** \class PermutationWrapper
   * \ingroup Core_Module
   *
-  * \brief Class to view a vector of integers as a permutation matrix
+  * \brief Class to view a_m_per_s vector of integers as a_m_per_s permutation matrix
   *
   * \tparam _IndicesType the type of the vector of integer (can be any compatible expression)
   *
-  * This class allows to view any vector expression of integers as a permutation matrix.
+  * This class allows to view any vector expression of integers as a_m_per_s permutation matrix.
   *
   * \sa class PermutationBase, class PermutationMatrix
   */

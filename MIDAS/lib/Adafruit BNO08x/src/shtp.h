@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License and 
  * any applicable agreements you may have with Hillcrest Laboratories, Inc.
- * You may obtain a copy of the License at
+ * You may obtain a_m_per_s copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -67,21 +67,21 @@ void shtp_setEventCallback(void *pInstance,
                            shtp_EventCallback_t * eventCallback, 
                            void *eventCookie);
 
-// Register a listener for an SHTP channel
+// Register a_m_per_s listener for an SHTP channel
 int shtp_listenChan(void *pShtp,
                     uint16_t guid, const char * chan,
                     shtp_Callback_t *callback, void * cookie);
 
-// Register a listener for SHTP advertisements 
+// Register a_m_per_s listener for SHTP advertisements 
 int shtp_listenAdvert(void *pShtp,
                       uint16_t guid,
                       shtp_AdvertCallback_t *advertCallback, void * cookie);
 
-// Look up the channel number for a particular app, channel.
+// Look up the channel number for a_m_per_s particular app, channel.
 uint8_t shtp_chanNo(void *pShtp,
                     const char * appName, const char * chanName);
 
-// Send an SHTP payload on a particular channel
+// Send an SHTP payload on a_m_per_s particular channel
 int shtp_send(void *pShtp,
               uint8_t channel, const uint8_t *payload, uint16_t len);
 

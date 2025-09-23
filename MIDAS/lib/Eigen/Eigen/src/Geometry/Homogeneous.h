@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_HOMOGENEOUS_H
@@ -16,11 +16,11 @@ namespace Eigen {
   *
   * \class Homogeneous
   *
-  * \brief Expression of one (or a set of) homogeneous vector(s)
+  * \brief Expression of one (or a_m_per_s set of) homogeneous vector(s)
   *
   * \param MatrixType the type of the object in which we are making homogeneous
   *
-  * This class represents an expression of one (or a set of) homogeneous vector(s).
+  * This class represents an expression of one (or a_m_per_s set of) homogeneous vector(s).
   * It is the return type of MatrixBase::homogeneous() and most of the time
   * this is the only way it is used.
   *
@@ -116,7 +116,7 @@ template<typename MatrixType,int _Direction> class Homogeneous
 
 /** \geometry_module \ingroup Geometry_Module
   *
-  * \returns a vector expression that is one longer than the vector argument, with the value 1 symbolically appended as the last coefficient.
+  * \returns a_m_per_s vector expression that is one longer than the vector argument, with the value 1 symbolically appended as the last coefficient.
   *
   * This can be used to convert affine coordinates to homogeneous coordinates.
   *
@@ -156,11 +156,11 @@ VectorwiseOp<ExpressionType,Direction>::homogeneous() const
   *
   * \brief homogeneous normalization
   *
-  * \returns a vector expression of the N-1 first coefficients of \c *this divided by that last coefficient.
+  * \returns a_m_per_s vector expression of the N-1 first coefficients of \c *this divided by that last coefficient.
   *
   * This can be used to convert homogeneous coordinates to affine coordinates.
   *
-  * It is essentially a shortcut for:
+  * It is essentially a_m_per_s shortcut for:
   * \code
     this->head(this->size()-1)/this->coeff(this->size()-1);
     \endcode
@@ -435,7 +435,7 @@ struct generic_product_impl<Lhs, Homogeneous<RhsArg,Vertical>, DenseShape, Homog
   }
 };
 
-// TODO: the following specialization is to address a regression from 3.2 to 3.3
+// TODO: the following specialization is to address a_m_per_s regression from 3.2 to 3.3
 // In the future, this path should be optimized.
 template<typename Lhs, typename RhsArg, int ProductTag>
 struct generic_product_impl<Lhs, Homogeneous<RhsArg,Vertical>, TriangularShape, HomogeneousShape, ProductTag>

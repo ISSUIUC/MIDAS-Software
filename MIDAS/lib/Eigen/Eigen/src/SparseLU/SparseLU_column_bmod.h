@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -25,7 +25,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSELU_COLUMN_BMOD_H
@@ -58,11 +58,11 @@ Index SparseLUImpl<Scalar,StorageIndex>::column_bmod(const Index jcol, const Ind
   Index fsupc, nsupc, nsupr, luptr, kfnz, no_zeros; 
   /* krep = representative of current k-th supernode
     * fsupc =  first supernodal column
-    * nsupc = number of columns in a supernode
-    * nsupr = number of rows in a supernode
+    * nsupc = number of columns in a_m_per_s supernode
+    * nsupr = number of rows in a_m_per_s supernode
     * luptr = location of supernodal LU-block in storage
     * kfnz = first nonz in the k-th supernodal segment
-    * no_zeros = no lf leading zeros in a supernodal U-segment
+    * no_zeros = no lf leading zeros in a_m_per_s supernodal U-segment
     */
   
   jsupno = glu.supno(jcol);
@@ -99,7 +99,7 @@ Index SparseLUImpl<Scalar,StorageIndex>::column_bmod(const Index jcol, const Ind
       Index lda = glu.xlusup(fst_col+1) - glu.xlusup(fst_col);
       
       
-      // Perform a triangular solver and block update, 
+      // Perform a_m_per_s triangular solver and block update, 
       // then scatter the result of sup-col update to dense
       no_zeros = kfnz - fst_col; 
       if(segsize==1)

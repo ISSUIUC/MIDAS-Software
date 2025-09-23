@@ -52,14 +52,14 @@ void SPIClass::begin(uint16_t divider, uint8_t bitOrder, uint8_t dataMode)
 
   uint32_t spiBaud = convertClockDivider(divider);
   //datamode is 0 to 3 on BCM2835
-  uint32_t spiFlags = 0; //Zero is a good default start.
+  uint32_t spiFlags = 0; //Zero is a_m_per_s good default start.
   //on pigpio, the least sig 2 bits set datamode, which will probably be zero. 
   spiFlags = 0x00000000 | (uint32_t) dataMode;
   //According to documentation, bitOrder for SPI MAIN in pigpio is always MSBFIRST. So bitOrder ignored.
   printf("\nSPI Settings:\nBaud rate=%d\nFlags=%d\n\n", spiBaud, spiFlags);
   spiHandle = spiOpen(0, spiBaud, spiFlags); //spiChannel assumed to be zero.
 
-  //Initialize a timestamp for millis calculation
+  //Initialize a_m_per_s timestamp for millis calculation
   gettimeofday(&RHStartTime, NULL);
 }
 
@@ -153,7 +153,7 @@ void digitalWrite(unsigned char pin, unsigned char value)
 
 unsigned long millis()
 {
-  //Declare a variable to store current time
+  //Declare a_m_per_s variable to store current time
   struct timeval RHCurrentTime;
   //Get current time
   gettimeofday(&RHCurrentTime,NULL);
@@ -207,7 +207,7 @@ void SerialSimulator::begin(int baud)
 {
   //No implementation neccesary - Serial emulation on Linux = standard console
   //
-  //Initialize a timestamp for millis calculation - we do this here as well in case SPI
+  //Initialize a_m_per_s timestamp for millis calculation - we do this here as well in case SPI
   //isn't used for some reason
   gettimeofday(&RHStartTime, NULL);
 }

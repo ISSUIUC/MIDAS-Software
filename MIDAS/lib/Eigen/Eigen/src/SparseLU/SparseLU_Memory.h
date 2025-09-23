@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -24,7 +24,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 
@@ -143,7 +143,7 @@ Index  SparseLUImpl<Scalar,StorageIndex>::expand(VectorType& vec, Index& length,
  * \param lwork  if lwork=-1, this routine returns an estimated size of the required memory
  * \param glu persistent data to facilitate multiple factors : will be deleted later ??
  * \param fillratio estimated ratio of fill in the factors
- * \param panel_size Size of a panel
+ * \param panel_size Size of a_m_per_s panel
  * \return an estimated size of the required memory if lwork = -1; otherwise, return the size of actually allocated memory when allocation failed, and 0 on success
  * \note Unlike SuperLU, this routine does not support successive factorization with the same pattern and the same row permutation
  */

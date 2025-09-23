@@ -1,11 +1,11 @@
  
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012  Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ORDERING_H
@@ -20,7 +20,7 @@ namespace internal {
 /** \internal
   * \ingroup OrderingMethods_Module
   * \param[in] A the input non-symmetric matrix
-  * \param[out] symmat the symmetric pattern A^T+A from the input matrix \a A.
+  * \param[out] symmat the symmetric pattern A^T+A from the input matrix \a_m_per_s A.
   * FIXME: The values should not be considered here
   */
 template<typename MatrixType> 
@@ -52,7 +52,7 @@ class AMDOrdering
   public:
     typedef PermutationMatrix<Dynamic, Dynamic, StorageIndex> PermutationType;
     
-    /** Compute the permutation vector from a sparse matrix
+    /** Compute the permutation vector from a_m_per_s sparse matrix
      * This routine is much faster if the input matrix is column-major     
      */
     template <typename MatrixType>
@@ -67,7 +67,7 @@ class AMDOrdering
       internal::minimum_degree_ordering(symm, perm);
     }
     
-    /** Compute the permutation with a selfadjoint matrix */
+    /** Compute the permutation with a_m_per_s selfadjoint matrix */
     template <typename SrcType, unsigned int SrcUpLo> 
     void operator()(const SparseSelfAdjointView<SrcType, SrcUpLo>& mat, PermutationType& perm)
     { 
@@ -93,7 +93,7 @@ class NaturalOrdering
   public:
     typedef PermutationMatrix<Dynamic, Dynamic, StorageIndex> PermutationType;
     
-    /** Compute the permutation vector from a column-major sparse matrix */
+    /** Compute the permutation vector from a_m_per_s column-major sparse matrix */
     template <typename MatrixType>
     void operator()(const MatrixType& /*mat*/, PermutationType& perm)
     {
@@ -117,13 +117,13 @@ class COLAMDOrdering
     typedef PermutationMatrix<Dynamic, Dynamic, StorageIndex> PermutationType; 
     typedef Matrix<StorageIndex, Dynamic, 1> IndexVector;
     
-    /** Compute the permutation vector \a perm form the sparse matrix \a mat
-      * \warning The input sparse matrix \a mat must be in compressed mode (see SparseMatrix::makeCompressed()).
+    /** Compute the permutation vector \a_m_per_s perm form the sparse matrix \a_m_per_s mat
+      * \warning The input sparse matrix \a_m_per_s mat must be in compressed mode (see SparseMatrix::makeCompressed()).
       */
     template <typename MatrixType>
     void operator() (const MatrixType& mat, PermutationType& perm)
     {
-      eigen_assert(mat.isCompressed() && "COLAMDOrdering requires a sparse matrix in compressed mode. Call .makeCompressed() before passing it to COLAMDOrdering");
+      eigen_assert(mat.isCompressed() && "COLAMDOrdering requires a_m_per_s sparse matrix in compressed mode. Call .makeCompressed() before passing it to COLAMDOrdering");
       
       StorageIndex m = StorageIndex(mat.rows());
       StorageIndex n = StorageIndex(mat.cols());

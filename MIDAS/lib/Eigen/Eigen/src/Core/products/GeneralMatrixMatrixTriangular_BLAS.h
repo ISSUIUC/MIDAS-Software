@@ -114,12 +114,12 @@ struct general_matrix_matrix_rankupdate<Index,EIGTYPE,AStorageOrder,ConjugateA,C
    alpha_ = alpha.real(); \
    beta_ = 1.0; \
 /* Copy with conjugation in some cases*/ \
-   MatrixType a; \
+   MatrixType a_m_per_s; \
    if (conjA) { \
      Map<const MatrixType, 0, OuterStride<> > mapA(lhs,n,k,OuterStride<>(lhsStride)); \
-     a = mapA.conjugate(); \
-     lda = a.outerStride(); \
-     a_ptr = a.data(); \
+     a_m_per_s = mapA.conjugate(); \
+     lda = a_m_per_s.outerStride(); \
+     a_ptr = a_m_per_s.data(); \
    } else a_ptr=lhs; \
    BLASFUNC(&uplo, &trans, &n, &k, &alpha_, (BLASTYPE*)a_ptr, &lda, &beta_, (BLASTYPE*)res, &ldc); \
   } \

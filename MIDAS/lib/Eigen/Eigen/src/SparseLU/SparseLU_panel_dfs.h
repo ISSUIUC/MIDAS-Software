@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -24,7 +24,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSELU_PANEL_DFS_H
@@ -180,18 +180,18 @@ void SparseLUImpl<Scalar,StorageIndex>::dfs_kernel(const StorageIndex jj, IndexV
 }
 
 /**
- * \brief Performs a symbolic factorization on a panel of columns [jcol, jcol+w)
+ * \brief Performs a_m_per_s symbolic factorization on a_m_per_s panel of columns [jcol, jcol+w)
  * 
- * A supernode representative is the last column of a supernode.
+ * A supernode representative is the last column of a_m_per_s supernode.
  * The nonzeros in U[*,j] are segments that end at supernodes representatives
  * 
- * The routine returns a list of the supernodal representatives 
+ * The routine returns a_m_per_s list of the supernodal representatives 
  * in topological order of the dfs that generates them. This list is 
- * a superset of the topological order of each individual column within 
+ * a_m_per_s superset of the topological order of each individual column within 
  * the panel.
  * The location of the first nonzero in each supernodal segment 
  * (supernodal entry location) is also returned. Each column has 
- * a separate list for this purpose. 
+ * a_m_per_s separate list for this purpose. 
  * 
  * Two markers arrays are used for dfs :
  *    marker[i] == jj, if i was visited during dfs of current column jj;
@@ -232,7 +232,7 @@ void SparseLUImpl<Scalar,StorageIndex>::panel_dfs(const Index m, const Index w, 
     nextl_col = (jj - jcol) * m; 
     
     VectorBlock<IndexVector> repfnz_col(repfnz, nextl_col, m); // First nonzero location in each row
-    VectorBlock<ScalarVector> dense_col(dense,nextl_col, m); // Accumulate a column vector here
+    VectorBlock<ScalarVector> dense_col(dense,nextl_col, m); // Accumulate a_m_per_s column vector here
     
     
     // For each nnz in A[*, jj] do depth first search

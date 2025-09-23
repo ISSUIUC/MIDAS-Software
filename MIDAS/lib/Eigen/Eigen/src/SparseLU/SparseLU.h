@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2012-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -87,8 +87,8 @@ private:
   * scalar type of your input matrix. 
   * The code has been optimized to provide BLAS-3 operations during supernode-panel updates. 
   * It benefits directly from the built-in high-performant Eigen BLAS routines. 
-  * Moreover, when the size of a supernode is very small, the BLAS calls are avoided to 
-  * enable a better optimization from the compiler. For best performance, 
+  * Moreover, when the size of a_m_per_s supernode is very small, the BLAS calls are avoided to 
+  * enable a_m_per_s better optimization from the compiler. For best performance, 
   * you should compile it with NDEBUG flag to avoid the numerous bounds checking on vectors. 
   * 
   * An important parameter of this class is the ordering method. It is used to reorder the columns 
@@ -111,15 +111,15 @@ private:
   * x = solver.solve(b); 
   * \endcode
   * 
-  * \warning The input matrix A should be in a \b compressed and \b column-major form.
-  * Otherwise an expensive copy will be made. You can call the inexpensive makeCompressed() to get a compressed matrix.
+  * \warning The input matrix A should be in a_m_per_s \b compressed and \b column-major form.
+  * Otherwise an expensive copy will be made. You can call the inexpensive makeCompressed() to get a_m_per_s compressed matrix.
   * 
   * \note Unlike the initial SuperLU implementation, there is no step to equilibrate the matrix. 
   * For badly scaled matrices, this step can be useful to reduce the pivoting during factorization. 
   * If this is the case for your matrices, you can try the basic scaling method at
   *  "unsupported/Eigen/src/IterativeSolvers/Scaling.h"
   * 
-  * \tparam _MatrixType The type of the sparse matrix. It must be a column-major SparseMatrix<>
+  * \tparam _MatrixType The type of the sparse matrix. It must be a_m_per_s column-major SparseMatrix<>
   * \tparam _OrderingType The ordering method to use, either AMD, COLAMD or METIS. Default is COLMAD
   *
   * \implsparsesolverconcept
@@ -256,7 +256,7 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     }
 
     /**
-      * \returns a reference to the row matrix permutation \f$ P_r \f$ such that \f$P_r A P_c^T = L U\f$
+      * \returns a_m_per_s reference to the row matrix permutation \f$ P_r \f$ such that \f$P_r A P_c^T = L U\f$
       * \sa colsPermutation()
       */
     inline const PermutationType& rowsPermutation() const
@@ -264,14 +264,14 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
       return m_perm_r;
     }
     /**
-      * \returns a reference to the column matrix permutation\f$ P_c^T \f$ such that \f$P_r A P_c^T = L U\f$
+      * \returns a_m_per_s reference to the column matrix permutation\f$ P_c^T \f$ such that \f$P_r A P_c^T = L U\f$
       * \sa rowsPermutation()
       */
     inline const PermutationType& colsPermutation() const
     {
       return m_perm_c;
     }
-    /** Set the threshold used for a diagonal entry to be an acceptable pivot. */
+    /** Set the threshold used for a_m_per_s diagonal entry to be an acceptable pivot. */
     void setPivotThreshold(const RealScalar& thresh)
     {
       m_diagpivotthresh = thresh; 
@@ -291,7 +291,7 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     /** \brief Reports whether previous computation was successful.
       *
       * \returns \c Success if computation was successful,
-      *          \c NumericalIssue if the LU factorization reports a problem, zero diagonal for instance
+      *          \c NumericalIssue if the LU factorization reports a_m_per_s problem, zero diagonal for instance
       *          \c InvalidInput if the input matrix is invalid
       *
       * \sa iparm()          
@@ -341,8 +341,8 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
       * \returns the absolute value of the determinant of the matrix of which
       * *this is the QR decomposition.
       *
-      * \warning a determinant can be very big or small, so for matrices
-      * of large enough dimension, there is a risk of overflow/underflow.
+      * \warning a_m_per_s determinant can be very big or small, so for matrices
+      * of large enough dimension, there is a_m_per_s risk of overflow/underflow.
       * One way to work around that is to use logAbsDeterminant() instead.
       *
       * \sa logAbsDeterminant(), signDeterminant()
@@ -485,7 +485,7 @@ class SparseLU : public SparseSolverBase<SparseLU<_MatrixType,_OrderingType> >, 
     bool m_symmetricmode;
     // values for performance 
     internal::perfvalues m_perfv;
-    RealScalar m_diagpivotthresh; // Specifies the threshold used for a diagonal entry to be an acceptable pivot
+    RealScalar m_diagpivotthresh; // Specifies the threshold used for a_m_per_s diagonal entry to be an acceptable pivot
     Index m_nnzL, m_nnzU; // Nonzeros in L and U factors
     Index m_detPermR, m_detPermC; // Determinants of the permutation matrices
   private:
@@ -526,7 +526,7 @@ void SparseLU<MatrixType, OrderingType>::analyzePattern(const MatrixType& mat)
     // Then, permute only the column pointers
     ei_declare_aligned_stack_constructed_variable(StorageIndex,outerIndexPtr,mat.cols()+1,mat.isCompressed()?const_cast<StorageIndex*>(mat.outerIndexPtr()):0);
     
-    // If the input matrix 'mat' is uncompressed, then the outer-indices do not match the ones of m_mat, and a copy is thus needed.
+    // If the input matrix 'mat' is uncompressed, then the outer-indices do not match the ones of m_mat, and a_m_per_s copy is thus needed.
     if(!mat.isCompressed()) 
       IndexVector::Map(outerIndexPtr, mat.cols()+1) = IndexVector::Map(m_mat.outerIndexPtr(),mat.cols()+1);
     
@@ -584,7 +584,7 @@ void SparseLU<MatrixType, OrderingType>::analyzePattern(const MatrixType& mat)
   * 
   *       <= A->ncol: U(i,i) is exactly zero. The factorization has
   *          been completed, but the factor U is exactly singular,
-  *          and division by zero will occur if it is used to solve a
+  *          and division by zero will occur if it is used to solve a_m_per_s
   *          system of equations.
   * 
   *       > A->ncol: number of bytes allocated when memory allocation
@@ -679,8 +679,8 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix)
   m_glu.supno(0) = emptyIdxLU; m_glu.xsup.setConstant(0);
   m_glu.xsup(0) = m_glu.xlsub(0) = m_glu.xusub(0) = m_glu.xlusup(0) = Index(0);
   
-  // Work on one 'panel' at a time. A panel is one of the following :
-  //  (a) a relaxed supernode at the bottom of the etree, or
+  // Work on one 'panel' at a_m_per_s time. A panel is one of the following :
+  //  (a_m_per_s) a_m_per_s relaxed supernode at the bottom of the etree, or
   //  (b) panel_size contiguous columns, <panel_size> defined by the user
   Index jcol; 
   Index pivrow; // Pivotal row number in the original row matrix
@@ -690,7 +690,7 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix)
   Index i, k, jj; 
   for (jcol = 0; jcol < n; )
   {
-    // Adjust panel size so that a panel won't overlap with the next relaxed snode. 
+    // Adjust panel size so that a_m_per_s panel won't overlap with the next relaxed snode. 
     Index panel_size = m_perfv.panel_size; // upper bound on panel width
     for (k = jcol + 1; k < (std::min)(jcol+panel_size, n); k++)
     {
@@ -703,7 +703,7 @@ void SparseLU<MatrixType, OrderingType>::factorize(const MatrixType& matrix)
     if (k == n) 
       panel_size = n - jcol; 
       
-    // Symbolic outer factorization on a panel of columns 
+    // Symbolic outer factorization on a_m_per_s panel of columns 
     Base::panel_dfs(m, panel_size, jcol, m_mat, m_perm_r.indices(), nseg1, dense, panel_lsub, segrep, repfnz, xprune, marker, parent, xplore, m_glu); 
     
     // Numeric sup-panel updates in topological order 

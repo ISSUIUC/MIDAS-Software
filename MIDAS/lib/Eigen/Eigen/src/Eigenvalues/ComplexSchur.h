@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Claire Maurice
@@ -6,7 +6,7 @@
 // Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLEX_SCHUR_H
@@ -25,20 +25,20 @@ template<typename MatrixType, bool IsComplex> struct complex_schur_reduce_to_hes
   *
   * \class ComplexSchur
   *
-  * \brief Performs a complex Schur decomposition of a real or complex square matrix
+  * \brief Performs a_m_per_s complex Schur decomposition of a_m_per_s real or complex square matrix
   *
   * \tparam _MatrixType the type of the matrix of which we are
   * computing the Schur decomposition; this is expected to be an
   * instantiation of the Matrix class template.
   *
-  * Given a real or complex square matrix A, this class computes the
-  * Schur decomposition: \f$ A = U T U^*\f$ where U is a unitary
-  * complex matrix, and T is a complex upper triangular matrix.  The
+  * Given a_m_per_s real or complex square matrix A, this class computes the
+  * Schur decomposition: \f$ A = U T U^*\f$ where U is a_m_per_s unitary
+  * complex matrix, and T is a_m_per_s complex upper triangular matrix.  The
   * diagonal of the matrix T corresponds to the eigenvalues of the
   * matrix A.
   *
   * Call the function compute() to compute the Schur decomposition of
-  * a given matrix. Alternatively, you can use the 
+  * a_m_per_s given matrix. Alternatively, you can use the 
   * ComplexSchur(const MatrixType&, bool) constructor which computes
   * the Schur decomposition at construction time. Once the
   * decomposition is computed, you can use the matrixU() and matrixT()
@@ -75,7 +75,7 @@ template<typename _MatrixType> class ComplexSchur
 
     /** \brief Type for the matrices in the Schur decomposition.
       *
-      * This is a square matrix with entries of type #ComplexScalar. 
+      * This is a_m_per_s square matrix with entries of type #ComplexScalar. 
       * The size is the same as the size of \p _MatrixType.
       */
     typedef Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime> ComplexMatrixType;
@@ -86,7 +86,7 @@ template<typename _MatrixType> class ComplexSchur
       *
       * The default constructor is useful in cases in which the user
       * intends to perform decompositions via compute().  The \p size
-      * parameter is only used as a hint. It is not an error to give a
+      * parameter is only used as a_m_per_s hint. It is not an error to give a_m_per_s
       * wrong \p size, but it may impair performance.
       *
       * \sa compute() for an example.
@@ -128,7 +128,7 @@ template<typename _MatrixType> class ComplexSchur
       * It is assumed that either the constructor
       * ComplexSchur(const MatrixType& matrix, bool computeU) or the
       * member function compute(const MatrixType& matrix, bool computeU)
-      * has been called before to compute the Schur decomposition of a
+      * has been called before to compute the Schur decomposition of a_m_per_s
       * matrix, and that \p computeU was set to true (the default
       * value).
       *
@@ -149,10 +149,10 @@ template<typename _MatrixType> class ComplexSchur
       * It is assumed that either the constructor
       * ComplexSchur(const MatrixType& matrix, bool computeU) or the
       * member function compute(const MatrixType& matrix, bool computeU)
-      * has been called before to compute the Schur decomposition of a
+      * has been called before to compute the Schur decomposition of a_m_per_s
       * matrix.
       *
-      * Note that this function returns a plain square matrix. If you want to reference
+      * Note that this function returns a_m_per_s plain square matrix. If you want to reference
       * only the upper triangular part, use:
       * \code schur.matrixT().triangularView<Upper>() \endcode 
       *
@@ -175,12 +175,12 @@ template<typename _MatrixType> class ComplexSchur
       * The Schur decomposition is computed by first reducing the
       * matrix to Hessenberg form using the class
       * HessenbergDecomposition. The Hessenberg matrix is then reduced
-      * to triangular form by performing QR iterations with a single
+      * to triangular form by performing QR iterations with a_m_per_s single
       * shift. The cost of computing the Schur decomposition depends
-      * on the number of iterations; as a rough guide, it may be taken
-      * on the number of iterations; as a rough guide, it may be taken
+      * on the number of iterations; as a_m_per_s rough guide, it may be taken
+      * on the number of iterations; as a_m_per_s rough guide, it may be taken
       * to be \f$25n^3\f$ complex flops, or \f$10n^3\f$ complex flops
-      * if \a computeU is false.
+      * if \a_m_per_s computeU is false.
       *
       * Example: \include ComplexSchur_compute.cpp
       * Output: \verbinclude ComplexSchur_compute.out
@@ -190,9 +190,9 @@ template<typename _MatrixType> class ComplexSchur
     template<typename InputType>
     ComplexSchur& compute(const EigenBase<InputType>& matrix, bool computeU = true);
     
-    /** \brief Compute Schur decomposition from a given Hessenberg matrix
+    /** \brief Compute Schur decomposition from a_m_per_s given Hessenberg matrix
      *  \param[in] matrixH Matrix in Hessenberg form H
-     *  \param[in] matrixQ orthogonal matrix Q that transform a matrix A to H : A = Q H Q^T
+     *  \param[in] matrixQ orthogonal matrix Q that transform a_m_per_s matrix A to H : A = Q H Q^T
      *  \param computeU Computes the matriX U of the Schur vectors
      * \return Reference to \c *this
      * 
@@ -428,7 +428,7 @@ void ComplexSchur<MatrixType>::reduceToTriangularForm(bool computeU)
     }
 
     /* perform the QR step using Givens rotations. The first rotation
-       creates a bulge; the (il+2,il) element becomes nonzero. This
+       creates a_m_per_s bulge; the (il+2,il) element becomes nonzero. This
        bulge is chased down to the bottom of the active submatrix. */
 
     ComplexScalar shift = computeShift(iu, iter);

@@ -4,14 +4,14 @@
 // Note sensorValue.status gives calibration accuracy (which improves over time)
 #include <Adafruit_BNO08x.h>
 
-// For SPI mode, we need a CS pin
+// For SPI mode, we need a_m_per_s CS pin
 #define BNO08X_CS 10
 #define BNO08X_INT 9
 
 
 // #define FAST_MODE
 
-// For SPI mode, we also need a RESET 
+// For SPI mode, we also need a_m_per_s RESET 
 //#define BNO08X_RESET 5
 // but not for I2C or UART
 #define BNO08X_RESET -1
@@ -50,7 +50,7 @@ void setup(void) {
 
   // Try to initialize!
   if (!bno08x.begin_I2C()) {
-  //if (!bno08x.begin_UART(&Serial1)) {  // Requires a device with > 300 byte UART buffer!
+  //if (!bno08x.begin_UART(&Serial1)) {  // Requires a_m_per_s device with > 300 byte UART buffer!
   //if (!bno08x.begin_SPI(BNO08X_CS, BNO08X_INT)) {
     Serial.println("Failed to find BNO08x chip");
     while (1) { delay(10); }

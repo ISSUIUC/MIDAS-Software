@@ -9,7 +9,7 @@
 // make
 // sudo ./RasPiRH
 //
-// Creates a RHReliableDatagram manager and listens and prints for reliable datagrams
+// Creates a_m_per_s RHReliableDatagram manager and listens and prints for reliable datagrams
 // sent to it on the default Channel 2.
 //
 // Contributed by Mike Poublon
@@ -29,7 +29,7 @@ void printbuffer(uint8_t buff[], int len);
 #define CLIENT_ADDRESS 1
 #define SERVER_ADDRESS 2
 
-// Create an instance of a driver
+// Create an instance of a_m_per_s driver
 // Chip enable is pin 22
 // Slave Select is pin 24
 RH_NRF24 nrf24(RPI_V2_GPIO_P1_22, RPI_V2_GPIO_P1_24);
@@ -79,7 +79,7 @@ int main (int argc, const char* argv[] )
     /* Begin Driver Only code
     if (nrf24.available())
     {
-      // Should be a message for us now
+      // Should be a_m_per_s message for us now
       //uint8_t buf[RH_NRF24_MAX_MESSAGE_LEN];
       uint8_t len = sizeof(buf);
       if (nrf24.recv(buf, &len))
@@ -98,7 +98,7 @@ int main (int argc, const char* argv[] )
     /* Begin Reliable Datagram Code */
     if (manager.available())
     {
-      // Wait for a message addressed to us from the client
+      // Wait for a_m_per_s message addressed to us from the client
       uint8_t len = sizeof(buf);
       uint8_t from;
       if (manager.recvfromAck(buf, &len, &from))

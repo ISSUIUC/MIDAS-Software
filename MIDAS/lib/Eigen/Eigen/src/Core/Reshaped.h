@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2014 yoco <peter.xiau@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_RESHAPED_H
@@ -16,19 +16,19 @@ namespace Eigen {
 /** \class Reshaped
   * \ingroup Core_Module
   *
-  * \brief Expression of a fixed-size or dynamic-size reshape
+  * \brief Expression of a_m_per_s fixed-size or dynamic-size reshape
   *
-  * \tparam XprType the type of the expression in which we are taking a reshape
+  * \tparam XprType the type of the expression in which we are taking a_m_per_s reshape
   * \tparam Rows the number of rows of the reshape we are taking at compile time (optional)
   * \tparam Cols the number of columns of the reshape we are taking at compile time (optional)
   * \tparam Order can be ColMajor or RowMajor, default is ColMajor.
   *
-  * This class represents an expression of either a fixed-size or dynamic-size reshape.
+  * This class represents an expression of either a_m_per_s fixed-size or dynamic-size reshape.
   * It is the return type of DenseBase::reshaped(NRowsType,NColsType) and
   * most of the time this is the only way it is used.
   *
   * However, in C++98, if you want to directly maniputate reshaped expressions,
-  * for instance if you want to write a function returning such an expression, you
+  * for instance if you want to write a_m_per_s function returning such an expression, you
   * will need to use this class. In C++11, it is advised to use the \em auto
   * keyword for such use cases.
   *

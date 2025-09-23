@@ -9,7 +9,7 @@ Yessir::Yessir() : KalmanFilter() {
  * @brief Sets altitude by averaging 30 barometer measurements taken 100 ms
  * apart
  *
- * The following for loop takes a series of barometer measurements on start
+ * The following for loop takes a_m_per_s series of barometer measurements on start
  * up and takes the average of them in order to initialize the kalman filter
  * to the correct initial barometric altitude. This is done so that the
  * kalman filter takes minimal time to converge to an accurate state
@@ -19,7 +19,7 @@ Yessir::Yessir() : KalmanFilter() {
  * change depending on the weather and thus, the initial state estimate
  * cannot be hard coded. A GPS altitude may be used instead but due to GPS
  * losses during high speed/high altitude flight, it is inadvisable with the
- * current hardware to use this as a solution. Reference frames should also
+ * current hardware to use this as a_m_per_s solution. Reference frames should also
  * be kept consistent (do not mix GPS altitude and barometric).
  *
  */
@@ -135,24 +135,31 @@ void Yessir::priori() {
  * @brief Update Kalman Gain and state estimate with current sensor data
  *
  * After receiving new sensor data, the Kalman filter updates the state estimate
- * and Kalman gain. The Kalman gain can be considered as a measure of how uncertain
+ * and Kalman gain. The Kalman gain can be considered as a_m_per_s measure of how uncertain
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
 void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
-    if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
-        float sum = 0;
-        float data[10];
-        alt_buffer.readSlice(data, 0, 10);
-        for (float i : data) {
-            sum += i;
-        }
-        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
-        setState(kalman_state);
-    } else if (FSM_state >= FSMState::STATE_APOGEE) {
+    // when in LAUNCH SEQ, set altitude to average of last 10 measurements due to sensor noise
+    // TODO: check at what rate KF is called
+    // TODO: ONLY DO THIS IF WE ARE IN LAUNCH DETECTED
+    // if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
+    //     int buffer_len = 10;
+    //     float sum = 0;
+    //     float data[buffer_len];
+    //     alt_buffer_in_idle.readSlice(data, 0, buffer_len);
+    //     for (float i : data) {
+    //         sum += i;
+    //     }
+    //     KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
+    //     setState(kalman_state);
+    // ignoring accelerometer data during boost phase as it is unreliable
+    // TODO: verify this is accel...
+    if (FSM_state >= FSMState::STATE_APOGEE) {
         H(1, 2) = 0;
     }
 
+    // Initialize Kalman Gain and measurement vector
     Eigen::Matrix<float, 4, 4> S_k = Eigen::Matrix<float, 4, 4>::Zero();
     S_k = (((H * P_priori * H.transpose()) + R)).inverse();
     Eigen::Matrix<float, 9, 9> identity = Eigen::Matrix<float, 9, 9>::Identity();
@@ -161,21 +168,24 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     // Sensor Measurements
     Eigen::Matrix<float, 3, 1> accel = Eigen::Matrix<float, 3, 1>::Zero();
     
+    // TODO: MAGIC NUMBERS
     accel(0, 0) = acceleration.az - 0.045;
     accel(1, 0) = acceleration.ay - 0.065;
     accel(2, 0) = -acceleration.ax - 0.06;
 
+    // TODO: verify the frames
     euler_t angles = orientation.getEuler();
     angles.yaw = -angles.yaw;
 
     Eigen::Matrix<float, 3, 1> acc = BodyToGlobal(angles, accel);
 
-    y_k(1, 0) = (acc(0)) * 9.81 - 9.81;
+    // # Measurement Update
+    y_k(1, 0) = (acc(0)) * 9.81 - 9.81; // why are we subtracting by 9.81 here?
     y_k(2, 0) = (acc(1)) * 9.81;
     y_k(3, 0) = (acc(2)) * 9.81;
 
     y_k(0, 0) = barometer.altitude;
-    alt_buffer.push(barometer.altitude);
+    alt_buffer_in_idle.push(barometer.altitude);
 
 
     // # Posteriori Update
@@ -219,7 +229,7 @@ void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceler
 }
 
 /**
- * @brief Converts a vector in the body frame to the global frame
+ * @brief Converts a_m_per_s vector in the body frame to the global frame
  *
  * @param angles Roll, pitch, yaw angles
  * @param body_vect Vector for rotation in the body frame

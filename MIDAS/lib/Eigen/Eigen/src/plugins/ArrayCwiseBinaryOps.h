@@ -1,5 +1,5 @@
 
-/** \returns an expression of the coefficient wise product of \c *this and \a other
+/** \returns an expression of the coefficient wise product of \c *this and \a_m_per_s other
   *
   * \sa MatrixBase::cwiseProduct
   */
@@ -11,7 +11,7 @@ operator*(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient wise quotient of \c *this and \a other
+/** \returns an expression of the coefficient wise quotient of \c *this and \a_m_per_s other
   *
   * \sa MatrixBase::cwiseQuotient
   */
@@ -23,7 +23,7 @@ operator/(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return CwiseBinaryOp<internal::scalar_quotient_op<Scalar,typename OtherDerived::Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient-wise min of \c *this and \a other
+/** \returns an expression of the coefficient-wise min of \c *this and \a_m_per_s other
   *
   * Example: \include Cwise_min.cpp
   * Output: \verbinclude Cwise_min.out
@@ -32,7 +32,7 @@ operator/(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   */
 EIGEN_MAKE_CWISE_BINARY_OP(min,min)
 
-/** \returns an expression of the coefficient-wise min of \c *this and scalar \a other
+/** \returns an expression of the coefficient-wise min of \c *this and scalar \a_m_per_s other
   *
   * \sa max()
   */
@@ -49,7 +49,7 @@ min
   return (min)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
-/** \returns an expression of the coefficient-wise max of \c *this and \a other
+/** \returns an expression of the coefficient-wise max of \c *this and \a_m_per_s other
   *
   * Example: \include Cwise_max.cpp
   * Output: \verbinclude Cwise_max.out
@@ -58,7 +58,7 @@ min
   */
 EIGEN_MAKE_CWISE_BINARY_OP(max,max)
 
-/** \returns an expression of the coefficient-wise max of \c *this and scalar \a other
+/** \returns an expression of the coefficient-wise max of \c *this and scalar \a_m_per_s other
   *
   * \sa min()
   */
@@ -75,7 +75,7 @@ max
   return (max)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
-/** \returns an expression of the coefficient-wise absdiff of \c *this and \a other
+/** \returns an expression of the coefficient-wise absdiff of \c *this and \a_m_per_s other
   *
   * Example: \include Cwise_absolute_difference.cpp
   * Output: \verbinclude Cwise_absolute_difference.out
@@ -84,7 +84,7 @@ max
   */
 EIGEN_MAKE_CWISE_BINARY_OP(absolute_difference,absolute_difference)
 
-/** \returns an expression of the coefficient-wise absolute_difference of \c *this and scalar \a other
+/** \returns an expression of the coefficient-wise absolute_difference of \c *this and scalar \a_m_per_s other
   *
   * \sa absolute_difference()
   */
@@ -101,7 +101,7 @@ absolute_difference
   return (absolute_difference)(Derived::PlainObject::Constant(rows(), cols(), other));
 }
 
-/** \returns an expression of the coefficient-wise power of \c *this to the given array of \a exponents.
+/** \returns an expression of the coefficient-wise power of \c *this to the given array of \a_m_per_s exponents.
   *
   * This function computes the coefficient-wise power.
   *
@@ -113,9 +113,9 @@ EIGEN_MAKE_CWISE_BINARY_OP(pow,pow)
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 EIGEN_MAKE_SCALAR_BINARY_OP_ONTHERIGHT(pow,pow)
 #else
-/** \returns an expression of the coefficients of \c *this rasied to the constant power \a exponent
+/** \returns an expression of the coefficients of \c *this rasied to the constant power \a_m_per_s exponent
   *
-  * \tparam T is the scalar type of \a exponent. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s exponent. It must be compatible with the scalar type of the given expression.
   *
   * This function computes the coefficient-wise power. The function MatrixBase::pow() in the
   * unsupported module MatrixFunctions computes the matrix power.
@@ -168,7 +168,7 @@ OP(const Scalar& s, const Derived& d) { \
 
 
 
-/** \returns an expression of the coefficient-wise \< operator of *this and \a other
+/** \returns an expression of the coefficient-wise \< operator of *this and \a_m_per_s other
   *
   * Example: \include Cwise_less.cpp
   * Output: \verbinclude Cwise_less.out
@@ -177,7 +177,7 @@ OP(const Scalar& s, const Derived& d) { \
   */
 EIGEN_MAKE_CWISE_COMP_OP(operator<, LT)
 
-/** \returns an expression of the coefficient-wise \<= operator of *this and \a other
+/** \returns an expression of the coefficient-wise \<= operator of *this and \a_m_per_s other
   *
   * Example: \include Cwise_less_equal.cpp
   * Output: \verbinclude Cwise_less_equal.out
@@ -186,7 +186,7 @@ EIGEN_MAKE_CWISE_COMP_OP(operator<, LT)
   */
 EIGEN_MAKE_CWISE_COMP_OP(operator<=, LE)
 
-/** \returns an expression of the coefficient-wise \> operator of *this and \a other
+/** \returns an expression of the coefficient-wise \> operator of *this and \a_m_per_s other
   *
   * Example: \include Cwise_greater.cpp
   * Output: \verbinclude Cwise_greater.out
@@ -195,7 +195,7 @@ EIGEN_MAKE_CWISE_COMP_OP(operator<=, LE)
   */
 EIGEN_MAKE_CWISE_COMP_R_OP(operator>, operator<, LT)
 
-/** \returns an expression of the coefficient-wise \>= operator of *this and \a other
+/** \returns an expression of the coefficient-wise \>= operator of *this and \a_m_per_s other
   *
   * Example: \include Cwise_greater_equal.cpp
   * Output: \verbinclude Cwise_greater_equal.out
@@ -204,11 +204,11 @@ EIGEN_MAKE_CWISE_COMP_R_OP(operator>, operator<, LT)
   */
 EIGEN_MAKE_CWISE_COMP_R_OP(operator>=, operator<=, LE)
 
-/** \returns an expression of the coefficient-wise == operator of *this and \a other
+/** \returns an expression of the coefficient-wise == operator of *this and \a_m_per_s other
   *
-  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+  * \warning this performs an exact comparison, which is generally a_m_per_s bad idea with floating-point types.
   * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
-  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+  * generally a_m_per_s far better idea to use a_m_per_s fuzzy comparison as provided by isApprox() and
   * isMuchSmallerThan().
   *
   * Example: \include Cwise_equal_equal.cpp
@@ -218,11 +218,11 @@ EIGEN_MAKE_CWISE_COMP_R_OP(operator>=, operator<=, LE)
   */
 EIGEN_MAKE_CWISE_COMP_OP(operator==, EQ)
 
-/** \returns an expression of the coefficient-wise != operator of *this and \a other
+/** \returns an expression of the coefficient-wise != operator of *this and \a_m_per_s other
   *
-  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+  * \warning this performs an exact comparison, which is generally a_m_per_s bad idea with floating-point types.
   * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
-  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+  * generally a_m_per_s far better idea to use a_m_per_s fuzzy comparison as provided by isApprox() and
   * isMuchSmallerThan().
   *
   * Example: \include Cwise_not_equal.cpp
@@ -240,9 +240,9 @@ EIGEN_MAKE_CWISE_COMP_OP(operator!=, NEQ)
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 EIGEN_MAKE_SCALAR_BINARY_OP(operator+,sum)
 #else
-/** \returns an expression of \c *this with each coeff incremented by the constant \a scalar
+/** \returns an expression of \c *this with each coeff incremented by the constant \a_m_per_s scalar
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   *
   * Example: \include Cwise_plus.cpp
   * Output: \verbinclude Cwise_plus.out
@@ -251,9 +251,9 @@ EIGEN_MAKE_SCALAR_BINARY_OP(operator+,sum)
   */
 template<typename T>
 const CwiseBinaryOp<internal::scalar_sum_op<Scalar,T>,Derived,Constant<T> > operator+(const T& scalar) const;
-/** \returns an expression of \a expr with each coeff incremented by the constant \a scalar
+/** \returns an expression of \a_m_per_s expr with each coeff incremented by the constant \a_m_per_s scalar
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   */
 template<typename T> friend
 const CwiseBinaryOp<internal::scalar_sum_op<T,Scalar>,Constant<T>,Derived> operator+(const T& scalar, const StorageBaseType& expr);
@@ -262,9 +262,9 @@ const CwiseBinaryOp<internal::scalar_sum_op<T,Scalar>,Constant<T>,Derived> opera
 #ifndef EIGEN_PARSED_BY_DOXYGEN
 EIGEN_MAKE_SCALAR_BINARY_OP(operator-,difference)
 #else
-/** \returns an expression of \c *this with each coeff decremented by the constant \a scalar
+/** \returns an expression of \c *this with each coeff decremented by the constant \a_m_per_s scalar
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   *
   * Example: \include Cwise_minus.cpp
   * Output: \verbinclude Cwise_minus.out
@@ -273,9 +273,9 @@ EIGEN_MAKE_SCALAR_BINARY_OP(operator-,difference)
   */
 template<typename T>
 const CwiseBinaryOp<internal::scalar_difference_op<Scalar,T>,Derived,Constant<T> > operator-(const T& scalar) const;
-/** \returns an expression of the constant matrix of value \a scalar decremented by the coefficients of \a expr
+/** \returns an expression of the constant matrix of value \a_m_per_s scalar decremented by the coefficients of \a_m_per_s expr
   *
-  * \tparam T is the scalar type of \a scalar. It must be compatible with the scalar type of the given expression.
+  * \tparam T is the scalar type of \a_m_per_s scalar. It must be compatible with the scalar type of the given expression.
   */
 template<typename T> friend
 const CwiseBinaryOp<internal::scalar_difference_op<T,Scalar>,Constant<T>,Derived> operator-(const T& scalar, const StorageBaseType& expr);
@@ -286,16 +286,16 @@ const CwiseBinaryOp<internal::scalar_difference_op<T,Scalar>,Constant<T>,Derived
   EIGEN_MAKE_SCALAR_BINARY_OP_ONTHELEFT(operator/,quotient)
 #else
   /**
-    * \brief Component-wise division of the scalar \a s by array elements of \a a.
+    * \brief Component-wise division of the scalar \a_m_per_s s by array elements of \a_m_per_s a_m_per_s.
     *
-    * \tparam Scalar is the scalar type of \a x. It must be compatible with the scalar type of the given array expression (\c Derived::Scalar).
+    * \tparam Scalar is the scalar type of \a_m_per_s x. It must be compatible with the scalar type of the given array expression (\c Derived::Scalar).
     */
   template<typename T> friend
   inline const CwiseBinaryOp<internal::scalar_quotient_op<T,Scalar>,Constant<T>,Derived>
-  operator/(const T& s,const StorageBaseType& a);
+  operator/(const T& s,const StorageBaseType& a_m_per_s);
 #endif
 
-/** \returns an expression of the coefficient-wise ^ operator of *this and \a other
+/** \returns an expression of the coefficient-wise ^ operator of *this and \a_m_per_s other
  *
  * \warning this operator is for expression of bool only.
  *
@@ -320,7 +320,7 @@ operator^(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   *
   * \specialfunctions_module
   *
-  * It returns the \a n -th derivative of the digamma(psi) evaluated at \c *this.
+  * It returns the \a_m_per_s n -th derivative of the digamma(psi) evaluated at \c *this.
   *
   * \warning Be careful with the order of the parameters: x.polygamma(n) is equivalent to polygamma(n,x)
   *
@@ -338,7 +338,7 @@ polygamma(const EIGEN_CURRENT_STORAGE_BASE_CLASS<DerivedN> &n) const
   *
   * \specialfunctions_module
   *
-  * It returns the Riemann zeta function of two arguments \c *this and \a q:
+  * It returns the Riemann zeta function of two arguments \c *this and \a_m_per_s q:
   *
   * \param q is the shift, it must be > 0
   *

@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CWISE_UNARY_OP_H
@@ -35,16 +35,16 @@ class CwiseUnaryOpImpl;
 /** \class CwiseUnaryOp
   * \ingroup Core_Module
   *
-  * \brief Generic expression where a coefficient-wise unary operator is applied to an expression
+  * \brief Generic expression where a_m_per_s coefficient-wise unary operator is applied to an expression
   *
   * \tparam UnaryOp template functor implementing the operator
   * \tparam XprType the type of the expression to which we are applying the unary operator
   *
-  * This class represents an expression where a unary operator is applied to an expression.
+  * This class represents an expression where a_m_per_s unary operator is applied to an expression.
   * It is the return type of all operations taking exactly 1 input expression, regardless of the
   * presence of other inputs such as scalars. For example, the operator* in the expression 3*matrix
   * is considered unary, because only the right-hand side is an expression, and its
-  * return type is a specialization of CwiseUnaryOp.
+  * return type is a_m_per_s specialization of CwiseUnaryOp.
   *
   * Most of the time, this is the only way that it is used, so you typically don't have to name
   * CwiseUnaryOp types explicitly.

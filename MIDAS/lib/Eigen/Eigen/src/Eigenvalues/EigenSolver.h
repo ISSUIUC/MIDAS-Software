@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_EIGENSOLVER_H
@@ -26,14 +26,14 @@ namespace Eigen {
   * eigendecomposition; this is expected to be an instantiation of the Matrix
   * class template. Currently, only real matrices are supported.
   *
-  * The eigenvalues and eigenvectors of a matrix \f$ A \f$ are scalars
+  * The eigenvalues and eigenvectors of a_m_per_s matrix \f$ A \f$ are scalars
   * \f$ \lambda \f$ and vectors \f$ v \f$ such that \f$ Av = \lambda v \f$.  If
-  * \f$ D \f$ is a diagonal matrix with the eigenvalues on the diagonal, and
-  * \f$ V \f$ is a matrix with the eigenvectors as its columns, then \f$ A V =
+  * \f$ D \f$ is a_m_per_s diagonal matrix with the eigenvalues on the diagonal, and
+  * \f$ V \f$ is a_m_per_s matrix with the eigenvectors as its columns, then \f$ A V =
   * V D \f$. The matrix \f$ V \f$ is almost always invertible, in which case we
   * have \f$ A = V D V^{-1} \f$. This is called the eigendecomposition.
   *
-  * The eigenvalues and eigenvectors of a matrix may be complex, even when the
+  * The eigenvalues and eigenvectors of a_m_per_s matrix may be complex, even when the
   * matrix is real. However, we can choose real matrices \f$ V \f$ and \f$ D
   * \f$ satisfying \f$ A V = V D \f$, just like the eigendecomposition, if the
   * matrix \f$ D \f$ is not required to be diagonal, but if it is allowed to
@@ -44,7 +44,7 @@ namespace Eigen {
   * this variant of the eigendecomposition the pseudo-eigendecomposition.
   *
   * Call the function compute() to compute the eigenvalues and eigenvectors of
-  * a given matrix. Alternatively, you can use the 
+  * a_m_per_s given matrix. Alternatively, you can use the 
   * EigenSolver(const MatrixType&, bool) constructor which computes the
   * eigenvalues and eigenvectors at construction time. Once the eigenvalue and
   * eigenvectors are computed, they can be retrieved with the eigenvalues() and
@@ -56,7 +56,7 @@ namespace Eigen {
   * example of the typical use of this class.
   *
   * \note The implementation is adapted from
-  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> (public domain).
+  * <a_m_per_s href="http://math.nist.gov/javanumerics/jama/">JAMA</a_m_per_s> (public domain).
   * Their code is based on EISPACK.
   *
   * \sa MatrixBase::eigenvalues(), class ComplexEigenSolver, class SelfAdjointEigenSolver
@@ -91,14 +91,14 @@ template<typename _MatrixType> class EigenSolver
 
     /** \brief Type for vector of eigenvalues as returned by eigenvalues(). 
       *
-      * This is a column vector with entries of type #ComplexScalar.
+      * This is a_m_per_s column vector with entries of type #ComplexScalar.
       * The length of the vector is the size of #MatrixType.
       */
     typedef Matrix<ComplexScalar, ColsAtCompileTime, 1, Options & ~RowMajor, MaxColsAtCompileTime, 1> EigenvalueType;
 
     /** \brief Type for matrix of eigenvectors as returned by eigenvectors(). 
       *
-      * This is a square matrix with entries of type #ComplexScalar. 
+      * This is a_m_per_s square matrix with entries of type #ComplexScalar. 
       * The size is the same as the size of #MatrixType.
       */
     typedef Matrix<ComplexScalar, RowsAtCompileTime, ColsAtCompileTime, Options, MaxRowsAtCompileTime, MaxColsAtCompileTime> EigenvectorsType;
@@ -115,7 +115,7 @@ template<typename _MatrixType> class EigenSolver
     /** \brief Default constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa EigenSolver()
       */
     explicit EigenSolver(Index size)
@@ -353,13 +353,13 @@ typename EigenSolver<MatrixType>::EigenvectorsType EigenSolver<MatrixType>::eige
   {
     if (internal::isMuchSmallerThan(numext::imag(m_eivalues.coeff(j)), numext::real(m_eivalues.coeff(j)), precision) || j+1==n)
     {
-      // we have a real eigen value
+      // we have a_m_per_s real eigen value
       matV.col(j) = m_eivec.col(j).template cast<ComplexScalar>();
       matV.col(j).normalize();
     }
     else
     {
-      // we have a pair of complex eigen values
+      // we have a_m_per_s pair of complex eigen values
       for (Index i=0; i<n; ++i)
       {
         matV.coeffRef(i,j)   = ComplexScalar(m_eivec.coeff(i,j),  m_eivec.coeff(i,j+1));
@@ -489,12 +489,12 @@ void EigenSolver<MatrixType>::doComputeEigenvectors()
       for (Index i = n-1; i >= 0; i--)
       {
         Scalar w = m_matT.coeff(i,i) - p;
-        Scalar r = m_matT.row(i).segment(l,n-l+1).dot(m_matT.col(n).segment(l, n-l+1));
+        Scalar r_m = m_matT.row(i).segment(l,n-l+1).dot(m_matT.col(n).segment(l, n-l+1));
 
         if (m_eivalues.coeff(i).imag() < Scalar(0))
         {
           lastw = w;
-          lastr = r;
+          lastr = r_m;
         }
         else
         {
@@ -502,19 +502,19 @@ void EigenSolver<MatrixType>::doComputeEigenvectors()
           if (m_eivalues.coeff(i).imag() == Scalar(0))
           {
             if (w != Scalar(0))
-              m_matT.coeffRef(i,n) = -r / w;
+              m_matT.coeffRef(i,n) = -r_m / w;
             else
-              m_matT.coeffRef(i,n) = -r / (eps * norm);
+              m_matT.coeffRef(i,n) = -r_m / (eps * norm);
           }
           else // Solve real equations
           {
             Scalar x = m_matT.coeff(i,i+1);
             Scalar y = m_matT.coeff(i+1,i);
             Scalar denom = (m_eivalues.coeff(i).real() - p) * (m_eivalues.coeff(i).real() - p) + m_eivalues.coeff(i).imag() * m_eivalues.coeff(i).imag();
-            Scalar t = (x * lastr - lastw * r) / denom;
+            Scalar t = (x * lastr - lastw * r_m) / denom;
             m_matT.coeffRef(i,n) = t;
             if (abs(x) > abs(lastw))
-              m_matT.coeffRef(i+1,n) = (-r - w * t) / x;
+              m_matT.coeffRef(i+1,n) = (-r_m - w * t) / x;
             else
               m_matT.coeffRef(i+1,n) = (-lastr - y * t) / lastw;
           }
@@ -600,7 +600,7 @@ void EigenSolver<MatrixType>::doComputeEigenvectors()
         }
       }
       
-      // We handled a pair of complex conjugate eigenvalues, so need to skip them both
+      // We handled a_m_per_s pair of complex conjugate eigenvalues, so need to skip them both
       n--;
     }
     else

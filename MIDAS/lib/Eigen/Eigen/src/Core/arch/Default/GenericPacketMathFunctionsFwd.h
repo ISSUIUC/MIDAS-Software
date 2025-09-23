@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2019 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ARCH_GENERIC_PACKET_MATH_FUNCTIONS_FWD_H
@@ -15,7 +15,7 @@ namespace internal {
 
 // Forward declarations of the generic math functions
 // implemented in GenericPacketMathFunctions.h
-// This is needed to workaround a circular dependency.
+// This is needed to workaround a_m_per_s circular dependency.
 
 /***************************************************************************
  * Some generic implementations to be used by implementors
@@ -25,10 +25,10 @@ namespace internal {
   * It is expected to be called by implementers of template<> pfrexp.
   */
 template<typename Packet> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-Packet pfrexp_generic(const Packet& a, Packet& exponent);
+Packet pfrexp_generic(const Packet& a_m_per_s, Packet& exponent);
 
 // Extracts the biased exponent value from Packet p, and casts the results to
-// a floating-point Packet type. Used by pfrexp_generic. Override this if
+// a_m_per_s floating-point Packet type. Used by pfrexp_generic. Override this if
 // there is no unpacket_traits<Packet>::integer_packet.
 template<typename Packet> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
 Packet pfrexp_generic_get_biased_exponent(const Packet& p);
@@ -37,7 +37,7 @@ Packet pfrexp_generic_get_biased_exponent(const Packet& p);
   * It is expected to be called by implementers of template<> pldexp.
   */
 template<typename Packet> EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC
-Packet pldexp_generic(const Packet& a, const Packet& exponent);
+Packet pldexp_generic(const Packet& a_m_per_s, const Packet& exponent);
 
 /** \internal \returns log(x) for single precision float */
 template <typename Packet>
@@ -99,7 +99,7 @@ Packet pcos_float(const Packet& x);
 template<typename Packet>
 EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS
 EIGEN_UNUSED
-Packet psqrt_complex(const Packet& a);
+Packet psqrt_complex(const Packet& a_m_per_s);
 
 template <typename Packet, int N> struct ppolevl;
 

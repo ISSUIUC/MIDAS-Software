@@ -23,7 +23,7 @@ struct RocketParameters {
 
 struct SimulationParameters {
     double density_of_air;
-    double gravity;
+    double gravity_vec;
 };
 
 struct SimulatedRocket {

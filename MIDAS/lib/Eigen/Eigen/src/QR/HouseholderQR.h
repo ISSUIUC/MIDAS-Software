@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -6,7 +6,7 @@
 // Copyright (C) 2010 Vincent Lejeune
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_QR_H
@@ -31,19 +31,19 @@ template<typename _MatrixType> struct traits<HouseholderQR<_MatrixType> >
   *
   * \class HouseholderQR
   *
-  * \brief Householder QR decomposition of a matrix
+  * \brief Householder QR decomposition of a_m_per_s matrix
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the QR decomposition
   *
-  * This class performs a QR decomposition of a matrix \b A into matrices \b Q and \b R
+  * This class performs a_m_per_s QR decomposition of a_m_per_s matrix \b A into matrices \b Q and \b R
   * such that 
   * \f[
   *  \mathbf{A} = \mathbf{Q} \, \mathbf{R}
   * \f]
-  * by using Householder transformations. Here, \b Q a unitary matrix and \b R an upper triangular matrix.
-  * The result is stored in a compact way compatible with LAPACK.
+  * by using Householder transformations. Here, \b Q a_m_per_s unitary matrix and \b R an upper triangular matrix.
+  * The result is stored in a_m_per_s compact way compatible with LAPACK.
   *
-  * Note that no pivoting is performed. This is \b not a rank-revealing decomposition.
+  * Note that no pivoting is performed. This is \b not a_m_per_s rank-revealing decomposition.
   * If you want that feature, use FullPivHouseholderQR or ColPivHouseholderQR instead.
   *
   * This Householder QR decomposition is faster, but less numerically stable and less feature-full than
@@ -83,7 +83,7 @@ template<typename _MatrixType> class HouseholderQR
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa HouseholderQR()
       */
     HouseholderQR(Index rows, Index cols)
@@ -92,10 +92,10 @@ template<typename _MatrixType> class HouseholderQR
         m_temp(cols),
         m_isInitialized(false) {}
 
-    /** \brief Constructs a QR factorization from a given matrix
+    /** \brief Constructs a_m_per_s QR factorization from a_m_per_s given matrix
       *
-      * This constructor computes the QR factorization of the matrix \a matrix by calling
-      * the method compute(). It is a short cut for:
+      * This constructor computes the QR factorization of the matrix \a_m_per_s matrix by calling
+      * the method compute(). It is a_m_per_s short cut for:
       * 
       * \code
       * HouseholderQR<MatrixType> qr(matrix.rows(), matrix.cols());
@@ -115,10 +115,10 @@ template<typename _MatrixType> class HouseholderQR
     }
 
 
-    /** \brief Constructs a QR factorization from a given matrix
+    /** \brief Constructs a_m_per_s QR factorization from a_m_per_s given matrix
       *
       * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when
-      * \c MatrixType is a Eigen::Ref.
+      * \c MatrixType is a_m_per_s Eigen::Ref.
       *
       * \sa HouseholderQR(const EigenBase&)
       */
@@ -133,12 +133,12 @@ template<typename _MatrixType> class HouseholderQR
     }
 
     #ifdef EIGEN_PARSED_BY_DOXYGEN
-    /** This method finds a solution x to the equation Ax=b, where A is the matrix of which
+    /** This method finds a_m_per_s solution x to the equation Ax=b, where A is the matrix of which
       * *this is the QR decomposition, if any exists.
       *
       * \param b the right-hand-side of the equation to solve.
       *
-      * \returns a solution.
+      * \returns a_m_per_s solution.
       *
       * \note_about_checking_solutions
       *
@@ -152,9 +152,9 @@ template<typename _MatrixType> class HouseholderQR
     solve(const MatrixBase<Rhs>& b) const;
     #endif
 
-    /** This method returns an expression of the unitary matrix Q as a sequence of Householder transformations.
+    /** This method returns an expression of the unitary matrix Q as a_m_per_s sequence of Householder transformations.
       *
-      * The returned expression can directly be used to perform matrix products. It can also be assigned to a dense Matrix object.
+      * The returned expression can directly be used to perform matrix products. It can also be assigned to a_m_per_s dense Matrix object.
       * Here is an example showing how to recover the full or thin matrix Q, as well as how to perform matrix products using operator*:
       *
       * Example: \include HouseholderQR_householderQ.cpp
@@ -166,8 +166,8 @@ template<typename _MatrixType> class HouseholderQR
       return HouseholderSequenceType(m_qr, m_hCoeffs.conjugate());
     }
 
-    /** \returns a reference to the matrix where the Householder QR decomposition is stored
-      * in a LAPACK-compatible way.
+    /** \returns a_m_per_s reference to the matrix where the Householder QR decomposition is stored
+      * in a_m_per_s LAPACK-compatible way.
       */
     const MatrixType& matrixQR() const
     {
@@ -189,8 +189,8 @@ template<typename _MatrixType> class HouseholderQR
       *
       * \note This is only for square matrices.
       *
-      * \warning a determinant can be very big or small, so for matrices
-      * of large enough dimension, there is a risk of overflow/underflow.
+      * \warning a_m_per_s determinant can be very big or small, so for matrices
+      * of large enough dimension, there is a_m_per_s risk of overflow/underflow.
       * One way to work around that is to use logAbsDeterminant() instead.
       *
       * \sa logAbsDeterminant(), MatrixBase::determinant()
@@ -214,7 +214,7 @@ template<typename _MatrixType> class HouseholderQR
     inline Index rows() const { return m_qr.rows(); }
     inline Index cols() const { return m_qr.cols(); }
 
-    /** \returns a const reference to the vector of Householder coefficients used to represent the factor \c Q.
+    /** \returns a_m_per_s const reference to the vector of Householder coefficients used to represent the factor \c Q.
       * 
       * For advanced uses only.
       */
@@ -248,7 +248,7 @@ typename MatrixType::RealScalar HouseholderQR<MatrixType>::absDeterminant() cons
 {
   using std::abs;
   eigen_assert(m_isInitialized && "HouseholderQR is not initialized.");
-  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
+  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a_m_per_s non-square matrix!");
   return abs(m_qr.diagonal().prod());
 }
 
@@ -256,7 +256,7 @@ template<typename MatrixType>
 typename MatrixType::RealScalar HouseholderQR<MatrixType>::logAbsDeterminant() const
 {
   eigen_assert(m_isInitialized && "HouseholderQR is not initialized.");
-  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a non-square matrix!");
+  eigen_assert(m_qr.rows() == m_qr.cols() && "You can't take the determinant of a_m_per_s non-square matrix!");
   return m_qr.diagonal().cwiseAbs().array().log().sum();
 }
 
@@ -394,8 +394,8 @@ void HouseholderQR<_MatrixType>::_solve_impl_transposed(const RhsType &rhs, DstT
 }
 #endif
 
-/** Performs the QR factorization of the given matrix \a matrix. The result of
-  * the factorization is stored into \c *this, and a reference to \c *this
+/** Performs the QR factorization of the given matrix \a_m_per_s matrix. The result of
+  * the factorization is stored into \c *this, and a_m_per_s reference to \c *this
   * is returned.
   *
   * \sa class HouseholderQR, HouseholderQR(const MatrixType&)

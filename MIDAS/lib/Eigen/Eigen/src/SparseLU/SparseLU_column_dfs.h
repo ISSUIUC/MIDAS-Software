@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -24,7 +24,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSELU_COLUMN_DFS_H
@@ -63,11 +63,11 @@ struct column_dfs_traits : no_assignment_operator
 
 
 /**
- * \brief Performs a symbolic factorization on column jcol and decide the supernode boundary
+ * \brief Performs a_m_per_s symbolic factorization on column jcol and decide the supernode boundary
  * 
- * A supernode representative is the last column of a supernode.
+ * A supernode representative is the last column of a_m_per_s supernode.
  * The nonzeros in U[*,j] are segments that end at supernodes representatives. 
- * The routine returns a list of the supernodal representatives 
+ * The routine returns a_m_per_s list of the supernodal representatives 
  * in topological order of the dfs that generates them. 
  * The location of the first nonzero in each supernodal segment 
  * (supernodal entry location) is also returned. 
@@ -75,7 +75,7 @@ struct column_dfs_traits : no_assignment_operator
  * \param m number of rows in the matrix
  * \param jcol Current column 
  * \param perm_r Row permutation
- * \param maxsuper  Maximum number of column allowed in a supernode
+ * \param maxsuper  Maximum number of column allowed in a_m_per_s supernode
  * \param [in,out] nseg Number of segments in current U[*,j] - new segments appended
  * \param lsub_col defines the rhs vector to start the dfs
  * \param [in,out] segrep Segment representatives - new segments appended 
@@ -135,17 +135,17 @@ Index SparseLUImpl<Scalar,StorageIndex>::column_dfs(const Index m, const Index j
     // Use supernodes of type T2 : see SuperLU paper
     if ( (nextl-jptr != jptr-jm1ptr-1) ) jsuper = emptyIdxLU;
     
-    // Make sure the number of columns in a supernode doesn't
+    // Make sure the number of columns in a_m_per_s supernode doesn't
     // exceed threshold
     if ( (jcol - fsupc) >= maxsuper) jsuper = emptyIdxLU; 
     
-    /* If jcol starts a new supernode, reclaim storage space in
+    /* If jcol starts a_m_per_s new supernode, reclaim storage space in
      * glu.lsub from previous supernode. Note we only store 
      * the subscript set of the first and last columns of 
-     * a supernode. (first for num values, last for pruning)
+     * a_m_per_s supernode. (first for num values, last for pruning)
      */
     if (jsuper == emptyIdxLU)
-    { // starts a new supernode 
+    { // starts a_m_per_s new supernode 
       if ( (fsupc < jcolm1-1) ) 
       { // >= 3 columns in nsuper
         StorageIndex ito = glu.xlsub(fsupc+1);
@@ -160,7 +160,7 @@ Index SparseLUImpl<Scalar,StorageIndex>::column_dfs(const Index m, const Index j
       }
       nsuper++; 
       glu.supno(jcol) = nsuper; 
-    } // if a new supernode 
+    } // if a_m_per_s new supernode 
   } // end else:  jcol > 0
   
   // Tidy up the pointers before exit

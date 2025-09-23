@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_DENSECOEFFSBASE_H
@@ -26,7 +26,7 @@ template<typename T> struct add_const_on_value_type_if_arithmetic
   * \note #ReadOnlyAccessors Constant indicating read-only access
   *
   * This class defines the \c operator() \c const function and friends, which can be used to read specific
-  * entries of a matrix or array.
+  * entries of a_m_per_s matrix or array.
   *
   * \sa DenseCoeffsBase<Derived, WriteAccessors>, DenseCoeffsBase<Derived, DirectAccessors>,
   *     \ref TopicClassHierarchy
@@ -41,11 +41,11 @@ class DenseCoeffsBase<Derived,ReadOnlyAccessors> : public EigenBase<Derived>
 
     // Explanation for this CoeffReturnType typedef.
     // - This is the return type of the coeff() method.
-    // - The LvalueBit means exactly that we can offer a coeffRef() method, which means exactly that we can get references
-    // to coeffs, which means exactly that we can have coeff() return a const reference (as opposed to returning a value).
+    // - The LvalueBit means exactly that we can offer a_m_per_s coeffRef() method, which means exactly that we can get references
+    // to coeffs, which means exactly that we can have coeff() return a_m_per_s const reference (as opposed to returning a_m_per_s value).
     // - The is_artihmetic check is required since "const int", "const double", etc. will cause warnings on some systems
-    // while the declaration of "const T", where T is a non arithmetic type does not. Always returning "const Scalar&" is
-    // not possible, since the underlying expressions might not offer a valid address the reference could be referring to.
+    // while the declaration of "const T", where T is a_m_per_s non arithmetic type does not. Always returning "const Scalar&" is
+    // not possible, since the underlying expressions might not offer a_m_per_s valid address the reference could be referring to.
     typedef typename internal::conditional<bool(internal::traits<Derived>::Flags&LvalueBit),
                          const Scalar&,
                          typename internal::conditional<internal::is_arithmetic<Scalar>::value, Scalar, const Scalar>::type
@@ -86,7 +86,7 @@ class DenseCoeffsBase<Derived,ReadOnlyAccessors> : public EigenBase<Derived>
       * \link operator()(Index,Index) const \endlink, but without the assertion.
       * Use this for limiting the performance cost of debugging code when doing
       * repeated coefficient access. Only use this when it is guaranteed that the
-      * parameters \a row and \a col are in range.
+      * parameters \a_m_per_s row and \a_m_per_s col are in range.
       *
       * If EIGEN_INTERNAL_DEBUGGING is defined, an assertion will be made, making this
       * function equivalent to \link operator()(Index,Index) const \endlink.
@@ -127,7 +127,7 @@ class DenseCoeffsBase<Derived,ReadOnlyAccessors> : public EigenBase<Derived>
       * \link operator[](Index) const \endlink, but without the assertion.
       * Use this for limiting the performance cost of debugging code when doing
       * repeated coefficient access. Only use this when it is guaranteed that the
-      * parameter \a index is in range.
+      * parameter \a_m_per_s index is in range.
       *
       * If EIGEN_INTERNAL_DEBUGGING is defined, an assertion will be made, making this
       * function equivalent to \link operator[](Index) const \endlink.
@@ -220,12 +220,12 @@ class DenseCoeffsBase<Derived,ReadOnlyAccessors> : public EigenBase<Derived>
 
     /** \internal
       * \returns the packet of coefficients starting at the given row and column. It is your responsibility
-      * to ensure that a packet really starts there. This method is only available on expressions having the
+      * to ensure that a_m_per_s packet really starts there. This method is only available on expressions having the
       * PacketAccessBit.
       *
-      * The \a LoadMode parameter may have the value \a #Aligned or \a #Unaligned. Its effect is to select
+      * The \a_m_per_s LoadMode parameter may have the value \a_m_per_s #Aligned or \a_m_per_s #Unaligned. Its effect is to select
       * the appropriate vectorization instruction. Aligned access is faster, but is only possible for packets
-      * starting at an address which is a multiple of the packet size.
+      * starting at an address which is a_m_per_s multiple of the packet size.
       */
 
     template<int LoadMode>
@@ -247,12 +247,12 @@ class DenseCoeffsBase<Derived,ReadOnlyAccessors> : public EigenBase<Derived>
 
     /** \internal
       * \returns the packet of coefficients starting at the given index. It is your responsibility
-      * to ensure that a packet really starts there. This method is only available on expressions having the
+      * to ensure that a_m_per_s packet really starts there. This method is only available on expressions having the
       * PacketAccessBit and the LinearAccessBit.
       *
-      * The \a LoadMode parameter may have the value \a #Aligned or \a #Unaligned. Its effect is to select
+      * The \a_m_per_s LoadMode parameter may have the value \a_m_per_s #Aligned or \a_m_per_s #Unaligned. Its effect is to select
       * the appropriate vectorization instruction. Aligned access is faster, but is only possible for packets
-      * starting at an address which is a multiple of the packet size.
+      * starting at an address which is a_m_per_s multiple of the packet size.
       */
 
     template<int LoadMode>
@@ -293,7 +293,7 @@ class DenseCoeffsBase<Derived,ReadOnlyAccessors> : public EigenBase<Derived>
   * \note #WriteAccessors Constant indicating read/write access
   *
   * This class defines the non-const \c operator() function and friends, which can be used to write specific
-  * entries of a matrix or array. This class inherits DenseCoeffsBase<Derived, ReadOnlyAccessors> which
+  * entries of a_m_per_s matrix or array. This class inherits DenseCoeffsBase<Derived, ReadOnlyAccessors> which
   * defines the const variant for reading specific entries.
   *
   * \sa DenseCoeffsBase<Derived, DirectAccessors>, \ref TopicClassHierarchy
@@ -331,7 +331,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
       * \link operator()(Index,Index) \endlink, but without the assertion.
       * Use this for limiting the performance cost of debugging code when doing
       * repeated coefficient access. Only use this when it is guaranteed that the
-      * parameters \a row and \a col are in range.
+      * parameters \a_m_per_s row and \a_m_per_s col are in range.
       *
       * If EIGEN_INTERNAL_DEBUGGING is defined, an assertion will be made, making this
       * function equivalent to \link operator()(Index,Index) \endlink.
@@ -354,7 +354,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
                       colIndexByOuterInner(outer, inner));
     }
 
-    /** \returns a reference to the coefficient at given the given row and column.
+    /** \returns a_m_per_s reference to the coefficient at given the given row and column.
       *
       * \sa operator[](Index)
       */
@@ -376,7 +376,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
       * \link operator[](Index) \endlink, but without the assertion.
       * Use this for limiting the performance cost of debugging code when doing
       * repeated coefficient access. Only use this when it is guaranteed that the
-      * parameters \a row and \a col are in range.
+      * parameters \a_m_per_s row and \a_m_per_s col are in range.
       *
       * If EIGEN_INTERNAL_DEBUGGING is defined, an assertion will be made, making this
       * function equivalent to \link operator[](Index) \endlink.
@@ -394,7 +394,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
       return internal::evaluator<Derived>(derived()).coeffRef(index);
     }
 
-    /** \returns a reference to the coefficient at given index.
+    /** \returns a_m_per_s reference to the coefficient at given index.
       *
       * This method is allowed only for vector expressions, and for matrix expressions having the LinearAccessBit.
       *
@@ -411,7 +411,7 @@ class DenseCoeffsBase<Derived, WriteAccessors> : public DenseCoeffsBase<Derived,
       return coeffRef(index);
     }
 
-    /** \returns a reference to the coefficient at given index.
+    /** \returns a_m_per_s reference to the coefficient at given index.
       *
       * This is synonymous to operator[](Index).
       *
@@ -491,7 +491,7 @@ class DenseCoeffsBase<Derived, DirectAccessors> : public DenseCoeffsBase<Derived
     using Base::size;
     using Base::derived;
 
-    /** \returns the pointer increment between two consecutive elements within a slice in the inner direction.
+    /** \returns the pointer increment between two consecutive elements within a_m_per_s slice in the inner direction.
       *
       * \sa outerStride(), rowStride(), colStride()
       */
@@ -502,7 +502,7 @@ class DenseCoeffsBase<Derived, DirectAccessors> : public DenseCoeffsBase<Derived
     }
 
     /** \returns the pointer increment between two consecutive inner slices (for example, between two consecutive columns
-      *          in a column-major matrix).
+      *          in a_m_per_s column-major matrix).
       *
       * \sa innerStride(), rowStride(), colStride()
       */
@@ -566,7 +566,7 @@ class DenseCoeffsBase<Derived, DirectWriteAccessors>
     using Base::size;
     using Base::derived;
 
-    /** \returns the pointer increment between two consecutive elements within a slice in the inner direction.
+    /** \returns the pointer increment between two consecutive elements within a_m_per_s slice in the inner direction.
       *
       * \sa outerStride(), rowStride(), colStride()
       */
@@ -577,7 +577,7 @@ class DenseCoeffsBase<Derived, DirectWriteAccessors>
     }
 
     /** \returns the pointer increment between two consecutive inner slices (for example, between two consecutive columns
-      *          in a column-major matrix).
+      *          in a_m_per_s column-major matrix).
       *
       * \sa innerStride(), rowStride(), colStride()
       */
@@ -632,7 +632,7 @@ struct first_aligned_impl<Alignment, Derived, false>
   }
 };
 
-/** \internal \returns the index of the first element of the array stored by \a m that is properly aligned with respect to \a Alignment for vectorization.
+/** \internal \returns the index of the first element of the array stored by \a_m_per_s m that is properly aligned with respect to \a_m_per_s Alignment for vectorization.
   *
   * \tparam Alignment requested alignment in Bytes.
   *

@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Mehdi Goli    Codeplay Software Ltd.
@@ -7,7 +7,7 @@
 // Contact: <eigen@codeplay.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /*****************************************************************
@@ -90,7 +90,7 @@ SYCL_PACKET_TRAITS(cl::sycl::cl_double2, 0, double, 2)
 SYCL_PACKET_TRAITS(cl::sycl::cl_double2, 0, const double, 2)
 #undef SYCL_PACKET_TRAITS
 
-// Make sure this is only available when targeting a GPU: we don't want to
+// Make sure this is only available when targeting a_m_per_s GPU: we don't want to
 // introduce conflicts between these packet_traits definitions and the ones
 // we'll use on the host side (SSE, AVX, ...)
 #define SYCL_ARITHMETIC(packet_type)  \

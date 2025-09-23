@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SELFADJOINTMATRIX_H
@@ -16,12 +16,12 @@ namespace Eigen {
   * \ingroup Core_Module
   *
   *
-  * \brief Expression of a selfadjoint matrix from a triangular part of a dense matrix
+  * \brief Expression of a_m_per_s selfadjoint matrix from a_m_per_s triangular part of a_m_per_s dense matrix
   *
   * \param MatrixType the type of the dense matrix storing the coefficients
   * \param TriangularPart can be either \c #Lower or \c #Upper
   *
-  * This class is an expression of a sefladjoint matrix from a triangular part of a matrix
+  * This class is an expression of a_m_per_s sefladjoint matrix from a_m_per_s triangular part of a_m_per_s matrix
   * with given dense storage of the coefficients. It is the return type of MatrixBase::selfadjointView()
   * and most of the time this is the only way that it is used.
   *
@@ -140,12 +140,12 @@ template<typename _MatrixType, unsigned int UpLo> class SelfAdjointView
       return (s*mat.nestedExpression()).template selfadjointView<UpLo>();
     }
 
-    /** Perform a symmetric rank 2 update of the selfadjoint matrix \c *this:
+    /** Perform a_m_per_s symmetric rank 2 update of the selfadjoint matrix \c *this:
       * \f$ this = this + \alpha u v^* + conj(\alpha) v u^* \f$
-      * \returns a reference to \c *this
+      * \returns a_m_per_s reference to \c *this
       *
-      * The vectors \a u and \c v \b must be column vectors, however they can be
-      * a adjoint expression without any overhead. Only the meaningful triangular
+      * The vectors \a_m_per_s u and \c v \b must be column vectors, however they can be
+      * a_m_per_s adjoint expression without any overhead. Only the meaningful triangular
       * part of the matrix is updated, the rest is left unchanged.
       *
       * \sa rankUpdate(const MatrixBase<DerivedU>&, Scalar)
@@ -154,10 +154,10 @@ template<typename _MatrixType, unsigned int UpLo> class SelfAdjointView
     EIGEN_DEVICE_FUNC
     SelfAdjointView& rankUpdate(const MatrixBase<DerivedU>& u, const MatrixBase<DerivedV>& v, const Scalar& alpha = Scalar(1));
 
-    /** Perform a symmetric rank K update of the selfadjoint matrix \c *this:
-      * \f$ this = this + \alpha ( u u^* ) \f$ where \a u is a vector or matrix.
+    /** Perform a_m_per_s symmetric rank K update of the selfadjoint matrix \c *this:
+      * \f$ this = this + \alpha ( u u^* ) \f$ where \a_m_per_s u is a_m_per_s vector or matrix.
       *
-      * \returns a reference to \c *this
+      * \returns a_m_per_s reference to \c *this
       *
       * Note that to perform \f$ this = this + \alpha ( u^* u ) \f$ you can simply
       * call this function with u.adjoint().
@@ -168,13 +168,13 @@ template<typename _MatrixType, unsigned int UpLo> class SelfAdjointView
     EIGEN_DEVICE_FUNC
     SelfAdjointView& rankUpdate(const MatrixBase<DerivedU>& u, const Scalar& alpha = Scalar(1));
 
-    /** \returns an expression of a triangular view extracted from the current selfadjoint view of a given triangular part
+    /** \returns an expression of a_m_per_s triangular view extracted from the current selfadjoint view of a_m_per_s given triangular part
       *
-      * The parameter \a TriMode can have the following values: \c #Upper, \c #StrictlyUpper, \c #UnitUpper,
+      * The parameter \a_m_per_s TriMode can have the following values: \c #Upper, \c #StrictlyUpper, \c #UnitUpper,
       * \c #Lower, \c #StrictlyLower, \c #UnitLower.
       *
-      * If \c TriMode references the same triangular part than \c *this, then this method simply return a \c TriangularView of the nested expression,
-      * otherwise, the nested expression is first transposed, thus returning a \c TriangularView<Transpose<MatrixType>> object.
+      * If \c TriMode references the same triangular part than \c *this, then this method simply return a_m_per_s \c TriangularView of the nested expression,
+      * otherwise, the nested expression is first transposed, thus returning a_m_per_s \c TriangularView<Transpose<MatrixType>> object.
       *
       * \sa MatrixBase::triangularView(), class TriangularView
       */
@@ -234,7 +234,7 @@ template<typename _MatrixType, unsigned int UpLo> class SelfAdjointView
       return ConstTransposeReturnType(m_matrix.transpose());
     }
 
-    /** \returns a const expression of the main diagonal of the matrix \c *this
+    /** \returns a_m_per_s const expression of the main diagonal of the matrix \c *this
       *
       * This method simply returns the diagonal of the nested expression, thus by-passing the SelfAdjointView decorator.
       *
@@ -278,7 +278,7 @@ template<typename _MatrixType, unsigned int UpLo> class SelfAdjointView
 
 namespace internal {
 
-// TODO currently a selfadjoint expression has the form SelfAdjointView<.,.>
+// TODO currently a_m_per_s selfadjoint expression has the form SelfAdjointView<.,.>
 //      in the future selfadjoint-ness should be defined by the expression traits
 //      such that Transpose<SelfAdjointView<.,.> > is valid. (currently TriangularBase::transpose() is overloaded to make it work)
 template<typename MatrixType, unsigned int Mode>
@@ -343,9 +343,9 @@ MatrixBase<Derived>::selfadjointView() const
   return typename ConstSelfAdjointViewReturnType<UpLo>::Type(derived());
 }
 
-/** \returns an expression of a symmetric/self-adjoint view extracted from the upper or lower triangular part of the current matrix
+/** \returns an expression of a_m_per_s symmetric/self-adjoint view extracted from the upper or lower triangular part of the current matrix
   *
-  * The parameter \a UpLo can be either \c #Upper or \c #Lower
+  * The parameter \a_m_per_s UpLo can be either \c #Upper or \c #Lower
   *
   * Example: \include MatrixBase_selfadjointView.cpp
   * Output: \verbinclude MatrixBase_selfadjointView.out

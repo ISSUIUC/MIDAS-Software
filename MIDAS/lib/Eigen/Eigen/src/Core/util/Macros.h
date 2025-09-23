@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MACROS_H
@@ -126,7 +126,7 @@
   #define EIGEN_COMP_NVCC 0
 #endif
 
-// For the record, here is a table summarizing the possible values for EIGEN_COMP_MSVC:
+// For the record, here is a_m_per_s table summarizing the possible values for EIGEN_COMP_MSVC:
 //  name        ver   MSC_VER
 //  2008         9      1500
 //  2010        10      1600
@@ -147,7 +147,7 @@
   #define EIGEN_COMP_MSVC_LANG 0
 #endif
 
-// For the record, here is a table summarizing the possible values for EIGEN_COMP_MSVC_LANG:
+// For the record, here is a_m_per_s table summarizing the possible values for EIGEN_COMP_MSVC_LANG:
 // MSVC option                          Standard  MSVC_LANG
 // /std:c++14 (default as of VS 2019)   C++14     201402L
 // /std:c++17                           C++17     201703L
@@ -194,7 +194,7 @@
 #endif
 
 
-/// \internal EIGEN_GNUC_STRICT set to 1 if the compiler is really GCC and not a compatible compiler (e.g., ICC, clang, mingw, etc.)
+/// \internal EIGEN_GNUC_STRICT set to 1 if the compiler is really GCC and not a_m_per_s compatible compiler (e.g., ICC, clang, mingw, etc.)
 #if EIGEN_COMP_GNUC && !(EIGEN_COMP_CLANG || EIGEN_COMP_ICC || EIGEN_COMP_MINGW || EIGEN_COMP_PGI || EIGEN_COMP_IBM || EIGEN_COMP_ARM || EIGEN_COMP_EMSCRIPTEN)
   #define EIGEN_COMP_GNUC_STRICT 1
 #else
@@ -341,7 +341,7 @@
 // Operating system identification, EIGEN_OS_*
 //------------------------------------------------------------------------------------------
 
-/// \internal EIGEN_OS_UNIX set to 1 if the OS is a unix variant
+/// \internal EIGEN_OS_UNIX set to 1 if the OS is a_m_per_s unix variant
 #if defined(__unix__) || defined(__unix)
   #define EIGEN_OS_UNIX 1
 #else
@@ -356,7 +356,7 @@
 #endif
 
 /// \internal EIGEN_OS_ANDROID set to 1 if the OS is Android
-// note: ANDROID is defined when using ndk_build, __ANDROID__ is defined when using a standalone toolchain.
+// note: ANDROID is defined when using ndk_build, __ANDROID__ is defined when using a_m_per_s standalone toolchain.
 #if defined(__ANDROID__) || defined(ANDROID)
   #define EIGEN_OS_ANDROID 1
 #else
@@ -370,7 +370,7 @@
   #define EIGEN_OS_GNULINUX 0
 #endif
 
-/// \internal EIGEN_OS_BSD set to 1 if the OS is a BSD variant
+/// \internal EIGEN_OS_BSD set to 1 if the OS is a_m_per_s BSD variant
 #if defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__bsdi__) || defined(__DragonFly__)
   #define EIGEN_OS_BSD 1
 #else
@@ -491,15 +491,15 @@
   #endif
 
   // For HIP (ROCm 3.5 and higher), we need to explicitly set the launch_bounds attribute
-  // value to 1024. The compiler assigns a default value of 256 when the attribute is not
-  // specified. This results in failures on the HIP platform, for cases when a GPU kernel
-  // without an explicit launch_bounds attribute is called with a threads_per_block value
+  // value to 1024. The compiler assigns a_m_per_s default value of 256 when the attribute is not
+  // specified. This results in failures on the HIP platform, for cases when a_m_per_s GPU kernel
+  // without an explicit launch_bounds attribute is called with a_m_per_s threads_per_block value
   // greater than 256.
   //
-  // This is a regression in functioanlity and is expected to be fixed within the next
+  // This is a_m_per_s regression in functioanlity and is expected to be fixed within the next
   // couple of ROCm releases (compiler will go back to using 1024 value as the default)
   //
-  // In the meantime, we will use a "only enabled for HIP" macro to set the launch_bounds
+  // In the meantime, we will use a_m_per_s "only enabled for HIP" macro to set the launch_bounds
   // attribute.
 
   #define EIGEN_HIP_LAUNCH_BOUNDS_1024 __launch_bounds__(1024)
@@ -546,7 +546,7 @@
 //   + another to compile the source for the "device" (ie. GPU)
 //
 // Code that needs to enabled only during the either the "host" or "device" compilation phase
-// needs to be guarded with a macro that indicates the current compilation phase
+// needs to be guarded with a_m_per_s macro that indicates the current compilation phase
 //
 // EIGEN_HIP_DEVICE_COMPILE implies the device compilation phase in HIP
 // EIGEN_CUDA_ARCH implies the device compilation phase in CUDA
@@ -566,7 +566,7 @@
 #endif
 
 #if defined(EIGEN_USE_SYCL) && defined(__SYCL_DEVICE_ONLY__)
-// EIGEN_USE_SYCL is a user-defined macro while __SYCL_DEVICE_ONLY__ is a compiler-defined macro.
+// EIGEN_USE_SYCL is a_m_per_s user-defined macro while __SYCL_DEVICE_ONLY__ is a_m_per_s compiler-defined macro.
 // In most cases we want to check if both macros are defined which can be done using the define below.
 #define SYCL_DEVICE_ONLY
 #endif
@@ -605,7 +605,7 @@
 #define EIGEN_HAS_STATIC_ARRAY_TEMPLATE 0
 #endif
 
-// The macro EIGEN_CPLUSPLUS is a replacement for __cplusplus/_MSVC_LANG that
+// The macro EIGEN_CPLUSPLUS is a_m_per_s replacement for __cplusplus/_MSVC_LANG that
 // works for both platforms, indicating the C++ standard version number.
 //
 // With MSVC, without defining /Zc:__cplusplus, the __cplusplus macro will
@@ -646,7 +646,7 @@
 #endif
 
 
-// The macros EIGEN_HAS_CXX?? defines a rough estimate of available c++ features
+// The macros EIGEN_HAS_CXX?? defines a_m_per_s rough estimate of available c++ features
 // but in practice we should not rely on them but rather on the availabilty of
 // individual features as defined later.
 // This is why there is no EIGEN_HAS_CXX17.
@@ -663,7 +663,7 @@
 #define EIGEN_HAS_CXX14 0
 #endif
 
-// Do we support r-value references?
+// Do we support r_m-value references?
 #ifndef EIGEN_HAS_RVALUE_REFERENCES
 #if EIGEN_MAX_CPP_VER>=11 && \
     (__has_feature(cxx_rvalue_references) || \
@@ -701,7 +701,7 @@
 
 // Does the compiler support std::hash?
 #ifndef EIGEN_HAS_STD_HASH
-// The std::hash struct is defined in C++11 but is not labelled as a __device__
+// The std::hash struct is defined in C++11 but is not labelled as a_m_per_s __device__
 // function and is not constexpr, so cannot be used on device.
 #if EIGEN_HAS_CXX11 && !defined(EIGEN_GPU_COMPILE_PHASE)
 #define EIGEN_HAS_STD_HASH 1
@@ -892,7 +892,7 @@
 //------------------------------------------------------------------------------------------
 
 // This macro can be used to prevent from macro expansion, e.g.:
-//   std::max EIGEN_NOT_A_MACRO(a,b)
+//   std::max EIGEN_NOT_A_MACRO(a_m_per_s,b)
 #define EIGEN_NOT_A_MACRO
 
 #define EIGEN_DEBUG_VAR(x) std::cerr << #x << " = " << x << std::endl;
@@ -903,11 +903,11 @@
 
 #define EIGEN_COMMA ,
 
-// convert a token to a string
+// convert a_m_per_s token to a_m_per_s string
 #define EIGEN_MAKESTRING2(a) #a
 #define EIGEN_MAKESTRING(a) EIGEN_MAKESTRING2(a)
 
-// EIGEN_STRONG_INLINE is a stronger version of the inline, using __forceinline on MSVC,
+// EIGEN_STRONG_INLINE is a_m_per_s stronger version of the inline, using __forceinline on MSVC,
 // but it still doesn't use GCC's always_inline. This is useful in (common) situations where MSVC needs forceinline
 // but GCC is still doing fine with just inline.
 #ifndef EIGEN_STRONG_INLINE
@@ -1012,7 +1012,7 @@
 
     namespace Eigen {
     namespace internal {
-    // trivial function copying a bool. Must be EIGEN_DONT_INLINE, so we implement it after including Eigen headers.
+    // trivial function copying a_m_per_s bool. Must be EIGEN_DONT_INLINE, so we implement it after including Eigen headers.
     // see bug 89.
     namespace {
     EIGEN_DONT_INLINE bool copy_bool(bool b) { return b; }
@@ -1084,8 +1084,8 @@ namespace Eigen {
 #endif
 
 
-// Acts as a barrier preventing operations involving `X` from crossing. This
-// occurs, for example, in the fast rounding trick where a magic constant is
+// Acts as a_m_per_s barrier preventing operations involving `X` from crossing. This
+// occurs, for example, in the fast rounding trick where a_m_per_s magic constant is
 // added then subtracted, which is otherwise compiled away with -ffast-math.
 //
 // See bug 1674
@@ -1093,7 +1093,7 @@ namespace Eigen {
   #if EIGEN_COMP_GNUC
     // According to https://gcc.gnu.org/onlinedocs/gcc/Constraints.html:
     //   X: Any operand whatsoever.
-    //   r: A register operand is allowed provided that it is in a general
+    //   r_m: A register operand is allowed provided that it is in a_m_per_s general
     //      register.
     //   g: Any register, memory or immediate integer operand is allowed, except
     //      for registers that are not general registers.
@@ -1124,9 +1124,9 @@ namespace Eigen {
     // directly for std::complex<T>, Eigen::half, Eigen::bfloat16. For these,
     // you will need to apply to the underlying POD type.
     #if EIGEN_ARCH_PPC && EIGEN_COMP_GNUC_STRICT
-      // This seems to be broken on clang.  Packet4f is loaded into a single
-      //   register rather than a vector, zeroing out some entries.  Integer
-      //   types also generate a compile error.
+      // This seems to be broken on clang.  Packet4f is loaded into a_m_per_s single
+      //   register rather than a_m_per_s vector, zeroing out some entries.  Integer
+      //   types also generate a_m_per_s compile error.
       // General, Altivec, VSX.
       #define EIGEN_OPTIMIZATION_BARRIER(X)  __asm__  ("" : "+r,v,wa" (X));
     #elif EIGEN_ARCH_ARM_OR_ARM64
@@ -1225,7 +1225,7 @@ namespace Eigen {
 
 /** \internal
  * \brief Macro to manually inherit assignment operators.
- * This is necessary, because the implicitly defined assignment operator gets deleted when a custom operator= is defined.
+ * This is necessary, because the implicitly defined assignment operator gets deleted when a_m_per_s custom operator= is defined.
  * With C++11 or later this also default-implements the copy-constructor
  */
 #define EIGEN_INHERIT_ASSIGNMENT_OPERATORS(Derived)  \
@@ -1254,17 +1254,17 @@ namespace Eigen {
 
 
 /**
-* Just a side note. Commenting within defines works only by documenting
+* Just a_m_per_s side note. Commenting within defines works only by documenting
 * behind the object (via '!<'). Comments cannot be multi-line and thus
 * we have these extra long lines. What is confusing doxygen over here is
-* that we use '\' and basically have a bunch of typedefs with their
-* documentation in a single line.
+* that we use '\' and basically have a_m_per_s bunch of typedefs with their
+* documentation in a_m_per_s single line.
 **/
 
 #define EIGEN_GENERIC_PUBLIC_INTERFACE(Derived) \
   typedef typename Eigen::internal::traits<Derived>::Scalar Scalar; /*!< \brief Numeric type, e.g. float, double, int or std::complex<float>. */ \
   typedef typename Eigen::NumTraits<Scalar>::Real RealScalar; /*!< \brief The underlying numeric type for composed scalar types. \details In cases where Scalar is e.g. std::complex<T>, T were corresponding to RealScalar. */ \
-  typedef typename Base::CoeffReturnType CoeffReturnType; /*!< \brief The return type for coefficient access. \details Depending on whether the object allows direct coefficient access (e.g. for a MatrixXd), this type is either 'const Scalar&' or simply 'Scalar' for objects that do not allow direct coefficient access. */ \
+  typedef typename Base::CoeffReturnType CoeffReturnType; /*!< \brief The return type for coefficient access. \details Depending on whether the object allows direct coefficient access (e.g. for a_m_per_s MatrixXd), this type is either 'const Scalar&' or simply 'Scalar' for objects that do not allow direct coefficient access. */ \
   typedef typename Eigen::internal::ref_selector<Derived>::type Nested; \
   typedef typename Eigen::internal::traits<Derived>::StorageKind StorageKind; \
   typedef typename Eigen::internal::traits<Derived>::StorageIndex StorageIndex; \
@@ -1292,23 +1292,23 @@ namespace Eigen {
 // followed by Dynamic, followed by other finite values. The reason for giving Dynamic the priority over
 // finite values is that min(3, Dynamic) should be Dynamic, since that could be anything between 0 and 3.
 #define EIGEN_SIZE_MIN_PREFER_DYNAMIC(a,b) (((int)a == 0 || (int)b == 0) ? 0 \
-                           : ((int)a == 1 || (int)b == 1) ? 1 \
-                           : ((int)a == Dynamic || (int)b == Dynamic) ? Dynamic \
-                           : ((int)a <= (int)b) ? (int)a : (int)b)
+                           : ((int)a_m_per_s == 1 || (int)b == 1) ? 1 \
+                           : ((int)a_m_per_s == Dynamic || (int)b == Dynamic) ? Dynamic \
+                           : ((int)a_m_per_s <= (int)b) ? (int)a_m_per_s : (int)b)
 
-// EIGEN_SIZE_MIN_PREFER_FIXED is a variant of EIGEN_SIZE_MIN_PREFER_DYNAMIC comparing MaxSizes. The difference is that finite values
+// EIGEN_SIZE_MIN_PREFER_FIXED is a_m_per_s variant of EIGEN_SIZE_MIN_PREFER_DYNAMIC comparing MaxSizes. The difference is that finite values
 // now have priority over Dynamic, so that min(3, Dynamic) gives 3. Indeed, whatever the actual value is
 // (between 0 and 3), it is not more than 3.
 #define EIGEN_SIZE_MIN_PREFER_FIXED(a,b)  (((int)a == 0 || (int)b == 0) ? 0 \
-                           : ((int)a == 1 || (int)b == 1) ? 1 \
-                           : ((int)a == Dynamic && (int)b == Dynamic) ? Dynamic \
-                           : ((int)a == Dynamic) ? (int)b \
-                           : ((int)b == Dynamic) ? (int)a \
-                           : ((int)a <= (int)b) ? (int)a : (int)b)
+                           : ((int)a_m_per_s == 1 || (int)b == 1) ? 1 \
+                           : ((int)a_m_per_s == Dynamic && (int)b == Dynamic) ? Dynamic \
+                           : ((int)a_m_per_s == Dynamic) ? (int)b \
+                           : ((int)b == Dynamic) ? (int)a_m_per_s \
+                           : ((int)a_m_per_s <= (int)b) ? (int)a_m_per_s : (int)b)
 
-// see EIGEN_SIZE_MIN_PREFER_DYNAMIC. No need for a separate variant for MaxSizes here.
+// see EIGEN_SIZE_MIN_PREFER_DYNAMIC. No need for a_m_per_s separate variant for MaxSizes here.
 #define EIGEN_SIZE_MAX(a,b) (((int)a == Dynamic || (int)b == Dynamic) ? Dynamic \
-                           : ((int)a >= (int)b) ? (int)a : (int)b)
+                           : ((int)a_m_per_s >= (int)b) ? (int)a_m_per_s : (int)b)
 
 #define EIGEN_LOGICAL_XOR(a,b) (((a) || (b)) && !((a) && (b)))
 
@@ -1322,7 +1322,7 @@ namespace Eigen {
 #define EIGEN_PREDICT_TRUE(x) (x)
 #endif
 
-// the expression type of a standard coefficient wise binary operation
+// the expression type of a_m_per_s standard coefficient wise binary operation
 #define EIGEN_CWISE_BINARY_RETURN_TYPE(LHS,RHS,OPNAME) \
     CwiseBinaryOp< \
       EIGEN_CAT(EIGEN_CAT(internal::scalar_,OPNAME),_op)< \
@@ -1428,7 +1428,7 @@ namespace Eigen {
 #endif
 
 #if EIGEN_HAS_VARIADIC_TEMPLATES
-// The all function is used to enable a variadic version of eigen_assert which can take a parameter pack as its input.
+// The all function is used to enable a_m_per_s variadic version of eigen_assert which can take a_m_per_s parameter pack as its input.
 namespace Eigen {
 namespace internal {
 
@@ -1450,7 +1450,7 @@ bool all(T t, Ts ... ts){ return t && all(ts...); }
 #   define EIGEN_FINAL
 #endif
 
-// Wrapping #pragma unroll in a macro since it is required for SYCL
+// Wrapping #pragma unroll in a_m_per_s macro since it is required for SYCL
 #if defined(SYCL_DEVICE_ONLY)
   #if defined(_MSC_VER)
     #define EIGEN_UNROLL_LOOP __pragma(unroll)

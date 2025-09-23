@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPRESSED_STORAGE_H
@@ -15,7 +15,7 @@ namespace Eigen {
 namespace internal {
 
 /** \internal
-  * Stores a sparse set of values as a list of values and a list of indices.
+  * Stores a_m_per_s sparse set of values as a_m_per_s list of values and a_m_per_s list of indices.
   *
   */
 template<typename _Scalar,typename _StorageIndex>
@@ -121,13 +121,13 @@ class CompressedStorage
     inline StorageIndex& index(Index i) { eigen_internal_assert(m_indices!=0); return m_indices[i]; }
     inline const StorageIndex& index(Index i) const { eigen_internal_assert(m_indices!=0); return m_indices[i]; }
 
-    /** \returns the largest \c k such that for all \c j in [0,k) index[\c j]\<\a key */
+    /** \returns the largest \c k such that for all \c j in [0,k) index[\c j]\<\a_m_per_s key */
     inline Index searchLowerIndex(Index key) const
     {
       return searchLowerIndex(0, m_size, key);
     }
 
-    /** \returns the largest \c k in [start,end) such that for all \c j in [start,k) index[\c j]\<\a key */
+    /** \returns the largest \c k in [start,end) such that for all \c j in [start,k) index[\c j]\<\a_m_per_s key */
     inline Index searchLowerIndex(Index start, Index end, Index key) const
     {
       while(end>start)
@@ -141,8 +141,8 @@ class CompressedStorage
       return start;
     }
 
-    /** \returns the stored value at index \a key
-      * If the value does not exist, then the value \a defaultValue is returned without any insertion. */
+    /** \returns the stored value at index \a_m_per_s key
+      * If the value does not exist, then the value \a_m_per_s defaultValue is returned without any insertion. */
     inline Scalar at(Index key, const Scalar& defaultValue = Scalar(0)) const
     {
       if (m_size==0)
@@ -168,8 +168,8 @@ class CompressedStorage
       return ((id<end) && (m_indices[id]==key)) ? m_values[id] : defaultValue;
     }
 
-    /** \returns a reference to the value at index \a key
-      * If the value does not exist, then the value \a defaultValue is inserted
+    /** \returns a_m_per_s reference to the value at index \a_m_per_s key
+      * If the value does not exist, then the value \a_m_per_s defaultValue is inserted
       * such that the keys are sorted. */
     inline Scalar& atWithInsertion(Index key, const Scalar& defaultValue = Scalar(0))
     {

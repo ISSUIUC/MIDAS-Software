@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSESPARSEPRODUCTWITHPRUNING_H
@@ -15,7 +15,7 @@ namespace Eigen {
 namespace internal {
 
 
-// perform a pseudo in-place sparse * sparse product assuming all matrices are col major
+// perform a_m_per_s pseudo in-place sparse * sparse product assuming all matrices are col major
 template<typename Lhs, typename Rhs, typename ResultType>
 static void sparse_sparse_product_with_pruning_impl(const Lhs& lhs, const Rhs& rhs, ResultType& res, const typename ResultType::RealScalar& tolerance)
 {
@@ -31,10 +31,10 @@ static void sparse_sparse_product_with_pruning_impl(const Lhs& lhs, const Rhs& r
   //Index size = lhs.outerSize();
   eigen_assert(lhs.outerSize() == rhs.innerSize());
 
-  // allocate a temporary buffer
+  // allocate a_m_per_s temporary buffer
   AmbiVector<ResScalar,StorageIndex> tempVector(rows);
 
-  // mimics a resizeByInnerOuter:
+  // mimics a_m_per_s resizeByInnerOuter:
   if(ResultType::IsRowMajor)
     res.resize(cols, rows);
   else
@@ -44,9 +44,9 @@ static void sparse_sparse_product_with_pruning_impl(const Lhs& lhs, const Rhs& r
   evaluator<Rhs> rhsEval(rhs);
   
   // estimate the number of non zero entries
-  // given a rhs column containing Y non zeros, we assume that the respective Y columns
+  // given a_m_per_s rhs column containing Y non zeros, we assume that the respective Y columns
   // of the lhs differs in average of one non zeros, thus the number of non zeros for
-  // the product of a rhs column with the lhs is X+Y where X is the average number of non zero
+  // the product of a_m_per_s rhs column with the lhs is X+Y where X is the average number of non zero
   // per column of the lhs.
   // Therefore, we have nnz(lhs*rhs) = nnz(lhs) + nnz(rhs)
   Index estimated_nnz_prod = lhsEval.nonZerosEstimate() + rhsEval.nonZerosEstimate();
@@ -57,7 +57,7 @@ static void sparse_sparse_product_with_pruning_impl(const Lhs& lhs, const Rhs& r
   {
     // FIXME:
     //double ratioColRes = (double(rhs.innerVector(j).nonZeros()) + double(lhs.nonZeros())/double(lhs.cols()))/double(lhs.rows());
-    // let's do a more accurate determination of the nnz ratio for the current column j of res
+    // let's do a_m_per_s more accurate determination of the nnz ratio for the current column j of res
     tempVector.init(ratioColRes);
     tempVector.setZero();
     for (typename evaluator<Rhs>::InnerIterator rhsIt(rhsEval, j); rhsIt; ++rhsIt)
@@ -102,7 +102,7 @@ struct sparse_sparse_product_with_pruning_selector<Lhs,Rhs,ResultType,ColMajor,C
   typedef typename ResultType::RealScalar RealScalar;
   static void run(const Lhs& lhs, const Rhs& rhs, ResultType& res, const RealScalar& tolerance)
   {
-    // we need a col-major matrix to hold the result
+    // we need a_m_per_s col-major matrix to hold the result
     typedef SparseMatrix<typename ResultType::Scalar,ColMajor,typename ResultType::StorageIndex> SparseTemporaryType;
     SparseTemporaryType _res(res.rows(), res.cols());
     internal::sparse_sparse_product_with_pruning_impl<Lhs,Rhs,SparseTemporaryType>(lhs, rhs, _res, tolerance);
@@ -116,7 +116,7 @@ struct sparse_sparse_product_with_pruning_selector<Lhs,Rhs,ResultType,RowMajor,R
   typedef typename ResultType::RealScalar RealScalar;
   static void run(const Lhs& lhs, const Rhs& rhs, ResultType& res, const RealScalar& tolerance)
   {
-    // let's transpose the product to get a column x column product
+    // let's transpose the product to get a_m_per_s column x column product
     typename remove_all<ResultType>::type _res(res.rows(), res.cols());
     internal::sparse_sparse_product_with_pruning_impl<Rhs,Lhs,ResultType>(rhs, lhs, _res, tolerance);
     res.swap(_res);
@@ -135,7 +135,7 @@ struct sparse_sparse_product_with_pruning_selector<Lhs,Rhs,ResultType,RowMajor,R
     ColMajorMatrixRhs colRhs(rhs);
     internal::sparse_sparse_product_with_pruning_impl<ColMajorMatrixLhs,ColMajorMatrixRhs,ResultType>(colLhs, colRhs, res, tolerance);
 
-    // let's transpose the product to get a column x column product
+    // let's transpose the product to get a_m_per_s column x column product
 //     typedef SparseMatrix<typename ResultType::Scalar> SparseTemporaryType;
 //     SparseTemporaryType _res(res.cols(), res.rows());
 //     sparse_sparse_product_with_pruning_impl<Rhs,Lhs,SparseTemporaryType>(rhs, lhs, _res);

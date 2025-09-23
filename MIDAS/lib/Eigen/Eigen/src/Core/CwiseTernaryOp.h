@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
@@ -6,7 +6,7 @@
 // Copyright (C) 2016 Eugene Brevdo <ebrevdo@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CWISE_TERNARY_OP_H
@@ -55,7 +55,7 @@ class CwiseTernaryOpImpl;
 /** \class CwiseTernaryOp
   * \ingroup Core_Module
   *
-  * \brief Generic expression where a coefficient-wise ternary operator is
+  * \brief Generic expression where a_m_per_s coefficient-wise ternary operator is
  * applied to two expressions
   *
   * \tparam TernaryOp template functor implementing the operator
@@ -63,12 +63,12 @@ class CwiseTernaryOpImpl;
   * \tparam Arg2Type the type of the second argument
   * \tparam Arg3Type the type of the third argument
   *
-  * This class represents an expression where a coefficient-wise ternary
+  * This class represents an expression where a_m_per_s coefficient-wise ternary
  * operator is applied to three expressions.
   * It is the return type of ternary operators, by which we mean only those
  * ternary operators where
   * all three arguments are Eigen expressions.
-  * For example, the return type of betainc(matrix1, matrix2, matrix3) is a
+  * For example, the return type of betainc(matrix1, matrix2, matrix3) is a_m_per_s
  * CwiseTernaryOp.
   *
   * Most of the time, this is the only way that it is used, so you typically

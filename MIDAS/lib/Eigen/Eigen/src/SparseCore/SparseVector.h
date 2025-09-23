@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEVECTOR_H
@@ -15,7 +15,7 @@ namespace Eigen {
 /** \ingroup SparseCore_Module
   * \class SparseVector
   *
-  * \brief a sparse vector class
+  * \brief a_m_per_s sparse vector class
   *
   * \tparam _Scalar the scalar type, i.e. the type of the coefficients
   *
@@ -116,11 +116,11 @@ class SparseVector
       return coeffRef(IsColVector ? row : col);
     }
 
-    /** \returns a reference to the coefficient value at given index \a i
-      * This operation involes a log(rho*size) binary search. If the coefficient does not
-      * exist yet, then a sorted insertion into a sequential buffer is performed.
+    /** \returns a_m_per_s reference to the coefficient value at given index \a_m_per_s i
+      * This operation involes a_m_per_s log(rho*size) binary search. If the coefficient does not
+      * exist yet, then a_m_per_s sorted insertion into a_m_per_s sequential buffer is performed.
       *
-      * This insertion might be very costly if the number of nonzeros above \a i is large.
+      * This insertion might be very costly if the number of nonzeros above \a_m_per_s i is large.
       */
     inline Scalar& coeffRef(Index i)
     {
@@ -212,11 +212,11 @@ class SparseVector
       m_data.prune(reference,epsilon);
     }
 
-    /** Resizes the sparse vector to \a rows x \a cols
+    /** Resizes the sparse vector to \a_m_per_s rows x \a_m_per_s cols
       *
       * This method is provided for compatibility with matrices.
-      * For a column vector, \a cols must be equal to 1.
-      * For a row vector, \a rows must be equal to 1.
+      * For a_m_per_s column vector, \a_m_per_s cols must be equal to 1.
+      * For a_m_per_s row vector, \a_m_per_s rows must be equal to 1.
       *
       * \sa resize(Index)
       */
@@ -226,7 +226,7 @@ class SparseVector
       resize(IsColVector ? rows : cols);
     }
 
-    /** Resizes the sparse vector to \a newSize
+    /** Resizes the sparse vector to \a_m_per_s newSize
       * This method deletes all entries, thus leaving an empty sparse vector
       *
       * \sa  conservativeResize(), setZero() */
@@ -236,7 +236,7 @@ class SparseVector
       m_data.clear();
     }
 
-    /** Resizes the sparse vector to \a newSize, while leaving old values untouched.
+    /** Resizes the sparse vector to \a_m_per_s newSize, while leaving old values untouched.
       *
       * If the size of the vector is decreased, then the storage of the out-of bounds coefficients is kept and reserved.
       * Call .data().squeeze() to free extra memory.
@@ -280,8 +280,8 @@ class SparseVector
       *this = other.derived();
     }
 
-    /** Swaps the values of \c *this and \a other.
-      * Overloaded for performance: this version performs a \em shallow swap by swapping pointers and attributes only.
+    /** Swaps the values of \c *this and \a_m_per_s other.
+      * Overloaded for performance: this version performs a_m_per_s \em shallow swap by swapping pointers and attributes only.
       * \sa SparseMatrixBase::swap()
       */
     inline void swap(SparseVector& other)
@@ -353,10 +353,10 @@ class SparseVector
     }
 
     /** \internal \deprecated use insertBack(Index,Index) */
-    EIGEN_DEPRECATED Scalar& fill(Index r, Index c)
+    EIGEN_DEPRECATED Scalar& fill(Index r_m, Index c)
     {
-      eigen_assert(r==0 || c==0);
-      return fill(IsColVector ? r : c);
+      eigen_assert(r_m==0 || c==0);
+      return fill(IsColVector ? r_m : c);
     }
 
     /** \internal \deprecated use insertBack(Index) */
@@ -367,10 +367,10 @@ class SparseVector
     }
 
     /** \internal \deprecated use insert(Index,Index) */
-    EIGEN_DEPRECATED Scalar& fillrand(Index r, Index c)
+    EIGEN_DEPRECATED Scalar& fillrand(Index r_m, Index c)
     {
-      eigen_assert(r==0 || c==0);
-      return fillrand(IsColVector ? r : c);
+      eigen_assert(r_m==0 || c==0);
+      return fillrand(IsColVector ? r_m : c);
     }
 
     /** \internal \deprecated use insert(Index) */

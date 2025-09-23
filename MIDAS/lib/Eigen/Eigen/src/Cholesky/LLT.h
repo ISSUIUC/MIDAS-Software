@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_LLT_H
@@ -30,13 +30,13 @@ template<typename MatrixType, int UpLo> struct LLT_Traits;
   *
   * \class LLT
   *
-  * \brief Standard Cholesky decomposition (LL^T) of a matrix and associated features
+  * \brief Standard Cholesky decomposition (LL^T) of a_m_per_s matrix and associated features
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the LL^T Cholesky decomposition
   * \tparam _UpLo the triangular part that will be used for the decompositon: Lower (default) or Upper.
   *               The other triangular part won't be read.
   *
-  * This class performs a LL^T Cholesky decomposition of a symmetric, positive definite
+  * This class performs a_m_per_s LL^T Cholesky decomposition of a_m_per_s symmetric, positive definite
   * matrix A such that A = LL^* = U^*U, where L is lower triangular.
   *
   * While the Cholesky decomposition is particularly useful to solve selfadjoint problems like  D^*D x = b,
@@ -45,15 +45,15 @@ template<typename MatrixType, int UpLo> struct LLT_Traits;
   * situations like generalised eigen problems with hermitian matrices.
   *
   * Remember that Cholesky decompositions are not rank-revealing. This LLT decomposition is only stable on positive definite matrices,
-  * use LDLT instead for the semidefinite case. Also, do not use a Cholesky decomposition to determine whether a system of equations
-  * has a solution.
+  * use LDLT instead for the semidefinite case. Also, do not use a_m_per_s Cholesky decomposition to determine whether a_m_per_s system of equations
+  * has a_m_per_s solution.
   *
   * Example: \include LLT_example.cpp
   * Output: \verbinclude LLT_example.out
   *
-  * \b Performance: for best performance, it is recommended to use a column-major storage format
-  * with the Lower triangular part (the default), or, equivalently, a row-major storage format
-  * with the Upper triangular part. Otherwise, you might get a 20% slowdown for the full factorization
+  * \b Performance: for best performance, it is recommended to use a_m_per_s column-major storage format
+  * with the Lower triangular part (the default), or, equivalently, a_m_per_s row-major storage format
+  * with the Upper triangular part. Otherwise, you might get a_m_per_s 20% slowdown for the full factorization
   * step, and rank-updates can be up to 3 times slower.
   *
   * This class supports the \link InplaceDecomposition inplace decomposition \endlink mechanism.
@@ -95,7 +95,7 @@ template<typename _MatrixType, int _UpLo> class LLT
     /** \brief Default Constructor with memory preallocation
       *
       * Like the default constructor but with preallocation of the internal data
-      * according to the specified problem \a size.
+      * according to the specified problem \a_m_per_s size.
       * \sa LLT()
       */
     explicit LLT(Index size) : m_matrix(size, size),
@@ -109,10 +109,10 @@ template<typename _MatrixType, int _UpLo> class LLT
       compute(matrix.derived());
     }
 
-    /** \brief Constructs a LLT factorization from a given matrix
+    /** \brief Constructs a_m_per_s LLT factorization from a_m_per_s given matrix
       *
       * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when
-      * \c MatrixType is a Eigen::Ref.
+      * \c MatrixType is a_m_per_s Eigen::Ref.
       *
       * \sa LLT(const EigenBase&)
       */
@@ -124,14 +124,14 @@ template<typename _MatrixType, int _UpLo> class LLT
       compute(matrix.derived());
     }
 
-    /** \returns a view of the upper triangular matrix U */
+    /** \returns a_m_per_s view of the upper triangular matrix U */
     inline typename Traits::MatrixU matrixU() const
     {
       eigen_assert(m_isInitialized && "LLT is not initialized.");
       return Traits::getU(m_matrix);
     }
 
-    /** \returns a view of the lower triangular matrix L */
+    /** \returns a_m_per_s view of the lower triangular matrix L */
     inline typename Traits::MatrixL matrixL() const
     {
       eigen_assert(m_isInitialized && "LLT is not initialized.");
@@ -194,7 +194,7 @@ template<typename _MatrixType, int _UpLo> class LLT
       return m_info;
     }
 
-    /** \returns the adjoint of \c *this, that is, a const reference to the decomposition itself as the underlying matrix is self-adjoint.
+    /** \returns the adjoint of \c *this, that is, a_m_per_s const reference to the decomposition itself as the underlying matrix is self-adjoint.
       *
       * This method is provided for compatibility with other matrix decompositions, thus enabling generic code such as:
       * \code x = decomposition.adjoint().solve(b) \endcode
@@ -420,24 +420,24 @@ template<typename MatrixType> struct LLT_Traits<MatrixType,Upper>
 
 } // end namespace internal
 
-/** Computes / recomputes the Cholesky decomposition A = LL^* = U^*U of \a matrix
+/** Computes / recomputes the Cholesky decomposition A = LL^* = U^*U of \a_m_per_s matrix
   *
-  * \returns a reference to *this
+  * \returns a_m_per_s reference to *this
   *
   * Example: \include TutorialLinAlgComputeTwice.cpp
   * Output: \verbinclude TutorialLinAlgComputeTwice.out
   */
 template<typename MatrixType, int _UpLo>
 template<typename InputType>
-LLT<MatrixType,_UpLo>& LLT<MatrixType,_UpLo>::compute(const EigenBase<InputType>& a)
+LLT<MatrixType,_UpLo>& LLT<MatrixType,_UpLo>::compute(const EigenBase<InputType>& a_m_per_s)
 {
   check_template_parameters();
 
-  eigen_assert(a.rows()==a.cols());
-  const Index size = a.rows();
+  eigen_assert(a_m_per_s.rows()==a_m_per_s.cols());
+  const Index size = a_m_per_s.rows();
   m_matrix.resize(size, size);
-  if (!internal::is_same_dense(m_matrix, a.derived()))
-    m_matrix = a.derived();
+  if (!internal::is_same_dense(m_matrix, a_m_per_s.derived()))
+    m_matrix = a_m_per_s.derived();
 
   // Compute matrix L1 norm = max abs column sum.
   m_l1_norm = RealScalar(0);
@@ -459,9 +459,9 @@ LLT<MatrixType,_UpLo>& LLT<MatrixType,_UpLo>::compute(const EigenBase<InputType>
   return *this;
 }
 
-/** Performs a rank one update (or dowdate) of the current decomposition.
+/** Performs a_m_per_s rank one update (or dowdate) of the current decomposition.
   * If A = LL^* before the rank one update,
-  * then after it we have LL^* = A + sigma * v v^* where \a v must be a vector
+  * then after it we have LL^* = A + sigma * v v^* where \a_m_per_s v must be a_m_per_s vector
   * of same dimension.
   */
 template<typename _MatrixType, int _UpLo>
@@ -504,9 +504,9 @@ void LLT<_MatrixType,_UpLo>::_solve_impl_transposed(const RhsType &rhs, DstType 
   *
   * \param bAndX represents both the right-hand side matrix b and result x.
   *
-  * This version avoids a copy when the right hand side matrix b is not needed anymore.
+  * This version avoids a_m_per_s copy when the right hand side matrix b is not needed anymore.
   *
-  * \warning The parameter is only marked 'const' to make the C++ compiler accept a temporary expression here.
+  * \warning The parameter is only marked 'const' to make the C++ compiler accept a_m_per_s temporary expression here.
   * This function will const_cast it, so constness isn't honored here.
   *
   * \sa LLT::solve(), MatrixBase::llt()

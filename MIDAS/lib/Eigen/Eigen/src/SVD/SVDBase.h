@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
@@ -10,7 +10,7 @@
 // Copyright (C) 2013 Pierre Zoppitelli <pierre.zoppitelli@ensimag.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SVDBASE_H
@@ -38,24 +38,24 @@ template<typename Derived> struct traits<SVDBase<Derived> >
  *
  * \tparam Derived the type of the actual SVD decomposition
  *
- * SVD decomposition consists in decomposing any n-by-p matrix \a A as a product
+ * SVD decomposition consists in decomposing any n-by-p matrix \a_m_per_s A as a_m_per_s product
  *   \f[ A = U S V^* \f]
- * where \a U is a n-by-n unitary, \a V is a p-by-p unitary, and \a S is a n-by-p real positive matrix which is zero outside of its main diagonal;
- * the diagonal entries of S are known as the \em singular \em values of \a A and the columns of \a U and \a V are known as the left
- * and right \em singular \em vectors of \a A respectively.
+ * where \a_m_per_s U is a_m_per_s n-by-n unitary, \a_m_per_s V is a_m_per_s p-by-p unitary, and \a_m_per_s S is a_m_per_s n-by-p real positive matrix which is zero outside of its main diagonal;
+ * the diagonal entries of S are known as the \em singular \em values of \a_m_per_s A and the columns of \a_m_per_s U and \a_m_per_s V are known as the left
+ * and right \em singular \em vectors of \a_m_per_s A respectively.
  *
  * Singular values are always sorted in decreasing order.
  *
  * 
- * You can ask for only \em thin \a U or \a V to be computed, meaning the following. In case of a rectangular n-by-p matrix, letting \a m be the
- * smaller value among \a n and \a p, there are only \a m singular vectors; the remaining columns of \a U and \a V do not correspond to actual
- * singular vectors. Asking for \em thin \a U or \a V means asking for only their \a m first columns to be formed. So \a U is then a n-by-m matrix,
- * and \a V is then a p-by-m matrix. Notice that thin \a U and \a V are all you need for (least squares) solving.
+ * You can ask for only \em thin \a_m_per_s U or \a_m_per_s V to be computed, meaning the following. In case of a_m_per_s rectangular n-by-p matrix, letting \a_m_per_s m be the
+ * smaller value among \a_m_per_s n and \a_m_per_s p, there are only \a_m_per_s m singular vectors; the remaining columns of \a_m_per_s U and \a_m_per_s V do not correspond to actual
+ * singular vectors. Asking for \em thin \a_m_per_s U or \a_m_per_s V means asking for only their \a_m_per_s m first columns to be formed. So \a_m_per_s U is then a_m_per_s n-by-m matrix,
+ * and \a_m_per_s V is then a_m_per_s p-by-m matrix. Notice that thin \a_m_per_s U and \a_m_per_s V are all you need for (least squares) solving.
  * 
- * The status of the computation can be retrived using the \a info() method. Unless \a info() returns \a Success, the results should be not
+ * The status of the computation can be retrived using the \a_m_per_s info() method. Unless \a_m_per_s info() returns \a_m_per_s Success, the results should be not
  * considered well defined.
  *  
- * If the input matrix has inf or nan coefficients, the result of the computation is undefined, and \a info() will return \a InvalidInput, but the computation is guaranteed to
+ * If the input matrix has inf or nan coefficients, the result of the computation is undefined, and \a_m_per_s info() will return \a_m_per_s InvalidInput, but the computation is guaranteed to
  * terminate in finite (and reasonable) time.
  * \sa class BDCSVD, class JacobiSVD
  */
@@ -89,14 +89,14 @@ public:
   Derived& derived() { return *static_cast<Derived*>(this); }
   const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
-  /** \returns the \a U matrix.
+  /** \returns the \a_m_per_s U matrix.
    *
-   * For the SVD decomposition of a n-by-p matrix, letting \a m be the minimum of \a n and \a p,
+   * For the SVD decomposition of a_m_per_s n-by-p matrix, letting \a_m_per_s m be the minimum of \a_m_per_s n and \a_m_per_s p,
    * the U matrix is n-by-n if you asked for \link Eigen::ComputeFullU ComputeFullU \endlink, and is n-by-m if you asked for \link Eigen::ComputeThinU ComputeThinU \endlink.
    *
-   * The \a m first columns of \a U are the left singular vectors of the matrix being decomposed.
+   * The \a_m_per_s m first columns of \a_m_per_s U are the left singular vectors of the matrix being decomposed.
    *
-   * This method asserts that you asked for \a U to be computed.
+   * This method asserts that you asked for \a_m_per_s U to be computed.
    */
   const MatrixUType& matrixU() const
   {
@@ -105,14 +105,14 @@ public:
     return m_matrixU;
   }
 
-  /** \returns the \a V matrix.
+  /** \returns the \a_m_per_s V matrix.
    *
-   * For the SVD decomposition of a n-by-p matrix, letting \a m be the minimum of \a n and \a p,
+   * For the SVD decomposition of a_m_per_s n-by-p matrix, letting \a_m_per_s m be the minimum of \a_m_per_s n and \a_m_per_s p,
    * the V matrix is p-by-p if you asked for \link Eigen::ComputeFullV ComputeFullV \endlink, and is p-by-m if you asked for \link Eigen::ComputeThinV ComputeThinV \endlink.
    *
-   * The \a m first columns of \a V are the right singular vectors of the matrix being decomposed.
+   * The \a_m_per_s m first columns of \a_m_per_s V are the right singular vectors of the matrix being decomposed.
    *
-   * This method asserts that you asked for \a V to be computed.
+   * This method asserts that you asked for \a_m_per_s V to be computed.
    */
   const MatrixVType& matrixV() const
   {
@@ -123,8 +123,8 @@ public:
 
   /** \returns the vector of singular values.
    *
-   * For the SVD decomposition of a n-by-p matrix, letting \a m be the minimum of \a n and \a p, the
-   * returned vector has size \a m.  Singular values are always sorted in decreasing order.
+   * For the SVD decomposition of a_m_per_s n-by-p matrix, letting \a_m_per_s m be the minimum of \a_m_per_s n and \a_m_per_s p, the
+   * returned vector has size \a_m_per_s m.  Singular values are always sorted in decreasing order.
    */
   const SingularValuesType& singularValues() const
   {
@@ -156,7 +156,7 @@ public:
     return i+1;
   }
   
-  /** Allows to prescribe a threshold to be used by certain methods, such as rank() and solve(),
+  /** Allows to prescribe a_m_per_s threshold to be used by certain methods, such as rank() and solve(),
     * which need to determine when singular values are to be considered nonzero.
     * This is not used for the SVD decomposition itself.
     *
@@ -198,22 +198,22 @@ public:
   RealScalar threshold() const
   {
     eigen_assert(m_isInitialized || m_usePrescribedThreshold);
-    // this temporary is needed to workaround a MSVC issue
+    // this temporary is needed to workaround a_m_per_s MSVC issue
     Index diagSize = (std::max<Index>)(1,m_diagSize);
     return m_usePrescribedThreshold ? m_prescribedThreshold
                                     : RealScalar(diagSize)*NumTraits<Scalar>::epsilon();
   }
 
-  /** \returns true if \a U (full or thin) is asked for in this SVD decomposition */
+  /** \returns true if \a_m_per_s U (full or thin) is asked for in this SVD decomposition */
   inline bool computeU() const { return m_computeFullU || m_computeThinU; }
-  /** \returns true if \a V (full or thin) is asked for in this SVD decomposition */
+  /** \returns true if \a_m_per_s V (full or thin) is asked for in this SVD decomposition */
   inline bool computeV() const { return m_computeFullV || m_computeThinV; }
 
   inline Index rows() const { return m_rows; }
   inline Index cols() const { return m_cols; }
   
   #ifdef EIGEN_PARSED_BY_DOXYGEN
-  /** \returns a (least squares) solution of \f$ A x = b \f$ using the current SVD decomposition of A.
+  /** \returns a_m_per_s (least squares) solution of \f$ A x = b \f$ using the current SVD decomposition of A.
     *
     * \param b the right-hand-side of the equation to solve.
     *
@@ -359,7 +359,7 @@ bool SVDBase<MatrixType>::allocate(Index rows, Index cols, unsigned int computat
   eigen_assert(!(m_computeFullU && m_computeThinU) && "SVDBase: you can't ask for both full and thin U");
   eigen_assert(!(m_computeFullV && m_computeThinV) && "SVDBase: you can't ask for both full and thin V");
   eigen_assert(EIGEN_IMPLIES(m_computeThinU || m_computeThinV, MatrixType::ColsAtCompileTime==Dynamic) &&
-	       "SVDBase: thin U and V are only available when your matrix has a dynamic number of columns.");
+	       "SVDBase: thin U and V are only available when your matrix has a_m_per_s dynamic number of columns.");
 
   m_diagSize = (std::min)(m_rows, m_cols);
   m_singularValues.resize(m_diagSize);

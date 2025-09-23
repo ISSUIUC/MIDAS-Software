@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SELFADJOINT_MATRIX_MATRIX_H
@@ -14,7 +14,7 @@ namespace Eigen {
 
 namespace internal {
 
-// pack a selfadjoint block diagonal for use with the gebp_kernel
+// pack a_m_per_s selfadjoint block diagonal for use with the gebp_kernel
 template<typename Scalar, typename Index, int Pack1, int Pack2_dummy, int StorageOrder>
 struct symm_pack_lhs
 {
@@ -259,7 +259,7 @@ struct symm_pack_rhs
       }
     }
 
-    // copy the remaining columns one at a time (=> the same with nr==1)
+    // copy the remaining columns one at a_m_per_s time (=> the same with nr==1)
     for(Index j2=packet_cols4; j2<cols; ++j2)
     {
       // transpose
@@ -379,8 +379,8 @@ EIGEN_DONT_INLINE void product_selfadjoint_matrix<Scalar,Index,LhsStorageOrder,t
       const Index actual_kc = (std::min)(k2+kc,size)-k2;
 
       // we have selected one row panel of rhs and one column panel of lhs
-      // pack rhs's panel into a sequential chunk of memory
-      // and expand each coeff to a constant packet for further reuse
+      // pack rhs's panel into a_m_per_s sequential chunk of memory
+      // and expand each coeff to a_m_per_s constant packet for further reuse
       pack_rhs(blockB, rhs.getSubMapper(k2,0), actual_kc, cols);
 
       // the select lhs's panel has to be split in three different parts:

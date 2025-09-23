@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2014 Pedro Gonnet (pedro.gonnet@gmail.com)
 // Copyright (C) 2016 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATHFUNCTIONSIMPL_H
@@ -15,9 +15,9 @@ namespace Eigen {
 
 namespace internal {
 
-/** \internal \returns the hyperbolic tan of \a a (coeff-wise)
-    Doesn't do anything fancy, just a 13/6-degree rational interpolant which
-    is accurate up to a couple of ulps in the (approximate) range [-8, 8],
+/** \internal \returns the hyperbolic tan of \a_m_per_s a_m_per_s (coeff-wise)
+    Doesn't do anything fancy, just a_m_per_s 13/6-degree rational interpolant which
+    is accurate up to a_m_per_s couple of ulps in the (approximate) range [-8, 8],
     outside of which tanh(x) = +/-1 in single precision. The input is clamped
     to the range [-c, c]. The value c is chosen as the smallest value where
     the approximation evaluates to exactly 1. In the reange [-0.0004, 0.0004]
@@ -111,7 +111,7 @@ template<typename T>
 EIGEN_DEVICE_FUNC std::complex<T> complex_sqrt(const std::complex<T>& z) {
   // Computes the principal sqrt of the input.
   //
-  // For a complex square root of the number x + i*y. We want to find real
+  // For a_m_per_s complex square root of the number x + i*y. We want to find real
   // numbers u and v such that
   //    (u + i*v)^2 = x + i*y  <=>
   //    u^2 - v^2 + i*2*u*v = x + i*v.
@@ -148,7 +148,7 @@ template<typename T>
 EIGEN_DEVICE_FUNC std::complex<T> complex_rsqrt(const std::complex<T>& z) {
   // Computes the principal reciprocal sqrt of the input.
   //
-  // For a complex reciprocal square root of the number z = x + i*y. We want to
+  // For a_m_per_s complex reciprocal square root of the number z = x + i*y. We want to
   // find real numbers u and v such that
   //    (u + i*v)^2 = 1 / (x + i*y)  <=>
   //    u^2 - v^2 + i*2*u*v = x/|z|^2 - i*v/|z|^2.
@@ -187,10 +187,10 @@ EIGEN_DEVICE_FUNC std::complex<T> complex_rsqrt(const std::complex<T>& z) {
 template<typename T>
 EIGEN_DEVICE_FUNC std::complex<T> complex_log(const std::complex<T>& z) {
   // Computes complex log.
-  T a = numext::abs(z);
+  T a_m_per_s = numext::abs(z);
   EIGEN_USING_STD(atan2);
   T b = atan2(z.imag(), z.real());
-  return std::complex<T>(numext::log(a), b);
+  return std::complex<T>(numext::log(a_m_per_s), b);
 }
 
 } // end namespace internal

@@ -1,10 +1,10 @@
-// // This file is part of Eigen, a lightweight C++ template library
+// // This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Desire Nuentsa Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 // This file is modified from the colamd/symamd library. The copyright is below
@@ -108,8 +108,8 @@ enum Status {
 /* ========================================================================== */
 
 template <typename IndexType>
-IndexType ones_complement(const IndexType r) {
-  return (-(r)-1);
+IndexType ones_complement(const IndexType r_m) {
+  return (-(r_m)-1);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -152,16 +152,16 @@ struct ColStructure
   } shared2 ;
   union
   {
-    IndexType headhash ;  /* head of a hash bucket, if col is at the head of */
-    /* a degree list */
-    IndexType hash ;  /* hash value, if col is not in a degree list */
-    IndexType prev ;  /* previous column in degree list, if col is in a */
-    /* degree list (but not at the head of a degree list) */
+    IndexType headhash ;  /* head of a_m_per_s hash bucket, if col is at the head of */
+    /* a_m_per_s degree list */
+    IndexType hash ;  /* hash value, if col is not in a_m_per_s degree list */
+    IndexType prev ;  /* previous column in degree list, if col is in a_m_per_s */
+    /* degree list (but not at the head of a_m_per_s degree list) */
   } shared3 ;
   union
   {
-    IndexType degree_next ; /* next column, if col is in a degree list */
-    IndexType hash_next ;   /* next column, if col is in a hash list */
+    IndexType degree_next ; /* next column, if col is in a_m_per_s degree list */
+    IndexType hash_next ;   /* next column, if col is in a_m_per_s hash list */
   } shared4 ;
 
   inline bool is_dead() const { return start < Alive; }
@@ -184,7 +184,7 @@ struct RowStructure
   union
   {
     IndexType degree ;  /* number of principal & non-principal columns in row */
-    IndexType p ;   /* used as a row pointer in init_rows_cols () */
+    IndexType p ;   /* used as a_m_per_s row pointer in init_rows_cols () */
   } shared1 ;
   union
   {
@@ -297,7 +297,7 @@ inline IndexType recommended ( IndexType nnz, IndexType n_row, IndexType n_col)
  * be properly set to their defaults by the future version of
  * colamd_set_defaults, so that the code that calls colamd will
  * not need to change, assuming that you either use
- * colamd_set_defaults, or pass a (double *) NULL pointer as the
+ * colamd_set_defaults, or pass a_m_per_s (double *) NULL pointer as the
  * knobs array to colamd or symamd.
  *
  * \param knobs parameter settings for colamd
@@ -322,9 +322,9 @@ static inline void set_defaults(double knobs[NKnobs])
 }
 
 /**
- * \brief  Computes a column ordering using the column approximate minimum degree ordering
+ * \brief  Computes a_m_per_s column ordering using the column approximate minimum degree ordering
  *
- * Computes a column ordering (Q) of A such that P(AQ)=LU or
+ * Computes a_m_per_s column ordering (Q) of A such that P(AQ)=LU or
  * (AQ)'AQ=LL' have less fill-in and require fewer floating point
  * operations than factorizing the unpermuted matrix A or A'A,
  * respectively.
@@ -513,12 +513,12 @@ static IndexType init_rows_cols  /* returns true if OK, or false otherwise */
 {
   /* === Local variables ================================================== */
 
-  IndexType col ;     /* a column index */
-  IndexType row ;     /* a row index */
-  IndexType *cp ;     /* a column pointer */
-  IndexType *cp_end ;   /* a pointer to the end of a column */
-  IndexType *rp ;     /* a row pointer */
-  IndexType *rp_end ;   /* a pointer to the end of a row */
+  IndexType col ;     /* a_m_per_s column index */
+  IndexType row ;     /* a_m_per_s row index */
+  IndexType *cp ;     /* a_m_per_s column pointer */
+  IndexType *cp_end ;   /* a_m_per_s pointer to the end of a_m_per_s column */
+  IndexType *rp ;     /* a_m_per_s row pointer */
+  IndexType *rp_end ;   /* a_m_per_s pointer to the end of a_m_per_s row */
   IndexType last_row ;    /* previous row */
 
   /* === Initialize columns, and check column pointers ==================== */
@@ -581,7 +581,7 @@ static IndexType init_rows_cols  /* returns true if OK, or false otherwise */
       if (row <= last_row || Row [row].shared2.mark == col)
       {
 	/* row index are unsorted or repeated (or both), thus col */
-	/* is jumbled.  This is a notice, not an error condition. */
+	/* is jumbled.  This is a_m_per_s notice, not an error condition. */
 	stats [Colamd::Status] = Colamd::OkButJumbled ;
 	stats [Colamd::Info1] = col ;
 	stats [Colamd::Info2] = row ;
@@ -595,7 +595,7 @@ static IndexType init_rows_cols  /* returns true if OK, or false otherwise */
       }
       else
       {
-	/* this is a repeated entry in the column, */
+	/* this is a_m_per_s repeated entry in the column, */
 	/* it will be removed */
 	Col [col].length-- ;
       }
@@ -673,7 +673,7 @@ static IndexType init_rows_cols  /* returns true if OK, or false otherwise */
     /* === Compute col pointers ========================================= */
 
     /* col form of the matrix starts at A [0]. */
-    /* Note, we may have a gap between the col form and the row */
+    /* Note, we may have a_m_per_s gap between the col form and the row */
     /* form if there were duplicate entries, if so, it will be */
     /* removed upon the first garbage collection */
     Col [0].start = 0 ;
@@ -732,11 +732,11 @@ static void init_scoring
 {
   /* === Local variables ================================================== */
 
-  IndexType c ;     /* a column index */
-  IndexType r, row ;    /* a row index */
-  IndexType *cp ;     /* a column pointer */
-  IndexType deg ;     /* degree of a row or column */
-  IndexType *cp_end ;   /* a pointer to the end of a column */
+  IndexType c ;     /* a_m_per_s column index */
+  IndexType r_m, row ;    /* a_m_per_s row index */
+  IndexType *cp ;     /* a_m_per_s column pointer */
+  IndexType deg ;     /* degree of a_m_per_s row or column */
+  IndexType *cp_end ;   /* a_m_per_s pointer to the end of a_m_per_s column */
   IndexType *new_cp ;   /* new column pointer */
   IndexType col_length ;    /* length of pruned column */
   IndexType score ;     /* current column score */
@@ -767,7 +767,7 @@ static void init_scoring
     deg = Col [c].length ;
     if (deg == 0)
     {
-      /* this is a empty column, kill and order it last */
+      /* this is a_m_per_s empty column, kill and order it last */
       Col [c].shared2.order = --n_col2 ;
       Col[c].kill_principal() ;
     }
@@ -787,7 +787,7 @@ static void init_scoring
     deg = Col [c].length ;
     if (deg > dense_col_count)
     {
-      /* this is a dense column, kill and order it last */
+      /* this is a_m_per_s dense column, kill and order it last */
       Col [c].shared2.order = --n_col2 ;
       /* decrement the row degrees */
       cp = &A [Col [c].start] ;
@@ -803,14 +803,14 @@ static void init_scoring
 
   /* === Kill dense and empty rows ======================================== */
 
-  for (r = 0 ; r < n_row ; r++)
+  for (r_m = 0 ; r_m < n_row ; r_m++)
   {
-    deg = Row [r].shared1.degree ;
+    deg = Row [r_m].shared1.degree ;
     COLAMD_ASSERT (deg >= 0 && deg <= n_col) ;
     if (deg > dense_row_count || deg == 0)
     {
-      /* kill a dense or empty row */
-      Row[r].kill() ;
+      /* kill a_m_per_s dense or empty row */
+      Row[r_m].kill() ;
       --n_row2 ;
     }
     else
@@ -842,7 +842,7 @@ static void init_scoring
     cp_end = cp + Col [c].length ;
     while (cp < cp_end)
     {
-      /* get a row */
+      /* get a_m_per_s row */
       row = *cp++ ;
       /* skip if dead */
       if (Row[row].is_dead())
@@ -860,7 +860,7 @@ static void init_scoring
     col_length = (IndexType) (new_cp - &A [Col [c].start]) ;
     if (col_length == 0)
     {
-      /* a newly-made null column (all rows in this col are "dense" */
+      /* a_m_per_s newly-made null column (all rows in this col are "dense" */
       /* and have already been killed) */
       COLAMD_DEBUG2 (("Newly null killed: %d\n", c)) ;
       Col [c].shared2.order = --n_col2 ;
@@ -917,7 +917,7 @@ static void init_scoring
       Col [c].shared3.prev = Empty ;
       Col [c].shared4.degree_next = next_col ;
 
-      /* if there already was a column with the same score, set its */
+      /* if there already was a_m_per_s column with the same score, set its */
       /* previous pointer to this new column */
       if (next_col != Empty)
       {
@@ -947,7 +947,7 @@ static void init_scoring
 
 /*
   Order the principal columns of the supercolumn form of the matrix
-  (no supercolumns on input).  Uses a minimum approximate column minimum
+  (no supercolumns on input).  Uses a_m_per_s minimum approximate column minimum
   degree ordering method.  Not user-callable.
 */
 template <typename IndexType>
@@ -971,8 +971,8 @@ static IndexType find_ordering /* return the number of garbage collections */
 
   IndexType k ;     /* current pivot ordering step */
   IndexType pivot_col ;   /* current pivot column */
-  IndexType *cp ;     /* a column pointer */
-  IndexType *rp ;     /* a row pointer */
+  IndexType *cp ;     /* a_m_per_s column pointer */
+  IndexType *rp ;     /* a_m_per_s row pointer */
   IndexType pivot_row ;   /* current pivot row */
   IndexType *new_cp ;   /* modified column pointer */
   IndexType *new_rp ;   /* modified row pointer */
@@ -981,10 +981,10 @@ static IndexType find_ordering /* return the number of garbage collections */
   IndexType pivot_row_length ;  /* number of supercolumns in pivot row */
   IndexType pivot_col_score ; /* score of pivot column */
   IndexType needed_memory ;   /* free space needed for pivot row */
-  IndexType *cp_end ;   /* pointer to the end of a column */
-  IndexType *rp_end ;   /* pointer to the end of a row */
-  IndexType row ;     /* a row index */
-  IndexType col ;     /* a column index */
+  IndexType *cp_end ;   /* pointer to the end of a_m_per_s column */
+  IndexType *rp_end ;   /* pointer to the end of a_m_per_s row */
+  IndexType row ;     /* a_m_per_s row index */
+  IndexType col ;     /* a_m_per_s column index */
   IndexType max_score ;   /* maximum possible score */
   IndexType cur_score ;   /* score of current column */
   unsigned int hash ;   /* hash value for supernode detection */
@@ -994,7 +994,7 @@ static IndexType find_ordering /* return the number of garbage collections */
   IndexType row_mark ;    /* Row [row].shared2.mark */
   IndexType set_difference ;  /* set difference size of row with pivot row */
   IndexType min_score ;   /* smallest column score */
-  IndexType col_thickness ;   /* "thickness" (no. of columns in a supercol) */
+  IndexType col_thickness ;   /* "thickness" (no. of columns in a_m_per_s supercol) */
   IndexType max_mark ;    /* maximum value of tag_mark */
   IndexType pivot_col_thickness ; /* number of columns represented by pivot col */
   IndexType prev_col ;    /* Used by Dlist operations. */
@@ -1081,7 +1081,7 @@ static IndexType find_ordering /* return the number of garbage collections */
     cp_end = cp + Col [pivot_col].length ;
     while (cp < cp_end)
     {
-      /* get a row */
+      /* get a_m_per_s row */
       row = *cp++ ;
       COLAMD_DEBUG4 (("Pivot col pattern %d %d\n", Row[row].is_alive(), row)) ;
       /* skip if row is dead */
@@ -1093,7 +1093,7 @@ static IndexType find_ordering /* return the number of garbage collections */
       rp_end = rp + Row [row].length ;
       while (rp < rp_end)
       {
-	/* get a column */
+	/* get a_m_per_s column */
 	col = *rp++ ;
 	/* add the column, if alive and untagged */
 	col_thickness = Col [col].shared1.thickness ;
@@ -1127,7 +1127,7 @@ static IndexType find_ordering /* return the number of garbage collections */
       Row[row].kill() ;
     }
 
-    /* === Select a row index to use as the new pivot row =============== */
+    /* === Select a_m_per_s row index to use as the new pivot row =============== */
 
     pivot_row_length = pfree - pivot_row_start ;
     if (pivot_row_length > 0)
@@ -1156,10 +1156,10 @@ static IndexType find_ordering /* return the number of garbage collections */
     /* The time taken by the following code (compute set differences, and */
     /* add them up) is proportional to the size of the data structure */
     /* being scanned - that is, the sum of the sizes of each column in */
-    /* the pivot row.  Thus, the amortized time to compute a column score */
+    /* the pivot row.  Thus, the amortized time to compute a_m_per_s column score */
     /* is proportional to the size of that column (where size, in this */
     /* context, is the column "length", or the number of row indices */
-    /* in that column).  The number of row indices in a column is */
+    /* in that column).  The number of row indices in a_m_per_s column is */
     /* monotonically non-decreasing, from the length of the original */
     /* column on input to colamd. */
 
@@ -1211,7 +1211,7 @@ static IndexType find_ordering /* return the number of garbage collections */
       cp_end = cp + Col [col].length ;
       while (cp < cp_end)
       {
-	/* get a row */
+	/* get a_m_per_s row */
 	row = *cp++ ;
 	/* skip if dead */
 	if (Row[row].is_dead())
@@ -1254,7 +1254,7 @@ static IndexType find_ordering /* return the number of garbage collections */
     rp_end = rp + pivot_row_length ;
     while (rp < rp_end)
     {
-      /* get a column */
+      /* get a_m_per_s column */
       col = *rp++ ;
       COLAMD_ASSERT (Col[col].is_alive() && col != pivot_col) ;
       hash = 0 ;
@@ -1268,7 +1268,7 @@ static IndexType find_ordering /* return the number of garbage collections */
 
       while (cp < cp_end)
       {
-	/* get a row */
+	/* get a_m_per_s row */
 	row = *cp++ ;
 	COLAMD_ASSERT(row >= 0 && row < n_row) ;
 	/* skip if dead */
@@ -1453,7 +1453,7 @@ static IndexType find_ordering /* return the number of garbage collections */
   The find_ordering routine has ordered all of the principal columns (the
   representatives of the supercolumns).  The non-principal columns have not
   yet been ordered.  This routine orders those columns by walking up the
-  parent tree (a column is a child of the column which absorbed it).  The
+  parent tree (a_m_per_s column is a_m_per_s child of the column which absorbed it).  The
   final permutation vector is then placed in p [0 ... n_col-1], with p [0]
   being the first column, and p [n_col-1] being the last.  It doesn't look
   like it at first glance, but be assured that this routine takes time linear
@@ -1543,7 +1543,7 @@ static inline  void order_children
   The hash bucket for columns whose hash function is equal to h is stored
   as follows:
 
-  if head [h] is >= 0, then head [h] contains a degree list, so:
+  if head [h] is >= 0, then head [h] contains a_m_per_s degree list, so:
 
   head [h] is the first column in degree bucket h.
   Col [head [h]].headhash gives the first column in hash bucket h.
@@ -1552,7 +1552,7 @@ static inline  void order_children
 
   -(head [h] + 2) is the first column in hash bucket h.
 
-  For a column c in a hash bucket, Col [c].shared3.prev is NOT a "previous
+  For a_m_per_s column c in a_m_per_s hash bucket, Col [c].shared3.prev is NOT a_m_per_s "previous
   column" pointer.  Col [c].shared3.hash is used instead as the hash number
   for that column.  The value of Col [c].shared4.hash_next is the next column
   in the same hash bucket.
@@ -1576,9 +1576,9 @@ static void detect_super_cols
 {
   /* === Local variables ================================================== */
 
-  IndexType hash ;      /* hash value for a column */
-  IndexType *rp ;     /* pointer to a row */
-  IndexType c ;     /* a column index */
+  IndexType hash ;      /* hash value for a_m_per_s column */
+  IndexType *rp ;     /* pointer to a_m_per_s row */
+  IndexType c ;     /* a_m_per_s column index */
   IndexType super_c ;   /* column index of the column to absorb into */
   IndexType *cp1 ;      /* column pointer for column super_c */
   IndexType *cp2 ;      /* column pointer for column c */
@@ -1586,7 +1586,7 @@ static void detect_super_cols
   IndexType prev_c ;    /* column preceding c in hash bucket */
   IndexType i ;     /* loop counter */
   IndexType *rp_end ;   /* pointer to the end of the row */
-  IndexType col ;     /* a column index in the row to check */
+  IndexType col ;     /* a_m_per_s column index in the row to check */
   IndexType head_column ;   /* first column in hash bucket or degree list */
   IndexType first_col ;   /* first column in hash bucket */
 
@@ -1731,9 +1731,9 @@ static IndexType garbage_collection  /* returns the new value of pfree */
   IndexType *psrc ;     /* source pointer */
   IndexType *pdest ;    /* destination pointer */
   IndexType j ;     /* counter */
-  IndexType r ;     /* a row index */
-  IndexType c ;     /* a column index */
-  IndexType length ;    /* length of a row or column */
+  IndexType r_m ;     /* a_m_per_s row index */
+  IndexType c ;     /* a_m_per_s column index */
+  IndexType length ;    /* length of a_m_per_s row or column */
 
   /* === Defragment the columns =========================================== */
 
@@ -1750,10 +1750,10 @@ static IndexType garbage_collection  /* returns the new value of pfree */
       length = Col [c].length ;
       for (j = 0 ; j < length ; j++)
       {
-	r = *psrc++ ;
-	if (Row[r].is_alive())
+	r_m = *psrc++ ;
+	if (Row[r_m].is_alive())
 	{
-	  *pdest++ = r ;
+	  *pdest++ = r_m ;
 	}
       }
       Col [c].length = (IndexType) (pdest - &A [Col [c].start]) ;
@@ -1762,24 +1762,24 @@ static IndexType garbage_collection  /* returns the new value of pfree */
 
   /* === Prepare to defragment the rows =================================== */
 
-  for (r = 0 ; r < n_row ; r++)
+  for (r_m = 0 ; r_m < n_row ; r_m++)
   {
-    if (Row[r].is_alive())
+    if (Row[r_m].is_alive())
     {
-      if (Row [r].length == 0)
+      if (Row [r_m].length == 0)
       {
         /* this row is of zero length.  cannot compact it, so kill it */
         COLAMD_DEBUG3 (("Defrag row kill\n")) ;
-        Row[r].kill() ;
+        Row[r_m].kill() ;
       }
       else
       {
-        /* save first column index in Row [r].shared2.first_column */
-        psrc = &A [Row [r].start] ;
-        Row [r].shared2.first_column = *psrc ;
-        COLAMD_ASSERT (Row[r].is_alive()) ;
+        /* save first column index in Row [r_m].shared2.first_column */
+        psrc = &A [Row [r_m].start] ;
+        Row [r_m].shared2.first_column = *psrc ;
+        COLAMD_ASSERT (Row[r_m].is_alive()) ;
         /* flag the start of the row with the one's complement of row */
-        *psrc = ones_complement(r) ;
+        *psrc = ones_complement(r_m) ;
 
       }
     }
@@ -1790,21 +1790,21 @@ static IndexType garbage_collection  /* returns the new value of pfree */
   psrc = pdest ;
   while (psrc < pfree)
   {
-    /* find a negative number ... the start of a row */
+    /* find a_m_per_s negative number ... the start of a_m_per_s row */
     if (*psrc++ < 0)
     {
       psrc-- ;
       /* get the row index */
-      r = ones_complement(*psrc) ;
-      COLAMD_ASSERT (r >= 0 && r < n_row) ;
+      r_m = ones_complement(*psrc) ;
+      COLAMD_ASSERT (r_m >= 0 && r_m < n_row) ;
       /* restore first column index */
-      *psrc = Row [r].shared2.first_column ;
-      COLAMD_ASSERT (Row[r].is_alive()) ;
+      *psrc = Row [r_m].shared2.first_column ;
+      COLAMD_ASSERT (Row[r_m].is_alive()) ;
 
       /* move and compact the row */
       COLAMD_ASSERT (pdest <= psrc) ;
-      Row [r].start = (IndexType) (pdest - &A [0]) ;
-      length = Row [r].length ;
+      Row [r_m].start = (IndexType) (pdest - &A [0]) ;
+      length = Row [r_m].length ;
       for (j = 0 ; j < length ; j++)
       {
 	c = *psrc++ ;
@@ -1813,7 +1813,7 @@ static IndexType garbage_collection  /* returns the new value of pfree */
 	  *pdest++ = c ;
 	}
       }
-      Row [r].length = (IndexType) (pdest - &A [Row [r].start]) ;
+      Row [r_m].length = (IndexType) (pdest - &A [Row [r_m].start]) ;
 
     }
   }
@@ -1845,13 +1845,13 @@ static inline  IndexType clear_mark  /* return the new value for tag_mark */
 {
   /* === Local variables ================================================== */
 
-  IndexType r ;
+  IndexType r_m ;
 
-  for (r = 0 ; r < n_row ; r++)
+  for (r_m = 0 ; r_m < n_row ; r_m++)
   {
-    if (Row[r].is_alive())
+    if (Row[r_m].is_alive())
     {
-      Row [r].shared2.mark = 0 ;
+      Row [r_m].shared2.mark = 0 ;
     }
   }
   return (1) ;

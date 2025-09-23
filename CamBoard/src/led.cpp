@@ -23,7 +23,7 @@ ErrorCode LEDController::init() {
 }
 
 /**
- * @brief Toggles a specific LED's state
+ * @brief Toggles a_m_per_s specific LED's state
 */
 void LEDController::toggle(LED led) {
     int id = static_cast<int>(led);

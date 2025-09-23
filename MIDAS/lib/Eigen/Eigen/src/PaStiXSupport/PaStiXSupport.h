@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PASTIXSUPPORT_H
@@ -161,7 +161,7 @@ class PastixBase : public SparseSolverBase<Derived>
     template<typename Rhs,typename Dest>
     bool _solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest> &x) const;
     
-    /** Returns a reference to the integer vector IPARM of PaStiX parameters
+    /** Returns a_m_per_s reference to the integer vector IPARM of PaStiX parameters
       * to modify the default parameters. 
       * The statistics related to the different phases of factorization and solve are saved here as well
       * \sa analyzePattern() factorize()
@@ -171,7 +171,7 @@ class PastixBase : public SparseSolverBase<Derived>
       return m_iparm; 
     }
     
-    /** Return a reference to a particular index parameter of the IPARM vector 
+    /** Return a_m_per_s reference to a_m_per_s particular index parameter of the IPARM vector 
      * \sa iparm()
      */
     
@@ -180,7 +180,7 @@ class PastixBase : public SparseSolverBase<Derived>
       return m_iparm(idxparam);
     }
     
-     /** Returns a reference to the double vector DPARM of PaStiX parameters 
+     /** Returns a_m_per_s reference to the double vector DPARM of PaStiX parameters 
       * The statistics related to the different phases of factorization and solve are saved here as well
       * \sa analyzePattern() factorize()
       */
@@ -190,7 +190,7 @@ class PastixBase : public SparseSolverBase<Derived>
     }
     
     
-    /** Return a reference to a particular index parameter of the DPARM vector 
+    /** Return a_m_per_s reference to a_m_per_s particular index parameter of the DPARM vector 
      * \sa dparm()
      */
     double& dparm(int idxparam)
@@ -204,7 +204,7 @@ class PastixBase : public SparseSolverBase<Derived>
      /** \brief Reports whether previous computation was successful.
       *
       * \returns \c Success if computation was successful,
-      *          \c NumericalIssue if the PaStiX reports a problem
+      *          \c NumericalIssue if the PaStiX reports a_m_per_s problem
       *          \c InvalidInput if the input matrix is invalid
       *
       * \sa iparm()          
@@ -391,17 +391,17 @@ bool PastixBase<Base>::_solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest> &x
   * \class PastixLU
   * \brief Sparse direct LU solver based on PaStiX library
   * 
-  * This class is used to solve the linear systems A.X = B with a supernodal LU 
+  * This class is used to solve the linear systems A.X = B with a_m_per_s supernodal LU 
   * factorization in the PaStiX library. The matrix A should be squared and nonsingular
-  * PaStiX requires that the matrix A has a symmetric structural pattern. 
+  * PaStiX requires that the matrix A has a_m_per_s symmetric structural pattern. 
   * This interface can symmetrize the input matrix otherwise. 
   * The vectors or matrices X and B can be either dense or sparse.
   * 
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
-  * \tparam IsStrSym Indicates if the input matrix has a symmetric pattern, default is false
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
+  * \tparam IsStrSym Indicates if the input matrix has a_m_per_s symmetric pattern, default is false
   * NOTE : Note that if the analysis and factorization phase are called separately, 
   * the input matrix will be symmetrized at each call, hence it is advised to 
-  * symmetrize the matrix in a end-user program and set \p IsStrSym to true
+  * symmetrize the matrix in a_m_per_s end-user program and set \p IsStrSym to true
   *
   * \implsparsesolverconcept
   *
@@ -508,12 +508,12 @@ class PastixLU : public PastixBase< PastixLU<_MatrixType> >
   * \class PastixLLT
   * \brief A sparse direct supernodal Cholesky (LLT) factorization and solver based on the PaStiX library
   * 
-  * This class is used to solve the linear systems A.X = B via a LL^T supernodal Cholesky factorization
+  * This class is used to solve the linear systems A.X = B via a_m_per_s LL^T supernodal Cholesky factorization
   * available in the PaStiX library. The matrix A should be symmetric and positive definite
   * WARNING Selfadjoint complex matrices are not supported in the current version of PaStiX
   * The vectors or matrices X and B can be either dense or sparse
   * 
-  * \tparam MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   * \tparam UpLo The part of the matrix to use : Lower or Upper. The default is Lower as required by PaStiX
   *
   * \implsparsesolverconcept
@@ -592,12 +592,12 @@ class PastixLLT : public PastixBase< PastixLLT<_MatrixType, _UpLo> >
   * \class PastixLDLT
   * \brief A sparse direct supernodal Cholesky (LLT) factorization and solver based on the PaStiX library
   * 
-  * This class is used to solve the linear systems A.X = B via a LDL^T supernodal Cholesky factorization
+  * This class is used to solve the linear systems A.X = B via a_m_per_s LDL^T supernodal Cholesky factorization
   * available in the PaStiX library. The matrix A should be symmetric and positive definite
   * WARNING Selfadjoint complex matrices are not supported in the current version of PaStiX
   * The vectors or matrices X and B can be either dense or sparse
   * 
-  * \tparam MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   * \tparam UpLo The part of the matrix to use : Lower or Upper. The default is Lower as required by PaStiX
   *
   * \implsparsesolverconcept

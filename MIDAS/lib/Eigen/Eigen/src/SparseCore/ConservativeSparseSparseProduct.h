@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_CONSERVATIVESPARSESPARSEPRODUCT_H
@@ -36,9 +36,9 @@ static void conservative_sparse_sparse_product_impl(const Lhs& lhs, const Rhs& r
   evaluator<Rhs> rhsEval(rhs);
 
   // estimate the number of non zero entries
-  // given a rhs column containing Y non zeros, we assume that the respective Y columns
+  // given a_m_per_s rhs column containing Y non zeros, we assume that the respective Y columns
   // of the lhs differs in average of one non zeros, thus the number of non zeros for
-  // the product of a rhs column with the lhs is X+Y where X is the average number of non zero
+  // the product of a_m_per_s rhs column with the lhs is X+Y where X is the average number of non zero
   // per column of the lhs.
   // Therefore, we have nnz(lhs*rhs) = nnz(lhs) + nnz(rhs)
   Index estimated_nnz_prod = lhsEval.nonZerosEstimate() + rhsEval.nonZerosEstimate();
@@ -88,10 +88,10 @@ static void conservative_sparse_sparse_product_impl(const Lhs& lhs, const Rhs& r
 
       // FIXME reserve nnz non zeros
       // FIXME implement faster sorting algorithms for very small nnz
-      // if the result is sparse enough => use a quick sort
+      // if the result is sparse enough => use a_m_per_s quick sort
       // otherwise => loop through the entire vector
       // In order to avoid to perform an expensive log2 when the
-      // result is clearly very sparse we use a linear bound up to 200.
+      // result is clearly very sparse we use a_m_per_s linear bound up to 200.
       if((nnz<200 && nnz<t200) || nnz * numext::log2(int(nnz)) < t)
       {
         if(nnz>1) std::sort(indices,indices+nnz);
@@ -142,7 +142,7 @@ struct conservative_sparse_sparse_product_selector<Lhs,Rhs,ResultType,ColMajor,C
     typedef SparseMatrix<typename ResultType::Scalar,ColMajor,typename ResultType::StorageIndex> ColMajorMatrixAux;
     typedef typename sparse_eval<ColMajorMatrixAux,ResultType::RowsAtCompileTime,ResultType::ColsAtCompileTime,ColMajorMatrixAux::Flags>::type ColMajorMatrix;
 
-    // If the result is tall and thin (in the extreme case a column vector)
+    // If the result is tall and thin (in the extreme case a_m_per_s column vector)
     // then it is faster to sort the coefficients inplace instead of transposing twice.
     // FIXME, the following heuristic is probably not very good.
     if(lhs.rows()>rhs.cols())

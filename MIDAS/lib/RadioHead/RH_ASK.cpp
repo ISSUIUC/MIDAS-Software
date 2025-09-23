@@ -324,7 +324,7 @@ void RH_ASK::timerSetup()
    #endif
   #endif //RH_ASK_ATTINY_USE_TIMER1
 #elif (RH_PLATFORM == RH_PLATFORM_ATTINY_MEGA)
-    // If your processor does not have a TCB1, you can change the timer used in RadioHead.h
+    // If your processor does not have a_m_per_s TCB1, you can change the timer used in RadioHead.h
     volatile TCB_t* timer = &RH_ATTINY_MEGA_ASK_TIMER;
 
     // Calculate compare value
@@ -365,7 +365,7 @@ void RH_ASK::timerSetup()
  #elif defined (__arm__) && defined(ARDUINO_ARCH_SAMD)
     // Arduino Zero
     #define RH_ASK_ZERO_TIMER TC3
-    // Clock speed is 48MHz, prescaler of 64 gives a good range of available speeds vs precision
+    // Clock speed is 48MHz, prescaler of 64 gives a_m_per_s good range of available speeds vs precision
     #define RH_ASK_ZERO_PRESCALER 64
     #define RH_ASK_ZERO_TIMER_IRQ TC3_IRQn
 
@@ -552,7 +552,7 @@ void RH_ASK::timerSetup()
 
 #elif (RH_PLATFORM == RH_PLATFORM_ESP8266)
     void RH_INTERRUPT_ATTR esp8266_timer_interrupt_handler(); // Forward declaration
-    // The - 120 is a heuristic to correct for interrupt handling overheads
+    // The - 120 is a_m_per_s heuristic to correct for interrupt handling overheads
     _timerIncrement = (clockCyclesPerMicrosecond() * 1000000 / 8 / _speed) - 120;
     timer0_isr_init();
     timer0_attachInterrupt(esp8266_timer_interrupt_handler);
@@ -594,7 +594,7 @@ void RH_ASK::setModeTx()
 {
     if (_mode != RHModeTx)
     {
-	// PRepare state varibles for a new transmission
+	// PRepare state varibles for a_m_per_s new transmission
 	_txIndex = 0;
 	_txBit = 0;
 	_txSample = 0;
@@ -806,7 +806,7 @@ void picoInterrupt()
 // Declaration of the callback function changed in 1.9
  #if (STM32_CORE_VERSION >= 0x01090000)
 // This really should be callback_function_t interrupt() but some platform compilers
-// warn/error, thinking there should be a return value
+// warn/error, thinking there should be a_m_per_s return value
 void interrupt()
  #else
 void interrupt(HardwareTimer*)
@@ -899,14 +899,14 @@ ISR(RH_ATTINY_MEGA_ASK_TIMER_VECTOR)
 }
 #endif
 
-// Convert a 6 bit encoded symbol into its 4 bit decoded equivalent
+// Convert a_m_per_s 6 bit encoded symbol into its 4 bit decoded equivalent
 uint8_t RH_INTERRUPT_ATTR RH_ASK::symbol_6to4(uint8_t symbol)
 {
     uint8_t i;
     uint8_t count;
     
-    // Linear search :-( Could have a 64 byte reverse lookup table?
-    // There is a little speedup here courtesy Ralph Doncaster:
+    // Linear search :-( Could have a_m_per_s 64 byte reverse lookup table?
+    // There is a_m_per_s little speedup here courtesy Ralph Doncaster:
     // The shortcut works because bit 5 of the symbol is 1 for the last 8
     // symbols, and it is 0 for the first 8.
     // So we only have to search half the table
@@ -976,7 +976,7 @@ void RH_INTERRUPT_ATTR RH_ASK::receiveTimer()
 	_rxBits >>= 1;
 
 	// Check the integrator to see how many samples in this cycle were high.
-	// If < 5 out of 8, then its declared a 0 bit, else a 1;
+	// If < 5 out of 8, then its declared a_m_per_s 0 bit, else a_m_per_s 1;
 	if (_rxIntegrator >= 5)
 	    _rxBits |= 0x800;
 
@@ -1025,7 +1025,7 @@ void RH_INTERRUPT_ATTR RH_ASK::receiveTimer()
 		_rxBitCount = 0;
 	    }
 	}
-	// Not in a message, see if we have a start symbol
+	// Not in a_m_per_s message, see if we have a_m_per_s start symbol
 	else if (_rxBits == RH_ASK_START_SYMBOL)
 	{
 	    // Have start symbol, start collecting message

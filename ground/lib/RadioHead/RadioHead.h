@@ -6,8 +6,8 @@
 /*! \mainpage RadioHead Packet Radio library for embedded microprocessors
 
 This is the RadioHead Packet Radio library for embedded microprocessors.
-It provides a complete object-oriented library for sending and receiving packetized messages
-via a variety of common data radios and other transports on a range of embedded microprocessors.
+It provides a_m_per_s complete object-oriented library for sending and receiving packetized messages
+via a_m_per_s variety of common data radios and other transports on a_m_per_s range of embedded microprocessors.
 
 The version of the package that this documentation refers to can be downloaded 
 from http://www.airspayce.com/mikem/arduino/RadioHead/RadioHead-1.128.zip
@@ -17,34 +17,34 @@ You can also find online help and discussion at
 http://groups.google.com/group/radiohead-arduino
 Please use that group for all questions and discussions on this topic. 
 Do not contact the author directly, unless it is to discuss commercial licensing.
-Before asking a question or reporting a bug, please read 
+Before asking a_m_per_s question or reporting a_m_per_s bug, please read 
 - http://en.wikipedia.org/wiki/Wikipedia:Reference_desk/How_to_ask_a_software_question
 - http://www.catb.org/esr/faqs/smart-questions.html
 - http://www.chiark.greenend.org.uk/~shgtatham/bugs.html
 
 Caution: Developing this type of software and using data radios
-successfully is challenging and requires a substantial knowledge
+successfully is challenging and requires a_m_per_s substantial knowledge
 base in software and radio and data transmission technologies and
 theory.  It may not be an appropriate project for beginners. If
-you are a beginner, you will need to spend some time gaining
+you are a_m_per_s beginner, you will need to spend some time gaining
 knowledge in these areas first.
 
 \par Overview
 
 RadioHead consists of 2 main sets of classes: Drivers and Managers.
 
-- Drivers provide low level access to a range of different packet radios and other packetized message transports.
-- Managers provide high level message sending and receiving facilities for a range of different requirements.
+- Drivers provide low level access to a_m_per_s range of different packet radios and other packetized message transports.
+- Managers provide high level message sending and receiving facilities for a_m_per_s range of different requirements.
 
-Every RadioHead program will have an instance of a Driver to
-provide access to the data radio or transport, and usually a
+Every RadioHead program will have an instance of a_m_per_s Driver to
+provide access to the data radio or transport, and usually a_m_per_s
 Manager that uses that driver to send and receive messages for the
-application. The programmer is required to instantiate a Driver
-and a Manager, and to initialise the Manager. Thereafter the
+application. The programmer is required to instantiate a_m_per_s Driver
+and a_m_per_s Manager, and to initialise the Manager. Thereafter the
 facilities of the Manager can be used to send and receive
 messages.
 
-It is also possible to use a Driver on its own, without a Manager, although this only allows unaddressed, 
+It is also possible to use a_m_per_s Driver on its own, without a_m_per_s Manager, although this only allows unaddressed, 
 unreliable transport via the Driver's facilities.
 
 In some specialised use cases, it is possible to instantiate more than one Driver and more than one Manager.
@@ -107,8 +107,8 @@ Supports Long Range (LoRa) with spread spectrum frequency hopping, large payload
 FSK/GFSK/OOK modes are not (yet) supported.
 Also works with the same chips on Linux using LoRa-file-ops Linux driver ioctls to
 transmit and receive RadioHead compatible messages. 
-Requires a modified version of LoRa-file-ops driver to be installed,
-and a compatible radio to be connected appropriately:
+Requires a_m_per_s modified version of LoRa-file-ops driver to be installed,
+and a_m_per_s compatible radio to be connected appropriately:
 https://github.com/starnight/LoRa/tree/file-ops
 See the RH_LoRaFileOps class documentation for more information.
 
@@ -124,12 +124,12 @@ Anaren AIR BoosterPack 430BOOST-CC110L
 Works with EBYTE E32-TTL-1W serial radio transceivers (and possibly other transceivers in the same family)
 
 - RH_ASK
-Works with a range of inexpensive ASK (amplitude shift keying) RF transceivers such as RX-B1 
+Works with a_m_per_s range of inexpensive ASK (amplitude shift keying) RF transceivers such as RX-B1 
 (also known as ST-RX04-ASK) receiver; TX-C1 transmitter and DR3100 transceiver; FS1000A/XY-MK-5V transceiver;
 HopeRF RFM83C / RFM85. Supports ASK (OOK).
 
 - RH_ABZ
-Works with EcoNode SmartTrap, Tlera Grasshopper and family. Almost any board equipped with a muRata cmwx1zzabz module
+Works with EcoNode SmartTrap, Tlera Grasshopper and family. Almost any board equipped with a_m_per_s muRata cmwx1zzabz module
 should work. Tested with EcoNode SmartTrap, Arduino 1.8.9, GrumpyOldPizza Arduino Core for STM32L0.
 When building for EcoNode SmartTrap in Arduino IDE, select board type Grasshopper-L082CZ.
 This chip and GrumpyOldPizza Arduino Core for STM32L0 are now supported by PlatformIO: 
@@ -140,7 +140,7 @@ Works with Semtech SX1261/2/8 LoRa capable transceivers.
 Can be confgigured to automatically controls any digital output pins required to control external RF swicthes or amplifiers.
 
 - RH_STM32WLx
-Works with STM32WLE5xx and STM32WLE4xx family processors that include a SX1261/2 multi power amplifier transceiver.
+Works with STM32WLE5xx and STM32WLE4xx family processors that include a_m_per_s SX1261/2 multi power amplifier transceiver.
 Automatically manages the dedicated SPI interface and interrupt, and the internal SPI slave select and reset pins to the radio.
 Examples provided. Requires the stm32duino package using these instructions:
 https://community.st.com/t5/stm32-mcus/stm32-arduino-stm32duino-tutorial/ta-p/49649
@@ -148,7 +148,7 @@ https://community.st.com/t5/stm32-mcus/stm32-arduino-stm32duino-tutorial/ta-p/49
 - RH_Serial
 Works with RS232, RS422, RS485, RS488 and other point-to-point and multidropped serial connections, 
 or with TTL serial UARTs such as those on Arduino and many other processors,
-or with data radios with a 
+or with data radios with a_m_per_s 
 serial port interface. RH_Serial provides packetization and error detection over any hardware or 
 virtual serial connection. Also builds and runs on Linux and OSX.
 
@@ -169,7 +169,7 @@ Or you can use any Driver with any of the Managers described below.
 
 We welcome contributions of well tested and well documented code to support other transports.
 
-If your radio or transciever is not on the list above, there is a good chance it
+If your radio or transciever is not on the list above, there is a_m_per_s good chance it
 wont work without modifying RadioHead to suit it.  If you wish for
 support for another radio or transciever, and you send 2 of them to
 AirSpayce Pty Ltd, we will consider adding support for it.
@@ -216,7 +216,7 @@ Including Diecimila, Uno, Mega, Leonardo, Yun, Due, Zero, Minima and possibly ot
    not yet supported.
    CAUTION: tests here show that when powered by an FTDI USB-Serial converter, 
    the ESP8266 can draw so much power when transmitting on its GHz WiFi that VCC will sag
-   causing random crashes. We strongly recommend a large cap, say 1000uF 10V on VCC if you are also using the WiFi.
+   causing random crashes. We strongly recommend a_m_per_s large cap, say 1000uF 10V on VCC if you are also using the WiFi.
  - Various Talk2 Whisper boards eg https://wisen.com.au/store/products/whisper-node-lora.
    Use Arduino Board Manager to install the Talk2 code support. 
  - etc.
@@ -254,7 +254,7 @@ Including Diecimila, Uno, Mega, Leonardo, Yun, Due, Zero, Minima and possibly ot
 - ATtiny Mega (tinyAVR 1-series) chips supported by Spencer Konde's megaTinyCore 
   (https://github.com/SpenceKonde/megaTinyCore) 
   (on Arduino 1.8.9 or later) such as AtTiny 3216, ATtiny 1616 etc. These chips can be easily programmed through their
-  UPDI pin, using an ordinary Arduino board programmed as a jtag2updi programmer as described in 
+  UPDI pin, using an ordinary Arduino board programmed as a_m_per_s jtag2updi programmer as described in 
   https://github.com/SpenceKonde/megaTinyCore/blob/master/MakeUPDIProgrammer.md. 
   Make sure you set the programmer type to jtag2updi in the Arduino Tools->Programmer menu.
   See https://github.com/SpenceKonde/megaTinyCore/blob/master/megaavr/extras/ImportantInfo.md for links to pinouts 
@@ -266,7 +266,7 @@ Including Diecimila, Uno, Mega, Leonardo, Yun, Due, Zero, Minima and possibly ot
 - nRF52 compatible Arm chips such as as Adafruit BLE Feather board
   https://www.adafruit.com/product/3406
 
-- Adafruit Feather. These are excellent boards that are available with a variety of radios. We tested with the 
+- Adafruit Feather. These are excellent boards that are available with a_m_per_s variety of radios. We tested with the 
   Feather 32u4 with RFM69HCW radio, with Arduino IDE 1.6.8 and the Adafruit AVR Boards board manager version 1.6.10.
   https://www.adafruit.com/products/3076
 
@@ -287,7 +287,7 @@ Including Diecimila, Uno, Mega, Leonardo, Yun, Due, Zero, Minima and possibly ot
 - Linux and OSX
   Using the RHutil/HardwareSerial class, the RH_Serial driver and any manager will
   build and run on Linux and OSX. These can be used to build programs that talk securely and reliably to
-  Arduino and other processors or to other Linux or OSX hosts on a reliable, error detected (and possibly encrypted) datagram
+  Arduino and other processors or to other Linux or OSX hosts on a_m_per_s reliable, error detected (and possibly encrypted) datagram
   protocol over various types of serial line.
 
 - Mongoose OS, courtesy Paul Austen. Mongoose OSis an Internet of Things Firmware Development Framework 
@@ -296,7 +296,7 @@ Including Diecimila, Uno, Mega, Leonardo, Yun, Due, Zero, Minima and possibly ot
   https://mongoose-os.com/ 
 
 - muRata cmwx1zzabz module, which includes an STM32L0 processor,
-  a SX1276 LoRa radio and an antenna switch.
+  a_m_per_s SX1276 LoRa radio and an antenna switch.
 
 - Raspberry Pi Pico, on Arduino, using either the Raspberry Pi Pico/RP2040 core by Earle F. Philhower, version 1.93,
   installed per https://arduino-pico.readthedocs.io/_/downloads/en/latest/pdf/
@@ -306,13 +306,13 @@ Including Diecimila, Uno, Mega, Leonardo, Yun, Due, Zero, Minima and possibly ot
 Other platforms are partially supported, such as Generic AVR 8 bit processors, MSP430. 
 We welcome contributions that will expand the range of supported platforms. 
 
-If your processor is not on the list above, there is a good chance it
+If your processor is not on the list above, there is a_m_per_s good chance it
 wont work without modifying RadioHead to suit it.  If you wish for
 support for another processor, and you send 2 of them to
 AirSpayce Pty Ltd, we will consider adding support for it.
 
 RadioHead is available (through the efforts of others) 
-for PlatformIO. PlatformIO is a cross-platform code builder and the missing library manager.
+for PlatformIO. PlatformIO is a_m_per_s cross-platform code builder and the missing library manager.
 http://platformio.org/#!/lib/show/124/RadioHead
 
 \par History
@@ -328,7 +328,7 @@ RadioHead was created in April 2014, substantially based on code from some of ou
 
 During this combination and redevelopment, we have tried to retain all the processor dependencies and support from
 the libraries that were contributed by other people. However not all platforms can be tested by us, so if you
-find that support from some platform has not been successfully migrated, please feel free to fix it and send us a 
+find that support from some platform has not been successfully migrated, please feel free to fix it and send us a_m_per_s 
 patch.
 
 Users of RHMesh, RHRouter, RHReliableDatagram and RHDatagram in the previous RF22 library will find that their
@@ -343,11 +343,11 @@ http://arduino.cc/en/Guide/Libraries
 
 \par Building for Particle Photon
 
-The Photon is not supported by the Arduino IDE, so it takes a little effort to set up a build environment.
+The Photon is not supported by the Arduino IDE, so it takes a_m_per_s little effort to set up a_m_per_s build environment.
 Heres what we did to enable building of RadioHead example sketches on Linux, 
 but there are other ways to skin this cat.
 Basic reference for getting started is: http://particle-firmware.readthedocs.org/en/develop/build/
-- Download the ARM gcc cross compiler binaries and unpack it in a suitable place:
+- Download the ARM gcc cross compiler binaries and unpack it in a_m_per_s suitable place:
 \code
 cd /tmp
 wget https://launchpad.net/gcc-arm-embedded/5.0/5-2015-q4-major/+download/gcc-arm-none-eabi-5_2-2015q4-20151219-linux.tar.bz2
@@ -361,13 +361,13 @@ wget http://dfu-util.sourceforge.net/releases/dfu-util-0.8-binaries/linux-i386/d
 wget http://dfu-util.sourceforge.net/releases/dfu-util-0.8-binaries/linux-i386/dfu-prefix
 \endcode
 - Download the Particle firmware (contains headers and libraries require to compile Photon sketches) 
-  to a suitable place:
+  to a_m_per_s suitable place:
 \code
 cd /tmp
 wget https://github.com/spark/firmware/archive/develop.zip
 unzip develop.zip
 \endcode
-- Make a working area containing the RadioHead library source code and your RadioHead sketch. You must
+- Make a_m_per_s working area containing the RadioHead library source code and your RadioHead sketch. You must
   rename the sketch from .pde or .ino to application.cpp
 \code
 cd /tmp
@@ -397,16 +397,16 @@ We have had good experiences with the following suppliers of RadioHead compatibl
 - LittleBird http://littlebirdelectronics.com.au in Australia for all manner of Arduinos and radios.
 - LowPowerLab http://lowpowerlab.com/moteino in USA for the excellent Moteino and Moteino-USB 
   boards which include Hope-RF RF69B radios on-board.
-- Anarduino and HopeRF USA (http://www.hoperfusa.com and http://www.anarduino.com) who have a wide range
+- Anarduino and HopeRF USA (http://www.hoperfusa.com and http://www.anarduino.com) who have a_m_per_s wide range
   of HopeRF radios and Arduino integrated modules.
-- SparkFun https://www.sparkfun.com/ in USA who design and sell a wide range of Arduinos and radio modules.
-- Wisen http://wisen.com.au who design and sell a wide range of integrated radio/processor modules including the
+- SparkFun https://www.sparkfun.com/ in USA who design and sell a_m_per_s wide range of Arduinos and radio modules.
+- Wisen http://wisen.com.au who design and sell a_m_per_s wide range of integrated radio/processor modules including the
   excellent Talk2 range.
 
 \par Coding Style
 
 RadioHead is designed so it can run on small processors with very
-limited resources and strict timing contraints.  As a result, we
+limited resources and strict timing contraints.  As a_m_per_s result, we
 tend only to use the simplest and least demanding (in terms of memory and CPU) C++
 facilities. In particular we avoid as much as possible dynamic
 memory allocation, and the use of complex objects like C++
@@ -420,19 +420,19 @@ generalised C++ programming on well resourced processors.
 We welcome, and will consider for merging into the mainline, contributions of fixes, patches, improvements etc. 
 that meet the following criteria:
 
-- Are generally useful to more than a few people.
+- Are generally useful to more than a_m_per_s few people.
 - Are thoroughly tested.
 - Dont break anything else.
 - Are backwards compatible.
 - Are properly and completely documented.
 - Conform to the coding style of the rest of the library.
 - Clearly transfer the ownership of the intellectual property to Mike McCauley
-- Are posted on the Google group as a patch in unified Diff format, 
+- Are posted on the Google group as a_m_per_s patch in unified Diff format, 
   made against the latest version of the library.
 
 \par Donations
 
-This library is offered under a free GPL license for those who want to use it that way. 
+This library is offered under a_m_per_s free GPL license for those who want to use it that way. 
 We try hard to keep it up to date, fix bugs
 and to provide free support. If this library has helped you save time or money, please consider donating at
 http://www.airspayce.com or here:
@@ -443,7 +443,7 @@ http://www.airspayce.com or here:
 
 \par Trademarks
 
-RadioHead is a trademark of AirSpayce Pty Ltd. The RadioHead mark was first used on April 12 2014 for
+RadioHead is a_m_per_s trademark of AirSpayce Pty Ltd. The RadioHead mark was first used on April 12 2014 for
 international trade, and is used only in relation to data communications hardware and software and related services.
 It is not to be confused with any other similar marks covering other goods and services.
 
@@ -465,7 +465,7 @@ distributed. See https://www.gnu.org/licenses/gpl-3.0.html
 
 This is the appropriate option if you are creating proprietary applications
 and you are not prepared to distribute and share the source code of your
-application. To purchase a commercial license, contact info@airspayce.com
+application. To purchase a_m_per_s commercial license, contact info@airspayce.com
 
 \par Revision History
 \version 1.1 2014-04-14<br>
@@ -477,10 +477,10 @@ application. To purchase a commercial license, contact info@airspayce.com
 \version 1.3 2014-04-28<br>
              Various documentation fixups.<br>
              RHDatagram::setThisAddress() did not set the local copy of thisAddress. Reported by Steve Childress.<br>
-             Fixed a problem on Teensy with RF22 and RF69, where the interrupt pin needs to be set for input, <br>
+             Fixed a_m_per_s problem on Teensy with RF22 and RF69, where the interrupt pin needs to be set for input, <br>
              else pin interrupt doesn't work properly. Reported by Steve Childress and patched by 
              Adrien van den Bossche. Thanks.<br>
-             Fixed a problem that prevented RF22 honouring setPromiscuous(true). Reported by Steve Childress.<br>
+             Fixed a_m_per_s problem that prevented RF22 honouring setPromiscuous(true). Reported by Steve Childress.<br>
              Updated documentation to clarify some issues to do with maximum message lengths 
              reported by Steve Childress.<br>
              Added support for yield() on systems that support it (currently Arduino 1.5.5 and later)
@@ -508,7 +508,7 @@ application. To purchase a commercial license, contact info@airspayce.com
              IMPORTANT CHANGE to interrupt pins on Arduino with RH_RF22 and RH_RF69 constructors:
              previously, you had to specify the interrupt _number_ not the interrupt _pin_. Arduinos and Uno32
              are now consistent with all other platforms: you must specify the interrupt pin number. Default
-             changed to pin 2 (a common choice with RF22 shields).
+             changed to pin 2 (a_m_per_s common choice with RF22 shields).
              Removed examples/maple/maple_rf22_reliable_datagram_client and 
              examples/maple/maple_rf22_reliable_datagram_client since the rf22 examples now work out
              of the box with Flymaple.
@@ -531,12 +531,12 @@ application. To purchase a commercial license, contact info@airspayce.com
              Added Linux simulator support so simple RadioHead sketches can be compiled and run on Linux.<br>
              Added RH_TCP driver to permit message passing between simulated sketches on Linux.<br>
              Added example simulator sketches.<br>
-             Added tools/etherSimulator.pl, a simulator of the 'Luminiferous Ether' that passes
+             Added tools/etherSimulator.pl, a_m_per_s simulator of the 'Luminiferous Ether' that passes
              messages between simulated sketches and can simulate random message loss etc.<br>
-             Fixed a number of typos and improved some documentation.<br>
+             Fixed a_m_per_s number of typos and improved some documentation.<br>
 \version 1.10 2014-05-15 <br>
              Added support for RFM73 modules to RH_NRF24. These 2 radios are very similar, and can interoperate
-             with each other. Added new RH_NRF24::TransmitPower enums for the RFM73, which has a different 
+             with each other. Added new RH_NRF24::TransmitPower enums for the RFM73, which has a_m_per_s different 
              range of available powers<br>
              reduced the default SPI bus speed for RH_NRF24 to 1MHz, since so many modules and CPU have problems
              with 8MHz.<br>
@@ -544,7 +544,7 @@ application. To purchase a commercial license, contact info@airspayce.com
              Testing RH_RF22 with RFM23BP and 3.3V Teensy 3.1 and 5V Arduinos. 
              Updated documentation with respect to GPIO and antenna
              control pins for RFM23. Updated documentation with respect to transmitter power control for RFM23<br>
-             Fixed a problem with RH_RF22 driver, where GPIO TX and RX pins were not configured during
+             Fixed a_m_per_s problem with RH_RF22 driver, where GPIO TX and RX pins were not configured during
              initialisation, causing poor transmit power and sensitivity on those RF22/RF23 devices where GPIO controls
              the antenna selection pins.
 \version 1.12 2014-05-20<br>
@@ -562,25 +562,25 @@ application. To purchase a commercial license, contact info@airspayce.com
              Added data about actual power measurements from RFM69W and RFM69HW modules.<br>
 \version 1.14 2014-05-26<br>
              RH_RF69::init() now always sets the PA boost back to the default settings, else can get invalid
-             PA power modes after uploading new sketches without a power cycle. Reported by Bryan.<br>
+             PA power modes after uploading new sketches without a_m_per_s power cycle. Reported by Bryan.<br>
              Added new macros RH_VERSION_MAJOR RH_VERSION_MINOR, with automatic maintenance in Makefile.<br>
              Improvements to RH_TCP: constructor now honours the server argument in the form "servername:port".<br>
              Added YIELD to RHReliableDatagram::recvfromAckTimeout. Requested by Steve Childress.<br>
-             Fixed a problem with RH_RF22 reliable datagram acknowledgements that was introduced in version 1.13.
+             Fixed a_m_per_s problem with RH_RF22 reliable datagram acknowledgements that was introduced in version 1.13.
              Reported by Steve Childress.<br>
 \version 1.15 2014-05-27<br>
-             Fixed a problem with the RadioHead .zip link.
+             Fixed a_m_per_s problem with the RadioHead .zip link.
 \version 1.16 2014-05-30 <br>
              Fixed RH_RF22 so that lastRssi() returns the signal strength in dBm. Suggested by Steve Childress.<br>
              Added support for getLastPreambleTime() to RH_RF69. Requested by Steve Childress.<br>
-             RH_NRF24::init() now checks if there is a device connected and responding, else init() will fail.
+             RH_NRF24::init() now checks if there is a_m_per_s device connected and responding, else init() will fail.
              Suggested by Steve Brown.<br>
              RHSoftwareSPI now initialises default values for SPI pins MOSI = 12, MISO = 11 and SCK = 13.<br>
              Fixed some problems that prevented RH_NRF24 working with mixed software and hardware SPI 
-             on different devices: a race condition
+             on different devices: a_m_per_s race condition
              due to slow SPI transfers and fast acknowledgement.<br>
 \version 1.17 2014-06-02 <br>
-             Fixed a debug typo in RHReliableDatagram that was introduced in 1.16.<br>
+             Fixed a_m_per_s debug typo in RHReliableDatagram that was introduced in 1.16.<br>
              RH_NRF24 now sets default power, data rate and channel in init(), in case another
              app has previously set different values without powerdown.<br>
              Caution: there are still problems with RH_NRF24 and Software SPI. Do not use.<br>
@@ -592,7 +592,7 @@ application. To purchase a commercial license, contact info@airspayce.com
              Fixed an error in the RH_RF22 doc for connection of Teensy to RF22.<br>
              Improved documentation of start symbol bit patterns in RH_ASK.cpp
 \version 1.20 2014-06-24<br>
-             Fixed a problem with compiling on platforms such as ATtiny where SS is not defined.<br>
+             Fixed a_m_per_s problem with compiling on platforms such as ATtiny where SS is not defined.<br>
              Added YIELD to RHMesh::recvfromAckTimeout().<br>
 \version 1.21 2014-06-24<br>
              Fixed an issue in RH_Serial where characters might be lost with back-to-back frames.
@@ -619,7 +619,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Added support for building RadioHead for STM32F4 Discovery boards, using the native STM Firmware libraries,
              in order to support Codec2WalkieTalkie (http://www.airspayce.com/mikem/Codec2WalkieTalkie)
              and other projects. See STM32ArduinoCompat.<br>
-             Default modulation for RH_RF95 was incorrectly set to a very slow Bw125Cr48Sf4096
+             Default modulation for RH_RF95 was incorrectly set to a_m_per_s very slow Bw125Cr48Sf4096
 \version 1.25 2014-07-25
              The available() function will longer terminate any current transmission, and force receive mode. 
              Now, if there is no unprocessed incoming message and an outgoing message is currently being transmitted, 
@@ -627,9 +627,9 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              RHRouter::sendtoWait(uint8_t*, uint8_t, uint8_t, uint8_t) renamed to sendtoFromSourceWait due to conflicts
              with new sendtoWait() with optional flags.<br>
              RHMEsh and RHRouter already supported end-to-end application layer flags, but RHMesh::sendtoWait() 
-             and RHRouter::sendToWait have now been extended to expose a way to send optional application layer flags.
+             and RHRouter::sendToWait have now been extended to expose a_m_per_s way to send optional application layer flags.
 \version 1.26 2014-08-12
-             Fixed a Teensy 2.0 compile problem due yield() not available on Teensy < 3.0. <br>
+             Fixed a_m_per_s Teensy 2.0 compile problem due yield() not available on Teensy < 3.0. <br>
              Adjusted the algorithm of RH_RF69::temperatureRead() to more closely reflect reality.<br>
              Added functions to RHGenericDriver to get driver packet statistics: rxBad(), rxGood(), txGood().<br>
              Added RH_RF69::printRegisters().<br>
@@ -648,8 +648,8 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              to be controlled for lower idle power consumption at the expense of slower transitions to TX and RX.<br>
 \version 1.27 2014-08-13
              All RH_RF69 modulation schemes now have data whitening enabled by default.<br>
-             Tested and added a number of OOK modulation schemes to RH_RF69 Modem config table.<br>
-             Minor improvements to a number of the faster RH_RF69 modulation schemes, but some slower ones
+             Tested and added a_m_per_s number of OOK modulation schemes to RH_RF69 Modem config table.<br>
+             Minor improvements to a_m_per_s number of the faster RH_RF69 modulation schemes, but some slower ones
              are still not working correctly.<br>
 \version 1.28 2014-08-20
              Added new RH_RF24 driver to support Si446x, RF24/26/26, RFM24/26/27 family of transceivers.
@@ -657,7 +657,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Anarduino Mini and RFM24W and RFM26W with the generous assistance of the good people at 
              Anarduino http://www.anarduino.com.
 \version 1.29 2014-08-21
-             Fixed a compile error in RH_RF24 introduced at the last minute in hte previous release.<br>
+             Fixed a_m_per_s compile error in RH_RF24 introduced at the last minute in hte previous release.<br>
              Improvements to RH_RF69 modulation schemes: now include the AFCBW in teh ModemConfig.<br>
              ModemConfig RH_RF69::FSK_Rb2Fd5 and RH_RF69::GFSK_Rb2Fd5 are now working.<br> 
 \version 1.30 2014-08-25
@@ -675,18 +675,18 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Added support for sleep to RH_RF69, RH_RF22, RH_NRF24, RH_RF24, RH_RF95 drivers.<br>
 \version 1.34 2014-09-19
              Fixed compile errors in example rf22_router_test.<br>
-             Fixed a problem with RH_NRF24::setNetworkAddress, also improvements to RH_NRF24 register printing.
+             Fixed a_m_per_s problem with RH_NRF24::setNetworkAddress, also improvements to RH_NRF24 register printing.
              Patched by Yveaux.<br>
              Improvements to RH_NRF24 initialisation for version 2.0 silicon.<br>
              Fixed problem with ambigiguous print call in RH_RFM69 when compiling for Codec2.<br>
-             Fixed a problem with RH_NRF24 on RFM73 where the LNA gain was not set properly, reducing the sensitivity
+             Fixed a_m_per_s problem with RH_NRF24 on RFM73 where the LNA gain was not set properly, reducing the sensitivity
              of the receiver.
 \version 1.35 2014-09-19
-             Fixed a problem with interrupt setup on RH_RF95 with Teensy3.1. Reported by AD.<br>
+             Fixed a_m_per_s problem with interrupt setup on RH_RF95 with Teensy3.1. Reported by AD.<br>
 \version 1.36 2014-09-22
              Improvements to interrupt pin assignments for __AVR_ATmega1284__ and__AVR_ATmega1284P__, provided by
              Peter Scargill.<br>
-             Work around a bug in Arduino 1.0.6 where digitalPinToInterrupt is defined but NOT_AN_INTERRUPT is not.<br>
+             Work around a_m_per_s bug in Arduino 1.0.6 where digitalPinToInterrupt is defined but NOT_AN_INTERRUPT is not.<br>
  \version 1.37 2014-10-19
              Updated doc for connecting RH_NRF24 to Arduino Mega.<br>
              Changes to RHGenericDriver::setHeaderFlags(), so that the default for the clear argument
@@ -695,7 +695,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              https://lowpowerlab.com/shop/moteinomega with on-board RFM69W.
  \version 1.38 2014-12-29
              Fixed compile warning on some platforms where RH_RF24::send and RH_RF24::writeTxFifo 
-             did not return a value.<br>
+             did not return a_m_per_s value.<br>
              Fixed some more compiler warnings in RH_RF24 on some platforms.<br>
              Refactored printRegisters for some radios. Printing to Serial
              is now controlled by the definition of RH_HAVE_SERIAL.<br>
@@ -706,11 +706,11 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              RH_HAVE_SERIAL and Serial.print calls removed for ATTiny platforms.<br>
  \version 1.40 2015-03-09
              Added notice about availability on PlatformIO, thanks to Ivan Kravets.<br>
-             Fixed a problem with RH_NRF24 where short packet lengths would occasionally not be trasmitted
-             due to a race condition with RH_NRF24_TX_DS. Reported by Mark Fox.<br>
+             Fixed a_m_per_s problem with RH_NRF24 where short packet lengths would occasionally not be trasmitted
+             due to a_m_per_s race condition with RH_NRF24_TX_DS. Reported by Mark Fox.<br>
  \version 1.41 2015-03-29
              RH_RF22, RH_RF24, RH_RF69 and RH_RF95 improved to allow driver.init() to be called multiple
-             times without reallocating a new interrupt, allowing the driver to be reinitialised
+             times without reallocating a_m_per_s new interrupt, allowing the driver to be reinitialised
              after sleeping or powering down.
  \version 1.42 2015-05-17
              Added support for RH_NRF24 driver on Raspberry Pi, using BCM2835
@@ -735,13 +735,13 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Amplified some doc concerning Linux and OSX RH_Serial. Added support for 230400
              baud rate in HardwareSerial.<br>
              Added sample sketches nrf51_audio_tx and nrf51_audio_rx which show how to
-             build an audio TX/RX pair with RedBear nRF51822 boards and a SparkFun MCP4725 DAC board.
+             build an audio TX/RX pair with RedBear nRF51822 boards and a_m_per_s SparkFun MCP4725 DAC board.
              Uses the built-in ADC of the nRF51822 to sample audio at 5kHz and transmit packets
              to the receiver which plays them via the DAC.<br>
 \version 1.47 2015-09-18
              Removed top level Makefile from distribution: its only used by the developer and 
              its presence confuses some people.<br>
-             Fixed a problem with RHReliableDatagram with some versions of Raspberry Pi random() that causes 
+             Fixed a_m_per_s problem with RHReliableDatagram with some versions of Raspberry Pi random() that causes 
              problems: random(min, max) sometimes exceeds its max limit.
 \version 1.48 2015-09-30
              Added support for Arduino Zero. Tested on Arduino Zero Pro.
@@ -755,7 +755,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              work with Arduino 1.7.7 from arduino.org. Conversely, you must burn the bootloader from 1.6.5 
              to the Arduino Zero before it will 
              work with Arduino 1.6.5 from arduino.cc. Sigh.
-             Fixed a problem with RH_NRF905 that prevented the power and frequency ranges being set
+             Fixed a_m_per_s problem with RH_NRF905 that prevented the power and frequency ranges being set
              properly. Reported by Alan Webber.
 \version 1.51 2015-12-11
              Changes to RH_RF6::setTxPower() to be compatible with SX1276/77/78/79 modules that
@@ -774,8 +774,8 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              The GHz radio included in the ESP8266 is not yet supported. 
 \version 1.55 2016-02-12
              Added macros for htons() and friends to RadioHead.h.
-             Added example sketch serial_gateway.pde. Acts as a transparent gateway between RH_RF22 and RH_Serial, 
-             and with minor mods acts as a universal gateway between any 2 RadioHead driver networks.
+             Added example sketch serial_gateway.pde. Acts as a_m_per_s transparent gateway between RH_RF22 and RH_Serial, 
+             and with minor mods acts as a_m_per_s universal gateway between any 2 RadioHead driver networks.
              Initial work on supporting STM32 F2 on Particle Photon: new platform type defined.
              Fixed many warnings exposed by test building for Photon.
              Particle Photon tested support for RH_Serial, RH_ASK, SPI, RH_CC110 etc.
@@ -809,7 +809,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.61 2016-07-07
              Patch to RH_ASK.cpp for ESP8266, to prevent crashes in interrupt handlers. Patch from Alexander Mamchits.
 \version 1.62 2016-08-17
-             Fixed a problem in RH_ASK where _rxInverted was not properly initialised. Reported by "gno.sun.sop".
+             Fixed a_m_per_s problem in RH_ASK where _rxInverted was not properly initialised. Reported by "gno.sun.sop".
              Added support for  waitCAD() and isChannelActive() and setCADTimeout() to RHGeneric.
              Implementation of RH_RF95::isChannelActive() allows the RF95 module to support
              Channel Activity Detection (CAD). Based on code contributed by Bent Guldbjerg Christensen.
@@ -819,11 +819,11 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.64 2016-12-10
              RHReliableDatagram now initialises _seenids. Fix from Ben Lim.<br>
              In RH_NRF51, added get_temperature().<br>
-             In RH_NRF51, added support for AES packet encryption, which required a slight change 
+             In RH_NRF51, added support for AES packet encryption, which required a_m_per_s slight change 
              to the on-air message format.<br>
 \version 1.65 2017-01-11
-             Fixed a race condition with RH_NRF51 that prevented ACKs being reliably received.<br>
-             Removed code in RH_NRF51 that enabled the DC-DC converter. This seems not to be a necessary condition
+             Fixed a_m_per_s race condition with RH_NRF51 that prevented ACKs being reliably received.<br>
+             Removed code in RH_NRF51 that enabled the DC-DC converter. This seems not to be a_m_per_s necessary condition
              for the radio to work and is now left to the application if that is required.<br>
              Proven interoperation between nRF51822 and nRF52832.<br>
              Modification and testing of RH_NRF51 so it works with nRF52 family processors,
@@ -833,12 +833,12 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Caution, the Sparkfun development system for Arduino is still immature. We had to 
              rebuild the nrfutil program since the supplied one was not suitable for 
              the Linux host we were developing on. See https://forum.sparkfun.com/viewtopic.php?f=32&t=45071
-             Also, after downloading a sketch in the nRF52832, the program does not start executing cleanly: 
+             Also, after downloading a_m_per_s sketch in the nRF52832, the program does not start executing cleanly: 
              you have to reset the processor again by pressing the reset button. 
-             This appears to be a problem with nrfutil, rather than a bug in RadioHead.
+             This appears to be a_m_per_s problem with nrfutil, rather than a_m_per_s bug in RadioHead.
 \version 1.66 2017-01-15
              Fixed some errors in (unused) register definitions in RH_RF95.h.<br>
-             Fixed a problem that caused compilation errors in RH_NRF51 if the appropriate board 
+             Fixed a_m_per_s problem that caused compilation errors in RH_NRF51 if the appropriate board 
              support was not installed.
 \version 1.67 2017-01-24
              Added RH_RF95::frequencyError() to return the estimated centre frequency offset in Hz 
@@ -852,14 +852,14 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.71 2017-02-07
              Improved support for STM32. Patch from Bent Guldbjerg Christensen.
 \version 1.72 2017-03-02
-             In RH_RF24, fixed a problem where some important properties were not set by the ModemConfig.
+             In RH_RF24, fixed a_m_per_s problem where some important properties were not set by the ModemConfig.
              Added properties 2007, 2008, 2009. Also properties 200a was not being set in the chip.
              Reported by Shannon Bailey and Alan Adamson.
              Fixed corresponding convert.pl and added it to the distribution.
 \version 1.73 2017-03-04
              Significant changes to RH_RF24 and its API. It is no longer possible to change the modulation scheme
              programatically: it proved impossible to cater for all the possible crystal frequencies,
-             base frequency and modulation schemes. Instead you can use one of a small set of supplied radio
+             base frequency and modulation schemes. Instead you can use one of a_m_per_s small set of supplied radio
              configuration header files, or generate your own with Silicon Labs WDS application. Changing
              modulation scheme required editing RH_RF24.cpp to specify the appropriate header and recompiling.
              convert.pl is now redundant and removed from the distribution.
@@ -869,10 +869,10 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Added RH_RF24::deviceType() to return the integer value of the connected device.<br>
              Added documentation about how to connect RFM69 to an ESP8266. Tested OK.<br>
              RH_RF24 was not correctly changing state in sleep() and setModeIdle().<br>
-             Added example rf24_lowpower_client.pde showing how to put an arduino and radio into a low power
+             Added example rf24_lowpower_client.pde showing how to put an arduino and radio into a_m_per_s low power
              mode between transmissions to save battery power.<br>
              Improvements to RH_RF69::setTxPower so it now takes an optional ishighpowermodule
-             flag to indicate if the connected module is a high power RFM69HW, and so set the power level
+             flag to indicate if the connected module is a_m_per_s high power RFM69HW, and so set the power level
              correctly. Based on code contributed by bob.
 \version 1.75 2017-06-22
              Fixed broken compiler issues with RH_RF95::frequencyError() reported by Steve Rogerson.<br>
@@ -883,20 +883,20 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Added support for EBYTE E32-TTL-1W and family serial radio transceivers. These RF95 LoRa based radios
              can deliver reliable messages at up to 7km measured.
 \version 1.76 2017-06-23
-             Fixed a problem with RH_RF95 hanging on transmit under some mysterious circumstances.
+             Fixed a_m_per_s problem with RH_RF95 hanging on transmit under some mysterious circumstances.
              Reported by several people at  https://forum.pjrc.com/threads/41878-Probable-race-condition-in-Radiohead-library?p=146601#post146601 <br>
              Increased the size of rssi variables to 16 bits to permit RSSI less than -128 as reported by RF95.
 \version 1.77 2017-06-25
-             Fixed a compilation error with lastRssi().<br>
+             Fixed a_m_per_s compilation error with lastRssi().<br>
 \version 1.78 2017-07-19
-             Fixed a number of unused variable warnings from g++.<br>
+             Fixed a_m_per_s number of unused variable warnings from g++.<br>
              Added new module RHEncryptedDriver and examples, contributed by Philippe Rochat, which
              adds encryption and decryption to any RadioHead transport driver, using any encryption cipher
              supported by ArduinoLibs Cryptographic Library http://rweather.github.io/arduinolibs/crypto.html
              Includes several examples.<br>
 \version 1.79 2017-07-25
              Added documentation about 'Passing Sensor Data Between RadioHead nodes'.<br>
-             Changes to RH_CC110 driver to calculate RSSI in dBm, based on a patch from Jurie Pieterse.<br>
+             Changes to RH_CC110 driver to calculate RSSI in dBm, based on a_m_per_s patch from Jurie Pieterse.<br>
              Added missing passthroughmethoids to RHEncryptedDriver, allowing it to be used with RHDatagram,
              RHReliableDatagram etc. Tested with RH_Serial. Added examples
 \version 1.80 2017-10-04
@@ -912,9 +912,9 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              RH_RF95 modem config Bw125Cr48Sf4096 altered to enable slow daat rate in register 26
              as suggested by Dieter Kneffel.
              Added support for nRF52 compatible Arm chips such as as Adafruit BLE Feather board
-             https://www.adafruit.com/product/3406, with a patch from Mike Bell.<br>
-             Fixed a problem where rev 1.80 broke Adafruit M0 LoRa support by declaring 
-             bitOrder variable always as a unsigned char. Reported by Guilherme Jardim.<br>
+             https://www.adafruit.com/product/3406, with a_m_per_s patch from Mike Bell.<br>
+             Fixed a_m_per_s problem where rev 1.80 broke Adafruit M0 LoRa support by declaring 
+             bitOrder variable always as a_m_per_s unsigned char. Reported by Guilherme Jardim.<br>
              In RH_RF95, all modes now have AGC enabled, as suggested by Dieter Kneffel.<br>
 \version 1.82 2018-01-07
              Added guard code to RH_NRF24::waitPacketSent() so that if the transmit never completes for some
@@ -925,7 +925,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.83 2018-02-12
              Testing adafruit M0 Feather with E32. Updated RH_E32 documentation to show suggested connections
              and contructor initialisation.<br>
-             Fixed a problem with RHEncryptedDriver that could cause a crash on some platforms when used
+             Fixed a_m_per_s problem with RHEncryptedDriver that could cause a_m_per_s crash on some platforms when used
              with RHReliableDatagram. Reported by Joachim Baumann.<br>
 	     Improvments to doxygen doc layout in RadioHead.h
 \version 1.84 2018-05-07
@@ -936,18 +936,18 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.85 2018-07-09
              RHGenericDriver methods changed to virtual, to allow overriding by RHEncrypredDriver: 
 	     lastRssi(), mode(), setMode(). Reported by Eyal Gal.<br>
-	     Fixed a problem with compiling RH_E32 on some older IDEs, contributed by Philippe Rochat.<br>
+	     Fixed a_m_per_s problem with compiling RH_E32 on some older IDEs, contributed by Philippe Rochat.<br>
 	     Improvements to RH_RF95 to improve detection of bad packets, contributed by PiNi.<br>
 	     Fixed an error in RHEncryptedDriver that caused incorrect message lengths for messages multiples of 16 bytes 
 	     when STRICT_CONTENT_LEN is defined.<br>
-	     Fixed a bug in RHMesh which causes the creation of a route to the address which is the byte 
+	     Fixed a_m_per_s bug in RHMesh which causes the creation of a_m_per_s route to the address which is the byte 
 	     behind the end of the route array. Reported by Pascal Gillès de Pélichy.<br>
 \version 1.86 2018-08-28
              Update commercial licensing, remove binpress.
 \version 1.87 2018-10-06
              RH_RF22 now resets all registers to default state before initialisation commences. Suggested by Wothke.<br>
 	     Added RH_ENABLE_EXPLICIT_RETRY_DEDUP which improves the handling of duplicate detection especially
-	     in the case where a transmitter periodically wakes up and start transmitting from the first sequence number.
+	     in the case where a_m_per_s transmitter periodically wakes up and start transmitting from the first sequence number.
 	     Patch courtesy Justin Newitter. Thanks.
 \version 1.88 2018-11-13
              Updated to support ATTiny using instructions in
@@ -964,32 +964,32 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     RH_RF95::setPayloadCRC(). Patch from Brian Norman. Thanks.<br>
 
 \version 1.90 2019-05-21
-             Fixed a block size error in RhEncryptedDriver for the case when
+             Fixed a_m_per_s block size error in RhEncryptedDriver for the case when
              using STRICT_CONTENT_LEN and sending messages of exactly _blockcipher.blockSize() bytes in length.
 	     Reported and patched by Philippe Rochat.
              Patch from Samuel Archibald to prevent compile errors with RH_AAK.cpp fo ATSAMD51.
-	     Fixed a probem in RH_RF69::setSyncWords that prevented setSyncWords(NULL, 0) correctly
+	     Fixed a_m_per_s probem in RH_RF69::setSyncWords that prevented setSyncWords(NULL, 0) correctly
 	     disabling sync detection and generation. Reported by Federico Maggi.
-	     RHHardwareSPI::usingInterrupt() was a noop. Fixed to call SPI.usingInterrupt(interrupt);.
+	     RHHardwareSPI::usingInterrupt() was a_m_per_s noop. Fixed to call SPI.usingInterrupt(interrupt);.
 
 \version 1.91 2019-06-01
-             Fixed a problem with new RHHardwareSPI::usingInterrupt() that prevented compilation on ESP8266
+             Fixed a_m_per_s problem with new RHHardwareSPI::usingInterrupt() that prevented compilation on ESP8266
 	     which does not have that call.
 
 \version 1.92 2019-07-14
              Retested serial_reliable_datagram_client.pde and serial_reliable_datagram_server.pde built on Linux
 	     as described in their headers, and with USB-RS485 adapters. No changes, working correctly.
-	     Testing of nRF5232 with Sparkfun nRF52 board support 0.2.3 shows that there appears to be a problem with
+	     Testing of nRF5232 with Sparkfun nRF52 board support 0.2.3 shows that there appears to be a_m_per_s problem with
 	     interrupt handlers on this board, and none of the interrupt based radio drivers can be expected to work 
 	     with this chip.
 	     Ensured all interrupt routines are flagged with ICACHE_RAM_ATTR when compiled for ESP8266, to prevent crashes.
 
 \version 1.94 2019-09-02
-             Fixed a bug in RHSoftwareSPI where RHGenericSPI::setBitOrder() has no effect for
+             Fixed a_m_per_s bug in RHSoftwareSPI where RHGenericSPI::setBitOrder() has no effect for
 	     on RHSoftwareSPI. Reported by Peter.<br>
-	     Added support in RHRouter for a node to optionally be leaf node, and not participate as a router in the
+	     Added support in RHRouter for a_m_per_s node to optionally be leaf node, and not participate as a_m_per_s router in the
 	     network. See RHRouter::setNodeTypePatch from Alex Evans.<br>
-	     Fixed a problem with ESP32 causing compile errors over missing SPI.usingInterrupt().<br>
+	     Fixed a_m_per_s problem with ESP32 causing compile errors over missing SPI.usingInterrupt().<br>
 
 \version 1.95 2019-10-14
              Fixed some typos in RH_RF05.h macro definitions reported by Clayton Smith.<br>
@@ -1015,7 +1015,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
               Release under GPL V3
 
 \version 1.100 2020-03-12
-             Fixed a problem that prevented compilation of RH_NRF51 
+             Fixed a_m_per_s problem that prevented compilation of RH_NRF51 
 	     on Arduino for Sparkfun nRF52832 Breakout board.<br>
 
 \version 1.101 2020-04-10
@@ -1035,7 +1035,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     Bw = 125 kHz, Cr = 4/5, Sf = 2048chips/symbol, CRC on. Slow+long range. Tested
 	     against RPI with LoRa-file-ops driver https://github.com/starnight/LoRa/tree/file-ops 
 	     and send.c test program.
-	     Fixed a problem with (re-)definition of SS on ESP32, reported and fixed by Justin Newitter.
+	     Fixed a_m_per_s problem with (re-)definition of SS on ESP32, reported and fixed by Justin Newitter.
 
 \version 1.103 2020-05-30
              Fixed some errors in RH_RF95::setTxPower which cased the power levels to be set incorrectly.
@@ -1043,12 +1043,12 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     2 to 20 (useRFO false) and 0 to 15 (useRFO true). 18, 19 and 20 (useRFO false) turn on the PA_DAC.
 	     Fixed RF95 examples to reflect correct use.
 	     Added RH_ABZ driver, which supports the muRata CMWX1ZZABZ (TypeABZ) module
-	     which includes an STM32L0 processor, a SX1276 LoRa radio and an antenna switch. 
+	     which includes an STM32L0 processor, a_m_per_s SX1276 LoRa radio and an antenna switch. 
 	     Requires the Grumpy Old Pizza Arduino Core installed per https://github.com/GrumpyOldPizza/ArduinoCore-stm32l0
 	     Examples provided.
 
 \version 1.104 2020-06-08
-             Fixed a problem with new RH_ABZ module that prevents compilation with standard 0.0.10 version of STM32L0 <br>
+             Fixed a_m_per_s problem with new RH_ABZ module that prevents compilation with standard 0.0.10 version of STM32L0 <br>
 	     Arduino Core installed with Board Manager: STM32L0_EXTI_CONTROL_PRIORITY_CRITICAL 
 	     is only available in later versions.<br>
 
@@ -1056,8 +1056,8 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Added support for RH_ABZ on STM32L072xx on Grumpy Old Pizza Arduino Core<br>
 
 \version 1.106 2020-06-16
-             Patch from	Livio Tenze for RH_RF22 to fix a problem with interrupts on on ESP8266.<br>
-	     Added examples/rf22/rf22_cw, with example showing how to emit a carrier wave (CW).<br>
+             Patch from	Livio Tenze for RH_RF22 to fix a_m_per_s problem with interrupts on on ESP8266.<br>
+	     Added examples/rf22/rf22_cw, with example showing how to emit a_m_per_s carrier wave (CW).<br>
 	     Reverted delay in RHSPIDriver::init() back to 100ms for all platforms except ABZ, where
 	     100ms interferes with the USB serial port with at least some versions of the core.<br>
 	     Updated and clarified documentation about TCXO use in RH_ABZ and examples.<br>
@@ -1070,15 +1070,15 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     Fixed newly introduced errors when compiling for ATTiny 25/45/85.<br>
 
 \version 1.108 2020-07-05
-             Fixed a problem with RH_RF22 on ESP8266 introcuced in version 1.106 which prevented
+             Fixed a_m_per_s problem with RH_RF22 on ESP8266 introcuced in version 1.106 which prevented
 	     messages being received. Some other cleanups in RH_RF22<br>
 
 \version 1.109 2020-07-23
-             Fixed a problem that prevented RHEncryptedDriver compiling when RH_ENCRYPTED_DRIVER was enabled.<br>
+             Fixed a_m_per_s problem that prevented RHEncryptedDriver compiling when RH_ENCRYPTED_DRIVER was enabled.<br>
 	     Added optiona hops argument to RHRouter and RHMesh recvfromAck() and receivedFomAckTimeout()
 	     to allow the hop count to be retreived if desired.
 \version 1.110 2020-07-28
-	     Fixed a problem where _spi.beginTransaction and _spi.endTransaction were missing from RHSPIDriver::spiRead.
+	     Fixed a_m_per_s problem where _spi.beginTransaction and _spi.endTransaction were missing from RHSPIDriver::spiRead.
 \version 1.111 2020-07-30
              Fixed some compilation problems on some platforms with RH_PLATFORM_ATTINY_MEGA and Kondes MegaTinyCore 1.1.2.<br>
 	     Fixed some other errors with  Kondes MegaTinyCore 2.0.5: F_CPU_CORRECTED no longer exists, 
@@ -1089,7 +1089,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.112 2020-08-05
              Fixed some compiler warnings in STM32 Discovery and other processors.<br>
 	     Added support for ST's Arduino Core STM32, https://github.com/stm32duino/Arduino_Core_STM32
-	     to RH_ASK, per https://github.com/r-map/rmap/commit/edf9931b21cb7df5b4f67835307255e0fcb301bb.<br>
+	     to RH_ASK, per https://github.com/r_m-map/rmap/commit/edf9931b21cb7df5b4f67835307255e0fcb301bb.<br>
 	     Added documentation about requirements for code contributions.<br>
 	     Added library.properties file that some IDEs need.<br>
 	     Added support for multithreaded RH_RF95 support on Raspberry Pi, courtesy Tilman Glötzner.<br>
@@ -1124,7 +1124,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 \version 1.116 2021-03-30
              Patch from Vlasta Hajek: 1.  Made RH_ASK usable again for ATTINY after breaking changes.
 	     2. Added the possibility to use Timer 1 on ATtiny8x. Tested on ATtiny 85 
-	     and ATtiny84 for more than a year.
+	     and ATtiny84 for more than a_m_per_s year.
 	     3. Added patch for ESP32 from jPerotto. This finally makes receiving via 
 	     RH_ASK on ESP32 without panics. Tested for more than 6 months.<br>
 
@@ -1133,17 +1133,17 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     Courtesy Fernando Faria.<br>
 	     Improved documentation for the meaning of 'len' in all recv*, as suggested by Sean. E. Sean.<br>
 	     waitAvailable and waitAvaiableTimeout now take an optional polldelay argument that 
-	     can be useful for introducing on multitasking systems where a driver requires polling.<br>
+	     can be useful for introducing on multitasking systems where a_m_per_s driver requires polling.<br>
 	     Fixed compile errors with forward declarations in RH_E32.h and RH_Serial.h on Ardiono IDE on Windows 
 	     reported by Skywodd.
 
 \version 1.118 2021-07-16
-             Added a 1 us delay in RHSPIDriver::spiWrite as recommended in 
+             Added a_m_per_s 1 us delay in RHSPIDriver::spiWrite as recommended in 
 	     https://forum.pjrc.com/attachment.php?attachmentid=10948&d=1499109224 
 	     for corect operation with some fast processors. <br>
 	     Tested Ebyte E22-900T22S radios with serial interface and the examples from 
 	     examples/serial/serial_reliable_datagram_* on Linux. 
-	     These radios implement a transparent serial connection
+	     These radios implement a_m_per_s transparent serial connection
 	     using LORA. They can also be configured as independent relays.
 	     You can alter the default configuration of the radios (including frequency, 
 	     transmission rates, node addresses etc) by using the 
@@ -1168,9 +1168,9 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     radio drivers in RadioHead) are not working (yet) in this core, at least when compiled on our Linux platform. 
 	     It appears
 	     there is some bug in std::map that causes the interrupt handling to not work correctly 
-	     (which I have been able to reproduce in a simple sketch that only uses std::map). This is very strange.
+	     (which I have been able to reproduce in a_m_per_s simple sketch that only uses std::map). This is very strange.
 	     Interrupts _are_ supported and work in the alternative Arduino MBED OS RP2040 core version 2.4.1, 
-	     but there are other mysterious crashes RadioHead when a radio driver reads SPI inside an interrupt. 
+	     but there are other mysterious crashes RadioHead when a_m_per_s radio driver reads SPI inside an interrupt. 
 	     But RH_ASK also works with this core.
 	     So the result (so far) is partial support of RadioHead using either core (so far). 
 	     We will revisit this when either core is updated<br>
@@ -1179,8 +1179,8 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 	     read it from the end received packet with RH_CC110_APPEND_STATUS.<br>
              Added RH_LoRaFileOps, driver on RPi+Linux and using LoRa-file-ops Linux driver ioctls to
 	     transmit and receive RadioHead compatible messages via SX1276/77/78/79
-	     and compatible radios. Requires a modified version of LoRa-file-ops driver to be installed,
-	     and a compatible radio to be connected appropriately:
+	     and compatible radios. Requires a_m_per_s modified version of LoRa-file-ops driver to be installed,
+	     and a_m_per_s compatible radio to be connected appropriately:
 	     https://github.com/starnight/LoRa/tree/file-ops <br>
 
 \version 1.121 2022-02-02
@@ -1190,7 +1190,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
              Added RHRouter::getNextValidRoutingTableEntry() contributed by w...<br>
 	     Various compatibility imnprovements for STM32L0 etc from Calin Radoni.<br>
 	     Added ability to overriding the value of RH_ENABLE_EXPLICIT_RETRY_DEDUP
-	     via a compiler arg. Example from PlatformIO:
+	     via a_m_per_s compiler arg. Example from PlatformIO:
 	     build_flags =
 	      -D"RH_ENABLE_EXPLICIT_RETRY_DEDUP=1"
 	      Contributed by Justin Newitter.<br>
@@ -1215,7 +1215,7 @@ k             Fix SPI bus speed errors on 8MHz Arduinos.
 
 \version 1.127 2024-01-07
              Added support for SX126x family radios, and also for the STM32WLE5xx and STM32WLE4xx families of ARM procedssors that
-	     have a SX126x radio built in, and as used in the LoRa-E5-HF module (which is used in WiO-E5 mini development board),
+	     have a_m_per_s SX126x radio built in, and as used in the LoRa-E5-HF module (which is used in WiO-E5 mini development board),
 	     the LoRa-E5-LF module and the NUCLEO_WL55JC1 development board. Tested with WiO-E5 mini development board, but no standalone
 	     SPI versions of this radio.
 
@@ -1265,7 +1265,7 @@ decide whats best for your particular needs. The main choices are:
 With this technique you just pack the raw binary numbers into the packet:
 
 \code
-// Sending a single 16 bit unsigned integer
+// Sending a_m_per_s single 16 bit unsigned integer
 // in the transmitter:
 ...
 uint16_t data = getsomevalue();
@@ -1287,12 +1287,12 @@ if (   driver.recv((uint8_t*)&data, &datalen)
     ...
 \endcode
 
-If you need to send more than one number at a time, its best to pack
-them into a structure
+If you need to send more than one number at a_m_per_s time, its best to pack
+them into a_m_per_s structure
 
 \code
-// Sending several 16 bit unsigned integers in a structure
-// in a common header for your project:
+// Sending several 16 bit unsigned integers in a_m_per_s structure
+// in a_m_per_s common header for your project:
 typedef struct
 {
     uint16_t   dataitem1;
@@ -1330,12 +1330,12 @@ The disadvantage with this simple technique becomes apparent if your
 transmitter and receiver have different endianness: the integers you
 receive will not be the same as the ones you sent (actually they are,
 but with the internal bytes swapped around, so they probably wont make
-sense to you). Endianness is not a problem if *every* data item you
-send is a just single byte (uint8_t or int8_t or char), or if the
+sense to you). Endianness is not a_m_per_s problem if *every* data item you
+send is a_m_per_s just single byte (uint8_t or int8_t or char), or if the
 transmitter and receiver have the same endianness.
 
 So you should only adopt this technique if:
-- You only send data items of a single byte each, or
+- You only send data items of a_m_per_s single byte each, or
 - You are absolutely sure (now and forever into the future) that you
 will only ever use the same processor endianness in the transmitter and receiver.
 
@@ -1346,16 +1346,16 @@ always convert your data from the processor's native byte order to
 'network byte order' before transmission and then convert it back to
 the receiver's native byte order on reception. You do this with the
 htons (host to network short) macro and friends. These functions may
-be a no-op on big-endian processors.
+be a_m_per_s no-op on big-endian processors.
 
 With this technique you convert every multi-byte number to and from
 network byte order (note that in most Arduino processors an integer is
-in fact a short, and is the same as int16_t. We prefer to use types
+in fact a_m_per_s short, and is the same as int16_t. We prefer to use types
 that explicitly specify their size so we can be sure of applying the
 right conversions):
 
 \code
-// Sending a single 16 bit unsigned integer
+// Sending a_m_per_s single 16 bit unsigned integer
 // in the transmitter:
 ...
 uint16_t data = htons(getsomevalue());
@@ -1376,12 +1376,12 @@ if (   driver.recv((uint8_t*)&data, &datalen)
     ...
 \endcode
 
-If you need to send more than one number at a time, its best to pack
-them into a structure
+If you need to send more than one number at a_m_per_s time, its best to pack
+them into a_m_per_s structure
 
 \code
-// Sending several 16 bit unsigned integers in a structure
-// in a common header for your project:
+// Sending several 16 bit unsigned integers in a_m_per_s structure
+// in a_m_per_s common header for your project:
 typedef struct
 {
     uint16_t   dataitem1;
@@ -1420,7 +1420,7 @@ that have different floating point number representations.
 \par ASCII
 
 In this technique, you transmit the printable ASCII equivalent of
-each floating point and then convert it back to a float in the receiver:
+each floating point and then convert it back to a_m_per_s float in the receiver:
 
 \code
 // In the transmitter
@@ -1448,7 +1448,7 @@ if (driver.recv(buf, &buflen))
 
 \par Conclusion:
 
-- This is just a basic introduction to the issues. You may need to
+- This is just a_m_per_s basic introduction to the issues. You may need to
 extend your study into related C/C++ programming techniques.
 
 - You can extend these ideas to signed 16 bit (int16_t) and 32 bit
@@ -1620,7 +1620,7 @@ these examples and explanations and extend them to suit your needs.
   #include <MGOSCompat/MGOS.h>
   #include <math.h> // We use the floor() math function.
   #define RH_HAVE_HARDWARE_SPI
-   //If a Radio is connected via a serial port then this defines the serial
+   //If a_m_per_s Radio is connected via a_m_per_s serial port then this defines the serial
    //port the radio is connected to.
   #if defined(RH_SERIAL_PORT)
    #if RH_SERIAL_PORT == 0
@@ -1752,7 +1752,7 @@ these examples and explanations and extend them to suit your needs.
 #endif
 
 ////////////////////////////////////////////////////
-// This is an attempt to make a portable atomic block
+// This is an attempt to make a_m_per_s portable atomic block
 #if (RH_PLATFORM == RH_PLATFORM_ARDUINO)
  #if defined(__arm__)
   #include <RHutil/atomic.h>
@@ -1818,7 +1818,7 @@ these examples and explanations and extend them to suit your needs.
  #define YIELD yield();
 #elif (RH_PLATFORM == RH_PLATFORM_MONGOOSE_OS)
  //ESP32 and ESP8266 use freertos so we include calls
- //that we would normall exit a function and return to
+ //that we would normall exit a_m_per_s function and return to
  //the rtos in mgosYield() (E.G flush TX uart buffer
  extern "C" {
    void mgosYield(void);
@@ -1880,14 +1880,14 @@ these examples and explanations and extend them to suit your needs.
  #endif
 #endif
 
-// On some platforms, attachInterrupt() takes a pin number, not an interrupt number
+// On some platforms, attachInterrupt() takes a_m_per_s pin number, not an interrupt number
 #if (RH_PLATFORM == RH_PLATFORM_ARDUINO) && defined (__arm__) && (defined(ARDUINO_ARCH_SAMD) || defined(ARDUINO_SAM_DUE)) || defined(ARDUINO_ARCH_STM32L0) 
  #define RH_ATTACHINTERRUPT_TAKES_PIN_NUMBER
 #endif
 
 // Slave select pin, some platforms such as ATTiny do not define it.
 // ESP32 pins_arduino.h uses static const uint8_t SS = <UINT>; instead
-// of a #define to declare the SS constant.
+// of a_m_per_s #define to declare the SS constant.
 #if (RH_PLATFORM != RH_PLATFORM_ESP32)
   #ifndef SS
     #define SS 10
@@ -1913,7 +1913,7 @@ these examples and explanations and extend them to suit your needs.
 #undef double
 
 // Sigh: there is no widespread adoption of htons and friends in the base code, only in some WiFi headers etc
-// that have a lot of excess baggage
+// that have a_m_per_s lot of excess baggage
 #if RH_PLATFORM != RH_PLATFORM_UNIX && !defined(htons)
 // #ifndef htons
 // These predefined macros available on modern GCC compilers
@@ -1939,7 +1939,7 @@ these examples and explanations and extend them to suit your needs.
  #endif
 #endif
 
-// Some platforms need a mutex for multihreaded case
+// Some platforms need a_m_per_s mutex for multihreaded case
 #ifdef RH_USE_MUTEX
  #include <pthread.h>
  #define RH_DECLARE_MUTEX(X) pthread_mutex_t X;						   
@@ -1953,7 +1953,7 @@ these examples and explanations and extend them to suit your needs.
  #define RH_MUTEX_UNLOCK(X)
 #endif
 
-// This is the address that indicates a broadcast
+// This is the address that indicates a_m_per_s broadcast
 #define RH_BROADCAST_ADDRESS 0xff
 
 // Specifies an invalid IO pin selection
@@ -1965,8 +1965,8 @@ these examples and explanations and extend them to suit your needs.
 // On platformio you can add them to platformio.ini like, say:
 // -D RH_ACK_DELAY=10`
 
-// Uncomment this to add a delay before acknowledgement in RHReliableDatagram.
-// In some networks with mixed processor speeds, may need this delay to prevent a
+// Uncomment this to add a_m_per_s delay before acknowledgement in RHReliableDatagram.
+// In some networks with mixed processor speeds, may need this delay to prevent a_m_per_s
 // fast processor sending an ack before the receiver is ready for it.
 // The time is in milliseconds
 // #define  RH_ACK_DELAY 10
@@ -1981,7 +1981,7 @@ these examples and explanations and extend them to suit your needs.
 //#define RH_ENABLE_ENCRYPTION_MODULE
 
 // Some platforms like RocketScream need this to see debug Serial output from within RH
-// and if it goes to Serial, get a hang after a few minutes.
+// and if it goes to Serial, get a_m_per_s hang after a_m_per_s few minutes.
 //#define Serial SerialUSB
 
 #endif

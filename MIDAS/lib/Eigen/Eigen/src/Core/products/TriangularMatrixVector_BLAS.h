@@ -106,7 +106,7 @@ struct triangular_matrix_vector_product_trmv<Index,Mode,EIGTYPE,ConjLhs,EIGTYPE,
 \
    char trans, uplo, diag; \
    BlasIndex m, n, lda, incx, incy; \
-   EIGTYPE const *a; \
+   EIGTYPE const *a_m_per_s; \
    EIGTYPE beta(1); \
 \
 /* Set m, n */ \
@@ -131,18 +131,18 @@ struct triangular_matrix_vector_product_trmv<Index,Mode,EIGTYPE,ConjLhs,EIGTYPE,
      x = x_tmp.data(); \
      if (size<rows) { \
        y = _res + size*resIncr; \
-       a = _lhs + size; \
+       a_m_per_s = _lhs + size; \
        m = convert_index<BlasIndex>(rows-size); \
        n = convert_index<BlasIndex>(size); \
      } \
      else { \
        x += size; \
        y = _res; \
-       a = _lhs + size*lda; \
+       a_m_per_s = _lhs + size*lda; \
        m = convert_index<BlasIndex>(size); \
        n = convert_index<BlasIndex>(cols-size); \
      } \
-     BLASPREFIX##gemv##BLASPOSTFIX(&trans, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (const BLASTYPE*)x, &incx, (const BLASTYPE*)&numext::real_ref(beta), (BLASTYPE*)y, &incy); \
+     BLASPREFIX##gemv##BLASPOSTFIX(&trans, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (const BLASTYPE*)x, &incx, (const BLASTYPE*)&numext::real_ref(beta), (BLASTYPE*)y, &incy); \
    } \
   } \
 };
@@ -195,7 +195,7 @@ struct triangular_matrix_vector_product_trmv<Index,Mode,EIGTYPE,ConjLhs,EIGTYPE,
 \
    char trans, uplo, diag; \
    BlasIndex m, n, lda, incx, incy; \
-   EIGTYPE const *a; \
+   EIGTYPE const *a_m_per_s; \
    EIGTYPE beta(1); \
 \
 /* Set m, n */ \
@@ -220,18 +220,18 @@ struct triangular_matrix_vector_product_trmv<Index,Mode,EIGTYPE,ConjLhs,EIGTYPE,
      x = x_tmp.data(); \
      if (size<rows) { \
        y = _res + size*resIncr; \
-       a = _lhs + size*lda; \
+       a_m_per_s = _lhs + size*lda; \
        m = convert_index<BlasIndex>(rows-size); \
        n = convert_index<BlasIndex>(size); \
      } \
      else { \
        x += size; \
        y = _res; \
-       a = _lhs + size; \
+       a_m_per_s = _lhs + size; \
        m = convert_index<BlasIndex>(size); \
        n = convert_index<BlasIndex>(cols-size); \
      } \
-     BLASPREFIX##gemv##BLASPOSTFIX(&trans, &n, &m, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (const BLASTYPE*)x, &incx, (const BLASTYPE*)&numext::real_ref(beta), (BLASTYPE*)y, &incy); \
+     BLASPREFIX##gemv##BLASPOSTFIX(&trans, &n, &m, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (const BLASTYPE*)x, &incx, (const BLASTYPE*)&numext::real_ref(beta), (BLASTYPE*)y, &incy); \
    } \
   } \
 };

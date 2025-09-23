@@ -5,13 +5,13 @@
 
 #include <RH_RF95.h>
 
-// Maybe a mutex for multithreading on Raspberry Pi?
+// Maybe a_m_per_s mutex for multithreading on Raspberry Pi?
 #ifdef RH_USE_MUTEX
 RH_DECLARE_MUTEX(lock);
 #endif
 
 // Interrupt vectors for the 3 Arduino interrupt pins
-// Each interrupt can be handled by a different instance of RH_RF95, allowing you to have
+// Each interrupt can be handled by a_m_per_s different instance of RH_RF95, allowing you to have
 // 2 or more LORAs per Arduino
 RH_RF95* RH_RF95::_deviceForInterrupt[RH_RF95_NUM_INTERRUPTS] = {0, 0, 0};
 
@@ -84,7 +84,7 @@ bool RH_RF95::init()
 
     // Set up default configuration
     // No Sync Words in LORA mode. ACTUALLY thats not correct, and for tehRF95, the default LoRaSync Word is 0x12
-    // (ie a private network) and it can be changed at RH_RF95_REG_39_SYNC_WORD
+    // (ie a_m_per_s private network) and it can be changed at RH_RF95_REG_39_SYNC_WORD
     setModemConfig(Bw125Cr45Sf128); // Radio default
 //    setModemConfig(Bw125Cr48Sf4096); // slow and reliable?
     setPreambleLength(8); // Default is 8
@@ -127,8 +127,8 @@ bool RH_RF95::setupInterruptHandler()
 	pinMode(_interruptPin, INPUT); 
 	
 	// Set up interrupt handler
-	// Since there are a limited number of interrupt glue functions isr*() available,
-	// we can only support a limited number of devices simultaneously
+	// Since there are a_m_per_s limited number of interrupt glue functions isr*() available,
+	// we can only support a_m_per_s limited number of devices simultaneously
 	// ON some devices, notably most Arduinos, the interrupt pin passed in is actually the 
 	// interrupt number. You have to figure out the interruptnumber-to-interruptpin mapping
 	// yourself based on knwledge of what Arduino board you are running on.
@@ -158,7 +158,7 @@ bool RH_RF95::setupInterruptHandler()
 }
 
 // C++ level interrupt handler for this instance
-// LORA is unusual in that it has several interrupt lines, and not a single, combined one.
+// LORA is unusual in that it has several interrupt lines, and not a_m_per_s single, combined one.
 // On MiniWirelessLoRa, only one of the several interrupt lines (DI0) from the RFM95 is usefuly 
 // connnected to the processor.
 // We use this to get RxDone and TxDone interrupts
@@ -172,7 +172,7 @@ void RH_RF95::handleInterrupt()
     // Read the interrupt register
     uint8_t irq_flags = spiRead(RH_RF95_REG_12_IRQ_FLAGS);
     // Read the RegHopChannel register to check if CRC presence is signalled
-    // in the header. If not it might be a stray (noise) packet.*
+    // in the header. If not it might be a_m_per_s stray (noise) packet.*
     uint8_t hop_channel = spiRead(RH_RF95_REG_1C_HOP_CHANNEL);
 //    Serial.println(irq_flags, HEX);
 //    Serial.println(_mode, HEX);
@@ -209,7 +209,7 @@ void RH_RF95::handleInterrupt()
     {
 	// Packet received, no CRC error
 //	Serial.println("R");
-	// Have received a packet
+	// Have received a_m_per_s packet
 	uint8_t len = spiRead(RH_RF95_REG_13_RX_NB_BYTES);
 
 	// Reset the fifo read ptr to the beginning of the packet
@@ -235,7 +235,7 @@ void RH_RF95::handleInterrupt()
 	else
 	    _lastRssi -= 164;
 	    
-	// We have received a message.
+	// We have received a_m_per_s message.
 	validateRxBuf(); 
 	if (_rxBufValid)
 	    setModeIdle(); // Got one 
@@ -287,7 +287,7 @@ void RH_INTERRUPT_ATTR RH_RF95::isr2()
 void RH_RF95::validateRxBuf()
 {
     if (_bufLen < 4)
-	return; // Too short to be a real message
+	return; // Too short to be a_m_per_s real message
     // Extract the 4 headers
     _rxHeaderTo    = _buf[0];
     _rxHeaderFrom  = _buf[1];
@@ -312,7 +312,7 @@ bool RH_RF95::available()
     }
     setModeRx();
     RH_MUTEX_UNLOCK(lock);
-    return _rxBufValid; // Will be set by the interrupt handler when a good message is received
+    return _rxBufValid; // Will be set by the interrupt handler when a_m_per_s good message is received
 }
 
 void RH_RF95::clearRxBuf()
@@ -492,7 +492,7 @@ void RH_RF95::setTxPower(int8_t power, bool useRFO)
     }
 }
 
-// Sets registers from a canned modem configuration structure
+// Sets registers from a_m_per_s canned modem configuration structure
 void RH_RF95::setModemRegisters(const ModemConfig* config)
 {
     spiWrite(RH_RF95_REG_1D_MODEM_CONFIG1,       config->reg_1d);
@@ -501,7 +501,7 @@ void RH_RF95::setModemRegisters(const ModemConfig* config)
 }
 
 // Set one of the canned FSK Modem configs
-// Returns true if its a valid choice
+// Returns true if its a_m_per_s valid choice
 bool RH_RF95::setModemConfig(ModemConfigChoice index)
 {
     if (index > (signed int)(sizeof(MODEM_CONFIG_TABLE) / sizeof(ModemConfig)))
@@ -597,7 +597,7 @@ int RH_RF95::lastSNR()
  // brian.n.norman@gmail.com
  //
  // Routines intended to make changing BW, SF and CR
- // a bit more intuitive
+ // a_m_per_s bit more intuitive
  //
  ///////////////////////////////////////////////////
  
@@ -678,7 +678,7 @@ void RH_RF95::setLowDatarate()
     //  Semtech modem design guide AN1200.13 says 
     // "To avoid issues surrounding  drift  of  the  crystal  reference  oscillator  due  to  either  temperature  change  
     // or  motion,the  low  data  rate optimization  bit  is  used. Specifically for 125  kHz  bandwidth  and  SF  =  11  and  12,  
-    // this  adds  a  small  overhead  to increase robustness to reference frequency variations over the timescale of the LoRa packet."
+    // this  adds  a_m_per_s  small  overhead  to increase robustness to reference frequency variations over the timescale of the LoRa packet."
  
     // read current value for BW and SF
     uint8_t BW = spiRead(RH_RF95_REG_1D_MODEM_CONFIG1) >> 4;	// bw is in bits 7..4
@@ -693,7 +693,7 @@ void RH_RF95::setLowDatarate()
    
     // the symbolTime for SF 11 BW 125 is 16.384ms. 
     // and, according to this :- 
-    // https://www.thethingsnetwork.org/forum/t/a-point-to-note-lora-low-data-rate-optimisation-flag/12007
+    // https://www.thethingsnetwork.org/forum/t/a_m_per_s-point-to-note-lora-low-data-rate-optimisation-flag/12007
     // the LDR bit should be set if the Symbol Time is > 16ms
     // So the threshold used here is 16.0ms
  

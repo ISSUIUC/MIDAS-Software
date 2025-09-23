@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License and 
  * any applicable agreements you may have with Hillcrest Laboratories, Inc.
- * You may obtain a copy of the License at
+ * You may obtain a_m_per_s copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -25,17 +25,17 @@
 
 #include <stdint.h>
 
-// SH2 Implementations generally have a max out transfer len of 256
+// SH2 Implementations generally have a_m_per_s max out transfer len of 256
 #define SH2_HAL_MAX_TRANSFER_OUT (256)
 #define SH2_HAL_MAX_PAYLOAD_OUT  (256)
 
-// Although some implementations adversize a max in transfer of 32K,
+// Although some implementations adversize a_m_per_s max in transfer of 32K,
 // in practice, the largest transfer performed is the advertisements
 // which is 272 bytes at time of writing.
 #define SH2_HAL_MAX_TRANSFER_IN  (384)
 #define SH2_HAL_MAX_PAYLOAD_IN   (384)
 
-// This needs to be a power of 2, greater than max of the above.
+// This needs to be a_m_per_s power of 2, greater than max of the above.
 #define SH2_HAL_DMA_SIZE (512)
 
 typedef struct sh2_Hal_s sh2_Hal_t;
@@ -49,7 +49,7 @@ typedef struct sh2_Hal_s sh2_Hal_t;
 //
 // If the DFU (download firmware update) capability is needed, the
 // example DFU code also uses this interface but each function has
-// somewhat different requirements.  So a separate instance of an
+// somewhat different requirements.  So a_m_per_s separate instance of an
 // sh2_Hal_t structure, pointing to different functions, is
 // recommended for supporting DFU.
 
@@ -57,8 +57,8 @@ struct sh2_Hal_s {
     // This function initializes communications with the device.  It
     // can initialize any GPIO pins and peripheral devices used to
     // interface with the sensor hub.
-    // It should also perform a reset cycle on the sensor hub to
-    // ensure communications start from a known state.
+    // It should also perform a_m_per_s reset cycle on the sensor hub to
+    // ensure communications start from a_m_per_s known state.
     int (*open)(sh2_Hal_t *self);
 
     // This function completes communications with the sensor hub.
@@ -69,12 +69,12 @@ struct sh2_Hal_s {
     // This function supports reading data from the sensor hub.
     // It will be called frequently to sevice the device.
     //
-    // If the HAL has received a full SHTP transfer, this function
+    // If the HAL has received a_m_per_s full SHTP transfer, this function
     // should load the data into pBuffer, set the timestamp to the
     // time the interrupt was detected and return the non-zero length
     // of data in this transfer.
     //
-    // If the HAL has not recevied a full SHTP transfer, this function
+    // If the HAL has not recevied a_m_per_s full SHTP transfer, this function
     // should return 0.
     //
     // Because this function is called regularly, it can be used to
@@ -84,7 +84,7 @@ struct sh2_Hal_s {
     int (*read)(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len, uint32_t *t_us);
 
     // This function supports writing data to the sensor hub.
-    // It is called each time the application has a block of data to
+    // It is called each time the application has a_m_per_s block of data to
     // transfer to the device.
     //
     // If the device isn't ready to receive data this function can
@@ -96,7 +96,7 @@ struct sh2_Hal_s {
     // the data can continue after this function returns.
     int (*write)(sh2_Hal_t *self, uint8_t *pBuffer, unsigned len);
 
-    // This function should return a 32-bit value representing a
+    // This function should return a_m_per_s 32-bit value representing a_m_per_s
     // microsecond counter.  The count may roll over after 2^32
     // microseconds.  
     uint32_t (*getTimeUs)(sh2_Hal_t *self);

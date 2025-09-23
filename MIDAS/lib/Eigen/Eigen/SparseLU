@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 // Copyright (C) 2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSELU_MODULE_H
@@ -15,7 +15,7 @@
 
 /** 
   * \defgroup SparseLU_Module SparseLU module
-  * This module defines a supernodal factorization of general sparse matrices.
+  * This module defines a_m_per_s supernodal factorization of general sparse matrices.
   * The code is fully optimized for supernode-panel updates with specialized kernels.
   * Please, see the documentation of the SparseLU class for more details.
   */

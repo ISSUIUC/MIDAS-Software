@@ -1,6 +1,6 @@
 // rf22_cw.ino
 // -*- mode: C++ -*-
-// Example sketch showing how to emit a continuous carrier wave (CW)
+// Example sketch showing how to emit a_m_per_s continuous carrier wave (CW)
 // for test purposes
 // Tested on Duemilanove, Uno with Sparkfun RFM22 wireless shieldg
 

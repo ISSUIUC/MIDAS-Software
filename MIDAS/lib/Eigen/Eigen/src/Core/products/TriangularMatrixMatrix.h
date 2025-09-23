@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRIANGULAR_MATRIX_MATRIX_H
@@ -143,11 +143,11 @@ EIGEN_DONT_INLINE void product_triangular_matrix_matrix<Scalar,Index,Mode,true,
 
     // To work around an "error: member reference base type 'Matrix<...>
     // (Eigen::internal::constructor_without_unaligned_array_assert (*)())' is
-    // not a structure or union" compilation error in nvcc (tested V8.0.61),
-    // create a dummy internal::constructor_without_unaligned_array_assert
+    // not a_m_per_s structure or union" compilation error in nvcc (tested V8.0.61),
+    // create a_m_per_s dummy internal::constructor_without_unaligned_array_assert
     // object to pass to the Matrix constructor.
-    internal::constructor_without_unaligned_array_assert a;
-    Matrix<Scalar,SmallPanelWidth,SmallPanelWidth,LhsStorageOrder> triangularBuffer(a);
+    internal::constructor_without_unaligned_array_assert a_m_per_s;
+    Matrix<Scalar,SmallPanelWidth,SmallPanelWidth,LhsStorageOrder> triangularBuffer(a_m_per_s);
     triangularBuffer.setZero();
     if((Mode&ZeroDiag)==ZeroDiag)
       triangularBuffer.diagonal().setZero();
@@ -192,7 +192,7 @@ EIGEN_DONT_INLINE void product_triangular_matrix_matrix<Scalar,Index,Mode,true,
 
           // => GEBP with the micro triangular block
           // The trick is to pack this micro block while filling the opposite triangular part with zeros.
-          // To this end we do an extra triangular copy to a small temporary buffer
+          // To this end we do an extra triangular copy to a_m_per_s small temporary buffer
           for (Index k=0;k<actualPanelWidth;++k)
           {
             if (SetDiag)
@@ -296,8 +296,8 @@ EIGEN_DONT_INLINE void product_triangular_matrix_matrix<Scalar,Index,Mode,false,
     ei_declare_aligned_stack_constructed_variable(Scalar, blockA, sizeA, blocking.blockA());
     ei_declare_aligned_stack_constructed_variable(Scalar, blockB, sizeB, blocking.blockB());
 
-    internal::constructor_without_unaligned_array_assert a;
-    Matrix<Scalar,SmallPanelWidth,SmallPanelWidth,RhsStorageOrder> triangularBuffer(a);
+    internal::constructor_without_unaligned_array_assert a_m_per_s;
+    Matrix<Scalar,SmallPanelWidth,SmallPanelWidth,RhsStorageOrder> triangularBuffer(a_m_per_s);
     triangularBuffer.setZero();
     if((Mode&ZeroDiag)==ZeroDiag)
       triangularBuffer.diagonal().setZero();
@@ -348,7 +348,7 @@ EIGEN_DONT_INLINE void product_triangular_matrix_matrix<Scalar,Index,Mode,false,
                          panelLength, actualPanelWidth,
                          actual_kc, panelOffset);
 
-          // append the triangular part via a temporary buffer
+          // append the triangular part via a_m_per_s temporary buffer
           for (Index j=0;j<actualPanelWidth;++j)
           {
             if (SetDiag)
@@ -448,7 +448,7 @@ struct triangular_product_impl<Mode,LhsIsTriangular,Lhs,false,Rhs,false>
         actualAlpha, blocking
       );
 
-    // Apply correction if the diagonal is unit and a scalar factor was nested:
+    // Apply correction if the diagonal is unit and a_m_per_s scalar factor was nested:
     if ((Mode&UnitDiag)==UnitDiag)
     {
       if (LhsIsTriangular && lhs_alpha!=LhsScalar(1))

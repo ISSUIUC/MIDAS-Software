@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 #ifndef METIS_SUPPORT_H
 #define METIS_SUPPORT_H
@@ -113,7 +113,7 @@ public:
      
     if(output_error != METIS_OK) 
     {
-      //FIXME The ordering interface should define a class of possible errors 
+      //FIXME The ordering interface should define a_m_per_s class of possible errors 
      std::cerr << "ERROR WHILE CALLING THE METIS PACKAGE \n"; 
      return; 
     }

@@ -27,7 +27,7 @@
 
  ********************************************************************************
  *   Content : Eigen bindings to Intel(R) MKL
- *   MKL VML support for coefficient-wise unary Eigen expressions like a=b.sin()
+ *   MKL VML support for coefficient-wise unary Eigen expressions like a_m_per_s=b.sin()
  ********************************************************************************
 */
 

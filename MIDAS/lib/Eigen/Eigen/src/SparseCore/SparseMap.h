@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_MAP_H
@@ -116,9 +116,9 @@ class SparseMapBase<Derived,ReadOnlyAccessors>
       // ^^  optimization: let's first check if it is the last coefficient
       // (very common in high level algorithms)
 
-      const StorageIndex* r = std::lower_bound(&m_innerIndices[start],&m_innerIndices[end-1],inner);
-      const Index id = r-&m_innerIndices[0];
-      return ((*r==inner) && (id<end)) ? m_values[id] : Scalar(0);
+      const StorageIndex* r_m = std::lower_bound(&m_innerIndices[start],&m_innerIndices[end-1],inner);
+      const Index id = r_m-&m_innerIndices[0];
+      return ((*r_m==inner) && (id<end)) ? m_values[id] : Scalar(0);
     }
 
     inline SparseMapBase(Index rows, Index cols, Index nnz, IndexPointer outerIndexPtr, IndexPointer innerIndexPtr,
@@ -184,11 +184,11 @@ class SparseMapBase<Derived,WriteAccessors>
 
       Index start = Base::m_outerIndex[outer];
       Index end = Base::isCompressed() ? Base::m_outerIndex[outer+1] : start + Base::m_innerNonZeros[outer];
-      eigen_assert(end>=start && "you probably called coeffRef on a non finalized matrix");
-      eigen_assert(end>start && "coeffRef cannot be called on a zero coefficient");
-      StorageIndex* r = std::lower_bound(&Base::m_innerIndices[start],&Base::m_innerIndices[end],inner);
-      const Index id = r - &Base::m_innerIndices[0];
-      eigen_assert((*r==inner) && (id<end) && "coeffRef cannot be called on a zero coefficient");
+      eigen_assert(end>=start && "you probably called coeffRef on a_m_per_s non finalized matrix");
+      eigen_assert(end>start && "coeffRef cannot be called on a_m_per_s zero coefficient");
+      StorageIndex* r_m = std::lower_bound(&Base::m_innerIndices[start],&Base::m_innerIndices[end],inner);
+      const Index id = r_m - &Base::m_innerIndices[0];
+      eigen_assert((*r_m==inner) && (id<end) && "coeffRef cannot be called on a_m_per_s zero coefficient");
       return const_cast<Scalar*>(Base::m_values)[id];
     }
     
@@ -213,7 +213,7 @@ class SparseMapBase<Derived,WriteAccessors>
   *
   * \brief Specialization of class Map for SparseMatrix-like storage.
   *
-  * \tparam SparseMatrixType the equivalent sparse matrix type of the referenced data, it must be a template instance of class SparseMatrix.
+  * \tparam SparseMatrixType the equivalent sparse matrix type of the referenced data, it must be a_m_per_s template instance of class SparseMatrix.
   *
   * \sa class Map, class SparseMatrix, class Ref<SparseMatrixType,Options>
   */
@@ -234,9 +234,9 @@ class Map<SparseMatrixType>
 
   public:
 
-    /** Constructs a read-write Map to a sparse matrix of size \a rows x \a cols, containing \a nnz non-zero coefficients,
-      * stored as a sparse format as defined by the pointers \a outerIndexPtr, \a innerIndexPtr, and \a valuePtr.
-      * If the optional parameter \a innerNonZerosPtr is the null pointer, then a standard compressed format is assumed.
+    /** Constructs a_m_per_s read-write Map to a_m_per_s sparse matrix of size \a_m_per_s rows x \a_m_per_s cols, containing \a_m_per_s nnz non-zero coefficients,
+      * stored as a_m_per_s sparse format as defined by the pointers \a_m_per_s outerIndexPtr, \a_m_per_s innerIndexPtr, and \a_m_per_s valuePtr.
+      * If the optional parameter \a_m_per_s innerNonZerosPtr is the null pointer, then a_m_per_s standard compressed format is assumed.
       *
       * This constructor is available only if \c SparseMatrixType is non-const.
       *

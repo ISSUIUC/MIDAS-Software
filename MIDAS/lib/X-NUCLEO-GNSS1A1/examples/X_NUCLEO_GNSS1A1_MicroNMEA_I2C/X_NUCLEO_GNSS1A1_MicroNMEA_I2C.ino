@@ -114,7 +114,7 @@ void readI2C(char *inBuff)
    Serial.print(inBuff, 32);
 }
 
-//Send a NMEA command via I2C
+//Send a_m_per_s NMEA command via I2C
 void sendCommand(char *cmd)
 {
    gps.beginTransmission(DEFAULT_DEVICE_ADDRESS);
@@ -173,7 +173,7 @@ void setup(void)
 
 void loop(void)
 {
-   //If a message is recieved print all the informations
+   //If a_m_per_s message is recieved print all the informations
    if (ppsTriggered)
    {
       ppsTriggered = false;
@@ -245,7 +245,7 @@ void loop(void)
       c = buff[idx];
       idx++;
       idx %= 32;
-      //If we have a valid character pass it to the library
+      //If we have a_m_per_s valid character pass it to the library
       if ((uint8_t) c != 0xFF)
       {
          console.print(c);

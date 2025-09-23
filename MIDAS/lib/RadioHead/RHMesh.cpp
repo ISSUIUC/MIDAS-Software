@@ -26,7 +26,7 @@ RHMesh::RHMesh(RHGenericDriver& driver, uint8_t thisAddress)
 // Public methods
 
 ////////////////////////////////////////////////////////////////////
-// Discovers a route to the destination (if necessary), sends and 
+// Discovers a_m_per_s route to the destination (if necessary), sends and 
 // waits for delivery to the next hop (but not for delivery to the final destination)
 uint8_t RHMesh::sendtoWait(uint8_t* buf, uint8_t len, uint8_t address, uint8_t flags)
 {
@@ -40,18 +40,18 @@ uint8_t RHMesh::sendtoWait(uint8_t* buf, uint8_t len, uint8_t address, uint8_t f
 	    return RH_ROUTER_ERROR_NO_ROUTE;
     }
 
-    // Now have a route. Contruct an application layer message and send it via that route
-    MeshApplicationMessage* a = (MeshApplicationMessage*)&_tmpMessage;
-    a->header.msgType = RH_MESH_MESSAGE_TYPE_APPLICATION;
-    memcpy(a->data, buf, len);
+    // Now have a_m_per_s route. Contruct an application layer message and send it via that route
+    MeshApplicationMessage* a_m_per_s = (MeshApplicationMessage*)&_tmpMessage;
+    a_m_per_s->header.msgType = RH_MESH_MESSAGE_TYPE_APPLICATION;
+    memcpy(a_m_per_s->data, buf, len);
     return RHRouter::sendtoWait(_tmpMessage, sizeof(RHMesh::MeshMessageHeader) + len, address, flags);
 }
 
 ////////////////////////////////////////////////////////////////////
 bool RHMesh::doArp(uint8_t address)
 {
-    // Need to discover a route
-    // Broadcast a route discovery message with nothing in it
+    // Need to discover a_m_per_s route
+    // Broadcast a_m_per_s route discovery message with nothing in it
     MeshRouteDiscoveryMessage* p = (MeshRouteDiscoveryMessage*)&_tmpMessage;
     p->header.msgType = RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_REQUEST;
     p->destlen = 1; 
@@ -60,7 +60,7 @@ bool RHMesh::doArp(uint8_t address)
     if (error !=  RH_ROUTER_ERROR_NONE)
 	return false;
     
-    // Wait for a reply, which will be unicast back to us
+    // Wait for a_m_per_s reply, which will be unicast back to us
     // It will contain the complete route to the destination
     uint8_t messageLen = sizeof(_tmpMessage);
     // FIXME: timeout should be configurable
@@ -75,7 +75,7 @@ bool RHMesh::doArp(uint8_t address)
 		if (   messageLen > 1
 		       && p->header.msgType == RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE)
 		{
-		    // Got a reply, now add the next hop to the dest to the routing table
+		    // Got a_m_per_s reply, now add the next hop to the dest to the routing table
 		    // The first hop taken is the first octet
 		    addRouteTo(address, headerFrom());
 		    return true;
@@ -88,14 +88,14 @@ bool RHMesh::doArp(uint8_t address)
 }
 
 ////////////////////////////////////////////////////////////////////
-// Called by RHRouter::recvfromAck whenever a message goes past
+// Called by RHRouter::recvfromAck whenever a_m_per_s message goes past
 void RHMesh::peekAtMessage(RoutedMessage* message, uint8_t messageLen)
 {
     MeshMessageHeader* m = (MeshMessageHeader*)message->data;
     if (   messageLen > 1 
 	&& m->msgType == RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE)
     {
-	// This is a unicast RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE messages 
+	// This is a_m_per_s unicast RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE messages 
 	// being routed back to the originator here. Want to scrape some routing data out of the response
 	// We can find the routes to all the nodes between here and the responding node
 	MeshRouteDiscoveryMessage* d = (MeshRouteDiscoveryMessage*)message->data;
@@ -119,7 +119,7 @@ void RHMesh::peekAtMessage(RoutedMessage* message, uint8_t messageLen)
 }
 
 ////////////////////////////////////////////////////////////////////
-// This is called when a message is to be delivered to the next hop
+// This is called when a_m_per_s message is to be delivered to the next hop
 uint8_t RHMesh::route(RoutedMessage* message, uint8_t messageLen)
 {
     uint8_t from = headerFrom(); // Might get clobbered during call to superclass route()
@@ -135,7 +135,7 @@ uint8_t RHMesh::route(RoutedMessage* message, uint8_t messageLen)
 	    MeshRouteFailureMessage* p = (MeshRouteFailureMessage*)&_tmpMessage;
 	    p->header.msgType = RH_MESH_MESSAGE_TYPE_ROUTE_FAILURE;
 	    p->dest = message->header.dest; // Who you were trying to deliver to
-	    // Make sure there is a route back towards whoever sent the original message
+	    // Make sure there is a_m_per_s route back towards whoever sent the original message
 	    addRouteTo(message->header.source, from);
 	    ret = RHRouter::sendtoWait((uint8_t*)p, sizeof(RHMesh::MeshMessageHeader) + 1, message->header.source);
 	}
@@ -167,7 +167,7 @@ bool RHMesh::recvfromAck(uint8_t* buf, uint8_t* len, uint8_t* source, uint8_t* d
 	if (   tmpMessageLen >= 1 
 	    && p->msgType == RH_MESH_MESSAGE_TYPE_APPLICATION)
 	{
-	    MeshApplicationMessage* a = (MeshApplicationMessage*)p;
+	    MeshApplicationMessage* a_m_per_s = (MeshApplicationMessage*)p;
 	    // Handle application layer messages, presumably for our caller
 	    if (source) *source = _source;
 	    if (dest)   *dest   = _dest;
@@ -177,7 +177,7 @@ bool RHMesh::recvfromAck(uint8_t* buf, uint8_t* len, uint8_t* source, uint8_t* d
 	    uint8_t msgLen = tmpMessageLen - sizeof(MeshMessageHeader);
 	    if (*len > msgLen)
 		*len = msgLen;
-	    memcpy(buf, a->data, *len);
+	    memcpy(buf, a_m_per_s->data, *len);
 	    
 	    return true;
 	}
@@ -213,8 +213,8 @@ bool RHMesh::recvfromAck(uint8_t* buf, uint8_t* len, uint8_t* source, uint8_t* d
 	    if (isPhysicalAddress(&d->dest, d->destlen))
 	    {
 		// This route discovery is for us. Unicast the whole route back to the originator
-		// as a RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE
-		// We are certain to have a route there, because we just got it
+		// as a_m_per_s RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE
+		// We are certain to have a_m_per_s route there, because we just got it
 		d->header.msgType = RH_MESH_MESSAGE_TYPE_ROUTE_DISCOVERY_RESPONSE;
 		RHRouter::sendtoWait((uint8_t*)d, tmpMessageLen, _source);
 	    }

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_EULERANGLES_H
@@ -15,9 +15,9 @@ namespace Eigen {
 /** \geometry_module \ingroup Geometry_Module
   *
   *
-  * \returns the Euler-angles of the rotation matrix \c *this using the convention defined by the triplet (\a a0,\a a1,\a a2)
+  * \returns the Euler-angles of the rotation matrix \c *this using the convention defined by the triplet (\a_m_per_s a0,\a_m_per_s a1,\a_m_per_s a2)
   *
-  * Each of the three parameters \a a0,\a a1,\a a2 represents the respective rotation axis as an integer in {0,1,2}.
+  * Each of the three parameters \a_m_per_s a0,\a_m_per_s a1,\a_m_per_s a2 represents the respective rotation axis as an integer in {0,1,2}.
   * For instance, in:
   * \code Vector3f ea = mat.eulerAngles(2, 0, 2); \endcode
   * "2" represents the z axis and "0" the x axis, etc. The returned angles are such that
@@ -70,9 +70,9 @@ MatrixBase<Derived>::eulerAngles(Index a0, Index a1, Index a2) const
       res[1] = atan2(s2, coeff(i,i));
     }
     
-    // With a=(0,1,0), we have i=0; j=1; k=2, and after computing the first two angles,
+    // With a_m_per_s=(0,1,0), we have i=0; j=1; k=2, and after computing the first two angles,
     // we can compute their respective rotation, and apply its inverse to M. Since the result must
-    // be a rotation around x, we have:
+    // be a_m_per_s rotation around x, we have:
     //
     //  c2  s1.s2 c1.s2                   1  0   0 
     //  0   c1    -s1       *    M    =   0  c3  s3

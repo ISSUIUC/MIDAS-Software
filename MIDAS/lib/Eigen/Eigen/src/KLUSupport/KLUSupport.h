@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Kyle Macfarlan <kyle.macfarlan@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_KLUSUPPORT_H
@@ -17,13 +17,13 @@ namespace Eigen {
 /** \ingroup KLUSupport_Module
   * \brief A sparse LU factorization and solver based on KLU
   *
-  * This class allows to solve for A.X = B sparse linear problems via a LU factorization
+  * This class allows to solve for A.X = B sparse linear problems via a_m_per_s LU factorization
   * using the KLU library. The sparse matrix A must be squared and full rank.
   * The vectors or matrices X and B can be either dense or sparse.
   *
-  * \warning The input matrix A should be in a \b compressed and \b column-major form.
-  * Otherwise an expensive copy will be made. You can call the inexpensive makeCompressed() to get a compressed matrix.
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \warning The input matrix A should be in a_m_per_s \b compressed and \b column-major form.
+  * Otherwise an expensive copy will be made. You can call the inexpensive makeCompressed() to get a_m_per_s compressed matrix.
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   *
   * \implsparsesolverconcept
   *
@@ -139,7 +139,7 @@ class KLU : public SparseSolverBase<KLU<_MatrixType> >
       return m_q;
     }
 #endif
-    /** Computes the sparse Cholesky decomposition of \a matrix
+    /** Computes the sparse Cholesky decomposition of \a_m_per_s matrix
      *  Note that the matrix should be column-major, and in compressed format for best performance.
      *  \sa SparseMatrix::makeCompressed().
      */
@@ -153,7 +153,7 @@ class KLU : public SparseSolverBase<KLU<_MatrixType> >
       factorize_impl();
     }
 
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       *
@@ -191,7 +191,7 @@ class KLU : public SparseSolverBase<KLU<_MatrixType> >
       return m_common;
     }
 
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the pattern anylysis has been performed.
       *
@@ -344,7 +344,7 @@ bool KLU<MatrixType>::_solve_impl(const MatrixBase<BDerived> &b, MatrixBase<XDer
 {
   Index rhsCols = b.cols();
   EIGEN_STATIC_ASSERT((XDerived::Flags&RowMajorBit)==0, THIS_METHOD_IS_ONLY_FOR_COLUMN_MAJOR_MATRICES);
-  eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for solving, you must first call either compute() or analyzePattern()/factorize()");
+  eigen_assert(m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for solving, you must first call either compute() or analyzePattern()/factorize()");
 
   x = b;
   int info = klu_solve(m_symbolic, m_numeric, b.rows(), rhsCols, x.const_cast_derived().data(), const_cast<klu_common*>(&m_common), Scalar());

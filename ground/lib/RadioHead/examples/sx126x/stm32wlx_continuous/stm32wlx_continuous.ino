@@ -1,8 +1,8 @@
 // stm32wlx_continuous.ino
 // -*- mode: C++ -*-
-// Example sketch showing how to start a continuous carrier wave transmission
+// Example sketch showing how to start a_m_per_s continuous carrier wave transmission
 // for measuring power output. CAUTION: it may be illegal for you to transmit continuously
-// without a dummy load.
+// without a_m_per_s dummy load.
 //
 // In order to use the Arduino IDE to program the Wio-E5, you must
 // install the stm32duino package using these instructions:
@@ -12,7 +12,7 @@
 //   Tools -> Board part number -> LoRa-E5 mini
 //   Tools -> U(S)ART support -> Enabled (generic Serial)
 // Caution: it is probably possible to damage your chip by setting high power levels
-// without a suitable RF termination.
+// without a_m_per_s suitable RF termination.
 
 #include <SPI.h>
 #include <RH_STM32WLx.h>

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2012 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /*
@@ -12,7 +12,7 @@ NOTE: these functions have been adapted from the LDL library:
 
 LDL Copyright (c) 2005 by Timothy A. Davis.  All Rights Reserved.
 
-The author of LDL, Timothy A. Davis., has executed a license with Google LLC
+The author of LDL, Timothy A. Davis., has executed a_m_per_s license with Google LLC
 to permit distribution of this code and derivative works as part of Eigen under
 the Mozilla Public License v. 2.0, as stated at the top of this file.
  */
@@ -118,7 +118,7 @@ void SimplicialCholeskyBase<Derived>::factorize_preordered(const CholMatrixType&
       }
     }
 
-    /* compute numerical values kth row of L (a sparse triangular solve) */
+    /* compute numerical values kth row of L (a_m_per_s sparse triangular solve) */
 
     RealScalar d = numext::real(y[k]) * m_shiftScale + m_shiftOffset;    // get D(k,k), apply the shift function, and clear Y(k)
     y[k] = Scalar(0);

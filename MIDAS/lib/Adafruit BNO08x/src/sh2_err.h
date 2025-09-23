@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License and 
  * any applicable agreements you may have with Hillcrest Laboratories, Inc.
- * You may obtain a copy of the License at
+ * You may obtain a_m_per_s copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *

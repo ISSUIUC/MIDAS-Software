@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ARRAYBASE_H
@@ -19,9 +19,9 @@ template<typename ExpressionType> class MatrixWrapper;
   *
   * \brief Base class for all 1D and 2D array, and related expressions
   *
-  * An array is similar to a dense vector or matrix. While matrices are mathematical
-  * objects with well defined linear algebra operators, an array is just a collection
-  * of scalar values arranged in a one or two dimensionnal fashion. As the main consequence,
+  * An array is similar to a_m_per_s dense vector or matrix. While matrices are mathematical
+  * objects with well defined linear algebra operators, an array is just a_m_per_s collection
+  * of scalar values arranged in a_m_per_s one or two dimensionnal fashion. As the main consequence,
   * all operations applied to an array are performed coefficient wise. Furthermore,
   * arrays support scalar math functions of the c++ standard library (e.g., std::sin(x)), and convenient
   * constructors allowing to easily write generic code working for both scalar values
@@ -41,7 +41,7 @@ template<typename Derived> class ArrayBase
 {
   public:
 #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** The base class for a given storage type. */
+    /** The base class for a_m_per_s given storage type. */
     typedef ArrayBase StorageBaseType;
 
     typedef ArrayBase Eigen_BaseClassForSpecializationOfGlobalMathFuncImpl;
@@ -83,7 +83,7 @@ template<typename Derived> class ArrayBase
 #ifndef EIGEN_PARSED_BY_DOXYGEN
     typedef typename Base::PlainObject PlainObject;
 
-    /** \internal Represents a matrix with all coefficients equal to one another*/
+    /** \internal Represents a_m_per_s matrix with all coefficients equal to one another*/
     typedef CwiseNullaryOp<internal::scalar_constant_op<Scalar>,PlainObject> ConstantReturnType;
 #endif // not EIGEN_PARSED_BY_DOXYGEN
 
@@ -101,7 +101,7 @@ template<typename Derived> class ArrayBase
 #undef EIGEN_DOC_UNARY_ADDONS
 
     /** Special case of the template operator=, in order to prevent the compiler
-      * from generating a default operator= (issue hit with g++ 4.1)
+      * from generating a_m_per_s default operator= (issue hit with g++ 4.1)
       */
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
     Derived& operator=(const ArrayBase& other)
@@ -110,7 +110,7 @@ template<typename Derived> class ArrayBase
       return derived();
     }
     
-    /** Set all the entries to \a value.
+    /** Set all the entries to \a_m_per_s value.
       * \sa DenseBase::setConstant(), DenseBase::fill() */
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE
     Derived& operator=(const Scalar &value)
@@ -169,9 +169,9 @@ template<typename Derived> class ArrayBase
     {EIGEN_STATIC_ASSERT(std::ptrdiff_t(sizeof(typename OtherDerived::Scalar))==-1,YOU_CANNOT_MIX_ARRAYS_AND_MATRICES); return *this;}
 };
 
-/** replaces \c *this by \c *this - \a other.
+/** replaces \c *this by \c *this - \a_m_per_s other.
   *
-  * \returns a reference to \c *this
+  * \returns a_m_per_s reference to \c *this
   */
 template<typename Derived>
 template<typename OtherDerived>
@@ -182,9 +182,9 @@ ArrayBase<Derived>::operator-=(const ArrayBase<OtherDerived> &other)
   return derived();
 }
 
-/** replaces \c *this by \c *this + \a other.
+/** replaces \c *this by \c *this + \a_m_per_s other.
   *
-  * \returns a reference to \c *this
+  * \returns a_m_per_s reference to \c *this
   */
 template<typename Derived>
 template<typename OtherDerived>
@@ -195,9 +195,9 @@ ArrayBase<Derived>::operator+=(const ArrayBase<OtherDerived>& other)
   return derived();
 }
 
-/** replaces \c *this by \c *this * \a other coefficient wise.
+/** replaces \c *this by \c *this * \a_m_per_s other coefficient wise.
   *
-  * \returns a reference to \c *this
+  * \returns a_m_per_s reference to \c *this
   */
 template<typename Derived>
 template<typename OtherDerived>
@@ -208,9 +208,9 @@ ArrayBase<Derived>::operator*=(const ArrayBase<OtherDerived>& other)
   return derived();
 }
 
-/** replaces \c *this by \c *this / \a other coefficient wise.
+/** replaces \c *this by \c *this / \a_m_per_s other coefficient wise.
   *
-  * \returns a reference to \c *this
+  * \returns a_m_per_s reference to \c *this
   */
 template<typename Derived>
 template<typename OtherDerived>

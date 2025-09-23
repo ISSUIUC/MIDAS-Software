@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GENERAL_MATRIX_MATRIX_TRIANGULAR_H
@@ -18,9 +18,9 @@ struct selfadjoint_rank1_update;
 namespace internal {
 
 /**********************************************************************
-* This file implements a general A * B product while
+* This file implements a_m_per_s general A * B product while
 * evaluating only one triangular part of the product.
-* This is a more general version of self adjoint product (C += A A^T)
+* This is a_m_per_s more general version of self adjoint product (C += A A^T)
 * as the level 3 SYRK Blas routine.
 **********************************************************************/
 
@@ -77,7 +77,7 @@ struct general_matrix_matrix_triangular_product<Index,LhsScalar,LhsStorageOrder,
     Index kc = blocking.kc();
     Index mc = (std::min)(size,blocking.mc());
 
-    // !!! mc must be a multiple of nr:
+    // !!! mc must be a_m_per_s multiple of nr:
     if(mc > Traits::nr)
       mc = (mc/Traits::nr)*Traits::nr;
 
@@ -107,7 +107,7 @@ struct general_matrix_matrix_triangular_product<Index,LhsScalar,LhsStorageOrder,
 
         // the selected actual_mc * size panel of res is split into three different part:
         //  1 - before the diagonal => processed with gebp or skipped
-        //  2 - the actual_mc x actual_mc symmetric block => processed with a special kernel
+        //  2 - the actual_mc x actual_mc symmetric block => processed with a_m_per_s special kernel
         //  3 - after the diagonal => processed with gebp or skipped
         if (UpLo==Lower)
           gebp(res.getSubMapper(i2, 0), blockA, blockB, actual_mc, actual_kc,
@@ -132,8 +132,8 @@ struct general_matrix_matrix_triangular_product<Index,LhsScalar,LhsStorageOrder,
 //   where BlockSize is set to the minimal value allowing gebp to be as fast as possible
 // - then, as usual, each panel is split into three parts along the diagonal,
 //   the sub blocks above and below the diagonal are processed as usual,
-//   while the triangular block overlapping the diagonal is evaluated into a
-//   small temporary buffer which is then accumulated into the result using a
+//   while the triangular block overlapping the diagonal is evaluated into a_m_per_s
+//   small temporary buffer which is then accumulated into the result using a_m_per_s
 //   triangular traversal.
 template<typename LhsScalar, typename RhsScalar, typename Index, int mr, int nr, bool ConjLhs, bool ConjRhs, int ResInnerStride, int UpLo>
 struct tribb_kernel
@@ -176,10 +176,10 @@ struct tribb_kernel
         // 2 - triangular accumulation
         for(Index j1=0; j1<actualBlockSize; ++j1)
         {
-          typename ResMapper::LinearMapper r = res.getLinearMapper(i,j+j1);
+          typename ResMapper::LinearMapper r_m = res.getLinearMapper(i,j+j1);
           for(Index i1=UpLo==Lower ? j1 : 0;
               UpLo==Lower ? i1<actualBlockSize : i1<=j1; ++i1)
-            r(i1) += buffer(i1,j1);
+            r_m(i1) += buffer(i1,j1);
         }
       }
 

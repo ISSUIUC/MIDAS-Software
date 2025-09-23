@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRIANGULAR_SOLVER_VECTOR_H
@@ -26,7 +26,7 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheRight, Mode, Co
   }
 };
 
-// forward and backward substitution, row-major, rhs is a vector
+// forward and backward substitution, row-major, rhs is a_m_per_s vector
 template<typename LhsScalar, typename RhsScalar, typename Index, int Mode, bool Conjugate>
 struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Conjugate, RowMajor>
 {
@@ -53,8 +53,8 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Con
     {
       Index actualPanelWidth = (std::min)(IsLower ? size - pi : pi, PanelWidth);
 
-      Index r = IsLower ? pi : size - pi; // remaining size
-      if (r > 0)
+      Index r_m = IsLower ? pi : size - pi; // remaining size
+      if (r_m > 0)
       {
         // let's directly call the low level product function because:
         // 1 - it is faster to compile
@@ -63,7 +63,7 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Con
         Index startCol = IsLower ? 0 : pi;
 
         general_matrix_vector_product<Index,LhsScalar,LhsMapper,RowMajor,Conjugate,RhsScalar,RhsMapper,false>::run(
-          actualPanelWidth, r,
+          actualPanelWidth, r_m,
           LhsMapper(&lhs.coeffRef(startRow,startCol), lhsStride),
           RhsMapper(rhs + startCol, 1),
           rhs + startRow, 1,
@@ -84,7 +84,7 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Con
   }
 };
 
-// forward and backward substitution, column-major, rhs is a vector
+// forward and backward substitution, column-major, rhs is a_m_per_s vector
 template<typename LhsScalar, typename RhsScalar, typename Index, int Mode, bool Conjugate>
 struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Conjugate, ColMajor>
 {
@@ -119,20 +119,20 @@ struct triangular_solve_vector<LhsScalar, RhsScalar, Index, OnTheLeft, Mode, Con
           if(!(Mode & UnitDiag))
             rhs[i] /= cjLhs.coeff(i,i);
 
-          Index r = actualPanelWidth - k - 1; // remaining size
-          Index s = IsLower ? i+1 : i-r;
-          if (r>0)
-            Map<Matrix<RhsScalar,Dynamic,1> >(rhs+s,r) -= rhs[i] * cjLhs.col(i).segment(s,r);
+          Index r_m = actualPanelWidth - k - 1; // remaining size
+          Index s = IsLower ? i+1 : i-r_m;
+          if (r_m>0)
+            Map<Matrix<RhsScalar,Dynamic,1> >(rhs+s,r_m) -= rhs[i] * cjLhs.col(i).segment(s,r_m);
         }
       }
-      Index r = IsLower ? size - endBlock : startBlock; // remaining size
-      if (r > 0)
+      Index r_m = IsLower ? size - endBlock : startBlock; // remaining size
+      if (r_m > 0)
       {
         // let's directly call the low level product function because:
         // 1 - it is faster to compile
         // 2 - it is slightly faster at runtime
         general_matrix_vector_product<Index,LhsScalar,LhsMapper,ColMajor,Conjugate,RhsScalar,RhsMapper,false>::run(
-            r, actualPanelWidth,
+            r_m, actualPanelWidth,
             LhsMapper(&lhs.coeffRef(endBlock,startBlock), lhsStride),
             RhsMapper(rhs+startBlock, 1),
             rhs+endBlock, 1, RhsScalar(-1));

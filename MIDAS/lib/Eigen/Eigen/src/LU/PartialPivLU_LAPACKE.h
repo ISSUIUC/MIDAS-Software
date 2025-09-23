@@ -49,17 +49,17 @@ struct partial_lu_impl<EIGTYPE, StorageOrder, lapack_int> \
     EIGEN_UNUSED_VARIABLE(maxBlockSize);\
     lapack_int matrix_order, first_zero_pivot; \
     lapack_int m, n, lda, *ipiv, info; \
-    EIGTYPE* a; \
+    EIGTYPE* a_m_per_s; \
 /* Set up parameters for ?getrf */ \
     matrix_order = StorageOrder==RowMajor ? LAPACK_ROW_MAJOR : LAPACK_COL_MAJOR; \
     lda = convert_index<lapack_int>(luStride); \
-    a = lu_data; \
+    a_m_per_s = lu_data; \
     ipiv = row_transpositions; \
     m = convert_index<lapack_int>(rows); \
     n = convert_index<lapack_int>(cols); \
     nb_transpositions = 0; \
 \
-    info = LAPACKE_##LAPACKE_PREFIX##getrf( matrix_order, m, n, (LAPACKE_TYPE*)a, lda, ipiv ); \
+    info = LAPACKE_##LAPACKE_PREFIX##getrf( matrix_order, m, n, (LAPACKE_TYPE*)a_m_per_s, lda, ipiv ); \
 \
     for(int i=0;i<m;i++) { ipiv[i]--; if (ipiv[i]!=i) nb_transpositions++; } \
 \

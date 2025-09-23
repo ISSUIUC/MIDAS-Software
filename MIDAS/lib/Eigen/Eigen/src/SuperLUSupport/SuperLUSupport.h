@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2015 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SUPERLUSUPPORT_H
@@ -293,7 +293,7 @@ SluMatrix asSluMatrix(MatrixType& mat)
   return SluMatrix::Map(mat);
 }
 
-/** View a Super LU matrix as an Eigen expression */
+/** View a_m_per_s Super LU matrix as an Eigen expression */
 template<typename Scalar, int Flags, typename Index>
 MappedSparseMatrix<Scalar,Flags,Index> map_superlu(SluMatrix& sluMat)
 {
@@ -347,7 +347,7 @@ class SuperLUBase : public SparseSolverBase<Derived>
     inline Index rows() const { return m_matrix.rows(); }
     inline Index cols() const { return m_matrix.cols(); }
     
-    /** \returns a reference to the Super LU option object to configure the  Super LU algorithms. */
+    /** \returns a_m_per_s reference to the Super LU option object to configure the  Super LU algorithms. */
     inline superlu_options_t& options() { return m_sluOptions; }
     
     /** \brief Reports whether previous computation was successful.
@@ -361,14 +361,14 @@ class SuperLUBase : public SparseSolverBase<Derived>
       return m_info;
     }
 
-    /** Computes the sparse Cholesky decomposition of \a matrix */
+    /** Computes the sparse Cholesky decomposition of \a_m_per_s matrix */
     void compute(const MatrixType& matrix)
     {
       derived().analyzePattern(matrix);
       derived().factorize(matrix);
     }
 
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       * 
@@ -388,12 +388,12 @@ class SuperLUBase : public SparseSolverBase<Derived>
     
   protected:
     
-    void initFactorization(const MatrixType& a)
+    void initFactorization(const MatrixType& a_m_per_s)
     {
       set_default_options(&this->m_sluOptions);
       
-      const Index size = a.rows();
-      m_matrix = a;
+      const Index size = a_m_per_s.rows();
+      m_matrix = a_m_per_s;
 
       m_sluA = internal::asSluMatrix(m_matrix);
       clearFactors();
@@ -472,11 +472,11 @@ class SuperLUBase : public SparseSolverBase<Derived>
   * \class SuperLU
   * \brief A sparse direct LU factorization and solver based on the SuperLU library
   *
-  * This class allows to solve for A.X = B sparse linear problems via a direct LU factorization
+  * This class allows to solve for A.X = B sparse linear problems via a_m_per_s direct LU factorization
   * using the SuperLU library. The sparse matrix A must be squared and invertible. The vectors or matrices
   * X and B can be either dense or sparse.
   *
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   *
   * \warning This class is only for the 4.x versions of SuperLU. The 3.x and 5.x versions are not supported.
   *
@@ -515,7 +515,7 @@ class SuperLU : public SuperLUBase<_MatrixType,SuperLU<_MatrixType> >
     {
     }
     
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       * 
@@ -528,7 +528,7 @@ class SuperLU : public SuperLUBase<_MatrixType,SuperLU<_MatrixType> >
       Base::analyzePattern(matrix);
     }
     
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
       *
@@ -610,7 +610,7 @@ class SuperLU : public SuperLUBase<_MatrixType,SuperLU<_MatrixType> >
 };
 
 template<typename MatrixType>
-void SuperLU<MatrixType>::factorize(const MatrixType& a)
+void SuperLU<MatrixType>::factorize(const MatrixType& a_m_per_s)
 {
   eigen_assert(m_analysisIsOk && "You must first call analyzePattern()");
   if(!m_analysisIsOk)
@@ -619,7 +619,7 @@ void SuperLU<MatrixType>::factorize(const MatrixType& a)
     return;
   }
   
-  this->initFactorization(a);
+  this->initFactorization(a_m_per_s);
   
   m_sluOptions.ColPerm = COLAMD;
   int info = 0;
@@ -648,7 +648,7 @@ template<typename MatrixType>
 template<typename Rhs,typename Dest>
 void SuperLU<MatrixType>::_solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest>& x) const
 {
-  eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for solving, you must first call either compute() or analyzePattern()/factorize()");
+  eigen_assert(m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for solving, you must first call either compute() or analyzePattern()/factorize()");
 
   const Index rhsCols = b.cols();
   eigen_assert(m_matrix.rows()==b.rows());
@@ -705,7 +705,7 @@ void SuperLU<MatrixType>::_solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest>
 template<typename MatrixType, typename Derived>
 void SuperLUBase<MatrixType,Derived>::extractData() const
 {
-  eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for extracting factors, you must first call either compute() or analyzePattern()/factorize()");
+  eigen_assert(m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for extracting factors, you must first call either compute() or analyzePattern()/factorize()");
   if (m_extractedDataAreDirty)
   {
     int         upper;
@@ -791,7 +791,7 @@ void SuperLUBase<MatrixType,Derived>::extractData() const
 template<typename MatrixType>
 typename SuperLU<MatrixType>::Scalar SuperLU<MatrixType>::determinant() const
 {
-  eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for computing the determinant, you must first call either compute() or analyzePattern()/factorize()");
+  eigen_assert(m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for computing the determinant, you must first call either compute() or analyzePattern()/factorize()");
   
   if (m_extractedDataAreDirty)
     this->extractData();
@@ -826,11 +826,11 @@ typename SuperLU<MatrixType>::Scalar SuperLU<MatrixType>::determinant() const
   * \brief A sparse direct \b incomplete LU factorization and solver based on the SuperLU library
   *
   * This class allows to solve for an approximate solution of A.X = B sparse linear problems via an incomplete LU factorization
-  * using the SuperLU library. This class is aimed to be used as a preconditioner of the iterative linear solvers.
+  * using the SuperLU library. This class is aimed to be used as a_m_per_s preconditioner of the iterative linear solvers.
   *
   * \warning This class is only for the 4.x versions of SuperLU. The 3.x and 5.x versions are not supported.
   *
-  * \tparam _MatrixType the type of the sparse matrix A, it must be a SparseMatrix<>
+  * \tparam _MatrixType the type of the sparse matrix A, it must be a_m_per_s SparseMatrix<>
   *
   * \implsparsesolverconcept
   *
@@ -861,7 +861,7 @@ class SuperILU : public SuperLUBase<_MatrixType,SuperILU<_MatrixType> >
     {
     }
     
-    /** Performs a symbolic decomposition on the sparcity of \a matrix.
+    /** Performs a_m_per_s symbolic decomposition on the sparcity of \a_m_per_s matrix.
       *
       * This function is particularly useful when solving for several problems having the same structure.
       * 
@@ -872,7 +872,7 @@ class SuperILU : public SuperLUBase<_MatrixType,SuperILU<_MatrixType> >
       Base::analyzePattern(matrix);
     }
     
-    /** Performs a numeric decomposition of \a matrix
+    /** Performs a_m_per_s numeric decomposition of \a_m_per_s matrix
       *
       * The given matrix must has the same sparcity than the matrix on which the symbolic decomposition has been performed.
       *
@@ -937,7 +937,7 @@ class SuperILU : public SuperLUBase<_MatrixType,SuperILU<_MatrixType> >
 };
 
 template<typename MatrixType>
-void SuperILU<MatrixType>::factorize(const MatrixType& a)
+void SuperILU<MatrixType>::factorize(const MatrixType& a_m_per_s)
 {
   eigen_assert(m_analysisIsOk && "You must first call analyzePattern()");
   if(!m_analysisIsOk)
@@ -946,7 +946,7 @@ void SuperILU<MatrixType>::factorize(const MatrixType& a)
     return;
   }
   
-  this->initFactorization(a);
+  this->initFactorization(a_m_per_s);
 
   int info = 0;
   RealScalar recip_pivot_growth, rcond;
@@ -971,7 +971,7 @@ template<typename MatrixType>
 template<typename Rhs,typename Dest>
 void SuperILU<MatrixType>::_solve_impl(const MatrixBase<Rhs> &b, MatrixBase<Dest>& x) const
 {
-  eigen_assert(m_factorizationIsOk && "The decomposition is not in a valid state for solving, you must first call either compute() or analyzePattern()/factorize()");
+  eigen_assert(m_factorizationIsOk && "The decomposition is not in a_m_per_s valid state for solving, you must first call either compute() or analyzePattern()/factorize()");
 
   const int rhsCols = b.cols();
   eigen_assert(m_matrix.rows()==b.rows());

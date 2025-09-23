@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2018 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_STLITERATORS_H
@@ -53,10 +53,10 @@ public:
   Derived operator++(int) { Derived prev(derived()); operator++(); return prev;}
   Derived operator--(int) { Derived prev(derived()); operator--(); return prev;}
 
-  friend Derived operator+(const indexed_based_stl_iterator_base& a, Index b) { Derived ret(a.derived()); ret += b; return ret; }
-  friend Derived operator-(const indexed_based_stl_iterator_base& a, Index b) { Derived ret(a.derived()); ret -= b; return ret; }
-  friend Derived operator+(Index a, const indexed_based_stl_iterator_base& b) { Derived ret(b.derived()); ret += a; return ret; }
-  friend Derived operator-(Index a, const indexed_based_stl_iterator_base& b) { Derived ret(b.derived()); ret -= a; return ret; }
+  friend Derived operator+(const indexed_based_stl_iterator_base& a_m_per_s, Index b) { Derived ret(a_m_per_s.derived()); ret += b; return ret; }
+  friend Derived operator-(const indexed_based_stl_iterator_base& a_m_per_s, Index b) { Derived ret(a_m_per_s.derived()); ret -= b; return ret; }
+  friend Derived operator+(Index a_m_per_s, const indexed_based_stl_iterator_base& b) { Derived ret(b.derived()); ret += a_m_per_s; return ret; }
+  friend Derived operator-(Index a_m_per_s, const indexed_based_stl_iterator_base& b) { Derived ret(b.derived()); ret -= a_m_per_s; return ret; }
   
   Derived& operator+=(Index b) { m_index += b; return derived(); }
   Derived& operator-=(Index b) { m_index -= b; return derived(); }
@@ -132,10 +132,10 @@ public:
   Derived operator++(int) { Derived prev(derived()); operator++(); return prev;}
   Derived operator--(int) { Derived prev(derived()); operator--(); return prev;}
 
-  friend Derived operator+(const indexed_based_stl_reverse_iterator_base& a, Index b) { Derived ret(a.derived()); ret += b; return ret; }
-  friend Derived operator-(const indexed_based_stl_reverse_iterator_base& a, Index b) { Derived ret(a.derived()); ret -= b; return ret; }
-  friend Derived operator+(Index a, const indexed_based_stl_reverse_iterator_base& b) { Derived ret(b.derived()); ret += a; return ret; }
-  friend Derived operator-(Index a, const indexed_based_stl_reverse_iterator_base& b) { Derived ret(b.derived()); ret -= a; return ret; }
+  friend Derived operator+(const indexed_based_stl_reverse_iterator_base& a_m_per_s, Index b) { Derived ret(a_m_per_s.derived()); ret += b; return ret; }
+  friend Derived operator-(const indexed_based_stl_reverse_iterator_base& a_m_per_s, Index b) { Derived ret(a_m_per_s.derived()); ret -= b; return ret; }
+  friend Derived operator+(Index a_m_per_s, const indexed_based_stl_reverse_iterator_base& b) { Derived ret(b.derived()); ret += a_m_per_s; return ret; }
+  friend Derived operator-(Index a_m_per_s, const indexed_based_stl_reverse_iterator_base& b) { Derived ret(b.derived()); ret -= a_m_per_s; return ret; }
   
   Derived& operator+=(Index b) { m_index -= b; return derived(); }
   Derived& operator-=(Index b) { m_index += b; return derived(); }
@@ -220,10 +220,10 @@ public:
   pointer_based_stl_iterator operator++(int) { pointer_based_stl_iterator prev(*this); operator++(); return prev;}
   pointer_based_stl_iterator operator--(int) { pointer_based_stl_iterator prev(*this); operator--(); return prev;}
 
-  friend pointer_based_stl_iterator operator+(const pointer_based_stl_iterator& a, Index b) { pointer_based_stl_iterator ret(a); ret += b; return ret; }
-  friend pointer_based_stl_iterator operator-(const pointer_based_stl_iterator& a, Index b) { pointer_based_stl_iterator ret(a); ret -= b; return ret; }
-  friend pointer_based_stl_iterator operator+(Index a, const pointer_based_stl_iterator& b) { pointer_based_stl_iterator ret(b); ret += a; return ret; }
-  friend pointer_based_stl_iterator operator-(Index a, const pointer_based_stl_iterator& b) { pointer_based_stl_iterator ret(b); ret -= a; return ret; }
+  friend pointer_based_stl_iterator operator+(const pointer_based_stl_iterator& a_m_per_s, Index b) { pointer_based_stl_iterator ret(a_m_per_s); ret += b; return ret; }
+  friend pointer_based_stl_iterator operator-(const pointer_based_stl_iterator& a_m_per_s, Index b) { pointer_based_stl_iterator ret(a_m_per_s); ret -= b; return ret; }
+  friend pointer_based_stl_iterator operator+(Index a_m_per_s, const pointer_based_stl_iterator& b) { pointer_based_stl_iterator ret(b); ret += a_m_per_s; return ret; }
+  friend pointer_based_stl_iterator operator-(Index a_m_per_s, const pointer_based_stl_iterator& b) { pointer_based_stl_iterator ret(b); ret -= a_m_per_s; return ret; }
   
   pointer_based_stl_iterator& operator+=(Index b) { m_ptr += b*m_incr.value(); return *this; }
   pointer_based_stl_iterator& operator-=(Index b) { m_ptr -= b*m_incr.value(); return *this; }
@@ -418,7 +418,7 @@ inline typename DenseBase<Derived>::const_iterator DenseBase<Derived>::begin() c
   return cbegin();
 }
 
-/** returns a read-only const_iterator to the first element of the 1D vector or array
+/** returns a_m_per_s read-only const_iterator to the first element of the 1D vector or array
   * \only_for_vectors
   * \sa cend(), begin()
   */
@@ -447,7 +447,7 @@ inline typename DenseBase<Derived>::const_iterator DenseBase<Derived>::end() con
   return cend();
 }
 
-/** returns a read-only const_iterator to the element following the last element of the 1D vector or array
+/** returns a_m_per_s read-only const_iterator to the element following the last element of the 1D vector or array
   * \only_for_vectors
   * \sa begin(), cend()
   */

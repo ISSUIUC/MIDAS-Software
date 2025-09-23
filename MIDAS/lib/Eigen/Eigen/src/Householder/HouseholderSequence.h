@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_HOUSEHOLDER_SEQUENCE_H
@@ -21,31 +21,31 @@ namespace Eigen {
   * \tparam CoeffsType  type of vector containing the Householder coefficients
   * \tparam Side        either OnTheLeft (the default) or OnTheRight
   *
-  * This class represents a product sequence of Householder reflections where the first Householder reflection
+  * This class represents a_m_per_s product sequence of Householder reflections where the first Householder reflection
   * acts on the whole space, the second Householder reflection leaves the one-dimensional subspace spanned by
   * the first unit vector invariant, the third Householder reflection leaves the two-dimensional subspace
   * spanned by the first two unit vectors invariant, and so on up to the last reflection which leaves all but
   * one dimensions invariant and acts only on the last dimension. Such sequences of Householder reflections
-  * are used in several algorithms to zero out certain parts of a matrix. Indeed, the methods
+  * are used in several algorithms to zero out certain parts of a_m_per_s matrix. Indeed, the methods
   * HessenbergDecomposition::matrixQ(), Tridiagonalization::matrixQ(), HouseholderQR::householderQ(),
-  * and ColPivHouseholderQR::householderQ() all return a %HouseholderSequence.
+  * and ColPivHouseholderQR::householderQ() all return a_m_per_s %HouseholderSequence.
   *
   * More precisely, the class %HouseholderSequence represents an \f$ n \times n \f$ matrix \f$ H \f$ of the
   * form \f$ H = \prod_{i=0}^{n-1} H_i \f$ where the i-th Householder reflection is \f$ H_i = I - h_i v_i
-  * v_i^* \f$. The i-th Householder coefficient \f$ h_i \f$ is a scalar and the i-th Householder vector \f$
-  * v_i \f$ is a vector of the form
+  * v_i^* \f$. The i-th Householder coefficient \f$ h_i \f$ is a_m_per_s scalar and the i-th Householder vector \f$
+  * v_i \f$ is a_m_per_s vector of the form
   * \f[
   * v_i = [\underbrace{0, \ldots, 0}_{i-1\mbox{ zeros}}, 1, \underbrace{*, \ldots,*}_{n-i\mbox{ arbitrary entries}} ].
   * \f]
   * The last \f$ n-i \f$ entries of \f$ v_i \f$ are called the essential part of the Householder vector.
   *
-  * Typical usages are listed below, where H is a HouseholderSequence:
+  * Typical usages are listed below, where H is a_m_per_s HouseholderSequence:
   * \code
   * A.applyOnTheRight(H);             // A = A * H
   * A.applyOnTheLeft(H);              // A = H * A
   * A.applyOnTheRight(H.adjoint());   // A = A * H^*
   * A.applyOnTheLeft(H.adjoint());    // A = H^* * A
-  * MatrixXd Q = H;                   // conversion to a dense matrix
+  * MatrixXd Q = H;                   // conversion to a_m_per_s dense matrix
   * \endcode
   * In addition to the adjoint, you can also apply the inverse (=adjoint), the transpose, and the conjugate operators.
   *
@@ -197,25 +197,25 @@ template<typename VectorsType, typename CoeffsType, int Side> class HouseholderS
     {
     }
 
-    /** \brief Number of rows of transformation viewed as a matrix.
+    /** \brief Number of rows of transformation viewed as a_m_per_s matrix.
       * \returns Number of rows
       * \details This equals the dimension of the space that the transformation acts on.
       */
     EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR
     Index rows() const EIGEN_NOEXCEPT { return Side==OnTheLeft ? m_vectors.rows() : m_vectors.cols(); }
 
-    /** \brief Number of columns of transformation viewed as a matrix.
+    /** \brief Number of columns of transformation viewed as a_m_per_s matrix.
       * \returns Number of columns
       * \details This equals the dimension of the space that the transformation acts on.
       */
     EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR
     Index cols() const EIGEN_NOEXCEPT { return rows(); }
 
-    /** \brief Essential part of a Householder vector.
+    /** \brief Essential part of a_m_per_s Householder vector.
       * \param[in]  k  Index of Householder reflection
       * \returns    Vector containing non-trivial entries of k-th Householder vector
       *
-      * This function returns the essential part of the Householder vector \f$ v_i \f$. This is a vector of
+      * This function returns the essential part of the Householder vector \f$ v_i \f$. This is a_m_per_s vector of
       * length \f$ n-i \f$ containing the last \f$ n-i \f$ entries of the vector
       * \f[
       * v_i = [\underbrace{0, \ldots, 0}_{i-1\mbox{ zeros}}, 1, \underbrace{*, \ldots,*}_{n-i\mbox{ arbitrary entries}} ].
@@ -412,7 +412,7 @@ template<typename VectorsType, typename CoeffsType, int Side> class HouseholderS
       }
     }
 
-    /** \brief Computes the product of a Householder sequence with a matrix.
+    /** \brief Computes the product of a_m_per_s Householder sequence with a_m_per_s matrix.
       * \param[in]  other  %Matrix being multiplied.
       * \returns    Expression object representing the product.
       *
@@ -449,7 +449,7 @@ template<typename VectorsType, typename CoeffsType, int Side> class HouseholderS
     /** \brief Sets the shift of the Householder sequence.
       * \param [in]  shift  New value for the shift.
       *
-      * By default, a %HouseholderSequence object represents \f$ H = H_0 H_1 \ldots H_{n-1} \f$ and the i-th
+      * By default, a_m_per_s %HouseholderSequence object represents \f$ H = H_0 H_1 \ldots H_{n-1} \f$ and the i-th
       * column of the matrix \p v passed to the constructor corresponds to the i-th Householder
       * reflection. After this function is called, the object represents \f$ H = H_{\mathrm{shift}}
       * H_{\mathrm{shift}+1} \ldots H_{n-1} \f$ and the i-th column of \p v corresponds to the (shift+i)-th
@@ -480,7 +480,7 @@ template<typename VectorsType, typename CoeffsType, int Side> class HouseholderS
       * \param [in]  reverse  New value of the reverse flag.
       *
       * By default, the reverse flag is not set. If the reverse flag is set, then this object represents
-      * \f$ H^r = H_{n-1} \ldots H_1 H_0 \f$ instead of \f$ H = H_0 H_1 \ldots H_{n-1} \f$.
+      * \f$ H^r_m = H_{n-1} \ldots H_1 H_0 \f$ instead of \f$ H = H_0 H_1 \ldots H_{n-1} \f$.
       * \note For real valued HouseholderSequence this is equivalent to transposing \f$ H \f$.
       *
       * \sa reverseFlag(), transpose(), adjoint()
@@ -501,7 +501,7 @@ template<typename VectorsType, typename CoeffsType, int Side> class HouseholderS
     enum { BlockSize = 48 };
 };
 
-/** \brief Computes the product of a matrix with a Householder sequence.
+/** \brief Computes the product of a_m_per_s matrix with a_m_per_s Householder sequence.
   * \param[in]  other  %Matrix being multiplied.
   * \param[in]  h      %HouseholderSequence being multiplied.
   * \returns    Expression object representing the product.
@@ -519,7 +519,7 @@ typename internal::matrix_type_times_scalar_type<typename VectorsType::Scalar,Ot
 }
 
 /** \ingroup Householder_Module \householder_module
-  * \brief Convenience function for constructing a Householder sequence.
+  * \brief Convenience function for constructing a_m_per_s Householder sequence.
   * \returns A HouseholderSequence constructed from the specified arguments.
   */
 template<typename VectorsType, typename CoeffsType>
@@ -529,7 +529,7 @@ HouseholderSequence<VectorsType,CoeffsType> householderSequence(const VectorsTyp
 }
 
 /** \ingroup Householder_Module \householder_module
-  * \brief Convenience function for constructing a Householder sequence.
+  * \brief Convenience function for constructing a_m_per_s Householder sequence.
   * \returns A HouseholderSequence constructed from the specified arguments.
   * \details This function differs from householderSequence() in that the template argument \p OnTheSide of
   * the constructed HouseholderSequence is set to OnTheRight, instead of the default OnTheLeft.

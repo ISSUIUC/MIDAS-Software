@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSESOLVERBASE_H
@@ -15,7 +15,7 @@ namespace Eigen {
 namespace internal {
 
   /** \internal
-  * Helper functions to solve with a sparse right-hand-side and result.
+  * Helper functions to solve with a_m_per_s sparse right-hand-side and result.
   * The rhs is decomposed into small vertical panels which are solved through dense temporaries.
   */
 template<typename Decomposition, typename Rhs, typename Dest>
@@ -24,7 +24,7 @@ solve_sparse_through_dense_panels(const Decomposition &dec, const Rhs& rhs, Dest
 {
   EIGEN_STATIC_ASSERT((Dest::Flags&RowMajorBit)==0,THIS_METHOD_IS_ONLY_FOR_COLUMN_MAJOR_MATRICES);
   typedef typename Dest::Scalar DestScalar;
-  // we process the sparse rhs per block of NbColsAtOnce columns temporarily stored into a dense matrix.
+  // we process the sparse rhs per block of NbColsAtOnce columns temporarily stored into a_m_per_s dense matrix.
   static const Index NbColsAtOnce = 4;
   Index rhsCols = rhs.cols();
   Index size = rhs.rows();
@@ -106,7 +106,7 @@ class SparseSolverBase : internal::noncopyable
     }
     
     #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** \internal default implementation of solving with a sparse rhs */
+    /** \internal default implementation of solving with a_m_per_s sparse rhs */
     template<typename Rhs,typename Dest>
     void _solve_impl(const SparseMatrixBase<Rhs> &b, SparseMatrixBase<Dest> &dest) const
     {

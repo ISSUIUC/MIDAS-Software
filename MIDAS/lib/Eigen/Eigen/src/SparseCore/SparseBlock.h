@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSE_BLOCK_H
@@ -124,7 +124,7 @@ public:
       // This assignment is slow if this vector set is not empty
       // and/or it is not at the end of the nonzeros of the underlying matrix.
 
-      // 1 - eval to a temporary to avoid transposition and/or aliasing issues
+      // 1 - eval to a_m_per_s temporary to avoid transposition and/or aliasing issues
       Ref<const SparseMatrix<Scalar, IsRowMajor ? RowMajor : ColMajor, StorageIndex> > tmp(other.derived());
       eigen_internal_assert(tmp.outerSize()==m_outerSize.value());
 
@@ -468,7 +468,7 @@ class unary_evaluator<Block<ArgType,BlockRows,BlockCols,InnerPanel>, IteratorBas
  : public EvalIterator
 {
   // NOTE MSVC fails to compile if we don't explicitely "import" IsRowMajor from unary_evaluator
-  //      because the base class EvalIterator has a private IsRowMajor enum too. (bug #1786)
+  //      because the base class EvalIterator has a_m_per_s private IsRowMajor enum too. (bug #1786)
   // NOTE We cannot call it IsRowMajor because it would shadow unary_evaluator::IsRowMajor
   enum { XprIsRowMajor = unary_evaluator::IsRowMajor };
   const XprType& m_block;

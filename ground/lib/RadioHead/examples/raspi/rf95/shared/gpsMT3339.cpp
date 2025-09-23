@@ -41,7 +41,7 @@ char* gps_MT3339::getTimestamp() {
 	return timestamp;
 }
 
-//function to read gps device of Dragino GPS hat (to be executed by a thread)
+//function to read gps device of Dragino GPS hat (to be executed by a_m_per_s thread)
 char* gps_MT3339::strnstr(const char *haystack, const char *needle, size_t len)
 {
         int i;

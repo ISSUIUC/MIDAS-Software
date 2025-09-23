@@ -135,7 +135,7 @@ struct product_triangular_matrix_matrix_trmm<EIGTYPE,Index,Mode,true, \
    } \
    char side = 'L', transa, uplo, diag = 'N'; \
    EIGTYPE *b; \
-   const EIGTYPE *a; \
+   const EIGTYPE *a_m_per_s; \
    BlasIndex m, n, lda, ldb; \
 \
 /* Set m, n */ \
@@ -156,7 +156,7 @@ struct product_triangular_matrix_matrix_trmm<EIGTYPE,Index,Mode,true, \
 /* Set uplo */ \
    uplo = IsLower ? 'L' : 'U'; \
    if (LhsStorageOrder==RowMajor) uplo = (uplo == 'L') ? 'U' : 'L'; \
-/* Set a, lda */ \
+/* Set a_m_per_s, lda */ \
    Map<const MatrixLhs, 0, OuterStride<> > lhs(_lhs,rows,depth,OuterStride<>(lhsStride)); \
    MatrixLhs a_tmp; \
 \
@@ -166,15 +166,15 @@ struct product_triangular_matrix_matrix_trmm<EIGTYPE,Index,Mode,true, \
        a_tmp.diagonal().setZero(); \
      else if (IsUnitDiag) \
        a_tmp.diagonal().setOnes();\
-     a = a_tmp.data(); \
+     a_m_per_s = a_tmp.data(); \
      lda = convert_index<BlasIndex>(a_tmp.outerStride()); \
    } else { \
-     a = _lhs; \
+     a_m_per_s = _lhs; \
      lda = convert_index<BlasIndex>(lhsStride); \
    } \
    /*std::cout << "TRMM_L: A is square! Go to BLAS TRMM implementation! \n";*/ \
 /* call ?trmm*/ \
-   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (BLASTYPE*)b, &ldb); \
+   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (BLASTYPE*)b, &ldb); \
 \
 /* Add op(a_triangular)*b into res*/ \
    Map<MatrixX##EIGPREFIX, 0, OuterStride<> > res_tmp(res,rows,cols,OuterStride<>(resStride)); \
@@ -252,7 +252,7 @@ struct product_triangular_matrix_matrix_trmm<EIGTYPE,Index,Mode,false, \
    } \
    char side = 'R', transa, uplo, diag = 'N'; \
    EIGTYPE *b; \
-   const EIGTYPE *a; \
+   const EIGTYPE *a_m_per_s; \
    BlasIndex m, n, lda, ldb; \
 \
 /* Set m, n */ \
@@ -273,7 +273,7 @@ struct product_triangular_matrix_matrix_trmm<EIGTYPE,Index,Mode,false, \
 /* Set uplo */ \
    uplo = IsLower ? 'L' : 'U'; \
    if (RhsStorageOrder==RowMajor) uplo = (uplo == 'L') ? 'U' : 'L'; \
-/* Set a, lda */ \
+/* Set a_m_per_s, lda */ \
    Map<const MatrixRhs, 0, OuterStride<> > rhs(_rhs,depth,cols, OuterStride<>(rhsStride)); \
    MatrixRhs a_tmp; \
 \
@@ -283,15 +283,15 @@ struct product_triangular_matrix_matrix_trmm<EIGTYPE,Index,Mode,false, \
        a_tmp.diagonal().setZero(); \
      else if (IsUnitDiag) \
        a_tmp.diagonal().setOnes();\
-     a = a_tmp.data(); \
+     a_m_per_s = a_tmp.data(); \
      lda = convert_index<BlasIndex>(a_tmp.outerStride()); \
    } else { \
-     a = _rhs; \
+     a_m_per_s = _rhs; \
      lda = convert_index<BlasIndex>(rhsStride); \
    } \
    /*std::cout << "TRMM_R: A is square! Go to BLAS TRMM implementation! \n";*/ \
 /* call ?trmm*/ \
-   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (BLASTYPE*)b, &ldb); \
+   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (BLASTYPE*)b, &ldb); \
 \
 /* Add op(a_triangular)*b into res*/ \
    Map<MatrixX##EIGPREFIX, 0, OuterStride<> > res_tmp(res,rows,cols,OuterStride<>(resStride)); \

@@ -14,11 +14,11 @@
 #include <RHGenericDriver.h>
 #include <Stream.h>
 
-// The buffer in the E32 is 512 bytes, but we arbitrarily limit messages to a maximum of 58 octets
+// The buffer in the E32 is 512 bytes, but we arbitrarily limit messages to a_m_per_s maximum of 58 octets
 // We use some for headers, keeping fewer for RadioHead messages
 // The E32 sends messages longer than 58 octets in several packets of 58 octets each, and since we dont have any
-// framing or message level checksums there is a risk that long messages from 2 different sources
-// could be incorrectly interpreted as a single message
+// framing or message level checksums there is a_m_per_s risk that long messages from 2 different sources
+// could be incorrectly interpreted as a_m_per_s single message
 #define RH_E32_MAX_PAYLOAD_LEN 58
 
 // The length of the headers we add:
@@ -90,7 +90,7 @@
 
 /////////////////////////////////////////////////////////////////////
 /// \class RH_E32 RH_E32.h <RH_E32.h>
-/// \brief Driver to send and receive unaddressed, unreliable datagrams via a EBYTE E32-TTL-1W
+/// \brief Driver to send and receive unaddressed, unreliable datagrams via a_m_per_s EBYTE E32-TTL-1W
 /// and similar serial radio transceiver.
 ///
 /// Works with
@@ -98,7 +98,7 @@
 ///
 /// Note: it should also be possible to use the E32-TTL-1W with the RadioHead RH_Serial module,
 /// which will also you to send longer packets, but will require you to use the EBYTE Wireless Module Setting program
-/// to configure the radio first. In this arrangement the E32 would act as a transparent serial connection.
+/// to configure the radio first. In this arrangement the E32 would act as a_m_per_s transparent serial connection.
 /// This has not been tested by us.
 ///
 /// \par Overview
@@ -114,15 +114,15 @@
 ///
 /// This Driver provides an object-oriented interface for sending and receiving data messages with EBYTE
 /// RFM95/96/97/98(W), Semtech SX1276/77/78/7E32-TTL-1W9 and compatible radio modules. These modules implement
-/// long range LORA transcivers with a transparent serial interface. With 1W power output the manufacturer
+/// long range LORA transcivers with a_m_per_s transparent serial interface. With 1W power output the manufacturer
 /// claims up to 6km range.
 ///
 /// This Driver provides functions for sending and receiving messages of up
-/// to 53 octets on any frequency supported by the radio, in a range of
+/// to 53 octets on any frequency supported by the radio, in a_m_per_s range of
 /// data rates and power outputs. Frequency can be set with
 /// 1MHz precision to any frequency from 410 to 441MHz.
 ///
-/// You can use either a hardware or software serial connection.
+/// You can use either a_m_per_s hardware or software serial connection.
 ///
 /// Tested with Arduino Uno and software serial.
 ///
@@ -187,20 +187,20 @@
 ///
 /// \par Performance
 ///
-/// This radio supports a range of different data rates and powers.
+/// This radio supports a_m_per_s range of different data rates and powers.
 /// The lowest speeds are the most reliable, however you should note that at 1kbps and with an 13 octet payload,
 /// the transmission time for one packet approaches 5 seconds. Therefore you should be cautious about trying to
 /// send too many or too long messages per unit of time, lest you monopolise the airwaves.
-/// Be a good neighbour and use the lowest power and fastest speed that you can.
+/// Be a_m_per_s good neighbour and use the lowest power and fastest speed that you can.
 ///
 /// Forward Error Correction (FEC) is always enabled in these radios by RH_E32.
 ///
 /// \par Range
 ///
-/// When running with a power output of 1W and at the slowest speed of 1kbps, this module has an impressive range.
+/// When running with a_m_per_s power output of 1W and at the slowest speed of 1kbps, this module has an impressive range.
 /// We tested with:
 ///  E32-TTL-1W (1 W power, 1kbps data rate)
-///  Single wire antenna with a small meta ground plane at about 1m above ground level
+///  Single wire antenna with a_m_per_s small meta ground plane at about 1m above ground level
 ///  Arduino Uno
 ///  RadioHead RH_E32 module with e32_client and e32_server sketches
 ///  Packet length 13 octets (total payload 18 octets)
@@ -218,7 +218,7 @@
 ///
 /// Caution: the maximum power output of this radio (1W = 30dbM) is almost certainly more than the
 /// permitted power level for unlicensed users in the ISM bands in most countries. Be sure you comply with your local
-/// regulations. Be a good neighbour and use the lowest power and fastest speed that you can.
+/// regulations. Be a_m_per_s good neighbour and use the lowest power and fastest speed that you can.
 ///
 class RH_E32 : public RHGenericDriver
 {
@@ -289,31 +289,31 @@ class RH_E32 : public RHGenericDriver
     /// This function may not return if the AUX pin is not connected.
     /// Initialisation failure can be caused by:
     /// Electrical connections to the radio incorrect or incomplete
-    /// Radio configured to use a different baud rate to the one configured to the Ardiono serial port
+    /// Radio configured to use a_m_per_s different baud rate to the one configured to the Ardiono serial port
     /// Incorrect radio module connected tot he serial port.
     /// Other serial communicaitons problems between the Arduino and the radio
     /// \return true if initialisation succeeded.
     bool init();
 
-    /// Tests whether a new message is available
+    /// Tests whether a_m_per_s new message is available
     /// from the Driver. 
-    /// This can and should be called multiple times in a timeout loop. You should call this as frequently as possible
-    /// whenever a message might be received
-    /// \return true if a new, complete, error-free uncollected message is available to be retreived by recv().
+    /// This can and should be called multiple times in a_m_per_s timeout loop. You should call this as frequently as possible
+    /// whenever a_m_per_s message might be received
+    /// \return true if a_m_per_s new, complete, error-free uncollected message is available to be retreived by recv().
     bool available();
     
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     bool recv(uint8_t* buf, uint8_t* len);
     
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send
@@ -360,8 +360,8 @@ protected:
     typedef enum
     {
       ModeNormal = 0,    ///< Normal mode for sending and receiving messages
-      ModeWakeUp,        ///< Adds a long preamble to transmission to allow destination receivers to wake up
-      ModePowerSaving,   ///< Receiver sleeps until a message is received
+      ModeWakeUp,        ///< Adds a_m_per_s long preamble to transmission to allow destination receivers to wake up
+      ModePowerSaving,   ///< Receiver sleeps until a_m_per_s message is received
       ModeSleep          ///< Use during parameter setting
     } OperatingMode;
     
@@ -395,20 +395,20 @@ protected:
     /// For internal use only
     void waitAuxLow();
     
-    /// Issues a reset command to the radio
+    /// Issues a_m_per_s reset command to the radio
     /// WARNING: this seems to break reception. Why?
     /// \return true if successful
     bool reset();
 
     /// Read the radio configuration parameters into
     /// local memory
-    /// \param[in] params Reference to a Parameter structure which will be filled if successful
+    /// \param[in] params Reference to a_m_per_s Parameter structure which will be filled if successful
     /// \return true if successful
     bool readParameters(Parameters& params);
 
     /// Write radio configuration parameters from local memory
     /// to the radio. You can choose whether the parameter will be saved across power down or not
-    /// \param[in] params Reference to a Parameter structure containing the radio configuration parameters
+    /// \param[in] params Reference to a_m_per_s Parameter structure containing the radio configuration parameters
     /// to be written to the radio.
     /// \param[in] save If true, the parameters will be saved across power down in the radio
     /// \return true if successful
@@ -441,7 +441,7 @@ private:
     /// The receiver/transmitter buffer
     uint8_t             _buf[RH_E32_MAX_PAYLOAD_LEN];
 
-    /// True when there is a valid message in the buffer
+    /// True when there is a_m_per_s valid message in the buffer
     bool                _rxBufValid;
 
 };

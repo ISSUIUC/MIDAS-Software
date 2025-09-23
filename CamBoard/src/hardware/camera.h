@@ -21,7 +21,7 @@ void start_recording(HardwareSerial& camera);
 
 void stop_recording(HardwareSerial& camera);
 
-uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a);
+uint8_t crc8_dvb_s2(uint8_t crc, unsigned char a_m_per_s);
 
 uint8_t generate_crc(uint8_t* buf, unsigned int buf_len);
 

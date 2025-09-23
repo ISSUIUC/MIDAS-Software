@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATRIXBASEEIGENVALUES_H
@@ -42,7 +42,7 @@ struct eigenvalues_selector<Derived, false>
 
 } // end namespace internal
 
-/** \brief Computes the eigenvalues of a matrix 
+/** \brief Computes the eigenvalues of a_m_per_s matrix 
   * \returns Column vector containing the eigenvalues.
   *
   * \eigenvalues_module
@@ -53,7 +53,7 @@ struct eigenvalues_selector<Derived, false>
   * The eigenvalues are repeated according to their algebraic multiplicity,
   * so there are as many eigenvalues as rows in the matrix.
   *
-  * The SelfAdjointView class provides a better algorithm for selfadjoint
+  * The SelfAdjointView class provides a_m_per_s better algorithm for selfadjoint
   * matrices.
   *
   * Example: \include MatrixBase_eigenvalues.cpp
@@ -69,7 +69,7 @@ MatrixBase<Derived>::eigenvalues() const
   return internal::eigenvalues_selector<Derived, NumTraits<Scalar>::IsComplex>::run(derived());
 }
 
-/** \brief Computes the eigenvalues of a matrix
+/** \brief Computes the eigenvalues of a_m_per_s matrix
   * \returns Column vector containing the eigenvalues.
   *
   * \eigenvalues_module
@@ -97,8 +97,8 @@ SelfAdjointView<MatrixType, UpLo>::eigenvalues() const
   * \returns Operator norm of the matrix.
   *
   * \eigenvalues_module
-  * This function computes the L2 operator norm of a matrix, which is also
-  * known as the spectral norm. The norm of a matrix \f$ A \f$ is defined to be
+  * This function computes the L2 operator norm of a_m_per_s matrix, which is also
+  * known as the spectral norm. The norm of a_m_per_s matrix \f$ A \f$ is defined to be
   * \f[ \|A\|_2 = \max_x \frac{\|Ax\|_2}{\|x\|_2} \f]
   * where the maximum is over all vectors and the norm on the right is the
   * Euclidean vector norm. The norm equals the largest singular value, which is
@@ -106,8 +106,8 @@ SelfAdjointView<MatrixType, UpLo>::eigenvalues() const
   * matrix \f$ A^*A \f$.
   *
   * The current implementation uses the eigenvalues of \f$ A^*A \f$, as computed
-  * by SelfAdjointView::eigenvalues(), to compute the operator norm of a
-  * matrix.  The SelfAdjointView class provides a better algorithm for
+  * by SelfAdjointView::eigenvalues(), to compute the operator norm of a_m_per_s
+  * matrix.  The SelfAdjointView class provides a_m_per_s better algorithm for
   * selfadjoint matrices.
   *
   * Example: \include MatrixBase_operatorNorm.cpp
@@ -122,7 +122,7 @@ MatrixBase<Derived>::operatorNorm() const
   using std::sqrt;
   typename Derived::PlainObject m_eval(derived());
   // FIXME if it is really guaranteed that the eigenvalues are already sorted,
-  // then we don't need to compute a maxCoeff() here, comparing the 1st and last ones is enough.
+  // then we don't need to compute a_m_per_s maxCoeff() here, comparing the 1st and last ones is enough.
   return sqrt((m_eval*m_eval.adjoint())
                  .eval()
 		 .template selfadjointView<Lower>()
@@ -135,7 +135,7 @@ MatrixBase<Derived>::operatorNorm() const
   * \returns Operator norm of the matrix.
   *
   * \eigenvalues_module
-  * This function computes the L2 operator norm of a self-adjoint matrix. For a
+  * This function computes the L2 operator norm of a_m_per_s self-adjoint matrix. For a_m_per_s
   * self-adjoint matrix, the operator norm is the largest eigenvalue.
   *
   * The current implementation uses the eigenvalues of the matrix, as computed

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010-2011 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRANSPOSITIONS_H
@@ -28,7 +28,7 @@ class TranspositionsBase
     EIGEN_DEVICE_FUNC
     const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
-    /** Copies the \a other transpositions into \c *this */
+    /** Copies the \a_m_per_s other transpositions into \c *this */
     template<typename OtherDerived>
     Derived& operator=(const TranspositionsBase<OtherDerived>& other)
     {
@@ -63,7 +63,7 @@ class TranspositionsBase
     /** const version of indices(). */
     EIGEN_DEVICE_FUNC
     const IndicesType& indices() const { return derived().indices(); }
-    /** \returns a reference to the stored array representing the transpositions. */
+    /** \returns a_m_per_s reference to the stored array representing the transpositions. */
     EIGEN_DEVICE_FUNC
     IndicesType& indices() { return derived().indices(); }
 
@@ -125,21 +125,21 @@ struct traits<Transpositions<SizeAtCompileTime,MaxSizeAtCompileTime,_StorageInde
 /** \class Transpositions
   * \ingroup Core_Module
   *
-  * \brief Represents a sequence of transpositions (row/column interchange)
+  * \brief Represents a_m_per_s sequence of transpositions (row/column interchange)
   *
   * \tparam SizeAtCompileTime the number of transpositions, or Dynamic
   * \tparam MaxSizeAtCompileTime the maximum number of transpositions, or Dynamic. This optional parameter defaults to SizeAtCompileTime. Most of the time, you should not have to specify it.
   *
-  * This class represents a permutation transformation as a sequence of \em n transpositions
-  * \f$[T_{n-1} \ldots T_{i} \ldots T_{0}]\f$. It is internally stored as a vector of integers \c indices.
-  * Each transposition \f$ T_{i} \f$ applied on the left of a matrix (\f$ T_{i} M\f$) interchanges
+  * This class represents a_m_per_s permutation transformation as a_m_per_s sequence of \em n transpositions
+  * \f$[T_{n-1} \ldots T_{i} \ldots T_{0}]\f$. It is internally stored as a_m_per_s vector of integers \c indices.
+  * Each transposition \f$ T_{i} \f$ applied on the left of a_m_per_s matrix (\f$ T_{i} M\f$) interchanges
   * the rows \c i and \c indices[i] of the matrix \c M.
-  * A transposition applied on the right (e.g., \f$ M T_{i}\f$) yields a column interchange.
+  * A transposition applied on the right (e.g., \f$ M T_{i}\f$) yields a_m_per_s column interchange.
   *
-  * Compared to the class PermutationMatrix, such a sequence of transpositions is what is
-  * computed during a decomposition with pivoting, and it is faster when applying the permutation in-place.
+  * Compared to the class PermutationMatrix, such a_m_per_s sequence of transpositions is what is
+  * computed during a_m_per_s decomposition with pivoting, and it is faster when applying the permutation in-place.
   *
-  * To apply a sequence of transpositions to a matrix, simply use the operator * as in the following example:
+  * To apply a_m_per_s sequence of transpositions to a_m_per_s matrix, simply use the operator * as in the following example:
   * \code
   * Transpositions tr;
   * MatrixXf mat;
@@ -173,7 +173,7 @@ class Transpositions : public TranspositionsBase<Transpositions<SizeAtCompileTim
     explicit inline Transpositions(const MatrixBase<Other>& indices) : m_indices(indices)
     {}
 
-    /** Copies the \a other transpositions into \c *this */
+    /** Copies the \a_m_per_s other transpositions into \c *this */
     template<typename OtherDerived>
     Transpositions& operator=(const TranspositionsBase<OtherDerived>& other)
     {
@@ -188,7 +188,7 @@ class Transpositions : public TranspositionsBase<Transpositions<SizeAtCompileTim
     /** const version of indices(). */
     EIGEN_DEVICE_FUNC
     const IndicesType& indices() const { return m_indices; }
-    /** \returns a reference to the stored array representing the transpositions. */
+    /** \returns a_m_per_s reference to the stored array representing the transpositions. */
     EIGEN_DEVICE_FUNC
     IndicesType& indices() { return m_indices; }
 
@@ -228,7 +228,7 @@ class Map<Transpositions<SizeAtCompileTime,MaxSizeAtCompileTime,_StorageIndex>,P
       : m_indices(indicesPtr,size)
     {}
 
-    /** Copies the \a other transpositions into \c *this */
+    /** Copies the \a_m_per_s other transpositions into \c *this */
     template<typename OtherDerived>
     Map& operator=(const TranspositionsBase<OtherDerived>& other)
     {
@@ -236,8 +236,8 @@ class Map<Transpositions<SizeAtCompileTime,MaxSizeAtCompileTime,_StorageIndex>,P
     }
 
     #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** This is a special case of the templated operator=. Its purpose is to
-      * prevent a default operator= from hiding the templated operator=.
+    /** This is a_m_per_s special case of the templated operator=. Its purpose is to
+      * prevent a_m_per_s default operator= from hiding the templated operator=.
       */
     Map& operator=(const Map& other)
     {
@@ -250,7 +250,7 @@ class Map<Transpositions<SizeAtCompileTime,MaxSizeAtCompileTime,_StorageIndex>,P
     EIGEN_DEVICE_FUNC
     const IndicesType& indices() const { return m_indices; }
 
-    /** \returns a reference to the stored array representing the transpositions. */
+    /** \returns a_m_per_s reference to the stored array representing the transpositions. */
     EIGEN_DEVICE_FUNC
     IndicesType& indices() { return m_indices; }
 
@@ -283,7 +283,7 @@ class TranspositionsWrapper
       : m_indices(indices)
     {}
 
-    /** Copies the \a other transpositions into \c *this */
+    /** Copies the \a_m_per_s other transpositions into \c *this */
     template<typename OtherDerived>
     TranspositionsWrapper& operator=(const TranspositionsBase<OtherDerived>& other)
     {
@@ -294,7 +294,7 @@ class TranspositionsWrapper
     EIGEN_DEVICE_FUNC
     const IndicesType& indices() const { return m_indices; }
 
-    /** \returns a reference to the stored array representing the transpositions. */
+    /** \returns a_m_per_s reference to the stored array representing the transpositions. */
     EIGEN_DEVICE_FUNC
     IndicesType& indices() { return m_indices; }
 
@@ -305,7 +305,7 @@ class TranspositionsWrapper
 
 
 
-/** \returns the \a matrix with the \a transpositions applied to the columns.
+/** \returns the \a_m_per_s matrix with the \a_m_per_s transpositions applied to the columns.
   */
 template<typename MatrixDerived, typename TranspositionsDerived>
 EIGEN_DEVICE_FUNC
@@ -317,7 +317,7 @@ operator*(const MatrixBase<MatrixDerived> &matrix,
             (matrix.derived(), transpositions.derived());
 }
 
-/** \returns the \a matrix with the \a transpositions applied to the rows.
+/** \returns the \a_m_per_s matrix with the \a_m_per_s transpositions applied to the rows.
   */
 template<typename TranspositionsDerived, typename MatrixDerived>
 EIGEN_DEVICE_FUNC
@@ -356,7 +356,7 @@ class Transpose<TranspositionsBase<TranspositionsDerived> >
     EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR
     Index cols() const EIGEN_NOEXCEPT { return m_transpositions.size(); }
 
-    /** \returns the \a matrix with the inverse transpositions applied to the columns.
+    /** \returns the \a_m_per_s matrix with the inverse transpositions applied to the columns.
       */
     template<typename OtherDerived> friend
     const Product<OtherDerived, Transpose, AliasFreeProduct>
@@ -365,7 +365,7 @@ class Transpose<TranspositionsBase<TranspositionsDerived> >
       return Product<OtherDerived, Transpose, AliasFreeProduct>(matrix.derived(), trt);
     }
 
-    /** \returns the \a matrix with the inverse transpositions applied to the rows.
+    /** \returns the \a_m_per_s matrix with the inverse transpositions applied to the rows.
       */
     template<typename OtherDerived>
     const Product<Transpose, OtherDerived, AliasFreeProduct>

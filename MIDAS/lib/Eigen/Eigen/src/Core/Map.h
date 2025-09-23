@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2007-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MAP_H
@@ -51,37 +51,37 @@ private:
   *                The default is \c #Unaligned.
   * \tparam StrideType optionally specifies strides. By default, Map assumes the memory layout
   *                   of an ordinary, contiguous array. This can be overridden by specifying strides.
-  *                   The type passed here must be a specialization of the Stride template, see examples below.
+  *                   The type passed here must be a_m_per_s specialization of the Stride template, see examples below.
   *
-  * This class represents a matrix or vector expression mapping an existing array of data.
+  * This class represents a_m_per_s matrix or vector expression mapping an existing array of data.
   * It can be used to let Eigen interface without any overhead with non-Eigen data structures,
   * such as plain C arrays or structures from other libraries. By default, it assumes that the
   * data is laid out contiguously in memory. You can however override this by explicitly specifying
   * inner and outer strides.
   *
-  * Here's an example of simply mapping a contiguous array as a \ref TopicStorageOrders "column-major" matrix:
+  * Here's an example of simply mapping a_m_per_s contiguous array as a_m_per_s \ref TopicStorageOrders "column-major" matrix:
   * \include Map_simple.cpp
   * Output: \verbinclude Map_simple.out
   *
   * If you need to map non-contiguous arrays, you can do so by specifying strides:
   *
-  * Here's an example of mapping an array as a vector, specifying an inner stride, that is, the pointer
-  * increment between two consecutive coefficients. Here, we're specifying the inner stride as a compile-time
+  * Here's an example of mapping an array as a_m_per_s vector, specifying an inner stride, that is, the pointer
+  * increment between two consecutive coefficients. Here, we're specifying the inner stride as a_m_per_s compile-time
   * fixed value.
   * \include Map_inner_stride.cpp
   * Output: \verbinclude Map_inner_stride.out
   *
   * Here's an example of mapping an array while specifying an outer stride. Here, since we're mapping
-  * as a column-major matrix, 'outer stride' means the pointer increment between two consecutive columns.
-  * Here, we're specifying the outer stride as a runtime parameter. Note that here \c OuterStride<> is
-  * a short version of \c OuterStride<Dynamic> because the default template parameter of OuterStride
+  * as a_m_per_s column-major matrix, 'outer stride' means the pointer increment between two consecutive columns.
+  * Here, we're specifying the outer stride as a_m_per_s runtime parameter. Note that here \c OuterStride<> is
+  * a_m_per_s short version of \c OuterStride<Dynamic> because the default template parameter of OuterStride
   * is  \c Dynamic
   * \include Map_outer_stride.cpp
   * Output: \verbinclude Map_outer_stride.out
   *
   * For more details and for an example of specifying both an inner and an outer stride, see class Stride.
   *
-  * \b Tip: to change the array of data mapped by a Map object, you can use the C++
+  * \b Tip: to change the array of data mapped by a_m_per_s Map object, you can use the C++
   * placement new syntax:
   *
   * Example: \include Map_placement_new.cpp

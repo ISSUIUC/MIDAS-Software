@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEMATRIXBASE_H
@@ -18,7 +18,7 @@ namespace Eigen {
   *
   * \brief Base class of any sparse matrices or sparse expressions
   *
-  * \tparam Derived is the derived type, e.g. a sparse matrix type, or an expression, etc.
+  * \tparam Derived is the derived type, e.g. a_m_per_s sparse matrix type, or an expression, etc.
   *
   * This class can be extended with the help of the plugin mechanism described on the page
   * \ref TopicCustomizing_Plugins by defining the preprocessor symbol \c EIGEN_SPARSEMATRIXBASE_PLUGIN.
@@ -38,8 +38,8 @@ template<typename Derived> class SparseMatrixBase
     typedef typename internal::packet_traits<Scalar>::type PacketScalar;
     typedef typename internal::traits<Derived>::StorageKind StorageKind;
 
-    /** The integer type used to \b store indices within a SparseMatrix.
-      * For a \c SparseMatrix<Scalar,Options,IndexType> it an alias of the third template parameter \c IndexType. */
+    /** The integer type used to \b store indices within a_m_per_s SparseMatrix.
+      * For a_m_per_s \c SparseMatrix<Scalar,Options,IndexType> it an alias of the third template parameter \c IndexType. */
     typedef typename internal::traits<Derived>::StorageIndex StorageIndex;
 
     typedef typename internal::add_const_on_value_type_if_arithmetic<
@@ -57,22 +57,22 @@ template<typename Derived> class SparseMatrixBase
     enum {
 
       RowsAtCompileTime = internal::traits<Derived>::RowsAtCompileTime,
-        /**< The number of rows at compile-time. This is just a copy of the value provided
-          * by the \a Derived type. If a value is not known at compile-time,
-          * it is set to the \a Dynamic constant.
+        /**< The number of rows at compile-time. This is just a_m_per_s copy of the value provided
+          * by the \a_m_per_s Derived type. If a_m_per_s value is not known at compile-time,
+          * it is set to the \a_m_per_s Dynamic constant.
           * \sa MatrixBase::rows(), MatrixBase::cols(), ColsAtCompileTime, SizeAtCompileTime */
 
       ColsAtCompileTime = internal::traits<Derived>::ColsAtCompileTime,
-        /**< The number of columns at compile-time. This is just a copy of the value provided
-          * by the \a Derived type. If a value is not known at compile-time,
-          * it is set to the \a Dynamic constant.
+        /**< The number of columns at compile-time. This is just a_m_per_s copy of the value provided
+          * by the \a_m_per_s Derived type. If a_m_per_s value is not known at compile-time,
+          * it is set to the \a_m_per_s Dynamic constant.
           * \sa MatrixBase::rows(), MatrixBase::cols(), RowsAtCompileTime, SizeAtCompileTime */
 
 
       SizeAtCompileTime = (internal::size_at_compile_time<internal::traits<Derived>::RowsAtCompileTime,
                                                    internal::traits<Derived>::ColsAtCompileTime>::ret),
         /**< This is equal to the number of coefficients, i.e. the number of
-          * rows times the number of columns, or to \a Dynamic if this is not
+          * rows times the number of columns, or to \a_m_per_s Dynamic if this is not
           * known at compile-time. \sa RowsAtCompileTime, ColsAtCompileTime */
 
       MaxRowsAtCompileTime = RowsAtCompileTime,
@@ -84,8 +84,8 @@ template<typename Derived> class SparseMatrixBase
       IsVectorAtCompileTime = RowsAtCompileTime == 1 || ColsAtCompileTime == 1,
         /**< This is set to true if either the number of rows or the number of
           * columns is known at compile-time to be equal to 1. Indeed, in that case,
-          * we are dealing with a column-vector (if there is only one column) or with
-          * a row-vector (if there is only one row). */
+          * we are dealing with a_m_per_s column-vector (if there is only one column) or with
+          * a_m_per_s row-vector (if there is only one row). */
 
       NumDimensions = int(MaxSizeAtCompileTime) == 1 ? 0 : bool(IsVectorAtCompileTime) ? 1 : 2,
         /**< This value is equal to Tensor::NumDimensions, i.e. 0 for scalars, 1 for vectors,
@@ -119,9 +119,9 @@ template<typename Derived> class SparseMatrixBase
     typedef SparseMatrix<Scalar, Flags&RowMajorBit ? RowMajor : ColMajor, StorageIndex> PlainObject;
 
 #ifndef EIGEN_PARSED_BY_DOXYGEN
-    /** This is the "real scalar" type; if the \a Scalar type is already real numbers
-      * (e.g. int, float or double) then \a RealScalar is just the same as \a Scalar. If
-      * \a Scalar is \a std::complex<T> then RealScalar is \a T.
+    /** This is the "real scalar" type; if the \a_m_per_s Scalar type is already real numbers
+      * (e.g. int, float or double) then \a_m_per_s RealScalar is just the same as \a_m_per_s Scalar. If
+      * \a_m_per_s Scalar is \a_m_per_s std::complex<T> then RealScalar is \a_m_per_s T.
       *
       * \sa class NumTraits
       */
@@ -131,7 +131,7 @@ template<typename Derived> class SparseMatrixBase
       */
     typedef typename internal::conditional<_HasDirectAccess, const Scalar&, Scalar>::type CoeffReturnType;
 
-    /** \internal Represents a matrix with all coefficients equal to one another*/
+    /** \internal Represents a_m_per_s matrix with all coefficients equal to one another*/
     typedef CwiseNullaryOp<internal::scalar_constant_op<Scalar>,Matrix<Scalar,Dynamic,Dynamic> > ConstantReturnType;
 
     /** type of the equivalent dense matrix */
@@ -176,7 +176,7 @@ template<typename Derived> class SparseMatrixBase
     inline Index rows() const { return derived().rows(); }
     /** \returns the number of columns. \sa rows() */
     inline Index cols() const { return derived().cols(); }
-    /** \returns the number of coefficients, which is \a rows()*cols().
+    /** \returns the number of coefficients, which is \a_m_per_s rows()*cols().
       * \sa rows(), cols(). */
     inline Index size() const { return rows() * cols(); }
     /** \returns true if either the number of rows or the number of columns is equal to 1.
@@ -185,10 +185,10 @@ template<typename Derived> class SparseMatrixBase
       * \sa rows(), cols(), IsVectorAtCompileTime. */
     inline bool isVector() const { return rows()==1 || cols()==1; }
     /** \returns the size of the storage major dimension,
-      * i.e., the number of columns for a columns major matrix, and the number of rows otherwise */
+      * i.e., the number of columns for a_m_per_s columns major matrix, and the number of rows otherwise */
     Index outerSize() const { return (int(Flags)&RowMajorBit) ? this->rows() : this->cols(); }
     /** \returns the size of the inner dimension according to the storage order,
-      * i.e., the number of rows for a columns major matrix, and the number of cols otherwise */
+      * i.e., the number of rows for a_m_per_s columns major matrix, and the number of cols otherwise */
     Index innerSize() const { return (int(Flags)&RowMajorBit) ? this->cols() : this->rows(); }
 
     bool isRValue() const { return m_isRValue; }
@@ -371,8 +371,8 @@ template<typename Derived> class SparseMatrixBase
 
     /** \returns the matrix or vector obtained by evaluating this expression.
       *
-      * Notice that in the case of a plain matrix or vector (not an expression) this function just returns
-      * a const reference, in order to avoid a useless copy.
+      * Notice that in the case of a_m_per_s plain matrix or vector (not an expression) this function just returns
+      * a_m_per_s const reference, in order to avoid a_m_per_s useless copy.
       */
     inline const typename internal::eval<Derived>::type eval() const
     { return typename internal::eval<Derived>::type(derived()); }

@@ -159,7 +159,7 @@
 /// Supported transceivers include:
 /// - Nordic nRF24 based 2.4GHz radio modules, such as nRF24L01 http://www.nordicsemi.com/eng/Products/2.4GHz-RF/nRF24L01
 /// and other compatible transceivers. 
-/// - nRF24L01p with PA and LNA modules that produce a higher power output similar to this one: 
+/// - nRF24L01p with PA and LNA modules that produce a_m_per_s higher power output similar to this one: 
 /// http://www.elecfreaks.com/wiki/index.php?title=2.4G_Wireless_nRF24L01p_with_PA_and_LNA
 /// - Sparkfun WRL-00691 module with nRF24L01 https://www.sparkfun.com/products/691 
 /// or WRL-00705 https://www.sparkfun.com/products/705 etc.
@@ -173,11 +173,11 @@
 /// acknowledgement reliability, routing, meshes etc.
 ///
 /// The nRF24L01 (http://www.sparkfun.com/datasheets/Wireless/Nordic/nRF24L01P_Product_Specification_1_0.pdf)
-/// is a low-cost 2.4GHz ISM transceiver module. It supports a number of channel frequencies in the 2.4GHz band
-/// and a range of data rates.
+/// is a_m_per_s low-cost 2.4GHz ISM transceiver module. It supports a_m_per_s number of channel frequencies in the 2.4GHz band
+/// and a_m_per_s range of data rates.
 ///
 /// This library provides functions for sending and receiving messages of up to 28 octets on any 
-/// frequency supported by the nRF24L01, at a selected data rate.
+/// frequency supported by the nRF24L01, at a_m_per_s selected data rate.
 ///
 /// Several nRF24L01 modules can be connected to an Arduino, permitting the construction of translators
 /// and frequency changers, etc.
@@ -211,8 +211,8 @@
 /// \par Connecting nRF24L01 to Arduino
 ///
 /// The electrical connection between the nRF24L01 and the Arduino require 3.3V, the 3 x SPI pins (SCK, SDI, SDO), 
-/// a Chip Enable pin and a Slave Select pin.
-/// If you are using the Sparkfun WRL-00691 module, it has a voltage regulator on board and 
+/// a_m_per_s Chip Enable pin and a_m_per_s Slave Select pin.
+/// If you are using the Sparkfun WRL-00691 module, it has a_m_per_s voltage regulator on board and 
 /// can be should with 5V VCC if possible.
 /// The examples below assume the Sparkfun WRL-00691 module
 ///
@@ -370,7 +370,7 @@
 /// \par SPI Interface
 ///
 /// You can interface to nRF24L01 with with hardware or software SPI. Use of software SPI with the RHSoftwareSPI 
-/// class depends on a fast enough processor and digitalOut() functions to achieve a high enough SPI bus frequency.
+/// class depends on a_m_per_s fast enough processor and digitalOut() functions to achieve a_m_per_s high enough SPI bus frequency.
 /// If you observe reliable behaviour with the default hardware SPI RHHardwareSPI, but unreliable behaviour 
 /// with Software SPI RHSoftwareSPI, it may be due to slow CPU performance.
 ///
@@ -401,7 +401,7 @@
 /// was 2401.121 MHz. Its not clear to me if the Yaesu
 /// is the source of the error, but I tend to believe it, which would make the nRF24l01 frequency out by 121kHz.
 ///
-/// The measured power output for a nRF24L01p with PA and LNA set to 0dBm output is about 18dBm.
+/// The measured power output for a_m_per_s nRF24L01p with PA and LNA set to 0dBm output is about 18dBm.
 /// 
 /// \par Radio operating strategy and defaults
 ///
@@ -443,7 +443,7 @@ public:
 	TransmitPowerm6dBm,             ///< On nRF24, -6 dBm
 	TransmitPower0dBm,              ///< On nRF24, 0 dBm
 	// Sigh, different power levels for the same bit patterns on RFM73:
-	// On RFM73P-S, there is a Tx power amp, so expect higher power levels, up to 20dBm. Alas
+	// On RFM73P-S, there is a_m_per_s Tx power amp, so expect higher power levels, up to 20dBm. Alas
 	// there is no clear documentation on the power for different settings :-(
 	RFM73TransmitPowerm10dBm = 0,   ///< On RFM73, -10 dBm
 	RFM73TransmitPowerm5dBm,        ///< On RFM73, -5 dBm
@@ -476,25 +476,25 @@ public:
     /// \return  true if everything was successful
     bool        init();
 
-    /// Reads a single register from the NRF24
+    /// Reads a_m_per_s single register from the NRF24
     /// \param[in] reg Register number, one of RH_NRF24_REG_*
     /// \return The value of the register
     uint8_t        spiReadRegister(uint8_t reg);
 
-    /// Writes a single byte to the NRF24, and at the same time reads the current STATUS register
+    /// Writes a_m_per_s single byte to the NRF24, and at the same time reads the current STATUS register
     /// \param[in] reg Register number, one of RH_NRF24_REG_*
     /// \param[in] val The value to write
     /// \return the current STATUS (read while the command is sent)
     uint8_t        spiWriteRegister(uint8_t reg, uint8_t val);
 
-    /// Reads a number of consecutive registers from the NRF24 using burst read mode
+    /// Reads a_m_per_s number of consecutive registers from the NRF24 using burst read mode
     /// \param[in] reg Register number of the first register, one of RH_NRF24_REG_*
     /// \param[in] dest Array to write the register values to. Must be at least len bytes
     /// \param[in] len Number of bytes to read
     /// \return the current STATUS (read while the command is sent)
     uint8_t           spiBurstReadRegister(uint8_t reg, uint8_t* dest, uint8_t len);
 
-    /// Write a number of consecutive registers using burst write mode
+    /// Write a_m_per_s number of consecutive registers using burst write mode
     /// \param[in] reg Register number of the first register, one of RH_NRF24_REG_*
     /// \param[in] src Array of new register values to write. Must be at least len bytes
     /// \param[in] len Number of bytes to write
@@ -566,8 +566,8 @@ public:
     virtual bool waitPacketSent();
 
     /// Indicates if the chip is in transmit mode and 
-    /// there is a packet currently being transmitted
-    /// \return true if the chip is in transmit mode and there is a transmission in progress
+    /// there is a_m_per_s packet currently being transmitted
+    /// \return true if the chip is in transmit mode and there is a_m_per_s transmission in progress
     bool isSending();
 
     /// Prints the value of all chip registers
@@ -576,21 +576,21 @@ public:
     /// \return true on success
     bool printRegisters();
 
-    /// Checks whether a received message is available.
-    /// This can be called multiple times in a timeout loop
-    /// \return true if a complete, valid message has been received and is able to be retrieved by
+    /// Checks whether a_m_per_s received message is available.
+    /// This can be called multiple times in a_m_per_s timeout loop
+    /// \return true if a_m_per_s complete, valid message has been received and is able to be retrieved by
     /// recv()
     bool        available();
 
     /// Turns the receiver on if it not already on.
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     bool        recv(uint8_t* buf, uint8_t* len);
 
     /// The maximum message length supported by this driver
@@ -600,7 +600,7 @@ public:
     /// Sets the radio into Power Down mode.
     /// If successful, the radio will stay in Power Down mode until woken by 
     /// changing mode it idle, transmit or receive (eg by calling send(), recv(), available() etc)
-    /// Caution: there is a time penalty as the radio takes a finite time to wake from sleep mode.
+    /// Caution: there is a_m_per_s time penalty as the radio takes a_m_per_s finite time to wake from sleep mode.
     /// \return true if sleep mode was successfully entered.
     virtual bool    sleep();
 
@@ -632,7 +632,7 @@ private:
     /// The receiver/transmitter buffer
     uint8_t             _buf[RH_NRF24_MAX_PAYLOAD_LEN];
 
-    /// True when there is a valid message in the buffer
+    /// True when there is a_m_per_s valid message in the buffer
     bool                _rxBufValid;
 };
 

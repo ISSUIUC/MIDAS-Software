@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SPARSEUTIL_H
@@ -154,7 +154,7 @@ struct LowerBoundIndex {
   *
   * \class Triplet
   *
-  * \brief A small structure to hold a non zero as a triplet (i,j,value).
+  * \brief A small structure to hold a_m_per_s non zero as a_m_per_s triplet (i,j,value).
   *
   * \sa SparseMatrix::setFromTriplets()
   */

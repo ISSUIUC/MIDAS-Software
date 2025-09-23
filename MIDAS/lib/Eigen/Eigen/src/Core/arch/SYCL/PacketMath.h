@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Mehdi Goli    Codeplay Software Ltd.
@@ -7,7 +7,7 @@
 // Contact: <eigen@codeplay.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /*****************************************************************
@@ -90,8 +90,8 @@ SYCL_PLOAD(Aligned, )
 #undef SYCL_PLOAD
 
 #ifdef SYCL_DEVICE_ONLY
-/** \internal \returns a packet version of \a *from.
- * The pointer \a from must be aligned on a \a Alignment bytes boundary. */
+/** \internal \returns a_m_per_s packet version of \a_m_per_s *from.
+ * The pointer \a_m_per_s from must be aligned on a_m_per_s \a_m_per_s Alignment bytes boundary. */
 #define SYCL_PLOADT(address_space_target)                                   \
   template <typename packet_type, int Alignment>                            \
   EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE packet_type ploadt(                 \
@@ -254,10 +254,10 @@ struct get_base_packet<cl::sycl::cl_float4> {
     to[tmp += stride] = from.w();
   }
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE cl::sycl::cl_float4 set_plset(
-      const float& a) {
-    return cl::sycl::cl_float4(static_cast<float>(a), static_cast<float>(a + 1),
-                               static_cast<float>(a + 2),
-                               static_cast<float>(a + 3));
+      const float& a_m_per_s) {
+    return cl::sycl::cl_float4(static_cast<float>(a_m_per_s), static_cast<float>(a_m_per_s + 1),
+                               static_cast<float>(a_m_per_s + 2),
+                               static_cast<float>(a_m_per_s + 3));
   }
 };
 
@@ -283,9 +283,9 @@ struct get_base_packet<cl::sycl::cl_double2> {
   }
 
   static EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE cl::sycl::cl_double2 set_plset(
-      const double& a) {
-    return cl::sycl::cl_double2(static_cast<double>(a),
-                                static_cast<double>(a + 1));
+      const double& a_m_per_s) {
+    return cl::sycl::cl_double2(static_cast<double>(a_m_per_s),
+                                static_cast<double>(a_m_per_s + 1));
   }
 };
 
@@ -320,8 +320,8 @@ SYCL_PLOAD_DUP_SPECILIZE(cl::sycl::cl_double2)
 #define SYCL_PLSET(packet_type)                                         \
   template <>                                                           \
   EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE packet_type plset<packet_type>( \
-      const typename unpacket_traits<packet_type>::type& a) {           \
-    return get_base_packet<packet_type>::set_plset(a);                  \
+      const typename unpacket_traits<packet_type>::type& a_m_per_s) {           \
+    return get_base_packet<packet_type>::set_plset(a_m_per_s);                  \
   }
 
 SYCL_PLSET(cl::sycl::cl_float4)
@@ -394,8 +394,8 @@ SYCL_PSCATTER_SPECILIZE(double, cl::sycl::cl_double2)
 #define SYCL_PMAD(packet_type)                                            \
   template <>                                                             \
   EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE packet_type pmadd(                \
-      const packet_type& a, const packet_type& b, const packet_type& c) { \
-    return cl::sycl::mad(a, b, c);                                        \
+      const packet_type& a_m_per_s, const packet_type& b, const packet_type& c) { \
+    return cl::sycl::mad(a_m_per_s, b, c);                                        \
   }
 
 SYCL_PMAD(cl::sycl::cl_float4)
@@ -404,103 +404,103 @@ SYCL_PMAD(cl::sycl::cl_double2)
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float pfirst<cl::sycl::cl_float4>(
-    const cl::sycl::cl_float4& a) {
-  return a.x();
+    const cl::sycl::cl_float4& a_m_per_s) {
+  return a_m_per_s.x();
 }
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE double pfirst<cl::sycl::cl_double2>(
-    const cl::sycl::cl_double2& a) {
-  return a.x();
+    const cl::sycl::cl_double2& a_m_per_s) {
+  return a_m_per_s.x();
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float predux<cl::sycl::cl_float4>(
-    const cl::sycl::cl_float4& a) {
-  return a.x() + a.y() + a.z() + a.w();
+    const cl::sycl::cl_float4& a_m_per_s) {
+  return a_m_per_s.x() + a_m_per_s.y() + a_m_per_s.z() + a_m_per_s.w();
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE double predux<cl::sycl::cl_double2>(
-    const cl::sycl::cl_double2& a) {
-  return a.x() + a.y();
+    const cl::sycl::cl_double2& a_m_per_s) {
+  return a_m_per_s.x() + a_m_per_s.y();
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float predux_max<cl::sycl::cl_float4>(
-    const cl::sycl::cl_float4& a) {
-  return cl::sycl::fmax(cl::sycl::fmax(a.x(), a.y()),
-                        cl::sycl::fmax(a.z(), a.w()));
+    const cl::sycl::cl_float4& a_m_per_s) {
+  return cl::sycl::fmax(cl::sycl::fmax(a_m_per_s.x(), a_m_per_s.y()),
+                        cl::sycl::fmax(a_m_per_s.z(), a_m_per_s.w()));
 }
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE double predux_max<cl::sycl::cl_double2>(
-    const cl::sycl::cl_double2& a) {
-  return cl::sycl::fmax(a.x(), a.y());
+    const cl::sycl::cl_double2& a_m_per_s) {
+  return cl::sycl::fmax(a_m_per_s.x(), a_m_per_s.y());
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float predux_min<cl::sycl::cl_float4>(
-    const cl::sycl::cl_float4& a) {
-  return cl::sycl::fmin(cl::sycl::fmin(a.x(), a.y()),
-                        cl::sycl::fmin(a.z(), a.w()));
+    const cl::sycl::cl_float4& a_m_per_s) {
+  return cl::sycl::fmin(cl::sycl::fmin(a_m_per_s.x(), a_m_per_s.y()),
+                        cl::sycl::fmin(a_m_per_s.z(), a_m_per_s.w()));
 }
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE double predux_min<cl::sycl::cl_double2>(
-    const cl::sycl::cl_double2& a) {
-  return cl::sycl::fmin(a.x(), a.y());
+    const cl::sycl::cl_double2& a_m_per_s) {
+  return cl::sycl::fmin(a_m_per_s.x(), a_m_per_s.y());
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE float predux_mul<cl::sycl::cl_float4>(
-    const cl::sycl::cl_float4& a) {
-  return a.x() * a.y() * a.z() * a.w();
+    const cl::sycl::cl_float4& a_m_per_s) {
+  return a_m_per_s.x() * a_m_per_s.y() * a_m_per_s.z() * a_m_per_s.w();
 }
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE double predux_mul<cl::sycl::cl_double2>(
-    const cl::sycl::cl_double2& a) {
-  return a.x() * a.y();
+    const cl::sycl::cl_double2& a_m_per_s) {
+  return a_m_per_s.x() * a_m_per_s.y();
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE cl::sycl::cl_float4
-pabs<cl::sycl::cl_float4>(const cl::sycl::cl_float4& a) {
-  return cl::sycl::cl_float4(cl::sycl::fabs(a.x()), cl::sycl::fabs(a.y()),
-                             cl::sycl::fabs(a.z()), cl::sycl::fabs(a.w()));
+pabs<cl::sycl::cl_float4>(const cl::sycl::cl_float4& a_m_per_s) {
+  return cl::sycl::cl_float4(cl::sycl::fabs(a_m_per_s.x()), cl::sycl::fabs(a_m_per_s.y()),
+                             cl::sycl::fabs(a_m_per_s.z()), cl::sycl::fabs(a_m_per_s.w()));
 }
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE cl::sycl::cl_double2
-pabs<cl::sycl::cl_double2>(const cl::sycl::cl_double2& a) {
-  return cl::sycl::cl_double2(cl::sycl::fabs(a.x()), cl::sycl::fabs(a.y()));
+pabs<cl::sycl::cl_double2>(const cl::sycl::cl_double2& a_m_per_s) {
+  return cl::sycl::cl_double2(cl::sycl::fabs(a_m_per_s.x()), cl::sycl::fabs(a_m_per_s.y()));
 }
 
 template <typename Packet>
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Packet sycl_pcmp_le(const Packet &a,
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Packet sycl_pcmp_le(const Packet &a_m_per_s,
                                                           const Packet &b) {
-  return ((a <= b)
+  return ((a_m_per_s <= b)
               .template convert<typename unpacket_traits<Packet>::type,
                                 cl::sycl::rounding_mode::automatic>());
 }
 
 template <typename Packet>
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Packet sycl_pcmp_lt(const Packet &a,
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Packet sycl_pcmp_lt(const Packet &a_m_per_s,
                                                           const Packet &b) {
-  return ((a < b)
+  return ((a_m_per_s < b)
               .template convert<typename unpacket_traits<Packet>::type,
                                 cl::sycl::rounding_mode::automatic>());
 }
 
 template <typename Packet>
-EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Packet sycl_pcmp_eq(const Packet &a,
+EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE Packet sycl_pcmp_eq(const Packet &a_m_per_s,
                                                           const Packet &b) {
-  return ((a == b)
+  return ((a_m_per_s == b)
               .template convert<typename unpacket_traits<Packet>::type,
                                 cl::sycl::rounding_mode::automatic>());
 }
 
 #define SYCL_PCMP(OP, TYPE)                                                    \
   template <>                                                                  \
-  EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE TYPE pcmp_##OP<TYPE>(const TYPE &a,    \
+  EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE TYPE pcmp_##OP<TYPE>(const TYPE &a_m_per_s,    \
                                                              const TYPE &b) {  \
-    return sycl_pcmp_##OP<TYPE>(a, b);                                         \
+    return sycl_pcmp_##OP<TYPE>(a_m_per_s, b);                                         \
   }
 
 SYCL_PCMP(le, cl::sycl::cl_float4)
@@ -541,9 +541,9 @@ convert_vector(const PacketIn &p) {
 
 #define SYCL_PAND(TYPE)                                                        \
   template <>                                                                  \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE pand<TYPE>(const TYPE &a,         \
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE pand<TYPE>(const TYPE &a_m_per_s,         \
                                                         const TYPE &b) {       \
-    return convert_vector<TYPE>(vector_as_int(a) & vector_as_int(b));          \
+    return convert_vector<TYPE>(vector_as_int(a_m_per_s) & vector_as_int(b));          \
   }
 SYCL_PAND(cl::sycl::cl_float4)
 SYCL_PAND(cl::sycl::cl_double2)
@@ -551,9 +551,9 @@ SYCL_PAND(cl::sycl::cl_double2)
 
 #define SYCL_POR(TYPE)                                                         \
   template <>                                                                  \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE por<TYPE>(const TYPE &a,          \
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE por<TYPE>(const TYPE &a_m_per_s,          \
                                                        const TYPE &b) {        \
-    return convert_vector<TYPE>(vector_as_int(a) | vector_as_int(b));          \
+    return convert_vector<TYPE>(vector_as_int(a_m_per_s) | vector_as_int(b));          \
   }
 
 SYCL_POR(cl::sycl::cl_float4)
@@ -562,9 +562,9 @@ SYCL_POR(cl::sycl::cl_double2)
 
 #define SYCL_PXOR(TYPE)                                                        \
   template <>                                                                  \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE pxor<TYPE>(const TYPE &a,         \
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE pxor<TYPE>(const TYPE &a_m_per_s,         \
                                                         const TYPE &b) {       \
-    return convert_vector<TYPE>(vector_as_int(a) ^ vector_as_int(b));          \
+    return convert_vector<TYPE>(vector_as_int(a_m_per_s) ^ vector_as_int(b));          \
   }
 
 SYCL_PXOR(cl::sycl::cl_float4)
@@ -573,9 +573,9 @@ SYCL_PXOR(cl::sycl::cl_double2)
 
 #define SYCL_PANDNOT(TYPE)                                                     \
   template <>                                                                  \
-  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE pandnot<TYPE>(const TYPE &a,      \
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE TYPE pandnot<TYPE>(const TYPE &a_m_per_s,      \
                                                            const TYPE &b) {    \
-    return convert_vector<TYPE>(vector_as_int(a) & (~vector_as_int(b)));       \
+    return convert_vector<TYPE>(vector_as_int(a_m_per_s) & (~vector_as_int(b)));       \
   }
 SYCL_PANDNOT(cl::sycl::cl_float4)
 SYCL_PANDNOT(cl::sycl::cl_double2)

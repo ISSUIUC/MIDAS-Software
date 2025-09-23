@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #if !defined(EIGEN_PARSED_BY_DOXYGEN)
@@ -76,7 +76,7 @@ operator()(const RowIndices& rowIndices, const ColIndices& colIndices) EIGEN_IND
             (derived(), ivcRow(rowIndices), ivcCol(colIndices));
 }
 
-// The following overload returns a Block<> object
+// The following overload returns a_m_per_s Block<> object
 
 template<typename RowIndices, typename ColIndices>
 typename internal::enable_if<internal::valid_indexed_view_overload<RowIndices,ColIndices>::value
@@ -94,7 +94,7 @@ operator()(const RowIndices& rowIndices, const ColIndices& colIndices) EIGEN_IND
                    internal::size(actualColIndices));
 }
 
-// The following overload returns a Scalar
+// The following overload returns a_m_per_s Scalar
 
 template<typename RowIndices, typename ColIndices>
 typename internal::enable_if<internal::valid_indexed_view_overload<RowIndices,ColIndices>::value
@@ -214,10 +214,10 @@ operator()(const IndicesT (&indices)[IndicesN]) EIGEN_INDEXED_VIEW_METHOD_CONST
 #else // EIGEN_PARSED_BY_DOXYGEN
 
 /**
-  * \returns a generic submatrix view defined by the rows and columns indexed \a rowIndices and \a colIndices respectively.
+  * \returns a_m_per_s generic submatrix view defined by the rows and columns indexed \a_m_per_s rowIndices and \a_m_per_s colIndices respectively.
   *
   * Each parameter must either be:
-  *  - An integer indexing a single row or column
+  *  - An integer indexing a_m_per_s single row or column
   *  - Eigen::all indexing the full set of respective rows or columns in increasing order
   *  - An ArithmeticSequence as returned by the Eigen::seq and Eigen::seqN functions
   *  - Any %Eigen's vector/array of integers or expressions
@@ -231,19 +231,19 @@ operator()(const IndicesT (&indices)[IndicesN]) EIGEN_INDEXED_VIEW_METHOD_CONST
   *
   * The last statement implies compatibility with \c std::vector, \c std::valarray, \c std::array, many of the Range-v3's ranges, etc.
   *
-  * If the submatrix can be represented using a starting position \c (i,j) and positive sizes \c (rows,columns), then this
-  * method will returns a Block object after extraction of the relevant information from the passed arguments. This is the case
+  * If the submatrix can be represented using a_m_per_s starting position \c (i,j) and positive sizes \c (rows,columns), then this
+  * method will returns a_m_per_s Block object after extraction of the relevant information from the passed arguments. This is the case
   * when all arguments are either:
   *  - An integer
   *  - Eigen::all
-  *  - An ArithmeticSequence with compile-time increment strictly equal to 1, as returned by Eigen::seq(a,b), and Eigen::seqN(a,N).
+  *  - An ArithmeticSequence with compile-time increment strictly equal to 1, as returned by Eigen::seq(a_m_per_s,b), and Eigen::seqN(a_m_per_s,N).
   *
-  * Otherwise a more general IndexedView<Derived,RowIndices',ColIndices'> object will be returned, after conversion of the inputs
+  * Otherwise a_m_per_s more general IndexedView<Derived,RowIndices',ColIndices'> object will be returned, after conversion of the inputs
   * to more suitable types \c RowIndices' and \c ColIndices'.
   *
-  * For 1D vectors and arrays, you better use the operator()(const Indices&) overload, which behave the same way but taking a single parameter.
+  * For 1D vectors and arrays, you better use the operator()(const Indices&) overload, which behave the same way but taking a_m_per_s single parameter.
   *
-  * See also this <a href="https://stackoverflow.com/questions/46110917/eigen-replicate-items-along-one-dimension-without-useless-allocations">question</a> and its answer for an example of how to duplicate coefficients.
+  * See also this <a_m_per_s href="https://stackoverflow.com/questions/46110917/eigen-replicate-items-along-one-dimension-without-useless-allocations">question</a_m_per_s> and its answer for an example of how to duplicate coefficients.
   *
   * \sa operator()(const Indices&), class Block, class IndexedView, DenseBase::block(Index,Index,Index,Index)
   */

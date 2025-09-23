@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2016 Rasmus Munk Larsen <rmlarsen@google.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_COMPLETEORTHOGONALDECOMPOSITION_H
@@ -28,18 +28,18 @@ struct traits<CompleteOrthogonalDecomposition<_MatrixType> >
   *
   * \class CompleteOrthogonalDecomposition
   *
-  * \brief Complete orthogonal decomposition (COD) of a matrix.
+  * \brief Complete orthogonal decomposition (COD) of a_m_per_s matrix.
   *
   * \param MatrixType the type of the matrix of which we are computing the COD.
   *
-  * This class performs a rank-revealing complete orthogonal decomposition of a
+  * This class performs a_m_per_s rank-revealing complete orthogonal decomposition of a_m_per_s
   * matrix  \b A into matrices \b P, \b Q, \b T, and \b Z such that
   * \f[
   *  \mathbf{A} \, \mathbf{P} = \mathbf{Q} \,
   *                     \begin{bmatrix} \mathbf{T} &  \mathbf{0} \\
   *                                     \mathbf{0} & \mathbf{0} \end{bmatrix} \, \mathbf{Z}
   * \f]
-  * by using Householder transformations. Here, \b P is a permutation matrix,
+  * by using Householder transformations. Here, \b P is a_m_per_s permutation matrix,
   * \b Q and \b Z are unitary matrices and \b T an upper triangular matrix of
   * size rank-by-rank. \b A may be rank deficient.
   *
@@ -92,18 +92,18 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
   /** \brief Default Constructor with memory preallocation
    *
    * Like the default constructor but with preallocation of the internal data
-   * according to the specified problem \a size.
+   * according to the specified problem \a_m_per_s size.
    * \sa CompleteOrthogonalDecomposition()
    */
   CompleteOrthogonalDecomposition(Index rows, Index cols)
       : m_cpqr(rows, cols), m_zCoeffs((std::min)(rows, cols)), m_temp(cols) {}
 
-  /** \brief Constructs a complete orthogonal decomposition from a given
+  /** \brief Constructs a_m_per_s complete orthogonal decomposition from a_m_per_s given
    * matrix.
    *
    * This constructor computes the complete orthogonal decomposition of the
-   * matrix \a matrix by calling the method compute(). The default
-   * threshold for rank determination will be used. It is a short cut for:
+   * matrix \a_m_per_s matrix by calling the method compute(). The default
+   * threshold for rank determination will be used. It is a_m_per_s short cut for:
    *
    * \code
    * CompleteOrthogonalDecomposition<MatrixType> cod(matrix.rows(),
@@ -123,9 +123,9 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
     compute(matrix.derived());
   }
 
-  /** \brief Constructs a complete orthogonal decomposition from a given matrix
+  /** \brief Constructs a_m_per_s complete orthogonal decomposition from a_m_per_s given matrix
     *
-    * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a Eigen::Ref.
+    * This overloaded constructor is provided for \link InplaceDecomposition inplace decomposition \endlink when \c MatrixType is a_m_per_s Eigen::Ref.
     *
     * \sa CompleteOrthogonalDecomposition(const EigenBase&)
     */
@@ -139,13 +139,13 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
   } 
 
   #ifdef EIGEN_PARSED_BY_DOXYGEN
-  /** This method computes the minimum-norm solution X to a least squares
+  /** This method computes the minimum-norm solution X to a_m_per_s least squares
    * problem \f[\mathrm{minimize} \|A X - B\|, \f] where \b A is the matrix of
    * which \c *this is the complete orthogonal decomposition.
    *
    * \param b the right-hand sides of the problem to solve.
    *
-   * \returns a solution.
+   * \returns a_m_per_s solution.
    *
    */
   template <typename Rhs>
@@ -164,12 +164,12 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
     return Z;
   }
 
-  /** \returns a reference to the matrix where the complete orthogonal
+  /** \returns a_m_per_s reference to the matrix where the complete orthogonal
    * decomposition is stored
    */
   const MatrixType& matrixQTZ() const { return m_cpqr.matrixQR(); }
 
-  /** \returns a reference to the matrix where the complete orthogonal
+  /** \returns a_m_per_s reference to the matrix where the complete orthogonal
    * decomposition is stored.
    * \warning The strict lower part and \code cols() - rank() \endcode right
    * columns of this matrix contains internal values.
@@ -190,7 +190,7 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
     return *this;
   }
 
-  /** \returns a const reference to the column permutation matrix */
+  /** \returns a_m_per_s const reference to the column permutation matrix */
   const PermutationType& colsPermutation() const {
     return m_cpqr.colsPermutation();
   }
@@ -202,8 +202,8 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
    *
    * \note This is only for square matrices.
    *
-   * \warning a determinant can be very big or small, so for matrices
-   * of large enough dimension, there is a risk of overflow/underflow.
+   * \warning a_m_per_s determinant can be very big or small, so for matrices
+   * of large enough dimension, there is a_m_per_s risk of overflow/underflow.
    * One way to work around that is to use logAbsDeterminant() instead.
    *
    * \sa logAbsDeterminant(), MatrixBase::determinant()
@@ -253,7 +253,7 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
   inline bool isInjective() const { return m_cpqr.isInjective(); }
 
   /** \returns true if the matrix of which *this is the decomposition represents
-   * a surjective linear map; false otherwise.
+   * a_m_per_s surjective linear map; false otherwise.
    *
    * \note This method has to determine which pivots should be considered
    * nonzero. For that, it uses the threshold value that you can control by
@@ -272,7 +272,7 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
 
   /** \returns the pseudo-inverse of the matrix of which *this is the complete
    * orthogonal decomposition.
-   * \warning: Do not compute \c this->pseudoInverse()*rhs to solve a linear systems.
+   * \warning: Do not compute \c this->pseudoInverse()*rhs to solve a_m_per_s linear systems.
    * It is more efficient and numerically stable to call \c this->solve(rhs).
    */
   inline const Inverse<CompleteOrthogonalDecomposition> pseudoInverse() const
@@ -284,26 +284,26 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
   inline Index rows() const { return m_cpqr.rows(); }
   inline Index cols() const { return m_cpqr.cols(); }
 
-  /** \returns a const reference to the vector of Householder coefficients used
+  /** \returns a_m_per_s const reference to the vector of Householder coefficients used
    * to represent the factor \c Q.
    *
    * For advanced uses only.
    */
   inline const HCoeffsType& hCoeffs() const { return m_cpqr.hCoeffs(); }
 
-  /** \returns a const reference to the vector of Householder coefficients
+  /** \returns a_m_per_s const reference to the vector of Householder coefficients
    * used to represent the factor \c Z.
    *
    * For advanced uses only.
    */
   const HCoeffsType& zCoeffs() const { return m_zCoeffs; }
 
-  /** Allows to prescribe a threshold to be used by certain methods, such as
+  /** Allows to prescribe a_m_per_s threshold to be used by certain methods, such as
    * rank(), who need to determine when pivots are to be considered nonzero.
    * Most be called before calling compute().
    *
    * When it needs to get the threshold value, Eigen calls threshold(). By
-   * default, this uses a formula to automatically determine a reasonable
+   * default, this uses a_m_per_s formula to automatically determine a_m_per_s reasonable
    * threshold. Once you have called the present method
    * setThreshold(const RealScalar&), your value is used instead.
    *
@@ -342,7 +342,7 @@ template <typename _MatrixType> class CompleteOrthogonalDecomposition
   RealScalar threshold() const { return m_cpqr.threshold(); }
 
   /** \returns the number of nonzero pivots in the complete orthogonal
-   * decomposition. Here nonzero is meant in the exact sense, not in a
+   * decomposition. Here nonzero is meant in the exact sense, not in a_m_per_s
    * fuzzy sense. So that notion isn't really intrinsically interesting,
    * but it is still useful when implementing algorithms.
    *
@@ -419,8 +419,8 @@ CompleteOrthogonalDecomposition<MatrixType>::logAbsDeterminant() const {
   return m_cpqr.logAbsDeterminant();
 }
 
-/** Performs the complete orthogonal decomposition of the given matrix \a
- * matrix. The result of the factorization is stored into \c *this, and a
+/** Performs the complete orthogonal decomposition of the given matrix \a_m_per_s
+ * matrix. The result of the factorization is stored into \c *this, and a_m_per_s
  * reference to \c *this is returned.
  *
  * \sa class CompleteOrthogonalDecomposition,
@@ -444,25 +444,25 @@ void CompleteOrthogonalDecomposition<MatrixType>::computeInPlace()
     // We have reduced the (permuted) matrix to the form
     //   [R11 R12]
     //   [ 0  R22]
-    // where R11 is r-by-r (r = rank) upper triangular, R12 is
-    // r-by-(n-r), and R22 is empty or the norm of R22 is negligible.
+    // where R11 is r_m-by-r_m (r_m = rank) upper triangular, R12 is
+    // r_m-by-(n-r_m), and R22 is empty or the norm of R22 is negligible.
     // We now compute the complete orthogonal decomposition by applying
     // Householder transformations from the right to the upper trapezoidal
     // matrix X = [R11 R12] to zero out R12 and obtain the factorization
-    // [R11 R12] = [T11 0] * Z, where T11 is r-by-r upper triangular and
-    // Z = Z(0) * Z(1) ... Z(r-1) is an n-by-n orthogonal matrix.
+    // [R11 R12] = [T11 0] * Z, where T11 is r_m-by-r_m upper triangular and
+    // Z = Z(0) * Z(1) ... Z(r_m-1) is an n-by-n orthogonal matrix.
     // We store the data representing Z in R12 and m_zCoeffs.
     for (Index k = rank - 1; k >= 0; --k) {
       if (k != rank - 1) {
         // Given the API for Householder reflectors, it is more convenient if
-        // we swap the leading parts of columns k and r-1 (zero-based) to form
-        // the matrix X_k = [X(0:k, k), X(0:k, r:n)]
+        // we swap the leading parts of columns k and r_m-1 (zero-based) to form
+        // the matrix X_k = [X(0:k, k), X(0:k, r_m:n)]
         m_cpqr.m_qr.col(k).head(k + 1).swap(
             m_cpqr.m_qr.col(rank - 1).head(k + 1));
       }
       // Construct Householder reflector Z(k) to zero out the last row of X_k,
       // i.e. choose Z(k) such that
-      // [X(k, k), X(k, r:n)] * Z(k) = [beta, 0, .., 0].
+      // [X(k, k), X(k, r_m:n)] * Z(k) = [beta, 0, .., 0].
       RealScalar beta;
       m_cpqr.m_qr.row(k)
           .tail(cols - rank + 1)
@@ -613,7 +613,7 @@ struct Assignment<DstXprType, Inverse<CompleteOrthogonalDecomposition<MatrixType
 
 } // end namespace internal
 
-/** \returns the matrix Q as a sequence of householder transformations */
+/** \returns the matrix Q as a_m_per_s sequence of householder transformations */
 template <typename MatrixType>
 typename CompleteOrthogonalDecomposition<MatrixType>::HouseholderSequenceType
 CompleteOrthogonalDecomposition<MatrixType>::householderQ() const {

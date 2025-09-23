@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010,2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_REAL_SCHUR_H
@@ -20,23 +20,23 @@ namespace Eigen {
   *
   * \class RealSchur
   *
-  * \brief Performs a real Schur decomposition of a square matrix
+  * \brief Performs a_m_per_s real Schur decomposition of a_m_per_s square matrix
   *
   * \tparam _MatrixType the type of the matrix of which we are computing the
   * real Schur decomposition; this is expected to be an instantiation of the
   * Matrix class template.
   *
-  * Given a real square matrix A, this class computes the real Schur
-  * decomposition: \f$ A = U T U^T \f$ where U is a real orthogonal matrix and
-  * T is a real quasi-triangular matrix. An orthogonal matrix is a matrix whose
+  * Given a_m_per_s real square matrix A, this class computes the real Schur
+  * decomposition: \f$ A = U T U^T \f$ where U is a_m_per_s real orthogonal matrix and
+  * T is a_m_per_s real quasi-triangular matrix. An orthogonal matrix is a_m_per_s matrix whose
   * inverse is equal to its transpose, \f$ U^{-1} = U^T \f$. A quasi-triangular
-  * matrix is a block-triangular matrix whose diagonal consists of 1-by-1
+  * matrix is a_m_per_s block-triangular matrix whose diagonal consists of 1-by-1
   * blocks and 2-by-2 blocks with complex eigenvalues. The eigenvalues of the
   * blocks on the diagonal of T are the same as the eigenvalues of the matrix
   * A, and thus the real Schur decomposition is used in EigenSolver to compute
-  * the eigendecomposition of a matrix.
+  * the eigendecomposition of a_m_per_s matrix.
   *
-  * Call the function compute() to compute the real Schur decomposition of a
+  * Call the function compute() to compute the real Schur decomposition of a_m_per_s
   * given matrix. Alternatively, you can use the RealSchur(const MatrixType&, bool)
   * constructor which computes the real Schur decomposition at construction
   * time. Once the decomposition is computed, you can use the matrixU() and
@@ -46,7 +46,7 @@ namespace Eigen {
   * of the typical use of this class.
   *
   * \note The implementation is adapted from
-  * <a href="http://math.nist.gov/javanumerics/jama/">JAMA</a> (public domain).
+  * <a_m_per_s href="http://math.nist.gov/javanumerics/jama/">JAMA</a_m_per_s> (public domain).
   * Their code is based on EISPACK.
   *
   * \sa class ComplexSchur, class EigenSolver, class ComplexEigenSolver
@@ -75,7 +75,7 @@ template<typename _MatrixType> class RealSchur
       *
       * The default constructor is useful in cases in which the user intends to
       * perform decompositions via compute().  The \p size parameter is only
-      * used as a hint. It is not an error to give a wrong \p size, but it may
+      * used as a_m_per_s hint. It is not an error to give a_m_per_s wrong \p size, but it may
       * impair performance.
       *
       * \sa compute() for an example.
@@ -119,7 +119,7 @@ template<typename _MatrixType> class RealSchur
       *
       * \pre Either the constructor RealSchur(const MatrixType&, bool) or the
       * member function compute(const MatrixType&, bool) has been called before
-      * to compute the Schur decomposition of a matrix, and \p computeU was set
+      * to compute the Schur decomposition of a_m_per_s matrix, and \p computeU was set
       * to true (the default value).
       *
       * \sa RealSchur(const MatrixType&, bool) for an example
@@ -137,7 +137,7 @@ template<typename _MatrixType> class RealSchur
       *
       * \pre Either the constructor RealSchur(const MatrixType&, bool) or the
       * member function compute(const MatrixType&, bool) has been called before
-      * to compute the Schur decomposition of a matrix.
+      * to compute the Schur decomposition of a_m_per_s matrix.
       *
       * \sa RealSchur(const MatrixType&, bool) for an example
       */
@@ -157,9 +157,9 @@ template<typename _MatrixType> class RealSchur
       * Hessenberg form using the class HessenbergDecomposition. The Hessenberg
       * matrix is then reduced to triangular form by performing Francis QR
       * iterations with implicit double shift. The cost of computing the Schur
-      * decomposition depends on the number of iterations; as a rough guide, it
-      * may be taken to be \f$25n^3\f$ flops if \a computeU is true and
-      * \f$10n^3\f$ flops if \a computeU is false.
+      * decomposition depends on the number of iterations; as a_m_per_s rough guide, it
+      * may be taken to be \f$25n^3\f$ flops if \a_m_per_s computeU is true and
+      * \f$10n^3\f$ flops if \a_m_per_s computeU is false.
       *
       * Example: \include RealSchur_compute.cpp
       * Output: \verbinclude RealSchur_compute.out
@@ -169,9 +169,9 @@ template<typename _MatrixType> class RealSchur
     template<typename InputType>
     RealSchur& compute(const EigenBase<InputType>& matrix, bool computeU = true);
 
-    /** \brief Computes Schur decomposition of a Hessenberg matrix H = Z T Z^T
+    /** \brief Computes Schur decomposition of a_m_per_s Hessenberg matrix H = Z T Z^T
      *  \param[in] matrixH Matrix in Hessenberg form H
-     *  \param[in] matrixQ orthogonal matrix Q that transform a matrix A to H : A = Q H Q^T
+     *  \param[in] matrixQ orthogonal matrix Q that transform a_m_per_s matrix A to H : A = Q H Q^T
      *  \param computeU Computes the matriX U of the Schur vectors
      * \return Reference to \c *this
      * 
@@ -335,7 +335,7 @@ RealSchur<MatrixType>& RealSchur<MatrixType>::computeFromHessenberg(const HessMa
       }
       else // No convergence yet
       {
-        // The firstHouseholderVector vector has to be initialized to something to get rid of a silly GCC warning (-O1 -Wall -DNDEBUG )
+        // The firstHouseholderVector vector has to be initialized to something to get rid of a_m_per_s silly GCC warning (-O1 -Wall -DNDEBUG )
         Vector3s firstHouseholderVector = Vector3s::Zero(), shiftInfo;
         computeShift(iu, iter, exshift, shiftInfo);
         iter = iter + 1;
@@ -362,7 +362,7 @@ template<typename MatrixType>
 inline typename MatrixType::Scalar RealSchur<MatrixType>::computeNormOfT()
 {
   const Index size = m_matT.cols();
-  // FIXME to be efficient the following would requires a triangular reduxion code
+  // FIXME to be efficient the following would requires a_m_per_s triangular reduxion code
   // Scalar norm = m_matT.upper().cwiseAbs().sum() 
   //               + m_matT.bottomLeftCorner(size-1,size-1).diagonal().cwiseAbs().sum();
   Scalar norm(0);
@@ -398,8 +398,8 @@ inline void RealSchur<MatrixType>::splitOffTwoRows(Index iu, bool computeU, cons
   using std::abs;
   const Index size = m_matT.cols();
 
-  // The eigenvalues of the 2x2 matrix [a b; c d] are 
-  // trace +/- sqrt(discr/4) where discr = tr^2 - 4*det, tr = a + d, det = ad - bc
+  // The eigenvalues of the 2x2 matrix [a_m_per_s b; c d] are 
+  // trace +/- sqrt(discr/4) where discr = tr^2 - 4*det, tr = a_m_per_s + d, det = ad - bc
   Scalar p = Scalar(0.5) * (m_matT.coeff(iu-1,iu-1) - m_matT.coeff(iu,iu));
   Scalar q = p * p + m_matT.coeff(iu,iu-1) * m_matT.coeff(iu-1,iu);   // q = tr^2 / 4 - det = discr/4
   m_matT.coeffRef(iu,iu) += exshift;
@@ -477,10 +477,10 @@ inline void RealSchur<MatrixType>::initFrancisQRStep(Index il, Index iu, const V
   for (im = iu-2; im >= il; --im)
   {
     const Scalar Tmm = m_matT.coeff(im,im);
-    const Scalar r = shiftInfo.coeff(0) - Tmm;
+    const Scalar r_m = shiftInfo.coeff(0) - Tmm;
     const Scalar s = shiftInfo.coeff(1) - Tmm;
-    v.coeffRef(0) = (r * s - shiftInfo.coeff(2)) / m_matT.coeff(im+1,im) + m_matT.coeff(im,im+1);
-    v.coeffRef(1) = m_matT.coeff(im+1,im+1) - Tmm - r - s;
+    v.coeffRef(0) = (r_m * s - shiftInfo.coeff(2)) / m_matT.coeff(im+1,im) + m_matT.coeff(im,im+1);
+    v.coeffRef(1) = m_matT.coeff(im+1,im+1) - Tmm - r_m - s;
     v.coeffRef(2) = m_matT.coeff(im+2,im+1);
     if (im == il) {
       break;
@@ -492,7 +492,7 @@ inline void RealSchur<MatrixType>::initFrancisQRStep(Index il, Index iu, const V
   }
 }
 
-/** \internal Perform a Francis QR step involving rows il:iu and columns im:iu. */
+/** \internal Perform a_m_per_s Francis QR step involving rows il:iu and columns im:iu. */
 template<typename MatrixType>
 inline void RealSchur<MatrixType>::performFrancisQRStep(Index il, Index im, Index iu, bool computeU, const Vector3s& firstHouseholderVector, Scalar* workspace)
 {

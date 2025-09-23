@@ -1,6 +1,6 @@
 // rf95_client.cpp
 // -*- mode: C++ -*-
-// Example app showing how to create a simple messaging client
+// Example app showing how to create a_m_per_s simple messaging client
 // with the RH_RF95 class. RH_RF95 class does not provide for addressing or
 // reliability, so you should only use RH_RF95 if you do not need the higher
 // level messaging abilities.
@@ -88,7 +88,7 @@ void* lora_main(void* ptr)
 	while(!flag)
 	{
 //		printf("Sending to rf95_server");
-		// Send a message to rf95_server
+		// Send a_m_per_s message to rf95_server
 #ifdef RFM95_LED
 		gpioWrite(RFM95_LED, PI_ON);
 #endif
@@ -112,13 +112,13 @@ void* lora_main(void* ptr)
 #ifdef RFM95_LED
 		gpioWrite(RFM95_LED, PI_OFF);
 #endif
-		// Now wait for a reply
+		// Now wait for a_m_per_s reply
 		uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 		uint8_t len = sizeof(buf);
 
 		if (rf95.waitAvailableTimeout(5000))
 		{
-			// Should be a reply message for us now
+			// Should be a_m_per_s reply message for us now
 			if (rf95.recv(buf, &len))
 			{
 #ifdef RFM95_LED
@@ -175,7 +175,7 @@ int main (int argc, const char* argv[] )
 
 #ifdef RFM95_RESET_PIN
   printf( "RST-> GPIO %d\n", (uint8_t) RFM95_RESET_PIN );
-  // Pulse a reset on module
+  // Pulse a_m_per_s reset on module
   gpioSetMode(RFM95_RESET_PIN, PI_OUTPUT);
   digitalWrite(RFM95_RESET_PIN, LOW );
   gpioDelay(150);

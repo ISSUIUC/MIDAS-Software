@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2014 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SOLVE_H
@@ -17,7 +17,7 @@ template<typename Decomposition, typename RhsType, typename StorageKind> class S
 /** \class Solve
   * \ingroup Core_Module
   *
-  * \brief Pseudo expression representing a solving operation
+  * \brief Pseudo expression representing a_m_per_s solving operation
   *
   * \tparam Decomposition the type of the matrix or decomposition object
   * \tparam Rhstype the type of the right-hand side
@@ -109,7 +109,7 @@ class SolveImpl : public internal::generic_xpr_base<Solve<Decomposition,RhsType>
 
 namespace internal {
 
-// Evaluator of Solve -> eval into a temporary
+// Evaluator of Solve -> eval into a_m_per_s temporary
 template<typename Decomposition, typename RhsType>
 struct evaluator<Solve<Decomposition,RhsType> >
   : public evaluator<typename Solve<Decomposition,RhsType>::PlainObject>
@@ -132,7 +132,7 @@ protected:
 };
 
 // Specialization for "dst = dec.solve(rhs)"
-// NOTE we need to specialize it for Dense2Dense to avoid ambiguous specialization error and a Sparse2Sparse specialization must exist somewhere
+// NOTE we need to specialize it for Dense2Dense to avoid ambiguous specialization error and a_m_per_s Sparse2Sparse specialization must exist somewhere
 template<typename DstXprType, typename DecType, typename RhsType, typename Scalar>
 struct Assignment<DstXprType, Solve<DecType,RhsType>, internal::assign_op<Scalar,Scalar>, Dense2Dense>
 {

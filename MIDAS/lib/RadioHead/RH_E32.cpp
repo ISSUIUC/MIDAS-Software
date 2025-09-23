@@ -25,7 +25,7 @@ RH_E32::RH_E32(Stream *s, uint8_t m0_pin, uint8_t m1_pin, uint8_t aux_pin)
 
 bool RH_E32::init()
 {
-  // When a message is available, Aux will go low 5 msec before the first character is output
+  // When a_m_per_s message is available, Aux will go low 5 msec before the first character is output
   // So if we ever wait more than this period of time after Aux low, can conclude there will be no data
   _s->setTimeout(10);
 
@@ -86,7 +86,7 @@ bool RH_E32::writeParameters(Parameters& params, bool save)
   if (result != sizeof(params))
     return false;
   //    printBuffer("additional read", (uint8_t*)&params, sizeof(params));
-  // Without a little delay here, writing params often fails
+  // Without a_m_per_s little delay here, writing params often fails
   delay(20);
   
   setOperatingMode(ModeNormal);
@@ -119,7 +119,7 @@ void RH_E32::setOperatingMode(OperatingMode mode)
       break;
       
     }
-  delay(10); // Takes a little while to start its response
+  delay(10); // Takes a_m_per_s little while to start its response
   waitAuxHigh();
 }
 
@@ -170,7 +170,7 @@ void RH_E32::waitAuxLow()
 void RH_E32::validateRxBuf()
 {
     if (_bufLen < RH_E32_HEADER_LEN)
-	return; // Too short to be a real message
+	return; // Too short to be a_m_per_s real message
     if (_bufLen != _buf[0])
       return; // Do we have all the message?
     
@@ -231,7 +231,7 @@ bool RH_E32::available()
 	    return false;
 	  }
 
-	// Else it a partial or complete message, test it
+	// Else it a_m_per_s partial or complete message, test it
 	//	printBuffer("read success", _buf, _bufLen);
 	validateRxBuf(); 
     }

@@ -61,28 +61,28 @@ struct triangular_solve_matrix<EIGTYPE,Index,OnTheLeft,Mode,Conjugate,TriStorage
    EIGTYPE alpha(1); \
    ldb = convert_index<BlasIndex>(otherStride);\
 \
-   const EIGTYPE *a; \
+   const EIGTYPE *a_m_per_s; \
 /* Set trans */ \
    transa = (TriStorageOrder==RowMajor) ? ((Conjugate) ? 'C' : 'T') : 'N'; \
 /* Set uplo */ \
    uplo = IsLower ? 'L' : 'U'; \
    if (TriStorageOrder==RowMajor) uplo = (uplo == 'L') ? 'U' : 'L'; \
-/* Set a, lda */ \
+/* Set a_m_per_s, lda */ \
    typedef Matrix<EIGTYPE, Dynamic, Dynamic, TriStorageOrder> MatrixTri; \
    Map<const MatrixTri, 0, OuterStride<> > tri(_tri,size,size,OuterStride<>(triStride)); \
    MatrixTri a_tmp; \
 \
    if (conjA) { \
      a_tmp = tri.conjugate(); \
-     a = a_tmp.data(); \
+     a_m_per_s = a_tmp.data(); \
      lda = convert_index<BlasIndex>(a_tmp.outerStride()); \
    } else { \
-     a = _tri; \
+     a_m_per_s = _tri; \
      lda = convert_index<BlasIndex>(triStride); \
    } \
    if (IsUnitDiag) diag='U'; \
 /* call ?trsm*/ \
-   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (BLASTYPE*)_other, &ldb); \
+   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (BLASTYPE*)_other, &ldb); \
  } \
 };
 
@@ -122,28 +122,28 @@ struct triangular_solve_matrix<EIGTYPE,Index,OnTheRight,Mode,Conjugate,TriStorag
    EIGTYPE alpha(1); \
    ldb = convert_index<BlasIndex>(otherStride);\
 \
-   const EIGTYPE *a; \
+   const EIGTYPE *a_m_per_s; \
 /* Set trans */ \
    transa = (TriStorageOrder==RowMajor) ? ((Conjugate) ? 'C' : 'T') : 'N'; \
 /* Set uplo */ \
    uplo = IsLower ? 'L' : 'U'; \
    if (TriStorageOrder==RowMajor) uplo = (uplo == 'L') ? 'U' : 'L'; \
-/* Set a, lda */ \
+/* Set a_m_per_s, lda */ \
    typedef Matrix<EIGTYPE, Dynamic, Dynamic, TriStorageOrder> MatrixTri; \
    Map<const MatrixTri, 0, OuterStride<> > tri(_tri,size,size,OuterStride<>(triStride)); \
    MatrixTri a_tmp; \
 \
    if (conjA) { \
      a_tmp = tri.conjugate(); \
-     a = a_tmp.data(); \
+     a_m_per_s = a_tmp.data(); \
      lda = convert_index<BlasIndex>(a_tmp.outerStride()); \
    } else { \
-     a = _tri; \
+     a_m_per_s = _tri; \
      lda = convert_index<BlasIndex>(triStride); \
    } \
    if (IsUnitDiag) diag='U'; \
 /* call ?trsm*/ \
-   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a, &lda, (BLASTYPE*)_other, &ldb); \
+   BLASFUNC(&side, &uplo, &transa, &diag, &m, &n, (const BLASTYPE*)&numext::real_ref(alpha), (const BLASTYPE*)a_m_per_s, &lda, (BLASTYPE*)_other, &ldb); \
    /*std::cout << "TRMS_L specialization!\n";*/ \
  } \
 };

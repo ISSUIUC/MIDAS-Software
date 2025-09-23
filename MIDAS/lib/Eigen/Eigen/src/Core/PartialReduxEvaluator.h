@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011-2018 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PARTIALREDUX_H
@@ -25,7 +25,7 @@ namespace internal {
 *       types of VectorwiseOp's members. They embed the functor calling the
 *       respective DenseBase's member function.
 *
-*  - vectorized path: implements a packet-wise reductions followed by
+*  - vectorized path: implements a_m_per_s packet-wise reductions followed by
 *    some (optional) processing of the outcome, e.g., division by n for mean.
 *
 * For the vectorized path let's observe that the packet-size and outer-unrolling
@@ -38,7 +38,7 @@ namespace internal {
 ***************************************************************************/
 
 
-/* logic deciding a strategy for unrolling of vectorized paths */
+/* logic deciding a_m_per_s strategy for unrolling of vectorized paths */
 template<typename Func, typename Evaluator>
 struct packetwise_redux_traits
 {
@@ -82,7 +82,7 @@ struct packetwise_redux_impl<Func, Evaluator, CompleteUnrolling>
   }
 };
 
-/* Add a specialization of redux_vec_unroller for size==0 at compiletime.
+/* Add a_m_per_s specialization of redux_vec_unroller for size==0 at compiletime.
  * This specialization is not required for general reductions, which is
  * why it is defined here.
  */

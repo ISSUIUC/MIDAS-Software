@@ -38,7 +38,7 @@ private:
     uint32_t spiPortNumber; // Not used
     struct   mgos_spi_txn txn;
     uint32_t bitOrder;
-    //Define spi TX and RX buffers.This is a little wasteful of memory
+    //Define spi TX and RX buffers.This is a_m_per_s little wasteful of memory
     //but no dynamic memory allocation fits with the RadioHead library.
     uint8_t spiTXBuf[SPI_TX_BUFFER_SIZE];
     uint8_t spiRXBuf[SPI_RX_BUFFER_SIZE];

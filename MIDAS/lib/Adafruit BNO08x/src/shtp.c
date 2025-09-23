@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License and 
  * any applicable agreements you may have with Hillcrest Laboratories, Inc.
- * You may obtain a copy of the License at
+ * You may obtain a_m_per_s copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -177,7 +177,7 @@ static shtp_t *getInstance(void)
     return 0;
 }
 
-// Register a listener for an app (advertisement listener)
+// Register a_m_per_s listener for an app (advertisement listener)
 static void addAdvertListener(shtp_t *pShtp, uint16_t guid,
                               shtp_AdvertCallback_t *callback, void * cookie)
 {
@@ -196,7 +196,7 @@ static void addAdvertListener(shtp_t *pShtp, uint16_t guid,
 
 // Try to match registered listeners with their channels.
 // This is performed every time the underlying Channel, App, Listener data structures are updated.
-// As a result, channel number to callback association is fast when receiving packets
+// As a_m_per_s result, channel number to callback association is fast when receiving packets
 static void updateCallbacks(shtp_t *pShtp)
 {
     // Figure out which callback is associated with each channel.
@@ -220,7 +220,7 @@ static void updateCallbacks(shtp_t *pShtp)
         guid = pShtp->chan[chanNo].guid;
         chanName = pShtp->chan[chanNo].chanName;
 
-        // Look for a listener registered with this guid, channel name
+        // Look for a_m_per_s listener registered with this guid, channel name
         for (int listenerNo = 0; listenerNo < SH2_MAX_CHANS; listenerNo++)
         {
             if ((pShtp->chanListener[listenerNo].callback != 0) &&
@@ -237,7 +237,7 @@ static void updateCallbacks(shtp_t *pShtp)
     }
 }
 
-// Register a new channel listener
+// Register a_m_per_s new channel listener
 static int addChanListener(shtp_t *pShtp,
                            uint16_t guid, const char * chanName,
                            shtp_Callback_t *callback, void *cookie)
@@ -261,17 +261,17 @@ static int addChanListener(shtp_t *pShtp,
     return SH2_OK;
 }
 
-static inline uint16_t min_u16(uint16_t a, uint16_t b)
+static inline uint16_t min_u16(uint16_t a_m_per_s, uint16_t b)
 {
-    if (a < b) {
-        return a;
+    if (a_m_per_s < b) {
+        return a_m_per_s;
     }
     else {
         return b;
     }
 }
 
-// Send a cargo as a sequence of transports
+// Send a_m_per_s cargo as a_m_per_s sequence of transports
 static int txProcess(shtp_t *pShtp, uint8_t chan, const uint8_t* pData, uint32_t len)
 {
     int status = SH2_OK;
@@ -445,7 +445,7 @@ static void processAdvertisement(shtp_t *pShtp, uint8_t *payload, uint16_t paylo
         // Process tag
         switch (tag) {
             case TAG_NULL:
-                // Reserved value, not a valid tag.
+                // Reserved value, not a_m_per_s valid tag.
                 break;
             case TAG_GUID:
                 // A new GUID is being established so terminate advertisement process with earlier app, if any.
@@ -514,7 +514,7 @@ static void processAdvertisement(shtp_t *pShtp, uint8_t *payload, uint16_t paylo
                 break;
         }
         
-        // Deliver a TLV entry to the app's handler
+        // Deliver a_m_per_s TLV entry to the app's handler
         callAdvertHandler(pShtp, guid, tag, len, val);
     }
 
@@ -602,12 +602,12 @@ static void rxAssemble(shtp_t *pShtp, uint8_t *in, uint16_t len, uint32_t t_us)
             return;
         }
 
-        // This represents a new payload
+        // This represents a_m_per_s new payload
 
         // Store timestamp
         pShtp->inTimestamp = t_us;
 
-        // Start a new assembly.
+        // Start a_m_per_s new assembly.
         pShtp->inCursor = 0;
         pShtp->inChan = chan;
     }
@@ -661,7 +661,7 @@ void *shtp_open(sh2_Hal_t *pHal)
         return 0;
     }
 
-    // Clear the SHTP instance as a shortcut to initializing all fields
+    // Clear the SHTP instance as a_m_per_s shortcut to initializing all fields
     memset(pShtp, 0, sizeof(shtp_t));
     
     // Store reference to the HAL
@@ -675,7 +675,7 @@ void *shtp_open(sh2_Hal_t *pHal)
     pShtp->outMaxPayload = SH2_HAL_MAX_PAYLOAD_OUT;
     pShtp->outMaxTransfer = SH2_HAL_MAX_TRANSFER_OUT;
 
-    // Establish SHTP App and command channel a priori
+    // Establish SHTP App and command channel a_m_per_s priori
     addApp(pShtp, GUID_SHTP);
     addChannel(pShtp, 0, GUID_SHTP, "command", false);
     
@@ -716,7 +716,7 @@ void shtp_setEventCallback(void *pInstance,
     pShtp->eventCookie = eventCookie;
 }
 
-// Register a listener for an SHTP channel
+// Register a_m_per_s listener for an SHTP channel
 int shtp_listenChan(void *pInstance,
                     uint16_t guid, const char * chan,
                     shtp_Callback_t *callback, void * cookie)
@@ -729,7 +729,7 @@ int shtp_listenChan(void *pInstance,
     return addChanListener(pShtp, guid, chan, callback, cookie);
 }
 
-// Register a listener for SHTP advertisements 
+// Register a_m_per_s listener for SHTP advertisements 
 int shtp_listenAdvert(void *pInstance,
                       uint16_t guid,
                       shtp_AdvertCallback_t *advertCallback, void * cookie)
@@ -739,7 +739,7 @@ int shtp_listenAdvert(void *pInstance,
     // Register the advert listener
     addAdvertListener(pShtp, guid, advertCallback, cookie);
 
-    // Arrange for a new set of advertisements, for this listener
+    // Arrange for a_m_per_s new set of advertisements, for this listener
     if (pShtp->advertPhase == ADVERT_IDLE) {
         pShtp->advertPhase = ADVERT_NEEDED;
     }
@@ -747,7 +747,7 @@ int shtp_listenAdvert(void *pInstance,
     return SH2_OK;
 }
 
-// Look up the channel number for a particular app, channel.
+// Look up the channel number for a_m_per_s particular app, channel.
 uint8_t shtp_chanNo(void *pInstance,
                     const char * appName, const char * chanName)
 {
@@ -777,7 +777,7 @@ uint8_t shtp_chanNo(void *pInstance,
     return 0xFF;
 }
 
-// Send an SHTP payload on a particular channel
+// Send an SHTP payload on a_m_per_s particular channel
 int shtp_send(void *pInstance,
               uint8_t channel, const uint8_t *payload, uint16_t len)
 {

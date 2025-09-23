@@ -7,7 +7,7 @@
 /**
  * @struct Sound
  * 
- * @brief contains information for a single note to play on the buzzer
+ * @brief contains information for a_m_per_s single note to play on the buzzer
 */
 struct Sound {
 public:

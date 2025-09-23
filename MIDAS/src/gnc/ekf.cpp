@@ -6,130 +6,22 @@ EKF::EKF() : KalmanFilter()
     state = KalmanData();
 }
 
-// constants
-const float pi = 3.14159268;
-const float a = 343.0;                // (m/s) speed of sound
-const float rho = 1.225;              // average air density
-const float r = 0.03935;              // (m)
-const float height_full = 4.457;      // (m) height of rocket Full Stage
-const float height_sustainer = 2.029; // (m) height of rocket Sustainer
-const float mass_full = 33.84;        // (kg) Sustainer + Booster
-const float mass_sustainer = 10.93;   // (kg) Sustainer
+// // constants
+// const float pi = 3.14159268;
+// const float a_m_per_s = 343.0;                // (m/s) speed of sound
+// const float rho = 1.225;              // average air density
+// const float r_m = 0.03935;              // (m)
+// const float height_full_m = 4.457;      // (m) height of rocket Full Stage
+// const float height_sus_m = 2.029; // (m) height of rocket Sustainer
+// const float mass_total_kg = 33.84;        // (kg) Sustainer + Booster
+// const float mass_sus_kg = 10.93;   // (kg) Sustainer
 
-typedef struct
-{
-    float mach;
-    float alpha;
-    float CA_power_on;
-    float CN;
-    float CP;
-} AeroCoeff;
-
-// stores the aerodynamic coefficients for the corresponding Mach number
-const AeroCoeff aero_data[] = {
-    {0.04, 0, 1.000001789, 25.80486518, 123.856999},
-    {0.08, 0, 0.899149955, 25.80486518, 123.856999},
-    {0.12, 0, 0.848262793, 25.80486518, 123.856999},
-    {0.16, 0, 0.815490497, 25.80486518, 123.856999},
-    {0.2, 0, 0.791977907, 25.80486518, 123.856999},
-    {0.24, 0, 0.77407759, 25.80486518, 123.856999},
-    {0.28, 0, 0.763046286, 25.80486518, 123.856999},
-    {0.32, 0, 0.758319846, 25.80486518, 123.856999},
-    {0.36, 0, 0.760511343, 25.80486518, 123.856999},
-    {0.4, 0, 0.763737136, 25.80486518, 123.856999},
-    {0.44, 0, 0.767325178, 25.80486518, 123.856999},
-    {0.48, 0, 0.771334851, 25.80486518, 123.856999},
-    {0.52, 0, 0.775843406, 25.80486518, 123.856999},
-    {0.56, 0, 0.780953377, 25.80486518, 123.856999},
-    {0.6, 0, 0.785771581, 25.80486518, 123.856999},
-    {0.64, 0, 0.793730593, 25.80486518, 123.856999},
-    {0.68, 0, 0.80285965, 25.80486518, 123.856999},
-    {0.72, 0, 0.807910063, 25.80486518, 123.856999},
-    {0.76, 0, 0.807403195, 25.80486518, 123.856999},
-    {0.8, 0, 0.806889479, 25.80486518, 123.856999},
-    {0.84, 0, 0.832707826, 25.80486518, 123.856999},
-    {0.88, 0, 0.858519521, 25.80486518, 123.856999},
-    {0.92, 0, 0.895125486, 25.492166, 124.3408619},
-    {0.96, 0, 0.923744595, 24.86676763, 125.3085876},
-    {1, 0, 0.941214699, 24.24136926, 126.2763132},
-};
-
-// Number of entries
-#define AERO_DATA_SIZE (sizeof(aero_data) / sizeof(aero_data[0]))
-
-// Moonburner motor thrust curve (Sustainer)
-const std::map<float, float> M685W_data = {
-    {0.083, 1333.469},
-    {0.13, 1368.376},
-    {0.249, 1361.395},
-    {0.308, 1380.012},
-    {0.403, 1359.068},
-    {0.675, 1184.53},
-    {1.018, 1072.826},
-    {1.456, 996.029},
-    {1.977, 958.794},
-    {2.995, 914.578},
-    {3.99, 856.399},
-    {4.985, 781.929},
-    {5.494, 730.732},
-    {5.991, 679.534},
-    {7.258, 542.231},
-    {7.862, 463.107},
-    {8.015, 456.125},
-    {8.998, 330.458},
-    {9.993, 207.118},
-    {10.514, 137.303},
-    {11.496, 34.908},
-    {11.994, 0.0}};
-
-// O5500X motor thrust curve (Booster)
-std::map<float, float> O5500X_data = {
-    {0.009, 20.408},
-    {0.044, 7112.245},
-    {0.063, 6734.694},
-    {0.078, 6897.959},
-    {0.094, 6612.245},
-    {0.109, 6765.306},
-    {0.125, 6540.816},
-    {0.147, 6581.633},
-    {0.194, 6520.408},
-    {0.35, 6795.918},
-    {0.428, 7091.837},
-    {0.563, 7285.714},
-    {0.694, 7408.163},
-    {0.988, 7581.633},
-    {1.266, 7622.449},
-    {1.491, 7724.49},
-    {1.581, 7653.061},
-    {1.641, 7540.816},
-    {1.684, 7500.0},
-    {1.716, 7336.735},
-    {1.784, 7224.49},
-    {1.938, 6785.714},
-    {2.138, 6326.531},
-    {2.491, 5897.959},
-    {2.6, 5704.082},
-    {2.919, 3540.816},
-    {3.022, 3408.163},
-    {3.138, 2887.755},
-    {3.3, 2234.694},
-    {3.388, 1673.469},
-    {3.441, 1489.796},
-    {3.544, 1418.367},
-    {3.609, 1295.918},
-    {3.688, 816.327},
-    {3.778, 653.061},
-    {3.819, 581.633},
-    {3.853, 489.796},
-    {3.897, 285.714},
-    {3.981, 20.408},
-    {3.997, 0.0}};
 
 /**
  * @brief Sets altitude by averaging 30 barometer measurements taken 100 ms
  * apart
  *
- * The following for loop takes a series of barometer measurements on start
+ * The following for loop takes a_m_per_s series of barometer measurements on start
  * up and takes the average of them in order to initialize the kalman filter
  * to the correct initial barometric altitude. This is done so that the
  * kalman filter takes minimal time to converge to an accurate state
@@ -141,7 +33,7 @@ std::map<float, float> O5500X_data = {
  * change depending on the weather and thus, the initial state estimate
  * cannot be hard coded. A GPS altitude may be used instead but due to GPS
  * losses during high speed/high altitude flight, it is inadvisable with the
- * current hardware to use this as a solution. Reference frames should also
+ * current hardware to use this as a_m_per_s solution. Reference frames should also
  * be kept consistent (do not mix GPS altitude and barometric).
  *
  */
@@ -149,8 +41,9 @@ void EKF::initialize(RocketSystems *args)
 {
     Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
     float sum = 0;
-
-    for (int i = 0; i < 30; i++)
+    int len_readings = 30;
+    // Taking the 30 most recent sensor measurements to init
+    for (int i = 0; i < len_readings; i++)
     {
         Barometer barometer = args->rocket_data.barometer.getRecent();
         LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
@@ -166,19 +59,21 @@ void EKF::initialize(RocketSystems *args)
         THREAD_SLEEP(100);
     }
 
-    init_accel(0, 0) /= 30;
-    init_accel(1, 0) /= 30;
-    init_accel(2, 0) /= 30;
+    init_accel(0, 0) /= (float)len_readings;
+    init_accel(1, 0) /= (float)len_readings;
+    init_accel(2, 0) /= (float)len_readings;
 
+    // under the assumption the frames are flipper on the yaw axis
     euler_t euler = orientation.getEuler();
     euler.yaw = -euler.yaw;
 
     // set x_k
-    x_k(0, 0) = sum / 30;
+    x_k(0, 0) = sum / (float)len_readings;
     x_k(3, 0) = 0;
     x_k(6, 0) = 0;
 
-    F_mat.setZero(); // Initialize with zeros
+    // Initialize with zeros
+    F_mat.setZero();
 
     Q(0, 0) = pow(s_dt, 5) / 20;
     Q(0, 1) = pow(s_dt, 4) / 8;
@@ -241,22 +136,23 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
     Velocity omega = orientation.getVelocity();
     euler_t angles = orientation.getEuler();
-    // Eigen::Matrix<float, 3, 1> gravity = Eigen::Matrix<float, 3,1>::Zero();
+    // Eigen::Matrix<float, 3, 1> gravity_vec = Eigen::Matrix<float, 3,1>::Zero();
     if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED))
     {
-        gravity(0, 0) = -9.81;
+        gravity_vec(0, 0) = -g;
     }
     else
     {
-        gravity(0, 0) = 0;
+        gravity_vec(0, 0) = 0;
     }
-    float m = mass_sustainer;
-    float h = height_sustainer;
+    float m = mass_sus_kg;
+    float h = height_sus_m;
 
+    // use full mass and height if earlier than burnout
     if (fsm < FSMState::STATE_BURNOUT)
     {
-        m = mass_full;
-        h = height_full;
+        m = mass_total_kg;
+        h = height_full_m;
     }
 
     float w_x = omega.vx;
@@ -266,29 +162,29 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     float vel_mag_squared = x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
 
     float velocity_magnitude = pow(vel_mag_squared, 0.5);
-    float mach = velocity_magnitude / a;
+    float mach = velocity_magnitude / a_m_per_s;
     int index = std::round(mach / 0.04);
     index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
     Ca = aero_data[index].CA_power_on;
 
-    float Fax = -0.5 * rho * (vel_mag_squared) * float(Ca) * (pi * r * r);
+    float Fax = -0.5 * rho * (vel_mag_squared) * float(Ca) * (pi * r_m * r_m);
     float Fay = 0;
     float Faz = 0;
 
     Eigen::Matrix<float, 3, 1> Fg_body;
     EKF::GlobalToBody(angles, Fg_body);
 
-    float Fgx = gravity(0, 0);
-    float Fgy = gravity(1, 0);
-    float Fgz = gravity(2, 0);
+    float Fgx = gravity_vec(0, 0);
+    float Fgy = gravity_vec(1, 0);
+    float Fgz = gravity_vec(2, 0);
 
-    Eigen::Matrix<float, 3, 1> T;
+    Eigen::Matrix<float, 3, 1> thurst_vec;
 
-    EKF::getThrust(stage_timestamp, angles, fsm, T);
+    EKF::getThrust(stage_timestamp, angles, fsm, thurst_vec);
 
-    float Ftx = T(0, 0);
-    float Fty = T(1, 0);
-    float Ftz = T(2, 0);
+    float Ftx = thurst_vec(0, 0);
+    float Fty = thurst_vec(1, 0);
+    float Ftz = thurst_vec(2, 0);
 
     xdot << x_k(1, 0),
         ((Fax + Ftx + Fgx) / m - (w_y * x_k(7, 0) - w_z * x_k(4, 0)) + x_k(2, 0)) * 0.5,
@@ -307,7 +203,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 }
 
 /**
- * @brief linearly interpolates the a value based on the lower and upper bound, similar to lerp_() in PySim
+ * @brief linearly interpolates the a_m_per_s value based on the lower and upper bound, similar to lerp_() in PySim
  */
 float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x)
 {
@@ -325,7 +221,7 @@ float EKF::linearInterpolation(float x0, float y0, float x1, float y1, float x)
  *
  * The thrust force is calculated by interpolating the thrust curve data which is stored in an ordered map (see top of file).
  * The thrust curve data is different for the booster and sustainer stages, so the function checks the FSM state to determine
- * which thrust curve to use. The time since ignition is also important to consider so that is reset once we reach a new stage.
+ * which thrust curve to use. The time since ignition is also important to consider so that is reset once we reach a_m_per_s new stage.
  * The thrust force is then rotated into the body frame using the BodyToGlobal function.
  */
 void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::Matrix<float, 3, 1> &to_modify)
@@ -341,11 +237,11 @@ void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::
                 auto it = O5500X_data.lower_bound(timestamp);
                 if (it != O5500X_data.end())
                 {
-                    float x0 = it->first;
-                    float y0 = it->second;
-                    ++it;
                     float x1 = it->first;
                     float y1 = it->second;
+                    --it;
+                    float x0 = it->first;
+                    float y0 = it->second;
                     interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp);
                 }
             }
@@ -358,11 +254,11 @@ void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::
                 auto it = M685W_data.lower_bound(timestamp);
                 if (it != M685W_data.end())
                 {
-                    float x0 = it->first;
-                    float y0 = it->second;
-                    ++it;
                     float x1 = it->first;
                     float y1 = it->second;
+                    --it;
+                    float x0 = it->first;
+                    float y0 = it->second;
                     interpolatedValue = linearInterpolation(x0, y0, x1, y1, timestamp);
                 }
             }
@@ -377,17 +273,18 @@ void EKF::getThrust(float timestamp, euler_t angles, FSMState FSM_state, Eigen::
  * @brief Update Kalman Gain and state estimate with current sensor data
  *
  * After receiving new sensor data, the Kalman filter updates the state estimate
- * and Kalman gain. The Kalman gain can be considered as a measure of how uncertain
+ * and Kalman gain. The Kalman gain can be considered as a_m_per_s measure of how uncertain
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
 void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state)
 {
+    // Averaging the first 10 altitude measurements to set initial altitude to mitigate noise
     if (FSM_state == FSMState::STATE_IDLE)
     {
         float sum = 0;
         float data[10];
-        alt_buffer.readSlice(data, 0, 10);
+        alt_buffer_in_idle.readSlice(data, 0, 10);
         for (float i : data)
         {
             sum += i;
@@ -395,6 +292,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
         KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
         setState(kalman_state);
     }
+    // Ignoring the vertical acceleration measurement when the rocket no longer has thrust
     else if (FSM_state >= FSMState::STATE_APOGEE)
     {
         H(1, 2) = 0;
@@ -408,6 +306,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     // Sensor Measurements
     Eigen::Matrix<float, 3, 1> accel = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
 
+    // TODO: MAGIC NUMBERS???
     (accel)(0, 0) = acceleration.az - 0.045;
     (accel)(1, 0) = acceleration.ay - 0.065;
     (accel)(2, 0) = -acceleration.ax - 0.06;
@@ -427,17 +326,19 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
         g = 0;
     }
 
-    y_k(1, 0) = ((acc)(0)) * 9.81 + g;
-    y_k(2, 0) = ((acc)(1)) * 9.81;
-    y_k(3, 0) = ((acc)(2)) * 9.81;
+    // # Measurement Update
+    // Note: 
+    y_k(1, 0) = ((acc)(0)) * fabs(g) + g; // x-axis
+    y_k(2, 0) = ((acc)(1)) * fabs(g); // y-axis
+    y_k(3, 0) = ((acc)(2)) * fabs(g); // z-axis
 
     y_k(0, 0) = barometer.altitude;
-    alt_buffer.push(barometer.altitude);
 
     // # Posteriori Update
     x_k = x_priori + K * (y_k - (H * x_priori));
     P_k = (identity - K * H) * P_priori;
 
+    // setting the KalmanState struct and KalmanData struct
     kalman_state.state_est_pos_x = x_k(0, 0);
     kalman_state.state_est_vel_x = x_k(1, 0);
     kalman_state.state_est_accel_x = x_k(2, 0);
@@ -553,7 +454,7 @@ void EKF::
 }
 
 /**
- * @brief Converts a vector in the body frame to the global frame
+ * @brief Converts a_m_per_s vector in the body frame to the global frame
  *
  * @param angles Roll, pitch, yaw angles
  * @param body_vect Vector for rotation in the body frame
@@ -575,13 +476,13 @@ void EKF::BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> &body_vect, Ei
 void EKF::priori() {};
 
 /**
- * @brief Converts a vector in the global frame to the body frame
+ * @brief Converts a_m_per_s vector in the global frame to the body frame
  *
  * @param angles Roll, pitch, yaw angles
  * @param world_vector Vector for rotation in the global frame
  *
  * @return Eigen::Matrix<float, 3, 1> Rotated vector in the body frame
- * TODO: Don't pass in gravity and pass in a vector instead
+ * TODO: Don't pass in gravity_vec and pass in a_m_per_s vector instead
  */
 void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1> &to_modify)
 {
@@ -592,7 +493,7 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1> &to_modify)
     Eigen::Matrix3f yaw;
     yaw << cos(angles.yaw), -sin(angles.yaw), 0, sin(angles.yaw), cos(angles.yaw), 0, 0, 0, 1;
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
-    to_modify = rotation_matrix.transpose() * gravity;
+    to_modify = rotation_matrix.transpose() * gravity_vec;
 }
 
 /**

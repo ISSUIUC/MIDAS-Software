@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2016 Pedro Gonnet (pedro.gonnet@gmail.com)
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef THIRD_PARTY_EIGEN3_EIGEN_SRC_CORE_ARCH_AVX512_MATHFUNCTIONS_H_
@@ -65,9 +65,9 @@ plog2<Packet8d>(const Packet8d& _x) {
 F16_PACKET_FUNCTION(Packet16f, Packet16h, plog2)
 BF16_PACKET_FUNCTION(Packet16f, Packet16bf, plog2)
 
-// Exponential function. Works by writing "x = m*log(2) + r" where
-// "m = floor(x/log(2)+1/2)" and "r" is the remainder. The result is then
-// "exp(x) = 2^m*exp(r)" where exp(r) is in the range [-1,1).
+// Exponential function. Works by writing "x = m*log(2) + r_m" where
+// "m = floor(x/log(2)+1/2)" and "r_m" is the remainder. The result is then
+// "exp(x) = 2^m*exp(r_m)" where exp(r_m) is in the range [-1,1).
 template <>
 EIGEN_DEFINE_FUNCTION_ALLOWING_MULTIPLE_DEFINITIONS EIGEN_UNUSED Packet16f
 pexp<Packet16f>(const Packet16f& _x) {
@@ -90,24 +90,24 @@ pexp<Packet16f>(const Packet16f& _x) {
   // Clamp x.
   Packet16f x = pmax(pmin(_x, p16f_exp_hi), p16f_exp_lo);
 
-  // Express exp(x) as exp(m*ln(2) + r), start by extracting
+  // Express exp(x) as exp(m*ln(2) + r_m), start by extracting
   // m = floor(x/ln(2) + 0.5).
   Packet16f m = _mm512_floor_ps(pmadd(x, p16f_cephes_LOG2EF, p16f_half));
 
-  // Get r = x - m*ln(2). Note that we can do this without losing more than one
+  // Get r_m = x - m*ln(2). Note that we can do this without losing more than one
   // ulp precision due to the FMA instruction.
   _EIGEN_DECLARE_CONST_Packet16f(nln2, -0.6931471805599453f);
-  Packet16f r = _mm512_fmadd_ps(m, p16f_nln2, x);
-  Packet16f r2 = pmul(r, r);
-  Packet16f r3 = pmul(r2, r);
+  Packet16f r_m = _mm512_fmadd_ps(m, p16f_nln2, x);
+  Packet16f r2 = pmul(r_m, r_m);
+  Packet16f r3 = pmul(r2, r_m);
 
   // Evaluate the polynomial approximant,improved by instruction-level parallelism.
   Packet16f y, y1, y2;
-  y  = pmadd(p16f_cephes_exp_p0, r, p16f_cephes_exp_p1);
-  y1 = pmadd(p16f_cephes_exp_p3, r, p16f_cephes_exp_p4);
-  y2 = padd(r, p16f_1);
-  y  = pmadd(y, r, p16f_cephes_exp_p2);
-  y1 = pmadd(y1, r, p16f_cephes_exp_p5);
+  y  = pmadd(p16f_cephes_exp_p0, r_m, p16f_cephes_exp_p1);
+  y1 = pmadd(p16f_cephes_exp_p3, r_m, p16f_cephes_exp_p4);
+  y2 = padd(r_m, p16f_1);
+  y  = pmadd(y, r_m, p16f_cephes_exp_p2);
+  y1 = pmadd(y1, r_m, p16f_cephes_exp_p5);
   y  = pmadd(y, r3, y1);
   y  = pmadd(y, r2, y2);
 
@@ -115,7 +115,7 @@ pexp<Packet16f>(const Packet16f& _x) {
   Packet16i emm0 = _mm512_cvttps_epi32(padd(m, p16f_127));
   emm0 = _mm512_slli_epi32(emm0, 23);
 
-  // Return 2^m * exp(r).
+  // Return 2^m * exp(r_m).
   return pmax(pmul(y, _mm512_castsi512_ps(emm0)), _x);
 }
 
@@ -129,34 +129,34 @@ F16_PACKET_FUNCTION(Packet16f, Packet16h, pexp)
 BF16_PACKET_FUNCTION(Packet16f, Packet16bf, pexp)
 
 template <>
-EIGEN_STRONG_INLINE Packet16h pfrexp(const Packet16h& a, Packet16h& exponent) {
+EIGEN_STRONG_INLINE Packet16h pfrexp(const Packet16h& a_m_per_s, Packet16h& exponent) {
   Packet16f fexponent;
-  const Packet16h out = float2half(pfrexp<Packet16f>(half2float(a), fexponent));
+  const Packet16h out = float2half(pfrexp<Packet16f>(half2float(a_m_per_s), fexponent));
   exponent = float2half(fexponent);
   return out;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet16h pldexp(const Packet16h& a, const Packet16h& exponent) {
-  return float2half(pldexp<Packet16f>(half2float(a), half2float(exponent)));
+EIGEN_STRONG_INLINE Packet16h pldexp(const Packet16h& a_m_per_s, const Packet16h& exponent) {
+  return float2half(pldexp<Packet16f>(half2float(a_m_per_s), half2float(exponent)));
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet16bf pfrexp(const Packet16bf& a, Packet16bf& exponent) {
+EIGEN_STRONG_INLINE Packet16bf pfrexp(const Packet16bf& a_m_per_s, Packet16bf& exponent) {
   Packet16f fexponent;
-  const Packet16bf out = F32ToBf16(pfrexp<Packet16f>(Bf16ToF32(a), fexponent));
+  const Packet16bf out = F32ToBf16(pfrexp<Packet16f>(Bf16ToF32(a_m_per_s), fexponent));
   exponent = F32ToBf16(fexponent);
   return out;
 }
 
 template <>
-EIGEN_STRONG_INLINE Packet16bf pldexp(const Packet16bf& a, const Packet16bf& exponent) {
-  return F32ToBf16(pldexp<Packet16f>(Bf16ToF32(a), Bf16ToF32(exponent)));
+EIGEN_STRONG_INLINE Packet16bf pldexp(const Packet16bf& a_m_per_s, const Packet16bf& exponent) {
+  return F32ToBf16(pldexp<Packet16f>(Bf16ToF32(a_m_per_s), Bf16ToF32(exponent)));
 }
 
 // Functions for sqrt.
 // The EIGEN_FAST_MATH version uses the _mm_rsqrt_ps approximation and one step
-// of Newton's method, at a cost of 1-2 bits of precision as opposed to the
+// of Newton's method, at a_m_per_s cost of 1-2 bits of precision as opposed to the
 // exact solution. The main advantage of this approach is not just speed, but
 // also the fact that it can be inlined and pipelined with other computations,
 // further reducing its effective latency.
@@ -172,7 +172,7 @@ psqrt<Packet16f>(const Packet16f& _x) {
 
   Packet16f x = _mm512_rsqrt14_ps(_x);
 
-  // Do a single step of Newton's iteration.
+  // Do a_m_per_s single step of Newton's iteration.
   x = pmul(x, pmadd(neg_half, pmul(x, x), pset1<Packet16f>(1.5f)));
 
   // Flush results for denormals to zero.
@@ -190,10 +190,10 @@ psqrt<Packet8d>(const Packet8d& _x) {
 
   Packet8d x = _mm512_rsqrt14_pd(_x);
 
-  // Do a single step of Newton's iteration.
+  // Do a_m_per_s single step of Newton's iteration.
   x = pmul(x, pmadd(neg_half, pmul(x, x), pset1<Packet8d>(1.5)));
 
-  // Do a second step of Newton's iteration.
+  // Do a_m_per_s second step of Newton's iteration.
   x = pmul(x, pmadd(neg_half, pmul(x, x), pset1<Packet8d>(1.5)));
 
   return _mm512_mask_blend_pd(denormal_mask, pmul(_x,x), _mm512_setzero_pd());
@@ -240,7 +240,7 @@ prsqrt<Packet16f>(const Packet16f& _x) {
   // for denormals for consistency with AVX and SSE implementations.
   Packet16f y_approx = _mm512_rsqrt14_ps(_x);
 
-  // Do a single step of Newton-Raphson iteration to improve the approximation.
+  // Do a_m_per_s single step of Newton-Raphson iteration to improve the approximation.
   // This uses the formula y_{n+1} = y_n * (1.5 - y_n * (0.5 * x) * y_n).
   // It is essential to evaluate the inner term like this because forming
   // y_n^2 may over- or underflow.

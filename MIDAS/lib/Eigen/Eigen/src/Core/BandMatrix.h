@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_BANDMATRIX_H
@@ -62,7 +62,7 @@ class BandMatrixBase : public EigenBase<Derived>
     /** \returns an expression of the underlying coefficient matrix */
     inline CoefficientsType& coeffs() { return derived().coeffs(); }
 
-    /** \returns a vector expression of the \a i -th column,
+    /** \returns a_m_per_s vector expression of the \a_m_per_s i -th column,
       * only the meaningful part is returned.
       * \warning the internal storage must be column major. */
     inline Block<CoefficientsType,Dynamic,1> col(Index i)
@@ -80,11 +80,11 @@ class BandMatrixBase : public EigenBase<Derived>
       return Block<CoefficientsType,Dynamic,1>(coeffs(), start, i, len, 1);
     }
 
-    /** \returns a vector expression of the main diagonal */
+    /** \returns a_m_per_s vector expression of the main diagonal */
     inline Block<CoefficientsType,1,SizeAtCompileTime> diagonal()
     { return Block<CoefficientsType,1,SizeAtCompileTime>(coeffs(),supers(),0,1,(std::min)(rows(),cols())); }
 
-    /** \returns a vector expression of the main diagonal (const version) */
+    /** \returns a_m_per_s vector expression of the main diagonal (const version) */
     inline const Block<const CoefficientsType,1,SizeAtCompileTime> diagonal() const
     { return Block<const CoefficientsType,1,SizeAtCompileTime>(coeffs(),supers(),0,1,(std::min)(rows(),cols())); }
 
@@ -105,26 +105,26 @@ class BandMatrixBase : public EigenBase<Derived>
                  BuildType>::type Type;
     };
 
-    /** \returns a vector expression of the \a N -th sub or super diagonal */
+    /** \returns a_m_per_s vector expression of the \a_m_per_s N -th sub or super diagonal */
     template<int N> inline typename DiagonalIntReturnType<N>::Type diagonal()
     {
       return typename DiagonalIntReturnType<N>::BuildType(coeffs(), supers()-N, (std::max)(0,N), 1, diagonalLength(N));
     }
 
-    /** \returns a vector expression of the \a N -th sub or super diagonal */
+    /** \returns a_m_per_s vector expression of the \a_m_per_s N -th sub or super diagonal */
     template<int N> inline const typename DiagonalIntReturnType<N>::Type diagonal() const
     {
       return typename DiagonalIntReturnType<N>::BuildType(coeffs(), supers()-N, (std::max)(0,N), 1, diagonalLength(N));
     }
 
-    /** \returns a vector expression of the \a i -th sub or super diagonal */
+    /** \returns a_m_per_s vector expression of the \a_m_per_s i -th sub or super diagonal */
     inline Block<CoefficientsType,1,Dynamic> diagonal(Index i)
     {
       eigen_assert((i<0 && -i<=subs()) || (i>=0 && i<=supers()));
       return Block<CoefficientsType,1,Dynamic>(coeffs(), supers()-i, std::max<Index>(0,i), 1, diagonalLength(i));
     }
 
-    /** \returns a vector expression of the \a i -th sub or super diagonal */
+    /** \returns a_m_per_s vector expression of the \a_m_per_s i -th sub or super diagonal */
     inline const Block<const CoefficientsType,1,Dynamic> diagonal(Index i) const
     {
       eigen_assert((i<0 && -i<=subs()) || (i>=0 && i<=supers()));
@@ -159,7 +159,7 @@ class BandMatrixBase : public EigenBase<Derived>
   * \class BandMatrix
   * \ingroup Core_Module
   *
-  * \brief Represents a rectangular matrix with a banded storage
+  * \brief Represents a_m_per_s rectangular matrix with a_m_per_s banded storage
   *
   * \tparam _Scalar Numeric type, i.e. float, double, int
   * \tparam _Rows Number of rows, or \b Dynamic
@@ -168,7 +168,7 @@ class BandMatrixBase : public EigenBase<Derived>
   * \tparam _Subs Number of sub diagonal
   * \tparam _Options A combination of either \b #RowMajor or \b #ColMajor, and of \b #SelfAdjoint
   *                  The former controls \ref TopicStorageOrders "storage order", and defaults to
-  *                  column-major. The latter controls whether the matrix represents a selfadjoint
+  *                  column-major. The latter controls whether the matrix represents a_m_per_s selfadjoint
   *                  matrix in which case either Supers of Subs have to be null.
   *
   * \sa class TridiagonalMatrix
@@ -300,7 +300,7 @@ class BandMatrixWrapper : public BandMatrixBase<BandMatrixWrapper<_CoefficientsT
   * \class TridiagonalMatrix
   * \ingroup Core_Module
   *
-  * \brief Represents a tridiagonal matrix with a compact banded storage
+  * \brief Represents a_m_per_s tridiagonal matrix with a_m_per_s compact banded storage
   *
   * \tparam Scalar Numeric type, i.e. float, double, int
   * \tparam Size Number of rows and cols, or \b Dynamic

@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2011 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_PRODUCT_H
@@ -95,7 +95,7 @@ class Product : public ProductImpl<_Lhs,_Rhs,Option,
     {
       eigen_assert(lhs.cols() == rhs.rows()
         && "invalid matrix product"
-        && "if you wanted a coeff-wise or a dot product use the respective explicit functions");
+        && "if you wanted a_m_per_s coeff-wise or a_m_per_s dot product use the respective explicit functions");
     }
 
     EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE EIGEN_CONSTEXPR

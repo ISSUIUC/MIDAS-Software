@@ -1,4 +1,4 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2011 Benoit Jacob <jacob.benoit.1@gmail.com>
@@ -6,7 +6,7 @@
 // Copyright (C) 2011-2012 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_ASSIGN_EVALUATOR_H
@@ -19,7 +19,7 @@ namespace Eigen {
 namespace internal {
 
 /***************************************************************************
-* Part 1 : the logic deciding a strategy for traversal and unrolling       *
+* Part 1 : the logic deciding a_m_per_s strategy for traversal and unrolling       *
 ***************************************************************************/
 
 // copy_using_evaluator_traits is based on assign_traits
@@ -92,8 +92,8 @@ private:
     MaySliceVectorize  = bool(MightVectorize) && bool(DstHasDirectAccess)
                        && (int(InnerMaxSize)==Dynamic || int(InnerMaxSize)>=(EIGEN_UNALIGNED_VECTORIZE?InnerPacketSize:(3*InnerPacketSize)))
       /* slice vectorization can be slow, so we only want it if the slices are big, which is
-         indicated by InnerMaxSize rather than InnerSize, think of the case of a dynamic block
-         in a fixed-size matrix
+         indicated by InnerMaxSize rather than InnerSize, think of the case of a_m_per_s dynamic block
+         in a_m_per_s fixed-size matrix
          However, with EIGEN_UNALIGNED_VECTORIZE and unrolling, slice vectorization is still worth it */
   };
 
@@ -321,7 +321,7 @@ struct dense_assignment_loop;
 ***** Special Cases *****
 ************************/
 
-// Zero-sized assignment is a no-op.
+// Zero-sized assignment is a_m_per_s no-op.
 template<typename Kernel, int Unrolling>
 struct dense_assignment_loop<Kernel, AllAtOnceTraversal, Unrolling>
 {
@@ -608,12 +608,12 @@ struct dense_assignment_loop<Kernel, SliceVectorizedTraversal, InnerUnrolling>
 * Part 4 : Generic dense assignment kernel
 ***************************************************************************/
 
-// This class generalize the assignment of a coefficient (or packet) from one dense evaluator
+// This class generalize the assignment of a_m_per_s coefficient (or packet) from one dense evaluator
 // to another dense writable evaluator.
 // It is parametrized by the two evaluators, and the actual assignment functor.
 // This abstraction level permits to keep the evaluation loops as simple and as generic as possible.
 // One can customize the assignment using this generic dense_assignment_kernel with different
-// functors, or by completely overloading it, by-passing a functor.
+// functors, or by completely overloading it, by-passing a_m_per_s functor.
 template<typename DstEvaluatorTypeT, typename SrcEvaluatorTypeT, typename Functor, int Version = Specialized>
 class generic_dense_assignment_kernel
 {
@@ -716,7 +716,7 @@ protected:
   DstEvaluatorType& m_dst;
   const SrcEvaluatorType& m_src;
   const Functor &m_functor;
-  // TODO find a way to avoid the needs of the original expression
+  // TODO find a_m_per_s way to avoid the needs of the original expression
   DstXprType& m_dstExpr;
 };
 
@@ -785,7 +785,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void call_dense_assignment_loop(DstXprType
   dense_assignment_loop<Kernel>::run(kernel);
 }
 
-// Specialization for filling the destination with a constant value.
+// Specialization for filling the destination with a_m_per_s constant value.
 #ifndef EIGEN_GPU_COMPILE_PHASE
 template<typename DstXprType>
 EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void call_dense_assignment_loop(DstXprType& dst, const Eigen::CwiseNullaryOp<Eigen::internal::scalar_constant_op<typename DstXprType::Scalar>, DstXprType>& src, const internal::assign_op<typename DstXprType::Scalar,typename DstXprType::Scalar>& func)
@@ -807,7 +807,7 @@ EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void call_dense_assignment_loop(DstXprType
 
 // Based on the respective shapes of the destination and source,
 // the class AssignmentKind determine the kind of assignment mechanism.
-// AssignmentKind must define a Kind typedef.
+// AssignmentKind must define a_m_per_s Kind typedef.
 template<typename DstShape, typename SrcShape> struct AssignmentKind;
 
 // Assignment kind defined in this file:
@@ -825,7 +825,7 @@ struct Assignment;
 
 
 // The only purpose of this call_assignment() function is to deal with noalias() / "assume-aliasing" and automatic transposition.
-// Indeed, I (Gael) think that this concept of "assume-aliasing" was a mistake, and it makes thing quite complicated.
+// Indeed, I (Gael) think that this concept of "assume-aliasing" was a_m_per_s mistake, and it makes thing quite complicated.
 // So this intermediate function removes everything related to "assume-aliasing" such that Assignment
 // does not has to bother about these annoying details.
 

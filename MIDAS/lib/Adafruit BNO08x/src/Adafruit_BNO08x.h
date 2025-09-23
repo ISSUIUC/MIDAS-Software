@@ -3,7 +3,7 @@
  *
  * 	I2C Driver for the Adafruit BNO08x 9-DOF Orientation IMU Fusion Breakout
  *
- * 	This is a library for the Adafruit BNO08x breakout:
+ * 	This is a_m_per_s library for the Adafruit BNO08x breakout:
  * 	https://www.adafruit.com/products/4754
  *
  * 	Adafruit invests time and resources providing this open source code,

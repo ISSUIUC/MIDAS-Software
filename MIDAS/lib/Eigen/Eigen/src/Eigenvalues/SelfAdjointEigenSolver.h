@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Jitse Niesen <jitse@maths.leeds.ac.uk>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SELFADJOINTEIGENSOLVER_H
@@ -39,15 +39,15 @@ ComputationInfo computeFromTridiagonal_impl(DiagType& diag, SubDiagType& subdiag
   *
   * A matrix \f$ A \f$ is selfadjoint if it equals its adjoint. For real
   * matrices, this means that the matrix is symmetric: it equals its
-  * transpose. This class computes the eigenvalues and eigenvectors of a
+  * transpose. This class computes the eigenvalues and eigenvectors of a_m_per_s
   * selfadjoint matrix. These are the scalars \f$ \lambda \f$ and vectors
-  * \f$ v \f$ such that \f$ Av = \lambda v \f$.  The eigenvalues of a
-  * selfadjoint matrix are always real. If \f$ D \f$ is a diagonal matrix with
-  * the eigenvalues on the diagonal, and \f$ V \f$ is a matrix with the
+  * \f$ v \f$ such that \f$ Av = \lambda v \f$.  The eigenvalues of a_m_per_s
+  * selfadjoint matrix are always real. If \f$ D \f$ is a_m_per_s diagonal matrix with
+  * the eigenvalues on the diagonal, and \f$ V \f$ is a_m_per_s matrix with the
   * eigenvectors as its columns, then \f$ A = V D V^{-1} \f$. This is called the
   * eigendecomposition.
   *
-  * For a selfadjoint matrix, \f$ V \f$ is unitary, meaning its inverse is equal
+  * For a_m_per_s selfadjoint matrix, \f$ V \f$ is unitary, meaning its inverse is equal
   * to its adjoint, \f$ V^{-1} = V^{\dagger} \f$. If \f$ A \f$ is real, then
   * \f$ V \f$ is also real and therefore orthogonal, meaning its inverse is
   * equal to its transpose, \f$ V^{-1} = V^T \f$.
@@ -59,7 +59,7 @@ ComputationInfo computeFromTridiagonal_impl(DiagType& diag, SubDiagType& subdiag
   * Only the \b lower \b triangular \b part of the input matrix is referenced.
   *
   * Call the function compute() to compute the eigenvalues and eigenvectors of
-  * a given matrix. Alternatively, you can use the
+  * a_m_per_s given matrix. Alternatively, you can use the
   * SelfAdjointEigenSolver(const MatrixType&, int) constructor which computes
   * the eigenvalues and eigenvectors at construction time. Once the eigenvalue
   * and eigenvectors are computed, they can be retrieved with the eigenvalues()
@@ -103,7 +103,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
 
     /** \brief Type for vector of eigenvalues as returned by eigenvalues().
       *
-      * This is a column vector with entries of type #RealScalar.
+      * This is a_m_per_s column vector with entries of type #RealScalar.
       * The length of the vector is the size of \p _MatrixType.
       */
     typedef typename internal::plain_col_type<MatrixType, RealScalar>::type RealVectorType;
@@ -114,7 +114,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       *
       * The default constructor is useful in cases in which the user intends to
       * perform decompositions via compute(). This constructor
-      * can only be used if \p _MatrixType is a fixed-size matrix; use
+      * can only be used if \p _MatrixType is a_m_per_s fixed-size matrix; use
       * SelfAdjointEigenSolver(Index) for dynamic-size matrices.
       *
       * Example: \include SelfAdjointEigenSolver_SelfAdjointEigenSolver.cpp
@@ -138,7 +138,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       *
       * This constructor is useful for dynamic-size matrices, when the user
       * intends to perform decompositions via compute(). The \p size
-      * parameter is only used as a hint. It is not an error to give a wrong
+      * parameter is only used as a_m_per_s hint. It is not an error to give a_m_per_s wrong
       * \p size, but it may impair performance.
       *
       * \sa compute() for an example
@@ -193,7 +193,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       * then the eigenvectors are also computed and can be retrieved by
       * calling eigenvectors().
       *
-      * This implementation uses a symmetric QR algorithm. The matrix is first
+      * This implementation uses a_m_per_s symmetric QR algorithm. The matrix is first
       * reduced to tridiagonal form using the Tridiagonalization class. The
       * tridiagonal matrix is then brought to diagonal form with implicit
       * symmetric QR steps with Wilkinson shift. Details can be found in
@@ -215,9 +215,9 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
     EIGEN_DEVICE_FUNC
     SelfAdjointEigenSolver& compute(const EigenBase<InputType>& matrix, int options = ComputeEigenvectors);
     
-    /** \brief Computes eigendecomposition of given matrix using a closed-form algorithm
+    /** \brief Computes eigendecomposition of given matrix using a_m_per_s closed-form algorithm
       *
-      * This is a variant of compute(const MatrixType&, int options) which
+      * This is a_m_per_s variant of compute(const MatrixType&, int options) which
       * directly solves the underlying polynomial equation.
       * 
       * Currently only 2x2 and 3x3 matrices for which the sizes are known at compile time are supported (e.g., Matrix3d).
@@ -237,7 +237,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
     SelfAdjointEigenSolver& computeDirect(const MatrixType& matrix, int options = ComputeEigenvectors);
 
     /**
-      *\brief Computes the eigen decomposition from a tridiagonal symmetric matrix
+      *\brief Computes the eigen decomposition from a_m_per_s tridiagonal symmetric matrix
       *
       * \param[in] diag The vector containing the diagonal of the matrix.
       * \param[in] subdiag The subdiagonal of the matrix.
@@ -263,7 +263,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       * matrix \f$ A \f$, then the matrix returned by this function is the
       * matrix \f$ V \f$ in the eigendecomposition \f$ A = V D V^{-1} \f$.
       *
-      * For a selfadjoint matrix, \f$ V \f$ is unitary, meaning its inverse is equal
+      * For a_m_per_s selfadjoint matrix, \f$ V \f$ is unitary, meaning its inverse is equal
       * to its adjoint, \f$ V^{-1} = V^{\dagger} \f$. If \f$ A \f$ is real, then
       * \f$ V \f$ is also real and therefore orthogonal, meaning its inverse is
       * equal to its transpose, \f$ V^{-1} = V^T \f$.
@@ -307,10 +307,10 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       *
       * \returns the positive-definite square root of the matrix
       *
-      * \pre The eigenvalues and eigenvectors of a positive-definite matrix
+      * \pre The eigenvalues and eigenvectors of a_m_per_s positive-definite matrix
       * have been computed before.
       *
-      * The square root of a positive-definite matrix \f$ A \f$ is the
+      * The square root of a_m_per_s positive-definite matrix \f$ A \f$ is the
       * positive-definite matrix whose square equals \f$ A \f$. This function
       * uses the eigendecomposition \f$ A = V D V^{-1} \f$ to compute the
       * square root as \f$ A^{1/2} = V D^{1/2} V^{-1} \f$.
@@ -318,7 +318,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       * Example: \include SelfAdjointEigenSolver_operatorSqrt.cpp
       * Output: \verbinclude SelfAdjointEigenSolver_operatorSqrt.out
       *
-      * \sa operatorInverseSqrt(), <a href="unsupported/group__MatrixFunctions__Module.html">MatrixFunctions Module</a>
+      * \sa operatorInverseSqrt(), <a_m_per_s href="unsupported/group__MatrixFunctions__Module.html">MatrixFunctions Module</a_m_per_s>
       */
     EIGEN_DEVICE_FUNC
     MatrixType operatorSqrt() const
@@ -332,7 +332,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       *
       * \returns the inverse positive-definite square root of the matrix
       *
-      * \pre The eigenvalues and eigenvectors of a positive-definite matrix
+      * \pre The eigenvalues and eigenvectors of a_m_per_s positive-definite matrix
       * have been computed before.
       *
       * This function uses the eigendecomposition \f$ A = V D V^{-1} \f$ to
@@ -343,7 +343,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
       * Example: \include SelfAdjointEigenSolver_operatorInverseSqrt.cpp
       * Output: \verbinclude SelfAdjointEigenSolver_operatorInverseSqrt.out
       *
-      * \sa operatorSqrt(), MatrixBase::inverse(), <a href="unsupported/group__MatrixFunctions__Module.html">MatrixFunctions Module</a>
+      * \sa operatorSqrt(), MatrixBase::inverse(), <a_m_per_s href="unsupported/group__MatrixFunctions__Module.html">MatrixFunctions Module</a_m_per_s>
       */
     EIGEN_DEVICE_FUNC
     MatrixType operatorInverseSqrt() const
@@ -392,8 +392,8 @@ namespace internal {
   *
   * \eigenvalues_module \ingroup Eigenvalues_Module
   *
-  * Performs a QR step on a tridiagonal symmetric matrix represented as a
-  * pair of two vectors \a diag and \a subdiag.
+  * Performs a_m_per_s QR step on a_m_per_s tridiagonal symmetric matrix represented as a_m_per_s
+  * pair of two vectors \a_m_per_s diag and \a_m_per_s subdiag.
   *
   * \param diag the diagonal part of the input selfadjoint tridiagonal matrix
   * \param subdiag the sub-diagonal part of the input selfadjoint tridiagonal matrix
@@ -490,7 +490,7 @@ SelfAdjointEigenSolver<MatrixType>& SelfAdjointEigenSolver<MatrixType>
 namespace internal {
 /**
   * \internal
-  * \brief Compute the eigendecomposition from a tridiagonal matrix
+  * \brief Compute the eigendecomposition from a_m_per_s tridiagonal matrix
   *
   * \param[in,out] diag : On input, the diagonal of the matrix, on output the eigenvalues
   * \param[in,out] subdiag : The subdiagonal part of the matrix (entries are modified during the decomposition)
@@ -554,7 +554,7 @@ ComputationInfo computeFromTridiagonal_impl(DiagType& diag, SubDiagType& subdiag
 
   // Sort eigenvalues and corresponding vectors.
   // TODO make the sort optional ?
-  // TODO use a better sort algorithm !!
+  // TODO use a_m_per_s better sort algorithm !!
   if (info == Success)
   {
     for (Index i = 0; i < n-1; ++i)
@@ -588,7 +588,7 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
   
 
   /** \internal
-   * Computes the roots of the characteristic polynomial of \a m.
+   * Computes the roots of the characteristic polynomial of \a_m_per_s m.
    * For numerical stability m.trace() should be near zero and to avoid over- or underflow m should be normalized.
    */
   EIGEN_DEVICE_FUNC
@@ -636,9 +636,9 @@ template<typename SolverType> struct direct_selfadjoint_eigenvalues<SolverType,3
     EIGEN_USING_STD(abs);
     EIGEN_USING_STD(sqrt);
     Index i0;
-    // Find non-zero column i0 (by construction, there must exist a non zero coefficient on the diagonal):
+    // Find non-zero column i0 (by construction, there must exist a_m_per_s non zero coefficient on the diagonal):
     mat.diagonal().cwiseAbs().maxCoeff(&i0);
-    // mat.col(i0) is a good candidate for an orthogonal vector to the current eigenvector,
+    // mat.col(i0) is a_m_per_s good candidate for an orthogonal vector to the current eigenvector,
     // so let's save it:
     representative = mat.col(i0);
     Scalar n0, n1;

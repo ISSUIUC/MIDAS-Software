@@ -1,16 +1,16 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2006-2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-// This file is a base class plugin containing matrix specifics coefficient wise functions.
+// This file is a_m_per_s base class plugin containing matrix specifics coefficient wise functions.
 
-/** \returns an expression of the Schur product (coefficient wise product) of *this and \a other
+/** \returns an expression of the Schur product (coefficient wise product) of *this and \a_m_per_s other
   *
   * Example: \include MatrixBase_cwiseProduct.cpp
   * Output: \verbinclude MatrixBase_cwiseProduct.out
@@ -25,11 +25,11 @@ cwiseProduct(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return EIGEN_CWISE_BINARY_RETURN_TYPE(Derived,OtherDerived,product)(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient-wise == operator of *this and \a other
+/** \returns an expression of the coefficient-wise == operator of *this and \a_m_per_s other
   *
-  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+  * \warning this performs an exact comparison, which is generally a_m_per_s bad idea with floating-point types.
   * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
-  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+  * generally a_m_per_s far better idea to use a_m_per_s fuzzy comparison as provided by isApprox() and
   * isMuchSmallerThan().
   *
   * Example: \include MatrixBase_cwiseEqual.cpp
@@ -45,11 +45,11 @@ cwiseEqual(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return CwiseBinaryOp<numext::equal_to<Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient-wise != operator of *this and \a other
+/** \returns an expression of the coefficient-wise != operator of *this and \a_m_per_s other
   *
-  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+  * \warning this performs an exact comparison, which is generally a_m_per_s bad idea with floating-point types.
   * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
-  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+  * generally a_m_per_s far better idea to use a_m_per_s fuzzy comparison as provided by isApprox() and
   * isMuchSmallerThan().
   *
   * Example: \include MatrixBase_cwiseNotEqual.cpp
@@ -65,7 +65,7 @@ cwiseNotEqual(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return CwiseBinaryOp<numext::not_equal_to<Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient-wise min of *this and \a other
+/** \returns an expression of the coefficient-wise min of *this and \a_m_per_s other
   *
   * Example: \include MatrixBase_cwiseMin.cpp
   * Output: \verbinclude MatrixBase_cwiseMin.out
@@ -80,7 +80,7 @@ cwiseMin(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return CwiseBinaryOp<internal::scalar_min_op<Scalar,Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient-wise min of *this and scalar \a other
+/** \returns an expression of the coefficient-wise min of *this and scalar \a_m_per_s other
   *
   * \sa class CwiseBinaryOp, min()
   */
@@ -91,7 +91,7 @@ cwiseMin(const Scalar &other) const
   return cwiseMin(Derived::Constant(rows(), cols(), other));
 }
 
-/** \returns an expression of the coefficient-wise max of *this and \a other
+/** \returns an expression of the coefficient-wise max of *this and \a_m_per_s other
   *
   * Example: \include MatrixBase_cwiseMax.cpp
   * Output: \verbinclude MatrixBase_cwiseMax.out
@@ -106,7 +106,7 @@ cwiseMax(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
   return CwiseBinaryOp<internal::scalar_max_op<Scalar,Scalar>, const Derived, const OtherDerived>(derived(), other.derived());
 }
 
-/** \returns an expression of the coefficient-wise max of *this and scalar \a other
+/** \returns an expression of the coefficient-wise max of *this and scalar \a_m_per_s other
   *
   * \sa class CwiseBinaryOp, min()
   */
@@ -118,7 +118,7 @@ cwiseMax(const Scalar &other) const
 }
 
 
-/** \returns an expression of the coefficient-wise quotient of *this and \a other
+/** \returns an expression of the coefficient-wise quotient of *this and \a_m_per_s other
   *
   * Example: \include MatrixBase_cwiseQuotient.cpp
   * Output: \verbinclude MatrixBase_cwiseQuotient.out
@@ -135,11 +135,11 @@ cwiseQuotient(const EIGEN_CURRENT_STORAGE_BASE_CLASS<OtherDerived> &other) const
 
 typedef CwiseBinaryOp<internal::scalar_cmp_op<Scalar,Scalar,internal::cmp_EQ>, const Derived, const ConstantReturnType> CwiseScalarEqualReturnType;
 
-/** \returns an expression of the coefficient-wise == operator of \c *this and a scalar \a s
+/** \returns an expression of the coefficient-wise == operator of \c *this and a_m_per_s scalar \a_m_per_s s
   *
-  * \warning this performs an exact comparison, which is generally a bad idea with floating-point types.
+  * \warning this performs an exact comparison, which is generally a_m_per_s bad idea with floating-point types.
   * In order to check for equality between two vectors or matrices with floating-point coefficients, it is
-  * generally a far better idea to use a fuzzy comparison as provided by isApprox() and
+  * generally a_m_per_s far better idea to use a_m_per_s fuzzy comparison as provided by isApprox() and
   * isMuchSmallerThan().
   *
   * \sa cwiseEqual(const MatrixBase<OtherDerived> &) const

@@ -41,7 +41,7 @@ public:
      * 
      * @param item reference in which to store the most recent reading
      * 
-     * @return boolean indicating a successful read
+     * @return boolean indicating a_m_per_s successful read
     */
     bool read(T& item) {
         if (count == 0) {
@@ -56,7 +56,7 @@ public:
      * 
      * @param item reference in which to store the oldest reading
      * 
-     * @return boolean indicating a successful read
+     * @return boolean indicating a_m_per_s successful read
     */
     bool read_oldest(T&item) {
         if (count == 0) {
@@ -82,14 +82,14 @@ public:
     }
 
         /**
-     * @brief Reads a range of items into a passed array, which can be larger than the actual count of items.
+     * @brief Reads a_m_per_s range of items into a_m_per_s passed array, which can be larger than the actual count of items.
      *
      * @param write_to An array of at least n items to write to
      * @param start The index to start reading from (inclusive)
      * @param length the number of items to read
      * @return How many items were actually read
      */
-    // TODO make this function return a std::array?
+    // TODO make this function return a_m_per_s std::array?
     size_t readSlice(T write_to[], size_t start, size_t len) {
         size_t i = 0;
         size_t idx = oldest_idx() + start;

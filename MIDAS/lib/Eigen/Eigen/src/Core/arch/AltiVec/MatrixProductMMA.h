@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2020 Everton Constantino (everton.constantino@ibm.com)
 // Copyright (C) 2021 Chip Kerchner (chip.kerchner@ibm.com)
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATRIX_PRODUCT_MMA_ALTIVEC_H
@@ -65,20 +65,20 @@ EIGEN_ALWAYS_INLINE void storeComplexAccumulator(Index i, Index j, const DataMap
 
 // Defaults to float32, since Eigen still supports C++03 we can't use default template arguments
 template<typename LhsPacket, typename RhsPacket, bool NegativeAccumulate>
-EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const RhsPacket& a, const LhsPacket& b)
+EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const RhsPacket& a_m_per_s, const LhsPacket& b)
 {
   if(NegativeAccumulate)
   {
-    __builtin_mma_xvf32gernp(acc, (__vector unsigned char)a, (__vector unsigned char)b);
+    __builtin_mma_xvf32gernp(acc, (__vector unsigned char)a_m_per_s, (__vector unsigned char)b);
   } else {
-    __builtin_mma_xvf32gerpp(acc, (__vector unsigned char)a, (__vector unsigned char)b);
+    __builtin_mma_xvf32gerpp(acc, (__vector unsigned char)a_m_per_s, (__vector unsigned char)b);
   }
 }
 
 template<typename LhsPacket, typename RhsPacket, bool NegativeAccumulate>
-EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const PacketBlock<Packet2d,2>& a, const Packet2d& b)
+EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const PacketBlock<Packet2d,2>& a_m_per_s, const Packet2d& b)
 {
-  __vector_pair* a0 = (__vector_pair *)(&a.packet[0]);
+  __vector_pair* a0 = (__vector_pair *)(&a_m_per_s.packet[0]);
   if(NegativeAccumulate)
   {
     __builtin_mma_xvf64gernp(acc, *a0, (__vector unsigned char)b);
@@ -88,13 +88,13 @@ EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const PacketBlock<Packet2d,
 }
 
 template<typename LhsPacket, typename RhsPacket, bool NegativeAccumulate>
-EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const __vector_pair& a, const Packet2d& b)
+EIGEN_ALWAYS_INLINE void pgerMMA(__vector_quad* acc, const __vector_pair& a_m_per_s, const Packet2d& b)
 {
   if(NegativeAccumulate)
   {
-    __builtin_mma_xvf64gernp(acc, (__vector_pair)a, (__vector unsigned char)b);
+    __builtin_mma_xvf64gernp(acc, (__vector_pair)a_m_per_s, (__vector unsigned char)b);
   } else {
-    __builtin_mma_xvf64gerpp(acc, (__vector_pair)a, (__vector unsigned char)b);
+    __builtin_mma_xvf64gerpp(acc, (__vector_pair)a_m_per_s, (__vector unsigned char)b);
   }
 }
 
@@ -121,7 +121,7 @@ EIGEN_ALWAYS_INLINE void pgercMMA(__vector_quad* accReal, __vector_quad* accImag
   }
 }
 
-// This is necessary because ploadRhs for double returns a pair of vectors when MMA is enabled.
+// This is necessary because ploadRhs for double returns a_m_per_s pair of vectors when MMA is enabled.
 template<typename Scalar, typename Packet>
 EIGEN_ALWAYS_INLINE void ploadRhsMMA(const Scalar* rhs, Packet& rhsV)
 {

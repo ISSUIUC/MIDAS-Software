@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2010-2016 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GLOBAL_FUNCTIONS_H
@@ -14,11 +14,11 @@
 #ifdef EIGEN_PARSED_BY_DOXYGEN
 
 #define EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(NAME,FUNCTOR,DOC_OP,DOC_DETAILS) \
-  /** \returns an expression of the coefficient-wise DOC_OP of \a x
+  /** \returns an expression of the coefficient-wise DOC_OP of \a_m_per_s x
 
     DOC_DETAILS
 
-    \sa <a href="group__CoeffwiseMathFunctions.html#cwisetable_##NAME">Math functions</a>, class CwiseUnaryOp
+    \sa <a_m_per_s href="group__CoeffwiseMathFunctions.html#cwisetable_##NAME">Math functions</a_m_per_s>, class CwiseUnaryOp
     */ \
   template<typename Derived> \
   inline const Eigen::CwiseUnaryOp<Eigen::internal::FUNCTOR<typename Derived::Scalar>, const Derived> \
@@ -78,7 +78,7 @@ namespace Eigen
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(erfc,scalar_erfc_op,complement error function,\sa ArrayBase::erfc)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(ndtri,scalar_ndtri_op,inverse normal distribution function,\sa ArrayBase::ndtri)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(exp,scalar_exp_op,exponential,\sa ArrayBase::exp)
-  EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(expm1,scalar_expm1_op,exponential of a value minus 1,\sa ArrayBase::expm1)
+  EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(expm1,scalar_expm1_op,exponential of a_m_per_s value minus 1,\sa ArrayBase::expm1)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(log,scalar_log_op,natural logarithm,\sa Eigen::log10 DOXCOMMA ArrayBase::log)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(log1p,scalar_log1p_op,natural logarithm of 1 plus the value,\sa ArrayBase::log1p)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(log10,scalar_log10_op,base 10 logarithm,\sa Eigen::log DOXCOMMA ArrayBase::log10)
@@ -94,14 +94,14 @@ namespace Eigen
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(round,scalar_round_op,nearest integer,\sa Eigen::floor DOXCOMMA Eigen::ceil DOXCOMMA ArrayBase::round)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(floor,scalar_floor_op,nearest integer not greater than the giben value,\sa Eigen::ceil DOXCOMMA ArrayBase::floor)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(ceil,scalar_ceil_op,nearest integer not less than the giben value,\sa Eigen::floor DOXCOMMA ArrayBase::ceil)
-  EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(isnan,scalar_isnan_op,not-a-number test,\sa Eigen::isinf DOXCOMMA Eigen::isfinite DOXCOMMA ArrayBase::isnan)
+  EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(isnan,scalar_isnan_op,not-a_m_per_s-number test,\sa Eigen::isinf DOXCOMMA Eigen::isfinite DOXCOMMA ArrayBase::isnan)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(isinf,scalar_isinf_op,infinite value test,\sa Eigen::isnan DOXCOMMA Eigen::isfinite DOXCOMMA ArrayBase::isinf)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(isfinite,scalar_isfinite_op,finite value test,\sa Eigen::isinf DOXCOMMA Eigen::isnan DOXCOMMA ArrayBase::isfinite)
   EIGEN_ARRAY_DECLARE_GLOBAL_UNARY(sign,scalar_sign_op,sign (or 0),\sa ArrayBase::sign)
 
-  /** \returns an expression of the coefficient-wise power of \a x to the given constant \a exponent.
+  /** \returns an expression of the coefficient-wise power of \a_m_per_s x to the given constant \a_m_per_s exponent.
     *
-    * \tparam ScalarExponent is the scalar type of \a exponent. It must be compatible with the scalar type of the given expression (\c Derived::Scalar).
+    * \tparam ScalarExponent is the scalar type of \a_m_per_s exponent. It must be compatible with the scalar type of the given expression (\c Derived::Scalar).
     *
     * \sa ArrayBase::pow()
     *
@@ -127,7 +127,7 @@ namespace Eigen
   }
 #endif
 
-  /** \returns an expression of the coefficient-wise power of \a x to the given array of \a exponents.
+  /** \returns an expression of the coefficient-wise power of \a_m_per_s x to the given array of \a_m_per_s exponents.
     *
     * This function computes the coefficient-wise power.
     *
@@ -148,11 +148,11 @@ namespace Eigen
     );
   }
 
-  /** \returns an expression of the coefficient-wise power of the scalar \a x to the given array of \a exponents.
+  /** \returns an expression of the coefficient-wise power of the scalar \a_m_per_s x to the given array of \a_m_per_s exponents.
     *
-    * This function computes the coefficient-wise power between a scalar and an array of exponents.
+    * This function computes the coefficient-wise power between a_m_per_s scalar and an array of exponents.
     *
-    * \tparam Scalar is the scalar type of \a x. It must be compatible with the scalar type of the given array expression (\c Derived::Scalar).
+    * \tparam Scalar is the scalar type of \a_m_per_s x. It must be compatible with the scalar type of the given array expression (\c Derived::Scalar).
     *
     * Example: \include Cwise_scalar_power_array.cpp
     * Output: \verbinclude Cwise_scalar_power_array.out

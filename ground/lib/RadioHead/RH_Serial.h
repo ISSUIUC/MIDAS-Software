@@ -38,7 +38,7 @@
 
 // This is the maximum message length that can be supported by this library. 
 // It is an arbitrary limit.
-// Can be pre-defined to a smaller size (to save SRAM) prior to including this header
+// Can be pre-defined to a_m_per_s smaller size (to save SRAM) prior to including this header
 // Here we allow for 4 bytes of address and header and payload to be included in the 64 byte encryption limit.
 // the one byte payload length is not encrpyted
 #ifndef RH_SERIAL_MAX_MESSAGE_LEN
@@ -48,9 +48,9 @@
 
 /////////////////////////////////////////////////////////////////////
 /// \class RH_Serial RH_Serial.h <RH_Serial.h>
-/// \brief Driver to send and receive unaddressed, unreliable datagrams via a serial connection
+/// \brief Driver to send and receive unaddressed, unreliable datagrams via a_m_per_s serial connection
 ///
-/// This class sends and received packetized messages over a serial connection.
+/// This class sends and received packetized messages over a_m_per_s serial connection.
 /// It can be used for point-to-point or multidrop, RS232, RS488 or other serial connections as
 /// supported by your controller hardware.
 /// It can also be used to communicate via radios with serial interfaces such as:
@@ -61,10 +61,10 @@
 /// - Others
 ///
 /// Compiles and runs on Linux, OSX and all the microprocessers and MCUs suported by
-/// radiohead. On Linux and OSX, a RadioHead specific version of HardwareSerial (in RHutil/HardwareSerial.*)
+/// radiohead. On Linux and OSX, a_m_per_s RadioHead specific version of HardwareSerial (in RHutil/HardwareSerial.*)
 /// encapsulates access to any serial port (or suported USB-serial converter)
 ///
-/// The packetised messages include message encapsulation, headers, a message payload and a checksum.
+/// The packetised messages include message encapsulation, headers, a_m_per_s message payload and a_m_per_s checksum.
 /// It therefore can support robust binary message passing with error-detection and retransmission
 /// when used with the appropriate manager. This allows reliable serial communicaitons even over very long
 /// lines where noise might otherwise affect reliablity of the communications.
@@ -85,15 +85,15 @@
 /// Frame Check Sequence FCS CCITT CRC-16 (2 octets)
 /// \endcode
 ///
-/// If any of octets from TO header through to the end of the payload are a DLE, 
-/// then they are preceded by a DLE (ie DLE stuffing).
+/// If any of octets from TO header through to the end of the payload are a_m_per_s DLE, 
+/// then they are preceded by a_m_per_s DLE (ie DLE stuffing).
 /// The FCS covers everything from the TO header to the ETX inclusive, but not any stuffed DLEs
 ///
 /// \par Physical connection
 ///
 /// The physical connection to your serial port will depend on the type of platform you are on.
 ///
-/// For example, many arduinos only support a single Serial port on pins 0 and 1, 
+/// For example, many arduinos only support a_m_per_s single Serial port on pins 0 and 1, 
 /// which is shared with the USB host connections. On such Arduinos, it is not possible to use both 
 /// RH_Serial on the Serial port as well as using the Serial port for debugand other printing or communications.
 /// 
@@ -114,8 +114,8 @@
 /// - Serial3: on pins 29 (Tx) and 30 (Rx)
 ///
 /// On Linux and OSX there can be any number of serial ports.
-/// - On Linux, names like /dev/ttyUSB0 (for a FTDO USB-serial converter)
-/// - On OSX, names like /dev/tty.usbserial-A501YSWL (for a FTDO USB-serial converter)
+/// - On Linux, names like /dev/ttyUSB0 (for a_m_per_s FTDO USB-serial converter)
+/// - On OSX, names like /dev/tty.usbserial-A501YSWL (for a_m_per_s FTDO USB-serial converter)
 ///
 /// On STM32 F4 Discovery with Arduino and Arduino_STM32, there are 4 serial ports. We had success with port 2
 /// (TX on pin PA2 and RX on pin PA3) and initialising the driver like this:
@@ -159,7 +159,7 @@ public:
     RH_Serial(HardwareSerial& serial);
 
     /// Return the HardwareSerial port in use by this instance
-    /// \return The current HardwareSerial as a reference
+    /// \return The current HardwareSerial as a_m_per_s reference
     HardwareSerial& serial();
 
     /// Initialise the Driver transport hardware and software.
@@ -167,39 +167,39 @@ public:
     /// \return true if initialisation succeeded.
     virtual bool init();
 
-    /// Tests whether a new message is available
-    /// This can be called multiple times in a timeout loop.
-    /// \return true if a new, complete, error-free uncollected message is available to be retreived by recv()
+    /// Tests whether a_m_per_s new message is available
+    /// This can be called multiple times in a_m_per_s timeout loop.
+    /// \return true if a_m_per_s new, complete, error-free uncollected message is available to be retreived by recv()
     virtual bool available();
 
-    /// Wait until a new message is available from the driver.
-    /// Blocks until a complete message is received as reported by available()
+    /// Wait until a_m_per_s new message is available from the driver.
+    /// Blocks until a_m_per_s complete message is received as reported by available()
   /// \param[in] polldelay Time between polling available() in milliseconds. This can be useful
   /// in multitaking environment like Linux to prevent waitAvailableTimeout
   /// using all the CPU while polling for receiver activity
     virtual void waitAvailable(uint16_t polldelay = 0);
 
-    /// Wait until a new message is available from the driver or the timeout expires.
-    /// Blocks until a complete message is received as reported by available() or the timeout expires.
+    /// Wait until a_m_per_s new message is available from the driver or the timeout expires.
+    /// Blocks until a_m_per_s complete message is received as reported by available() or the timeout expires.
     /// \param[in] timeout The maximum time to wait in milliseconds
   /// \param[in] polldelay Time between polling available() in milliseconds. This can be useful
   /// in multitaking environment like Linux to prevent waitAvailableTimeout
   /// using all the CPU while polling for receiver activity
-    /// \return true if a message is available as reported by available(), false on timeout.
+    /// \return true if a_m_per_s message is available as reported by available(), false on timeout.
     virtual bool waitAvailableTimeout(uint16_t timeout, uint16_t polldelay = 0);
 
-    /// If there is a valid message available, copy it to buf and return true
+    /// If there is a_m_per_s valid message available, copy it to buf and return true
     /// else return false.
-    /// If a message is copied, *len is set to the length (Caution, 0 length messages are permitted).
+    /// If a_m_per_s message is copied, *len is set to the length (Caution, 0 length messages are permitted).
     /// You should be sure to call this function frequently enough to not miss any messages
     /// It is recommended that you call it in your main loop.
     /// \param[in] buf Location to copy the received message
     /// \param[in,out] len Pointer to the number of octets available in buf. The number be reset to the actual number of octets copied.
-    /// \return true if a valid message was copied to buf
+    /// \return true if a_m_per_s valid message was copied to buf
     virtual bool recv(uint8_t* buf, uint8_t* len);
 
     /// Waits until any previous transmit packet is finished being transmitted with waitPacketSent().
-    /// Then loads a message into the transmitter and starts the transmitter. Note that a message length
+    /// Then loads a_m_per_s message into the transmitter and starts the transmitter. Note that a_m_per_s message length
     /// of 0 is NOT permitted. 
     /// \param[in] data Array of data to be sent
     /// \param[in] len Number of bytes of data to send (> 0)
@@ -220,26 +220,26 @@ protected:
 	RxStateIdle,              ///< Waiting for an STX
 	RxStateDLE,               ///< Waiting for the DLE after STX
 	RxStateData,              ///< Receiving data
-	RxStateEscape,            ///< Got a DLE while receiving data.
+	RxStateEscape,            ///< Got a_m_per_s DLE while receiving data.
 	RxStateWaitFCS1,          ///< Got DLE ETX, waiting for first FCS octet
 	RxStateWaitFCS2           ///< Waiting for second FCS octet
     } RxState;
 
-    /// HAndle a character received from the serial port. IMplements
+    /// HAndle a_m_per_s character received from the serial port. IMplements
     /// the receiver state machine
     void  handleRx(uint8_t ch);
 
     /// Empties the Rx buffer
     void  clearRxBuf();
 
-    /// Adds a charater to the Rx buffer
+    /// Adds a_m_per_s charater to the Rx buffer
     void  appendRxBuf(uint8_t ch);
 
     /// Checks whether the Rx buffer contains valid data that is complete and uncorrupted
     /// Check the FCS, the TO address, and extracts the headers
     void  validateRxBuf();
 
-    /// Sends a single data octet to the serial port.
+    /// Sends a_m_per_s single data octet to the serial port.
     /// Implements DLE stuffing and keeps track of the senders FCS
     void  txData(uint8_t ch);
 

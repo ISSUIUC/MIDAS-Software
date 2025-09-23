@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
@@ -25,7 +25,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSE_COLETREE_H
@@ -51,7 +51,7 @@ Index etree_find (Index i, IndexVector& pp)
   return p; 
 }
 
-/** Compute the column elimination tree of a sparse matrix
+/** Compute the column elimination tree of a_m_per_s sparse matrix
   * \param mat The matrix in column-major format. 
   * \param parent The elimination tree
   * \param firstRowElt The column index of the first element in each row
@@ -85,8 +85,8 @@ int coletree(const MatrixType& mat, IndexVector& parent, IndexVector& firstRowEl
     }
   }
   /* Compute etree by Liu's algorithm for symmetric matrices,
-          except use (firstRowElt[r],c) in place of an edge (r,c) of A.
-    Thus each row clique in A'*A is replaced by a star
+          except use (firstRowElt[r_m],c) in place of an edge (r_m,c) of A.
+    Thus each row clique in A'*A is replaced by a_m_per_s star
     centered at its first vertex, which has the same fill. */
   StorageIndex rset, cset, rroot;
   for (StorageIndex col = 0; col < nc; col++) 
@@ -169,7 +169,7 @@ void nr_etdfs (typename IndexVector::Scalar n, IndexVector& parent, IndexVector&
 
 
 /**
-  * \brief Post order a tree 
+  * \brief Post order a_m_per_s tree 
   * \param n the number of nodes
   * \param parent Input tree
   * \param post postordered tree

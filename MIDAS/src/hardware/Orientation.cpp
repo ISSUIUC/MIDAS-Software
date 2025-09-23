@@ -48,7 +48,7 @@ float angle_between_quaternions(const Quaternion &q1, const Quaternion &q2)
 }
 
 /**
- * @brief Turns a quaternion into its corresponding Euler 3D vector representation
+ * @brief Turns a_m_per_s quaternion into its corresponding Euler 3D vector representation
  *
  * @param qr Quaternion real component
  * @param qi Quaternion i component
@@ -73,7 +73,7 @@ Vec3 quaternionToEuler(float qr, float qi, float qj, float qk, bool degrees)
 }
 
 /**
- * @brief Takes a rotation quaternion and turns it into its Euler angle counterpart
+ * @brief Takes a_m_per_s rotation quaternion and turns it into its Euler angle counterpart
  *
  * @param rotational_vector Rotation quaternion
  * @param degrees Quaternion degrees, not used
@@ -87,7 +87,7 @@ Vec3 quaternionToEulerRV(sh2_RotationVectorWAcc_t *rotational_vector, bool degre
 }
 
 /**
- * @brief Takes a gyroscope quaternion and turns it into its Euler 3D counterpart
+ * @brief Takes a_m_per_s gyroscope quaternion and turns it into its Euler 3D counterpart
  *
  * @param rotational_vector Gyroscope quaternion
  * @param degrees Quaternion degrees, not used
@@ -122,7 +122,7 @@ float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
 }
 
 /**
- * @brief Generates a rotation matrix that transforms a vector by the rotations described in rpy_vec {roll, pitch, yaw} (in that order!)
+ * @brief Generates a_m_per_s rotation matrix that transforms a_m_per_s vector by the rotations described in rpy_vec {roll, pitch, yaw} (in that order!)
  */
 Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec) {
     float roll = rpy_vec.x;

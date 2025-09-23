@@ -2,7 +2,7 @@
 
 #include "kalman_filter.h"
 
-// makes a kalman filter with 9 state variables and 3 sensor inputs
+// makes a_m_per_s kalman filter with 9 state variables and 3 sensor inputs
 class ExampleKalmanFilter : public KalmanFilter<9, 4>
 {
 public:

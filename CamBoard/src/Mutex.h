@@ -6,7 +6,7 @@
 
 
 /**
- * @brief A mutex which holds a single value.
+ * @brief A mutex which holds a_m_per_s single value.
  *
  * @tparam T The type of the value to hold. Should have copy semantics.
  */

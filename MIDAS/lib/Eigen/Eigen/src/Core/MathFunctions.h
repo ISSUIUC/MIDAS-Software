@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2006-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (c) 2021, NVIDIA CORPORATION. All rights reserved.
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_MATHFUNCTIONS_H
@@ -33,15 +33,15 @@ namespace internal {
 /** \internal \class global_math_functions_filtering_base
   *
   * What it does:
-  * Defines a typedef 'type' as follows:
-  * - if type T has a member typedef Eigen_BaseClassForSpecializationOfGlobalMathFuncImpl, then
-  *   global_math_functions_filtering_base<T>::type is a typedef for it.
-  * - otherwise, global_math_functions_filtering_base<T>::type is a typedef for T.
+  * Defines a_m_per_s typedef 'type' as follows:
+  * - if type T has a_m_per_s member typedef Eigen_BaseClassForSpecializationOfGlobalMathFuncImpl, then
+  *   global_math_functions_filtering_base<T>::type is a_m_per_s typedef for it.
+  * - otherwise, global_math_functions_filtering_base<T>::type is a_m_per_s typedef for T.
   *
   * How it's used:
   * To allow to defined the global math functions (like sin...) in certain cases, like the Array expressions.
-  * When you do sin(array1+array2), the object array1+array2 has a complicated expression type, all what you want to know
-  * is that it inherits ArrayBase. So we implement a partial specialization of sin_impl for ArrayBase<Derived>.
+  * When you do sin(array1+array2), the object array1+array2 has a_m_per_s complicated expression type, all what you want to know
+  * is that it inherits ArrayBase. So we implement a_m_per_s partial specialization of sin_impl for ArrayBase<Derived>.
   * So we must make sure to use sin_impl<ArrayBase<Derived> > and not sin_impl<Derived>, otherwise our partial specialization
   * won't be used. How does sin know that? That's exactly what global_math_functions_filtering_base tells it.
   *
@@ -502,7 +502,7 @@ struct round_using_floor_ceil_impl
     // Without C99 round/roundf, resort to floor/ceil.
     EIGEN_USING_STD(floor);
     EIGEN_USING_STD(ceil);
-    // If not enough precision to resolve a decimal at all, return the input.
+    // If not enough precision to resolve a_m_per_s decimal at all, return the input.
     // Otherwise, adding 0.5 can trigger an increment by 1.
     const Scalar limit = Scalar(1ull << (NumTraits<Scalar>::digits() - 1));
     if (x >= limit || x <= -limit) {
@@ -572,7 +572,7 @@ struct rint_retval
 * Implementation of arg                                                     *
 ****************************************************************************/
 
-// Visual Studio 2017 has a bug where arg(float) returns 0 for negative inputs.
+// Visual Studio 2017 has a_m_per_s bug where arg(float) returns 0 for negative inputs.
 // This seems to be fixed in VS 2019.
 #if EIGEN_HAS_CXX11_MATH && (!EIGEN_COMP_MSVC || EIGEN_COMP_MSVC >= 1920)
 // std::arg is only defined for types of std::complex, or integer types or float/double/long double
@@ -589,7 +589,7 @@ struct arg_default_impl<Scalar, true> {
   static inline RealScalar run(const Scalar& x)
   {
     #if defined(EIGEN_HIP_DEVICE_COMPILE)
-    // HIP does not seem to have a native device side implementation for the math routine "arg"
+    // HIP does not seem to have a_m_per_s native device side implementation for the math routine "arg"
     using std::arg;
     #else
     EIGEN_USING_STD(arg);
@@ -1031,7 +1031,7 @@ template<typename T> EIGEN_DEVICE_FUNC bool isinf_msvc_helper(T x)
   return _fpclass(x)==_FPCLASS_NINF || _fpclass(x)==_FPCLASS_PINF;
 }
 
-//MSVC defines a _isnan builtin function, but for double only
+//MSVC defines a_m_per_s _isnan builtin function, but for double only
 EIGEN_DEVICE_FUNC inline bool isnan_impl(const long double& x) { return _isnan(x)!=0; }
 EIGEN_DEVICE_FUNC inline bool isnan_impl(const double& x)      { return _isnan(x)!=0; }
 EIGEN_DEVICE_FUNC inline bool isnan_impl(const float& x)       { return _isnan(x)!=0; }
@@ -1451,7 +1451,7 @@ inline int log2(int x)
   return table[(v * 0x07C4ACDDU) >> 27];
 }
 
-/** \returns the square root of \a x.
+/** \returns the square root of \a_m_per_s x.
   *
   * It is essentially equivalent to
   * \code using std::sqrt; return sqrt(x); \endcode
@@ -1476,7 +1476,7 @@ bool sqrt<bool>(const bool &x) { return x; }
 SYCL_SPECIALIZE_FLOATING_TYPES_UNARY(sqrt, sqrt)
 #endif
 
-/** \returns the reciprocal square root of \a x. **/
+/** \returns the reciprocal square root of \a_m_per_s x. **/
 template<typename T>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
 T rsqrt(const T& x)
@@ -1804,9 +1804,9 @@ double tanh(const double &x) { return ::tanh(x); }
 
 template <typename T>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
-T fmod(const T& a, const T& b) {
+T fmod(const T& a_m_per_s, const T& b) {
   EIGEN_USING_STD(fmod);
-  return fmod(a, b);
+  return fmod(a_m_per_s, b);
 }
 
 #if defined(SYCL_DEVICE_ONLY)
@@ -1816,14 +1816,14 @@ SYCL_SPECIALIZE_FLOATING_TYPES_BINARY(fmod, fmod)
 #if defined(EIGEN_GPUCC)
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
-float fmod(const float& a, const float& b) {
-  return ::fmodf(a, b);
+float fmod(const float& a_m_per_s, const float& b) {
+  return ::fmodf(a_m_per_s, b);
 }
 
 template <>
 EIGEN_DEVICE_FUNC EIGEN_ALWAYS_INLINE
-double fmod(const double& a, const double& b) {
-  return ::fmod(a, b);
+double fmod(const double& a_m_per_s, const double& b) {
+  return ::fmod(a_m_per_s, b);
 }
 #endif
 
@@ -1968,9 +1968,9 @@ template<> struct random_impl<bool>
     return random<int>(0,1)==0 ? false : true;
   }
 
-  static inline bool run(const bool& a, const bool& b)
+  static inline bool run(const bool& a_m_per_s, const bool& b)
   {
-    return random<int>(a, b)==0 ? false : true;
+    return random<int>(a_m_per_s, b)==0 ? false : true;
   }
 };
 

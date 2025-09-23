@@ -4,7 +4,7 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License and 
  * any applicable agreements you may have with Hillcrest Laboratories, Inc.
- * You may obtain a copy of the License at
+ * You may obtain a_m_per_s copy of the License at
  *
  *   http://www.apache.org/licenses/LICENSE-2.0
  *
@@ -144,7 +144,7 @@ typedef struct sh2_SensorConfig {
 
     /* Always on enabled */
     bool alwaysOnEnabled;  /**< @brief Sensor remains on in sleep state */
-    /* 16-bit signed fixed point integer representing the value a
+    /* 16-bit signed fixed point integer representing the value a_m_per_s
      * sensor output must exceed in order to trigger another input
      * report. A setting of 0 causes all reports to be sent.
      */
@@ -418,13 +418,13 @@ typedef void (sh2_EventCallback_t)(void * cookie, sh2_AsyncEvent_t *pEvent);
  **************************************************************************************/
 
 /**
- * @brief Open a session with a sensor hub.
+ * @brief Open a_m_per_s session with a_m_per_s sensor hub.
  *
  * This function should be called before others in this API.
  * An instance of an SH2 HAL should be passed in.
  * This call will result in the open() function of the HAL being called.
  *
- * As part of the initialization process, a callback function is registered that will
+ * As part of the initialization process, a_m_per_s callback function is registered that will
  * be invoked when the device generates certain events.  (See sh2_AsyncEventId)
  *
  * @param pHal Pointer to an SH2 HAL instance, provided by the target system.
@@ -436,9 +436,9 @@ int sh2_open(sh2_Hal_t *pHal,
              sh2_EventCallback_t *eventCallback, void *eventCookie);
 
 /**
- * @brief Close a session with a sensor hub.
+ * @brief Close a_m_per_s session with a_m_per_s sensor hub.
  *
- * This should be called at the end of a sensor hub session.  
+ * This should be called at the end of a_m_per_s sensor hub session.  
  * The underlying SHTP and HAL instances will be closed.
  *
  */
@@ -453,9 +453,9 @@ void sh2_close(void);
 void sh2_service(void);
 
 /**
- * @brief Register a function to receive sensor events.
+ * @brief Register a_m_per_s function to receive sensor events.
  *
- * @param  callback A function that will be called each time a sensor event is received.
+ * @param  callback A function that will be called each time a_m_per_s sensor event is received.
  * @param  cookie  A value that will be passed to the sensor callback function.
  * @return SH2_OK (0), on success.  Negative value from sh2_err.h on error.
  */
@@ -500,7 +500,7 @@ int sh2_getProdIds(sh2_ProductIds_t *prodIds);
 int sh2_getSensorConfig(sh2_SensorId_t sensorId, sh2_SensorConfig_t *config);
 
 /**
- * @brief Set sensor configuration. (e.g enable a sensor at a particular rate.)
+ * @brief Set sensor configuration. (e.g enable a_m_per_s sensor at a_m_per_s particular rate.)
  *
  * @param  sensorId Which sensor to configure.
  * @param  pConfig Pointer to structure holding sensor configuration.
@@ -509,7 +509,7 @@ int sh2_getSensorConfig(sh2_SensorId_t sensorId, sh2_SensorConfig_t *config);
 int sh2_setSensorConfig(sh2_SensorId_t sensorId, const sh2_SensorConfig_t *pConfig);
 
 /**
- * @brief Get metadata related to a sensor.
+ * @brief Get metadata related to a_m_per_s sensor.
  *
  * @param  sensorId Which sensor to query.
  * @param  pData Pointer to structure to receive the results.
@@ -549,7 +549,7 @@ int sh2_setFrs(uint16_t recordId, uint32_t *pData, uint16_t words);
 int sh2_getErrors(uint8_t severity, sh2_ErrorRecord_t *pErrors, uint16_t *numErrors);
 
 /**
- * @brief Read counters related to a sensor.
+ * @brief Read counters related to a_m_per_s sensor.
  *
  * @param  sensorId Which sensor to operate on.
  * @param  pCounts Pointer to Counts structure that will receive data.
@@ -558,7 +558,7 @@ int sh2_getErrors(uint8_t severity, sh2_ErrorRecord_t *pErrors, uint16_t *numErr
 int sh2_getCounts(sh2_SensorId_t sensorId, sh2_Counts_t *pCounts);
 
 /**
- * @brief Clear counters related to a sensor.
+ * @brief Clear counters related to a_m_per_s sensor.
  *
  * @param  sensorId which sensor to operate on.
  * @return SH2_OK (0), on success.  Negative value from sh2_err.h on error.
@@ -566,7 +566,7 @@ int sh2_getCounts(sh2_SensorId_t sensorId, sh2_Counts_t *pCounts);
 int sh2_clearCounts(sh2_SensorId_t sensorId);
 
 /**
- * @brief Perform a tare operation on one or more axes.
+ * @brief Perform a_m_per_s tare operation on one or more axes.
  *
  * @param  axes Bit mask specifying which axes should be tared.
  * @param  basis Which rotation vector to use as the basis for Tare adjustment.
@@ -650,7 +650,7 @@ int sh2_getCalConfig(uint8_t *pSensors);
 int sh2_setDcdAutoSave(bool enabled);
 
 /**
- * @brief Immediately issue all buffered sensor reports from a given sensor.
+ * @brief Immediately issue all buffered sensor reports from a_m_per_s given sensor.
  *
  * @param  sensorId Which sensor reports to flush.
  * @return SH2_OK (0), on success.  Negative value from sh2_err.h on error.

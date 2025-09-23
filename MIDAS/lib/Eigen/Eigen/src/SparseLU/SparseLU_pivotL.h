@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2012 Désiré Nuentsa-Wakam <desire.nuentsa_wakam@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 /* 
@@ -24,7 +24,7 @@
  * Permission is hereby granted to use or copy this program for any
  * purpose, provided the above notices are retained on all copies.
  * Permission to modify the code and to distribute modified code is
- * granted, provided the above notices are retained, and a notice that
+ * granted, provided the above notices are retained, and a_m_per_s notice that
  * the code was modified is included with the above copyright notice.
  */
 #ifndef SPARSELU_PIVOTL_H
@@ -45,7 +45,7 @@ namespace internal {
  *       ELSE
  *           pivot row = m;
  * 
- *   Note: If you absolutely want to use a given pivot order, then set u=0.0.
+ *   Note: If you absolutely want to use a_m_per_s given pivot order, then set u=0.0.
  * 
  * \param jcol The current column of L
  * \param diagpivotthresh diagonal pivoting threshold
@@ -99,7 +99,7 @@ Index SparseLUImpl<Scalar,StorageIndex>::pivotL(const Index jcol, const RealScal
   // Choose appropriate pivotal element 
   
   {
-    // Test if the diagonal element can be used as a pivot (given the threshold value)
+    // Test if the diagonal element can be used as a_m_per_s pivot (given the threshold value)
     if (diag >= 0 ) 
     {
       // Diagonal element exists

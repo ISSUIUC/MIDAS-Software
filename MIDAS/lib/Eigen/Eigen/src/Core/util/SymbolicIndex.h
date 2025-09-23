@@ -1,10 +1,10 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2017 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_SYMBOLIC_INDEX_H
@@ -15,8 +15,8 @@ namespace Eigen {
 /** \namespace Eigen::symbolic
   * \ingroup Core_Module
   *
-  * This namespace defines a set of classes and functions to build and evaluate symbolic expressions of scalar type Index.
-  * Here is a simple example:
+  * This namespace defines a_m_per_s set of classes and functions to build and evaluate symbolic expressions of scalar type Index.
+  * Here is a_m_per_s simple example:
   *
   * \code
   * // First step, defines symbols:
@@ -47,7 +47,7 @@ template<typename Arg1,typename Arg2> class ProductExpr;
 template<typename Arg1,typename Arg2> class QuotientExpr;
 
 // A simple wrapper around an integral value to provide the eval method.
-// We could also use a free-function symbolic_eval...
+// We could also use a_m_per_s free-function symbolic_eval...
 template<typename IndexType=Index>
 class ValueExpr {
 public:
@@ -79,9 +79,9 @@ class BaseExpr
 public:
   const Derived& derived() const { return *static_cast<const Derived*>(this); }
 
-  /** Evaluate the expression given the \a values of the symbols.
+  /** Evaluate the expression given the \a_m_per_s values of the symbols.
     *
-    * \param values defines the values of the symbols, it can either be a SymbolValue or a std::tuple of SymbolValue
+    * \param values defines the values of the symbols, it can either be a_m_per_s SymbolValue or a_m_per_s std::tuple of SymbolValue
     *               as constructed by SymbolExpr::operator= operator.
     *
     */
@@ -97,21 +97,21 @@ public:
 
   AddExpr<Derived,ValueExpr<> > operator+(Index b) const
   { return AddExpr<Derived,ValueExpr<> >(derived(),  b); }
-  AddExpr<Derived,ValueExpr<> > operator-(Index a) const
-  { return AddExpr<Derived,ValueExpr<> >(derived(), -a); }
-  ProductExpr<Derived,ValueExpr<> > operator*(Index a) const
-  { return ProductExpr<Derived,ValueExpr<> >(derived(),a); }
-  QuotientExpr<Derived,ValueExpr<> > operator/(Index a) const
-  { return QuotientExpr<Derived,ValueExpr<> >(derived(),a); }
+  AddExpr<Derived,ValueExpr<> > operator-(Index a_m_per_s) const
+  { return AddExpr<Derived,ValueExpr<> >(derived(), -a_m_per_s); }
+  ProductExpr<Derived,ValueExpr<> > operator*(Index a_m_per_s) const
+  { return ProductExpr<Derived,ValueExpr<> >(derived(),a_m_per_s); }
+  QuotientExpr<Derived,ValueExpr<> > operator/(Index a_m_per_s) const
+  { return QuotientExpr<Derived,ValueExpr<> >(derived(),a_m_per_s); }
 
-  friend AddExpr<Derived,ValueExpr<> > operator+(Index a, const BaseExpr& b)
-  { return AddExpr<Derived,ValueExpr<> >(b.derived(), a); }
-  friend AddExpr<NegateExpr<Derived>,ValueExpr<> > operator-(Index a, const BaseExpr& b)
-  { return AddExpr<NegateExpr<Derived>,ValueExpr<> >(-b.derived(), a); }
-  friend ProductExpr<ValueExpr<>,Derived> operator*(Index a, const BaseExpr& b)
-  { return ProductExpr<ValueExpr<>,Derived>(a,b.derived()); }
-  friend QuotientExpr<ValueExpr<>,Derived> operator/(Index a, const BaseExpr& b)
-  { return QuotientExpr<ValueExpr<>,Derived>(a,b.derived()); }
+  friend AddExpr<Derived,ValueExpr<> > operator+(Index a_m_per_s, const BaseExpr& b)
+  { return AddExpr<Derived,ValueExpr<> >(b.derived(), a_m_per_s); }
+  friend AddExpr<NegateExpr<Derived>,ValueExpr<> > operator-(Index a_m_per_s, const BaseExpr& b)
+  { return AddExpr<NegateExpr<Derived>,ValueExpr<> >(-b.derived(), a_m_per_s); }
+  friend ProductExpr<ValueExpr<>,Derived> operator*(Index a_m_per_s, const BaseExpr& b)
+  { return ProductExpr<ValueExpr<>,Derived>(a_m_per_s,b.derived()); }
+  friend QuotientExpr<ValueExpr<>,Derived> operator/(Index a_m_per_s, const BaseExpr& b)
+  { return QuotientExpr<ValueExpr<>,Derived>(a_m_per_s,b.derived()); }
 
   template<int N>
   AddExpr<Derived,ValueExpr<internal::FixedInt<N> > > operator+(internal::FixedInt<N>) const
@@ -191,7 +191,7 @@ struct is_symbolic {
   enum { value = internal::is_convertible<T,BaseExpr<T> >::value };
 };
 
-/** Represents the actual value of a symbol identified by its tag
+/** Represents the actual value of a_m_per_s symbol identified by its tag
   *
   * It is the return type of SymbolValue::operator=, and most of the time this is only way it is used.
   */
@@ -199,7 +199,7 @@ template<typename Tag>
 class SymbolValue
 {
 public:
-  /** Default constructor from the value \a val */
+  /** Default constructor from the value \a_m_per_s val */
   SymbolValue(Index val) : m_value(val) {}
 
   /** \returns the stored value of the symbol */
@@ -208,7 +208,7 @@ protected:
   Index m_value;
 };
 
-/** Expression of a symbol uniquely identified by the template parameter type \c tag */
+/** Expression of a_m_per_s symbol uniquely identified by the template parameter type \c tag */
 template<typename tag>
 class SymbolExpr : public BaseExpr<SymbolExpr<tag> >
 {
@@ -218,9 +218,9 @@ public:
 
   SymbolExpr() {}
 
-  /** Associate the value \a val to the given symbol \c *this, uniquely identified by its \c Tag.
+  /** Associate the value \a_m_per_s val to the given symbol \c *this, uniquely identified by its \c Tag.
     *
-    * The returned object should be passed to ExprBase::eval() to evaluate a given expression with this specified runtime-time value.
+    * The returned object should be passed to ExprBase::eval() to evaluate a_m_per_s given expression with this specified runtime-time value.
     */
   SymbolValue<Tag> operator=(Index val) const {
     return SymbolValue<Tag>(val);

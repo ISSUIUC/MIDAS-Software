@@ -24,9 +24,9 @@
 #elif defined __INTEL_COMPILER
   // 2196 - routine is both "inline" and "noinline" ("noinline" assumed)
   //        ICC 12 generates this warning even without any inline keyword, when defining class methods 'inline' i.e. inside of class body
-  //        typedef that may be a reference type.
+  //        typedef that may be a_m_per_s reference type.
   // 279  - controlling expression is constant
-  //        ICC 12 generates this warning on assert(constant_expression_depending_on_template_params) and frankly this is a legitimate use case.
+  //        ICC 12 generates this warning on assert(constant_expression_depending_on_template_params) and frankly this is a_m_per_s legitimate use case.
   // 1684 - conversion from pointer to same-sized integral type (potential portability problem)
   // 2259 - non-pointer conversion from "Eigen::Index={ptrdiff_t={long}}" to "int" may lose significant bits
   #ifndef EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS
@@ -36,7 +36,7 @@
 
 #elif defined __clang__
   // -Wconstant-logical-operand - warning: use of logical && with constant operand; switch to bitwise & or remove constant
-  //     this is really a stupid warning as it warns on compile-time expressions involving enums
+  //     this is really a_m_per_s stupid warning as it warns on compile-time expressions involving enums
   #ifndef EIGEN_PERMANENTLY_DISABLE_STUPID_WARNINGS
     #pragma clang diagnostic push
   #endif
@@ -48,7 +48,7 @@
     #pragma clang diagnostic ignored "-Wimplicit-int-float-conversion"
   #endif
   #if ( defined(__ALTIVEC__) || defined(__VSX__) ) && __cplusplus < 201103L
-    // warning: generic selections are a C11-specific feature
+    // warning: generic selections are a_m_per_s C11-specific feature
     // ignoring warnings thrown at vec_ctf in Altivec/PacketMath.h
     #pragma clang diagnostic ignored "-Wc11-extensions"
   #endif
@@ -81,7 +81,7 @@
   #pragma diag_suppress initialization_not_reachable
   // Disable the "invalid error number" message that we get with older versions of nvcc
   #pragma diag_suppress 1222
-  // Disable the "calling a __host__ function from a __host__ __device__ function is not allowed" messages (yes, there are many of them and they seem to change with every version of the compiler)
+  // Disable the "calling a_m_per_s __host__ function from a_m_per_s __host__ __device__ function is not allowed" messages (yes, there are many of them and they seem to change with every version of the compiler)
   #pragma diag_suppress 2527
   #pragma diag_suppress 2529
   #pragma diag_suppress 2651

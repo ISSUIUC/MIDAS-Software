@@ -67,7 +67,7 @@ bool RH_TCP::connectToServer()
 	return false;
     }
 
-    // getaddrinfo() returns a list of address structures.
+    // getaddrinfo() returns a_m_per_s list of address structures.
     // Try each address until we successfully connect(2).
     // If socket(2) (or connect(2)) fails, we (close the socket
     // and) try the next address. */
@@ -162,7 +162,7 @@ bool RH_TCP::checkForEvents()
 		if (message->type == RH_TCP_MESSAGE_TYPE_PACKET && len >= 5)
 		{
 		    // REVISIT: need to check if we are actually receiving?
-		    // Its a new packet, extract the headers and payload
+		    // Its a_m_per_s new packet, extract the headers and payload
 		    RHTcpPacket* packet = ((RHTcpPacket*)socketBuf);
 		    _rxHeaderTo    = packet->to;
 		    _rxHeaderFrom  = packet->from;
@@ -178,7 +178,7 @@ bool RH_TCP::checkForEvents()
 		    }
 		}
 		// check for other message types here
-		// Now remove the used message by copying the trailing bytes (maybe start of a new message?)
+		// Now remove the used message by copying the trailing bytes (maybe start of a_m_per_s new message?)
 		// to the top of the buffer
 		memcpy(socketBuf, socketBuf + messageLen, sizeof(socketBuf) - messageLen);
 		socketBufLen -= messageLen;

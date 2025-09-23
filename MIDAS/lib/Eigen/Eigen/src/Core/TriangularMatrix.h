@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2008 Benoit Jacob <jacob.benoit.1@gmail.com>
 // Copyright (C) 2008-2009 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_TRIANGULARMATRIX_H
@@ -22,7 +22,7 @@ template<int Side, typename TriangularType, typename Rhs> struct triangular_solv
 /** \class TriangularBase
   * \ingroup Core_Module
   *
-  * \brief Base class for triangular part in a matrix
+  * \brief Base class for triangular part in a_m_per_s matrix
   */
 template<typename Derived> class TriangularBase : public EigenBase<Derived>
 {
@@ -38,7 +38,7 @@ template<typename Derived> class TriangularBase : public EigenBase<Derived>
       SizeAtCompileTime = (internal::size_at_compile_time<internal::traits<Derived>::RowsAtCompileTime,
                                                    internal::traits<Derived>::ColsAtCompileTime>::ret),
       /**< This is equal to the number of coefficients, i.e. the number of
-          * rows times the number of columns, or to \a Dynamic if this is not
+          * rows times the number of columns, or to \a_m_per_s Dynamic if this is not
           * known at compile-time. \sa RowsAtCompileTime, ColsAtCompileTime */
 
       MaxSizeAtCompileTime = (internal::size_at_compile_time<internal::traits<Derived>::MaxRowsAtCompileTime,
@@ -151,15 +151,15 @@ template<typename Derived> class TriangularBase : public EigenBase<Derived>
 /** \class TriangularView
   * \ingroup Core_Module
   *
-  * \brief Expression of a triangular part in a matrix
+  * \brief Expression of a_m_per_s triangular part in a_m_per_s matrix
   *
   * \param MatrixType the type of the object in which we are taking the triangular part
   * \param Mode the kind of triangular matrix expression to construct. Can be #Upper,
   *             #Lower, #UnitUpper, #UnitLower, #StrictlyUpper, or #StrictlyLower.
-  *             This is in fact a bit field; it must have either #Upper or #Lower,
+  *             This is in fact a_m_per_s bit field; it must have either #Upper or #Lower,
   *             and additionally it may have #UnitDiag or #ZeroDiag or neither.
   *
-  * This class represents a triangular part of a matrix, not necessarily square. Strictly speaking, for rectangular
+  * This class represents a_m_per_s triangular part of a_m_per_s matrix, not necessarily square. Strictly speaking, for rectangular
   * matrices one should speak of "trapezoid" parts. This class is the return type
   * of MatrixBase::triangularView() and SparseMatrixBase::triangularView(), and most of the time this is the only way it is used.
   *
@@ -228,11 +228,11 @@ template<typename _MatrixType, unsigned int _Mode> class TriangularView
     EIGEN_DEVICE_FUNC EIGEN_CONSTEXPR
     inline Index cols() const EIGEN_NOEXCEPT { return m_matrix.cols(); }
 
-    /** \returns a const reference to the nested expression */
+    /** \returns a_m_per_s const reference to the nested expression */
     EIGEN_DEVICE_FUNC
     const NestedExpression& nestedExpression() const { return m_matrix; }
 
-    /** \returns a reference to the nested expression */
+    /** \returns a_m_per_s reference to the nested expression */
     EIGEN_DEVICE_FUNC
     NestedExpression& nestedExpression() { return m_matrix; }
 
@@ -295,9 +295,9 @@ template<typename _MatrixType, unsigned int _Mode> class TriangularView
     using Base::solve;
   #endif
 
-    /** \returns a selfadjoint view of the referenced triangular part which must be either \c #Upper or \c #Lower.
+    /** \returns a_m_per_s selfadjoint view of the referenced triangular part which must be either \c #Upper or \c #Lower.
       *
-      * This is a shortcut for \code this->nestedExpression().selfadjointView<(*this)::Mode>() \endcode
+      * This is a_m_per_s shortcut for \code this->nestedExpression().selfadjointView<(*this)::Mode>() \endcode
       * \sa MatrixBase::selfadjointView() */
     EIGEN_DEVICE_FUNC
     SelfAdjointView<MatrixTypeNestedNonRef,Mode> selfadjointView()
@@ -335,7 +335,7 @@ template<typename _MatrixType, unsigned int _Mode> class TriangularView
 
 /** \ingroup Core_Module
   *
-  * \brief Base class for a triangular part in a \b dense matrix
+  * \brief Base class for a_m_per_s triangular part in a_m_per_s \b dense matrix
   *
   * This class is an abstract base class of class TriangularView, and objects of type TriangularViewImpl cannot be instantiated.
   * It extends class TriangularView with additional methods which available for dense expressions only.
@@ -432,7 +432,7 @@ template<typename _MatrixType, unsigned int _Mode> class TriangularViewImpl<_Mat
       return derived().nestedExpression().coeffRef(row, col);
     }
 
-    /** Assigns a triangular matrix to a triangular part of a dense matrix */
+    /** Assigns a_m_per_s triangular matrix to a_m_per_s triangular part of a_m_per_s dense matrix */
     template<typename OtherDerived>
     EIGEN_DEVICE_FUNC
     TriangularViewType& operator=(const TriangularBase<OtherDerived>& other);
@@ -476,23 +476,23 @@ template<typename _MatrixType, unsigned int _Mode> class TriangularViewImpl<_Mat
       return Product<OtherDerived,TriangularViewType>(lhs.derived(),rhs.derived());
     }
 
-    /** \returns the product of the inverse of \c *this with \a other, \a *this being triangular.
+    /** \returns the product of the inverse of \c *this with \a_m_per_s other, \a_m_per_s *this being triangular.
       *
-      * This function computes the inverse-matrix matrix product inverse(\c *this) * \a other if
-      * \a Side==OnTheLeft (the default), or the right-inverse-multiply  \a other * inverse(\c *this) if
-      * \a Side==OnTheRight.
+      * This function computes the inverse-matrix matrix product inverse(\c *this) * \a_m_per_s other if
+      * \a_m_per_s Side==OnTheLeft (the default), or the right-inverse-multiply  \a_m_per_s other * inverse(\c *this) if
+      * \a_m_per_s Side==OnTheRight.
       *
       * Note that the template parameter \c Side can be omitted, in which case \c Side==OnTheLeft
       *
       * The matrix \c *this must be triangular and invertible (i.e., all the coefficients of the
-      * diagonal must be non zero). It works as a forward (resp. backward) substitution if \c *this
+      * diagonal must be non zero). It works as a_m_per_s forward (resp. backward) substitution if \c *this
       * is an upper (resp. lower) triangular matrix.
       *
       * Example: \include Triangular_solve.cpp
       * Output: \verbinclude Triangular_solve.out
       *
       * This function returns an expression of the inverse-multiply and can works in-place if it is assigned
-      * to the same matrix or vector \a other.
+      * to the same matrix or vector \a_m_per_s other.
       *
       * For users coming from BLAS, this function (and more specifically solveInPlace()) offer
       * all the operations supported by the \c *TRSV and \c *TRSM BLAS routines.
@@ -503,9 +503,9 @@ template<typename _MatrixType, unsigned int _Mode> class TriangularViewImpl<_Mat
     inline const internal::triangular_solve_retval<Side,TriangularViewType, Other>
     solve(const MatrixBase<Other>& other) const;
 
-    /** "in-place" version of TriangularView::solve() where the result is written in \a other
+    /** "in-place" version of TriangularView::solve() where the result is written in \a_m_per_s other
       *
-      * \warning The parameter is only marked 'const' to make the C++ compiler accept a temporary expression here.
+      * \warning The parameter is only marked 'const' to make the C++ compiler accept a_m_per_s temporary expression here.
       * This function will const_cast it, so constness isn't honored here.
       *
       * Note that the template parameter \c Side can be omitted, in which case \c Side==OnTheLeft
@@ -609,7 +609,7 @@ EIGEN_DEVICE_FUNC void TriangularViewImpl<MatrixType, Mode, Dense>::lazyAssign(c
 * Implementation of TriangularBase methods
 ***************************************************************************/
 
-/** Assigns a triangular or selfadjoint matrix to a dense matrix.
+/** Assigns a_m_per_s triangular or selfadjoint matrix to a_m_per_s dense matrix.
   * If the matrix is triangular, the opposite part is set to zero. */
 template<typename Derived>
 template<typename DenseDerived>
@@ -627,9 +627,9 @@ EIGEN_DEVICE_FUNC void TriangularBase<Derived>::evalTo(MatrixBase<DenseDerived> 
 ***************************************************************************/
 
 /**
-  * \returns an expression of a triangular view extracted from the current matrix
+  * \returns an expression of a_m_per_s triangular view extracted from the current matrix
   *
-  * The parameter \a Mode can have the following values: \c #Upper, \c #StrictlyUpper, \c #UnitUpper,
+  * The parameter \a_m_per_s Mode can have the following values: \c #Upper, \c #StrictlyUpper, \c #UnitUpper,
   * \c #Lower, \c #StrictlyLower, \c #UnitLower.
   *
   * Example: \include MatrixBase_triangularView.cpp
@@ -657,7 +657,7 @@ MatrixBase<Derived>::triangularView() const
 }
 
 /** \returns true if *this is approximately equal to an upper triangular matrix,
-  *          within the precision given by \a prec.
+  *          within the precision given by \a_m_per_s prec.
   *
   * \sa isLowerTriangular()
   */
@@ -681,8 +681,8 @@ bool MatrixBase<Derived>::isUpperTriangular(const RealScalar& prec) const
   return true;
 }
 
-/** \returns true if *this is approximately equal to a lower triangular matrix,
-  *          within the precision given by \a prec.
+/** \returns true if *this is approximately equal to a_m_per_s lower triangular matrix,
+  *          within the precision given by \a_m_per_s prec.
   *
   * \sa isUpperTriangular()
   */
@@ -716,7 +716,7 @@ bool MatrixBase<Derived>::isLowerTriangular(const RealScalar& prec) const
 namespace internal {
 
 
-// TODO currently a triangular expression has the form TriangularView<.,.>
+// TODO currently a_m_per_s triangular expression has the form TriangularView<.,.>
 //      in the future triangular-ness should be defined by the expression traits
 //      such that Transpose<TriangularView<.,.> > is valid. (currently TriangularBase::transpose() is overloaded to make it work)
 template<typename MatrixType, unsigned int Mode>
@@ -905,7 +905,7 @@ struct triangular_assignment_loop<Kernel, Mode, 0, SetOpposite>
 
 
 
-// TODO: experiment with a recursive assignment procedure splitting the current
+// TODO: experiment with a_m_per_s recursive assignment procedure splitting the current
 //       triangular part into one rectangular and two triangular parts.
 
 
@@ -944,7 +944,7 @@ struct triangular_assignment_loop<Kernel, Mode, Dynamic, SetOpposite>
 
 } // end namespace internal
 
-/** Assigns a triangular or selfadjoint matrix to a dense matrix.
+/** Assigns a_m_per_s triangular or selfadjoint matrix to a_m_per_s dense matrix.
   * If the matrix is triangular, the opposite part is set to zero. */
 template<typename Derived>
 template<typename DenseDerived>

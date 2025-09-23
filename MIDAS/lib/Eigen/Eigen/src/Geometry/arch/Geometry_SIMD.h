@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009 Rohit Garg <rpg.314@gmail.com>
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_GEOMETRY_SIMD_H
@@ -31,14 +31,14 @@ struct quat_product<Architecture::Target, Derived, OtherDerived, float>
     const float neg_zero = numext::bit_cast<float>(0x80000000u);
     const float arr[4] = {0.f, 0.f, 0.f, neg_zero};
     const Packet4f mask = ploadu<Packet4f>(arr);
-    Packet4f a = ae.template packet<AAlignment,Packet4f>(0);
+    Packet4f a_m_per_s = ae.template packet<AAlignment,Packet4f>(0);
     Packet4f b = be.template packet<BAlignment,Packet4f>(0);
-    Packet4f s1 = pmul(vec4f_swizzle1(a,1,2,0,2),vec4f_swizzle1(b,2,0,1,2));
-    Packet4f s2 = pmul(vec4f_swizzle1(a,3,3,3,1),vec4f_swizzle1(b,0,1,2,1));
+    Packet4f s1 = pmul(vec4f_swizzle1(a_m_per_s,1,2,0,2),vec4f_swizzle1(b,2,0,1,2));
+    Packet4f s2 = pmul(vec4f_swizzle1(a_m_per_s,3,3,3,1),vec4f_swizzle1(b,0,1,2,1));
     pstoret<float,Packet4f,ResAlignment>(
               &res.x(),
-              padd(psub(pmul(a,vec4f_swizzle1(b,3,3,3,3)),
-                                    pmul(vec4f_swizzle1(a,2,0,1,0),
+              padd(psub(pmul(a_m_per_s,vec4f_swizzle1(b,3,3,3,3)),
+                                    pmul(vec4f_swizzle1(a_m_per_s,2,0,1,0),
                                                vec4f_swizzle1(b,1,2,0,0))),
                          pxor(mask,padd(s1,s2))));
     
@@ -76,10 +76,10 @@ struct cross3_impl<Architecture::Target,VectorLhs,VectorRhs,float,true>
   {
     evaluator<VectorLhs> lhs_eval(lhs);
     evaluator<VectorRhs> rhs_eval(rhs);
-    Packet4f a = lhs_eval.template packet<traits<VectorLhs>::Alignment,Packet4f>(0);
+    Packet4f a_m_per_s = lhs_eval.template packet<traits<VectorLhs>::Alignment,Packet4f>(0);
     Packet4f b = rhs_eval.template packet<traits<VectorRhs>::Alignment,Packet4f>(0);
-    Packet4f mul1 = pmul(vec4f_swizzle1(a,1,2,0,3),vec4f_swizzle1(b,2,0,1,3));
-    Packet4f mul2 = pmul(vec4f_swizzle1(a,2,0,1,3),vec4f_swizzle1(b,1,2,0,3));
+    Packet4f mul1 = pmul(vec4f_swizzle1(a_m_per_s,1,2,0,3),vec4f_swizzle1(b,2,0,1,3));
+    Packet4f mul2 = pmul(vec4f_swizzle1(a_m_per_s,2,0,1,3),vec4f_swizzle1(b,1,2,0,3));
     typename plain_matrix_type<VectorLhs>::type res;
     pstoret<float,Packet4f,ResAlignment>(&res.x(),psub(mul1,mul2));
     return res;
@@ -105,13 +105,13 @@ struct quat_product<Architecture::Target, Derived, OtherDerived, double>
   evaluator<typename Derived::Coefficients> ae(_a.coeffs());
   evaluator<typename OtherDerived::Coefficients> be(_b.coeffs());
 
-  const double* a = _a.coeffs().data();
+  const double* a_m_per_s = _a.coeffs().data();
   Packet2d b_xy = be.template packet<BAlignment,Packet2d>(0);
   Packet2d b_zw = be.template packet<BAlignment,Packet2d>(2);
-  Packet2d a_xx = pset1<Packet2d>(a[0]);
-  Packet2d a_yy = pset1<Packet2d>(a[1]);
-  Packet2d a_zz = pset1<Packet2d>(a[2]);
-  Packet2d a_ww = pset1<Packet2d>(a[3]);
+  Packet2d a_xx = pset1<Packet2d>(a_m_per_s[0]);
+  Packet2d a_yy = pset1<Packet2d>(a_m_per_s[1]);
+  Packet2d a_zz = pset1<Packet2d>(a_m_per_s[2]);
+  Packet2d a_ww = pset1<Packet2d>(a_m_per_s[3]);
 
   // two temporaries:
   Packet2d t1, t2;

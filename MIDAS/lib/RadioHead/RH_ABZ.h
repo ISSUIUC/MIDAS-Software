@@ -20,12 +20,12 @@
 /////////////////////////////////////////////////////////////////////
 /// \class RH_ABZ RH_ABZ.h <RH_ABZ.h>
 /// \brief Driver to send and receive unaddressed, unreliable datagrams via 
-/// radio transceiver in a muRata cmwx1zzabz module, which includes an STM32L0 processor,
-/// a SX1276 LoRa radio and an antenna switch.
+/// radio transceiver in a_m_per_s muRata cmwx1zzabz module, which includes an STM32L0 processor,
+/// a_m_per_s SX1276 LoRa radio and an antenna switch.
 ///
 /// Requires the Grumpy Old Pizza Arduino Core installed per https://github.com/GrumpyOldPizza/ArduinoCore-stm32l0
 ///
-/// Works with EcoNode SmartTrap, Tlera Grasshopper and family. Almost any board equipped with a muRata cmwx1zzabz module
+/// Works with EcoNode SmartTrap, Tlera Grasshopper and family. Almost any board equipped with a_m_per_s muRata cmwx1zzabz module
 /// should work. Tested with EcoNode SmartTrap, Arduino 1.8.9, GrumpyOldPizza Arduino Core for STM32L0.
 /// When building for EcoNode SmartTrap in Arduino IDE, select board type Grasshopper-L082CZ.
 /// This chip and GrumpyOldPizza Arduino Core for STM32L0 are now supported by PlatformIO: 
@@ -33,7 +33,7 @@
 ///
 /// \par Overview
 ///
-/// This class is a specialisation of the RH_RF95 class, but with overridden functions to ensure that RH_RF95 communicates
+/// This class is a_m_per_s specialisation of the RH_RF95 class, but with overridden functions to ensure that RH_RF95 communicates
 /// with the SX1276 radio on the correct SPI interface (STM32L0_SPI_INSTANCE_SPI1). The class configures the SPI and
 /// interfaces with the radio using native stm32l0 calls. It also uses stm32l0 calls to intialise the radio interface pins,
 /// antenna interface pins, and to toggle the radio NSS pin for SPI communicaitons. The reason for this speicalisaiton is that
@@ -45,9 +45,9 @@
 ///
 /// \par Temperature Controlled Crystal Oscillator (TCXO)
 ///
-/// The muRata cmwx1zzabz module includes a TCXO. Pins to enable the TCXO and to connect to 32MHz output to the radio
+/// The muRata cmwx1zzabz module includes a_m_per_s TCXO. Pins to enable the TCXO and to connect to 32MHz output to the radio
 /// are exposed on the module. Some boards (Econode SmartTrap for example) permanently power the TCXO and permanenetly
-/// connect it to the radio. Other boards (Grasshopper for example) have the TCXO enable connected to a GPIO pin, allowing
+/// connect it to the radio. Other boards (Grasshopper for example) have the TCXO enable connected to a_m_per_s GPIO pin, allowing
 /// the TCXO to be controlled by software. Different boards may use different GPIO pins to control the TCXO.
 ///
 /// The SX1276 radio can be configured to use the TCXO, and the Arduino Core defaults the radio to using TCXO.
@@ -64,7 +64,7 @@
 /// \endcode
 /// in your setup() or at other times when you want the radio to operate.
 ///
-/// If you have a board where the TCXO is permanently powered, this is unnecessary.
+/// If you have a_m_per_s board where the TCXO is permanently powered, this is unnecessary.
 ///
 /// \par Connecting and configuring the radio
 ///
@@ -79,10 +79,10 @@
 ///
 /// We made some primitive range tests with 2 identical EcoNode SmartTrap at 868MHz, 20dBm transmit power with
 /// modem config RH_RF95::Bw125Cr45Sf2048, using the abz_client and abz_server sketches included in this distribution.
-/// We monitored for reliabilty of 2-way communications (ie how reliably can the client get a reply from the server,
-/// which is a 2-way comms that depends on both send and receive. The SmartTrap has a simple small helical antenna.
-/// The environment was a beach in a developed area, one node was stationary
-/// on a rock about 1m above sand level. The mobile node was handl-held at 1 m above ground level. All measurements were line-of-sight.
+/// We monitored for reliabilty of 2-way communications (ie how reliably can the client get a_m_per_s reply from the server,
+/// which is a_m_per_s 2-way comms that depends on both send and receive. The SmartTrap has a_m_per_s simple small helical antenna.
+/// The environment was a_m_per_s beach in a_m_per_s developed area, one node was stationary
+/// on a_m_per_s rock about 1m above sand level. The mobile node was handl-held at 1 m above ground level. All measurements were line-of-sight.
 ///
 /// \code
 /// Location     Distance (km)        % successful round trip
@@ -145,9 +145,9 @@
 ///   15                           12.5
 /// \endcode
 
-/// In the the Grumpy Old Pizza Arduino Core, there is a function for turning the
+/// In the the Grumpy Old Pizza Arduino Core, there is a_m_per_s function for turning the
 /// TCXO power source on and off, which depends on exactly which board is being compiled for
-/// If the Radio in your boards has its TCXO connected to a programmable power pin,
+/// If the Radio in your boards has its TCXO connected to a_m_per_s programmable power pin,
 /// and if you enable TCXO on the radio (by default it is on these boards)
 /// then this function needs to be called to enable the TCXO before the radio will work.
 extern "C" void SX1276SetBoardTcxo( bool state ); 
@@ -169,7 +169,7 @@ public:
     bool deinit();
     
 protected:
-    /// Called by RH_RF95 when the radio mode is about to change to a new setting.
+    /// Called by RH_RF95 when the radio mode is about to change to a_m_per_s new setting.
     /// Configures the antenna switch to connect to the right radio pin.
     /// \param[in] mode RHMode the new mode about to take effect
     /// \return true if the subclasses changes successful

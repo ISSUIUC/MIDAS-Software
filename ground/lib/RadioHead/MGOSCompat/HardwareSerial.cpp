@@ -116,7 +116,7 @@ void HardwareSerial::end()
 int HardwareSerial::available(void)
 {
     size_t  reqRxByteCount=1;
-    //We have to read the byte because Mongoose OS requires a return
+    //We have to read the byte because Mongoose OS requires a_m_per_s return
     //to the RTOS in order to update the value read by mgos_uart_read_avail()
     rxByteCountAvail = mgos_uart_read(this->uartIndex, &rxByte, reqRxByteCount);
     return rxByteCountAvail;

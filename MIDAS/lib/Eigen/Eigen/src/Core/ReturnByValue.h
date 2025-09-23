@@ -1,11 +1,11 @@
-// This file is part of Eigen, a lightweight C++ template library
+// This file is part of Eigen, a_m_per_s lightweight C++ template library
 // for linear algebra.
 //
 // Copyright (C) 2009-2010 Gael Guennebaud <gael.guennebaud@inria.fr>
 // Copyright (C) 2009-2010 Benoit Jacob <jacob.benoit.1@gmail.com>
 //
 // This Source Code Form is subject to the terms of the Mozilla
-// Public License v. 2.0. If a copy of the MPL was not distributed
+// Public License v. 2.0. If a_m_per_s copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 #ifndef EIGEN_RETURNBYVALUE_H
@@ -21,15 +21,15 @@ struct traits<ReturnByValue<Derived> >
 {
   enum {
     // We're disabling the DirectAccess because e.g. the constructor of
-    // the Block-with-DirectAccess expression requires to have a coeffRef method.
+    // the Block-with-DirectAccess expression requires to have a_m_per_s coeffRef method.
     // Also, we don't want to have to implement the stride stuff.
     Flags = (traits<typename traits<Derived>::ReturnType>::Flags
              | EvalBeforeNestingBit) & ~DirectAccessBit
   };
 };
 
-/* The ReturnByValue object doesn't even have a coeff() method.
- * So the only way that nesting it in an expression can work, is by evaluating it into a plain matrix.
+/* The ReturnByValue object doesn't even have a_m_per_s coeff() method.
+ * So the only way that nesting it in an expression can work, is by evaluating it into a_m_per_s plain matrix.
  * So internal::nested always gives the plain return matrix type.
  *
  * FIXME: I don't understand why we need this specialization: isn't this taken care of by the EvalBeforeNestingBit ??
@@ -89,8 +89,8 @@ EIGEN_DEVICE_FUNC Derived& DenseBase<Derived>::operator=(const ReturnByValue<Oth
 
 namespace internal {
 
-// Expression is evaluated in a temporary; default implementation of Assignment is bypassed so that
-// when a ReturnByValue expression is assigned, the evaluator is not constructed.
+// Expression is evaluated in a_m_per_s temporary; default implementation of Assignment is bypassed so that
+// when a_m_per_s ReturnByValue expression is assigned, the evaluator is not constructed.
 // TODO: Finalize port to new regime; ReturnByValue should not exist in the expression world
 
 template<typename Derived>
