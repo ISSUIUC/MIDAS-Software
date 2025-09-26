@@ -1,5 +1,11 @@
 #pragma once
 
+// FSM Threshold file: This file stores all values referenced by the MIDAS FSM in ./fsm.cpp
+// Tags: @SDA and @REC tags indicate that these values are of interest to these teams, and may optionally include a note.
+// (Core Setting) -- This is a value that is set by general flight profiles and should not change based solely on new flight profiles
+// (Flight Parameter) -- This is a value that is expected to change between every flight.
+// (UNUSED) -- This value is not referenced in the MIDAS FSM and may be deleted
+
 // ----------------------------------
 // SAFETY THRESHOLDS
 // ----------------------------------
