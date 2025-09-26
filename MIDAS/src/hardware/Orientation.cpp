@@ -6,9 +6,9 @@
 
 // global static instance of the sensor
 Adafruit_BNO08x imu(BNO086_RESET);
-#define REPORT_INTERVAL_US 5000
-// 25 ms
-#define REPORT_INTERVAL_US_AV 100000
+#define REPORT_INTERVAL_US 10000
+// 50 ms
+#define REPORT_INTERVAL_US_AV 50000
 unsigned long lastTime = 0;
 float deltaTime = 0;
 
