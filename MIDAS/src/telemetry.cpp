@@ -119,7 +119,8 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     uint8_t sat_count = gps.fix_type;
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
     float kf_vx_clamped = std::clamp(kalman.velocity.vx, -2000.f, 2000.f);
-    packet.kf_vx = (uint16_t) ((kf_vx_clamped + 2000) / 4000. * ((1 << 16) - 1));
+    // freaky
+    packet.kf_vx = (uint16_t) ((kf_vx_clamped + 2000.f) / 4000.f * ((1 << 16) - 1));
 
     #ifdef IS_SUSTAINER
     packet.fsm_callsign_satcount |= (1 << 7);
