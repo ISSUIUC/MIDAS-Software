@@ -310,7 +310,11 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
 
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
+    double last_ble_advert = 0;
     bool has_triggered_vmux_fallback = false;
+
+    MIDASBLE ble;
+    ble.set_advertising(true);
 
     arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true) {
@@ -319,6 +323,15 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+
+        if (current_state == FSMState::STATE_SAFE) {
+            if(current_time - last_ble_advert > 1000) {
+                ble.update_char_data(arg->rocket_data);
+            }
+            ble.set_advertising(true);
+        } else {
+            ble.set_advertising(false);
+        }
 
         // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
         if (current_state <= FSMState::STATE_IDLE) {
