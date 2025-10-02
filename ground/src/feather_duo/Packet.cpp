@@ -60,3 +60,46 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
 
     return data;
 }
+
+DecodedGNCData DecodePacketGNC(const GNCTelemData& packet, float frequency) {
+    int64_t start_printing = millis();
+    DecodedGNCData data;
+
+    data.k_pos_x = convert_range<int16_t>(packet.k_pos_x, 10000);
+    data.k_pos_y = convert_range<int16_t>(packet.k_pos_y, 10000);
+    data.k_pos_z = convert_range<int16_t>(packet.k_pos_z, 10000);
+
+    data.k_vel_x = convert_range<int16_t>(packet.k_vel_x, 1000);
+    data.k_vel_y = convert_range<int16_t>(packet.k_vel_y, 1000);
+    data.k_vel_z = convert_range<int16_t>(packet.k_vel_z, 1000);
+
+    data.k_acc_x = convert_range<int16_t>(packet.k_acc_x, 1000);
+    data.k_acc_y = convert_range<int16_t>(packet.k_acc_y, 1000);
+    data.k_acc_z = convert_range<int16_t>(packet.k_acc_z, 1000);
+
+    data.k_altitude = convert_range<int16_t>(packet.k_altitude, 10000);
+
+    // Decode sensor readings
+    data.r_ax = convert_range<int16_t>(packet.r_ax, 32);
+    data.r_ay = convert_range<int16_t>(packet.r_ay, 32);
+    data.r_az = convert_range<int16_t>(packet.r_az, 32);
+
+    data.r_pitch = convert_range<int16_t>(packet.r_pitch, 100);
+    data.r_roll = convert_range<int16_t>(packet.r_roll, 100);
+    data.r_yaw = convert_range<int16_t>(packet.r_yaw, 100);
+
+    data.r_tilt = packet.r_tilt;
+
+    data.kf_reset = (packet.fsm_callsign_ack >> 4) & 1;
+    data.FSM_State = packet.fsm_callsign_ack & 0b1111;
+    data.is_sustainer = (packet.fsm_callsign_ack >> 5);
+
+
+    if (packet.fsm_callsign_ack == static_cast<uint8_t>(-1)) {
+        data.FSM_State = static_cast<uint8_t>(-1);
+    }
+
+    data.freq = frequency;
+
+    return data;
+}

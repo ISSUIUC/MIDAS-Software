@@ -91,3 +91,57 @@ void printPacketJson(FullTelemetryData const& packet) {
     // printJSONField("pyro_d", packet.pyros[3], false);
     // Serial.println("}}");
 }
+
+void printPacketJsonGNC(DecodedGNCData const& packet) {
+
+    bool is_heartbeat = packet.FSM_State == static_cast<uint8_t>(-1);
+    char buff[1024]{};
+    int len = sprintf(buff, R"({"type": "data", "value": {"kf_px": %f, "kf_py": %f, "kf_pz": %f, "kf_vx": %f, "kf_vy": %f, "kf_vz": %f, "kf_ax": %f, "kf_ay": %f, "kf_az": %f, "kf_alt": %f, "frequency": %f, "r_ax": %f, "r_ay": %f, "r_az": %f, "r_pitch": %f, "r_roll": %f, "r_yaw": %f, "r_tilt": %f, "FSM_State": %i, "is_sustainer": %i, "kf_reset": %i}})",
+    packet.k_pos_x,
+    packet.k_pos_y,
+    packet.k_pos_z,
+    packet.k_vel_x,
+    packet.k_vel_y,
+    packet.k_vel_z,
+    packet.k_acc_x,
+    packet.k_acc_y,
+    packet.k_acc_z,
+    packet.k_altitude,
+    packet.freq,
+    packet.r_ax,
+    packet.r_ay,
+    packet.r_az,
+    packet.r_pitch,
+    packet.r_roll,
+    packet.r_yaw,
+    packet.r_tilt,
+    packet.FSM_State,
+    packet.is_sustainer,
+    packet.kf_reset
+    );
+    Serial.println(buff);
+    // Serial.print(R"({"type": ")");
+    // Serial.print(is_heartbeat ? "heartbeat" : "data");
+    // Serial.print(R"(", "value": {)");
+    // printJSONField("barometer_altitude", packet.barometer_altitude);
+    // printJSONField("latitude", packet.latitude);
+    // printJSONField("longitude", packet.longitude);
+    // printJSONField("altitude", packet.altitude);
+    // printJSONField("highG_ax", packet.highG_ax);
+    // printJSONField("highG_ay", packet.highG_ay);
+    // printJSONField("highG_az", packet.highG_az);
+    // printJSONField("battery_voltage", packet.battery_voltage);
+    // printJSONField("FSM_State", packet.FSM_State);
+    // printJSONField("tilt_angle", packet.tilt_angle);
+    // printJSONField("frequency", packet.freq);
+    // printJSONField("RSSI", packet.rssi);
+    // printJSONField("sat_count", packet.sat_count);
+    // printJSONField("kf_velocity", packet.kf_vx);
+    // printJSONField("is_sustainer", packet.is_sustainer);
+    // printJSONField("pyro_a", packet.pyros[0]);
+    // printJSONField("pyro_b", packet.pyros[1]);
+    // printJSONField("pyro_c", packet.pyros[2]);
+    // printJSONField("kf_reset", packet.kf_reset);
+    // printJSONField("pyro_d", packet.pyros[3], false);
+    // Serial.println("}}");
+}

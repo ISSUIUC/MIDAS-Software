@@ -26,6 +26,11 @@
 #define TX_FREQ 421.15
 #endif
 
+#ifdef GNC_DATA
+#undef TX_FREQ
+#define TX_FREQ 423.00
+#endif
+
 #define TX_OUTPUT_POWER 22		// dBm
 #define LORA_BANDWIDTH 0		// [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
 #define LORA_SPREADING_FACTOR 8// [SF7..SF12]
@@ -54,6 +59,7 @@ ErrorCode TelemetryBackend::init() {
     if(lora.set_modulation_params(8, LORA_BW_250, LORA_CR_4_8, false) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
 	if(lora.set_frequency((uint32_t) (TX_FREQ * 1e6)) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
 	if(lora.set_tx_power(22) != SX1268Error::NoError) return ErrorCode::LoraCommunicationFailed;
+
 
     return ErrorCode::NoError;
 }

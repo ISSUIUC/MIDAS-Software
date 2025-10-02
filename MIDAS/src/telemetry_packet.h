@@ -8,6 +8,7 @@
  * 
  * @brief format of the telemetry packet
 */
+#ifndef GNC_DATA
 struct TelemetryPacket {
     int32_t lat;
     int32_t lon;
@@ -26,6 +27,7 @@ struct TelemetryPacket {
     uint16_t kf_vx; // 16 bit meters/second
     uint32_t pyro; // 7 bit continuity 4 bit tilt
 };
+#endif
 
 
 // Commands transmitted from ground station to rocket
@@ -44,3 +46,33 @@ struct TelemetryCommand {
         return verify == std::array<char, 3>{{'B','R','K'}};
     }
 };
+
+#ifdef GNC_DATA
+struct TelemetryPacket {
+    // Stores kalman data
+    uint16_t k_pos_x;
+    uint16_t k_pos_y;
+    uint16_t k_pos_z;
+    uint16_t k_vel_x;
+    uint16_t k_vel_y;
+    uint16_t k_vel_z;
+    uint16_t k_acc_x;
+    uint16_t k_acc_y;
+    uint16_t k_acc_z;
+    uint16_t k_altitude;
+
+    // Raw sensor readings which are relevant
+    uint16_t r_ax; 
+    uint16_t r_ay; 
+    uint16_t r_az;
+
+    uint16_t r_pitch;
+    uint16_t r_roll;
+    uint16_t r_yaw;
+
+    uint16_t r_tilt;
+
+    // Other
+    uint8_t fsm_callsign_ack; // 4 bit fsm state, 1 bit is_sustainer, 1 bit ack, 2 unused.
+};
+#endif

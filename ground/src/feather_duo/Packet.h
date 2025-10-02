@@ -44,4 +44,64 @@ struct FullTelemetryData {
     bool kf_reset;
 };
 
+struct GNCTelemData {
+    // Stores kalman data
+    uint16_t k_pos_x;
+    uint16_t k_pos_y;
+    uint16_t k_pos_z;
+    uint16_t k_vel_x;
+    uint16_t k_vel_y;
+    uint16_t k_vel_z;
+    uint16_t k_acc_x;
+    uint16_t k_acc_y;
+    uint16_t k_acc_z;
+    uint16_t k_altitude;
+
+    // Raw sensor readings which are relevant
+    uint16_t r_ax; 
+    uint16_t r_ay; 
+    uint16_t r_az;
+
+    uint16_t r_pitch;
+    uint16_t r_roll;
+    uint16_t r_yaw;
+
+    uint16_t r_tilt;
+
+    // Other
+    uint8_t fsm_callsign_ack; // 4 bit fsm state, 1 bit is_sustainer, 1 bit ack, 2 unused.
+};
+
+struct DecodedGNCData {
+    float k_pos_x;
+    float k_pos_y;
+    float k_pos_z;
+    float k_vel_x;
+    float k_vel_y;
+    float k_vel_z;
+    float k_acc_x;
+    float k_acc_y;
+    float k_acc_z;
+    float k_altitude;
+
+    // Raw sensor readings which are relevant
+    float r_ax; 
+    float r_ay; 
+    float r_az;
+
+    float r_pitch;
+    float r_roll;
+    float r_yaw;
+
+    float r_tilt;
+
+    // Other
+    bool is_sustainer;
+    uint8_t FSM_State; // [0, 255]
+    bool kf_reset;    
+    float freq;
+    float rssi;
+};
+
 FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency);
+DecodedGNCData DecodePacketGNC(const GNCTelemData& packet, float frequency);

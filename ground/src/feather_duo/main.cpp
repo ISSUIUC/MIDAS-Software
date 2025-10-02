@@ -10,6 +10,7 @@
 
 constexpr uint32_t BOOSTER_FREQ = 425150000;
 constexpr uint32_t SUSTAINER_FREQ = 421150000;
+constexpr uint32_t GNC_FREQ = 423000000;
 Queue<TelemetryCommand> booster_cmds;
 Queue<TelemetryCommand> sustainer_cmds;
 
@@ -47,8 +48,11 @@ void Radio_Rx_Thread(void * arg) {
     to_send.command = CommandType::EMPTY;
 
     while(true) {
+        #ifndef GNC_DATA
         TelemetryPacket packet{};
         SX1268Error res = cfg->radio->recv((uint8_t*)&packet, sizeof(packet), -1);
+
+        
         if(res == SX1268Error::NoError) {
             led_state = !led_state;
             digitalWrite(cfg->indicator_led, led_state);
@@ -78,6 +82,41 @@ void Radio_Rx_Thread(void * arg) {
                 Serial.println(json_command_sent);
             }
         }
+        #else
+        GNCTelemData packet{};
+        SX1268Error res = cfg->radio->recv((uint8_t*)&packet, sizeof(packet), -1);
+
+        
+        if(res == SX1268Error::NoError) {
+            led_state = !led_state;
+            digitalWrite(cfg->indicator_led, led_state);
+            DecodedGNCData data = DecodePacketGNC(packet, cfg->frequency / 1e6);
+            data.rssi = cfg->radio->get_last_snr();
+            printPacketJsonGNC(data);
+
+            if(initial_ack_flag) {
+                reset_state = data.kf_reset;
+                initial_ack_flag = false;
+            }
+
+            if(data.kf_reset != reset_state) {
+                reset_state = data.kf_reset;
+                Serial.println(json_command_ack);
+                to_send.command = CommandType::EMPTY;
+            }
+
+            if(to_send.command == CommandType::EMPTY) {
+                if(!cfg->cmd_queue->receive(&to_send)){
+                    to_send.command = CommandType::EMPTY;
+                }
+            }
+
+            if(to_send.command != CommandType::EMPTY) {
+                (void)cfg->radio->send((uint8_t*)&to_send, sizeof(to_send));
+                Serial.println(json_command_sent);
+            }
+        }
+        #endif
     }
 }
 
@@ -190,7 +229,11 @@ void setup() {
     SPI1.begin(Pins::SPI_SCK_1, Pins::SPI_MISO_1, Pins::SPI_MOSI_1);
     
     if(!init_radio(Radio0, BOOSTER_FREQ)) Serial.println(json_init_failure);
+    #ifdef GNC_DATA
+    if(!init_radio(Radio1, GNC_FREQ)) Serial.println(json_init_failure);
+    #else
     if(!init_radio(Radio1, SUSTAINER_FREQ)) Serial.println(json_init_failure);
+    #endif
     Serial.println(json_init_success);
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
@@ -204,6 +247,15 @@ void setup() {
         .indicator_led=Pins::LED_ORANGE,
     };
 
+    #ifdef GNC_DATA
+    RadioConfig sustainer_cfg{
+        .radio=&Radio1,
+        .cmd_queue=&sustainer_cmds,
+        .frequency=GNC_FREQ,
+        .stage=Stage::Sustainer,
+        .indicator_led=Pins::LED_BLUE,
+    };
+    #else
     RadioConfig sustainer_cfg{
         .radio=&Radio1,
         .cmd_queue=&sustainer_cmds,
@@ -211,6 +263,7 @@ void setup() {
         .stage=Stage::Sustainer,
         .indicator_led=Pins::LED_BLUE,
     };
+    #endif
 
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);

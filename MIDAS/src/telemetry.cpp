@@ -78,6 +78,7 @@ void Telemetry::acknowledgeReceived() {
  * 
  * @param data the data to serialize into a packet
 */
+#ifndef GNC_DATA
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
@@ -127,6 +128,51 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     return packet;
 }
+#endif
+
+#ifdef GNC_DATA
+TelemetryPacket Telemetry::makePacket(RocketData& data) {
+
+    TelemetryPacket packet { };
+    FSMState fsm = data.fsm_state.getRecentUnsync();
+    HighGData highg = data.high_g.getRecentUnsync();
+    Orientation orientation = data.orientation.getRecentUnsync();
+    KalmanData kalman = data.kalman.getRecentUnsync();
+
+    packet.k_pos_x = (uint16_t)inv_convert_range<int16_t>(kalman.position.px, 10000);
+    packet.k_pos_y = (uint16_t)inv_convert_range<int16_t>(kalman.position.py, 10000);
+    packet.k_pos_z = (uint16_t)inv_convert_range<int16_t>(kalman.position.pz, 10000);
+
+    packet.k_vel_x = (uint16_t)inv_convert_range<int16_t>(kalman.velocity.vx, 1000);
+    packet.k_vel_y = (uint16_t)inv_convert_range<int16_t>(kalman.velocity.vy, 1000);
+    packet.k_vel_z = (uint16_t)inv_convert_range<int16_t>(kalman.velocity.vz, 1000);
+
+    packet.k_acc_x = (uint16_t)inv_convert_range<int16_t>(kalman.acceleration.ax, 1000);
+    packet.k_acc_y = (uint16_t)inv_convert_range<int16_t>(kalman.acceleration.ay, 1000);
+    packet.k_acc_z = (uint16_t)inv_convert_range<int16_t>(kalman.acceleration.az, 1000);
+    
+    packet.k_altitude = (uint16_t)inv_convert_range<int16_t>(kalman.altitude, 10000);
+
+    // Sensor readings
+    packet.r_ax = (uint16_t) inv_convert_range<int16_t>(highg.ax, 32);
+    packet.r_ay = (uint16_t) inv_convert_range<int16_t>(highg.ay, 32);
+    packet.r_az = (uint16_t) inv_convert_range<int16_t>(highg.az, 32);
+
+    packet.r_pitch = (uint16_t) inv_convert_range<int16_t>(orientation.pitch, 100);
+    packet.r_roll = (uint16_t) inv_convert_range<int16_t>(orientation.roll, 100);
+    packet.r_yaw = (uint16_t) inv_convert_range<int16_t>(orientation.yaw, 100);
+
+    packet.r_tilt = (uint16_t) map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023);
+
+    packet.fsm_callsign_ack = ((uint8_t)fsm) | ((received_count & 0x0001) << 4);
+
+    #ifdef IS_SUSTAINER
+    packet.fsm_callsign_ack |= (1 << 5);
+    #endif
+
+    return packet;
+}
+#endif
 
 /**
  * @brief initializes the Telemetry system
