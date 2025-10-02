@@ -177,6 +177,10 @@ void EKF::initialize(RocketSystems *args)
     x_k(3, 0) = 0;
     x_k(6, 0) = 0;
 
+    x_k(1,0) = 0;
+    x_k(4,0) = 0;
+    x_k(7,0) = 0;
+
     F_mat.setZero(); // Initialize with zeros
 
     Q(0, 0) = pow(s_dt, 5) / 20;
@@ -402,7 +406,8 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
 
     (accel)(0, 0) = acceleration.az - 0.045;
     (accel)(1, 0) = acceleration.ay - 0.065;
-    (accel)(2, 0) = -acceleration.ax - 0.06;
+    // (accel)(2, 0) = -acceleration.ax - 0.06;
+    (accel)(2, 0) = acceleration.ax;
 
     euler_t angles = orientation.getEuler();
     angles.yaw = -angles.yaw;
