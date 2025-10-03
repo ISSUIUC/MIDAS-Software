@@ -37,7 +37,7 @@
 // @SDA: This value should be a reasonable lower bound experienced by the vehicle during the sustainer stage boost.
 //       Given values should err on the lower side if possible, but should never be below 2
 // (Flight Parameter)
-#define sustainer_ignition_to_second_boost_acceleration_threshold 3
+#define sustainer_ignition_to_second_boost_acceleration_threshold 8
 
 // Return state to SECOND_BOOST if not boosting for this amount of time (ms)
 // Note: This number should be as low as possible without causing false positives. Ultra-short boosts may break this value
@@ -78,7 +78,7 @@
 // @REC: MIDAS does not currently auto-calculate launch site altitudes. 
 //       This value should always be set at (launch site ASL) + (desired altitude AGL)
 // (Flight Parameter)
-#define sustainer_main_deploy_altitude_threshold 1350
+#define sustainer_main_deploy_altitude_threshold 545 // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED
 
 // The minimum delay between drogue deployment and main deployment (ms)
 // @REC: This is a safety feature to prevent overpressurization or internal firing, and forces MAIN_DEPLOY to wait at least this much time,
@@ -102,7 +102,7 @@
 // Return state to FIRST_BOOST if not in BURNOUT for this amount of time (ms)
 // @SDA: This is the amount of time the sustainer should coast before attempting a second stage ignition
 // (Flight Parameter)
-#define sustainer_coast_time 8000
+#define sustainer_coast_time 3000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
 // @REC: This number should be below the MINIMUM descent velocity of the vehicle with significant margin.
@@ -112,7 +112,7 @@
 // Transition back to MAIN if vertical speed is greater than this threshold (m/s)
 // @REC: This number should be below the MINIMUM descent velocity of the vehicle with significant margin.
 // (Flight Parameter)
-#define sustainer_landed_to_main_vertical_speed_threshold 5
+#define sustainer_landed_to_main_vertical_speed_threshold 3 // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 // (Core Setting)
@@ -185,7 +185,7 @@
 //       This value should always be set at (launch site ASL) + (desired altitude AGL)
 // (Flight Parameter)
 // [STARGAZER 1.4] This is a "dontcare" value --> The booster does not have a drogue, we transition immediately to MAIN
-#define booster_main_deploy_altitude_threshold 999999
+#define booster_main_deploy_altitude_threshold 545 // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED
 
 // The minimum delay between drogue deployment and main deployment (ms)
 // @REC: This is a safety feature to prevent overpressurization or internal firing, and forces MAIN_DEPLOY to wait at least this much time,
@@ -208,7 +208,7 @@
 // Amount of time after booster burn that the stage separation event should trigger (ms)
 // @SDA
 // (Flight parameter)
-#define booster_first_boost_to_burnout_time_threshold 1500
+#define booster_first_boost_to_burnout_time_threshold 1000
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
 // @REC: This number should be below the MINIMUM descent velocity of the vehicle with significant margin.
