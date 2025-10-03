@@ -377,15 +377,16 @@ DECLARE_THREAD(esp_now, RocketSystems *arg)
     {
         GpsData to_send{};
         // Important set long, lat to current position of Sam Turret before launch
-        GPS my_gps = GPS{353501160, -1178017930, 640, 0, 0, 0};
+        // GPS my_gps = GPS{353501160, -1178017930, 640, 0, 0, 0};
+        GPS my_gps = GPS{0, 0, 0, 0, 0, 0};
         // GPS my_gps = arg->rocket_data.gps.getRecent();
         // GPS rocket_gps = arg->rocket_data.rocket_gps.getRecent();
         
-        GPS rocket_gps = GPS{arg->rocket_data.rocket_gps.getRecent().latitude*1e7,arg->rocket_data.rocket_gps.getRecent().longitude*1e7,arg->rocket_data.rocket_gps.getRecent().altitude, 0, 0, 0}; // Example GPS coordinates for the rocket East
+        GPS rocket_gps = GPS{arg->rocket_data.rocket_gps.getRecent().latitude,arg->rocket_data.rocket_gps.getRecent().longitude,arg->rocket_data.rocket_gps.getRecent().altitude, 0, 0, 0}; // Example GPS coordinates for the rocket East
         // GPS rocket_gps = GPS{353478930, -1178093950, 100000, 0, 0, 0};
-        Serial.println(arg->rocket_data.rocket_gps.getRecent().latitude);
-        Serial.println(arg->rocket_data.rocket_gps.getRecent().longitude);
         // Serial.println(arg->rocket_data.rocket_gps.getRecent().latitude);
+        // Serial.println(arg->rocket_data.rocket_gps.getRecent().longitude);
+        // Serial.println(arg->rocket_data.rocket_gps.getRecent().altitude);
 
         // Serial.println(rocket_gps.longitude);
         /*Debugging Stuff*/
@@ -433,21 +434,23 @@ DECLARE_THREAD(esp_now, RocketSystems *arg)
                 mode = 1;
             }
         } 
+
         to_send.my_alt = my_gps.altitude;
-        to_send.my_lat = static_cast<float>(my_gps.latitude * 1.0e-7);
-        to_send.my_lon = static_cast<float>(my_gps.longitude * 1.0e-7);
+        to_send.my_lat = static_cast<float>(my_gps.latitude) * 1.0e-7;
+        to_send.my_lon = static_cast<float>(my_gps.longitude) * 1.0e-7;
         to_send.my_pitch = manual_pitch;
         to_send.my_yaw = manual_yaw;
         // to_send.my_pitch = atan2(lowg.ay, -lowg.ax);
         // to_send.my_yaw = atan2(lowg.az, lowg.ay);
         to_send.rocket_alt = rocket_gps.altitude;
-        to_send.rocket_lat = static_cast<float>(rocket_gps.latitude * 1.0e-7);
-        to_send.rocket_lon = static_cast<float>(rocket_gps.longitude * 1.0e-7);
+        to_send.rocket_lat = static_cast<float>(rocket_gps.latitude) * 1.0e-7;
+        to_send.rocket_lon = static_cast<float>(rocket_gps.longitude) * 1.0e-7;
+
 
         // Serial.println(to_send.rocket_lat,7);
         // Serial.println(to_send.rocket_lon,7);
         to_send.mode = mode;
-
+        
         esp_err_t result = esp_now_send(broadcastAddress, (uint8_t *)&to_send, sizeof(to_send));
         if (result == ESP_OK)
         {
@@ -504,8 +507,8 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
         if (arg->tlm.receive(&packet, 2000))
         {
             GPS gps_data;
-            gps_data.latitude = packet.lat * 1.0e-7;
-            gps_data.longitude = packet.lon * 1.0e-7;
+            gps_data.latitude = packet.lat;
+            gps_data.longitude = packet.lon;
             gps_data.altitude = packet.alt;
             arg->rocket_data.rocket_gps.update(gps_data);
         }
