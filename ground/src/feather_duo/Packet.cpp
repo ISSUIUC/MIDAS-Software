@@ -37,7 +37,7 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     // Tilt & FSM
     constexpr int tilt_bit_size = 12; // Number of bits that tilt is encoded as
     data.tilt_angle = ((packet.tilt_fsm >> 4) / (float)(1 << tilt_bit_size)) * 180;
-    data.FSM_State = packet.tilt_fsm * 0x000f;
+    data.FSM_State = packet.tilt_fsm & 0x000f;
 
     // Acceleration
     int16_t ax = packet.highg_ax;
@@ -50,9 +50,9 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
 
     // Other data
     data.battery_voltage = convert_range(packet.batt_volt, MAX_TELEM_VOLTAGE_V);
-    data.sat_count = packet.callsign_gpsfix_satcount >> 4 & 0b0111;
+    data.gps_fixtype = packet.callsign_gpsfix_satcount >> 1 & 0b0111;
     data.is_sustainer = (packet.callsign_gpsfix_satcount & 0b1);
-    data.FSM_State = packet.callsign_gpsfix_satcount & 0b1111;
+    data.sat_count = (packet.callsign_gpsfix_satcount >> 4) & 0b1111;
 
     //Pyros
     data.pyros[0] = (packet.pyro >> 0) & (0x7F);

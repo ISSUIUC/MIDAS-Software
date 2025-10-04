@@ -36,7 +36,6 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 }
 
 void printPacketJson(FullTelemetryData const& packet) {
-
     bool is_heartbeat = packet.FSM_State == static_cast<uint8_t>(-1);
     char buff[1024]{};
     int len = sprintf(buff, R"({"type": "data", "value": {"barometer_altitude": %f, "latitude": %f, "longitude": %f, "altitude": %i, "highG_ax": %f, "highG_ay": %f, "highG_az": %f, "battery_voltage": %f, "FSM_State": %i, "tilt_angle": %f, "frequency": %f, "RSSI": %f, "sat_count": %f, "kf_velocity": %f, "kf_position": %f, "is_sustainer": %i, "roll_rate": %f, "c_valid": %u, "c_on": %u, "c_rec": %u, "vtx_on": %u, "vmux_stat": %u, "cam_ack": %u, "cmd_ack": %i, "gps_fixtype": %i, "pyro_a": %f, "pyro_b": %f, "pyro_c": %f, "pyro_d": %f}})",
