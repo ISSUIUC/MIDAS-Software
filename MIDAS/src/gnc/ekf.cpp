@@ -182,7 +182,61 @@ void EKF::initialize(RocketSystems *args)
     x_k(7,0) = 0;
 
     F_mat.setZero(); // Initialize with zeros
+    // making some changes to the Q Matrix....
+    
+    Q(0, 0) = pow(s_dt, 5) / 20;
+    Q(0, 1) = pow(s_dt, 4) / 8;
+    Q(0, 2) = pow(s_dt, 3) / 6;
+    Q(1, 0) = pow(s_dt, 4) / 8;
+    Q(1,1) = pow(s_dt, 3)  / 3;
+    Q(1, 2) = pow(s_dt, 2) / 2;
+    Q(2,0) = Q(0,2);
+    Q(2, 1) = Q(1, 2);
+    Q(2, 2) = s_dt;
+    //Q(1, 0) = Q(0, 1);
+    //Q(2, 0) = Q(0, 2);
+    
 
+    //Q(3, 3) = pow(s_dt, 5) / 20;
+    //Q(3, 4) = pow(s_dt, 4) / 8;
+    //Q(3, 5) = pow(s_dt, 3) / 6;
+    //Q(4, 4) = pow(s_dt, 3) / 8;
+    //Q(4, 5) = pow(s_dt, 2) / 2;
+    //Q(5, 5) = s_dt;
+    //Q(4, 3) = Q(3, 4);
+    //Q(5, 3) = Q(3, 5);
+    //Q(5, 4) = Q(4, 5);
+
+    Q(3, 3) = pow(s_dt, 5) / 20;
+    Q(3, 4) = pow(s_dt, 4) / 8;
+    Q(3, 5) = pow(s_dt, 3) / 6;
+    Q(4, 3) = pow(s_dt, 4) / 8;
+    Q(4,4) = pow(s_dt, 3)  / 3;
+    Q(4,5) = pow(s_dt, 2) / 2;
+    Q(5,3) = Q(0,2);
+    Q(5, 4) = Q(1, 2);
+    Q(5, 5) = s_dt;
+
+    //Q(6, 6) = pow(s_dt, 5) / 20;
+    //Q(6, 7) = pow(s_dt, 4) / 8;
+    //Q(6, 8) = pow(s_dt, 3) / 6;
+    //Q(7, 7) = pow(s_dt, 3) / 8;
+    //Q(7, 8) = pow(s_dt, 2) / 2;
+    //Q(8, 8) = s_dt;
+    //Q(7, 6) = Q(6, 7);
+    //Q(8, 6) = Q(6, 8);
+    //Q(8, 7) = Q(7, 8);
+    
+    Q(6, 6) = pow(s_dt, 5) / 20;
+    Q(6, 7) = pow(s_dt, 4) / 8;
+    Q(6, 8) = pow(s_dt, 3) / 6;
+    Q(7, 6) = pow(s_dt, 4) / 8;
+    Q(7,7) = pow(s_dt, 3)  / 3;
+    Q(7,8) = pow(s_dt, 2) / 2;
+    Q(8,6) = Q(0,2);
+    Q(8, 7) = Q(1, 2);
+    Q(8, 8) = s_dt;
+    /**
     Q(0, 0) = pow(s_dt, 5) / 20;
     Q(0, 1) = pow(s_dt, 4) / 8;
     Q(0, 2) = pow(s_dt, 3) / 6;
@@ -212,7 +266,7 @@ void EKF::initialize(RocketSystems *args)
     Q(7, 6) = Q(6, 7);
     Q(8, 6) = Q(6, 8);
     Q(8, 7) = Q(7, 8);
-
+    */
     // set H
     H(0, 0) = 1;
     H(1, 2) = 1;
@@ -224,8 +278,8 @@ void EKF::initialize(RocketSystems *args)
     // set R
     R(0, 0) = 2.0;
     R(1, 1) = 1.9;
-    R(2, 2) = 10;
-    R(3, 3) = 10;
+    R(2, 2) = 1.9; // changed from 10 
+    R(3, 3) = 1.9; // changed from 10 
 
     // set B (don't care about what's in B since we have no control input)
     B(2, 0) = -1;
@@ -419,6 +473,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     // (accel)(0, 0) = acceleration.az - 0.045;
     // (accel)(1, 0) = acceleration.ay - 0.065;
     // (accel)(2, 0) = -acceleration.ax - 0.06;
+
     (accel)(0, 0) = acceleration.az;
     (accel)(1, 0) = acceleration.ay;
     (accel)(2, 0) = -acceleration.ax;
@@ -427,20 +482,21 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     euler_t angles = orientation.getEuler();
     angles.yaw = -angles.yaw;
 
-    Eigen::Matrix<float, 3, 1> acc;
-    EKF::BodyToGlobal(angles, accel,acc);
+    Eigen::Matrix<float, 3, 1> accel_global;
+    EKF::BodyToGlobal(angles, accel, accel_global);
 
     Eigen::Matrix<float, 3, 1> Fg_body;
     
-    EKF::GlobalToBody(angles,Fg_body);
+    EKF::GlobalToBody(angles, Fg_body);
 
+    // Acceleration in x is switched to z & vice versa
     float Fgx = Fg_body(0, 0);
     float Fgy = Fg_body(1, 0);
     float Fgz = Fg_body(2, 0);
 
-    y_k(1, 0) = ((acc)(0)) * 9.81 +Fgx ;
-    y_k(2, 0) = ((acc)(1)) * 9.81 +Fgy;
-    y_k(3, 0) = ((acc)(2)) * 9.81 + Fgz;
+    y_k(1, 0) = ((accel_global)(0)) * 9.81 + Fgx;
+    y_k(2, 0) = ((accel_global)(1)) * 9.81 + Fgy;
+    y_k(3, 0) = ((accel_global)(2)) * 9.81 + Fgz;
 
 
     y_k(0, 0) = barometer.altitude;
@@ -652,6 +708,7 @@ void EKF::setF(float dt, FSMState fsm, float wx, float wy, float wz)
     F_mat(1, 7) = -pi * Ca * r * r * rho * x_k(7, 0) / m - w(1, 0);
 
     F_mat(4, 1) = pi * Cn * r * r * rho * x_k(1, 0) / m - w(2, 0);
+    // to do : maybe this is wrong
     F_mat(4, 4) = pi * Cn * r * r * rho * x_k(2, 0) / m + w(0, 0);
     F_mat(4, 7) = pi * Cn * r * r * rho * x_k(3, 0) / m;
 
