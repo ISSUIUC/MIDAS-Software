@@ -115,6 +115,12 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.pyro |= ((((uint16_t) (kf_px_clamped / max_kf_altitude * 4095)) & 0xFFF) << (2 * 8));  // bits 16-27
     packet.pyro |= tilt_extra << 28;
 
+    /* Replacement for pyro unpacking?
+    packet.roll_rate = roll_rate_hz / max_roll_rate_hz * 0xFF;
+    packet.camera_state = ((uint16_t) (data.camera_state)) & 0xFF;
+    packet.kf_px = (((uint16_t) (kf_px_clamped / max_kf_altitude * 4095)) & 0xFFF);
+    */
+
     static_assert(FSMState::FSM_STATE_COUNT < 16);
     uint8_t sat_count = gps.fix_type;
     packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);

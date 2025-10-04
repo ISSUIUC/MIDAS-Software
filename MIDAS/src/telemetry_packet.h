@@ -9,14 +9,19 @@
  * @brief format of the telemetry packet
 */
 struct TelemetryPacket {
+
+    // GPS
     int32_t lat;
     int32_t lon;
     uint16_t alt; //15 bit meters, 1 bit command ack
     uint16_t baro_alt;
-    uint16_t highg_ax; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint16_t highg_ay; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint16_t highg_az; //14 bit signed ax [-16,16) 2 bit tilt angle
-    uint8_t batt_volt;
+
+    // High-G
+    uint16_t highg_ax;
+    uint16_t highg_ay; //000|00000|0000
+    uint16_t highg_az;
+    
+    uint16_t tilt_angle_battery_volts; //12 bit tilt angle, 4 bits will be [battery_volt]
     
     // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
     //
@@ -24,7 +29,11 @@ struct TelemetryPacket {
     
     uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
     uint16_t kf_vx; // 16 bit meters/second
-    uint32_t pyro; // 7 bit continuity 4 bit tilt
+    uint32_t pyro; // 7 bit continuity (4 bit tilt-> we made a new tilt angle 10 bit var, use that instead)
+    
+    uint8_t roll_rate;
+    uint8_t camera_state;
+    uint8_t kf_px;
 };
 
 
