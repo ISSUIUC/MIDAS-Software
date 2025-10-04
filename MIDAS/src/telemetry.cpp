@@ -6,6 +6,12 @@ inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
+//fsm state not working
+//check gps
+//check barom
+//tilt angle not working but roll rate is fine
+//pyros not working
+//
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
@@ -102,14 +108,15 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
   
     //auto [ax,ay,az, tilt_extra] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023));
     packet.highg_ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
-    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
-    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(highg.az, MAX_ABS_ACCEL_RANGE_G);
 
     // Tilt & FSM State
     static_assert(FSMState::FSM_STATE_COUNT < 16);
     packet.tilt_fsm |= ((uint16_t)orientation.tilt & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 
+    Serial.println(packet.tilt_fsm, 2);
     // Battery voltage
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, MAX_TELEM_VOLTAGE_V);
     
