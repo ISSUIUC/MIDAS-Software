@@ -33,6 +33,7 @@ T inv_convert_range(float val, float range) {
  * @return tuple with packed data
 */
 std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) {
+    
     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
     uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
@@ -93,42 +94,57 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
-    packet.alt = (((int16_t) gps.altitude) & 0xfffe) | (received_count & 0x0001);    // Convert range of value so that we can also account for negative altitudes
+
+    packet.alt = (((int16_t) gps.altitude) & 0xfffe) | (received_count & 0x0001);    // Convert range of value so that we can also account for negative altitudes (converting float to 15 bit alt, 1 bit command ack)
+    
+    
     packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
   
-    auto [ax,ay,az, tilt_extra] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023));
-    packet.highg_ax = ax;
-    packet.highg_ay = ay;
-    packet.highg_az = az;
-    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, 16);
-    
-    // Pack all data into pyro struct (we will eventually use pyro properly, just not now.)
-    // Roll rate
-    constexpr float max_roll_rate_hz = 10.0f;
-    constexpr float max_kf_altitude = 40000.0f;
-    float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, max_roll_rate_hz);
-    float kf_px_clamped = std::clamp(kalman.position.px, 0.0f, max_kf_altitude);
-    const float max_volts = 12;
+    //auto [ax,ay,az, tilt_extra] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023));
+    packet.highg_ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
 
-    packet.pyro |= ((((uint16_t) (roll_rate_hz / max_roll_rate_hz * 255)) & 0xFF) << (0 * 8));    // bits 0-7
-    packet.pyro |= ((((uint16_t) (data.camera_state)) & 0xFF) << (1 * 8));                        // bits 8-15
-    packet.pyro |= ((((uint16_t) (kf_px_clamped / max_kf_altitude * 4095)) & 0xFFF) << (2 * 8));  // bits 16-27
-    packet.pyro |= tilt_extra << 28;
-
-    /* Replacement for pyro unpacking?
-    packet.roll_rate = roll_rate_hz / max_roll_rate_hz * 0xFF;
-    packet.camera_state = ((uint16_t) (data.camera_state)) & 0xFF;
-    packet.kf_px = (((uint16_t) (kf_px_clamped / max_kf_altitude * 4095)) & 0xFFF);
-    */
-
+    // Tilt & FSM State
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint8_t sat_count = gps.fix_type;
-    packet.fsm_callsign_satcount = ((uint8_t)fsm) | (sat_count << 4);
-    float kf_vx_clamped = std::clamp(kalman.velocity.vx, -2000.f, 2000.f);
-    packet.kf_vx = (uint16_t) ((kf_vx_clamped + 2000) / 4000. * ((1 << 16) - 1));
+    packet.tilt_fsm |= ((uint16_t)orientation.tilt & 0xfff0);
+    packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
+
+    // Battery voltage
+    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, MAX_TELEM_VOLTAGE_V);
+    
+    // Roll rate
+    float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, MAX_ROLL_RATE_HZ);
+    packet.roll_rate = roll_rate_hz / MAX_ROLL_RATE_HZ * 0xFF;
+
+    // KF data
+    packet.kf_px = inv_convert_range<uint16_t>(kalman.position.px, MAX_KF_XPOSITION_M);
+    packet.kf_vx = inv_convert_range<int16_t>(kalman.velocity.vx, MAX_KF_XVELOCITY_MS);
+
+    //Camera Data
+    packet.camera_state = ((uint16_t) (data.camera_state)) & 0xFF;
+    
+    //Pyro A0 | B1 | C2 | D3
+    // This is what we're telemetering for MIDAS mk2
+    packet.pyro |= ((((uint32_t) (std::round(continuity.pins[0]))) & 0x7F) << (0 * 7));
+    packet.pyro |= ((((uint32_t) (continuity.pins[1] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (1 * 7));
+    packet.pyro |= ((((uint32_t) (continuity.pins[2] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (2 * 7));
+    packet.pyro |= ((((uint32_t) (continuity.pins[3] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (3 * 7));
+
+    // This is what we want for MIDAS mk3
+    // packet.pyro |= (uint8_t)inv_convert_range<int8_t>(pins[0], MAX_TELEM_VOLTAGE_V);
+    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[1], (float)std::numeric_limits<float>::max()) & 0xFF) << (1*8);
+    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[2], (float)std::numeric_limits<float>::max()) & 0xFF) << (2*8);
+    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[3], (float)std::numeric_limits<float>::max()) & 0xFF) << (3*8);
+
+    // GPS state & Callsign
+    // 0000 | 000 | 0
+    // SATC | FT  | C
+    packet.callsign_gpsfix_satcount |= (gps.fix_type & 0x07) << 1;
+    packet.callsign_gpsfix_satcount |= (gps.fix_type & 0x0F) << 4; // Replace fix type here with satcount later
 
     #ifdef IS_SUSTAINER
-    packet.fsm_callsign_satcount |= (1 << 7);
+    packet.callsign_gpsfix_satcount |= 0b1;
     #endif
 
     return packet;

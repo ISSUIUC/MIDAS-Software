@@ -3,6 +3,12 @@
 #include <array>
 #include <cstdint>
 
+#define MAX_TELEM_VOLTAGE_V 6.0f
+#define MAX_KF_XPOSITION_M 40000.0f
+#define MAX_ROLL_RATE_HZ 10.0f
+#define MAX_ABS_ACCEL_RANGE_G 64
+#define MAX_KF_XVELOCITY_MS 2000.0f
+
 /**
  * @struct TelemetryPacket
  * 
@@ -17,23 +23,27 @@ struct TelemetryPacket {
     uint16_t baro_alt;
 
     // High-G
-    uint16_t highg_ax;
-    uint16_t highg_ay; //000|00000|0000
-    uint16_t highg_az;
+    uint16_t highg_ax; //16 bit accel (-64G, 64G]
+    uint16_t highg_ay; //16 bit ay (-64G, 64G]
+    uint16_t highg_az; //16 bit az (-64G, 64G]
     
-    uint16_t tilt_angle_battery_volts; //12 bit tilt angle, 4 bits will be [battery_volt]
+    uint16_t tilt_fsm; //12 bits tilt | 4 bits FSM
+    uint8_t batt_volt;
     
     // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
     //
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
-    uint8_t fsm_callsign_satcount; //4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+
+    uint8_t callsign_gpsfix_satcount; //3 bits gpsfix, 4 bits sat count, 1 bit is_sustainer_callsign
     uint16_t kf_vx; // 16 bit meters/second
-    uint32_t pyro; // 7 bit continuity (4 bit tilt-> we made a new tilt angle 10 bit var, use that instead)
+    uint16_t kf_px;  // 16 bit meters
+
+    uint32_t pyro; // 7 bit continuity | Pyro -> A(rotation rate) | B(camera state) | C(kf_px) | D()
     
     uint8_t roll_rate;
     uint8_t camera_state;
-    uint8_t kf_px;
+    
 };
 
 
