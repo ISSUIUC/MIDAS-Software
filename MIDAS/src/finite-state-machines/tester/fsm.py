@@ -252,7 +252,7 @@ class BoosterFsm:
                 # if in burnout for long enough then go on to the next state (time transition)
                 elif ((current_time - self.burnout_time) > thresholds.BOOSTER_FIRST_BOOST_TO_BURNOUT_TIME_THRESHOLD):
                     self.sustainer_ignition_time = current_time
-                    self.state = FSMState.STATE_SUSTAINER_IGNITION
+                    self.state = FSMState.STATE_FIRST_SEPARATION
                     reason_transition = f"Transitioned BURNOUT TO FIRST_SEPARATION due to long enough time after burnout. It has been {current_time - self.burnout_time}ms since burnout_time"
             case FSMState.STATE_FIRST_SEPARATION:
                 # if jerk is low, go to next state

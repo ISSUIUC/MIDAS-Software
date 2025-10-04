@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt
 
 ACCEL_STRING = "accel_x"
 TIME_STRING = "time"
-HEIGHT_STRING = "pos_x"
-SPEED_STRING = "vel_x"
+HEIGHT_STRING = "altitude"
+SPEED_STRING = "speed"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=pathlib.Path)
