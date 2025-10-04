@@ -172,6 +172,52 @@ struct CommandFlags {
     bool FSM_should_set_cam_feed_cam1 = false;  // Triggered at launch (IDLE --> FIRST_BOOST)
     bool FSM_should_swap_camera_feed = false;   // Triggered COAST --> APOGEE
 };
+
+/**
+ * @struct MIDAS_Events
+ * 
+ * @brief Abstracts changing command flags during state changes away from fsm.cpp.
+ * The functions are defined in MIDAS_Events.cpp
+ */
+struct MIDAS_Events {
+    void safe_to_pyroTest();
+    void safe_to_stateIdle();
+    
+    void pyroTest_to_safe_forced();
+    void pyroTest_to_safe_timed();
+    void pyroTest_to_firstBoost();
+
+    void firstBoost_to_idle();
+    void firstBoost_to_burnout();
+
+    void burnout_to_firstBoost();
+    void burnout_to_sustainerIgnition();
+
+    void sustainerIgnition_to_coast();
+    void sustainerIgnition_to_secondBoost();
+
+    void secondBoost_to_sustainerIgnition();
+    void secondBoost_to_coast();
+
+    void coast_to_secondBoost();
+    void coast_to_apogee();
+
+    void apogee_to_coast();
+    void apogee_to_drogueDeploy();
+
+    void drogueDeploy_to_drogue_jerk();
+    void drogueDeploy_to_drouge_timed();
+
+    void drogue_to_mainDeploy();
+
+    void mainDeploy_to_main_jerk();
+    void mainDeploy_to_main_timed();
+
+    void main_to_landed();
+
+    void landed_to_safe();
+    void landed_to_main();
+};
 /**
  * @struct RocketData
  * 
