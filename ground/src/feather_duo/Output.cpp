@@ -73,7 +73,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     ((uint8_t) packet.camera_state >> 4) & 0x01, //vtx_on
     ((uint8_t) packet.camera_state >> 5) & 0x01, //vmux_stat
     ((uint8_t) packet.camera_state >> 6) & 0x01, //cam_ack
-    packet.kf_reset,
+    packet.cmd_ack,
     packet.gps_fixtype,
     
     packet.pyros[0],

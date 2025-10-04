@@ -74,10 +74,6 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     // Roll rate
     data.roll_rate_hz = ((float)packet.roll_rate / 0xFF) * MAX_ROLL_RATE_HZ;
 
-    // kinda hacky but it will work
-    if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
-        data.FSM_State = static_cast<uint8_t>(-1);
-    }
 
     data.freq = frequency;
 
