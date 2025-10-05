@@ -159,9 +159,9 @@ void EKF::initialize(RocketSystems *args)
             .az = initial_accelerometer.az};
         sum += barometer.altitude;
 
-        init_accel(0, 0) += accelerations.az;
+        init_accel(0, 0) += accelerations.ax;
         init_accel(1, 0) += accelerations.ay;
-        init_accel(2, 0) += -accelerations.ax;
+        init_accel(2, 0) += -accelerations.az;
         THREAD_SLEEP(100);
     }
 
@@ -351,15 +351,15 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     //     (Faz + Ftz + Fgz) / m - (w_x * x_k(4, 0) - w_y * x_k(1, 0)),
     //     1.0;
     
-    xdot << x_k(1, 0),
+    xdot << 0,
         0,
         0,
 
-        x_k(4, 0),
+        0,
         0,
         0,
 
-        x_k(7, 0),
+        0,
        0,
         0;
     x_priori = (xdot * dt) + x_k;
@@ -474,9 +474,9 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     // (accel)(1, 0) = acceleration.ay - 0.065;
     // (accel)(2, 0) = -acceleration.ax - 0.06;
 
-    (accel)(0, 0) = acceleration.az;
+    (accel)(0, 0) = acceleration.ax;
     (accel)(1, 0) = acceleration.ay;
-    (accel)(2, 0) = -acceleration.ax;
+    (accel)(2, 0) = -acceleration.az;
     // (accel)(2, 0) = acceleration.ax;
 
     euler_t angles = orientation.getEuler();
@@ -494,16 +494,28 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     float Fgy = Fg_body(1, 0);
     float Fgz = Fg_body(2, 0);
 
-    y_k(1, 0) = ((accel_global)(0)) * 9.81 + Fgx;
-    y_k(2, 0) = ((accel_global)(1)) * 9.81 + Fgy;
-    y_k(3, 0) = ((accel_global)(2)) * 9.81 + Fgz;
-
-
+    y_k(1, 0) = ((accel)(0)) * 9.81 - Fgx;
+    y_k(2, 0) = ((accel)(1)) * 9.81 + Fgz;
+    y_k(3, 0) = ((accel)(2)) * 9.81 - Fgy;
+    Serial.print("x = ");
+    Serial.println(y_k(1,0));
+    Serial.print("y = ");
+    Serial.println(y_k(2,0));
+    Serial.print("z = ");
+    Serial.println(y_k(3,0));
+    // float mag = sqrt(Fgx * Fgx + Fgy * Fgy + Fgz * Fgz);
+    // Serial.print("GRAVITY MAG = ");
+    // Serial.println(mag);
+    // y_k(1, 0) = Fgy;
+    // y_k(2, 0) = Fgz;
+    // y_k(3, 0) = Fgx;
     y_k(0, 0) = barometer.altitude;
     alt_buffer.push(barometer.altitude);
 
     // # Posteriori Update
     x_k = x_priori + K * (y_k - (H * x_priori));
+    // K = 
+    // x_k = y_k;
     P_k = (identity - K * H) * P_priori;
 
     kalman_state.state_est_pos_x = x_k(0, 0);
@@ -663,7 +675,7 @@ void EKF::GlobalToBody(euler_t angles, Eigen::Matrix<float,3,1> &to_modify)
     Eigen::Matrix3f yaw;
     yaw << cos(angles.yaw), -sin(angles.yaw), 0, sin(angles.yaw), cos(angles.yaw), 0, 0, 0, 1;
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
-    to_modify = rotation_matrix.transpose() * gravity;
+    to_modify = rotation_matrix.transpose()* gravity;
     // return to_return;
 }
 
