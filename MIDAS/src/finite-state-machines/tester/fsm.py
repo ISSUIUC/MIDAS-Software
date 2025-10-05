@@ -56,6 +56,7 @@ class SustainerFSM:
     drogue_time: float = 0.0
     apogee_time: float = 0.0
     main_time: float = 0.0
+    main_deployed_time: float = 0.0
     landed_time: float = 0.0
     first_separation_time: float = 0.0
 
@@ -172,6 +173,7 @@ class SustainerFSM:
 
                 elif (abs(jerk) > thresholds.SUSTAINER_MAIN_JERK_THRESHOLD):
                     self.state = FSMState.STATE_MAIN
+                    self.main_deployed_time = current_time
                     reason_transition = "Transitioned MAIN_DEPLOY TO MAIN due to large magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
 
                 # if no transtion after a certain amount of time then just move on to next state
@@ -186,7 +188,7 @@ class SustainerFSM:
                     reason_transition = f"Transitioned MAIN TO LANDED due to low enough vertical speed. Vertical speed is currently {vertical_speed}m/s"
             case FSMState.STATE_LANDED:
                 # if the slow speed was too brief then return to previous state
-                if ((abs(vertical_speed) > thresholds.SUSTAINER_LANDED_VERTICAL_SPEED_THRESHOLD) and ((current_time - self.landed_time) > thresholds.SUSTAINER_LANDED_TIMER_THRESHOLD)):
+                if ((abs(vertical_speed) > thresholds.SUSTAINER_LANDED_TO_MAIN_VERTICAL_SPEED_THRESHOLD) and ((current_time - self.landed_time) > thresholds.SUSTAINER_LANDED_TIMER_THRESHOLD)):
                     self.state = FSMState.STATE_MAIN
                     reason_transition = f"Transitioned LANDED TO MAIN due to short length of low vertical speed. Vertical speed is currently {vertical_speed}m/s and it has been {current_time - self.landed_time}ms since landed_time"
             case _:
@@ -211,6 +213,7 @@ class BoosterFsm:
     drogue_time: float = 0.0
     apogee_time: float = 0.0
     main_time: float = 0.0
+    main_deployed_time: float = 0.0
     landed_time: float = 0.0
     first_separation_time: float = 0.0
 
@@ -257,8 +260,14 @@ class BoosterFsm:
             case FSMState.STATE_FIRST_SEPARATION:
                 # if jerk is low, go to next state
                 if (abs(jerk) < thresholds.BOOSTER_FIRST_SEPARATION_JERK_THRESHOLD):
-                    self.state - FSMState.STATE_COAST
+                    self.state = FSMState.STATE_COAST
                     reason_transition = f"Transitioned FIRST_SEPARATION to COAST due to low magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
+
+                # if first separation time threshold passed, go to next state
+                elif ((current_time - self.first_separation_time) > thresholds.BOOSTER_FIRST_SEPARATION_TIME_THRESHOLD):
+                    self.state = FSMState.STATE_COAST
+                    reason_transition = f"Transitioned FIRST_SEPARATION TO COAST due to long enough time after first separation. It has been {current_time - self.first_separation_time}ms since first_separation_time"
+
             case FSMState.STATE_COAST:
                 if (vertical_speed <= thresholds.BOOSTER_COAST_TO_APOGEE_VERTICAL_SPEED_THRESHOLD):
                     self.apogee_time = current_time
@@ -276,40 +285,45 @@ class BoosterFsm:
                     self.state = FSMState.STATE_DROGUE_DEPLOY
                     reason_transition = f"Transitioned APOGEE TO DROGUE_DEPLOY due to length of time. It has been {current_time - self.apogee_time}ms since apogee_time"
             case FSMState.STATE_DROGUE_DEPLOY:
-                # if detected a sharp change in jerk then go to next state
-                if (abs(jerk) < thresholds.BOOSTER_DROGUE_JERK_THRESHOLD):
-                    self.state = FSMState.STATE_DROGUE
-                    reason_transition = f"Transitioned DROGUE_DEPLOY TO DROGUE due to large magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
+                # lockout for minimum transition time in DROGUE_DEPLOY state
+                if ((current_time - self.drogue_time) >= thresholds.BOOSTER_PYRO_FIRING_TIME_MINIMUM):
+                    # if detected a sharp change in jerk then go to next state
+                    if (abs(jerk) > thresholds.BOOSTER_DROGUE_JERK_THRESHOLD):
+                        self.state = FSMState.STATE_DROGUE
+                        reason_transition = f"Transitioned DROGUE_DEPLOY TO DROGUE due to large magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
 
-                # if no transtion after a certain amount of time then just move on to next state
-                if ((current_time - self.drogue_time) > thresholds.BOOSTER_DROGUE_TIMER_THRESHOLD):
-                    self.state = FSMState.STATE_DROGUE
-                    reason_transition = f"Transitioned DROGUE_DEPLOY TO DROGUE due to enough time passed. It has been {current_time - self.drogue_time}ms since drogue_time"
+                    # if no transtion after a certain amount of time then just move on to next state
+                    if ((current_time - self.drogue_time) > thresholds.BOOSTER_DROGUE_TIMER_THRESHOLD):
+                        self.state = FSMState.STATE_DROGUE
+                        reason_transition = f"Transitioned DROGUE_DEPLOY TO DROGUE due to enough time passed. It has been {current_time - self.drogue_time}ms since drogue_time"
             case FSMState.STATE_DROGUE:
-                # if altitude low enough then next state
-                if (altitude <= thresholds.BOOSTER_MAIN_DEPLOY_ALTITUDE_THRESHOLD):
+                # if altitude low enough and 1 second after drogue deploy then go to next state
+                if (altitude <= thresholds.BOOSTER_MAIN_DEPLOY_ALTITUDE_THRESHOLD and (current_time - self.drogue_time) > thresholds.BOOSTER_MAIN_DEPLOY_DELAY_AFTER_DROGUE):
                     self.state = FSMState.STATE_MAIN_DEPLOY
                     self.main_time = current_time
                     reason_transition = f"Transitioned DROGUE TO MAIN_DEPLOY due to low enough altitude. Altitude is currently {altitude}m"
             case FSMState.STATE_MAIN_DEPLOY:
-                # if detected a sharp change in jerk then go to the next state
-                if (abs(jerk) < thresholds.BOOSTER_MAIN_JERK_THRESHOLD):
-                    self.state = FSMState.STATE_MAIN
-                    reason_transition = "Transitioned MAIN_DEPLOY TO MAIN due to large magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
+                # Lockout for minimum transition time in MAIN_DEPLOY state
+                if ((current_time - self.main_time) >= thresholds.BOOSTER_PYRO_FIRING_TIME_MINIMUM):
+                    # if detected a sharp change in jerk then go to the next state
+                    if (abs(jerk) > thresholds.BOOSTER_MAIN_JERK_THRESHOLD):
+                        self.state = FSMState.STATE_MAIN
+                        self.main_deployed_time = current_time
+                        reason_transition = "Transitioned MAIN_DEPLOY TO MAIN due to large magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
 
-                # if no transtion after a certain amount of time then just move on to next state
-                if ((current_time - self.main_time) > thresholds.BOOSTER_MAIN_TO_MAIN_DEPLOY_TIMER_THRESHOLD):
-                    self.state = FSMState.STATE_MAIN
-                    reason_transition = f"Transitioned MAIN_DEPLOY TO MAIN due to long enough time. It has been {current_time - self.main_time}ms since main_time"
+                    # if no transtion after a certain amount of time then just move on to next state
+                    if ((current_time - self.main_time) > thresholds.BOOSTER_MAIN_TO_MAIN_DEPLOY_TIMER_THRESHOLD):
+                        self.state = FSMState.STATE_MAIN
+                        reason_transition = f"Transitioned MAIN_DEPLOY TO MAIN due to long enough time. It has been {current_time - self.main_time}ms since main_time"
             case FSMState.STATE_MAIN:
                 # if slowed down enough then go on to the next state
-                if (abs(vertical_speed) <= thresholds.BOOSTER_LANDED_VERTICAL_SPEED_THRESHOLD):
+                if (abs(vertical_speed) <= thresholds.BOOSTER_LANDED_VERTICAL_SPEED_THRESHOLD and (current_time - self.main_deployed_time) > thresholds.BOOSTER_MAIN_TO_LANDED_LOCKOUT):
                     self.landed_time = current_time
                     self.state = FSMState.STATE_LANDED
                     reason_transition = f"Transitioned MAIN TO LANDED due to low enough vertical speed. Vertical speed is currently {vertical_speed}m/s"
             case FSMState.STATE_LANDED:
                 # if the slow speed was too brief then return to previous state
-                if ((abs(vertical_speed) > thresholds.BOOSTER_LANDED_VERTICAL_SPEED_THRESHOLD) and ((current_time - self.landed_time) > thresholds.BOOSTER_LANDED_TIMER_THRESHOLD)):
+                if ((abs(vertical_speed) > thresholds.BOOSTER_LANDED_TO_MAIN_VERTICAL_SPEED_THRESHOLD) and ((current_time - self.landed_time) > thresholds.BOOSTER_LANDED_TIMER_THRESHOLD)):
                     self.state = FSMState.STATE_MAIN
                     reason_transition = f"Transitioned LANDED TO MAIN due to short length of low vertical speed. Vertical speed is currently {vertical_speed}m/s and it has been {current_time - self.landed_time}ms since landed_time"
             case _:

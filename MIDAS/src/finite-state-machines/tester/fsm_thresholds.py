@@ -66,6 +66,9 @@ SUSTAINER_COAST_TIME = 3000
 # Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
 SUSTAINER_LANDED_VERTICAL_SPEED_THRESHOLD = 1
 
+# Transition to MAIN from LANDED if vertical speed is greater than this threshold (m/s)
+SUSTAINER_LANDED_TO_MAIN_VERTICAL_SPEED_THRESHOLD = 3
+
 # Lock out further transitions from LANDED after this much time passes in the LANDED state (ms)
 SUSTAINER_LANDED_TIME_LOCKOUT = 60000
 
@@ -132,6 +135,9 @@ BOOSTER_FIRST_BOOST_TO_BURNOUT_TIME_THRESHOLD = 1000
 
 # Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
 BOOSTER_LANDED_VERTICAL_SPEED_THRESHOLD = 1
+
+# Transition to MAIN from LANDED if vertical speed is greater than this threshokd (m/s)
+BOOSTER_LANDED_TO_MAIN_VERTICAL_SPEED_THRESHOLD = 5
 
 # Lock out further transitions from LANDED after this much time passes in the LANDED state (ms)
 BOOSTER_LANDED_TIME_LOCKOUT = 60000
