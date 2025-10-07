@@ -16,7 +16,7 @@ public:
     void priori();
     void priori(float dt, Orientation &orientation, FSMState fsm); 
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
-
+    Eigen::Matrix3f eulerToRotation(float yaw, float pitch, float roll);
     void setQ(float dt, float sd);
     void setF(float dt, FSMState fsm, float w_x, float w_y, float w_z); 
     void getThrust(float timestamp, euler_t angles, FSMState FSM_state,  Eigen::Matrix<float, 3, 1> &to_modify);
