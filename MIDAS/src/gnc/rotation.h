@@ -9,17 +9,17 @@
  * @return Eigen::Matrix<float, 3, 1> Rotated vector in the global frame
  */
 template <typename Angles>
-void BodyToGlobal(Angles& angles, Eigen::Matrix<float, 3, 1> &body_vec)
+void BodyToGlobal(Angles& angles_rad, Eigen::Matrix<float, 3, 1> &body_vec)
 {
     Eigen::Matrix3f roll, pitch, yaw;
     roll << 1., 0., 0.,
-            0., cos(angles.roll), -sin(angles.roll),
-            0., sin(angles.roll), cos(angles.roll);
-    pitch << cos(angles.pitch), 0., sin(angles.pitch),
+            0., cos(angles_rad.roll), -sin(angles_rad.roll),
+            0., sin(angles_rad.roll), cos(angles_rad.roll);
+    pitch << cos(angles_rad.pitch), 0., sin(angles_rad.pitch),
              0., 1., 0., 
-             -sin(angles.pitch), 0., cos(angles.pitch);
-    yaw << cos(angles.yaw), -sin(angles.yaw), 0.,
-           sin(angles.yaw), cos(angles.yaw), 0., 
+             -sin(angles_rad.pitch), 0., cos(angles_rad.pitch);
+    yaw << cos(angles_rad.yaw), -sin(angles_rad.yaw), 0.,
+           sin(angles_rad.yaw), cos(angles_rad.yaw), 0., 
            0., 0., 1.;
 
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
@@ -36,17 +36,17 @@ void BodyToGlobal(Angles& angles, Eigen::Matrix<float, 3, 1> &body_vec)
  * @return Eigen::Matrix<float, 3, 1> Rotated vector in the body frame
  */
 template <typename Angles>
-void GlobalToBody(Angles& angles, Eigen::Matrix<float, 3, 1> &global_vec)
+void GlobalToBody(Angles& angles_rad, Eigen::Matrix<float, 3, 1> &global_vec)
 {
     Eigen::Matrix3f roll, pitch, yaw;
     roll << 1, 0, 0,
-            0, cos(angles.roll), -sin(angles.roll),
-            0, sin(angles.roll), cos(angles.roll);
-    pitch << cos(angles.pitch), 0, sin(angles.pitch), 
+            0, cos(angles_rad.roll), -sin(angles_rad.roll),
+            0, sin(angles_rad.roll), cos(angles_rad.roll);
+    pitch << cos(angles_rad.pitch), 0, sin(angles_rad.pitch), 
              0, 1, 0,
-             -sin(angles.pitch), 0, cos(angles.pitch);
-    yaw << cos(angles.yaw), -sin(angles.yaw), 0, 
-           sin(angles.yaw), cos(angles.yaw), 
+             -sin(angles_rad.pitch), 0, cos(angles_rad.pitch);
+    yaw << cos(angles_rad.yaw), -sin(angles_rad.yaw), 0, 
+           sin(angles_rad.yaw), cos(angles_rad.yaw), 
            0, 0, 1;
 
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;

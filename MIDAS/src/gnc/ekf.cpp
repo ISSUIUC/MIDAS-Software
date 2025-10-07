@@ -132,8 +132,8 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
 
     // angular states from sensors
-    Velocity omega = orientation.getVelocity();
-    euler_t angles = orientation.getEuler();
+    Velocity omega_rps = orientation.getVelocity(); // rads per sec
+    euler_t angles_rad = orientation.getEuler();
 
     // ignore effects of gravity when on pad
     Eigen::Matrix<float,3,1> Fg_global = Eigen::Matrix<float,3,1>::Zero();
@@ -173,7 +173,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     // force due to gravity
     Eigen::Matrix<float, 3, 1> Fg_body = Fg_global;
-    GlobalToBody(angles, Fg_body);
+    GlobalToBody(angles_rad, Fg_body);
 
     float Fgx = Fg_body(0, 0);
     float Fgy = Fg_body(1, 0);
@@ -181,27 +181,27 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     // thurst force
     Eigen::Matrix<float, 3, 1> Ft_global;
-    EKF::getThrust(stage_timestamp, angles, fsm, Ft_global);
+    EKF::getThrust(stage_timestamp, angles_rad, fsm, Ft_global);
 
     float Ftx = Ft_global(0, 0);
     float Fty = Ft_global(1, 0);
     float Ftz = Ft_global(2, 0);
 
     xdot << x_k(1, 0),
-        ((Fax + Ftx + Fgx) / curr_mass_kg - (omega.vy * x_k(7, 0) - omega.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
+        ((Fax + Ftx + Fgx) / curr_mass_kg - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
         0.0,
 
         x_k(4, 0),
-        ((Fay + Fty + Fgy) / curr_mass_kg - (omega.vz * x_k(1, 0) - omega.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
+        ((Fay + Fty + Fgy) / curr_mass_kg - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
         0.0,
 
         x_k(7, 0),
-        ((Faz + Ftz + Fgz) / curr_mass_kg - (omega.vx * x_k(4, 0) - omega.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
+        ((Faz + Ftz + Fgz) / curr_mass_kg - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
         0.0;
         
     // priori step
     x_priori = (xdot * dt) + x_k;
-    setF(dt, omega.vx, omega.vy, omega.vz);
+    setF(dt, omega_rps.vx, omega_rps.vy, omega_rps.vz);
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
@@ -241,34 +241,34 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     K = (P_priori * H.transpose()) * S_k;
 
     // Sensor Measurements
-    Eigen::Matrix<float, 3, 1> sensor_accel_global = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+    Eigen::Matrix<float, 3, 1> sensor_accel_global_g = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
 
     // accouting for sensor bias and coordinate frame transforms
-    (sensor_accel_global)(0, 0) = acceleration.az - 0.045;
-    (sensor_accel_global)(1, 0) = acceleration.ay - 0.065;
-    (sensor_accel_global)(2, 0) = -acceleration.ax - 0.06;
+    (sensor_accel_global_g)(0, 0) = acceleration.az - 0.045;
+    (sensor_accel_global_g)(1, 0) = acceleration.ay - 0.065;
+    (sensor_accel_global_g)(2, 0) = -acceleration.ax - 0.06;
 
-    euler_t angles = orientation.getEuler();
-    angles.yaw = -angles.yaw; // coordinate frame match
+    euler_t angles_rad = orientation.getEuler();
+    angles_rad.yaw = -angles_rad.yaw; // coordinate frame match
 
-    BodyToGlobal(angles, sensor_accel_global);
+    BodyToGlobal(angles_rad, sensor_accel_global_g);
 
-    float g;
+    float g_ms2;
     if ((FSM_state > FSMState::STATE_IDLE) && (FSM_state < FSMState::STATE_LANDED))
     {
-        g = -gravity_ms2;
+        g_ms2 = -gravity_ms2;
     }
     else
     {
-        g = 0;
+        g_ms2 = 0;
     }
 
     // acceloremeter reports values in g's and measures specific force
-    y_k(1, 0) = ((sensor_accel_global)(0)) * gravity_ms2 + g;
-    y_k(2, 0) = ((sensor_accel_global)(1)) * gravity_ms2;
-    y_k(3, 0) = ((sensor_accel_global)(2)) * gravity_ms2;
+    y_k(1, 0) = ((sensor_accel_global_g)(0)) * gravity_ms2 + g_ms2;
+    y_k(2, 0) = ((sensor_accel_global_g)(1)) * gravity_ms2;
+    y_k(3, 0) = ((sensor_accel_global_g)(2)) * gravity_ms2;
 
-    y_k(0, 0) = barometer.altitude;
+    y_k(0, 0) = barometer.altitude; // meters
 
     // # Posteriori Update
     x_k = x_priori + K * (y_k - (H * x_priori));
