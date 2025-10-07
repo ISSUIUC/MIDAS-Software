@@ -3,10 +3,15 @@
 #include "kalman_filter.h"
 #include "sensor_data.h"
 #include "Buffer.h"
+#include "constants.h"
+#include "aero_coeff.h"
 
 #define NUM_STATES 9
 #define NUM_SENSOR_INPUTS 4
 #define ALTITUDE_BUFFER_SIZE 10
+
+// Number of entries for aerodynamic data table
+#define AERO_DATA_SIZE (sizeof(aero_data) / sizeof(aero_data[0]))
 
 class EKF : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 {
