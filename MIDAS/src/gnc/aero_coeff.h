@@ -1,3 +1,9 @@
+/** 
+ * This file contains all the aerodynamic constants
+ * aero_data - the aerodynamic coefficients for drag calculations
+ * thurst curves for both motors
+ * 
+ */
 typedef struct
 {
     float mach;
@@ -5,10 +11,10 @@ typedef struct
     float CA_power_on;
     float CN;
     float CP;
-} AeroCoeff;
+} aero_coeff_t;
 
 // stores the aerodynamic coefficients for the corresponding Mach number
-const AeroCoeff aero_data[] = {
+const aero_coeff_t aero_data[] = {
     {0.04, 0, 1.000001789, 25.80486518, 123.856999},
     {0.08, 0, 0.899149955, 25.80486518, 123.856999},
     {0.12, 0, 0.848262793, 25.80486518, 123.856999},
@@ -38,7 +44,6 @@ const AeroCoeff aero_data[] = {
 
 // Moonburner motor thrust curve (Sustainer)
 const std::map<float, float> M685W_data = {
-    {0.083, 1333.469},
     {0.13, 1368.376},
     {0.249, 1361.395},
     {0.308, 1380.012},
@@ -59,11 +64,11 @@ const std::map<float, float> M685W_data = {
     {9.993, 207.118},
     {10.514, 137.303},
     {11.496, 34.908},
-    {11.994, 0.0}};
+    {11.994, 0.0}
+};
 
 // O5500X motor thrust curve (Booster)
 const std::map<float, float> O5500X_data = {
-    {0.009, 20.408},
     {0.044, 7112.245},
     {0.063, 6734.694},
     {0.078, 6897.959},
@@ -102,4 +107,19 @@ const std::map<float, float> O5500X_data = {
     {3.853, 489.796},
     {3.897, 285.714},
     {3.981, 20.408},
-    {3.997, 0.0}};
+    {3.997, 0.0}
+};
+
+// constant variable that contains the booster and sustainer motors
+const std::map<std::string, std::map<float, float>> motor_data = {
+    {"Booster", O5500X_data},
+    {"Sustainer", M685W_data}
+};
+
+/**
+ * @brief linearly interpolates the a value based on the lower and upper bound, similar to lerp_() in PySim
+ */
+inline float linearInterpolation(float x0, float y0, float x1, float y1, float x)
+{
+    return y0 + ((x - x0) * (y1 - y0) / (x1 - x0));
+}
