@@ -127,82 +127,9 @@ void EKF::initialize(RocketSystems *args)
  * it extrapolates the state at time n+1 based on the state at time n.
  */
 
-void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
+void EKF::priori()
 {
-    Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
-
-    // angular states from sensors
-    Velocity omega_rps = orientation.getVelocity(); // rads per sec
-    euler_t angles_rad = orientation.getEuler();
-
-    // ignore effects of gravity when on pad
-    Eigen::Matrix<float,3,1> Fg_global = Eigen::Matrix<float,3,1>::Zero();
-    if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED))
-    {
-        Fg_global(0, 0) = -gravity_ms2;
-    }
-    else
-    {
-        Fg_global(0, 0) = 0;
-    }
-
-    // mass and height init
-    float curr_mass_kg = mass_sustainer;
-    float curr_height_m = height_sustainer;
-
-    if (fsm < FSMState::STATE_BURNOUT)
-    {
-        curr_mass_kg = mass_full;
-        curr_height_m = height_full;
-    }
-
-    // Mach number
-    float vel_mag_squared_ms = x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
-    float vel_magnitude_ms = pow(vel_mag_squared_ms, 0.5);
-    float mach = vel_magnitude_ms / a;
-
-    // approximating C_a (aerodynamic coeff.)
-    int index = std::round(mach / 0.04);
-    index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
-    Ca = aero_data[index].CA_power_on;
-
-    // aerodynamic force
-    float Fax = -0.5 * rho * (vel_mag_squared_ms) * float(Ca) * (pi * r * r);
-    float Fay = 0; // assuming no aerodynamic effects
-    float Faz = 0; // assuming no aerodynamic effects
-
-    // force due to gravity
-    Eigen::Matrix<float, 3, 1> Fg_body = Fg_global;
-    GlobalToBody(angles_rad, Fg_body);
-
-    float Fgx = Fg_body(0, 0);
-    float Fgy = Fg_body(1, 0);
-    float Fgz = Fg_body(2, 0);
-
-    // thurst force
-    Eigen::Matrix<float, 3, 1> Ft_global;
-    EKF::getThrust(stage_timestamp, angles_rad, fsm, Ft_global);
-
-    float Ftx = Ft_global(0, 0);
-    float Fty = Ft_global(1, 0);
-    float Ftz = Ft_global(2, 0);
-
-    xdot << x_k(1, 0),
-        ((Fax + Ftx + Fgx) / curr_mass_kg - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
-        0.0,
-
-        x_k(4, 0),
-        ((Fay + Fty + Fgy) / curr_mass_kg - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
-        0.0,
-
-        x_k(7, 0),
-        ((Faz + Ftz + Fgz) / curr_mass_kg - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
-        0.0;
-        
-    // priori step
-    x_priori = (xdot * dt) + x_k;
-    setF(dt, omega_rps.vx, omega_rps.vy, omega_rps.vz);
-    P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
+    
 }
 
 /**
