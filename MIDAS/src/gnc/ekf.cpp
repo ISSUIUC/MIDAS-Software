@@ -162,78 +162,31 @@ void EKF::priori()
  */
 void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state)
 {
-    // if on pad -> take last 10 barometer measurements for init state
-    if (FSM_state == FSMState::STATE_IDLE)
-    {
-        float sum = 0;
-        float data[10];
-        alt_buffer.readSlice(data, 0, 10);
-        for (float i : data)
-        {
-            sum += i;
-        }
-        KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
-        setState(kalman_state);
-    }
-    // ignore alitiude measurements after apogee
-    else if (FSM_state >= FSMState::STATE_APOGEE)
-    {
-        H(1, 2) = 0;
-    }
 
-    // Kalman Gain
-    Eigen::Matrix<float, 4, 4> S_k = Eigen::Matrix<float, 4, 4>::Zero();
-    S_k = (((H * P_priori * H.transpose()) + R)).inverse();
-    Eigen::Matrix<float, 9, 9> identity = Eigen::Matrix<float, 9, 9>::Identity();
-    K = (P_priori * H.transpose()) * S_k;
 
-    // Sensor Measurements
-    Eigen::Matrix<float, 3, 1> sensor_accel_global_g = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+    // We only care about acceleration and altitude measurements for now
+    // define z (measurement) matrix
+    Eigen::Matrix<float,4, 1> z;
 
-    // accouting for sensor bias and coordinate frame transforms
-    (sensor_accel_global_g)(0, 0) = acceleration.az - 0.045;
-    (sensor_accel_global_g)(1, 0) = acceleration.ay - 0.065;
-    (sensor_accel_global_g)(2, 0) = -acceleration.ax - 0.06;
+    z(0,0) = barometer.altitude;
+    z(1,0) = acceleration.ax;
+    z(2,0) = acceleration.ay;
+    z(3,0) = acceleration.az;
 
-    euler_t angles_rad = orientation.getEuler();
-    angles_rad.yaw = -angles_rad.yaw; // coordinate frame match
 
-    BodyToGlobal(angles_rad, sensor_accel_global_g);
 
-    float g_ms2;
-    if ((FSM_state > FSMState::STATE_IDLE) && (FSM_state < FSMState::STATE_LANDED))
-    {
-        g_ms2 = -gravity_ms2;
-    }
-    else
-    {
-        g_ms2 = 0;
-    }
+    // Define the prediction of next measurements;
+    Eigen::Matrix<float,4,1> z_pred;
+    
+    z_pred(0) = x_priori(0); // altitude
+    z_pred(1) = a_pred(0);
+    z_pred(2) = a_pred(1);
+    z_pred(3) = a_pred(2);
 
-    // acceloremeter reports values in g's and measures specific force
-    y_k(1, 0) = ((sensor_accel_global_g)(0)) * gravity_ms2 + g_ms2;
-    y_k(2, 0) = ((sensor_accel_global_g)(1)) * gravity_ms2;
-    y_k(3, 0) = ((sensor_accel_global_g)(2)) * gravity_ms2;
 
-    y_k(0, 0) = barometer.altitude; // meters
 
-    // # Posteriori Update
-    x_k = x_priori + K * (y_k - (H * x_priori));
-    P_k = (identity - K * H) * P_priori;
 
-    kalman_state.state_est_pos_x = x_k(0, 0);
-    kalman_state.state_est_vel_x = x_k(1, 0);
-    kalman_state.state_est_accel_x = x_k(2, 0);
-    kalman_state.state_est_pos_y = x_k(3, 0);
-    kalman_state.state_est_vel_y = x_k(4, 0);
-    kalman_state.state_est_accel_y = x_k(5, 0);
-    kalman_state.state_est_pos_z = x_k(6, 0);
-    kalman_state.state_est_vel_z = x_k(7, 0);
-    kalman_state.state_est_accel_z = x_k(8, 0);
 
-    state.position = (Position){kalman_state.state_est_pos_x, kalman_state.state_est_pos_y, kalman_state.state_est_pos_z};
-    state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
-    state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
 }
 
 /**
