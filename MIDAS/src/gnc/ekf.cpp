@@ -13,7 +13,27 @@ EKF::EKF() : KalmanFilter()
 /**
  * THIS IS A PLACEHOLDER FUNCTION SO WE CAN ABSTRACT FROM `kalman_filter.h`
  */
-void EKF::priori() {};
+void EKF::priori(float dt, Orientation &orientation, FSMSTATE fsm) {
+
+    (void)orientation;
+    (void) fsm;
+
+    Eigen::Matrix<float, 9, 9> F_mat = Eigen::Matrix<float,9,9>::Identity();
+    
+    for (int i = 0; i < 3; i++) {
+
+        // x = v0t dt + 1/2a^2
+        F_mat(3i,3i + 1) = dt;
+        F_mat(3i, 3i + 2) = dt * dt * 1/2; 
+
+        // v = at
+        F_mat(3i + 1, 3i + 2) = dt;
+
+    }
+
+    x_priori = F_mat * x_k;
+    P_priori = F_mat * P_k * F_mat.transpose() + Q;
+};
 
 /**
  * @brief Sets altitude by averaging 30 barometer measurements taken 100 ms
