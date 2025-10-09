@@ -55,8 +55,8 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
 
     //Pyros
     data.pyros[0] = (packet.pyro >> 0) & (0x7F);
-    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
-    data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
+    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * MAX_TELEM_CONT_I;
+    data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * MAX_TELEM_CONT_I;
     data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
 
     // TODO: MIDAS MK3 will have proper pyro telem reporting.
@@ -67,7 +67,7 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     // data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
 
     // kalman filter    
-    data.kf_px = convert_range<uint16_t>(packet.kf_px, MAX_KF_XPOSITION_M);
+    data.kf_px = convert_range<int16_t>(packet.kf_px, MAX_KF_XPOSITION_M);
     data.kf_vx = convert_range<int16_t>(packet.kf_vx, MAX_KF_XVELOCITY_MS);
 
     // Camera state

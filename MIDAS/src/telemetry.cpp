@@ -138,8 +138,8 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     //Pyro A0 | B1 | C2 | D3
     // This is what we're telemetering for MIDAS mk2
     packet.pyro |= ((((uint32_t) (std::round(continuity.pins[0]))) & 0x7F) << (0 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[1] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (1 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[2] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (2 * 7));
+    packet.pyro |= ((((uint32_t) (continuity.pins[1] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (1 * 7));
+    packet.pyro |= ((((uint32_t) (continuity.pins[2] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (2 * 7));
     packet.pyro |= ((((uint32_t) (continuity.pins[3] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (3 * 7));
 
     // This is what we want for MIDAS mk3
