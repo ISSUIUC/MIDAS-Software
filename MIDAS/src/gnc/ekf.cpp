@@ -60,8 +60,8 @@ void EKF::priori(float dt, Orientation &orientation, FSMSTATE fsm) {
 void EKF::initialize(RocketSystems *args)
 {
     Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
-    float sum = 0;
-
+    
+    float alt_sum = 0;
     for (int i = 0; i < 30; i++)
     {
         Barometer barometer = args->rocket_data.barometer.getRecent();
@@ -70,7 +70,7 @@ void EKF::initialize(RocketSystems *args)
             .ax = initial_accelerometer.ax,
             .ay = initial_accelerometer.ay,
             .az = initial_accelerometer.az};
-        sum += barometer.altitude;
+        alt_sum += barometer.altitude;
 
         init_accel(0, 0) += accelerations.az;
         init_accel(1, 0) += accelerations.ay;
@@ -149,9 +149,27 @@ void EKF::initialize(RocketSystems *args)
  * it extrapolates the state at time n+1 based on the state at time n.
  */
 
-void EKF::priori()
+void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 {
-    
+    (void)orientation;
+    (void)fsm;
+    // Only care about the time step for now
+    Eigen::Matrix<float, 9, 9> F_mat = Eigen::Matrix<float, 9, 9>::Identity();
+    for (int i = 0; i < 3l i++) {
+        // x = v0t dt + 1/2at^2
+        F_mat(3 * i, 3 * i + 1) = dt;
+        F_mat(3* i, 3 * i + 2) = dt * dt * 1/2;
+        
+        // v = at
+        F_mat(3 * i + 1, 3 * i + 2) = dt;
+
+    }
+
+    // State transition Matrix * State, matrix with dimensions 9x9 * 9x1 = 9x1
+    x_priori = F_mat * x_k;
+
+    // Project the error covariance ahead
+    P_priori = F_mat * P_k * F_mat.transpose() + Q;
 }
 
 /**
@@ -173,9 +191,9 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     // Acceleration Prediction matrix
     Eigen::Vector3f a_pred;
 
-    a_pred(0) = x_priori(0);
-    a_pred(1) = x_priori(3);
-    a_pred(2) = x_priori(6);
+    a_pred(0) = x_priori(2);
+    a_pred(1) = x_priori(5);
+    a_pred(2) = x_priori(8);
     
 
     // We only care about acceleration and altitude measurements for now
@@ -187,8 +205,6 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     z(2,0) = acceleration.ay;
     z(3,0) = acceleration.az;
 
-
-
     // Define the prediction of next measurements;
     Eigen::Matrix<float,4,1> z_pred;
     
@@ -197,9 +213,23 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     z_pred(2) = a_pred(1);
     z_pred(3) = a_pred(2);
 
+    // Jacobian H
+    Eigen::Matrix<float,4,9> H_j = Eigen::Matrix<float,4,9>::Zero();
+    H_j(0,0) = 1.0f; // baro altitude
+    H_j(2,1) = 1.0f; // x acceleration
+    H_j(5,6) = 1.0f; // y acceleration
+    H_j(8,8) = 1.0f; // z acceleration
 
+    // Innovation or measurement residual
+    Eigen::Matrix<float,4,4> S = H_j * P_priori * H_j.transpose() + R;
+    Eigen::Matrix<float,9,4> K = P_priori * H_j.transpose() * S.inverse();
 
+    // Update state estimate
+    Eigen::Matrix<float,4,1> y = z - z_pred;
+    x_k = x_priori + K * y;
 
+    // Update error covariance
+    P_k = (Eigen::Matrix<float,9,9>::Identity() - K * H_j) * P_priori;
 
 }
 
@@ -215,19 +245,9 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
  */
 void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state)
 {
-    if (FSM_state >= FSMState::STATE_IDLE)
-    {
-        if (FSM_state != last_fsm)
-        {
-            stage_timestamp = 0;
-            last_fsm = FSM_state;
-        }
-        stage_timestamp += dt;
-        setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
-        setQ(dt, sd);
-        priori(dt, orientation, FSM_state);
-        update(barometer, acceleration, orientation, FSM_state);
-    }
+    priori(dt, orientation, state);
+    update(barometer, acceleration, orientation, FSM_state);
+    last_fsm = FSM_state;
 }
 
 /**
