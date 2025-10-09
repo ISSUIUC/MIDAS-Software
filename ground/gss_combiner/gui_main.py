@@ -524,7 +524,7 @@ class DeviceApp(tk.Tk):
             target_device.has_errored = False
             target_device.reset()
             target_device.stat = "STARTUP..."
-            target_device.meta = f"{self.stage_sel.get().upper()} (LOG: {"YES" if should_log else "NO"})"
+            # target_device.meta = f"{self.stage_sel.get().upper()} (LOG: {"YES" if should_log else "NO"})"
             target_device.stage_sel = self.stage_sel.get()
             target_device.pipe_conn, child_conn = multiprocessing.Pipe()
             target_device.proc = multiprocessing.Process(target=run_standalone_worker, args=(child_conn, ip, self.selected_device, self.stage_sel.get(), should_log))
