@@ -32,13 +32,13 @@ packet = fsm.StateEstimate()
 state_rows = []
 
 for i, line in df.iterrows():
-    packet['acceleration'] = float(line[ACCEL_STRING])
+    packet['acceleration'] = -(float(line[ACCEL_STRING])) / 9.81
     packet['altitude'] = float(line[HEIGHT_STRING])
     packet['current_time'] = float(line[TIME_STRING])
     packet['jerk'] = 0
 
     if i > 0 and line[TIME_STRING] - df[TIME_STRING][i - 1] != 0:
-        packet['jerk'] = float((line[ACCEL_STRING] - df[ACCEL_STRING][i - 1]) / (line[TIME_STRING] - df[TIME_STRING][i - 1]))
+        packet['jerk'] = float((line[ACCEL_STRING] - df[ACCEL_STRING][i - 1]) / (line[TIME_STRING] - df[TIME_STRING][i - 1])) / 9.81
 
     packet['vertical_speed'] = float(line[SPEED_STRING])
 

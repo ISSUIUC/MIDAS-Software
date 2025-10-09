@@ -216,6 +216,7 @@ class BoosterFsm:
     main_deployed_time: float = 0.0
     landed_time: float = 0.0
     first_separation_time: float = 0.0
+    stage_sep_time: float = 0.0
 
     def tick_fsm(self, state_estimate: StateEstimate) -> None:
         acceleration: float = state_estimate['acceleration']
@@ -255,18 +256,20 @@ class BoosterFsm:
                 # if in burnout for long enough then go on to the next state (time transition)
                 elif ((current_time - self.burnout_time) > thresholds.BOOSTER_FIRST_BOOST_TO_BURNOUT_TIME_THRESHOLD):
                     self.sustainer_ignition_time = current_time
+                    self.stage_sep_time = current_time
                     self.state = FSMState.STATE_FIRST_SEPARATION
                     reason_transition = f"Transitioned BURNOUT TO FIRST_SEPARATION due to long enough time after burnout. It has been {current_time - self.burnout_time}ms since burnout_time"
             case FSMState.STATE_FIRST_SEPARATION:
-                # if jerk is low, go to next state
-                if (abs(jerk) < thresholds.BOOSTER_FIRST_SEPARATION_JERK_THRESHOLD):
-                    self.state = FSMState.STATE_COAST
-                    reason_transition = f"Transitioned FIRST_SEPARATION to COAST due to low magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
+                if ((current_time - self.stage_sep_time) >= thresholds.BOOSTER_PYRO_FIRING_TIME_MINIMUM):
+                    # if jerk is low, go to next state
+                    if (abs(jerk) < thresholds.BOOSTER_FIRST_SEPARATION_JERK_THRESHOLD):
+                        self.state = FSMState.STATE_COAST
+                        reason_transition = f"Transitioned FIRST_SEPARATION to COAST due to low magnitude of jerk. Experienced a jerk of {jerk}m/s^3"
 
-                # if first separation time threshold passed, go to next state
-                elif ((current_time - self.first_separation_time) > thresholds.BOOSTER_FIRST_SEPARATION_TIME_THRESHOLD):
-                    self.state = FSMState.STATE_COAST
-                    reason_transition = f"Transitioned FIRST_SEPARATION TO COAST due to long enough time after first separation. It has been {current_time - self.first_separation_time}ms since first_separation_time"
+                    # if first separation time threshold passed, go to next state
+                    elif ((current_time - self.first_separation_time) > thresholds.BOOSTER_FIRST_SEPARATION_TIME_THRESHOLD):
+                        self.state = FSMState.STATE_COAST
+                        reason_transition = f"Transitioned FIRST_SEPARATION TO COAST due to long enough time after first separation. It has been {current_time - self.first_separation_time}ms since first_separation_time"
 
             case FSMState.STATE_COAST:
                 if (vertical_speed <= thresholds.BOOSTER_COAST_TO_APOGEE_VERTICAL_SPEED_THRESHOLD):
