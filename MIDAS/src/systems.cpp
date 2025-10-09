@@ -13,6 +13,24 @@
 
 #define ENABLE_TELEM
 
+static char buff[512]{};
+static char fbuf[24];
+
+inline void append_char(size_t &pos, char c) {
+  if (pos + 1 < sizeof(buff)) buff[pos++] = c;
+}
+
+inline void append_cstr(size_t &pos, const char *s) {
+  size_t n = strlen(s);
+  if (pos + n < sizeof(buff)) { memcpy(buff + pos, s, n); pos += n; }
+}
+
+inline void append_float(size_t &pos, float v, uint8_t prec = 5) {
+  dtostrf(v, 0, prec, fbuf);
+  append_cstr(pos, fbuf);
+}
+
+
 /**
  * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
@@ -20,6 +38,7 @@
  * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
 DECLARE_THREAD(logger, RocketSystems* arg) {
+    #ifndef GNC_DATA
     log_begin(arg->log_sink);
     while (true) {
         log_data(arg->log_sink, arg->rocket_data);
@@ -28,6 +47,39 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 
         THREAD_SLEEP(1);
     }
+    #else
+    while (true) {
+        KalmanData current_state = arg->rocket_data.kalman.getRecent();
+        HighGData cur_acc = arg->rocket_data.high_g.getRecent();
+        Orientation cur_ori = arg->rocket_data.orientation.getRecent();
+
+        size_t pos = 0;
+
+        append_char(pos, ';');
+        append_float(pos, current_state.position.px); append_char(pos, ',');
+        append_float(pos, current_state.position.py); append_char(pos, ',');
+        append_float(pos, current_state.position.pz); append_char(pos, ',');
+        append_float(pos, current_state.velocity.vx); append_char(pos, ',');
+        append_float(pos, current_state.velocity.vy); append_char(pos, ',');
+        append_float(pos, current_state.velocity.vz); append_char(pos, ',');
+        append_float(pos, current_state.acceleration.ax); append_char(pos, ',');
+        append_float(pos, current_state.acceleration.ay); append_char(pos, ',');
+        append_float(pos, current_state.acceleration.az); append_char(pos, ',');
+        append_float(pos, current_state.altitude); append_char(pos, ',');
+        append_float(pos, cur_acc.ax); append_char(pos, ',');
+        append_float(pos, cur_acc.ay); append_char(pos, ',');
+        append_float(pos, cur_acc.az); append_char(pos, ',');
+        append_float(pos, cur_ori.pitch); append_char(pos, ',');
+        append_float(pos, cur_ori.roll); append_char(pos, ',');
+        append_float(pos, cur_ori.yaw); append_char(pos, ',');
+        append_float(pos, cur_ori.tilt);
+        append_char(pos, '!');
+        buff[pos] = '\0';
+        (size_t)Serial.println(buff);
+
+        THREAD_SLEEP(50);
+    }
+    #endif
 }
 
 DECLARE_THREAD(barometer, RocketSystems* arg) {
@@ -242,6 +294,36 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
+
+
+        
+
+
+        // int len = snprintf(buff, sizeof(buff), ";%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,|%.5f,%.5f,%.5f,|%.5f,%.5f,%.5f,%.5f!",
+        // current_state.position.px,
+        // current_state.position.py,
+        // current_state.position.pz,
+        // current_state.velocity.vx,
+        // current_state.velocity.vy,
+        // current_state.velocity.vz,
+        // current_state.acceleration.ax,
+        // current_state.acceleration.ay,
+        // current_state.acceleration.az,
+        // current_state.altitude,
+        // current_accelerations.ax,
+        // current_accelerations.ay,
+        // current_accelerations.az,
+        // current_orientation.pitch,
+        // current_orientation.roll,
+        // current_orientation.yaw,
+        // current_orientation.tilt
+        // );
+        // Serial.println(buff);
+
+        // px,py,pz,vx,vy,vz,ax,ay,az,
+        
+
+
         THREAD_SLEEP(50);
     }
 }
@@ -417,9 +499,9 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     while (true) {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
+        // Serial.print("Running (Log Latency: ");
+        // Serial.print(config->rocket_data.log_latency.getLatency());
+        // Serial.println(")");
     }
 }
 
