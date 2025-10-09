@@ -77,7 +77,7 @@ DECLARE_THREAD(cmdq, RocketSystems* arg) {
                 break;
             }
         }
-        THREAD_SLEEP(100);
+        THREAD_SLEEP(BROWNOUT_PROTECTION_DELAY);
     }
 }
 
@@ -420,9 +420,11 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     START_THREAD(i2c, MAIN_CORE, config, 9);
     START_THREAD(fsm, MAIN_CORE, config, 8);
+    START_THREAD(cmdq, MAIN_CORE, config, 7);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     START_THREAD(flash, MAIN_CORE, config, 10);
     START_THREAD(comms_check, MAIN_CORE, config, 10);
+    
     //START_THREAD(can, MAIN_CORE, config, 15);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);

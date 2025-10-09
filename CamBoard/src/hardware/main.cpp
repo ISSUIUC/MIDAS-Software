@@ -94,21 +94,21 @@ void update_desired_state(uint8_t state_byte) {
 
   // Turn on cameras if we want them to be on
   if(DESIRED_CAM_STATE.cam1_on) {
-    delay(50);
+    delay(BROWNOUT_PROTECTION_DELAY);
     digitalWrite(CAM1_ON_OFF, HIGH);
   } else {
     digitalWrite(CAM1_ON_OFF, LOW);
   }
   
   if(DESIRED_CAM_STATE.cam2_on) {
-    delay(50);
+    delay(BROWNOUT_PROTECTION_DELAY);
     digitalWrite(CAM2_ON_OFF, HIGH);
   } else {
     digitalWrite(CAM2_ON_OFF, LOW);
   }
   
   if(DESIRED_CAM_STATE.vtx_on) {
-    delay(50);
+    delay(BROWNOUT_PROTECTION_DELAY);
     digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
   }
   
