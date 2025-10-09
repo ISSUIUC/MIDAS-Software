@@ -113,7 +113,8 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     // Tilt & FSM State
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    packet.tilt_fsm |= ((uint16_t)orientation.tilt & 0xfff0);
+    uint16_t tilt_norm = (orientation.tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
+    packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 
     Serial.println(packet.tilt_fsm, 2);

@@ -35,8 +35,7 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
 
     // Tilt & FSM
-    constexpr int tilt_bit_size = 12; // Number of bits that tilt is encoded as
-    data.tilt_angle = ((packet.tilt_fsm >> 4) / (float)(1 << tilt_bit_size)) * 180;
+    data.tilt_angle = ((float)((packet.tilt_fsm >> 4) & 0x0fff) / 0x0fff) * M_PI;
     data.FSM_State = packet.tilt_fsm & 0x000f;
 
     // Acceleration
@@ -67,6 +66,9 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     // data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
     // data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
 
+    // kalman filter    
+    data.kf_px = convert_range<uint16_t>(packet.kf_px, MAX_KF_XPOSITION_M);
+    data.kf_vx = convert_range<int16_t>(packet.kf_vx, MAX_KF_XVELOCITY_MS);
 
     // Camera state
     data.camera_state = packet.camera_state;
