@@ -35,7 +35,7 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
 
     // Tilt & FSM
-    data.tilt_angle = ((float)((packet.tilt_fsm >> 4) & 0x0fff) / 0x0fff) * M_PI;
+    data.tilt_angle = ((float)((packet.tilt_fsm >> 4) & 0x0fff) / 0x0fff) * 180;
     data.FSM_State = packet.tilt_fsm & 0x000f;
 
     // Acceleration
