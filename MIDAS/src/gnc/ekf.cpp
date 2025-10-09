@@ -31,6 +31,8 @@ void EKF::priori(float dt, Orientation &orientation, FSMSTATE fsm) {
 
     }
 
+    // State transition Matrix * State
+    
     x_priori = F_mat * x_k;
     P_priori = F_mat * P_k * F_mat.transpose() + Q;
 };
@@ -162,7 +164,19 @@ void EKF::priori()
  */
 void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state)
 {
+    (void)FSM_state;
 
+    // rotation matrix
+    // euler_t = orientation.getEuler();
+    // Eigen::Matrix R_be = eulerToRotation(e.yaw, e.pitch, e.roll);
+
+    // Acceleration Prediction matrix
+    Eigen::Vector3f a_pred;
+
+    a_pred(0) = x_priori(0);
+    a_pred(1) = x_priori(3);
+    a_pred(2) = x_priori(6);
+    
 
     // We only care about acceleration and altitude measurements for now
     // define z (measurement) matrix
