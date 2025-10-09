@@ -77,7 +77,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         buff[pos] = '\0';
         (size_t)Serial.println(buff);
 
-        THREAD_SLEEP(50);
+        THREAD_SLEEP(25);
     }
     #endif
 }
