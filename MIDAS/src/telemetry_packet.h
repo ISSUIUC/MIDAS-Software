@@ -4,7 +4,7 @@
 #include <cstdint>
 
 #define MAX_TELEM_VOLTAGE_V 6.0f
-#define MAX_KF_XPOSITION_M 40000.0f
+#define MAX_KF_XPOSITION_M 20000.0f
 #define MAX_ROLL_RATE_HZ 10.0f
 #define MAX_ABS_ACCEL_RANGE_G 64
 #define MAX_KF_XVELOCITY_MS 2000.0f

@@ -117,7 +117,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 
-    Serial.println(packet.tilt_fsm, 2);
+    //Serial.println(packet.tilt_fsm, 2);
     // Battery voltage
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, MAX_TELEM_VOLTAGE_V);
     
@@ -126,7 +126,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.roll_rate = roll_rate_hz / MAX_ROLL_RATE_HZ * 0xFF;
 
     // KF data
-    packet.kf_px = inv_convert_range<uint16_t>(kalman.position.px, MAX_KF_XPOSITION_M);
+    packet.kf_px = inv_convert_range<int16_t>(kalman.position.px, MAX_KF_XPOSITION_M);
+
+    Serial.println(kalman.position.px);
+
     packet.kf_vx = inv_convert_range<int16_t>(kalman.velocity.vx, MAX_KF_XVELOCITY_MS);
 
     //Camera Data
