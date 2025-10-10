@@ -76,6 +76,10 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(orientation, RocketSystems* arg) {
+
+    size_t start = millis();
+    bool is_first_reset = true;
+
     while (true) {
         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
         Orientation reading = arg->sensors.orientation.read();
@@ -100,6 +104,10 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
             arg->rocket_data.orientation.update(orientation_holder);
         }
+
+        Serial.println(orientation_holder.tilt);
+
+
 
         THREAD_SLEEP(5);
     }

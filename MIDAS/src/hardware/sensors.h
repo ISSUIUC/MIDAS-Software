@@ -75,6 +75,8 @@ struct OrientationSensor {
     float prev_z = 0;
     float prev_tilt = 0;
 
+    bool is_first_reset = true;
+
     ErrorCode init();
     Orientation read();
 };

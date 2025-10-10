@@ -167,8 +167,36 @@ Orientation OrientationSensor::read()
     deltaTime = (currentTime - lastTime) / 1000.0;
     lastTime = currentTime;
 
+
+    if(imu.wasReset()) {
+
+        if(is_first_reset) {
+            is_first_reset = false;
+            return {.has_data = false};
+        }
+
+        // do whatever steps to initialize the sensor
+        // if it errors, return the relevant error code
+        Serial.println("Setting BNO desired reports");
+        if (!imu.enableReport(SH2_ARVR_STABILIZED_RV, REPORT_INTERVAL_US_AV))
+        {
+            Serial.println("no stabilized :(");
+        }
+
+        if (!imu.enableReport(SH2_GYRO_INTEGRATED_RV, REPORT_INTERVAL_US))
+        {
+            Serial.println("no integrated :(");
+        }
+
+
+        Serial.println(":awesome:");
+        
+    }
+
+
     if (imu.getSensorEvent(&event))
     {
+
         Orientation sensor_reading;
         sensor_reading.has_data = true;
 

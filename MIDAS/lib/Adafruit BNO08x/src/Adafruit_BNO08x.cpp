@@ -214,7 +214,7 @@ bool Adafruit_BNO08x::_init(int32_t sensor_id) {
  * @brief Reset the device using the Reset pin
  *
  */
-void Adafruit_BNO08x::hardwareReset(void) { hal_hardwareReset(); }
+void Adafruit_BNO08x::hardwareReset(void) { hal_hardwareReset(); Serial.println("HARDWARE RESET!!!"); }
 
 /**
  * @brief Check if a reset has occured
