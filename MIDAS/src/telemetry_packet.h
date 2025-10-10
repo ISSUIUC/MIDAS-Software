@@ -41,6 +41,10 @@ struct TelemetryCommand {
     std::array<char, 3> verify;
 
     bool valid() {
+        #ifdef IS_SUSTAINER
         return verify == std::array<char, 3>{{'B','R','K'}};
+        #elif IS_BOOSTER
+        return verify == std::array<char, 3>{{'A','R','K'}};
+        #endif
     }
 };
