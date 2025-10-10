@@ -128,7 +128,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     // KF data
     packet.kf_px = inv_convert_range<int16_t>(kalman.position.px, MAX_KF_XPOSITION_M);
 
-    Serial.println(kalman.position.px);
+    // Serial.println(kalman.position.px);
 
     packet.kf_vx = inv_convert_range<int16_t>(kalman.velocity.vx, MAX_KF_XVELOCITY_MS);
 
