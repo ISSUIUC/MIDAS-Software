@@ -60,3 +60,25 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
 
     return data;
 }
+
+FullTelemetryData DecodeDronePacket(const DroneTelemetryPacket& packet, float frequency) {
+    int64_t start_printing = millis();
+    FullTelemetryData data;
+    data.altitude = static_cast<float>(packet.alt);
+    data.latitude = ConvertGPS(packet.lat);
+    data.longitude = ConvertGPS(packet.lon);
+    data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
+
+    data.sat_count = packet.fsm_callsign_satcount >> 4 & 0b0111;
+    data.is_sustainer = (packet.fsm_callsign_satcount >> 7);
+    data.FSM_State = packet.fsm_callsign_satcount & 0b1111;
+    data.kf_reset = packet.alt & 1;
+
+    // kinda hacky but it will work
+    if (packet.fsm_callsign_satcount == static_cast<uint8_t>(-1)) {
+        data.FSM_State = static_cast<uint8_t>(-1);
+    }
+    data.freq = frequency;
+
+    return data;
+}
