@@ -152,7 +152,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     // 0000 | 000 | 0
     // SATC | FT  | C
     packet.callsign_gpsfix_satcount |= (gps.fix_type & 0x07) << 1;
-    packet.callsign_gpsfix_satcount |= (gps.fix_type & 0x0F) << 4; // Replace fix type here with satcount later
+    packet.callsign_gpsfix_satcount |= (gps.sats_in_view & 0x0F) << 4;
 
     #ifdef IS_SUSTAINER
     packet.callsign_gpsfix_satcount |= 0b1;
