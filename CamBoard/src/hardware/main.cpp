@@ -92,7 +92,7 @@ void update_desired_state(uint8_t state_byte) {
   DESIRED_CAM_STATE.cam1_rec = state_byte & 0b00010000;
   DESIRED_CAM_STATE.cam2_rec = state_byte & 0b00100000;
 
-  // Turn on vtx cameras if we want them to be on
+  // Turn on vtx / cameras if we want them to be on
   
   // vtx must be first because of higher inrush current (TS832)
   if(DESIRED_CAM_STATE.vtx_on) {
