@@ -33,7 +33,8 @@ bool BLUE_LED_STATE = false;
 bool GREEN_LED_STATE = false;
 
 void onRequest() {
-  uint16_t cam_dat = 0;
+  uint8_t cam_dat = 0;
+  uint8_t cam_batt_volt = 0;
   // encode data
 
   // "FSM" thread data
@@ -49,7 +50,7 @@ void onRequest() {
 
   // Camera battery voltage data
 
-  cam_dat |= (GLOBAL_CAM_BATT_VOLTAGE >> 7) << 8;
+  cam_batt_volt |= (GLOBAL_CAM_BATT_VOLTAGE >> 7);
 
   // Toggle blue LED
   BLUE_LED_STATE = !BLUE_LED_STATE;
@@ -66,10 +67,9 @@ void onRequest() {
   Serial.println(GLOBAL_CAM_STATE.cam2_rec);
 
   // Send to MIDAS
-
-  uint16_t buf[1] = { cam_dat };
+  uint8_t buf[2] = {cam_dat, cam_batt_volt};
   LAST_I2C_COMM = millis();
-  Wire1.slaveWrite(buf, 1);
+  Wire1.slaveWrite(buf, 2);
 }
 
 void onReceive(int len) {
