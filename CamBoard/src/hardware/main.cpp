@@ -92,7 +92,14 @@ void update_desired_state(uint8_t state_byte) {
   DESIRED_CAM_STATE.cam1_rec = state_byte & 0b00010000;
   DESIRED_CAM_STATE.cam2_rec = state_byte & 0b00100000;
 
-  // Turn on cameras if we want them to be on
+  // Turn on vtx cameras if we want them to be on
+  
+  // vtx must be first because of higher inrush current (TS832)
+  if(DESIRED_CAM_STATE.vtx_on) {
+    delay(BROWNOUT_PROTECTION_DELAY);
+    digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
+  }
+
   if(DESIRED_CAM_STATE.cam1_on) {
     delay(BROWNOUT_PROTECTION_DELAY);
     digitalWrite(CAM1_ON_OFF, HIGH);
@@ -107,10 +114,6 @@ void update_desired_state(uint8_t state_byte) {
     digitalWrite(CAM2_ON_OFF, LOW);
   }
   
-  if(DESIRED_CAM_STATE.vtx_on) {
-    delay(BROWNOUT_PROTECTION_DELAY);
-    digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
-  }
   
   digitalWrite(VIDEO_SELECT, DESIRED_CAM_STATE.vmux_state ? HIGH : LOW);
 }

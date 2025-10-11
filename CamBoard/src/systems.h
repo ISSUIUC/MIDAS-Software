@@ -15,7 +15,7 @@
 
 #define CAMBOARD_I2C_ADDR 0x69
 
-#define BROWNOUT_PROTECTION_DELAY 100
+#define BROWNOUT_PROTECTION_DELAY 1000
 /**
  * @struct Sensors
  * 
