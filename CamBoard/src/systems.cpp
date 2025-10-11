@@ -12,6 +12,7 @@
 #define I2C_RECOVERY_FALLBACK_TIME 180000
 
 cam_state_t GLOBAL_CAM_STATE;
+int GLOBAL_CAM_BATT_VOLTAGE;
 cam_state_t DESIRED_CAM_STATE;
 uint32_t LAST_I2C_COMM;
 
@@ -32,6 +33,7 @@ DECLARE_THREAD(i2c, RocketSystems* arg) {
             int current = read_reg(0x7, 2);
             int temp = read_reg(0x6, 2);
             int voltage = read_reg(0x5, 2);
+            GLOBAL_CAM_BATT_VOLTAGE = voltage;
             //arg->rocket_data.voltage_sense.update({power, current, temp, voltage});
             Serial.print("Voltage ");
             Serial.println(voltage * 3.125 / 1000.0);

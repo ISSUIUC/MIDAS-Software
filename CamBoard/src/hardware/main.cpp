@@ -26,13 +26,14 @@ enum class CameraCommand {
 
 extern cam_state_t GLOBAL_CAM_STATE;
 extern cam_state_t DESIRED_CAM_STATE;
+extern int GLOBAL_CAM_BATT_VOLTAGE;
 extern uint32_t LAST_I2C_COMM;
 
 bool BLUE_LED_STATE = false;
 bool GREEN_LED_STATE = false;
 
 void onRequest() {
-  uint8_t cam_dat = 0;
+  uint16_t cam_dat = 0;
   // encode data
 
   // "FSM" thread data
@@ -45,6 +46,10 @@ void onRequest() {
   cam_dat |= (GLOBAL_CAM_STATE.vtx_on) << 4;
   cam_dat |= (GLOBAL_CAM_STATE.vmux_state) << 5;
   cam_dat |= (GLOBAL_CAM_STATE.cam_ack) << 6;
+
+  // Camera battery voltage data
+
+  cam_dat |= (GLOBAL_CAM_BATT_VOLTAGE >> 7) << 8;
 
   // Toggle blue LED
   BLUE_LED_STATE = !BLUE_LED_STATE;
@@ -62,7 +67,7 @@ void onRequest() {
 
   // Send to MIDAS
 
-  uint8_t buf[1] = { cam_dat };
+  uint16_t buf[1] = { cam_dat };
   LAST_I2C_COMM = millis();
   Wire1.slaveWrite(buf, 1);
 }

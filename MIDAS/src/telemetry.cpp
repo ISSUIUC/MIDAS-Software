@@ -97,6 +97,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     PyroState pyro = data.pyro.getRecentUnsync();
     Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
+    uint8_t cam_batt_voltage = data.cam_batt_voltage.getRecentUnsync();
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
@@ -134,6 +135,8 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     //Camera Data
     packet.camera_state = ((uint16_t) (data.camera_state)) & 0xFF;
+    packet.camera_batt_volt = ((data.cam_batt_voltage));
+
     
     //Pyro A0 | B1 | C2 | D3
     // This is what we're telemetering for MIDAS mk2
