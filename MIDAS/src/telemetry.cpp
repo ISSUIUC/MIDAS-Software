@@ -97,7 +97,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     PyroState pyro = data.pyro.getRecentUnsync();
     Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
-    uint8_t cam_batt_voltage = data.cam_batt_voltage.getRecentUnsync();
+    uint8_t cam_batt_voltage = data.cam_batt_voltage;
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
