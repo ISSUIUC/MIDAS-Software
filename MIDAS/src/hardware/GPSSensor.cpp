@@ -36,7 +36,7 @@ ErrorCode GPSSensor::init() {
  * @return GPS data packet
  */
 GPS GPSSensor::read() {
-    return GPS{ublox.getLatitude(), ublox.getLongitude(), (float) ublox.getAltitude() / 1000.f, (float) ublox.getGroundSpeed() / 1000.f, ublox.getFixType(), ublox.getUnixEpoch()};
+    return GPS{ublox.getLatitude(), ublox.getLongitude(), (float) ublox.getAltitude() / 1000.f, (float) ublox.getGroundSpeed() / 1000.f, ublox.getFixType(), ublox.getSIV(), ublox.getUnixEpoch()};
 }
 
 bool GPSSensor::valid() {
