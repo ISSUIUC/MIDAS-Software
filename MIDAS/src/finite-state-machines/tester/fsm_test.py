@@ -5,15 +5,19 @@ import fsm
 import math
 import matplotlib.pyplot as plt
 
-# ACCEL_STRING = "acceleration"
+# Run configuration for sg1.4-telemega-booster.csv for booster data
+
+# ACCEL_STRING = "accel_x"
 # TIME_STRING = "time"
-# HEIGHT_STRING = "height"
+# HEIGHT_STRING = "altitude"
 # SPEED_STRING = "speed"
+
+# Run configuration for sustainer pysim data
 
 ACCEL_STRING = "accel_x"
 TIME_STRING = "time"
-HEIGHT_STRING = "altitude"
-SPEED_STRING = "speed"
+HEIGHT_STRING = "pos_x"
+SPEED_STRING = "vel_x"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=pathlib.Path)
@@ -32,7 +36,12 @@ packet = fsm.StateEstimate()
 state_rows = []
 
 for i, line in df.iterrows():
-    packet['acceleration'] = -(float(line[ACCEL_STRING])) / 9.81
+    # Accel configuration for booster data
+    # packet['acceleration'] = -(float(line[ACCEL_STRING])) / 9.81
+
+    # Accel configuration for sustainer data
+    packet['acceleration'] = (float(line[ACCEL_STRING])) / 9.81
+
     packet['altitude'] = float(line[HEIGHT_STRING])
     packet['current_time'] = float(line[TIME_STRING])
     packet['jerk'] = 0
@@ -60,10 +69,11 @@ plt.yticks(ynums, yticks)
 plt.xlabel("Time (s)")
 plt.plot(df["time"], state_rows)
 
-plt.vlines(60, 0, top_state, label="Booster Ignition", colors="r", linestyles='--')
-plt.vlines(64, 0, top_state, label="Booster Burnout", colors="b", linestyles='--')
-plt.vlines(65, 0, top_state, label="Sustainer Ignition", colors="g", linestyles='--')
-plt.vlines(70, 0, top_state, label="Sustainer Burnout", colors="c", linestyles='--')
+# Lines for SG1.4 flight events
+# plt.vlines(60, 0, top_state, label="Booster Ignition", colors="r", linestyles='--')
+# plt.vlines(64, 0, top_state, label="Booster Burnout", colors="b", linestyles='--')
+# plt.vlines(65, 0, top_state, label="Sustainer Ignition", colors="g", linestyles='--')
+# plt.vlines(70, 0, top_state, label="Sustainer Burnout", colors="c", linestyles='--')
 
 
 plt.legend()
