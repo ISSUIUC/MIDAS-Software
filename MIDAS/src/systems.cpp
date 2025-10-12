@@ -84,7 +84,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
                 orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
                 orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
                 orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
-                // Serial.print("VX: "); Serial.println(orientation_holder.angular_velocity.vx);
                 
             } else if(reading.reading_type == OrientationReadingType::FULL_READING){
                 float old_vx = orientation_holder.angular_velocity.vx;
@@ -94,8 +93,6 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
                 orientation_holder.angular_velocity.vx = old_vx;
                 orientation_holder.angular_velocity.vy = old_vy;
                 orientation_holder.angular_velocity.vz = old_vz;
-                // Serial.print("Tilt: "); Serial.println(orientation_holder.tilt);
-
             }
 
             arg->rocket_data.orientation.update(orientation_holder);
