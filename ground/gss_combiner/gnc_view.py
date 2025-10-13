@@ -71,7 +71,6 @@ def inputprocess():
 
 
 
-
 # CHATGPT CODE FURTHER ---------------
 
 
@@ -487,6 +486,6 @@ if __name__ == "__main__":
     inp_thd.start()
 
 
-    app = RocketDashboard(data, lock=lock, poll_ms=100, history_sec=30.0)
+    app = RocketDashboard(data, lock=lock, poll_ms=10, history_sec=30.0)
     
     app.mainloop()
