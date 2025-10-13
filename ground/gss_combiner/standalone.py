@@ -14,6 +14,7 @@ import time
 
 import argparse
 
+import re
 import util.logger
 
 stdin_q = queue.Queue()
@@ -102,6 +103,7 @@ class TelemetryStandalone():
         self.__in_buf = ""
 
         self.__out_all = False
+        self.__filter = ".*"
 
 
     def process_packet(self, packet_json):
@@ -164,7 +166,9 @@ class TelemetryStandalone():
                 if len(packets) > 0:
                     if self.__out_all:
                         for p in packets:
-                            print(f"[F] {p.strip()}", flush=True)
+
+                            if re.findall(self.__filter, p.strip()):
+                                print(f"[F] {p.strip()}", flush=True)
 
                 # Process stdin
                 if not stdin_q.empty():
@@ -184,6 +188,28 @@ class TelemetryStandalone():
                         print("[CMD] OUT_ALL - Now outputting all serial data.")
                         print("Note: Serial data from the feather will be formatted like below:")
                         print("[F] This is a sample serial output.", flush=True)
+
+                    if line.startswith("FILTER "):
+                        f = line[7:]
+                        
+
+                        if not self.__out_all:
+                            print("[CMD] Automatically invoking OUT_ALL...")
+                            print("[CMD] OUT_ALL - Now outputting all serial data.")
+                            print("Note: Serial data from the feather will be formatted like below:")
+                            print("[F] This is a sample serial output.", flush=True)
+
+                        if f == "*":
+                            f = ".*"
+
+                        if f.lower() == "boo":
+                            f = "is_sustainer\": 0"
+
+                        if f.lower() == "sus":
+                            f = "is_sustainer\": 1"
+
+                        self.__filter = f
+                        print(f"[CMD] Filter set to {self.__filter}", flush=True)
 
                     if line == "OUT_DEFAULT":
                         is_internal = True

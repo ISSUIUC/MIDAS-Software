@@ -29,7 +29,7 @@ def is_port_taken(port):
         bool: True if the port is taken, False otherwise.
     """
     try:
-        ser = serial.Serial(port)
+        ser = serial.Serial(port, write_timeout=1, timeout=2)
         return False, ser  # Port is free
     except serial.SerialException as e:
         return True, None
@@ -524,7 +524,10 @@ class DeviceApp(tk.Tk):
             target_device.has_errored = False
             target_device.reset()
             target_device.stat = "STARTUP..."
-            target_device.meta = f"{self.stage_sel.get().upper()} (LOG: {"YES" if should_log else "NO"})"
+            log_str = "NO"
+            if should_log:
+                log_str = "YES"
+            target_device.meta = f"{self.stage_sel.get().upper()} (LOG: {log_str})"
             target_device.stage_sel = self.stage_sel.get()
             target_device.pipe_conn, child_conn = multiprocessing.Pipe()
             target_device.proc = multiprocessing.Process(target=run_standalone_worker, args=(child_conn, ip, self.selected_device, self.stage_sel.get(), should_log))
@@ -536,36 +539,6 @@ class DeviceApp(tk.Tk):
             print("Opening terminal window")
             self.open_terminal_window(self.selected_device)
             # Add real logic here
-
-    def show_json_window(self):
-        window = tk.Toplevel(self)
-
-        title = "Data"
-        json_data = {"hello": "world", "bruh": "moment"}
-        window.title(title)
-        window.geometry("600x400")
-
-        label = ttk.Label(window, text=title, font=("Helvetica", 14, "bold"))
-        label.pack(pady=5)
-
-        # Text widget with scrollbar
-        text_frame = ttk.Frame(window)
-        text_frame.pack(fill="both", expand=True, padx=10, pady=5)
-
-        scrollbar = ttk.Scrollbar(text_frame)
-        scrollbar.pack(side="right", fill="y")
-
-        text = tk.Text(text_frame, wrap="none", yscrollcommand=scrollbar.set, bg="#1e1e1e", fg="#d4d4d4", insertbackground="white")
-        text.pack(fill="both", expand=True)
-        scrollbar.config(command=text.yview)
-
-        # Pretty-print the JSON
-        pretty_json = json.dumps(json_data, indent=4)
-        text.insert("1.0", pretty_json)
-        text.config(state="disabled")  # Make it read-only
-
-        # Optional: allow closing with Esc
-        window.bind("<Escape>", lambda e: window.destroy())
 
     def open_terminal_window(self, device):
         global devices
@@ -616,6 +589,7 @@ class DeviceApp(tk.Tk):
                 output.insert("end", f">> {command}\n", "user_in")
                 output.config(state="disabled")
                 output.see("end")
+                
                 target_device.pipe_conn.send(command + "\n")
                 input_var.set("")
 
