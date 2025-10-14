@@ -12,14 +12,7 @@ uint8_t* CameraB2B::read() {
     #ifdef B2B_I2C
     Wire.requestFrom(0x69, 2);
     res = Wire.read();
-    // int i=0;
-    // while (Wire.available()) {
-    //     uint8_t res[i] = Wire.read();
-    //     i++;
-    // }
-    // uint8_t res = Wire.read();
     uint8_t* ptr = &(res);
-    // uint8_t* ptr = &res;
     return ptr;
     #endif
 
