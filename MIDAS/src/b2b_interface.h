@@ -45,7 +45,7 @@ struct CameraB2B {
     void vmux_set(int cam_select);
     void vmux_toggle();
 
-    uint8_t read();
+    uint8_t* read();
 
     private:
     void transmit_command(CameraCommand command);
