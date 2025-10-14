@@ -138,14 +138,14 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     euler_t angles_rad = orientation.getEuler();
 
     // ignore effects of gravity when on pad
-    Eigen::Matrix<float,3,1> Fg_global = Eigen::Matrix<float,3,1>::Zero();
+    Eigen::Matrix<float,3,1> g_global = Eigen::Matrix<float,3,1>::Zero();
     if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED))
     {
-        Fg_global(0, 0) = -gravity_ms2;
+        g_global(0, 0) = -gravity_ms2;
     }
     else
     {
-        Fg_global(0, 0) = 0;
+        g_global(0, 0) = 0;
     }
 
     // mass and height init
@@ -185,14 +185,14 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     
 
-    // force due to gravity
-    Eigen::Matrix<float, 3, 1> Fg_body = Fg_global;
+    // acceleration due to gravity
+    Eigen::Matrix<float, 3, 1> g_body = g_global;
 
-    GlobalToBody(angles_rad, Fg_body);
+    GlobalToBody(angles_rad, g_body);
 
-    float Agx = Fg_body(0, 0);
-    float Agy = Fg_body(1, 0);
-    float Agz = Fg_body(2, 0);
+    float gx = g_body(0, 0);
+    float gy = g_body(1, 0);
+    float gz = g_body(2, 0);
 
     // thurst force
     Eigen::Matrix<float, 3, 1> Ft_global;
@@ -205,15 +205,15 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
 
     xdot << x_k(1, 0),
-        ((Fax + Ftx) / curr_mass_kg + Agx - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
+        ((Fax + Ftx) / curr_mass_kg + gx - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
         0.0,
 
         x_k(4, 0),
-        ((Fay + Fty) / curr_mass_kg + Agy - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
+        ((Fay + Fty) / curr_mass_kg + gy - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
         0.0,
 
         x_k(7, 0),
-        ((Faz + Ftz) / curr_mass_kg + Agz - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
+        ((Faz + Ftz) / curr_mass_kg + gz - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
         0.0;
         
     // priori step
