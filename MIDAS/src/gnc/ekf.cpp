@@ -131,8 +131,10 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 {
     Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
 
+
     // angular states from sensors
     Velocity omega_rps = orientation.getVelocity(); // rads per sec
+
     euler_t angles_rad = orientation.getEuler();
 
     // ignore effects of gravity when on pad
@@ -158,51 +160,68 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     // Mach number
     float vel_mag_squared_ms = x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
+
     float vel_magnitude_ms = pow(vel_mag_squared_ms, 0.5);
+
     float mach = vel_magnitude_ms / a;
+
 
     // approximating C_a (aerodynamic coeff.)
     int index = std::round(mach / 0.04);
+
     index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
+
+
     Ca = aero_data[index].CA_power_on;
 
     // aerodynamic force
+    // Body frame
     float Fax = -0.5 * rho * (vel_mag_squared_ms) * float(Ca) * (pi * r * r);
     float Fay = 0; // assuming no aerodynamic effects
     float Faz = 0; // assuming no aerodynamic effects
 
+    Serial.println("vel_mag_squared_ms: " + String(vel_mag_squared_ms));
+
+
+    
+
     // force due to gravity
     Eigen::Matrix<float, 3, 1> Fg_body = Fg_global;
+
     GlobalToBody(angles_rad, Fg_body);
 
-    float Fgx = Fg_body(0, 0);
-    float Fgy = Fg_body(1, 0);
-    float Fgz = Fg_body(2, 0);
+    float Agx = Fg_body(0, 0);
+    float Agy = Fg_body(1, 0);
+    float Agz = Fg_body(2, 0);
 
     // thurst force
     Eigen::Matrix<float, 3, 1> Ft_global;
     EKF::getThrust(stage_timestamp, angles_rad, fsm, Ft_global);
 
+    // Global frame
     float Ftx = Ft_global(0, 0);
     float Fty = Ft_global(1, 0);
-    float Ftz = Ft_global(2, 0);
+    float Ftz = Ft_global(2, 0); 
+
 
     xdot << x_k(1, 0),
-        ((Fax + Ftx + Fgx) / curr_mass_kg - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
+        ((Fax + Ftx) / curr_mass_kg + Agx - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
         0.0,
 
         x_k(4, 0),
-        ((Fay + Fty + Fgy) / curr_mass_kg - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
+        ((Fay + Fty) / curr_mass_kg + Agy - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
         0.0,
 
         x_k(7, 0),
-        ((Faz + Ftz + Fgz) / curr_mass_kg - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
+        ((Faz + Ftz) / curr_mass_kg + Agz - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
         0.0;
         
     // priori step
     x_priori = (xdot * dt) + x_k;
     setF(dt, omega_rps.vx, omega_rps.vy, omega_rps.vz);
+
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
+
 }
 
 /**
@@ -244,9 +263,9 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     Eigen::Matrix<float, 3, 1> sensor_accel_global_g = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
 
     // accouting for sensor bias and coordinate frame transforms
-    (sensor_accel_global_g)(0, 0) = acceleration.az - 0.045;
+    (sensor_accel_global_g)(0, 0) = acceleration.ax - 0.045;
     (sensor_accel_global_g)(1, 0) = acceleration.ay - 0.065;
-    (sensor_accel_global_g)(2, 0) = -acceleration.ax - 0.06;
+    (sensor_accel_global_g)(2, 0) = acceleration.az - 0.06;
 
     euler_t angles_rad = orientation.getEuler();
     angles_rad.yaw = -angles_rad.yaw; // coordinate frame match
@@ -264,7 +283,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     }
 
     // acceloremeter reports values in g's and measures specific force
-    y_k(1, 0) = ((sensor_accel_global_g)(0)) * gravity_ms2 + g_ms2;
+    y_k(1, 0) = ((sensor_accel_global_g)(0)) * gravity_ms2;
     y_k(2, 0) = ((sensor_accel_global_g)(1)) * gravity_ms2;
     y_k(3, 0) = ((sensor_accel_global_g)(2)) * gravity_ms2;
 
@@ -309,9 +328,10 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
             last_fsm = FSM_state;
         }
         stage_timestamp += dt;
+
         setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
         setQ(dt, sd);
-        priori(dt, orientation, FSM_state);
+        priori(dt, orientation, FSM_state); 
         update(barometer, acceleration, orientation, FSM_state);
     }
 }

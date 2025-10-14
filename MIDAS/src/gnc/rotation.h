@@ -46,7 +46,7 @@ void GlobalToBody(Angles& angles_rad, Eigen::Matrix<float, 3, 1> &global_vec)
              0, 1, 0,
              -sin(angles_rad.pitch), 0, cos(angles_rad.pitch);
     yaw << cos(angles_rad.yaw), -sin(angles_rad.yaw), 0, 
-           sin(angles_rad.yaw), cos(angles_rad.yaw), 
+           sin(angles_rad.yaw), cos(angles_rad.yaw), 0,
            0, 0, 1;
 
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
