@@ -98,6 +98,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
             arg->rocket_data.orientation.update(orientation_holder);
         }
 
+
         THREAD_SLEEP(5);
     }
 }
@@ -122,6 +123,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(pyro, RocketSystems* arg) {
+    THREAD_SLEEP(2000);
     while(true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         CommandFlags& command_flags = arg->rocket_data.command_flags;
@@ -304,8 +306,20 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 }
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
+    bool conn_good = false;
     while (true) {
-        arg->rocket_data.camera_state = arg->b2b.camera.read();
+
+        Wire.beginTransmission(0x69);
+        byte error = Wire.endTransmission();
+
+        conn_good = (error == 0);
+
+        if (conn_good) {
+            arg->rocket_data.camera_state = arg->b2b.camera.read();
+        } else {
+            THREAD_SLEEP(1800);
+        }
+        
         THREAD_SLEEP(200);
     }
 }
