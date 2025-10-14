@@ -88,6 +88,7 @@ void onReceive(int len) {
           Serial.println("Case 1\n");
           DESIRED_CAM_STATE.cam1_on = true;
           Serial.println("Trying to turn on camera 1");
+          delay(50);
           digitalWrite(CAM1_ON_OFF, HIGH);
           break;}
         case 2:{
@@ -99,6 +100,7 @@ void onReceive(int len) {
           Serial.println("Case 3\n");
           DESIRED_CAM_STATE.cam2_on = true;
           Serial.println("Trying to turn on camera 2");
+          delay(50);
           digitalWrite(CAM2_ON_OFF, HIGH);
           break;}
         case 4:
@@ -110,6 +112,7 @@ void onReceive(int len) {
         case 5:
           digitalWrite(VTX_ON_OFF, HIGH);
           Serial.println("Case 5\n");
+          delay(50);
           GLOBAL_CAM_STATE.vtx_on = true;
           DESIRED_CAM_STATE.vtx_on = true;
           break;
@@ -121,6 +124,7 @@ void onReceive(int len) {
         case 7:
           digitalWrite(VIDEO_SELECT, HIGH);
           Serial.println("Case 7\n");
+          delay(51);
           GLOBAL_CAM_STATE.vmux_state = true;
           break;
         default:
@@ -142,21 +146,21 @@ void update_desired_state(uint8_t state_byte) {
 
   // Turn on cameras if we want them to be on
   if(DESIRED_CAM_STATE.cam1_on) {
-    delay(50);
+    delay(100);
     digitalWrite(CAM1_ON_OFF, HIGH);
   } else {
     digitalWrite(CAM1_ON_OFF, LOW);
   }
   
   if(DESIRED_CAM_STATE.cam2_on) {
-    delay(50);
+    delay(100);
     digitalWrite(CAM2_ON_OFF, HIGH);
   } else {
     digitalWrite(CAM2_ON_OFF, LOW);
   }
   
   if(DESIRED_CAM_STATE.vtx_on) {
-    delay(50);
+    delay(100);
     digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
   }
   
