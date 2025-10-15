@@ -42,7 +42,7 @@
  * @brief Default constructor for the telemetry system
 */
 TelemetryBackend::TelemetryBackend() : lora(SPI, E22_CS, E22_BUSY, E22_DI01, E22_RXEN, E22_RESET) {
-    led_state = false;
+
 }
 /**
  * @brief Initializes the telemetry system
