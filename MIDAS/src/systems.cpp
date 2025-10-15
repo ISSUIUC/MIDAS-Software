@@ -306,15 +306,12 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 }
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
-    bool conn_good = false;
     while (true) {
 
         Wire.beginTransmission(0x69);
         byte error = Wire.endTransmission();
 
-        conn_good = (error == 0);
-
-        if (conn_good) {
+        if (error == 0) {
             arg->rocket_data.camera_state = arg->b2b.camera.read();
         } else {
             THREAD_SLEEP(1800);
