@@ -40,7 +40,7 @@ struct TelemetryPacket {
     uint16_t kf_vx; // 16 bit meters/second
     uint16_t kf_px;  // 16 bit meters
 
-    uint32_t pyro; // 7 bit continuity | Pyro -> A(rotation rate) | B(camera state) | C(kf_px) | D()
+    uint32_t pyro; // 7 bit continuity, 4 bit unused
     
     uint8_t roll_rate;
     uint8_t camera_state;
