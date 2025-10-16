@@ -303,10 +303,9 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
     while (true) {
-        uint8_t* cam_state_and_cam_volt = arg->b2b.camera.read();
-        arg->rocket_data.camera_state = cam_state_and_cam_volt[0];
-        arg->rocket_data.cam_batt_voltage = cam_state_and_cam_volt[1];
-        delete[] cam_state_and_cam_volt;
+        CameraState cam_state_and_cam_volt = arg->b2b.camera.read();
+        arg->rocket_data.camera_state = cam_state_and_cam_volt.cam_state;
+        arg->rocket_data.cam_batt_voltage = cam_state_and_cam_volt.batt_volt;
         THREAD_SLEEP(200);
     }
 }
