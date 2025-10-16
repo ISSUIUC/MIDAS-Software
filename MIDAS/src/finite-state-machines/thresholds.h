@@ -78,7 +78,7 @@
 // @REC: MIDAS does not currently auto-calculate launch site altitudes. 
 //       This value should always be set at (launch site ASL) + (desired altitude AGL)
 // (Flight Parameter)
-#define sustainer_main_deploy_altitude_threshold 545 // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED
+#define sustainer_main_deploy_altitude_threshold 545
 
 // The minimum delay between drogue deployment and main deployment (ms)
 // @REC: This is a safety feature to prevent overpressurization or internal firing, and forces MAIN_DEPLOY to wait at least this much time,
@@ -112,7 +112,7 @@
 // Transition back to MAIN if vertical speed is greater than this threshold (m/s)
 // @REC: This number should be below the MINIMUM descent velocity of the vehicle with significant margin.
 // (Flight Parameter)
-#define sustainer_landed_to_main_vertical_speed_threshold 3 // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED
+#define sustainer_landed_to_main_vertical_speed_threshold 3
 
 // Lock out further transitions from LANDED after this much time passes in the LANDED state. (ms)
 // (Core Setting)
@@ -185,7 +185,7 @@
 //       This value should always be set at (launch site ASL) + (desired altitude AGL)
 // (Flight Parameter)
 // [STARGAZER 1.4] This is a "dontcare" value --> The booster does not have a drogue, we transition immediately to MAIN
-#define booster_main_deploy_altitude_threshold 545 // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED // CHANGED
+#define booster_main_deploy_altitude_threshold 545
 
 // The minimum delay between drogue deployment and main deployment (ms)
 // @REC: This is a safety feature to prevent overpressurization or internal firing, and forces MAIN_DEPLOY to wait at least this much time,
