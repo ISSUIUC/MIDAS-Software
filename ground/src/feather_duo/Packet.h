@@ -54,4 +54,4 @@ struct FullTelemetryData {
 };
 
 FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency);
-FullTelemetryData DecodeDronePacket(const TelemetryPacket& packet, float frequency);
+FullTelemetryData DecodeDronePacket(const DroneTelemetryPacket& packet, float frequency);
