@@ -16,3 +16,4 @@ static constexpr const char* json_receive_failure = R"({"type": "receive_error",
 static constexpr const char* json_send_failure = R"({"type": "send_error", "error": "command_retries_exceded"})";
 
 void printPacketJson(FullTelemetryData const& packet);
+void printDronePacketJson(FullTelemetryData const& packet);

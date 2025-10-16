@@ -47,6 +47,15 @@ struct TelemetryPacket {
 };
 
 
+struct DroneTelemetryPacket {
+    uint16_t alt; //15 bit meters, 1 bit command ack
+    int32_t lon;
+    int32_t lat;
+    uint16_t baro_alt;
+    uint8_t fsm_callsign_satcount; // 4 bit fsm state, 1 bit is_sustainer_callsign, 3 bits sat count
+};
+
+
 struct FullTelemetryData {
     
     systime_t timestamp;  //[0, 2^32]
@@ -85,3 +94,4 @@ struct FullTelemetryData {
 };
 
 FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency);
+FullTelemetryData DecodeDronePacket(const DroneTelemetryPacket& packet, float frequency);
