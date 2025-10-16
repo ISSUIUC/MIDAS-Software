@@ -57,12 +57,12 @@ void Radio_Rx_Thread(void * arg) {
             printPacketJson(data);
 
             if(initial_ack_flag) {
-                reset_state = data.kf_reset;
+                reset_state = data.cmd_ack;
                 initial_ack_flag = false;
             }
 
-            if(data.kf_reset != reset_state) {
-                reset_state = data.kf_reset;
+            if(data.cmd_ack != reset_state) {
+                reset_state = data.cmd_ack;
                 Serial.println(json_command_ack);
                 to_send.command = CommandType::EMPTY;
             }
