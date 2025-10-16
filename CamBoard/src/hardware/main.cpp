@@ -124,7 +124,8 @@ void onReceive(int len) {
         case 7:
           digitalWrite(VIDEO_SELECT, HIGH);
           Serial.println("Case 7\n");
-          delay(51);
+          //Making delays for VMX
+          delay(50);
           GLOBAL_CAM_STATE.vmux_state = true;
           break;
         default:
