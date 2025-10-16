@@ -71,7 +71,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
 
-        THREAD_SLEEP(2);
+        THREAD_SLEEP(5);
     }
 }
 
@@ -79,12 +79,13 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
         Orientation reading = arg->sensors.orientation.read();
-        if (reading.has_data) {
+        if(reading.has_data){
             if(reading.reading_type == OrientationReadingType::ANGULAR_VELOCITY_UPDATE) {
                 orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
                 orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
                 orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
-            } else {
+                
+            } else if(reading.reading_type == OrientationReadingType::FULL_READING){
                 float old_vx = orientation_holder.angular_velocity.vx;
                 float old_vy = orientation_holder.angular_velocity.vy;
                 float old_vz = orientation_holder.angular_velocity.vz;
@@ -96,8 +97,9 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
             arg->rocket_data.orientation.update(orientation_holder);
         }
+        
 
-        THREAD_SLEEP(100);
+        THREAD_SLEEP(5);
     }
 }
 
@@ -121,6 +123,7 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(pyro, RocketSystems* arg) {
+    THREAD_SLEEP(2000);
     while(true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         CommandFlags& command_flags = arg->rocket_data.command_flags;
@@ -303,7 +306,16 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
     while (true) {
-        arg->rocket_data.camera_state = arg->b2b.camera.read();
+
+        Wire.beginTransmission(0x69);
+        byte error = Wire.endTransmission();
+
+        if (error == 0) {
+            arg->rocket_data.camera_state = arg->b2b.camera.read();
+        } else {
+            THREAD_SLEEP(1800);
+        }
+        
         THREAD_SLEEP(200);
     }
 }
