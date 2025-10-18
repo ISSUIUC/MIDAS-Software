@@ -10,7 +10,7 @@
 // Fire the pyros for this time during PYRO_TEST (ms)
 #define PYRO_TEST_FIRE_TIME 100
 
-#define MAXIMUM_TILT_ANGLE (M_PI/5)    // 36 degrees
+#define MAXIMUM_TILT_ANGLE (M_PI/8)    // 22.5 degrees
 
 /**
  * @brief Returns true if the error_code signals failure.

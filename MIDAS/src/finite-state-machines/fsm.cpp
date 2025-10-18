@@ -422,6 +422,12 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             break;
 
         case FSMState::STATE_FIRST_SEPARATION:
+
+            // Stage sep should ALWAYS stay for at least some time, due to a lack of a back-transition from STAGE_FIRST_SEPARATION
+            if((current_time - first_separation_time) < booster_pyro_firing_time_minimum) {
+                break;
+            }
+
             if (abs(state_estimate.jerk) < booster_first_separation_jerk_threshold) {
                 state = FSMState::STATE_COAST;
                 break;
