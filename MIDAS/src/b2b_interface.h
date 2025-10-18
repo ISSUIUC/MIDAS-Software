@@ -32,6 +32,11 @@ enum class CameraCommand {
     MUX_2 = 7
 };
 
+struct CameraState {
+    uint16_t batt_volt;
+    uint8_t cam_state;
+};
+
 struct CameraB2B {
 
     void camera_on(int cam_index);
@@ -45,7 +50,7 @@ struct CameraB2B {
     void vmux_set(int cam_select);
     void vmux_toggle();
 
-    uint8_t* read();
+    CameraState read();
 
     private:
     void transmit_command(CameraCommand command);
@@ -61,9 +66,4 @@ struct B2BInterface {
     ErrorCode init();
 
     CameraB2B camera;
-};
-
-struct CameraState {
-    uint16_t batt_volt;
-    uint8_t cam_state;
 };
