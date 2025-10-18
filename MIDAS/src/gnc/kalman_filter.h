@@ -36,7 +36,8 @@ protected:
     Eigen::Matrix<float, _NumStates, 1> x_priori;
     Eigen::Matrix<float, _NumStates, _NumInputs> K;
     Eigen::Matrix<float, _NumInputs, 1> y_k;
-
+    Eigen::Matrix<float, 1, 3> Wind ;
+    float current_vel; 
     Eigen::Matrix<float, _NumStates, _NumInputs> B;
 
 public:
@@ -52,8 +53,9 @@ public:
         x_priori = Eigen::Matrix<float, _NumStates, 1>::Zero();
         K = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
         y_k = Eigen::Matrix<float, _NumInputs, 1>::Zero();
-
+        Wind = Eigen::Matrix<float, 1, 3>::Zero(); // Wind vector
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
+        current_vel = 0.0; // current velocity magnitude
     }
     
     virtual void initialize(RocketSystems* args) = 0;

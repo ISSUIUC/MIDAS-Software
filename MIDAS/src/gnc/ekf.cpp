@@ -50,9 +50,9 @@ void EKF::initialize(RocketSystems *args)
             .az = initial_accelerometer.az};
         sum += barometer.altitude;
 
-        init_accel(0, 0) += accelerations.az;
+        init_accel(0, 0) += -accelerations.ax;
         init_accel(1, 0) += accelerations.ay;
-        init_accel(2, 0) += -accelerations.ax;
+        init_accel(2, 0) += accelerations.az;
         THREAD_SLEEP(100);
     }
 
@@ -109,11 +109,24 @@ void EKF::initialize(RocketSystems *args)
 
     Q = Q * spectral_density_;
 
+
+     // Wind vector
+    Wind(0, 0) = 10.0; // wind in x direction
+    Wind(0, 1) = 0.0; // wind in y direction
+    Wind(0, 2) = 0.0; // wind in z direction
+
+    float Wind_alpha = 0.85; 
+
+    
+
+
     // set R
     R(0, 0) = 2.0;
     R(1, 1) = 1.9;
     R(2, 2) = 10;
     R(3, 3) = 10;
+
+      
 
     // set B (don't care about what's in B since we have no control input)
     B(2, 0) = -1;
@@ -158,8 +171,8 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         curr_height_m = height_full;
     }
 
-    // Mach number
-    float vel_mag_squared_ms = x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
+    // Mach number // Subtracting wind from velocity
+    float vel_mag_squared_ms = ((x_k(1, 0) - 1.2*Wind(1,0)) * (x_k(1, 0) - 1.2*Wind(1,0))) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
 
     float vel_magnitude_ms = pow(vel_mag_squared_ms, 0.5);
 
@@ -176,7 +189,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     // aerodynamic force
     // Body frame
-    float Fax = -0.5 * rho * (vel_mag_squared_ms) * float(Ca) * (pi * r * r);
+    float Fax = -0.5 * rho * (vel_magnitude_ms) * float(Ca) * (pi * r * r) * x_k(1,0); // instead of mag square --> mag * vel_x 
     float Fay = 0; // assuming no aerodynamic effects
     float Faz = 0; // assuming no aerodynamic effects
 
@@ -263,7 +276,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     Eigen::Matrix<float, 3, 1> sensor_accel_global_g = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
 
     // accouting for sensor bias and coordinate frame transforms
-    (sensor_accel_global_g)(0, 0) = acceleration.ax - 0.045;
+    (sensor_accel_global_g)(0, 0) = -acceleration.ax - 0.045;
     (sensor_accel_global_g)(1, 0) = acceleration.ay - 0.065;
     (sensor_accel_global_g)(2, 0) = acceleration.az - 0.06;
 
@@ -306,6 +319,24 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     state.position = (Position){kalman_state.state_est_pos_x, kalman_state.state_est_pos_y, kalman_state.state_est_pos_z};
     state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
     state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
+
+    if (FSM_state  == FSMState::STATE_FIRST_BOOST) {
+        current_vel  += (dt)*y_k(1);
+        Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+        measured_v(0,0) = current_vel;
+        //measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
+        Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+        err(0,0) = measured_v(0,0) - x_k(1,0);
+        Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
+        if(Wind.norm() > 15) {
+            Wind(0,0) = 15.0;
+            Wind(1,0) = 0.0;
+            Wind(2,0) = 0.0;
+        }
+    
+    
+    }
+        
 }
 
 /**
