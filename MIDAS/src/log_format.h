@@ -20,9 +20,12 @@ enum ReadingDiscriminant {
     ID_FSM = 10,
     ID_KALMAN = 11,
     ID_PYRO = 12,
+    ID_CAMDATA = 13,
+    ID_GPS_SIV = 14,
+    ID_ORIENTATION_QUATERNION = 15,
 };
 
-
+ 
 /**
  * @struct LoggerReading
  * 
@@ -44,12 +47,21 @@ struct LoggedReading {
         Barometer barometer;
         Continuity continuity;
         Voltage voltage;
+
         GPS gps;
+
         Magnetometer magnetometer;
         Orientation orientation;
         LowGLSM lowg_lsm;
         KalmanData kalman;
         FSMState fsm;
         PyroState pyro;
+
+        CameraData camdata;
+        GPSSIV gpssiv;
+        Quaternion orientation_quaternion;
+
+        
+
     } data;
 };

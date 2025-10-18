@@ -151,6 +151,7 @@ struct GPS {
     int32_t longitude = 0;
     float altitude = 0; // Altitude in meters
     float speed = 0; // Speed in meters/second
+
     uint16_t fix_type = 0;
     uint16_t sats_in_view = 0;
     // Unix timestamp since 1970
@@ -171,14 +172,13 @@ struct Magnetometer {
     float mz;
 };
 
+//only this
 struct Quaternion {
     float w, x, y, z;
 
     static float dot(const Quaternion& q1, const Quaternion& q2) {
         return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
     }
-
-
 
 };
 
@@ -263,3 +263,18 @@ struct PyroState {
      * [3] PYRO D / AUX
      */
 };
+
+
+/**
+ * @struct Camera Data
+ * 
+ * @brief data regarding Cam state and Cam voltage
+*/
+struct CameraData {
+    float cam_state = 127;
+    float cam_voltage = 0;
+}
+
+struct GPSSIV {
+    float satview = 0;
+}

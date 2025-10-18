@@ -37,6 +37,7 @@ struct TelemetryPacket {
     
 
     uint8_t callsign_gpsfix_satcount; //3 bits gpsfix, 4 bits sat count, 1 bit is_sustainer_callsign
+    
     uint16_t kf_vx; // 16 bit meters/second
     uint16_t kf_px;  // 16 bit meters
 
