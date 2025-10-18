@@ -40,7 +40,7 @@ struct TelemetryPacket {
     uint16_t kf_vx; // 16 bit meters/second
     uint16_t kf_px;  // 16 bit meters
 
-    uint32_t pyro; // 7 bit continuity | Pyro -> A(rotation rate) | B(camera state) | C(kf_px) | D()
+    uint32_t pyro; // 7 bit continuity x 4 channels, 4 bit unused
     
     uint8_t roll_rate;
     uint8_t camera_state;
@@ -62,6 +62,10 @@ struct TelemetryCommand {
     std::array<char, 3> verify;
 
     bool valid() {
+        #ifdef IS_SUSTAINER
         return verify == std::array<char, 3>{{'B','R','K'}};
+        #elif IS_BOOSTER
+        return verify == std::array<char, 3>{{'A','R','K'}};
+        #endif
     }
 };

@@ -303,9 +303,18 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
     while (true) {
-        CameraState cam_state_and_cam_volt = arg->b2b.camera.read();
-        arg->rocket_data.camera_state = cam_state_and_cam_volt.cam_state;
-        arg->rocket_data.cam_batt_voltage = cam_state_and_cam_volt.batt_volt;
+
+        Wire.beginTransmission(0x69);
+        byte error = Wire.endTransmission();
+
+        if (error == 0) {
+            CameraState cam_state_and_cam_volt = arg->b2b.camera.read();
+            arg->rocket_data.camera_state = cam_state_and_cam_volt.cam_state;
+            arg->rocket_data.cam_batt_voltage = cam_state_and_cam_volt.batt_volt;
+        } else {
+            THREAD_SLEEP(1800);
+        }
+        
         THREAD_SLEEP(200);
     }
 }
@@ -313,6 +322,7 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
     bool has_triggered_vmux_fallback = false;
+
 
     arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true) {

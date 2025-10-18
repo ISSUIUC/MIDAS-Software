@@ -6,12 +6,6 @@ inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 
-//fsm state not working
-//check gps
-//check barom
-//tilt angle not working but roll rate is fine
-//pyros not working
-//
 
 /**
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
