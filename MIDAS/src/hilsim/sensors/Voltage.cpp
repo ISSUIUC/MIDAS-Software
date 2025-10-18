@@ -1,4 +1,5 @@
-#include "sensors.h"
+#include "../sensors.h"
+#include "../kal_rocket.h"
 
 /**
  * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.
@@ -12,5 +13,5 @@ ErrorCode VoltageSensor::init() {
  * \return The scaled voltage given by the voltage sensor
 */
 Voltage VoltageSensor::read() {
-    return Voltage{};
+    return GLOBAL_DATA.voltage;
 }

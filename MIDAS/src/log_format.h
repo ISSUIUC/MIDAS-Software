@@ -20,8 +20,10 @@ enum ReadingDiscriminant {
     ID_FSM = 10,
     ID_KALMAN = 11,
     ID_PYRO = 12,
+    COUNT = 13, // Last element must be COUNT for HIL
 };
 
+constexpr uint8_t READING_DISC_COUNT = static_cast<uint8_t>(ReadingDiscriminant::COUNT);
 
 /**
  * @struct LoggerReading
