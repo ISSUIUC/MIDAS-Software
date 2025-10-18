@@ -218,6 +218,10 @@ struct Orientation {
         return orientation_velocity;
     }
 
+    Velocity getAngularVelocity() const {
+        return angular_velocity;
+    }
+
     Acceleration orientation_acceleration;
 
     Acceleration linear_acceleration;

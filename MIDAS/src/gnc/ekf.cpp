@@ -50,18 +50,18 @@ void EKF::initialize(RocketSystems *args)
             .az = initial_accelerometer.az};
         sum += barometer.altitude;
 
-        init_accel(0, 0) += -accelerations.ax;
-        init_accel(1, 0) += accelerations.ay;
-        init_accel(2, 0) += accelerations.az;
+        // init_accel(0, 0) += -accelerations.ax;
+        // init_accel(1, 0) += accelerations.ay;
+        // init_accel(2, 0) += accelerations.az;
         THREAD_SLEEP(100);
     }
 
-    init_accel(0, 0) /= 30;
-    init_accel(1, 0) /= 30;
-    init_accel(2, 0) /= 30;
+    // init_accel(0, 0) /= 30;
+    // init_accel(1, 0) /= 30;
+    // init_accel(2, 0) /= 30;
 
     euler_t euler = orientation.getEuler();
-    euler.yaw = -euler.yaw;
+    // euler.yaw = -euler.yaw;
 
     // set x_k
     x_k(0, 0) = sum / 30;
@@ -74,7 +74,7 @@ void EKF::initialize(RocketSystems *args)
     Q(0, 0) = pow(s_dt, 5) / 20;
     Q(0, 1) = pow(s_dt, 4) / 8;
     Q(0, 2) = pow(s_dt, 3) / 6;
-    Q(1, 1) = pow(s_dt, 3) / 8;
+    Q(1, 1) = pow(s_dt, 3) / 3;//fxed
     Q(1, 2) = pow(s_dt, 2) / 2;
     Q(2, 2) = s_dt;
     Q(1, 0) = Q(0, 1);
@@ -84,7 +84,7 @@ void EKF::initialize(RocketSystems *args)
     Q(3, 3) = pow(s_dt, 5) / 20;
     Q(3, 4) = pow(s_dt, 4) / 8;
     Q(3, 5) = pow(s_dt, 3) / 6;
-    Q(4, 4) = pow(s_dt, 3) / 8;
+    Q(4, 4) = pow(s_dt, 3) / 3; //fixed
     Q(4, 5) = pow(s_dt, 2) / 2;
     Q(5, 5) = s_dt;
     Q(4, 3) = Q(3, 4);
@@ -94,7 +94,7 @@ void EKF::initialize(RocketSystems *args)
     Q(6, 6) = pow(s_dt, 5) / 20;
     Q(6, 7) = pow(s_dt, 4) / 8;
     Q(6, 8) = pow(s_dt, 3) / 6;
-    Q(7, 7) = pow(s_dt, 3) / 8;
+    Q(7, 7) = pow(s_dt, 3) / 3; //fixed 
     Q(7, 8) = pow(s_dt, 2) / 2;
     Q(8, 8) = s_dt;
     Q(7, 6) = Q(6, 7);
@@ -120,11 +120,11 @@ void EKF::initialize(RocketSystems *args)
     
 
 
-    // set R
-    R(0, 0) = 2.0;
+    // set 
+    R(0, 0) = 1.0;
     R(1, 1) = 1.9;
-    R(2, 2) = 10;
-    R(3, 3) = 10;
+    R(2, 2) = 1.9;
+    R(3, 3) = 1.9;
 
       
 
@@ -146,7 +146,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
 
     // angular states from sensors
-    Velocity omega_rps = orientation.getVelocity(); // rads per sec
+    Velocity omega_rps = orientation.getAngularVelocity(); // rads per sec
 
     euler_t angles_rad = orientation.getEuler();
 
