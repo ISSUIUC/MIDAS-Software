@@ -185,7 +185,11 @@ struct MIDAS_Events {
     
     void pyroTest_to_safe_forced(CommandFlags& commands);
     void pyroTest_to_safe_timed(CommandFlags& commands);
+    void pyroTest_to_firstBoost(CommandFlags& commands);
 
+    void idle_to_safe_forced(CommandFlags& commands);
+    void idle_to_firstBoost(CommandFlags& commands);
+    
     void firstBoost_to_idle(CommandFlags& commands);
     void firstBoost_to_burnout(CommandFlags& commands);
 

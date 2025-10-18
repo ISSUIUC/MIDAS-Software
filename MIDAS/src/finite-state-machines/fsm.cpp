@@ -347,7 +347,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 */
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& commands) {
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
-
+    MIDAS_Events dispatch
     switch (state) {
          case FSMState::STATE_SAFE:
             // Deconflict if multip commands are processed
