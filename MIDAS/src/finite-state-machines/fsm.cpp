@@ -87,7 +87,7 @@ StateEstimate::StateEstimate(RocketData& state) {
 FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& commands) {
     //get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
-
+    MIDAS_Events dispatch;
     switch (state) {
 
         case FSMState::STATE_SAFE:
@@ -103,13 +103,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             if(commands.should_transition_pyro_test) {
                 state = FSMState::STATE_PYRO_TEST;
                 pyro_test_entry_time = current_time;
-                commands.should_transition_pyro_test = false;
+                safe_to_pyroTest(commands);
             }
 
             // Only switch to STATE_IDLE if triggered wirelessly.
             if(commands.should_transition_idle) {
                 state = FSMState::STATE_IDLE;
-                commands.should_transition_idle = false;
+                safe_to_stateIdle(commands);
             }
 
             break;
@@ -118,15 +118,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // Force transtion to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
+                pyroTest_to_safe_forced(commands);
                 break;
             }
 
             // Switch back to STATE_SAFE after a certain amount of time passes 
             if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
-                commands.should_transition_pyro_test = false;
+                pyroTest_to_safe_timed(commands);
                 state = FSMState::STATE_SAFE;
             }
 
@@ -137,16 +135,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // Force transtion to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
+                idle_to_safe_forced(commands);
                 break;
             }
 
             // once a significant amount of acceleration is detected change states
             if (state_estimate.acceleration > sustainer_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
-                commands.FSM_should_set_cam_feed_cam1 = true;
+                idle_to_firstBoost(commands);
                 state = FSMState::STATE_FIRST_BOOST;
             }
 
@@ -156,12 +152,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if acceleration spike was too brief then go back to idle
             if ((state_estimate.acceleration < sustainer_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < sustainer_idle_to_first_boost_time_threshold)) {
                 state = FSMState::STATE_IDLE;
+                firstBoost_to_idle(commands);
                 break;
             }
 
             // once acceleartion decreases to a the threshold go on the next state
             if (state_estimate.acceleration < sustainer_coast_detection_acceleration_threshold) {
                 burnout_time = current_time;
+                firstBoost_to_burnout(commands);
                 state = FSMState::STATE_BURNOUT;
             }
             break;
@@ -170,12 +168,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if low acceleration is too brief than go on to the previous state
             if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_coast_time)) {
                 state = FSMState::STATE_FIRST_BOOST;
+                burnout_to_firstBoost(commands);
                 break;
             }
 
             // if in burnout for long enough then go on to the next state (time transition)
             if ((current_time - burnout_time) > sustainer_coast_time) {
                 sustainer_ignition_time = current_time;
+                burnout_to_sustainerIgnition(commands);
                 state = FSMState::STATE_SUSTAINER_IGNITION;
             }
             break;
@@ -185,6 +185,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // another time transition into coast after a certain amount of time
             if ((current_time - sustainer_ignition_time) > sustainer_ignition_to_coast_timer_threshold) {
                 coast_time = current_time;
+                sustainerIgnition_to_coast(commands);
                 state = FSMState::STATE_COAST;
                 break;
             }
@@ -192,6 +193,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // once a high enough acceleration is detected then go to next state
             if (state_estimate.acceleration > sustainer_ignition_to_second_boost_acceleration_threshold) {
                 second_boost_time = current_time;
+                sustainerIgnition_to_secondBoost(commands);
                 state = FSMState::STATE_SECOND_BOOST;
             }
 
@@ -201,12 +203,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if high accleration is too brief then return to previous state
             if ((state_estimate.acceleration < sustainer_ignition_to_second_boost_acceleration_threshold) && ((current_time - second_boost_time) < sustainer_ignition_to_second_boost_time_threshold)) {
                 state = FSMState::STATE_SUSTAINER_IGNITION;
+                secondBoost_to_sustainerIgnition(commands);
                 break;
             }
 
             // if low acceleration detected go to next state
             if (state_estimate.acceleration < sustainer_coast_detection_acceleration_threshold) {
                 coast_time = current_time;
+                secondBoost_to_coast(commands);
                 state = FSMState::STATE_COAST;
             }
             break;
@@ -215,6 +219,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if the low acceleration detected was too brief then return to previous state
             if ((state_estimate.acceleration > sustainer_coast_detection_acceleration_threshold) && ((current_time - coast_time) < sustainer_second_boost_to_coast_time_threshold)) {
                 state = FSMState::STATE_SECOND_BOOST;
+                coast_to_secondBoost(commands);
                 break;
             }
 
@@ -222,7 +227,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             if (state_estimate.vertical_speed <= sustainer_coast_to_apogee_vertical_speed_threshold) {
                 apogee_time = current_time;
                 state = FSMState::STATE_APOGEE;
-                commands.FSM_should_swap_camera_feed = true;
+                coast_to_apogee(commands);
             }
             break;
 
@@ -230,12 +235,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if the slow speed was too brief then return to previous state
             if ((state_estimate.vertical_speed) > sustainer_apogee_backto_coast_vertical_speed_threshold && ((current_time - apogee_time) < sustainer_apogee_check_threshold)) {
                 state = FSMState::STATE_COAST;
+                apogee_to_coast(commands);
                 break;
             }
 
             // transition to next state after a certain amount of time
             if ((current_time - apogee_time) > sustainer_apogee_timer_threshold) {
                 drogue_time = current_time;
+                apogee_to_drogueDeploy(commands);
                 state = FSMState::STATE_DROGUE_DEPLOY;
             }
             break;
@@ -248,12 +255,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             }
 
             if (abs(state_estimate.jerk) > sustainer_drogue_jerk_threshold) {
+                drogueDeploy_to_drogue_jerk(commands);
                 state = FSMState::STATE_DROGUE;
                 break;
             }
 
             // if no transtion after a certain amount of time then just move on to next state
             if ((current_time - drogue_time) > sustainer_drogue_timer_threshold) {
+                drogueDeploy_to_drouge_timed(commands);
                 state = FSMState::STATE_DROGUE;
             }
 
@@ -263,6 +272,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if altitude low enough then next state
             // Also, wait at least 1 second after drogue deploy to deploy main.
             if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold && (current_time - drogue_time) > sustainer_main_deploy_delay_after_drogue) {
+                drogue_to_mainDeploy(commands);
                 state = FSMState::STATE_MAIN_DEPLOY;
                 main_time = current_time;
             }
@@ -277,6 +287,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if detected a sharp change in jerk then go to the next state
             if (abs(state_estimate.jerk) > sustainer_main_jerk_threshold) {
                 state = FSMState::STATE_MAIN;
+                mainDeploy_to_main_jerk(commands);
                 main_deployed_time = current_time;
                 break;
             }
@@ -284,6 +295,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if no transtion after a certain amount of time then just move on to next state
             if ((current_time - main_time) > sustainer_main_to_main_deploy_timer_threshold) {
                 state = FSMState::STATE_MAIN;
+                mainDeploy_to_main_timed(commands);
             }
             break;
 
@@ -291,6 +303,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if slowed down enough then go on to the next state
             if ((abs(state_estimate.vertical_speed) <= sustainer_landed_vertical_speed_threshold) && (current_time - main_deployed_time) > sustainer_main_to_landed_lockout) {
                 landed_time = current_time;
+                main_to_landed(commands);
                 state = FSMState::STATE_LANDED;
             }
             break;
@@ -303,9 +316,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 // Force transtion to safe if requested + clear all transition flags.
                 if(commands.should_transition_safe) {
                     state = FSMState::STATE_SAFE;
-                    commands.should_transition_pyro_test = false;
-                    commands.should_transition_idle = false;
-                    commands.should_transition_safe = false;
+                    landed_to_safe(commands);
                 }
 
                 break;
@@ -314,6 +325,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // if the slow speed was too brief then return to previous state
             if ((abs(state_estimate.vertical_speed) > sustainer_landed_to_main_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
                 state = FSMState::STATE_MAIN;
+                landed_to_main(commands);
             }
             break;
 
@@ -350,13 +362,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             if(commands.should_transition_pyro_test) {
                 state = FSMState::STATE_PYRO_TEST;
                 pyro_test_entry_time = current_time;
-                commands.should_transition_pyro_test = false;
+                safe_to_pyroTest(commands);
             }
 
             // Only switch to STATE_IDLE if triggered wirelessly.
             if(commands.should_transition_idle) {
                 state = FSMState::STATE_IDLE;
-                commands.should_transition_idle = false;
+                safe_to_stateIdle(commands);
             }
 
             break;
@@ -365,15 +377,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // Force transtion to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
+                pyroTest_to_safe_forced(commands);
                 break;
             }
 
             // Switch back to STATE_SAFE after a certain amount of time passes 
             if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
-                commands.should_transition_pyro_test = false;
+                pyroTest_to_safe_timed(commands);
                 state = FSMState::STATE_SAFE;
             }
 
@@ -383,16 +393,14 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // Force transtion to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
+                idle_to_safe_forced(commands);
                 break;
             }
 
             // once a significant amount of acceleration is detected change states
             if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
                 launch_time = current_time;
-                commands.FSM_should_set_cam_feed_cam1 = true;
+                idle_to_firstBoost(commands);
                 state = FSMState::STATE_FIRST_BOOST;
             }
 
@@ -400,11 +408,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_FIRST_BOOST:
             if ((state_estimate.acceleration < booster_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < booster_idle_to_first_boost_time_threshold)) {
                 state = FSMState::STATE_IDLE;
+                firstBoost_to_idle(commands);
                 break;
             }
             if (state_estimate.acceleration < booster_coast_detection_acceleration_threshold) {
                 burnout_time = current_time;
                 state = FSMState::STATE_BURNOUT;
+                firstBoost_to_burnout(commands);
             }
 
             break;
@@ -412,11 +422,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_BURNOUT:
             if ((state_estimate.acceleration >= booster_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < booster_first_boost_to_burnout_time_threshold)) {
                 state = FSMState::STATE_FIRST_BOOST;
+                burnout_to_firstBoost(commands);
                 break;
             }
 
             if ((current_time - burnout_time) > booster_first_boost_to_burnout_time_threshold) {
                 first_separation_time = current_time;
+                burnout_to_firstSeparation(commands);
                 state = FSMState::STATE_FIRST_SEPARATION;
             }
             break;
@@ -424,11 +436,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_FIRST_SEPARATION:
             if (abs(state_estimate.jerk) < booster_first_separation_jerk_threshold) {
                 state = FSMState::STATE_COAST;
+                firstSeparation_to_coast_jerk(commands);
                 break;
             }
 
             if ((current_time - first_separation_time) > booster_first_seperation_time_threshold) {
                 state = FSMState::STATE_COAST;
+                firstSeparation_to_coast_timed(commands);
             }
 
             break;

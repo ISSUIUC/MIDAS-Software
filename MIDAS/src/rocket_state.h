@@ -180,43 +180,46 @@ struct CommandFlags {
  * The functions are defined in MIDAS_Events.cpp
  */
 struct MIDAS_Events {
-    void safe_to_pyroTest();
-    void safe_to_stateIdle();
+    void safe_to_pyroTest(CommandFlags& commands);
+    void safe_to_stateIdle(CommandFlags& commands);
     
-    void pyroTest_to_safe_forced();
-    void pyroTest_to_safe_timed();
-    void pyroTest_to_firstBoost();
+    void pyroTest_to_safe_forced(CommandFlags& commands);
+    void pyroTest_to_safe_timed(CommandFlags& commands);
 
-    void firstBoost_to_idle();
-    void firstBoost_to_burnout();
+    void firstBoost_to_idle(CommandFlags& commands);
+    void firstBoost_to_burnout(CommandFlags& commands);
 
-    void burnout_to_firstBoost();
-    void burnout_to_sustainerIgnition();
+    void burnout_to_firstBoost(CommandFlags& commands);
+    void burnout_to_sustainerIgnition(CommandFlags& commands);
+    void burnout_to_firstSeparation(CommandFlags& commands);
 
-    void sustainerIgnition_to_coast();
-    void sustainerIgnition_to_secondBoost();
+    void sustainerIgnition_to_coast(CommandFlags& commands);
+    void sustainerIgnition_to_secondBoost(CommandFlags& commands);
 
-    void secondBoost_to_sustainerIgnition();
-    void secondBoost_to_coast();
+    void firstSeparation_to_coast_jerk(CommandFlags& commands);
+    void firstSeparation_to_coast_timed(CommandFlags& commands);
 
-    void coast_to_secondBoost();
-    void coast_to_apogee();
+    void secondBoost_to_sustainerIgnition(CommandFlags& commands);
+    void secondBoost_to_coast(CommandFlags& commands);
 
-    void apogee_to_coast();
-    void apogee_to_drogueDeploy();
+    void coast_to_secondBoost(CommandFlags& commands);
+    void coast_to_apogee(CommandFlags& commands);
 
-    void drogueDeploy_to_drogue_jerk();
-    void drogueDeploy_to_drouge_timed();
+    void apogee_to_coast(CommandFlags& commands);
+    void apogee_to_drogueDeploy(CommandFlags& commands);
 
-    void drogue_to_mainDeploy();
+    void drogueDeploy_to_drogue_jerk(CommandFlags& commands);
+    void drogueDeploy_to_drouge_timed(CommandFlags& commands);
 
-    void mainDeploy_to_main_jerk();
-    void mainDeploy_to_main_timed();
+    void drogue_to_mainDeploy(CommandFlags& commands);
 
-    void main_to_landed();
+    void mainDeploy_to_main_jerk(CommandFlags& commands);
+    void mainDeploy_to_main_timed(CommandFlags& commands);
 
-    void landed_to_safe();
-    void landed_to_main();
+    void main_to_landed(CommandFlags& commands);
+
+    void landed_to_safe(CommandFlags& commands);
+    void landed_to_main(CommandFlags& commands);
 };
 /**
  * @struct RocketData

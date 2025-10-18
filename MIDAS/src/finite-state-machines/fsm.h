@@ -8,6 +8,7 @@
 #include "sensor_data.h"
 #include "Buffer.h"
 #include "rocket_state.h"
+#include "MIDAS_Events.cpp"
 
 /**
  * @struct StateEstimate
