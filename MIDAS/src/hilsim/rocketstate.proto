@@ -1,5 +1,0 @@
-
-message RocketState {
-    // Get the state of the rocket
-    required int32 rocket_state = 1;
-}

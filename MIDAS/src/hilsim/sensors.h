@@ -3,6 +3,7 @@
 #include "errors.h"
 #include "sensor_data.h"
 #include "hardware/pins.h"
+#include "rocket_state.h"
 
 
 /**

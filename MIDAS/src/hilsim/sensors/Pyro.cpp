@@ -1,5 +1,5 @@
-#include "sensors.h"
-#include "../global_packet.h"
+#include "../sensors.h"
+#include "../kal_rocket.h"
 
 ErrorCode Pyro::init() {
     return ErrorCode::NoError;
@@ -7,5 +7,6 @@ ErrorCode Pyro::init() {
 
 PyroState Pyro::tick(FSMState fsm_state, AngularKalmanData angularkalman) {
     return PyroState();
-    //tick
-} // No new line for rhbog >:(
+
+    // TODO: Add actual pyro logic back..
+}
