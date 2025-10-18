@@ -64,6 +64,6 @@ struct B2BInterface {
 };
 
 struct CameraState {
-    uint8_t batt_volt;
+    uint16_t batt_volt;
     uint8_t cam_state;
 };
