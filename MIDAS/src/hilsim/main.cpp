@@ -64,9 +64,7 @@ DECLARE_THREAD(hilsim, void*arg) {
 
 void setup() {
     Serial.begin(9600);
-
     k_init_sensordata();
-    
     hilsim_thread(nullptr);
 }
 
