@@ -103,13 +103,13 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             if(commands.should_transition_pyro_test) {
                 state = FSMState::STATE_PYRO_TEST;
                 pyro_test_entry_time = current_time;
-                safe_to_pyroTest(commands);
+                dispatch.safe_to_pyroTest(commands);
             }
 
             // Only switch to STATE_IDLE if triggered wirelessly.
             if(commands.should_transition_idle) {
                 state = FSMState::STATE_IDLE;
-                safe_to_stateIdle(commands);
+                dispatch.safe_to_stateIdle(commands);
             }
 
             break;
@@ -118,7 +118,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             // Force transtion to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
-                pyroTest_to_safe_forced(commands);
+                dispatch.pyroTest_to_safe_forced(commands);
                 break;
             }
 
