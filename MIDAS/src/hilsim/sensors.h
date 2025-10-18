@@ -3,6 +3,7 @@
 #include "errors.h"
 #include "sensor_data.h"
 #include "hardware/pins.h"
+#include "rocket_state.h"
 
 /**
  * @struct LowG interface
@@ -84,5 +85,5 @@ struct GPSSensor {
  */
 struct Pyro {
     ErrorCode init();
-    PyroState tick(FSMState fsm_state, Orientation orientation);
+    PyroState tick(FSMState fsm_state, Orientation orientation, CommandFlags command_flags);
 };

@@ -1,17 +1,27 @@
 #include <Arduino.h>
-#include <pb_decode.h>
-#include <pb_encode.h>
-
 #include <systems.h>
-#include "global_packet.h"
-
-HILSIMPacket global_packet = HILSIMPacket_init_zero;
+#include "kal.h"
 
 MultipleLogSink<> sink;
 RocketSystems systems{.log_sink = sink};
 
+static bool read_exact(uint8_t* dst, size_t n, unsigned long timeout_ms) {
+  unsigned long start = millis();
+  size_t got = 0;
+  while (got < n) {
+    int avail = Serial.available();
+    if (avail > 0) {
+      int r = Serial.readBytes(dst + got, n - got);
+      got += (r > 0 ? (size_t)r : 0);
+      continue;
+    }
+    if ((millis() - start) > timeout_ms) return false;
+    THREAD_SLEEP(1); // yield
+  }
+  return true;
+}
+
 DECLARE_THREAD(hilsim, void*arg) {
-    uint8_t buffer[HILSIMPacket_size];
     int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
     while (Serial.read() != 33);
@@ -21,41 +31,42 @@ DECLARE_THREAD(hilsim, void*arg) {
     Serial.println(__DATE__);
     Serial.flush();
 
+    uint8_t header[5];
+    uint8_t crc_buf[2];
+    uint32_t timestamp;
+    uint8_t discriminator;
+    size_t data_size;
+    uint8_t data_buf[128];
+    uint16_t crc;
+    
     while (true) {
-        while (!Serial.available());
-        uint8_t a = Serial.read();
-        uint8_t b = Serial.read();
-        uint16_t length = (uint16_t) b + (((uint16_t) a) << 8);
-        // Parse the two bytes as integers
 
-        size_t hilsim_packet_size = Serial.readBytes(buffer, length);
-        // Serial.print(length);
-        // Serial.print(" ");
-        // Serial.printf("%d %d ", a, b);
-        HILSIMPacket packet = HILSIMPacket_init_zero;
-        pb_istream_t stream = pb_istream_from_buffer(buffer, hilsim_packet_size);
-        bool status = pb_decode(&stream, HILSIMPacket_fields, &packet);
-        if (!status) {
-            THREAD_SLEEP(10);
-            continue;
-        }
-        global_packet = packet;
-        RocketState rocket_state = RocketState_init_zero;
-        rocket_state.rocket_state = (int) (100 * sin((double)n / 360));
-        uint8_t buffer2[RocketState_size];
-        pb_ostream_t output_stream = pb_ostream_from_buffer(buffer, sizeof(buffer));
-        status = pb_encode(&output_stream, RocketState_fields, &rocket_state);
-        Serial.write(output_stream.bytes_written);
-        Serial.write(buffer, output_stream.bytes_written);
-        Serial.flush();
-        n++;
-        
-        THREAD_SLEEP(10);
+        int delim;
+        do {
+            while (!Serial.available());
+            delim = Serial.read();
+        } while(delim != '$');
+            
+        if(!read_exact(header, sizeof(header), 10)) continue;
+        memcpy(&timestamp, &header[0], 4);
+        discriminator = header[4];
+        data_size = k_get_discriminant_size(discriminator);
+
+        if (!read_exact(data_buf, (size_t)data_size, 10)) continue;
+        if (!read_exact(crc_buf, sizeof(crc_buf), 5)) continue;
+
+        memcpy(&crc, crc_buf, sizeof(crc_buf));
+
+        k_handle_reading(timestamp, discriminator, data_buf, data_size, crc);
+
     }
 }
 
 void setup() {
     Serial.begin(9600);
+
+    k_init_sensordata();
+    
     hilsim_thread(nullptr);
 }
 
