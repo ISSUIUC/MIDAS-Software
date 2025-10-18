@@ -25,9 +25,13 @@ ASSOCIATE(Orientation, ID_ORIENTATION)
 ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
 ASSOCIATE(PyroState, ID_PYRO)
-ASSOCIATE(CameraData, ID_CAMDATA)
-ASSOCIATE(GPSSIV, ID_GPS_SIV)
-ASSOCIATE(Quaternion, ID_ORIENTATION_QUATERNION)
+
+ASSOCIATE(CameraData, ID_CAMERADATA)
+
+ASSOCIATE(GPSSIV, ID_GPSSIV)
+
+ASSOCIATE(Quaternion, ID_QUATERNION)
+
 
 /**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
@@ -71,7 +75,7 @@ void log_begin(LogSink& sink) {
     uint32_t checksum = LOG_CHECKSUM;
     sink.write((uint8_t*) &checksum, 4);
 }
- 
+
 /**
  * @brief logs all sensor data from the rocket
  * 
@@ -85,18 +89,16 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.barometer);
     log_from_sensor_data(sink, data.continuity);
     log_from_sensor_data(sink, data.voltage);
-
     log_from_sensor_data(sink, data.gps);
-
     log_from_sensor_data(sink, data.magnetometer);
     log_from_sensor_data(sink, data.orientation);
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
     log_from_sensor_data(sink, data.pyro);
-    
-    log_from_sensor_data(sink, data.camera_data);
+    log_from_sensor_data(sink, data.quaternions);
     log_from_sensor_data(sink, data.gpssiv);
-    log_from_sensor_data(sink, data.orientation_quaternion);
+    log_from_sensor_data(sink, data.cam_data);
+
 }
 
 #ifndef SILSIM

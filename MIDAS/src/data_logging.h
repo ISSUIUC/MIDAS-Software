@@ -23,7 +23,7 @@ public:
     virtual ErrorCode init() = 0;
     virtual void write(const uint8_t* data, size_t size) = 0;
 };
- 
+
 void log_begin(LogSink& sink);
 void log_data(LogSink& sink, RocketData& data);
 

@@ -82,9 +82,7 @@ void Telemetry::acknowledgeReceived() {
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
-
     GPS gps = data.gps.getRecentUnsync();
-
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
@@ -93,10 +91,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     PyroState pyro = data.pyro.getRecentUnsync();
     Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
-
-    Quaternion orientation_quat = data.orientation_quaternion.getRecentUnsync(); //this might not need to be here?
-    GPSSIV gps_siv = data.gps_siv.getRecentUnsync();
-    CameraData camera_state = data.camera_data.getRecentUnsync();
+    //CameraData cam_data = data.cam_data.getRecentUnsync();
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
@@ -152,8 +147,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     // 0000 | 000 | 0
     // SATC | FT  | C
     packet.callsign_gpsfix_satcount |= (gps.fix_type & 0x07) << 1;
-
-    packet.callsign_gpsfix_satcount |= (gps.sats_in_view & 0x0F) << 4; //packing bits here
+    packet.callsign_gpsfix_satcount |= (gps.sats_in_view & 0x0F) << 4;
 
     #ifdef IS_SUSTAINER
     packet.callsign_gpsfix_satcount |= 0b1;

@@ -191,22 +191,18 @@ public:
     SensorData<Continuity> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
-
     SensorData<GPS> gps;
-    
     SensorData<Magnetometer> magnetometer;
-
     SensorData<Orientation> orientation;
-    
-
     SensorData<Voltage> voltage;
 
-    SensorData<CameraData> camera_data;
-    SensorData<GPSSIV> gps_siv;
-    SensorData<Quaternion> orientation_quaternion; 
+    SensorData<Quaternion> quaternions;
+    SensorData<GPSSIV> gpssiv;
+    SensorData<CameraData> cam_data;
     
     CommandFlags command_flags;
-    //uint8_t camera_state = 127;
+    uint8_t camera_state = 127;
+    
 
     Latency log_latency;
 };

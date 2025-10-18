@@ -1,5 +1,5 @@
 #include "systems.h"
-
+#include "sensor_data.h"
 #include "hal.h"
 #include "gnc/ekf.h"
 
@@ -311,7 +311,17 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
         byte error = Wire.endTransmission();
 
         if (error == 0) {
-            arg->rocket_data.camera_state = arg->b2b.camera.read();
+
+            arg->rocket_data.camera_state = arg->b2b.camera.read(); //pls fix pls fix
+
+            // uint8_t x = arg->b2b.camera.read();
+
+            // CameraData current_cam = arg->rocket_data.cam_data.current.read();
+            // current_cam.updatecamstate(x);
+            // arg->rocket_data.cam_data.current.write(current_cam);
+
+            //arg->rocket_data.cam_data.current.write(x); //I need camera state in cam_data to be updated with x
+
         } else {
             THREAD_SLEEP(1800);
         }
