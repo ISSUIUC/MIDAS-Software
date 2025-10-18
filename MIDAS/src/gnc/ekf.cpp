@@ -50,9 +50,9 @@ void EKF::initialize(RocketSystems *args)
             .az = initial_accelerometer.az};
         sum += barometer.altitude;
 
-        init_accel(0, 0) += -accelerations.ax;
+        init_accel(0, 0) += accelerations.az;
         init_accel(1, 0) += accelerations.ay;
-        init_accel(2, 0) += accelerations.az;
+        init_accel(2, 0) += -accelerations.ax;
         THREAD_SLEEP(100);
     }
 
@@ -109,24 +109,11 @@ void EKF::initialize(RocketSystems *args)
 
     Q = Q * spectral_density_;
 
-
-     // Wind vector
-    Wind(0, 0) = 10.0; // wind in x direction
-    Wind(0, 1) = 0.0; // wind in y direction
-    Wind(0, 2) = 0.0; // wind in z direction
-
-    float Wind_alpha = 0.85; 
-
-    
-
-
     // set R
     R(0, 0) = 2.0;
     R(1, 1) = 1.9;
     R(2, 2) = 10;
     R(3, 3) = 10;
-
-      
 
     // set B (don't care about what's in B since we have no control input)
     B(2, 0) = -1;
@@ -144,14 +131,13 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 {
     Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
 
-
     // angular states from sensors
     Velocity omega_rps = orientation.getVelocity(); // rads per sec
 
     euler_t angles_rad = orientation.getEuler();
 
     // ignore effects of gravity when on pad
-    Eigen::Matrix<float,3,1> g_global = Eigen::Matrix<float,3,1>::Zero();
+    Eigen::Matrix<float, 3, 1> g_global = Eigen::Matrix<float, 3, 1>::Zero();
     if ((fsm > FSMState::STATE_IDLE) && (fsm < FSMState::STATE_LANDED))
     {
         g_global(0, 0) = -gravity_ms2;
@@ -171,37 +157,33 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         curr_height_m = height_full;
     }
 
-    // Mach number // Subtracting wind from velocity
-    float vel_mag_squared_ms = ((x_k(1, 0) - 1.2*Wind(1,0)) * (x_k(1, 0) - 1.2*Wind(1,0))) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
+    // Mach number
+    float vel_mag_squared_ms = x_k(1, 0) * x_k(1, 0) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
 
     float vel_magnitude_ms = pow(vel_mag_squared_ms, 0.5);
 
     float mach = vel_magnitude_ms / a;
-
 
     // approximating C_a (aerodynamic coeff.)
     int index = std::round(mach / 0.04);
 
     index = std::clamp(index, 0, (int)AERO_DATA_SIZE - 1);
 
-
     Ca = aero_data[index].CA_power_on;
 
     // aerodynamic force
     // Body frame
-    float Fax = -0.5 * rho * (vel_magnitude_ms) * float(Ca) * (pi * r * r) * x_k(1,0); // instead of mag square --> mag * vel_x 
+    float Fax = -0.5 * rho * (vel_mag_squared_ms) * float(Ca) * (pi * r * r);
     float Fay = 0; // assuming no aerodynamic effects
     float Faz = 0; // assuming no aerodynamic effects
 
     Serial.println("vel_mag_squared_ms: " + String(vel_mag_squared_ms));
 
-
-    
-
     // acceleration due to gravity
     Eigen::Matrix<float, 3, 1> g_body = g_global;
 
-    GlobalToBody(angles_rad, g_body);
+    // Rotate gravity into the body frame using quaternion from orientation
+    GlobalToBodyQuat(orientation.q0, orientation.q1, orientation.q2, orientation.q3, g_body);
 
     float gx = g_body(0, 0);
     float gy = g_body(1, 0);
@@ -209,13 +191,12 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     // thurst force
     Eigen::Matrix<float, 3, 1> Ft_global;
-    EKF::getThrust(stage_timestamp, angles_rad, fsm, Ft_global);
+    EKF::getThrust(stage_timestamp, orientation, fsm, Ft_global);
 
     // Global frame
     float Ftx = Ft_global(0, 0);
     float Fty = Ft_global(1, 0);
-    float Ftz = Ft_global(2, 0); 
-
+    float Ftz = Ft_global(2, 0);
 
     xdot << x_k(1, 0),
         ((Fax + Ftx) / curr_mass_kg + gx - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
@@ -228,13 +209,12 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         x_k(7, 0),
         ((Faz + Ftz) / curr_mass_kg + gz - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
         0.0;
-        
+
     // priori step
     x_priori = (xdot * dt) + x_k;
     setF(dt, omega_rps.vx, omega_rps.vy, omega_rps.vz);
 
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
-
 }
 
 /**
@@ -276,19 +256,21 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     Eigen::Matrix<float, 3, 1> sensor_accel_global_g = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
 
     // accouting for sensor bias and coordinate frame transforms
-    (sensor_accel_global_g)(0, 0) = -acceleration.ax - 0.045;
+    (sensor_accel_global_g)(0, 0) = acceleration.ax - 0.045;
     (sensor_accel_global_g)(1, 0) = acceleration.ay - 0.065;
-    (sensor_accel_global_g)(2, 0) = acceleration.az - 0.06;
+    (sensor_accel_global_g)(2, 0) = acceleration.az - 0.06; // sensor biases
 
-    euler_t angles_rad = orientation.getEuler();
-    angles_rad.yaw = -angles_rad.yaw; // coordinate frame match
+    BodyToGlobalQuat(orientation.q0, orientation.q1, orientation.q2, orientation.q3, sensor_accel_global_g);
+    // Since the quaternion from the sensor has its axis flipped, we will have to flip the axis as well
 
-    BodyToGlobal(angles_rad, sensor_accel_global_g);
+    (sensor_accel_global_g)(0, 0) = (sensor_accel_global_g)(2, 0);
+    (sensor_accel_global_g)(1, 0) = (sensor_accel_global_g)(1, 0);
+    (sensor_accel_global_g)(2, 0) = -1 * (sensor_accel_global_g)(0, 0);
 
     float g_ms2;
     if ((FSM_state > FSMState::STATE_IDLE) && (FSM_state < FSMState::STATE_LANDED))
     {
-        g_ms2 = -gravity_ms2;
+        g_ms2 = -gravity_ms2; // either negative or positive need to check
     }
     else
     {
@@ -320,23 +302,22 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
     state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
 
-    if (FSM_state  == FSMState::STATE_FIRST_BOOST) {
-        current_vel  += (dt)*y_k(1);
+    if (FSM_state == FSMState::STATE_FIRST_BOOST)
+    {
+        current_vel += (dt)*y_k(1);
         Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
-        measured_v(0,0) = current_vel;
-        //measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
+        measured_v(0, 0) = current_vel;
+        // measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
         Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
-        err(0,0) = measured_v(0,0) - x_k(1,0);
+        err(0, 0) = measured_v(0, 0) - x_k(1, 0);
         Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
-        if(Wind.norm() > 15) {
-            Wind(0,0) = 15.0;
-            Wind(1,0) = 0.0;
-            Wind(2,0) = 0.0;
+        if (Wind.norm() > 15)
+        {
+            Wind(0, 0) = 15.0;
+            Wind(1, 0) = 0.0;
+            Wind(2, 0) = 0.0;
         }
-    
-    
     }
-        
 }
 
 /**
@@ -362,7 +343,7 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
 
         setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
         setQ(dt, sd);
-        priori(dt, orientation, FSM_state); 
+        priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
     }
 }
@@ -478,27 +459,31 @@ void EKF::setF(float dt, float wx, float wy, float wz)
  * which thrust curve to use. The time since ignition is also important to consider so that is reset once we reach a new stage.
  * The thrust force is then rotated into the body frame using the BodyToGlobal function.
  */
-void EKF::getThrust(float timestamp, const euler_t& angles, FSMState FSM_state, Eigen::Vector3f& thrust_out)
+void EKF::getThrust(float timestamp, const Orientation &orientation, FSMState FSM_state, Eigen::Vector3f &thrust_out)
 {
     // Pick which motor thrust curve to use
-    const std::map<float, float>* thrust_curve = nullptr;
+    const std::map<float, float> *thrust_curve = nullptr;
     if (FSM_state >= STATE_FIRST_BOOST && FSM_state < FSMState::STATE_BURNOUT)
         thrust_curve = &motor_data.at("Booster"); // Booster
     else if (FSM_state >= FSMState::STATE_BURNOUT)
-        thrust_curve = &motor_data.at("Sustainer");  // Sustainer
-    else {
+        thrust_curve = &motor_data.at("Sustainer"); // Sustainer
+    else
+    {
         thrust_out.setZero();
         return; // No thrust before ignition
     }
 
     // Handle case where timestamp is before or after available data
-    if (timestamp <= thrust_curve->begin()->first) {
+    if (timestamp <= thrust_curve->begin()->first)
+    {
         thrust_out = Eigen::Vector3f(thrust_curve->begin()->second, 0.f, 0.f);
     }
-    else if (timestamp >= thrust_curve->rbegin()->first) {
+    else if (timestamp >= thrust_curve->rbegin()->first)
+    {
         thrust_out.setZero(); // assume motor burned out after curve ends
     }
-    else {
+    else
+    {
         // Find interpolation interval
         auto it_upper = thrust_curve->lower_bound(timestamp);
         auto it_lower = std::prev(it_upper);
@@ -512,8 +497,10 @@ void EKF::getThrust(float timestamp, const euler_t& angles, FSMState FSM_state, 
         thrust_out = Eigen::Vector3f(interpolated_thrust, 0.f, 0.f);
     }
 
-    // Rotate from body to global
-    BodyToGlobal(angles, thrust_out);
+    // Rotate from body to global using quaternion from orientation
+    Eigen::Matrix<float, 3, 1> thrust_vec = thrust_out;
+    BodyToGlobalQuat(orientation.q0, orientation.q1, orientation.q2, orientation.q3, thrust_vec);
+    thrust_out = thrust_vec;
 }
 
 EKF ekf;

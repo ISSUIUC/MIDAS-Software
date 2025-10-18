@@ -18,13 +18,13 @@ class EKF : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
 {
 public:
     EKF();
-    void initialize(RocketSystems* args) override;
+    void initialize(RocketSystems *args) override;
     void priori();
-    void priori(float dt, Orientation &orientation, FSMState fsm); 
+    void priori(float dt, Orientation &orientation, FSMState fsm);
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
 
     void setQ(float dt, float sd);
-    void setF(float dt, float w_x, float w_y, float w_z); 
+    void setF(float dt, float w_x, float w_y, float w_z);
 
     // void BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> &body_vec);
     // void GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1> &global_vec);
@@ -32,11 +32,13 @@ public:
     KalmanData getState() override;
     void setState(KalmanState state) override;
 
-    void getThrust(float timestamp, const euler_t& angles, FSMState FSM_state, Eigen::Vector3f& thrust_out);
+    // Use Orientation (quaternion) for frame rotations
+    void getThrust(float timestamp, const Orientation &orientation, FSMState FSM_state, Eigen::Vector3f &thrust_out);
 
     void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
-   
+
     bool should_reinit = false;
+
 private:
     float s_dt = 0.05f;
     float spectral_density_ = 13.0f;

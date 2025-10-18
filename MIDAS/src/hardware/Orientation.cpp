@@ -124,31 +124,29 @@ float angular_difference(float pitch1, float yaw1, float pitch2, float yaw2)
 /**
  * @brief Generates a rotation matrix that transforms a vector by the rotations described in rpy_vec {roll, pitch, yaw} (in that order!)
  */
-Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec) {
+Eigen::Matrix3f generate_rotation_matrix(Vec3 rpy_vec)
+{
     float roll = rpy_vec.x;
     float pitch = rpy_vec.y;
     float yaw = rpy_vec.z;
 
-    Eigen::Matrix3f Rx {
+    Eigen::Matrix3f Rx{
         {1, 0, 0},
         {0, cos(roll), -sin(roll)},
-        {0, sin(roll), cos(roll)}
-    };
+        {0, sin(roll), cos(roll)}};
 
-    Eigen::Matrix3f Ry {
+    Eigen::Matrix3f Ry{
         {cos(pitch), 0, sin(pitch)},
         {0, 1, 0},
-        {-sin(pitch), 0, cos(pitch)}
-    };
+        {-sin(pitch), 0, cos(pitch)}};
 
-    Eigen::Matrix3f Rz {
+    Eigen::Matrix3f Rz{
         {cos(yaw), -sin(yaw), 0},
         {sin(yaw), cos(yaw), 0},
-        {0, 0, 1}
-    };
+        {0, 0, 1}};
 
     return Rx * Ry * Rz;
-} 
+}
 
 /**
  * @brief Reads and returns the data from the sensor
@@ -184,10 +182,10 @@ Orientation OrientationSensor::read()
             sensor_reading.angular_velocity.vx = event.un.gyroIntegratedRV.angVelX;
             sensor_reading.angular_velocity.vy = event.un.gyroIntegratedRV.angVelY;
             sensor_reading.angular_velocity.vz = event.un.gyroIntegratedRV.angVelZ;
-            
+
             return sensor_reading;
         }
-        
+
         // filtered_euler.x = alpha * (euler.x) + (1 - alpha) * prev_x;
         // filtered_euler.y = alpha * (euler.y) + (1 - alpha) * prev_y;
         // filtered_euler.z = alpha * (euler.z ) + (1 - alpha) * prev_z;
@@ -195,7 +193,7 @@ Orientation OrientationSensor::read()
         // prev_x = euler.x;
         // prev_y = euler.y;
         // prev_z = euler.z;
-        
+
         /*
         sensor_reading.yaw = -filtered_euler.y;
         sensor_reading.pitch = filtered_euler.x;
@@ -206,6 +204,12 @@ Orientation OrientationSensor::read()
         sensor_reading.pitch = euler.x;
         sensor_reading.roll = euler.z;
 
+        // Store raw quaternion components from the BNO report
+        sensor_reading.q0 = event.un.arvrStabilizedRV.real;
+        sensor_reading.q1 = event.un.arvrStabilizedRV.i;
+        sensor_reading.q2 = event.un.arvrStabilizedRV.j;
+        sensor_reading.q3 = event.un.arvrStabilizedRV.k;
+
         sensor_reading.linear_acceleration.ax = -event.un.accelerometer.y;
         sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;
         sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
@@ -215,9 +219,8 @@ Orientation OrientationSensor::read()
         velocity.vy = sensor_reading.linear_acceleration.ay * deltaTime + velocity.vy;
         velocity.vz = sensor_reading.linear_acceleration.az * deltaTime + velocity.vz;
 
-
         sensor_reading.orientation_velocity = velocity;
-        
+
         sensor_reading.gx = -event.un.gyroscope.y;
         sensor_reading.gy = event.un.gyroscope.x;
         sensor_reading.gz = event.un.gyroscope.z;
@@ -234,8 +237,8 @@ Orientation OrientationSensor::read()
             initial_orientation = sensor_reading;
             initial_flag = 1;
         }
-      
-        Vec3 rotated_data {-euler.z, -euler.y, euler.x}; // roll, pitch, yaw
+
+        Vec3 rotated_data{-euler.z, -euler.y, euler.x}; // roll, pitch, yaw
 
         // The guess & check method!
         // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
@@ -250,18 +253,19 @@ Orientation OrientationSensor::read()
         float ref_mag = reference_vector.norm();
 
         sensor_reading.tilt = 0;
-        if(cur_mag != 0 && ref_mag != 0) {
-            sensor_reading.tilt = acos(dot/(cur_mag*ref_mag));
+        if (cur_mag != 0 && ref_mag != 0)
+        {
+            sensor_reading.tilt = acos(dot / (cur_mag * ref_mag));
         }
 
         const float alpha = 0.2;
         // Arthur's Comp Filter
-        float filtered_tilt = alpha * sensor_reading.tilt + (1-alpha) * prev_tilt;
+        float filtered_tilt = alpha * sensor_reading.tilt + (1 - alpha) * prev_tilt;
         prev_tilt = filtered_tilt;
 
         // Serial.print("TILT: ");
         // Serial.println(filtered_tilt * (180/3.14f));
-        
+
         return sensor_reading;
     }
     return {.has_data = false};
