@@ -64,7 +64,7 @@
 
 // Delay between the APOGEE state being confirmed and moving into DROGUE_DEPLOY for pyros (ms)
 // (Core Setting)
-#define sustainer_apogee_timer_threshold 500
+#define sustainer_apogee_timer_threshold 0
 
 // If drogue deployment is not auto-detected, transition to DROGUE anyway after this amount of time (ms)
 // (Core Setting)
@@ -137,7 +137,7 @@
 
 // Regardless of sensor inputs, stay on pyro firing states for at LEAST this time. (ms)
 // (Core Setting)
-#define booster_pyro_firing_time_minimum 200
+#define booster_pyro_firing_time_minimum 100
 
 // Transition to FIRST_BOOST if acceleration is greater than this (G)
 // @SDA: This value should be a reasonable lower bound experienced by the vehicle during the first stage boost.
@@ -170,7 +170,7 @@
 
 // Delay between the APOGEE state being confirmed and moving into DROGUE_DEPLOY for pyros (ms)
 // (Core Setting)
-#define booster_apogee_timer_threshold 1000
+#define booster_apogee_timer_threshold 0
 
 // If drogue deployment is not auto-detected, transition to DROGUE anyway after this amount of time (ms)
 // (Core Setting)
