@@ -8,7 +8,7 @@ on:
 
 jobs:
   build_sustainer:
-    name: Build mcu_main_sustainer
+    name: Build MIDAS:mcu_main_sustainer
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -48,7 +48,7 @@ jobs:
           path: MIDAS/.pio/build/mcu_main_sustainer/firmware*.*
 
   build_booster:
-    name: Build mcu_main_booster
+    name: Build MIDAS:mcu_main_booster
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -87,21 +87,62 @@ jobs:
           name: firmware-mcu_main_booster
           path: MIDAS/.pio/build/mcu_main_booster/firmware*.*
 
+  build_feather_duo:
+    name: Build ground:feather_duo
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ground
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      - name: PlatformIO version
+        run: pio --version
+      - name: Build feather_duo
+        run: pio run -e feather_duo
+      - name: Upload Artifact for feather_duo
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-feather_duo
+          path: ground/.pio/build/feather_duo/firmware*.*
+
   notify:
     name: Slack Notification Summary (main)
-    needs: [build_sustainer, build_booster]
+    needs: [build_sustainer, build_booster, build_feather_duo]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Send Slack Summary
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: ${{ (needs.build_sustainer.result == 'success' && needs.build_booster.result == 'success') && 'good' || 'danger' }}
+          SLACK_COLOR: ${{ (needs.build_sustainer.result == 'success' && needs.build_booster.result == 'success' && needs.build_feather_duo.result == 'success') && 'good' || 'danger' }}
           SLACK_TITLE: "Firmware Build Summary"
           SLACK_MESSAGE: |
             Build results:
-            - *mcu_main_sustainer*: ${{ needs.build_sustainer.result }}
-            - *mcu_main_booster*: ${{ needs.build_booster.result }}
+            - *MIDAS:mcu_main_sustainer*: ${{ needs.build_sustainer.result }}
+            - *MIDAS:mcu_main_booster*: ${{ needs.build_booster.result }}
+            - *ground:feather_duo*: ${{ needs.build_feather_duo.result }}
 
             :information_source: CI Notifications only run on the `main` branch.
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}

@@ -93,6 +93,8 @@ void setup()
 	digitalWrite(BNO086_CS, HIGH);
 	digitalWrite(CAN_CS, HIGH);
 	digitalWrite(E22_CS, HIGH);
+
+    digitalWrite(BNO086_RESET, HIGH);
     //configure output leds
     gpioPinMode(LED_BLUE, OUTPUT);
     gpioPinMode(LED_GREEN, OUTPUT);

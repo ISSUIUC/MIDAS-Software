@@ -44,6 +44,7 @@ struct TelemetryPacket {
     
     uint8_t roll_rate;
     uint8_t camera_state;
+    uint8_t camera_batt_volt;
     
 };
 
@@ -61,6 +62,10 @@ struct TelemetryCommand {
     std::array<char, 3> verify;
 
     bool valid() {
+        #ifdef IS_SUSTAINER
         return verify == std::array<char, 3>{{'B','R','K'}};
+        #elif IS_BOOSTER
+        return verify == std::array<char, 3>{{'A','R','K'}};
+        #endif
     }
 };

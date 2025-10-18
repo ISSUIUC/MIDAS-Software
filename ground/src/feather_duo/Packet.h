@@ -43,6 +43,7 @@ struct TelemetryPacket {
     
     uint8_t roll_rate;
     uint8_t camera_state;
+    uint8_t camera_batt_volt;
     
 };
 
@@ -82,6 +83,7 @@ struct FullTelemetryData {
 
     float roll_rate_hz;
     uint8_t camera_state;
+    float camera_batt_volt;
 };
 
 FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency);

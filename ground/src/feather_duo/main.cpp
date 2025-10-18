@@ -74,6 +74,13 @@ void Radio_Rx_Thread(void * arg) {
             }
 
             if(to_send.command != CommandType::EMPTY) {
+
+                if (cfg->stage == Stage::Booster) {
+                    to_send.verify[0] = 'A';
+                } else if (cfg->stage == Stage::Sustainer) {
+                    to_send.verify[0] = 'B';
+                }
+
                 (void)cfg->radio->send((uint8_t*)&to_send, sizeof(to_send));
                 Serial.println(json_command_sent);
             }

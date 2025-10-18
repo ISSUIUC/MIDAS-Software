@@ -35,8 +35,6 @@ public:
     template<typename T>
     void send(const T& data) {
         static_assert(sizeof(T) <= 0xFF, "The data type to send is too large"); // Max payload is 255
-        gpioDigitalWrite(LED_BLUE, led_state);
-        led_state = !led_state;
 
         SX1268Error result = lora.send((uint8_t*) &data, sizeof(T));
         if(result != SX1268Error::NoError) {
@@ -76,5 +74,4 @@ public:
 
 private:
     SX1268 lora;
-    bool led_state;
 };

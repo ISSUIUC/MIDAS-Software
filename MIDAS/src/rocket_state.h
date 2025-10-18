@@ -198,6 +198,7 @@ public:
     
     CommandFlags command_flags;
     uint8_t camera_state = 127;
+    int16_t cam_batt_voltage;
 
     Latency log_latency;
 };
