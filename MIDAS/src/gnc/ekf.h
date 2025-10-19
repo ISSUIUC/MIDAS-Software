@@ -37,6 +37,8 @@ public:
     void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
    
     bool should_reinit = false;
+    float current_vel = 0.0f;
+
 private:
     float s_dt = 0.05f;
     float spectral_density_ = 13.0f;
@@ -44,6 +46,7 @@ private:
     float Ca = 0;
     float Cn = 0;
     float Cp = 0;
+    
     // Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
     KalmanState kalman_state;
     FSMState last_fsm = FSMState::STATE_IDLE;

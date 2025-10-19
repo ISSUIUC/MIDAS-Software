@@ -5,6 +5,7 @@ extern const std::map<float, float> O5500X_data;
 extern const std::map<float, float> M685W_data;
 extern const std::map<std::string, std::map<float, float>> motor_data;
 
+
 EKF::EKF() : KalmanFilter()
 {
     state = KalmanData();
@@ -112,12 +113,9 @@ void EKF::initialize(RocketSystems *args)
 
      // Wind vector
     Wind(0, 0) = 10.0; // wind in x direction
-    Wind(0, 1) = 0.0; // wind in y direction
-    Wind(0, 2) = 0.0; // wind in z direction
+    Wind(1, 0) = 0.0; // wind in y direction
+    Wind(2, 0) = 0.0; // wind in z direction
 
-    float Wind_alpha = 0.85; 
-
-    
 
 
     // set R
@@ -319,15 +317,16 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     state.position = (Position){kalman_state.state_est_pos_x, kalman_state.state_est_pos_y, kalman_state.state_est_pos_z};
     state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
     state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
-
+    
     if (FSM_state  == FSMState::STATE_FIRST_BOOST) {
-        current_vel  += (dt)*y_k(1);
-        Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+        const float Wind_alpha = 0.85f;
+        current_vel = current_vel +  (s_dt)*y_k(1,0); // integrating accel to get velocity
+        Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>::Zero();
         measured_v(0,0) = current_vel;
         //measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
-        Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+        Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>::Zero();
         err(0,0) = measured_v(0,0) - x_k(1,0);
-        Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
+        Wind = Wind_alpha * Wind + (1.0f - Wind_alpha) * err;
         if(Wind.norm() > 15) {
             Wind(0,0) = 15.0;
             Wind(1,0) = 0.0;
