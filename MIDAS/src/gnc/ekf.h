@@ -24,7 +24,7 @@ public:
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
 
     void setQ(float dt, float sd);
-    void setF(float dt, float w_x, float w_y, float w_z); 
+    void setF(float dt, float w_x, float w_y, float w_z, float coeff, float v_x,float v_y, float v_z); 
 
     // void BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> &body_vec);
     // void GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1> &global_vec);
