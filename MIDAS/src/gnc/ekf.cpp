@@ -112,6 +112,7 @@ void EKF::initialize(RocketSystems *args)
 
      // Wind vector
     Wind(0, 0) = 10.0; // wind in x direction
+    Wind(0, 0) = 0.0; // wind in x direction
     Wind(0, 1) = 0.0; // wind in y direction
     Wind(0, 2) = 0.0; // wind in z direction
 
@@ -172,7 +173,8 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     }
 
     // Mach number // Subtracting wind from velocity
-    float vel_mag_squared_ms = ((x_k(1, 0) - 1.2*Wind(1,0)) * (x_k(1, 0) - 1.2*Wind(1,0))) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
+    // float vel_mag_squared_ms = ((x_k(1, 0) - 1.2*Wind(1,0)) * (x_k(1, 0) - 1.2*Wind(1,0))) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
+    float vel_mag_squared_ms = ((x_k(1, 0) ) * (x_k(1, 0) )) + x_k(4, 0) * x_k(4, 0) + x_k(7, 0) * x_k(7, 0);
 
     float vel_magnitude_ms = pow(vel_mag_squared_ms, 0.5);
 
@@ -190,10 +192,10 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     // aerodynamic force
     // Body frame
     float Fax = -0.5 * rho * (vel_magnitude_ms) * float(Ca) * (pi * r * r) * x_k(1,0); // instead of mag square --> mag * vel_x 
+    Fax = 0;
     float Fay = 0; // assuming no aerodynamic effects
     float Faz = 0; // assuming no aerodynamic effects
 
-    Serial.println("vel_mag_squared_ms: " + String(vel_mag_squared_ms));
 
 
     
@@ -203,9 +205,12 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
     GlobalToBody(angles_rad, g_body);
 
-    float gx = g_body(0, 0);
-    float gy = g_body(1, 0);
-    float gz = g_body(2, 0);
+    // float gx = g_body(0, 0);
+    // float gy = g_body(1, 0);
+    // float gz = g_body(2, 0);
+    float gx = g_global(0, 0);
+    float gy = g_global(1, 0);
+    float gz = g_global(2, 0);
 
     // thurst force
     Eigen::Matrix<float, 3, 1> Ft_global;
@@ -217,16 +222,22 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     float Ftz = Ft_global(2, 0); 
 
 
+
+    Eigen::Matrix <float,3,1> coriolis;
+    Eigen::Matrix <float,3,1> angular_velocity;
+    angular_velocity << omega_rps.vx, omega_rps.vy,omega_rps.vz;
+    // Eigen::Matrix <float,3,1> velocity_world <<;
+    
     xdot << x_k(1, 0),
-        ((Fax + Ftx) / curr_mass_kg + gx - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0)) + x_k(2, 0)) * 0.5,
+        ((Fax + Ftx) / curr_mass_kg + gx - (omega_rps.vy * x_k(7, 0) - omega_rps.vz * x_k(4, 0))),
         0.0,
 
         x_k(4, 0),
-        ((Fay + Fty) / curr_mass_kg + gy - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0)) + x_k(5, 0)) * 0.5,
+        ((Fay + Fty) / curr_mass_kg + gy - (omega_rps.vz * x_k(1, 0) - omega_rps.vx * x_k(7, 0))),
         0.0,
 
         x_k(7, 0),
-        ((Faz + Ftz) / curr_mass_kg + gz - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0)) + x_k(8, 0)) * 0.5,
+        ((Faz + Ftz) / curr_mass_kg + gz - (omega_rps.vx * x_k(4, 0) - omega_rps.vy * x_k(1, 0))),
         0.0;
         
     // priori step
@@ -320,22 +331,20 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
     state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
 
-    if (FSM_state  == FSMState::STATE_FIRST_BOOST) {
-        current_vel  += (dt)*y_k(1);
-        Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
-        measured_v(0,0) = current_vel;
-        //measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
-        Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
-        err(0,0) = measured_v(0,0) - x_k(1,0);
-        Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
-        if(Wind.norm() > 15) {
-            Wind(0,0) = 15.0;
-            Wind(1,0) = 0.0;
-            Wind(2,0) = 0.0;
-        }
+    // if (FSM_state  == FSMState::STATE_FIRST_BOOST) {
+    //     current_vel  += (dt)*y_k(1);
+    //     Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+    //     measured_v(0,0) = current_vel;
+    //     //measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
+    //     Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+    //     err(0,0) = measured_v(0,0) - x_k(1,0);
+    //     Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
+    //     if(Wind.norm() > 15) {
+    //         Wind(0,0) = 15.0;
+    //         Wind(1,0) = 0.0;
+    //         Wind(2,0) = 0.0;
+    //     }
     
-    
-    }
         
 }
 

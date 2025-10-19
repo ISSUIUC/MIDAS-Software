@@ -24,7 +24,14 @@ void BodyToGlobal(Angles& angles_rad, Eigen::Matrix<float, 3, 1> &body_vec)
 
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
     Eigen::Vector3f temp = rotation_matrix * body_vec;
-    body_vec = temp;
+
+    // Convert from Z-up convention to X-up convention
+    Eigen::Vector3f corrected;
+    corrected(0) = temp(2);  // Z → X
+    corrected(1) = temp(0);  // X → Y 
+    corrected(2) = temp(1);  // Y → Z 
+
+    body_vec = corrected;
 }
 
 /**
@@ -51,5 +58,11 @@ void GlobalToBody(Angles& angles_rad, Eigen::Matrix<float, 3, 1> &global_vec)
 
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
     Eigen::Vector3f temp = rotation_matrix.transpose() * global_vec;
-    global_vec = temp;
+    Eigen::Matrix3f R_zup_to_xup;
+    R_zup_to_xup << 0, 0, 1,
+                    1, 0, 0,
+                    0, 1, 0;
+
+    global_vec = (R_zup_to_xup * rotation_matrix).transpose() * global_vec;
+
 }
