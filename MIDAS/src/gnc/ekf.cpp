@@ -5,6 +5,7 @@ extern const std::map<float, float> O5500X_data;
 extern const std::map<float, float> M685W_data;
 extern const std::map<std::string, std::map<float, float>> motor_data;
 
+
 EKF::EKF() : KalmanFilter()
 {
     state = KalmanData();
