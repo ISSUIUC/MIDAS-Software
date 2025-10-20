@@ -126,7 +126,7 @@ void EKF::initialize(RocketSystems *args)
 
 
     // set 
-    R(0, 0) = 1.0;
+    R(0, 0) = 10.0;
     R(1, 1) = 1.9;
     R(2, 2) = 1.9;
     R(3, 3) = 1.9;
@@ -227,15 +227,14 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     Eigen::Matrix <float,3,1> accels; //we compute everything in the body frame for accelerations, and then convert those accelerations to global frame
     accels << 
     (Fax+Ftx)/ curr_mass_kg - (omega_rps.vy *vz_body - omega_rps.vz * vy_body),  
-    ((Fay + Fty) / curr_mass_kg + gy - (omega_rps.vz * vx_body - omega_rps.vx * vz_body)),
-    ((Faz + Ftz) / curr_mass_kg + gz - (omega_rps.vx *vy_body - omega_rps.vy * vx_body));
+    ((Fay + Fty) / curr_mass_kg  - (omega_rps.vz * vx_body - omega_rps.vx * vz_body)),
+    ((Faz + Ftz) / curr_mass_kg - (omega_rps.vx *vy_body - omega_rps.vy * vx_body));
 
     // Serial.println("x-accel: "+ String(accels(0,0)));
     // Serial.println("y-accel: "+ String(accels(1,0)));
     // Serial.println("z-accel: "+ String(accels(2,0)));
 
     BodyToGlobal(angles_rad, accels);
-
 
 
     xdot << x_k(1, 0),accels(0,0) + gx,
@@ -258,7 +257,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         coeff = -pi*Ca*(r*r)*rho / curr_mass_kg;
     }
     
-    setF(dt, omega_rps.vx, omega_rps.vy, omega_rps.vz, coeff,vx_body,vy_body,vz_body );
+    setF(dt,0,0,0,0,0,0,0);
 
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 
@@ -463,7 +462,7 @@ void EKF::
     Q(6, 6) = pow(dt, 5) / 20;
     Q(6, 7) = pow(dt, 4) / 8;
     Q(6, 8) = pow(dt, 3) / 6;
-    Q(7, 7) = pow(dt, 3) / 8;
+    Q(7, 7) = pow(dt, 3) / 3;
     Q(7, 8) = pow(dt, 2) / 2;
     Q(8, 8) = dt;
     Q(7, 6) = Q(6, 7);
@@ -485,16 +484,22 @@ void EKF::
 void EKF::setF(float dt, float w_x, float w_y, float w_z, float coeff, float v_x,float v_y, float v_z)
 
 {
-    F_mat.setZero();
-    F_mat(0, 1) = 1;
-    F_mat(1, 2) = coeff*v_x;
-    F_mat(1, 4) = w_z +coeff*v_y;
-    F_mat(1, 7) = -w_y +coeff*v_z;
-    F_mat(3, 4) = 1;
-    F_mat(4, 1) = -w_z ;
-    F_mat(4, 7) = w_x;
-    F_mat(7, 1) = w_y ;
-    F_mat(7, 4) = -w_x ;
+    F_mat.setIdentity(); // start from identity
+
+// For x
+F_mat(0, 1) = dt;
+F_mat(0, 2) = 0.5f * dt * dt;
+F_mat(1, 2) = dt;
+
+// For y
+F_mat(3, 4) = dt;
+F_mat(3, 5) = 0.5f * dt * dt;
+F_mat(4, 5) = dt;
+
+// For z
+F_mat(6, 7) = dt;
+F_mat(6, 8) = 0.5f * dt * dt;
+F_mat(7, 8) = dt;
 }
 
 /**
