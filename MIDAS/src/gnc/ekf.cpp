@@ -323,10 +323,10 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     {
         g_ms2 = -gravity_ms2;
     }
-    else
-    {
-        g_ms2 = 0;
-    }
+    // else
+    // {
+    //     g_ms2 = 0;
+    // }
 
     // acceloremeter reports values in g's and measures specific force
     y_k(1, 0) = ((sensor_accel_global_g)(0)) * g_ms2;

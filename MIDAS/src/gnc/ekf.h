@@ -44,8 +44,8 @@ public:
     #endif
 
 private:
-    float s_dt = 0.0001f;
-    float spectral_density_ = 13.0f;
+    float s_dt = 0.05f;
+    float spectral_density_ = 0.001f;
     float kalman_apo = 0;
     float Ca = 0;
     float Cn = 0;
