@@ -27,6 +27,43 @@ class Orientation:
     yaw = 0
     tilt = 0
 
+class Matrix:
+    def __init__(self, _xdim, _ydim):
+        # Converts an eigen .data() stream back to a _x*_y matrix
+
+        self._x = _xdim
+        self._y = _ydim
+
+        self._data = []
+        for i in range(_xdim):
+            self._data.append([])
+            for _ in range(_ydim):
+                self._data[i].append(0)
+
+    def from_eigen_stream(self, arr, begin_idx) -> int:
+        # Patches the data into this matrix, and returns the end index
+        n = self._x * self._y
+        for i in range(self._x):
+            for j in range(self._y):
+                self._data[i][j] = arr[begin_idx + j + (i*self._x)]
+        return begin_idx + n
+
+
+
+# # Test matrix class
+
+# a = Matrix(2, 2)
+
+# c = [1, 2, 3, 4]
+
+# r = a.from_eigen_stream(c, 0)
+# print(r)
+# print(a._data[1][0])
+
+
+# sys.exit(0)
+
+
 class RocketData:
     position = Position()
     velocity = Velocity()
@@ -34,25 +71,71 @@ class RocketData:
     raw_accel = Acceleration()
     altitude: float = 0
     orientation = Orientation()
+    K_mat = Matrix(9, 4)
+    P_k_mat = Matrix(9, 9)
+    verify: float = 0
 
     def from_csvf(self, csvf_split: list[str]):
-        self.position.px = csvf_split[0]
-        self.position.py = csvf_split[1]
-        self.position.pz = csvf_split[2]
-        self.velocity.vx = csvf_split[3]
-        self.velocity.vy = csvf_split[4]
-        self.velocity.vz = csvf_split[5]
-        self.acceleration.ax = csvf_split[6]
-        self.acceleration.ay = csvf_split[7]
-        self.acceleration.az = csvf_split[8]
-        self.altitude = csvf_split[9]
-        self.raw_accel.ax = csvf_split[10]
-        self.raw_accel.ay = csvf_split[11]
-        self.raw_accel.az = csvf_split[12]
-        self.orientation.pitch = float(csvf_split[13]) * (180/math.pi)
-        self.orientation.roll = float(csvf_split[14]) * (180/math.pi)
-        self.orientation.yaw = float(csvf_split[15]) * (180/math.pi)
-        self.orientation.tilt = float(csvf_split[16]) * (180/math.pi)
+        try:
+            # Validate all values can be converted to float before making any changes
+            validated_values = []
+            for i in range(18):
+                validated_values.append(float(csvf_split[i]))
+
+            # Only update if all validations passed
+            self.position.px = validated_values[0]
+            self.position.py = validated_values[1]
+            self.position.pz = validated_values[2]
+            self.velocity.vx = validated_values[3]
+            self.velocity.vy = validated_values[4]
+            self.velocity.vz = validated_values[5]
+            self.acceleration.ax = validated_values[6]
+            self.acceleration.ay = validated_values[7]
+            self.acceleration.az = validated_values[8]
+            self.altitude = validated_values[9]
+            self.raw_accel.ax = validated_values[10]
+            self.raw_accel.ay = validated_values[11]
+            self.raw_accel.az = validated_values[12]
+            self.orientation.pitch = validated_values[13] * (180/math.pi)
+            self.orientation.roll = validated_values[14] * (180/math.pi)
+            self.orientation.yaw = validated_values[15] * (180/math.pi)
+            self.orientation.tilt = validated_values[16] * (180/math.pi)
+            self.verify = validated_values[17]
+        except:
+            print("err decode data")
+
+    def from_csvf_mat(self, csvf_split: list[str]):
+        try:
+            # Calculate total number of values needed
+            k_mat_size = self.K_mat._x * self.K_mat._y  # 9x4 = 36
+            pk_mat_size = self.P_k_mat._x * self.P_k_mat._y  # 9x9 = 81
+            total_values = k_mat_size + pk_mat_size + 1  # +1 for verify
+
+            # Validate all values can be converted to float before making any changes
+            validated_values = []
+            for i in range(total_values):
+                validated_values.append(float(csvf_split[i]))
+
+            # Only update if all validations passed
+            # Update K_mat
+            idx = 0
+            for i in range(self.K_mat._x):
+                for j in range(self.K_mat._y):
+                    self.K_mat._data[i][j] = validated_values[idx]
+                    idx += 1
+
+            # Update P_k_mat
+            for i in range(self.P_k_mat._x):
+                for j in range(self.P_k_mat._y):
+                    self.P_k_mat._data[i][j] = validated_values[idx]
+                    idx += 1
+
+            # Update verify
+            self.verify = validated_values[idx]
+        except:
+            print("err decoding mat")
+
+
 
 data = RocketData()
 def inputprocess():
@@ -63,9 +146,17 @@ def inputprocess():
         strdat = dat_raw.decode().strip()
 
         if strdat.startswith(";") and strdat.endswith("!"):
+            # normal data
             fixed_str = strdat[1:-1]
             split_data = fixed_str.split(",")
             data.from_csvf(split_data)
+
+        if strdat.startswith("&") and strdat.endswith("!"):
+            # matrix data
+            fixed_str = strdat[1:-1]
+            split_data = fixed_str.split(",")
+            data.from_csvf_mat(split_data)
+
 
 
 
@@ -91,39 +182,6 @@ from matplotlib.figure import Figure
 
 
 # ----------------------------
-# Your provided data structures
-# ----------------------------
-class Position:
-    px = 0
-    py = 0
-    pz = 0
-
-class Velocity:
-    vx = 0
-    vy = 0
-    vz = 0
-
-class Acceleration:
-    ax = 0
-    ay = 0
-    az = 0
-
-class Orientation:
-    pitch = 0
-    roll = 0
-    yaw = 0
-    tilt = 0
-
-class RocketData:
-    position = Position()
-    velocity = Velocity()
-    acceleration = Acceleration()
-    raw_accel = Acceleration()
-    altitude: float = 0
-    orientation = Orientation()
-
-
-# ----------------------------
 # Tkinter UI with tabs
 # ----------------------------
 class RocketDashboard(tk.Tk):
@@ -132,6 +190,7 @@ class RocketDashboard(tk.Tk):
     Right side uses a Notebook with:
       - Tab 1 (Kinematics): Position (x,y,z), Velocity (x,y,z), Acceleration (x,y,z)
       - Tab 2 (Orientation & Raw): Orientation (pitch,roll,yaw) and Raw accel (x,y,z)
+      - Tab 3 (Matrices): K_mat (9x4) and P_k_mat (9x9)
     Left side shows raw readouts.
     """
     def __init__(self, rocket: RocketData, lock: Optional[threading.Lock] = None,
@@ -334,6 +393,36 @@ class RocketDashboard(tk.Tk):
 
         self.nb.add(ori, text="Orientation & Raw")
 
+        # ---- Tab 3: Matrices (K_mat and P_k_mat) ----
+        mat = ttk.Frame(self.nb)
+        mat.rowconfigure(0, weight=1)
+        mat.rowconfigure(1, weight=1)
+        mat.columnconfigure(0, weight=1)
+
+        # K_mat heatmap (9x4)
+        self.fig_kmat = Figure(figsize=(5, 3.2), dpi=100)
+        self.ax_kmat = self.fig_kmat.add_subplot(111)
+        self.ax_kmat.set_title("K Matrix (9x4)")
+        self.im_kmat = self.ax_kmat.imshow([[0]*4 for _ in range(9)], cmap='coolwarm', aspect='auto')
+        self.fig_kmat.colorbar(self.im_kmat, ax=self.ax_kmat)
+        self.ax_kmat.set_xlabel("Column")
+        self.ax_kmat.set_ylabel("Row")
+        self.canvas_kmat = FigureCanvasTkAgg(self.fig_kmat, master=mat)
+        self.canvas_kmat.get_tk_widget().grid(row=0, column=0, sticky="nsew", padx=6, pady=6)
+
+        # P_k_mat heatmap (9x9)
+        self.fig_pkmat = Figure(figsize=(5, 3.2), dpi=100)
+        self.ax_pkmat = self.fig_pkmat.add_subplot(111)
+        self.ax_pkmat.set_title("P_k Matrix (9x9)")
+        self.im_pkmat = self.ax_pkmat.imshow([[0]*9 for _ in range(9)], cmap='coolwarm', aspect='auto')
+        self.fig_pkmat.colorbar(self.im_pkmat, ax=self.ax_pkmat)
+        self.ax_pkmat.set_xlabel("Column")
+        self.ax_pkmat.set_ylabel("Row")
+        self.canvas_pkmat = FigureCanvasTkAgg(self.fig_pkmat, master=mat)
+        self.canvas_pkmat.get_tk_widget().grid(row=1, column=0, sticky="nsew", padx=6, pady=6)
+
+        self.nb.add(mat, text="Matrices")
+
     # ---------- POLLING / UPDATE ----------
     def _snapshot(self):
         """Thread-safe-ish snapshot of current rocket data."""
@@ -354,6 +443,9 @@ class RocketDashboard(tk.Tk):
             roll  = float(r.orientation.roll)
             yaw   = float(r.orientation.yaw)
             tilt  = float(r.orientation.tilt)
+            # Matrices - deep copy the data
+            k_mat_data = [[float(r.K_mat._data[i][j]) for j in range(r.K_mat._y)] for i in range(r.K_mat._x)]
+            pk_mat_data = [[float(r.P_k_mat._data[i][j]) for j in range(r.P_k_mat._y)] for i in range(r.P_k_mat._x)]
         finally:
             if self.lock:
                 self.lock.release()
@@ -364,6 +456,8 @@ class RocketDashboard(tk.Tk):
             "ax": ax, "ay": ay, "az": az,
             "rax": rax, "ray": ray, "raz": raz,
             "pitch": pitch, "roll": roll, "yaw": yaw, "tilt": tilt,
+            "k_mat": k_mat_data,
+            "pk_mat": pk_mat_data,
         }
 
     def _poll_and_update(self):
@@ -451,6 +545,13 @@ class RocketDashboard(tk.Tk):
                                 self.t_hist)
         self.canvas_raw.draw_idle()
 
+        # Update matrix heatmaps
+        self._update_matrix_heatmap(self.im_kmat, snap["k_mat"])
+        self.canvas_kmat.draw_idle()
+
+        self._update_matrix_heatmap(self.im_pkmat, snap["pk_mat"])
+        self.canvas_pkmat.draw_idle()
+
         self.after(self.poll_ms, self._poll_and_update)
 
     @staticmethod
@@ -471,6 +572,40 @@ class RocketDashboard(tk.Tk):
             pad = 0.05 * (ymax - ymin)
             ax.set_ylim(ymin - pad, ymax + pad)
 
+    def _update_matrix_heatmap(self, image, matrix_data):
+        """Update a matrix heatmap with new data."""
+        image.set_data(matrix_data)
+        # Auto-scale color limits based on data range
+        all_vals = [val for row in matrix_data for val in row]
+        if all_vals:
+            vmin, vmax = min(all_vals), max(all_vals)
+            if abs(vmax - vmin) < 1e-9:
+                vmin -= 0.1
+                vmax += 0.1
+            image.set_clim(vmin, vmax)
+
+        # Get the axes from the image
+        ax = image.axes
+
+        # Clear existing text annotations
+        for txt in ax.texts:
+            txt.remove()
+
+        # Add text annotations for each cell
+        rows = len(matrix_data)
+        cols = len(matrix_data[0]) if rows > 0 else 0
+        for i in range(rows):
+            for j in range(cols):
+                value = matrix_data[i][j]
+                # Format the value - use scientific notation for very small/large values
+                if abs(value) < 0.01 or abs(value) >= 1000:
+                    text_str = f"{value:.2e}"
+                else:
+                    text_str = f"{value:.3f}"
+                ax.text(j, i, text_str, ha="center", va="center",
+                       color="white" if abs(value) > (vmin + vmax) / 2 else "black",
+                       fontsize=7)
+
     def _on_close(self):
         self.destroy()
 
@@ -486,6 +621,6 @@ if __name__ == "__main__":
     inp_thd.start()
 
 
-    app = RocketDashboard(data, lock=lock, poll_ms=10, history_sec=30.0)
+    app = RocketDashboard(data, lock=lock, poll_ms=100, history_sec=30.0)
     
     app.mainloop()

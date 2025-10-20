@@ -39,6 +39,10 @@ public:
     bool should_reinit = false;
     float current_vel = 0.0f;
 
+    #ifdef GNC_DATA
+    void encode_to_buf(float* buf) override;
+    #endif
+
 private:
     float s_dt = 0.05f;
     float spectral_density_ = 13.0f;
@@ -56,5 +60,7 @@ private:
     Buffer<float, ALTITUDE_BUFFER_SIZE> alt_buffer;
     KalmanData state;
 };
+
+
 
 extern EKF ekf;

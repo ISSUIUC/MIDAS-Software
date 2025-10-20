@@ -13,7 +13,7 @@
 
 #define ENABLE_TELEM
 
-static char buff[512]{};
+static char buff[1024]{};
 static char fbuf[24];
 
 inline void append_char(size_t &pos, char c) {
@@ -48,36 +48,54 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         THREAD_SLEEP(1);
     }
     #else
+    size_t n = 0;
     while (true) {
         KalmanData current_state = arg->rocket_data.kalman.getRecent();
         HighGData cur_acc = arg->rocket_data.high_g.getRecent();
         Orientation cur_ori = arg->rocket_data.orientation.getRecent();
 
         size_t pos = 0;
+        ++n;
+        if (n%5 == 0) {
+            // Print matrix data
+            append_char(pos, '&');
+            // Now EKF matrices. K (9x4), then P_k (9x9)
+            for(int i = 0; i < (9*4) + (9*9); i++) {
+                append_float(pos, current_state.gnc_mat_buf[i]); append_char(pos, ',');
+            }
+        } else {
+            // print normal data
+            append_char(pos, ';');
+            append_float(pos, current_state.position.px); append_char(pos, ',');
+            append_float(pos, current_state.position.py); append_char(pos, ',');
+            append_float(pos, current_state.position.pz); append_char(pos, ',');
+            append_float(pos, current_state.velocity.vx); append_char(pos, ',');
+            append_float(pos, current_state.velocity.vy); append_char(pos, ',');
+            append_float(pos, current_state.velocity.vz); append_char(pos, ',');
+            append_float(pos, current_state.acceleration.ax); append_char(pos, ',');
+            append_float(pos, current_state.acceleration.ay); append_char(pos, ',');
+            append_float(pos, current_state.acceleration.az); append_char(pos, ',');
+            append_float(pos, current_state.altitude); append_char(pos, ',');
+            append_float(pos, cur_acc.ax); append_char(pos, ',');
+            append_float(pos, cur_acc.ay); append_char(pos, ',');
+            append_float(pos, cur_acc.az); append_char(pos, ',');
+            append_float(pos, cur_ori.pitch); append_char(pos, ',');
+            append_float(pos, cur_ori.roll); append_char(pos, ',');
+            append_float(pos, cur_ori.yaw); append_char(pos, ',');
+            append_float(pos, cur_ori.tilt); append_char(pos, ',');
+        }
 
-        append_char(pos, ';');
-        append_float(pos, current_state.position.px); append_char(pos, ',');
-        append_float(pos, current_state.position.py); append_char(pos, ',');
-        append_float(pos, current_state.position.pz); append_char(pos, ',');
-        append_float(pos, current_state.velocity.vx); append_char(pos, ',');
-        append_float(pos, current_state.velocity.vy); append_char(pos, ',');
-        append_float(pos, current_state.velocity.vz); append_char(pos, ',');
-        append_float(pos, current_state.acceleration.ax); append_char(pos, ',');
-        append_float(pos, current_state.acceleration.ay); append_char(pos, ',');
-        append_float(pos, current_state.acceleration.az); append_char(pos, ',');
-        append_float(pos, current_state.altitude); append_char(pos, ',');
-        append_float(pos, cur_acc.ax); append_char(pos, ',');
-        append_float(pos, cur_acc.ay); append_char(pos, ',');
-        append_float(pos, cur_acc.az); append_char(pos, ',');
-        append_float(pos, cur_ori.pitch); append_char(pos, ',');
-        append_float(pos, cur_ori.roll); append_char(pos, ',');
-        append_float(pos, cur_ori.yaw); append_char(pos, ',');
-        append_float(pos, cur_ori.tilt);
-        append_char(pos, '!');
+        append_float(pos, 1.337); append_char(pos, '!');
+
+
+
+        
+
+        
         buff[pos] = '\0';
         (size_t)Serial.println(buff);
 
-        THREAD_SLEEP(25);
+        THREAD_SLEEP(50);
     }
     #endif
 }
@@ -290,38 +308,15 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
         KalmanData current_state = ekf.getState();
 
+        #ifdef GNC_DATA
+        ekf.encode_to_buf(current_state.gnc_mat_buf);
+        #endif
+
         arg->rocket_data.kalman.update(current_state);
 
+
+
         last = xTaskGetTickCount();
-        // Serial.println("Kalman");
-
-
-        
-
-
-        // int len = snprintf(buff, sizeof(buff), ";%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,%.5f,|%.5f,%.5f,%.5f,|%.5f,%.5f,%.5f,%.5f!",
-        // current_state.position.px,
-        // current_state.position.py,
-        // current_state.position.pz,
-        // current_state.velocity.vx,
-        // current_state.velocity.vy,
-        // current_state.velocity.vz,
-        // current_state.acceleration.ax,
-        // current_state.acceleration.ay,
-        // current_state.acceleration.az,
-        // current_state.altitude,
-        // current_accelerations.ax,
-        // current_accelerations.ay,
-        // current_accelerations.az,
-        // current_orientation.pitch,
-        // current_orientation.roll,
-        // current_orientation.yaw,
-        // current_orientation.tilt
-        // );
-        // Serial.println(buff);
-
-        // px,py,pz,vx,vy,vz,ax,ay,az,
-        
 
 
         THREAD_SLEEP(50);

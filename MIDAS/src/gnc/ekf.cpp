@@ -119,7 +119,11 @@ void EKF::initialize(RocketSystems *args)
 
     float Wind_alpha = 0.85; 
 
-    
+    P_k.setZero();
+    P_k.block<3,3>(0,0) = Eigen::Matrix3f::Identity() * 1e-2f;   // x block (pos,vel,acc)
+    P_k.block<3,3>(3,3) = Eigen::Matrix3f::Identity() * 1e-2f;   // y block
+    P_k.block<3,3>(6,6) = Eigen::Matrix3f::Identity() * 1e-2f;   // z block
+
 
 
     // set 
@@ -261,6 +265,13 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
 
 }
 
+#ifdef GNC_DATA
+void EKF::encode_to_buf(float* buf) {
+    memcpy(buf, K.data(), sizeof(float) * NUM_STATES * NUM_SENSOR_INPUTS);
+    memcpy(buf, P_k.data(), sizeof(float) * NUM_STATES * NUM_STATES);
+}
+#endif
+
 /**
  * @brief Update Kalman Gain and state estimate with current sensor data
  *
@@ -314,10 +325,10 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     {
         g_ms2 = -gravity_ms2;
     }
-    // else
-    // {
-    //     g_ms2 = 0;
-    // }
+    else
+    {
+        g_ms2 = 0;
+    }
 
     // acceloremeter reports values in g's and measures specific force
     y_k(1, 0) = ((sensor_accel_global_g)(0)) * g_ms2;
@@ -374,7 +385,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
  */
 void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state)
 {
-    if (FSM_state >= FSMState::STATE_IDLE)
+    if (true)
     {
         if (FSM_state != last_fsm)
         {

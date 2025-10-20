@@ -248,6 +248,10 @@ struct KalmanData {
     Acceleration acceleration;
 
     float altitude;
+
+    #ifdef GNC_DATA
+    float gnc_mat_buf[9*9 * 2]; // Can store 2x (9x9) matrices. Can be expanded later.
+    #endif
 };
 
 /**

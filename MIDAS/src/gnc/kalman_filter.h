@@ -65,4 +65,9 @@ public:
     virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) = 0;
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanState state) = 0;
+
+    #ifdef GNC_DATA
+    virtual void encode_to_buf(float* buf) {};
+    #endif
 };
+
