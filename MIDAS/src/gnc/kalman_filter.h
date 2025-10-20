@@ -38,7 +38,7 @@ protected:
     Eigen::Matrix<float, _NumStates, 1> x_priori;
     Eigen::Matrix<float, _NumStates, _NumInputs> K;
     Eigen::Matrix<float, _NumInputs, 1> y_k;
-    Eigen::Matrix<float, 3, 1> Wind ;
+    Eigen::Matrix<float, _NumStates, 1> Wind ;
     Eigen::Matrix<float, _NumStates, _NumInputs> B;
     
 
@@ -55,7 +55,7 @@ public:
         x_priori = Eigen::Matrix<float, _NumStates, 1>::Zero();
         K = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
         y_k = Eigen::Matrix<float, _NumInputs, 1>::Zero();
-        Wind = Eigen::Matrix<float, 3, 1>::Zero(); // Wind vector
+        Wind = Eigen::Matrix<float, _NumStates, 1>::Zero(); // Wind vector
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
         
     }

@@ -49,6 +49,7 @@ private:
     float kalman_apo = 0;
     float Ca = 0;
     float Cn = 0;
+    float Wind_alpha = 0.85f;
     float Cp = 0;
     
     // Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
