@@ -232,6 +232,8 @@ struct Orientation {
 
     float tilt = 0;
 
+    Quaternion orientation_quaternion;
+
 };
 
 /**
@@ -264,17 +266,9 @@ struct PyroState {
      */
 };
 
-struct GPSSIV {
-    float sat_in_view = 0;
-};
-
 
 
 struct CameraData {
-    float camera_state = 127.0f;
+    float camera_state = 127;
     float camera_voltage = 0;
-
-    void updatecamstate(uint8_t num) {
-        camera_state = (float)num;
-    }
 };

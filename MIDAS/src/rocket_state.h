@@ -196,12 +196,10 @@ public:
     SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
 
-    SensorData<Quaternion> quaternions;
-    SensorData<GPSSIV> gpssiv;
     SensorData<CameraData> cam_data;
     
     CommandFlags command_flags;
-    uint8_t camera_state = 127;
+    //uint8_t camera_state = 127;
     
 
     Latency log_latency;

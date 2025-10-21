@@ -28,9 +28,9 @@ ASSOCIATE(PyroState, ID_PYRO)
 
 ASSOCIATE(CameraData, ID_CAMERADATA)
 
-ASSOCIATE(GPSSIV, ID_GPSSIV)
 
-ASSOCIATE(Quaternion, ID_QUATERNION)
+
+
 
 
 /**
@@ -95,8 +95,8 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
     log_from_sensor_data(sink, data.pyro);
-    log_from_sensor_data(sink, data.quaternions);
-    log_from_sensor_data(sink, data.gpssiv);
+
+    //log_from_sensor_data(sink, data.quaternions);
     log_from_sensor_data(sink, data.cam_data);
 
 }
