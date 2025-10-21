@@ -199,7 +199,7 @@ class SustainerFSM:
         if transition_ret != "":
             transition_ret = reason_transition + f" at time = {current_time}ms"
 
-        return self.state, transition_ret
+        return self.state, transition_ret, current_time
     
 @dataclass
 class BoosterFsm:
@@ -337,5 +337,5 @@ class BoosterFsm:
         if transition_ret != "":
             transition_ret = reason_transition + f" at time = {current_time}ms"
 
-        return self.state, transition_ret
-    
+        return self.state, transition_ret, current_time
+    3

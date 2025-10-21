@@ -34,6 +34,7 @@ df = pd.read_csv(args.filename)
 packet = fsm.StateEstimate()
 
 state_rows = []
+table_data =  [["Time (ms)","State Transition"]]
 
 for i, line in df.iterrows():
     # Accel configuration for booster data
@@ -51,10 +52,11 @@ for i, line in df.iterrows():
 
     packet['vertical_speed'] = float(line[SPEED_STRING])
 
-    state, transition_reason = state_machine.tick_fsm(packet)
+    state, transition_reason, current_time = state_machine.tick_fsm(packet)
 
     if transition_reason != "":
         print("\t".join([fsm.FSM_STATE_TO_STRING[state], transition_reason, str(state.value)]))
+        table_data.append([current_time, fsm.FSM_STATE_TO_STRING[state]])
     
     state_rows.append(state.value)
 
@@ -75,7 +77,14 @@ plt.plot(df["time"], state_rows)
 # plt.vlines(65, 0, top_state, label="Sustainer Ignition", colors="g", linestyles='--')
 # plt.vlines(70, 0, top_state, label="Sustainer Burnout", colors="c", linestyles='--')
 
-
 plt.legend()
+
+fig, ax = plt.subplots(figsize = (4,4)) 
+
+table = plt.table(cellText =  table_data, loc = 'center')
+table.scale(1.2, 1.2)
+
+ax.axis("off")
+
 plt.show()
 

@@ -37,7 +37,7 @@ SUSTAINER_APOGEE_BACKTO_COAST_VERTICAL_SPEED_THRESHOLD = 25
 SUSTAINER_APOGEE_CHECK_THRESHOLD = 1000
 
 # Move on to DROGUE_DEPLOY after being in apogee for this amount of time (ms)
-SUSTAINER_APOGEE_TIMER_THRESHOLD = 500
+SUSTAINER_APOGEE_TIMER_THRESHOLD = 0
 
 # Move on to DROGUE after a second of reaching apogee (ms)
 SUSTAINER_DROGUE_TIMER_THRESHOLD = 3000
@@ -86,7 +86,7 @@ SUSTAINER_MAIN_JERK_THRESHOLD = 300
 # ----------------------------------
 
 # Regardless of sensor inputs, stay on pyro firing states for at LEAST this time (ms)
-BOOSTER_PYRO_FIRING_TIME_MINIMUM = 200
+BOOSTER_PYRO_FIRING_TIME_MINIMUM = 100
 
 # Transition to FIRST_BOOST if acceleration is greater than this (G)
 BOOSTER_IDLE_TO_FIRST_BOOST_ACCELERATION_THRESHOLD = 5
@@ -107,7 +107,7 @@ BOOSTER_COAST_TO_APOGEE_VERTICAL_SPEED_THRESHOLD = 20
 BOOSTER_APOGEE_CHECK_THRESHOLD = 1000
 
 # Move on to DROGUE_DEPLOY after being in apogee for this amount of time (ms)
-BOOSTER_APOGEE_TIMER_THRESHOLD = 1000
+BOOSTER_APOGEE_TIMER_THRESHOLD = 0
 
 # Move on to DROGUE after a second of reaching apogee (ms)
 BOOSTER_DROGUE_TIMER_THRESHOLD = 3000
