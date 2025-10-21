@@ -123,7 +123,7 @@ void EKF::initialize(RocketSystems *args)
     P_k.block<3,3>(3,3) = Eigen::Matrix3f::Identity() * 1e-2f;   // y block
     P_k.block<3,3>(6,6) = Eigen::Matrix3f::Identity() * 1e-2f;   // z block
 
-
+    
 
     // set 
     R(0, 0) = 10.0;
@@ -224,27 +224,27 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     float vy_body= velocities_body(1,0);
     float vz_body= velocities_body(2,0);
 
-    Eigen::Matrix <float,3,1> accels; //we compute everything in the body frame for accelerations, and then convert those accelerations to global frame
-    accels << 
-    (Fax+Ftx)/ curr_mass_kg - (omega_rps.vy *vz_body - omega_rps.vz * vy_body),  
-    ((Fay + Fty) / curr_mass_kg  - (omega_rps.vz * vx_body - omega_rps.vx * vz_body)),
-    ((Faz + Ftz) / curr_mass_kg - (omega_rps.vx *vy_body - omega_rps.vy * vx_body));
+    Eigen::Matrix <float,3,1> v_dot; //we compute everything in the body frame for accelerations, and then convert those accelerations to global frame
+    v_dot << 
+    ((Fax + Ftx)/ curr_mass_kg - (omega_rps.vy *vz_body - omega_rps.vz * vy_body)+x_k(2,0))/2,  
+    ((Fay + Fty) / curr_mass_kg  - (omega_rps.vz * vx_body - omega_rps.vx * vz_body)+x_k(5,0)/2),
+    ((Faz + Ftz) / curr_mass_kg - (omega_rps.vx *vy_body - omega_rps.vy * vx_body)+x_k(8,0)/2);
 
     // Serial.println("x-accel: "+ String(accels(0,0)));
     // Serial.println("y-accel: "+ String(accels(1,0)));
     // Serial.println("z-accel: "+ String(accels(2,0)));
 
-    BodyToGlobal(angles_rad, accels);
+    BodyToGlobal(angles_rad, v_dot);
 
 
-    xdot << x_k(1, 0),accels(0,0) + gx,
+    xdot << x_k(1, 0),v_dot(0,0) + gx,
         0.0,
 
-        x_k(4, 0),accels(1,0) + gy
+        x_k(4, 0),v_dot(1,0) + gy
        ,
         0.0,
 
-        x_k(7, 0),accels(2,0) + gz
+        x_k(7, 0),v_dot(2,0) + gz
         ,
         0.0;
         
@@ -257,7 +257,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
         coeff = -pi*Ca*(r*r)*rho / curr_mass_kg;
     }
     
-    setF(dt,0,0,0,0,0,0,0);
+    setF(dt, omega_rps.vx, omega_rps.vy, omega_rps.vz, coeff,vx_body,vy_body,vz_body );
 
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 
@@ -290,6 +290,8 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
         {
             sum += i;
         }
+        P_k(4,4) = 1e-6f; // variance for vel_y
+        P_k(7,7) = 1e-6f; // variance for vel_z
         KalmanState kalman_state = (KalmanState){sum / 10.0f, 0, 0, 0, 0, 0, 0, 0, 0};
         setState(kalman_state);
     }
@@ -321,12 +323,12 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     float g_ms2 ;
     if ((FSM_state > FSMState::STATE_IDLE) && (FSM_state < FSMState::STATE_LANDED))
     {
-        g_ms2 = -gravity_ms2;
+        g_ms2 = gravity_ms2;
     }
-    // else
-    // {
-    //     g_ms2 = 0;
-    // }
+    else
+    {
+        g_ms2 = 0;
+    }
 
     // acceloremeter reports values in g's and measures specific force
     y_k(1, 0) = ((sensor_accel_global_g)(0)) * g_ms2;
@@ -384,7 +386,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
  */
 void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state)
 {
-    if (true)
+    if (true) //
     {
         if (FSM_state != last_fsm)
         {
@@ -487,19 +489,29 @@ void EKF::setF(float dt, float w_x, float w_y, float w_z, float coeff, float v_x
     F_mat.setIdentity(); // start from identity
 
 // For x
-F_mat(0, 1) = dt;
-F_mat(0, 2) = 0.5f * dt * dt;
-F_mat(1, 2) = dt;
+// F_mat(0, 1) = dt;
+// F_mat(0, 2) = 0.5f * dt * dt;
+// F_mat(1, 2) = dt;
 
-// For y
-F_mat(3, 4) = dt;
-F_mat(3, 5) = 0.5f * dt * dt;
-F_mat(4, 5) = dt;
+// // For y
+// F_mat(3, 4) = dt;
+// F_mat(3, 5) = 0.5f * dt * dt;
+// F_mat(4, 5) = dt;
 
-// For z
-F_mat(6, 7) = dt;
-F_mat(6, 8) = 0.5f * dt * dt;
-F_mat(7, 8) = dt;
+// // For z
+// F_mat(6, 7) = dt;
+// F_mat(6, 8) = 0.5f * dt * dt;
+// F_mat(7, 8) = dt;
+
+ F_mat(0, 1) = 1;
+    F_mat(1, 2) = coeff*v_x;
+    F_mat(1, 4) = w_z +coeff*v_y;
+    F_mat(1, 7) = -w_y +coeff*v_z;
+    F_mat(3, 4) = 1;
+    F_mat(4, 1) = -w_z ;
+    F_mat(4, 7) = w_x;
+    F_mat(7, 1) = w_y ;
+    F_mat(7, 4) = -w_x ;
 }
 
 /**
