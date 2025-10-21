@@ -5,7 +5,7 @@
 #include <WiFi.h>
 
 // REPLACE WITH YOUR RECEIVER MAC Address
-uint8_t broadcastAddress[] = {0xf4,0x12,0xfa,0x74,0x84,0xbc};
+uint8_t broadcastAddress[] = {0xdc, 0x54, 0x75, 0xca, 0xa0, 0x10}; 
 #include "systems.h"
 #include "hardware/pins.h"
 #include "hardware/Emmc.h"

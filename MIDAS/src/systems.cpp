@@ -367,6 +367,8 @@ struct GpsData
 
 DECLARE_THREAD(esp_now, RocketSystems *arg)
 {
+
+    //DC:54:75:CA:A0:10
     uint8_t broadcastAddress[] = {0xdc, 0x54, 0x75, 0xca, 0xa0, 0x10}; //DC:54:75:CA:A0:10
     uint32_t start = millis();
     int mode = 0;
