@@ -197,7 +197,7 @@ public:
     SensorData<Voltage> voltage;
     
     CommandFlags command_flags;
-    uint8_t camera_state = 127;
+    uint8_t camera_state = 255;
 
     Latency log_latency;
 };
