@@ -54,7 +54,7 @@ struct LoggedReading {
         FSMState fsm;
         PyroState pyro;
         
-        CameraData camdata;
+        CameraData cameradata;
 
 
 
