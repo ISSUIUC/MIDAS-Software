@@ -36,7 +36,7 @@ DECLARE_THREAD(cmdq, RocketSystems* arg) {
                 camera_on_off(Serial1); // Stop recording
                 DESIRED_CAM_STATE.cam1_on = false; // Attempt to turn off the camera when recording stopped.
                 delay(5000);
-                digitalWrite(CAM1_ON_OFF, LOW); // force stop recording after 5s
+                digitalWrite(CAM1_ON_OFF, LOW); // force power off after 5s
                 break;}
             case 1: {
                 Serial.println("proc cmd: CAM1 ON");
@@ -48,7 +48,7 @@ DECLARE_THREAD(cmdq, RocketSystems* arg) {
                 camera_on_off(Serial2); // Stop recording
                 DESIRED_CAM_STATE.cam2_on = false; // Attempt to turn off the camera when recording stopped.
                 delay(5000);
-                digitalWrite(CAM2_ON_OFF, LOW); // force stop recording after 5s
+                digitalWrite(CAM2_ON_OFF, LOW); // force power off after 5s
                 break;}
             case 3: {
                 Serial.println("proc cmd: CAM2 ON");
