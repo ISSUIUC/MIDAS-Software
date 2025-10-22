@@ -53,10 +53,6 @@ struct LoggedReading {
         KalmanData kalman;
         FSMState fsm;
         PyroState pyro;
-        
         CameraData cameradata;
-
-
-
     } data;
 };
