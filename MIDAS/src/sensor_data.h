@@ -269,6 +269,6 @@ struct PyroState {
 
 
 struct CameraData {
-    float camera_state = 127;
+    float camera_state = 255;
     float camera_voltage = 0;
 };
