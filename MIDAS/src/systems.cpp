@@ -313,6 +313,8 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
         if (error == 0) {
             arg->rocket_data.camera_state = arg->b2b.camera.read();
         } else {
+            // If failed:
+            arg->rocket_data.camera_state |= 0b10000000; // Set the MSB (CAM_VALID) to 1.
             THREAD_SLEEP(1800);
         }
         
