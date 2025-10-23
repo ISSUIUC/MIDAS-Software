@@ -1,5 +1,5 @@
 #include "systems.h"
-
+#include "sensor_data.h"
 #include "hal.h"
 #include "gnc/ekf.h"
 
@@ -284,14 +284,14 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
             }
             break;
         case CommandType::CAM_ON:
+            arg->b2b.camera.vtx_on(); // comes first to avoid brownouts due to high inrush current
             arg->b2b.camera.camera_on(CAM_1);
             arg->b2b.camera.camera_on(CAM_2);
-            arg->b2b.camera.vtx_on();
             break;
         case CommandType::CAM_OFF:
+            arg->b2b.camera.vtx_off();
             arg->b2b.camera.camera_off(CAM_1);
             arg->b2b.camera.camera_off(CAM_2);
-            arg->b2b.camera.vtx_off();
             break;
         case CommandType::TOGGLE_CAM_VMUX:
             arg->b2b.camera.vmux_toggle();
@@ -308,10 +308,12 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
         byte error = Wire.endTransmission();
 
         if (error == 0) {
-            CameraState cam_state_and_cam_volt = arg->b2b.camera.read();
-            arg->rocket_data.camera_state = cam_state_and_cam_volt.cam_state;
-            arg->rocket_data.cam_batt_voltage = cam_state_and_cam_volt.batt_volt;
+            arg->rocket_data.cam_data.update(arg->b2b.camera.read());
         } else {
+            // If failed:
+            CameraData new_cam_data = arg->rocket_data.cam_data.getRecent();
+            new_cam_data.camera_state = 255; // all 1s, invalid state
+            arg->rocket_data.cam_data.update(new_cam_data);
             THREAD_SLEEP(1800);
         }
         

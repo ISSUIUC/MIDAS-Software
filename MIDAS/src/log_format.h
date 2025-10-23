@@ -20,6 +20,8 @@ enum ReadingDiscriminant {
     ID_FSM = 10,
     ID_KALMAN = 11,
     ID_PYRO = 12,
+    ID_CAMERADATA = 13,
+    
 };
 
 
@@ -51,5 +53,6 @@ struct LoggedReading {
         KalmanData kalman;
         FSMState fsm;
         PyroState pyro;
+        CameraData cameradata;
     } data;
 };
