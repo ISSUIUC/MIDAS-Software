@@ -236,6 +236,8 @@ struct Orientation {
 
     float tilt = 0;
 
+    Quaternion orientation_quaternion;
+
 };
 
 /**
@@ -266,4 +268,11 @@ struct PyroState {
      * [2] PYRO C / MOTOR
      * [3] PYRO D / AUX
      */
+};
+
+
+
+struct CameraData {
+    uint8_t camera_state = 255;
+    float camera_voltage = 0;
 };

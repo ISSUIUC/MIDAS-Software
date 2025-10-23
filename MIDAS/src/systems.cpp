@@ -1,5 +1,5 @@
 #include "systems.h"
-
+#include "sensor_data.h"
 #include "hal.h"
 #include "gnc/ekf.h"
 
@@ -311,10 +311,12 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
         byte error = Wire.endTransmission();
 
         if (error == 0) {
-            arg->rocket_data.camera_state = arg->b2b.camera.read();
+            arg->rocket_data.cam_data.update(arg->b2b.camera.read());
         } else {
             // If failed:
-            arg->rocket_data.camera_state |= 0b10000000; // Set the MSB (CAM_VALID) to 1.
+            CameraData new_cam_data = arg->rocket_data.cam_data.getRecent();
+            new_cam_data.camera_state = 255; // all 1s, invalid state
+            arg->rocket_data.cam_data.update(new_cam_data);
             THREAD_SLEEP(1800);
         }
         

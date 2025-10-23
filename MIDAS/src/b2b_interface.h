@@ -3,6 +3,8 @@
 #include <Wire.h>
 #include "errors.h"
 #include "hal.h"
+#include "sensor_data.h"
+#include "rocket_state.h"
 
 // Which b2b communication we should use
 #define B2B_I2C
@@ -45,7 +47,7 @@ struct CameraB2B {
     void vmux_set(int cam_select);
     void vmux_toggle();
 
-    uint8_t read();
+    CameraData read();
 
     private:
     void transmit_command(CameraCommand command);

@@ -1,19 +1,22 @@
 #include "b2b_interface.h"
-
+#include "sensor_data.h"
+#include "rocket_state.h"
 
 ErrorCode B2BInterface::init() {
     // No special init
     return ErrorCode::NoError;
 }
 
-uint8_t CameraB2B::read() {
+CameraData CameraB2B::read() {
     #ifdef B2B_I2C
     Wire.requestFrom(0x69, 1);
     uint8_t res = Wire.read();
-    return res;
+    CameraData result;
+    result.camera_state = res;
+    return result;
     #endif
 
-    return 0xFF;
+    //return 0xFF;
 }
 
 /** 
