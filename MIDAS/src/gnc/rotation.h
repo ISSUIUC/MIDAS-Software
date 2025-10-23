@@ -33,7 +33,7 @@ void BodyToGlobal(Angles &angles_rad, Eigen::Matrix<float, 3, 1> &body_vec)
     // corrected(1) = temp(1);  // X → Y
     // corrected(2) = temp(0);  // Y → Z
 
-    // body_vec = corrected;
+    // body_vec = corrected; //why is ts commented vro 🥀
 }
 
 /**
@@ -49,6 +49,7 @@ void GlobalToBody(Angles &angles_rad, Eigen::Matrix<float, 3, 1> &global_vec)
 {
     Eigen::Matrix3f roll, pitch, yaw;
 
+    // Roll about Z
     roll << cos(angles_rad.roll), -sin(angles_rad.roll), 0.,
         sin(angles_rad.roll), cos(angles_rad.roll), 0.,
         0., 0., 1.;

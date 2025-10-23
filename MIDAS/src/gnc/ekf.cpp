@@ -210,7 +210,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     Eigen::Matrix<float, 3, 1> velocities_body;
     velocities_body << x_k(1, 0), x_k(4, 0), x_k(7, 0);
 
-    GlobalToBody(angles_rad, velocities_body);
+    GlobalToBodyQuat(orientation.q0, orientation.q1, orientation.q2, orientation.q3, velocities_body);
     float vx_body = velocities_body(0, 0);
     float vy_body = velocities_body(1, 0);
     float vz_body = velocities_body(2, 0);
@@ -224,7 +224,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
     // Serial.println("y-accel: "+ String(accels(1,0)));
     // Serial.println("z-accel: "+ String(accels(2,0)));
 
-    BodyToGlobal(angles_rad, v_dot);
+    BodyToGlobalQuat(orientation.q0, orientation.q1, orientation.q2, orientation.q3, v_dot);
 
     xdot << x_k(1, 0), v_dot(0, 0) + gx,
         0.0,
