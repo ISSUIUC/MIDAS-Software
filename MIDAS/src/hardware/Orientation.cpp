@@ -182,6 +182,10 @@ Orientation OrientationSensor::read()
         case SH2_ARVR_STABILIZED_RV:
             euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
             sensor_reading.reading_type = OrientationReadingType::FULL_READING;
+            sensor_reading.orientation_quaternion.w = event.un.arvrStabilizedRV.real;
+            sensor_reading.orientation_quaternion.x = event.un.arvrStabilizedRV.i;
+            sensor_reading.orientation_quaternion.y = event.un.arvrStabilizedRV.j;
+            sensor_reading.orientation_quaternion.z = event.un.arvrStabilizedRV.k;
             break;
         case SH2_GYRO_INTEGRATED_RV:
             sensor_reading.reading_type = OrientationReadingType::ANGULAR_VELOCITY_UPDATE;

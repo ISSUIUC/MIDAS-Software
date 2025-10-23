@@ -28,6 +28,7 @@ extern cam_state_t GLOBAL_CAM_STATE;
 extern cam_state_t DESIRED_CAM_STATE;
 extern int GLOBAL_CAM_BATT_VOLTAGE;
 extern uint32_t LAST_I2C_COMM;
+extern Queue<uint8_t> commandqueue;
 
 bool BLUE_LED_STATE = false;
 bool GREEN_LED_STATE = false;
@@ -80,60 +81,11 @@ void onReceive(int len) {
       Serial.print(recieve);
       Serial.print(": ");
 
+      commandqueue.send(recieve);
       GREEN_LED_STATE = !GREEN_LED_STATE;
       digitalWrite(LED_GREEN, GREEN_LED_STATE ? HIGH : LOW);
-
       GLOBAL_CAM_STATE.cam_ack = !GLOBAL_CAM_STATE.cam_ack;
-      switch(recieve) {
-        case 0: {
-          Serial.println("Case 0\n");
-          camera_on_off(Serial1); // Stop recording
-          DESIRED_CAM_STATE.cam1_on = false; // Attempt to turn off the camera when recording stopped.
-          break;}
-        case 1: {
-          Serial.println("Case 1\n");
-          DESIRED_CAM_STATE.cam1_on = true;
-          Serial.println("Trying to turn on camera 1");
-          digitalWrite(CAM1_ON_OFF, HIGH);
-          break;}
-        case 2:{
-          Serial.println("Case 2\n");
-          camera_on_off(Serial2); // Stop recording
-          DESIRED_CAM_STATE.cam2_on = false; // Attempt to turn off the camera when recording stopped.
-          break;}
-        case 3: {
-          Serial.println("Case 3\n");
-          DESIRED_CAM_STATE.cam2_on = true;
-          Serial.println("Trying to turn on camera 2");
-          digitalWrite(CAM2_ON_OFF, HIGH);
-          break;}
-        case 4:
-          digitalWrite(VTX_ON_OFF, LOW);
-          Serial.println("Case 4\n");
-          GLOBAL_CAM_STATE.vtx_on = false;
-          DESIRED_CAM_STATE.vtx_on = false;
-          break;
-        case 5:
-          digitalWrite(VTX_ON_OFF, HIGH);
-          Serial.println("Case 5\n");
-          GLOBAL_CAM_STATE.vtx_on = true;
-          DESIRED_CAM_STATE.vtx_on = true;
-          break;
-        case 6:
-          digitalWrite(VIDEO_SELECT, LOW);
-          Serial.println("Case 6\n");
-          GLOBAL_CAM_STATE.vmux_state = false;
-          break;
-        case 7:
-          digitalWrite(VIDEO_SELECT, HIGH);
-          Serial.println("Case 7\n");
-          GLOBAL_CAM_STATE.vmux_state = true;
-          break;
-        default:
-          break;
-      }
     }
-    Serial.println("(EOT)");
   }
 
 
@@ -146,25 +98,28 @@ void update_desired_state(uint8_t state_byte) {
   DESIRED_CAM_STATE.cam1_rec = state_byte & 0b00010000;
   DESIRED_CAM_STATE.cam2_rec = state_byte & 0b00100000;
 
-  // Turn on cameras if we want them to be on
+  // Turn on vtx / cameras if we want them to be on
+  
+  // vtx must be first because of higher inrush current (TS832)
+  if(DESIRED_CAM_STATE.vtx_on) {
+    delay(BROWNOUT_PROTECTION_DELAY);
+    digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
+  }
+
   if(DESIRED_CAM_STATE.cam1_on) {
-    delay(50);
+    delay(BROWNOUT_PROTECTION_DELAY);
     digitalWrite(CAM1_ON_OFF, HIGH);
   } else {
     digitalWrite(CAM1_ON_OFF, LOW);
   }
   
   if(DESIRED_CAM_STATE.cam2_on) {
-    delay(50);
+    delay(BROWNOUT_PROTECTION_DELAY);
     digitalWrite(CAM2_ON_OFF, HIGH);
   } else {
     digitalWrite(CAM2_ON_OFF, LOW);
   }
   
-  if(DESIRED_CAM_STATE.vtx_on) {
-    delay(50);
-    digitalWrite(VTX_ON_OFF, DESIRED_CAM_STATE.vtx_on ? HIGH : LOW);
-  }
   
   digitalWrite(VIDEO_SELECT, DESIRED_CAM_STATE.vmux_state ? HIGH : LOW);
 }

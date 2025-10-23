@@ -2,6 +2,7 @@
 #include "EEPROM.h"
 #include "hardware/voltage.h"
 
+#include "Queue.h"
 #include "hal.h"
 
 // Amount of time (in ms) without communication that causes us to go into the i2c recovery state.
@@ -16,12 +17,74 @@ int16_t GLOBAL_CAM_BATT_VOLTAGE;
 cam_state_t DESIRED_CAM_STATE;
 uint32_t LAST_I2C_COMM;
 
+Queue<uint8_t> commandqueue;
+
 /**
  * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
  *
  * The `DECLARE_THREAD` macro creates a function whose name is suffixed by _thread, and annotates it with [[noreturn]]
  */
+
+// Handles incoming command queue
+DECLARE_THREAD(cmdq, RocketSystems* arg) {
+    uint8_t cur_cmd;
+    while (true) {
+        if (commandqueue.receive(&cur_cmd)) {
+            switch(cur_cmd) {
+            case 0: {
+                Serial.println("proc cmd: CAM1 OFF");
+                camera_on_off(Serial1); // Stop recording
+                DESIRED_CAM_STATE.cam1_on = false; // Attempt to turn off the camera when recording stopped.
+                delay(5000);
+                digitalWrite(CAM1_ON_OFF, LOW); // force power off after 5s
+                break;}
+            case 1: {
+                Serial.println("proc cmd: CAM1 ON");
+                DESIRED_CAM_STATE.cam1_on = true;
+                digitalWrite(CAM1_ON_OFF, HIGH);
+                break;}
+            case 2:{
+                Serial.println("proc cmd: CAM2 OFF");
+                camera_on_off(Serial2); // Stop recording
+                DESIRED_CAM_STATE.cam2_on = false; // Attempt to turn off the camera when recording stopped.
+                delay(5000);
+                digitalWrite(CAM2_ON_OFF, LOW); // force power off after 5s
+                break;}
+            case 3: {
+                Serial.println("proc cmd: CAM2 ON");
+                DESIRED_CAM_STATE.cam2_on = true;
+                digitalWrite(CAM2_ON_OFF, HIGH);
+                break;}
+            case 4:
+                digitalWrite(VTX_ON_OFF, LOW);
+                Serial.println("proc cmd: VTX ON/OFF --> LOW");
+                GLOBAL_CAM_STATE.vtx_on = false;
+                DESIRED_CAM_STATE.vtx_on = false;
+                break;
+            case 5:
+                digitalWrite(VTX_ON_OFF, HIGH);
+                Serial.println("proc cmd: VTX ON/OFF --> HIGH");
+                GLOBAL_CAM_STATE.vtx_on = true;
+                DESIRED_CAM_STATE.vtx_on = true;
+                break;
+            case 6:
+                digitalWrite(VIDEO_SELECT, LOW);
+                Serial.println("proc cmd: VIDEO SELECT --> LOW");
+                GLOBAL_CAM_STATE.vmux_state = false;
+                break;
+            case 7:
+                digitalWrite(VIDEO_SELECT, HIGH);
+                Serial.println("proc cmd: VIDEO_SELECT --> HIGH");
+                GLOBAL_CAM_STATE.vmux_state = true;
+                break;
+            default:
+                break;
+            }
+        }
+        THREAD_SLEEP(BROWNOUT_PROTECTION_DELAY);
+    }
+}
 
 // Ever device which communicates over i2c is on this thread to avoid interference
 DECLARE_THREAD(i2c, RocketSystems* arg) {
@@ -363,9 +426,11 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     START_THREAD(i2c, MAIN_CORE, config, 9);
     START_THREAD(fsm, MAIN_CORE, config, 8);
+    START_THREAD(cmdq, MAIN_CORE, config, 7);
     START_THREAD(buzzer, MAIN_CORE, config, 6);
     START_THREAD(flash, MAIN_CORE, config, 10);
     START_THREAD(comms_check, MAIN_CORE, config, 10);
+    
     //START_THREAD(can, MAIN_CORE, config, 15);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
