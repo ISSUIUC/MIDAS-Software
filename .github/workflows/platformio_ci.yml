@@ -127,22 +127,63 @@ jobs:
           name: firmware-feather_duo
           path: ground/.pio/build/feather_duo/firmware*.*
 
+  build_cam:
+    name: Build CamBoard:CamBoard
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: CamBoard
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      - name: PlatformIO version
+        run: pio --version
+      - name: Build CamBoard
+        run: pio run -e CamBoard
+      - name: Upload Artifact for CamBoard
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-cam_board
+          path: ground/.pio/build/CamBoard/firmware*.*
+
   notify:
     name: Slack Notification Summary (main)
-    needs: [build_sustainer, build_booster, build_feather_duo]
+    needs: [build_sustainer, build_booster, build_feather_duo, build_cam]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Send Slack Summary
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: ${{ (needs.build_sustainer.result == 'success' && needs.build_booster.result == 'success' && needs.build_feather_duo.result == 'success') && 'good' || 'danger' }}
+          SLACK_COLOR: ${{ (needs.build_sustainer.result == 'success' && needs.build_booster.result == 'success' && needs.build_feather_duo.result == 'success' && needs.build_cam.result == 'success') && 'good' || 'danger' }}
           SLACK_TITLE: "Firmware Build Summary"
           SLACK_MESSAGE: |
             Build results:
             - *MIDAS:mcu_main_sustainer*: ${{ needs.build_sustainer.result }}
             - *MIDAS:mcu_main_booster*: ${{ needs.build_booster.result }}
             - *ground:feather_duo*: ${{ needs.build_feather_duo.result }}
+            - *CamBoard:CamBoard*: ${{ needs.build_cam.result }}
 
             :information_source: CI Notifications only run on the `main` branch.
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
