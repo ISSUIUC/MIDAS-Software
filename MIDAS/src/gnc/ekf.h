@@ -24,7 +24,7 @@ public:
     void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
 
     void setQ(float dt, float sd);
-    void setF(float dt, float w_x, float w_y, float w_z);
+    void setF(float dt, float w_x, float w_y, float w_z, float coeff, float v_x, float v_y, float v_z);
 
     // void BodyToGlobal(euler_t angles, Eigen::Matrix<float, 3, 1> &body_vec);
     // void GlobalToBody(euler_t angles, Eigen::Matrix<float, 3, 1> &global_vec);
@@ -38,14 +38,21 @@ public:
     void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
 
     bool should_reinit = false;
+    float current_vel = 0.0f;
+
+#ifdef GNC_DATA
+    void encode_to_buf(float *buf) override;
+#endif
 
 private:
     float s_dt = 0.05f;
-    float spectral_density_ = 13.0f;
+    float spectral_density_ = 0.001f;
     float kalman_apo = 0;
     float Ca = 0;
     float Cn = 0;
+    float Wind_alpha = 0.85f;
     float Cp = 0;
+
     // Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
     KalmanState kalman_state;
     FSMState last_fsm = FSMState::STATE_IDLE;
