@@ -64,6 +64,7 @@ void EKF::initialize(RocketSystems *args)
     // euler.yaw = -euler.yaw;
 
     // set x_k
+    x_k.setZero();
     x_k(0, 0) = sum / 30;
     x_k(3, 0) = 0;
     x_k(6, 0) = 0;
@@ -370,7 +371,7 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
         }
         stage_timestamp += dt;
         // setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
-        // setQ(dt, sd);
+        setQ(dt, sd);
         priori(dt, orientation, FSM_state);
         update(barometer, acceleration, orientation, FSM_state);
     }
