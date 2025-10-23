@@ -317,6 +317,8 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
 
 
         } else {
+            // If failed:
+            arg->rocket_data.camera_state |= 0b10000000; // Set the MSB (CAM_VALID) to 1.
             THREAD_SLEEP(1800);
         }
         
