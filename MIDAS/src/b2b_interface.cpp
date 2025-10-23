@@ -14,8 +14,10 @@ CameraData CameraB2B::read() {
     uint8_t res2 = Wire.read();
     uint8_t res3 = Wire.read();
 
+    uint16_t res2_convert = (((uint16_t)res2 << 8) || (uint16_t) res3);
+
     CameraData res;
-    res.camera_voltage = (((uint16_t) res2) * 9) / 0xFFFF; // making uint16_t from two uint8_ts
+    res.camera_voltage = (((uint16_t) res2_convert) * 9) / 0xFFFF; // making uint16_t from two uint8_ts
     res.camera_state = res1;
     
     return res;

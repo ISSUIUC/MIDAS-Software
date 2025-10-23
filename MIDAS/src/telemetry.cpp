@@ -130,7 +130,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     //Camera Data
     packet.camera_state = cam_data.camera_state;
     // bit shift by 4 to give max resolution while still keeping possible voltage up to >=12V
-    packet.camera_batt_volt = (cam_data.camera_voltage / 9) * 0xFF;
+    packet.camera_batt_volt = (float)((cam_data.camera_voltage) / 9) * 0xFF;
 
     
     //Pyro A0 | B1 | C2 | D3
