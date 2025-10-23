@@ -315,7 +315,7 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
         } else {
             // If failed:
             CameraData new_cam_data = arg->rocket_data.cam_data.getRecent();
-            new_cam_data.camera_state |= 0b10000000; // Set the MSB (CAM_VALID) to 1.
+            new_cam_data.camera_state = 255; // all 1s, invalid state
             arg->rocket_data.cam_data.update(new_cam_data);
             THREAD_SLEEP(1800);
         }
