@@ -25,15 +25,7 @@ void BodyToGlobal(Angles &angles_rad, Eigen::Matrix<float, 3, 1> &body_vec)
         0., sin(angles_rad.yaw), cos(angles_rad.yaw);
 
     Eigen::Matrix3f rotation_matrix = yaw * pitch * roll;
-    Eigen::Vector3f temp = rotation_matrix * body_vec;
-
-    // Convert from Z-up convention to X-up convention
-    // Eigen::Vector3f corrected;
-    // corrected(0) = temp(2);  // Z → X
-    // corrected(1) = temp(1);  // X → Y
-    // corrected(2) = temp(0);  // Y → Z
-
-    // body_vec = corrected; //why is ts commented vro 🥀
+    Eigen::Vector3f temp = rotation_matrix * body_vec; // body vec is memory address so no need to reassign values
 }
 
 /**
