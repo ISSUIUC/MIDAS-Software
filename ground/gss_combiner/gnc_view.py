@@ -4,6 +4,7 @@ import threading
 import time
 import re
 import math
+import msvcrt
 
 
 class Position:
@@ -144,6 +145,11 @@ def inputprocess():
     while True:
         dat_raw = s.read_until()
         strdat = dat_raw.decode().strip()
+
+        if msvcrt.kbhit():
+            key = msvcrt.getch()
+            s.write(key)
+
 
         if strdat.startswith(";") and strdat.endswith("!"):
             # normal data
@@ -608,7 +614,6 @@ class RocketDashboard(tk.Tk):
 
     def _on_close(self):
         self.destroy()
-
 
 
 # ----------------------------

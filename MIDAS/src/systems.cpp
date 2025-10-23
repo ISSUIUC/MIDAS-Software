@@ -11,7 +11,7 @@
 #error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
 #endif
 
-#define ENABLE_TELEM
+// #define ENABLE_TELEM
 
 static char buff[1024]{};
 static char fbuf[24];
@@ -50,6 +50,13 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
     #else
     size_t n = 0;
     while (true) {
+
+        int i = Serial.read();
+        if (i != -1) {
+            FSMState new_s = (FSMState) (i - 'a');
+            arg->rocket_data.fsm_state.update(new_s);
+        }
+        
         KalmanData current_state = arg->rocket_data.kalman.getRecent();
         HighGData cur_acc = arg->rocket_data.high_g.getRecent();
         Orientation cur_ori = arg->rocket_data.orientation.getRecent();
@@ -227,9 +234,8 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
-
-        arg->rocket_data.fsm_state.update(next_state);
+        // FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
+        // arg->rocket_data.fsm_state.update(next_state);
 
         if (current_state == FSMState::STATE_SAFE) {
             if((current_time - last_time_led_flash) > 250) {
@@ -380,7 +386,7 @@ void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState 
 
 DECLARE_THREAD(cam, RocketSystems* arg) {
     while (true) {
-        arg->rocket_data.camera_state = arg->b2b.camera.read();
+        // arg->rocket_data.camera_state = arg->b2b.camera.read();
         THREAD_SLEEP(200);
     }
 }
@@ -434,21 +440,21 @@ ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
     INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
-    INIT_SYSTEM(systems.log_sink);
+    // INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
     INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
-    INIT_SYSTEM(systems.sensors.voltage);
-    INIT_SYSTEM(systems.sensors.pyro);
+    // INIT_SYSTEM(systems.sensors.continuity);
+    // INIT_SYSTEM(systems.sensors.voltage);
+    // INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
     INIT_SYSTEM(systems.buzzer);
-    INIT_SYSTEM(systems.b2b);
+    // INIT_SYSTEM(systems.b2b);
     #ifdef ENABLE_TELEM
         INIT_SYSTEM(systems.tlm);
     #endif
-    INIT_SYSTEM(systems.sensors.gps);
+    // INIT_SYSTEM(systems.sensors.gps);
     gpioDigitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
@@ -478,11 +484,11 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(accelerometers, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
-    START_THREAD(gps, SENSOR_CORE, config, 8);
-    START_THREAD(voltage, SENSOR_CORE, config, 9);
-    START_THREAD(pyro, SENSOR_CORE, config, 14);
+    // START_THREAD(gps, SENSOR_CORE, config, 8);
+    // START_THREAD(voltage, SENSOR_CORE, config, 9);
+    // START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(cam, SENSOR_CORE, config, 16);
+    // START_THREAD(cam, SENSOR_CORE, config, 16);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
