@@ -7,6 +7,7 @@ import time
 import threading
 import sys
 import queue
+import os
 
 import serial # PySerial
 import paho.mqtt.client as mqtt
@@ -36,6 +37,7 @@ class TelemetryStandalone():
         self.__outfile_raw = None
 
         if(self.__should_log):
+            os.makedirs("outputs", exist_ok=True)
             self.__outfile = open(f"./outputs/{time.time()}_log.telem", "w+")
             self.__outfile_raw = open(f"./outputs/{time.time()}_raw_log.txt", "w+")
 
