@@ -71,7 +71,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
 
-        THREAD_SLEEP(2);
+        THREAD_SLEEP(5);
     }
 }
 
