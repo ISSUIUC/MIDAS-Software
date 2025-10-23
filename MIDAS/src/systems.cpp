@@ -194,6 +194,12 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
             arg->b2b.camera.camera_on(BULKHEAD_CAMERA);
         }
 
+        if(arg->rocket_data.command_flags.FSM_should_power_save) {
+            arg->rocket_data.command_flags.FSM_should_power_save = false;
+
+            arg->b2b.camera.vtx_off();
+        }
+
         if(arg->rocket_data.command_flags.FSM_should_swap_camera_feed) { 
             // Swap camera feed to MUX 2 (recovery bay camera)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
