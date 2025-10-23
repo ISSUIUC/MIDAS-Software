@@ -170,6 +170,7 @@ struct CommandFlags {
     bool should_fire_pyro_d = false;            // CommandType::FIRE_PYRO_D
     // FSM Transition commands
     bool FSM_should_set_cam_feed_cam1 = false;  // Triggered at launch (IDLE --> FIRST_BOOST)
+    bool FSM_should_power_save = false;         // Triggered after 60 seconds in LANDED state.
     bool FSM_should_swap_camera_feed = false;   // Triggered COAST --> APOGEE
 };
 /**

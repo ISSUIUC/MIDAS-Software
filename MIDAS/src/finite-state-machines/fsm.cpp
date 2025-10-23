@@ -298,6 +298,11 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_LANDED:
 
             if((current_time - landed_time) > sustainer_landed_time_lockout) {
+                
+                if(!landing_lockout_triggered) {
+                    landing_lockout_triggered = true;
+                    commands.FSM_should_power_save = true;
+                }
 
                 // Check for any telem transitions
                 // Force transtion to safe if requested + clear all transition flags.
@@ -512,6 +517,11 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
         case FSMState::STATE_LANDED:
 
             if((current_time - landed_time) > booster_landed_time_lockout) {
+
+                if(!landing_lockout_triggered) {
+                    landing_lockout_triggered = true;
+                    commands.FSM_should_power_save = true;
+                }
 
                 // Check for any telem transitions
                 // Force transtion to safe if requested + clear all transition flags.

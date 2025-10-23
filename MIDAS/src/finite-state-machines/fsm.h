@@ -47,4 +47,6 @@ private:
     double landed_time;
     double first_separation_time;
     double pyro_test_entry_time;
+
+    bool landing_lockout_triggered = false;
 };
