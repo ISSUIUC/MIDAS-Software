@@ -14,10 +14,17 @@ import matplotlib.pyplot as plt
 
 # Run configuration for sustainer pysim data
 
-ACCEL_STRING = "accel_x"
-TIME_STRING = "time"
-HEIGHT_STRING = "pos_x"
-SPEED_STRING = "vel_x"
+# ACCEL_STRING = "accel_x"
+# TIME_STRING = "time"
+# HEIGHT_STRING = "pos_x"
+# SPEED_STRING = "vel_x"
+
+# Config for MIDAS booster data
+
+ACCEL_STRING = "highg.ax"
+TIME_STRING = "timestamp"
+HEIGHT_STRING = "barometer.altitude"
+SPEED_STRING = "gps.speed"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("filename", type=pathlib.Path)
@@ -38,9 +45,12 @@ table_data =  [["Time (ms)","State Transition"]]
 
 for i, line in df.iterrows():
     # Accel configuration for booster data
-    # packet['acceleration'] = -(float(line[ACCEL_STRING])) / 9.81
+    #packet['acceleration'] = -(float(line[ACCEL_STRING])) / 9.81
 
     # Accel configuration for sustainer data
+    # packet['acceleration'] = (float(line[ACCEL_STRING])) / 9.81
+
+    # Accel config for MIDAS booster
     packet['acceleration'] = (float(line[ACCEL_STRING])) / 9.81
 
     packet['altitude'] = float(line[HEIGHT_STRING])

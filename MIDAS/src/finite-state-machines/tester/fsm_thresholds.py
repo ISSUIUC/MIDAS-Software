@@ -1,4 +1,4 @@
-# ----------------------------------
+#    ----------------------------------
 # SAFETY THRESHOLDS
 # ----------------------------------
 
@@ -34,10 +34,10 @@ SUSTAINER_COAST_TO_APOGEE_VERTICAL_SPEED_THRESHOLD = 25
 SUSTAINER_APOGEE_BACKTO_COAST_VERTICAL_SPEED_THRESHOLD = 25
 
 # Revert back to COAST if apogee was too brief (ms)
-SUSTAINER_APOGEE_CHECK_THRESHOLD = 1000
+SUSTAINER_APOGEE_CHECK_THRESHOLD = 500
 
 # Move on to DROGUE_DEPLOY after being in apogee for this amount of time (ms)
-SUSTAINER_APOGEE_TIMER_THRESHOLD = 0
+SUSTAINER_APOGEE_TIMER_THRESHOLD = 500
 
 # Move on to DROGUE after a second of reaching apogee (ms)
 SUSTAINER_DROGUE_TIMER_THRESHOLD = 3000
@@ -104,10 +104,10 @@ BOOSTER_COAST_DETECTION_ACCELERATION_THRESHOLD = 0.2
 BOOSTER_COAST_TO_APOGEE_VERTICAL_SPEED_THRESHOLD = 20
 
 # Revert back to COAST if apogee was too brief (ms)
-BOOSTER_APOGEE_CHECK_THRESHOLD = 1000
+BOOSTER_APOGEE_CHECK_THRESHOLD = 500
 
 # Move on to DROGUE_DEPLOY after being in apogee for this amount of time (ms)
-BOOSTER_APOGEE_TIMER_THRESHOLD = 0
+BOOSTER_APOGEE_TIMER_THRESHOLD = 500
 
 # Move on to DROGUE after a second of reaching apogee (ms)
 BOOSTER_DROGUE_TIMER_THRESHOLD = 3000

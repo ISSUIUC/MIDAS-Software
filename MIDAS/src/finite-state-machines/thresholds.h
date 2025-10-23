@@ -60,11 +60,11 @@
 
 // Revert back to COAST if the conditions for apogee are met for too little time (ms)
 // (Core Setting)
-#define sustainer_apogee_check_threshold 1000
+#define sustainer_apogee_check_threshold 500
 
 // Delay between the APOGEE state being confirmed and moving into DROGUE_DEPLOY for pyros (ms)
 // (Core Setting)
-#define sustainer_apogee_timer_threshold 0
+#define sustainer_apogee_timer_threshold 500
 
 // If drogue deployment is not auto-detected, transition to DROGUE anyway after this amount of time (ms)
 // (Core Setting)
@@ -166,11 +166,11 @@
 
 // Check vertical speed for this amount of time in the APOGEE state, move back to COAST if needed (m/s)
 // (Core Setting)
-#define booster_apogee_check_threshold 1000
+#define booster_apogee_check_threshold 500
 
 // Delay between the APOGEE state being confirmed and moving into DROGUE_DEPLOY for pyros (ms)
 // (Core Setting)
-#define booster_apogee_timer_threshold 0
+#define booster_apogee_timer_threshold 500
 
 // If drogue deployment is not auto-detected, transition to DROGUE anyway after this amount of time (ms)
 // (Core Setting)
