@@ -8,8 +8,10 @@
 #include"Command.h"
 #include"Queue.h"
 
-constexpr uint32_t BOOSTER_FREQ = 425150000;
-constexpr uint32_t SUSTAINER_FREQ = 421150000;
+constexpr uint32_t ROCKET_BOOSTER_FREQ = 425150000;
+constexpr uint32_t ROCKET_SUSTAINER_FREQ = 421150000;
+constexpr uint32_t DRONE_BOOSTER_FREQ = 0;
+constexpr uint32_t DRONE_SUSTAINER_FREQ = 0;
 Queue<TelemetryCommand> booster_cmds;
 Queue<TelemetryCommand> sustainer_cmds;
 
@@ -38,7 +40,24 @@ bool init_radio(SX1268& radio, uint32_t frequency) {
     return true;
 }
 
-void Radio_Rx_Thread(void * arg) {
+void Drone_Rx_Thread(void * arg) {
+    RadioConfig* cfg = (RadioConfig*)arg;
+    bool led_state = false;
+
+    while(true) {
+        DroneTelemetryPacket packet{};
+        SX1268Error res = cfg->radio->recv((uint8_t*)&packet, sizeof(packet), -1);
+        if(res == SX1268Error::NoError) {
+            led_state = !led_state;
+            digitalWrite(cfg->indicator_led, led_state);
+            FullTelemetryData data = DecodeDronePacket(packet, cfg->frequency / 1e6);
+            data.rssi = cfg->radio->get_last_snr();
+            printDronePacketJson(data);
+        }
+    }
+}
+
+void Rocket_Rx_Thread(void * arg) {
     RadioConfig* cfg = (RadioConfig*)arg;
     bool led_state = false;
     bool reset_state = false;
@@ -182,6 +201,13 @@ void Management_Thread(void * arg) {
 
 void setup() {
     Serial.begin(460800);
+
+    uint32_t BOOSTER_FREQ = ROCKET_BOOSTER_FREQ;
+    uint32_t SUSTAINER_FREQ = ROCKET_BOOSTER_FREQ;
+    #ifdef IS_DRONE
+        BOOSTER_FREQ = DRONE_BOOSTER_FREQ;
+        SUSTAINER_FREQ = DRONE_SUSTAINER_FREQ;
+    #endif
     
     SPIClass SPI0(HSPI);
     SPIClass SPI1(FSPI);
@@ -219,9 +245,15 @@ void setup() {
         .indicator_led=Pins::LED_BLUE,
     };
 
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
+    #ifdef IS_DRONE
+        xTaskCreatePinnedToCore(Drone_Rx_Thread, "Drone0_thread", 8192, nullptr, 0, nullptr, 1);
+        xTaskCreatePinnedToCore(Drone_Rx_Thread, "Drone1_thread", 8192, nullptr, 0, nullptr, 1);    
+    #else  
+        xTaskCreatePinnedToCore(Rocket_Rx_Thread, "Rocket0_thread", 8192, &booster_cfg, 0, nullptr, 1);
+        xTaskCreatePinnedToCore(Rocket_Rx_Thread, "Rocket1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
+        xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
+    #endif
+        
     while(true) {
         delay(10000);
     }
