@@ -184,6 +184,9 @@ class TelemetryStandalone():
                         is_internal = True
                         print("[CMD] PONG", flush=True)
 
+                    if line.startswith("FILTER"):
+                        is_internal = True
+
                     if line == "OUT_ALL":
                         is_internal = True
                         self.__out_all = True
