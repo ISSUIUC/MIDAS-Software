@@ -44,6 +44,7 @@ struct TelemetryPacket {
     
     uint8_t roll_rate;
     uint8_t camera_state;
+    uint8_t camera_batt_volt;
     
 };
 

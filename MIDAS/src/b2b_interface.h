@@ -34,6 +34,11 @@ enum class CameraCommand {
     MUX_2 = 7
 };
 
+struct CameraState {
+    uint16_t batt_volt;
+    uint8_t cam_state;
+};
+
 struct CameraB2B {
 
     void camera_on(int cam_index);
@@ -47,7 +52,7 @@ struct CameraB2B {
     void vmux_set(int cam_select);
     void vmux_toggle();
 
-    CameraData read();
+    CameraData read(); // divide x OxFF mult by 9
 
     private:
     void transmit_command(CameraCommand command);

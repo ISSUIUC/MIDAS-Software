@@ -71,7 +71,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) {
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
 
-        THREAD_SLEEP(5);
+        THREAD_SLEEP(2);
     }
 }
 
@@ -79,13 +79,12 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
         Orientation reading = arg->sensors.orientation.read();
-        if(reading.has_data){
+        if (reading.has_data) {
             if(reading.reading_type == OrientationReadingType::ANGULAR_VELOCITY_UPDATE) {
                 orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
                 orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
                 orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
-                
-            } else if(reading.reading_type == OrientationReadingType::FULL_READING){
+            } else {
                 float old_vx = orientation_holder.angular_velocity.vx;
                 float old_vy = orientation_holder.angular_velocity.vy;
                 float old_vz = orientation_holder.angular_velocity.vz;
@@ -97,9 +96,8 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
 
             arg->rocket_data.orientation.update(orientation_holder);
         }
-        
 
-        THREAD_SLEEP(5);
+        THREAD_SLEEP(100);
     }
 }
 
@@ -123,7 +121,6 @@ DECLARE_THREAD(gps, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(pyro, RocketSystems* arg) {
-    THREAD_SLEEP(2000);
     while(true) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         CommandFlags& command_flags = arg->rocket_data.command_flags;
@@ -326,6 +323,8 @@ DECLARE_THREAD(cam, RocketSystems* arg) {
 
 DECLARE_THREAD(telemetry, RocketSystems* arg) {
     double launch_time = 0;
+    bool has_triggered_vmux_fallback = false;
+
 
     arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true) {
@@ -338,6 +337,15 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
         // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
         if (current_state <= FSMState::STATE_IDLE) {
             launch_time = current_time;
+            has_triggered_vmux_fallback = false;
+        }
+
+        if ((current_time - launch_time) > 79200 && !has_triggered_vmux_fallback) {
+            // THIS IS A HARDCODED VALUE FOR AETHER II 6/21/2025 -- Value is optimal TTA from SDA
+            // If the rocket has been in flight for over 79.2 seconds, we swap the FSM camera feed to the bulkhead camera
+            // This is a fallback in case we can't detect the APOGEE event, so it is more conservative.
+            has_triggered_vmux_fallback = true;
+            arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
 
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000) {

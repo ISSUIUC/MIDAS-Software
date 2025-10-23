@@ -9,14 +9,22 @@ ErrorCode B2BInterface::init() {
 
 CameraData CameraB2B::read() {
     #ifdef B2B_I2C
-    Wire.requestFrom(0x69, 1);
-    uint8_t res = Wire.read();
-    CameraData result;
-    result.camera_state = res;
-    return result;
+    Wire.requestFrom(0x69, 3);
+    uint8_t res1 = Wire.read();
+    uint8_t res2 = Wire.read();
+    uint8_t res3 = Wire.read();
+
+    uint16_t res2_convert = (((uint16_t)res2 << 8) | ((uint16_t)res3));
+
+    CameraData res;
+    res.camera_voltage = (((float)res2_convert) / 0xFFFF) * 9; // making uint16_t from two uint8_ts
+    res.camera_state = res1;
+    
+    return res;
     #endif
 
-    //return 0xFF;
+    
+    return CameraData();
 }
 
 /** 

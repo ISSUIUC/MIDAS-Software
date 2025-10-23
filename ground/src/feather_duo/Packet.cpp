@@ -73,6 +73,8 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     // Camera state
     data.camera_state = packet.camera_state;
 
+    data.camera_batt_volt = ((float)packet.camera_batt_volt / 0xFF) * 9.0f;
+
     // Roll rate
     data.roll_rate_hz = ((float)packet.roll_rate / 0xFF) * MAX_ROLL_RATE_HZ;
 

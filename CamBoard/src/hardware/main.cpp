@@ -6,6 +6,7 @@
 #include <ACAN2517FD.h>
 #include <ACAN2517FDSettings.h>
 #include <EEPROM.h>
+#include <algorithm>
 
 #include "hardware/pins.h"
 #include "systems.h"
@@ -26,6 +27,7 @@ enum class CameraCommand {
 
 extern cam_state_t GLOBAL_CAM_STATE;
 extern cam_state_t DESIRED_CAM_STATE;
+extern float GLOBAL_CAM_BATT_VOLTAGE;
 extern uint32_t LAST_I2C_COMM;
 extern Queue<uint8_t> commandqueue;
 
@@ -34,6 +36,7 @@ bool GREEN_LED_STATE = false;
 
 void onRequest() {
   uint8_t cam_dat = 0;
+  uint16_t cam_batt_volt;
   // encode data
 
   // "FSM" thread data
@@ -46,6 +49,10 @@ void onRequest() {
   cam_dat |= (GLOBAL_CAM_STATE.vtx_on) << 4;
   cam_dat |= (GLOBAL_CAM_STATE.vmux_state) << 5;
   cam_dat |= (GLOBAL_CAM_STATE.cam_ack) << 6;
+
+  // Camera battery voltage data encoded
+  constexpr float max_cam_batt_voltage = 9.0f;
+  cam_batt_volt = (uint16_t) (0xFFFF * std::clamp(GLOBAL_CAM_BATT_VOLTAGE, 0.0f, max_cam_batt_voltage) / max_cam_batt_voltage); 
 
   // Toggle blue LED
   BLUE_LED_STATE = !BLUE_LED_STATE;
@@ -62,10 +69,10 @@ void onRequest() {
   Serial.println(GLOBAL_CAM_STATE.cam2_rec);
 
   // Send to MIDAS
-
-  uint8_t buf[1] = { cam_dat };
+  // breaking up full int of cam_batt_volt into two bytes
+  uint8_t buf[3] = {cam_dat, (uint8_t) (cam_batt_volt >> 8), (uint8_t) (cam_batt_volt & 0xFF)}; 
   LAST_I2C_COMM = millis();
-  Wire1.slaveWrite(buf, 1);
+  Wire1.slaveWrite(buf, 3);
 }
 
 void onReceive(int len) {
