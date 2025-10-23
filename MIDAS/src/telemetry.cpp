@@ -128,9 +128,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.kf_vx = inv_convert_range<int16_t>(kalman.velocity.vx, MAX_KF_XVELOCITY_MS);
 
     //Camera Data
-    packet.camera_state = data.camera_state;
+    packet.camera_state = cam_data.camera_state;
     // bit shift by 4 to give max resolution while still keeping possible voltage up to >=12V
-    packet.camera_batt_volt = (uint8_t) (data.cam_batt_voltage >> 4);  
+    packet.camera_batt_volt = (cam_data.camera_voltage / 9) * 0xFF;
 
     
     //Pyro A0 | B1 | C2 | D3

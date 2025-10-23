@@ -52,7 +52,7 @@ struct CameraB2B {
     void vmux_set(int cam_select);
     void vmux_toggle();
 
-    CameraData read();
+    CameraData read(); // divide x OxFF mult by 9
 
     private:
     void transmit_command(CameraCommand command);

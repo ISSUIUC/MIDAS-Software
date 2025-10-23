@@ -7,22 +7,22 @@ ErrorCode B2BInterface::init() {
     return ErrorCode::NoError;
 }
 
-CameraState CameraB2B::read() {
+CameraData CameraB2B::read() {
     #ifdef B2B_I2C
     Wire.requestFrom(0x69, 3);
     uint8_t res1 = Wire.read();
     uint8_t res2 = Wire.read();
     uint8_t res3 = Wire.read();
 
-    CameraState res;
-    res.batt_volt = (((uint16_t) res2) << 8) | res3; // making uint16_t from two uint8_ts
-    res.cam_state = res1;
+    CameraData res;
+    res.camera_voltage = (((uint16_t) res2) * 9) / 0xFF; // making uint16_t from two uint8_ts
+    res.camera_state = res1;
     
     return res;
     #endif
 
     
-    return CameraState();
+    return CameraData();
 }
 
 /** 
