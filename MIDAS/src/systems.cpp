@@ -97,7 +97,7 @@ DECLARE_THREAD(orientation, RocketSystems* arg) {
             arg->rocket_data.orientation.update(orientation_holder);
         }
 
-        THREAD_SLEEP(100);
+        THREAD_SLEEP(5);
     }
 }
 
