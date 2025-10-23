@@ -263,14 +263,10 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     BodyToGlobalQuat(orientation.q0, orientation.q1, orientation.q2, orientation.q3, sensor_accel_global_g);
     // Since the quaternion from the sensor has its axis flipped, we will have to flip the axis as well
 
-    (sensor_accel_global_g)(0, 0) = (sensor_accel_global_g)(2, 0);
-    (sensor_accel_global_g)(1, 0) = (sensor_accel_global_g)(1, 0);
-    (sensor_accel_global_g)(2, 0) = -1 * (sensor_accel_global_g)(0, 0);
-
     float g_ms2;
     if ((FSM_state > FSMState::STATE_IDLE) && (FSM_state < FSMState::STATE_LANDED))
     {
-        g_ms2 = -gravity_ms2; // either negative or positive need to check
+        g_ms2 = gravity_ms2; // either negative or positive need to check
     }
     else
     {
@@ -281,6 +277,10 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     y_k(1, 0) = ((sensor_accel_global_g)(0)) * gravity_ms2;
     y_k(2, 0) = ((sensor_accel_global_g)(1)) * gravity_ms2;
     y_k(3, 0) = ((sensor_accel_global_g)(2)) * gravity_ms2;
+
+    // float temp = y_k(1, 0);
+    // y_k(1, 0) = -1 * y_k(3, 0);
+    // y_k(3, 0) = temp;
 
     y_k(0, 0) = barometer.altitude; // meters
 
@@ -302,22 +302,22 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
     state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
 
-    if (FSM_state == FSMState::STATE_FIRST_BOOST)
-    {
-        current_vel += (dt)*y_k(1);
-        Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
-        measured_v(0, 0) = current_vel;
-        // measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
-        Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
-        err(0, 0) = measured_v(0, 0) - x_k(1, 0);
-        Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
-        if (Wind.norm() > 15)
-        {
-            Wind(0, 0) = 15.0;
-            Wind(1, 0) = 0.0;
-            Wind(2, 0) = 0.0;
-        }
-    }
+    // if (FSM_state == FSMState::STATE_FIRST_BOOST)
+    // {
+    //     current_vel += (dt)*y_k(1);
+    //     Eigen::Matrix<float, 3, 1> measured_v = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+    //     measured_v(0, 0) = current_vel;
+    //     // measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
+    //     Eigen::Matrix<float, 3, 1> err = Eigen::Matrix<float, 3, 1>(Eigen::Matrix<float, 3, 1>::Zero());
+    //     err(0, 0) = measured_v(0, 0) - x_k(1, 0);
+    //     Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
+    //     if (Wind.norm() > 15)
+    //     {
+    //         Wind(0, 0) = 15.0;
+    //         Wind(1, 0) = 0.0;
+    //         Wind(2, 0) = 0.0;
+    //     }
+    // }
 }
 
 /**
