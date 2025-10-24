@@ -165,7 +165,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: firmware-cam_board
-          path: ground/.pio/build/CamBoard/firmware*.*
+          path: CamBoard/.pio/build/CamBoard/firmware*.*
 
   notify:
     name: Slack Notification Summary (main)
