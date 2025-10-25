@@ -173,6 +173,8 @@ struct CommandFlags {
     bool FSM_should_power_save = false;         // Triggered after 60 seconds in LANDED state.
     bool FSM_should_swap_camera_feed = false;   // Triggered COAST --> APOGEE
 };
+
+
 /**
  * @struct RocketData
  * 
