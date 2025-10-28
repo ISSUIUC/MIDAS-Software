@@ -43,9 +43,20 @@ DECLARE_THREAD(hilsim, void*arg) {
 
         int delim;
         do {
-            while (!Serial.available());
+            while (!Serial.available()) {
+              k_tick();
+            }
             delim = Serial.read();
-        } while(delim != '$');
+
+        } while(delim != '$' && delim != '#');
+
+        if(delim == '#') {
+          if (!read_exact(data_buf, 16, 10)) continue;
+          // Sys message is 14 byte data, 2 byte crc  
+          memcpy(&crc, data_buf + 14, sizeof(crc_buf));
+          k_handle_sys_msg(data_buf, crc);
+          continue;
+        }
             
         if(!read_exact(header, sizeof(header), 10)) continue;
         memcpy(&timestamp, &header[0], 4);
@@ -59,12 +70,14 @@ DECLARE_THREAD(hilsim, void*arg) {
 
         k_handle_reading(timestamp, discriminator, data_buf, data_size, crc);
 
+        k_tick();
+        THREAD_SLEEP(1);
     }
 }
 
 void setup() {
     Serial.begin(9600);
-    k_init_sensordata();
+    k_setup();
     hilsim_thread(nullptr);
 }
 
