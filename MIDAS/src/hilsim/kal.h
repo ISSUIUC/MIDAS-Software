@@ -23,21 +23,28 @@ typedef struct SensorMapping {
 // Non-halting exceptions
 void k_EVENTOVERFLOW() {
     // Too many events allocated
-    Serial.println("!EO");
+    Serial.write("!EO\n");
 }
 
 void k_REPORTOVERFLOW() {
     // Too many reports enabled
-    Serial.println("!RO");
+    Serial.write("!RO\n");
 }
 
 void k_INVALIDINSTR() {
     // Invalid system instruction
-    Serial.println("!II");
+    Serial.write("!II\n");
 }
+
+enum K_EVENT_TYPE {
+    SYSTEM_MESSAGE = 0,
+    DATA_REPORT = 1,
+    LOG = 2,
+};
 
 typedef struct {
     unsigned long timestamp;
+    uint8_t event_type; // 0--sys msg, 1--data report, 2--log
     uint8_t size;
     uint8_t buf[128];
 } k_event_t;
@@ -49,7 +56,9 @@ k_event_t EVENT_STACK[EVENT_STACK_SIZE];
 uint8_t st_remaining = 0;
 uint8_t data_report_top = 0;
 
-#define ASSOCIATE(ty, id) MAP[id] = SensorMapping{sizeof(ty), &(ty)}
+constexpr k_event_t K_SETUP_DONE {0, K_EVENT_TYPE::SYSTEM_MESSAGE, 3, {'H', 'I', 'L'}};
+
+#define ASSOCIATE(ty, id) MAP[id-1] = SensorMapping{sizeof(ty), &(ty)}
 
 // Note: crc poly 0x1021
 // Note: crc check is little endian
@@ -121,11 +130,17 @@ void k_push_event(k_event_t evt) {
 }
 
 void k_handle_k_evt(k_event_t evt) {
-    Serial.print("%");
-    Serial.print(evt.timestamp);
-    Serial.print(evt.size);
-    Serial.println((char*)evt.buf);
+
+    uint8_t ts_buf[4];
+    memcpy(ts_buf, &evt.timestamp, sizeof(evt.timestamp));
+
+    Serial.write('%');
+    Serial.write(ts_buf, sizeof(evt.timestamp));
+    Serial.write(&evt.event_type, sizeof(evt.event_type));
+    Serial.write(&evt.size, sizeof(evt.size));
+    Serial.write((char*)evt.buf, evt.size);
 }
+
 
 void k_handle_all_k_evt() {
     while (st_remaining) {
@@ -137,7 +152,7 @@ void k_handle_all_k_evt() {
 // Commands to communicate back to the streamer
 void k_log(char* log_message, size_t len) {
     // +1 to handle \0
-    k_event_t evt = {0, (uint8_t)len+2, "@"};
+    k_event_t evt = {0, K_EVENT_TYPE::LOG, (uint8_t)len+2, "@"};
     memcpy(evt.buf + 1, log_message, len+1);
     k_push_event(evt);
 }
@@ -156,13 +171,19 @@ void k_enable_data_report(ReadingDiscriminant sens_id, uint32_t report_interval)
 void k_tick_data_report() {
     unsigned long cur_t = millis();
     for(uint8_t i = 0; i < data_report_top; i++) {
-        SensorMapping s = MAP[data_reports[i] - 1];
+        uint8_t disc_id = (uint8_t)data_reports[i];
+        ReadingDiscriminant disc = (ReadingDiscriminant) (disc_id-1);
+        SensorMapping* s = &MAP[disc];
+        if(s->report_interval) {
 
-        if(s.report_interval) {
-            if(cur_t - s.last_report_tick > s.report_interval) {
-                k_event_t s_event = {cur_t, (uint8_t)s.struct_size, 0};
-                memcpy(s_event.buf, s.struct_map, s.struct_size);
+            if((cur_t - s->last_report_tick) > s->report_interval) {
+                // The first byte of the event data will be the disc, so its size + 1 byte for disc
+                k_event_t s_event = {cur_t, K_EVENT_TYPE::DATA_REPORT, (uint8_t) (s->struct_size + 1), 0};
+                s->last_report_tick = cur_t;
+                memcpy(s_event.buf, &disc_id, sizeof(uint8_t));
+                memcpy(s_event.buf + 1, s->struct_map, s->struct_size);
                 k_push_event(s_event);
+
             }
         }
     }
@@ -196,12 +217,13 @@ void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
             return;
     }
 
-    Serial.println("%OK");
+    Serial.write("%OK");
 }
 
 // High level entries
 void k_setup() {
     k_init_sensordata();
+    k_push_event(K_SETUP_DONE);
 }
 
 void k_tick() {

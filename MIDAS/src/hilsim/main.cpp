@@ -22,53 +22,62 @@ static bool read_exact(uint8_t* dst, size_t n, unsigned long timeout_ms) {
 }
 
 DECLARE_THREAD(hilsim, void*arg) {
-    int n = 0;
+    // int n = 0;
     // Debug kamaji output to verify if we're reading the correct packets
-    while (Serial.read() != 33);
-    char magic[] = {69, 110, 117, 109, 99, 108, 97, 119, 0};
-    Serial.println(magic);
-    Serial.println(__TIME__);
-    Serial.println(__DATE__);
-    Serial.flush();
+    // char magic[] = {69, 110, 117, 109, 99, 108, 97, 119, 0};
+    // Serial.println(magic);
+    // Serial.println(__TIME__);
+    // Serial.println(__DATE__);
+    // Serial.flush();
 
     uint8_t header[5];
     uint8_t crc_buf[2];
     uint32_t timestamp;
-    uint8_t discriminator;
+    uint8_t discriminant;
     size_t data_size;
     uint8_t data_buf[128];
     uint16_t crc;
     
     while (true) {
-
         int delim;
         do {
-            while (!Serial.available()) {
-              k_tick();
-            }
+            // while (!Serial.available()) {
+            //   Serial.print(" nav");
+            //   k_tick();
+            //   THREAD_SLEEP(5);
+            // }
+            k_tick();
             delim = Serial.read();
+            THREAD_SLEEP(1);
 
         } while(delim != '$' && delim != '#');
 
+        
+
         if(delim == '#') {
           if (!read_exact(data_buf, 16, 10)) continue;
+
           // Sys message is 14 byte data, 2 byte crc  
           memcpy(&crc, data_buf + 14, sizeof(crc_buf));
           k_handle_sys_msg(data_buf, crc);
           continue;
         }
             
-        if(!read_exact(header, sizeof(header), 10)) continue;
-        memcpy(&timestamp, &header[0], 4);
-        discriminator = header[4];
-        data_size = k_get_discriminant_size(discriminator);
+        if(delim == '$') {
+          if(!read_exact(header, sizeof(header), 10)) continue;
 
-        if (!read_exact(data_buf, (size_t)data_size, 10)) continue;
-        if (!read_exact(crc_buf, sizeof(crc_buf), 5)) continue;
+          memcpy(&timestamp, &header[0], 4);
+          discriminant = header[4];
+          data_size = k_get_discriminant_size(discriminant);
 
-        memcpy(&crc, crc_buf, sizeof(crc_buf));
+          if (!read_exact(data_buf, (size_t)data_size, 10)) continue;
+          if (!read_exact(crc_buf, sizeof(crc_buf), 5)) continue;
 
-        k_handle_reading(timestamp, discriminator, data_buf, data_size, crc);
+          memcpy(&crc, crc_buf, sizeof(crc_buf));
+          k_handle_reading(timestamp, discriminant, data_buf, data_size, crc);
+          
+        }
+
 
         k_tick();
         THREAD_SLEEP(1);
@@ -77,8 +86,17 @@ DECLARE_THREAD(hilsim, void*arg) {
 
 void setup() {
     Serial.begin(9600);
+    while(!Serial);
+    delay(200);
+    // Serial.println("MAIN THREAD BEGIN");
     k_setup();
     hilsim_thread(nullptr);
+
+    while(true) {
+      THREAD_SLEEP(1000);
+      Serial.println(".");
+    }
 }
 
-void loop(){}
+void loop(){
+}
