@@ -3,6 +3,7 @@ import sys
 import time
 import threading
 import struct
+import math
 
 # INSTR 1 (REPORT_EN) 
 
@@ -23,10 +24,12 @@ def enable_report(serial, sensor_id: int, interval: int):
 
 def write_raw_pkt(serial):
 
-    accel = struct.pack("<f", 1.234) + struct.pack("<f", 3.21) + struct.pack("<f", 1.3385)
+    t = float(math.floor(time.time()) % 16)
+
+    accel = struct.pack("<f", t) + struct.pack("<f", 3.21) + struct.pack("<f", 1.3385)
     print("accel raw", accel)
 
-    rep = bytearray([b"$"[0], 0, 0, 0, 0, 1]) + accel + bytearray([176, 177])
+    rep = bytearray([b"$"[0], 0, 0, 0, 0, 2]) + accel + bytearray([176, 177])
     serial.write(rep)
 
 def to_pktdata(arr):
@@ -66,11 +69,7 @@ def out():
             # print(a.read_all())
 
             d = a.read_until(b"%")
-            # n += 1
-            # if(n % 100 == 0):
             to_pktdata(d)
-            # print(d)
-            # print(a.read_all())
 
 p = threading.Thread(target=out, daemon=True)
 p.start()
@@ -80,10 +79,11 @@ time.sleep(1)
 
 def sequence():
     time.sleep(0.5)
-    enable_report(a, 1, 50)
-    time.sleep(3)
-    print("write..")
-    write_raw_pkt(a)
+    enable_report(a, 2, 50)
+    time.sleep(1)
+    while True:
+        time.sleep(0.25)
+        write_raw_pkt(a)
     
 
 
@@ -92,4 +92,5 @@ g.start()
 
 while True:
     time.sleep(0.5)
+    # print(math.floor((time.time()))
     # print(n)

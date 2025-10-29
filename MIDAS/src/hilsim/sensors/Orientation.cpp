@@ -1,5 +1,5 @@
-#include "../sensors.h"
-#include "../kal_rocket.h"
+#include "sensors.h"
+#include "../kamaji/kal_rocket.h"
 // #include sensor library
 
 // global static instance of the sensor

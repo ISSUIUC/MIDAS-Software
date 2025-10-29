@@ -1,115 +1,39 @@
 // KAL - Kamaji Abstraction Layer
-#include "esp_rom_crc.h"
-#include "data_logging.h"
-#include "log_format.h"
+#pragma once
 #include "systems.h"
-#include "kal_rocket.h"
+#include "kamaji/kal_rocket.h"
+#include "kamaji/kal_error.h"
+#include "kamaji/kal_events.h"
+#include "kamaji/kal_crc.h"
+#include "kamaji/kal_sensordata.h"
+#include "kamaji/kal_interface.h"
 
-#define EVENT_STACK_SIZE 8
-#define MAX_DATA_REPORTS 16
+#define INIT_SYSTEM(s) do { ErrorCode code = (s).init(); if (code != NoError) { Serial.println("init err"); while(true); } } while (0)
 
-#pragma pack(push, 1)
-typedef struct {uint32_t ts_us; uint8_t disc;} k_hdr;
-#pragma pack(pop)
+// ---- INIT SENSORS ----
+void k_init_sensordata();
 
-typedef struct SensorMapping {
-    size_t struct_size;
-    void* struct_map;
-
-    uint32_t report_interval = 0;
-    unsigned long last_report_tick = 0;
-};
-
-// Non-halting exceptions
-void k_EVENTOVERFLOW() {
-    // Too many events allocated
-    Serial.write("!EO\n");
+// ---- UTIL ----
+static bool k_read_exact(uint8_t* dst, size_t n, unsigned long timeout_ms) {
+  unsigned long start = millis();
+  size_t got = 0;
+  while (got < n) {
+    int avail = Serial.available();
+    if (avail > 0) {
+      int r = Serial.readBytes(dst + got, n - got);
+      got += (r > 0 ? (size_t)r : 0);
+      continue;
+    }
+    if ((millis() - start) > timeout_ms) return false;
+    THREAD_SLEEP(1); // yield
+  }
+  return true;
 }
 
-void k_REPORTOVERFLOW() {
-    // Too many reports enabled
-    Serial.write("!RO\n");
-}
-
-void k_INVALIDINSTR() {
-    // Invalid system instruction
-    Serial.write("!II\n");
-}
-
-enum K_EVENT_TYPE {
-    SYSTEM_MESSAGE = 0,
-    DATA_REPORT = 1,
-    LOG = 2,
-};
-
-typedef struct {
-    unsigned long timestamp;
-    uint8_t event_type; // 0--sys msg, 1--data report, 2--log
-    uint8_t size;
-    uint8_t buf[128];
-} k_event_t;
-
-SensorMapping MAP[READING_DISC_COUNT-1];
-ReadingDiscriminant data_reports[MAX_DATA_REPORTS];
-k_event_t EVENT_STACK[EVENT_STACK_SIZE];
-
-uint8_t st_remaining = 0;
-uint8_t data_report_top = 0;
-
-constexpr k_event_t K_SETUP_DONE {0, K_EVENT_TYPE::SYSTEM_MESSAGE, 3, {'H', 'I', 'L'}};
-
-#define ASSOCIATE(ty, id) MAP[id-1] = SensorMapping{sizeof(ty), &(ty)}
-
-// Note: crc poly 0x1021
-// Note: crc check is little endian
-bool k_crc_check(const k_hdr* header, const uint8_t* payload, uint16_t size, uint16_t crc_cmp) {
-    uint16_t crc = 0xFFFF;
-    crc = esp_rom_crc16_le(crc, (const uint8_t*) header, sizeof(header));
-    crc = esp_rom_crc16_le(crc, payload, size);
-    return crc == crc_cmp;
-}
-
-bool k_crc_check_sys(const uint8_t* payload, uint16_t crc_cmp) {
-    uint16_t crc = 0xFFFF;
-    crc = esp_rom_crc16_le(crc, payload, 14);
-    return crc == crc_cmp;
-}
-
-void k_init_sensordata() {
-    KRocketData* arg = &GLOBAL_DATA;
-
-    // This list should run parallel to the list defined in data_logging. This macro will perform the opposite task,
-    // mapping disc IDs to their locations in the struct.
-    ASSOCIATE(arg->low_g, ID_LOWG);
-    ASSOCIATE(arg->low_g_lsm, ID_LOWGLSM);
-    ASSOCIATE(arg->high_g, ID_HIGHG);
-    ASSOCIATE(arg->barometer, ID_BAROMETER);
-    ASSOCIATE(arg->continuity, ID_CONTINUITY);
-    ASSOCIATE(arg->voltage, ID_VOLTAGE);
-    ASSOCIATE(arg->gps, ID_GPS);
-    ASSOCIATE(arg->magnetometer, ID_MAGNETOMETER);
-    ASSOCIATE(arg->orientation, ID_ORIENTATION);
-    ASSOCIATE(arg->fsm_state, ID_FSM);
-    ASSOCIATE(arg->kalman, ID_KALMAN);
-    ASSOCIATE(arg->pyro, ID_PYRO);
-}
-
-void k_read_into_sensordata(uint8_t disc, uint8_t* data) {
-    SensorMapping cur_map = MAP[disc - 1];
-    memcpy(cur_map.struct_map, data, cur_map.struct_size);
-}
-
-size_t k_get_discriminant_size(uint8_t disc) {
-    return MAP[disc-1].struct_size;
-}
-
-void k_set_timestamp(uint32_t ts) {
-    return;
-}
-
+// ---- HANDLE SYS MESSAGES ----
 // Packet: $ uint32_t:timestamp uint8_t:disc uint8_t*:data uint16_t:crc
 // Returns true if the reading was accepted
-bool k_handle_reading(uint32_t ts, uint8_t disc, uint8_t* data, size_t data_size, uint16_t crc) {
+inline bool k_handle_reading(uint32_t ts, uint8_t disc, uint8_t* data, size_t data_size, uint16_t crc) {
     k_hdr header = {ts, disc};
     if(k_crc_check(&header, data, data_size, crc)) {
         k_read_into_sensordata(disc, data);
@@ -118,75 +42,6 @@ bool k_handle_reading(uint32_t ts, uint8_t disc, uint8_t* data, size_t data_size
     }
 
     return false;
-}
-
-void k_push_event(k_event_t evt) {
-    if(st_remaining >= EVENT_STACK_SIZE - 1) {
-        k_EVENTOVERFLOW();
-        return; // Cannot allocate the event.
-    }
-    EVENT_STACK[st_remaining] = evt;
-    st_remaining++;
-}
-
-void k_handle_k_evt(k_event_t evt) {
-
-    uint8_t ts_buf[4];
-    memcpy(ts_buf, &evt.timestamp, sizeof(evt.timestamp));
-
-    Serial.write('%');
-    Serial.write(ts_buf, sizeof(evt.timestamp));
-    Serial.write(&evt.event_type, sizeof(evt.event_type));
-    Serial.write(&evt.size, sizeof(evt.size));
-    Serial.write((char*)evt.buf, evt.size);
-}
-
-
-void k_handle_all_k_evt() {
-    while (st_remaining) {
-        --st_remaining;
-        k_handle_k_evt(EVENT_STACK[st_remaining]);
-    }
-}
-
-// Commands to communicate back to the streamer
-void k_log(char* log_message, size_t len) {
-    // +1 to handle \0
-    k_event_t evt = {0, K_EVENT_TYPE::LOG, (uint8_t)len+2, "@"};
-    memcpy(evt.buf + 1, log_message, len+1);
-    k_push_event(evt);
-}
-
-// Data reporting
-void k_enable_data_report(ReadingDiscriminant sens_id, uint32_t report_interval) {
-    if(data_report_top >= MAX_DATA_REPORTS - 1) {
-        k_REPORTOVERFLOW();
-        return;
-    }
-    data_reports[data_report_top] = sens_id;
-    ++data_report_top;
-    MAP[sens_id-1].report_interval = report_interval;
-}
-
-void k_tick_data_report() {
-    unsigned long cur_t = millis();
-    for(uint8_t i = 0; i < data_report_top; i++) {
-        uint8_t disc_id = (uint8_t)data_reports[i];
-        ReadingDiscriminant disc = (ReadingDiscriminant) (disc_id-1);
-        SensorMapping* s = &MAP[disc];
-        if(s->report_interval) {
-
-            if((cur_t - s->last_report_tick) > s->report_interval) {
-                // The first byte of the event data will be the disc, so its size + 1 byte for disc
-                k_event_t s_event = {cur_t, K_EVENT_TYPE::DATA_REPORT, (uint8_t) (s->struct_size + 1), 0};
-                s->last_report_tick = cur_t;
-                memcpy(s_event.buf, &disc_id, sizeof(uint8_t));
-                memcpy(s_event.buf + 1, s->struct_map, s->struct_size);
-                k_push_event(s_event);
-
-            }
-        }
-    }
 }
 
 
@@ -200,7 +55,7 @@ enum sys_instr_t {
 // INSTR
 // - 0x00 --> reserved
 // - 0x01 --> REPORT_EN
-void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
+inline void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
     sys_instr_t instr = (sys_instr_t) data[0];
 
     switch(instr) {
@@ -220,13 +75,12 @@ void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
     Serial.write("%OK");
 }
 
-// High level entries
-void k_setup() {
-    k_init_sensordata();
-    k_push_event(K_SETUP_DONE);
-}
+// ---- Kamaji Thread ----
+void hilsim_thread(void* arg);
 
-void k_tick() {
-    k_tick_data_report();
-    k_handle_all_k_evt();
-}
+// Run the Kamaji process
+[[noreturn]] void k_start();
+
+// ---- ENTRY FUNCS ----
+void k_run();
+void k_tick();

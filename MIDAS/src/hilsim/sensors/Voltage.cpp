@@ -1,5 +1,5 @@
-#include "../sensors.h"
-#include "../kal_rocket.h"
+#include "sensors.h"
+#include "../kamaji/kal_rocket.h"
 
 /**
  * "Initializes" the voltage sensor. Since it reads directly from a pin without a library, there is no specific initialization.

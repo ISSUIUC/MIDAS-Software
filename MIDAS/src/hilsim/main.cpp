@@ -1,5 +1,3 @@
-#include <Arduino.h>
-#include <systems.h>
 #include "kal.h"
 
 SDSink sink;
@@ -85,18 +83,7 @@ DECLARE_THREAD(hilsim, void*arg) {
 }
 
 void setup() {
-    Serial.begin(9600);
-    while(!Serial);
-    delay(200);
-    // Serial.println("MAIN THREAD BEGIN");
-    k_setup();
-    hilsim_thread(nullptr);
-
-    while(true) {
-      THREAD_SLEEP(1000);
-      Serial.println(".");
-    }
+    k_run();
 }
 
-void loop(){
-}
+void loop(){}

@@ -1,5 +1,5 @@
-// A HILSIM version of the RocketData struct without any of the additional wrapping.
 #pragma once
+// A HILSIM version of the RocketData struct without any of the additional wrapping.
 #include "sensor_data.h"
 #include "rocket_state.h"
 
