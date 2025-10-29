@@ -1,5 +1,5 @@
-#include "../sensors.h"
-#include "../kal_rocket.h"
+#include "sensors.h"
+#include "../kamaji/kal_rocket.h"
 
 ErrorCode LowGLSMSensor::init() {
     return ErrorCode::NoError;

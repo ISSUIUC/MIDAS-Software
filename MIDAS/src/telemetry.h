@@ -8,7 +8,7 @@
 #if defined(SILSIM)
 #include "silsim/emulated_telemetry.h"
 #elif defined(HILSIM)
-#include "hilsim/telemetry_backend.h"
+#include "hilsim/sensors/telemetry_backend.h"
 #else
 #include "hardware/telemetry_backend.h"
 #endif
