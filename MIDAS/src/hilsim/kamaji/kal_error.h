@@ -17,3 +17,8 @@ inline void k_INVALIDINSTR() {
     Serial.write("!II\n");
 }
 
+inline void k_INVALIDCHECKSUM() {
+    // Invalid checksum test
+    Serial.write("!IC\n");
+}
+

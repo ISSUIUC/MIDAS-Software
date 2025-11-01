@@ -48,6 +48,7 @@ inline bool k_handle_reading(uint32_t ts, uint8_t disc, uint8_t* data, size_t da
 enum sys_instr_t {
     RESERVED = 0,
     REPORT_EN = 1,
+    VERIFY_CHECKSUM = 2,
 };
 
 // System message: instruct the Kamaji driver to do something
@@ -67,12 +68,34 @@ inline void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
                 k_enable_data_report(disc, report_intv);
             }
             break;
+        case (sys_instr_t::VERIFY_CHECKSUM):
+            {
+                uint32_t checksum;
+                memcpy(&checksum, data + 1, sizeof(uint32_t));
+                if(checksum != LOG_CHECKSUM) {
+                    k_INVALIDCHECKSUM();
+                }
+            }
+            break;
         default:
             k_INVALIDINSTR();
             return;
     }
 
     Serial.write("%OK");
+}
+
+void k_wait_until(char sig) {
+    char a;
+    do {
+        a = Serial.read();
+    } while (a != sig);
+}
+
+void k_clear_inbuf() {
+    while(Serial.available() > 0) {
+        char tb = Serial.read();
+    }
 }
 
 // ---- Kamaji Thread ----

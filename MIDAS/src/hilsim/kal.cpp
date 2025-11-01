@@ -119,9 +119,21 @@ DECLARE_THREAD(hilsim, void*arg) {
 // ---- ENTRY FUNCS ----
 void k_run() {
     Serial.begin(115200);
+    while(!Serial);
+
+    k_push_event(K_START_E);
+    k_push_event(k_get_checksum_evt());
+
+    // Wait until start signal (newline written to serial)
+    k_wait_until('\n');
+    k_clear_inbuf();
+
+    // Set up MIDAS
     k_midas_setup();
     k_init_sensordata();
     k_push_event(K_SETUP_DONE);
+
+    // Start systems
     k_start();
 }
 

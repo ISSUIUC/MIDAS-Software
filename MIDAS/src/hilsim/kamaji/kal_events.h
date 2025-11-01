@@ -1,6 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "kal_error.h"
+#include "log_checksum.h"
 
 // ---- CONFIGURATION ----
 #define EVENT_STACK_SIZE 8
@@ -62,6 +63,14 @@ inline void k_log(char* log_message, size_t len) {
     k_push_event(evt);
 }
 
+inline k_event_t k_get_checksum_evt() {
+    k_event_t evt;
+    uint32_t checksum = LOG_CHECKSUM;
+    memcpy(evt.buf + 1, &checksum, sizeof(uint32_t));
+    evt.buf[0] = 'C';
+    return evt;
+}
 
 // ---- PRE-DEFINED EVENTS ----
-constexpr k_event_t K_SETUP_DONE {0, K_EVENT_TYPE::SYSTEM_MESSAGE, 3, {'H', 'I', 'L'}};
+constexpr k_event_t K_START_E {0, K_EVENT_TYPE::SYSTEM_MESSAGE, 3, {'H', 'I', 'L'}};
+constexpr k_event_t K_SETUP_DONE {0, K_EVENT_TYPE::SYSTEM_MESSAGE, 3, {'H', 'S', 'D'}};
