@@ -85,14 +85,14 @@ inline void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
     Serial.write("%OK");
 }
 
-void k_wait_until(char sig) {
+inline void k_wait_until(char sig) {
     char a;
     do {
         a = Serial.read();
     } while (a != sig);
 }
 
-void k_clear_inbuf() {
+inline void k_clear_inbuf() {
     while(Serial.available() > 0) {
         char tb = Serial.read();
     }

@@ -5,7 +5,7 @@ import math
 import random
 
 UINT32_T = 4
-FILENAME = "./lunaboo.launch"
+FILENAME = "./lunasus.launch"
 
 com = serial.Serial(sys.argv[1], baudrate=115200)
 
@@ -62,8 +62,11 @@ def read_entry():
 
     return Entry(ts, disc, data, crc)
 
-# ROWS_SKIP = 2087693 - 5000
-ROWS_SKIP = 2064768 - 5000
+#sus
+ROWS_SKIP = 2087693 - 5000
+
+#boo
+# ROWS_SKIP = 2064768 - 5000
 ROW_END = 100000000
 
 def cur_millis():
@@ -83,6 +86,8 @@ def stream_data():
     while rows_read < ROWS_SKIP + 1:
         rows_read += 1
         cur_entry = read_entry()
+
+    input("Run? Any key works.")
 
     start_ts = cur_entry.ts
     next_ts = cur_entry.ts
@@ -125,7 +130,7 @@ def stream_data():
 
 
 def main():
-    input("Run? Any key works.")
+    print("loading...")
     stream_data()
 
 
