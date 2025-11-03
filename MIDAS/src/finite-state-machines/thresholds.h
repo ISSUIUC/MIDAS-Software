@@ -240,6 +240,5 @@
 // (Core Setting)
 #define booster_main_jerk_threshold 300
 
-// Time to wait before deciding to go from BURNOUT to FIRST_BOOST. (ms)
-
-#define minimum_time_for_burnout_to_first_boost 250
+// Minimum time to wait before deciding to go from BURNOUT to FIRST_BOOST. (ms)
+#define sustainer_burnout_to_first_boost_time_threshold 250
