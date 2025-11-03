@@ -157,22 +157,24 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
             // Additionally, check if orientation allows for firing
             if (can_fire_igniter(orientation)) {
                 new_pyro_state.channel_firing[2] = true;
-                gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
             }
             break;
         case FSMState::STATE_DROGUE_DEPLOY:
             // Fire "Pyro A" to deploy upper stage drogue
             new_pyro_state.channel_firing[0] = true;
-            gpioDigitalWrite(PYROA_FIRE_PIN, HIGH);
             break;
         case FSMState::STATE_MAIN_DEPLOY:
             // Fire "Pyro B" to deploy main.
             new_pyro_state.channel_firing[1] = true;
-            gpioDigitalWrite(PYROB_FIRE_PIN, HIGH);
             break;
         default:
             break;
     }
+
+    gpioDigitalWrite(PYROA_FIRE_PIN, new_pyro_state.channel_firing[0] ? HIGH : LOW);
+    gpioDigitalWrite(PYROB_FIRE_PIN, new_pyro_state.channel_firing[1] ? HIGH : LOW);
+    gpioDigitalWrite(PYROC_FIRE_PIN, new_pyro_state.channel_firing[2] ? HIGH : LOW);
+    gpioDigitalWrite(PYROD_FIRE_PIN, new_pyro_state.channel_firing[3] ? HIGH : LOW);
 
     return new_pyro_state;
 }
