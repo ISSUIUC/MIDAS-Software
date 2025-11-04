@@ -83,3 +83,7 @@ inline void k_midas_setup() {
 
     delay(200);
 }
+
+void k_ident() {
+    Serial.println("%id:MIDAS");
+}
