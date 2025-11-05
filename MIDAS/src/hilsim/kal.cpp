@@ -119,13 +119,13 @@ DECLARE_THREAD(hilsim, void*arg) {
 // ---- ENTRY FUNCS ----
 void k_run() {
     Serial.begin(115200);
-    while(!Serial);
+    // while(!Serial);
 
     k_push_event(K_START_E);
     k_push_event(k_get_checksum_evt());
 
     // Wait until start signal (newline written to serial)
-    k_wait_until('\n');
+    // k_wait_until('\n');
     k_ident();
     k_clear_inbuf();
 
