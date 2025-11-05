@@ -63,7 +63,7 @@ def read_entry():
     return Entry(ts, disc, data, crc)
 
 #sus
-ROWS_SKIP = 2087693 - 5000
+ROWS_SKIP = 2087693 
 
 #boo
 # ROWS_SKIP = 2064768 - 5000

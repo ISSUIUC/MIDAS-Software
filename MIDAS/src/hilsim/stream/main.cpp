@@ -99,7 +99,6 @@ bool read_entry(entry_t& entry) {
     return true;
 }
 
-void handle_return()
 
 
 void send_data(serialib& s, entry_t& dat) {
