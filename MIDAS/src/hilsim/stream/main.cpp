@@ -264,12 +264,13 @@ int main(int argc, char** argv) {
             case 'r':
                 // r(ealtime) -- streams data to com port in real time
                 {
-                    printf(".BEGIN\n");
                     fflush(stdout);
                     if (!inptr) {
                         std::cerr << "No file specified" << std::endl;
                         break;
                     }
+
+                    printf(".BEGIN\n");
 
                     if (outptr) {
                         fputs(".KAMAJI_STREAM\n", outptr);
