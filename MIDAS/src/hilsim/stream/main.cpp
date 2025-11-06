@@ -13,6 +13,7 @@ size_t struct_sizes[16];
 #define DEBUG
 
 FILE* inptr;
+FILE* outptr;
 
 // Packet: $ uint32_t:timestamp uint8_t:disc uint8_t*:data uint16_t:crc
 typedef struct {
@@ -110,11 +111,20 @@ void send_data(serialib& s, entry_t& dat) {
     memcpy(buf + 1, &dat.raw_data_stream, dat.raw_data_stream_size);
     memcpy(buf + 1 + dat.raw_data_stream_size, &dat.crc, sizeof(uint16_t));
 
-    #ifdef DEBUG
-    printf("$");
-    for(int i = 1; i < dat.raw_data_stream_size + 2; i++) {
-        printf("%x", buf[i]);
+    if(outptr) {
+        fputs(".D $", outptr);
+        for(int i = 1; i < dat.raw_data_stream_size + 2; i++) {
+            fprintf(outptr, "%x", buf[i]);
+        }
+        fputc('\n', outptr);
+        fflush(outptr);
     }
+
+    #ifdef DEBUG
+    // printf("$");
+    // for(int i = 1; i < dat.raw_data_stream_size + 2; i++) {
+    //     printf("%x", buf[i]);
+    // }
     // printf("\n");
     #else
     s.writeBytes(buf, dat._data_size + num_overhead_bytes);
@@ -138,14 +148,15 @@ int main(int argc, char** argv) {
 
     entry_t entry;
     size_t num_read = 0;
+    uint32_t _inf_checksum;
 
     auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now(); 
 
     while (true) {
 
-        char _inbuf[128];
-        fgets(_inbuf, 128, stdin);
+        char _inbuf[255];
+        fgets(_inbuf, 255, stdin);
         // std::cout << (uint8_t)cmd << std::endl;
 
         switch(_inbuf[0]) {
@@ -158,6 +169,23 @@ int main(int argc, char** argv) {
                 char serial_open_err = Serial.openDevice(sbuf, 115200);
                 if (serial_open_err != 1) return wrap_err(serial_open_err);
                 printf("SERIAL OK\n", sbuf);
+                fflush(stdout);
+                }
+                break;
+            case 'o':
+                // (o)utfile <filepath>: Set data output path
+                char sbuf[240];
+                sscanf(_inbuf + 1, " %s", &sbuf);
+                outptr = fopen(sbuf, "w+");
+                
+                {
+                if (outptr == NULL) {
+                    std::cerr << "Error opening file " << sbuf << std::endl;
+                    continue;
+                }
+
+                printf(".OUTF %s\n", sbuf);
+
                 fflush(stdout);
                 }
                 break;
@@ -189,6 +217,7 @@ int main(int argc, char** argv) {
                 // memcpy(&checksum, buf, sizeof(uint32_t));
 
                 printf(".CHECKSUM %x\n", checksum);
+                _inf_checksum = checksum;
 
                 fflush(stdout);
                 break;
@@ -232,6 +261,20 @@ int main(int argc, char** argv) {
             case 'r':
                 // r(ealtime) -- streams data to com port in real time
                 {
+                    printf(".BEGIN\n");
+                    fflush(stdout);
+                    if (!inptr) {
+                        std::cerr << "No file specified" << std::endl;
+                        break;
+                    }
+
+                    if (outptr) {
+                        fputs(".KAMAJI_STREAM\n", outptr);
+                        fprintf(outptr, ".CHECKSUM %X\n", _inf_checksum);
+                        fputs(".BEGIN_RUN:\n", outptr);
+                        fflush(outptr);
+                    }
+
                     uint32_t cur_entry_time = 0;
                     uint32_t first_entry_time = 0;
                     long long millis = 0;
