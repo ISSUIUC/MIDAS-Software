@@ -7,7 +7,7 @@ on:
   workflow_dispatch: 
 
 jobs:
-  build_streamter:
+  build_streamer:
     name: Build MIDAS:native_hilsim_streamer
     runs-on: ubuntu-latest
     defaults:
