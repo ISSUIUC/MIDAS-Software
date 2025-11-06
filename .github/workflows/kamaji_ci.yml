@@ -7,6 +7,47 @@ on:
   workflow_dispatch: 
 
 jobs:
+  build_streamter:
+    name: Build MIDAS:native_hilsim_streamer
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: MIDAS
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: |
+            ${{ runner.os }}-pio-
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      - name: Install PlatformIO
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio
+      - name: PlatformIO version
+        run: pio --version
+      - name: Build native_hilsim_streamer
+        run: pio run -e native_hilsim_streamer
+      - name: Upload Artifact for native_hilsim_streamer
+        uses: actions/upload-artifact@v4
+        with:
+          name: executable-native_hilsim_streamer
+          path: MIDAS/.pio/build/native_hilsim_streamer/program*.*
+
+
   build_sustainer:
     name: Build MIDAS:mcu_hilsim_sustainer
     runs-on: ubuntu-latest
@@ -89,7 +130,7 @@ jobs:
 
   notify:
     name: Slack Notification (main)
-    needs: [build_sustainer, build_booster]
+    needs: [build_streamer, build_sustainer, build_booster]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
