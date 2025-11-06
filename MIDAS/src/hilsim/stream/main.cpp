@@ -142,15 +142,17 @@ int main(int argc, char** argv) {
     auto current_time = std::chrono::high_resolution_clock::now(); 
 
     while (true) {
-        char cmd;
-        scanf("%c", &cmd);
 
-        switch(cmd) {
+        char _inbuf[128];
+        fgets(_inbuf, 128, stdin);
+        // std::cout << (uint8_t)cmd << std::endl;
+
+        switch(_inbuf[0]) {
             case 'S':
                 // (S)erial <COM>: Set serial port
                 {
                 char sbuf[128];
-                scanf(" %s", &sbuf);
+                sscanf(_inbuf + 1, " %s", &sbuf);
 
                 char serial_open_err = Serial.openDevice(sbuf, 115200);
                 if (serial_open_err != 1) return wrap_err(serial_open_err);
@@ -161,7 +163,7 @@ int main(int argc, char** argv) {
             case 'd':
                 // debug: discriminant <num>
                 int discrim_int;
-                scanf(" %i", &discrim_int);
+                sscanf(_inbuf + 1, " %i", &discrim_int);
 
                 printf("DISCRIM  (%i) %uB\n", discrim_int, get_size(static_cast<uint8_t>(discrim_int)));
                 fflush(stdout);
@@ -169,7 +171,7 @@ int main(int argc, char** argv) {
             case 'l':
                 // LOAD(file) <filename>
                 char inbuf[255];
-                scanf(" %s", &inbuf);
+                sscanf(_inbuf + 1, " %s", &inbuf);
 
                 printf("LOAD  %s\n", inbuf);
                 inptr = fopen(inbuf, "r");
@@ -204,20 +206,19 @@ int main(int argc, char** argv) {
             case 'N':
                 // debug: NEXT <n> gets n lines
                 int n;
-                scanf(" %i", &n);
+                sscanf(_inbuf + 1, " %i", &n);
                 
                 if (inptr) {
                     for(int a = 0; a < n; a++) {
                         if(read_entry(entry)) {
                             printf("DEBUG ENTRY [%u]: (%u) <size: %uB> (CRC 0x%x)\n", entry.ts, entry.disc, entry._data_size, entry.crc);
                             fflush(stdin);
-                        } else {
-                            std::cerr << "oops" << std::endl;
                         }
                     } 
                 } else {
                     std::cerr << "No file specified" << std::endl;
                 }
+                fflush(stdin);
                 break;
             case 's':
                 // s(tream) -- stream all data to com port as fast as possible
@@ -286,19 +287,11 @@ int main(int argc, char** argv) {
                     // }
                 }
                 break;
-            case '\r':
-                // discard
-                break;
-            case '\n':
-                // discard
-                break;
             default:
-                std::cerr << "Invalid command " << cmd << std::endl;
+                std::cerr << "Invalid command " << _inbuf[0] << std::endl;
         }
 
         
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\r');
-        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
     // Serial.closeDevice();
