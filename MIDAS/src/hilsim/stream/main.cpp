@@ -3,14 +3,26 @@
 #include <chrono>
 #include <fstream>
 #include <cstdint>
+#include <cstring>
+
+#include <thread>
+#include <queue>
+#include <mutex>
+#include <condition_variable>
+#include <string>
+
 #include "sensor_data.h"
 #include "log_format.h"
 #include "crc.h"
 
+#define STR2(x) #x
+#define STR(x)  STR2(x)
+#pragma message "__cplusplus=" STR(__cplusplus)
+
 size_t struct_sizes[16];
 
 #define ASSOCIATE(ty, id) struct_sizes[id] = sizeof(ty)
-#define DEBUG
+// #define DEBUG
 
 FILE* inptr;
 FILE* outptr;
@@ -101,15 +113,58 @@ bool read_entry(entry_t& entry) {
     return true;
 }
 
+class InputReader {
+
+    private:
+
+    std::queue<std::string> _q;
+    std::istream& _in;
+    std::thread _th;
+    std::mutex _mut;
+    std::condition_variable _cv;
+    bool _stop = false;
+
+    void run() {
+        std::string line;
+
+        while (std::getline(_in, line)) {
+            { std::lock_guard<std::mutex> lk(_mut); _q.push(line); }
+            _cv.notify_one();
+        }
+        // EOF or error: mark stop so mainside can finish if desired
+        { std::lock_guard<std::mutex> lk(_mut); _stop = true; }
+        _cv.notify_all();
+    }
+
+    public:
+    explicit InputReader(std::istream& in) : _in(in), _th([this]{ run(); }) {}
+    ~InputReader() {
+        {
+            std::lock_guard<std::mutex> lk(_mut); _stop = true;
+        }
+        _cv.notify_all();
+        _th.join();
+    }
+
+    bool get(std::string& out) {
+        std::lock_guard<std::mutex> lk(_mut);
+        if (_q.empty()) { return false; }
+        out = std::move(_q.front());
+        _q.pop();
+        return true;
+    }
+};
+
 
 
 void send_data(serialib& s, entry_t& dat) {
     // $ 4 bytes ts, 1 byte disc, n bytes payload, 2 bytes crc
+    size_t size_of_send_buf = 0;
     uint8_t buf[150];
-    buf[0] = (uint8_t)'$';
+    buf[0] = (uint8_t)'$'; size_of_send_buf += 1;
     
-    memcpy(buf + 1, &dat.raw_data_stream, dat.raw_data_stream_size);
-    memcpy(buf + 1 + dat.raw_data_stream_size, &dat.crc, sizeof(uint16_t));
+    memcpy(buf + 1, &dat.raw_data_stream, dat.raw_data_stream_size); size_of_send_buf += dat.raw_data_stream_size;
+    memcpy(buf + 1 + dat.raw_data_stream_size, &dat.crc, sizeof(uint16_t)); size_of_send_buf += sizeof(uint16_t);
 
     if(outptr) {
         fputs(".D $", outptr);
@@ -127,7 +182,7 @@ void send_data(serialib& s, entry_t& dat) {
     // }
     // printf("\n");
     #else
-    s.writeBytes(buf, dat._data_size + num_overhead_bytes);
+    s.writeBytes(buf, size_of_send_buf);
     #endif
 }
 
@@ -141,6 +196,7 @@ int main(int argc, char** argv) {
     setup_ssizes();
 
     serialib Serial;
+    bool _ser_open = false;
 
     printf("Awaiting commands from stdin...\n");
 
@@ -153,11 +209,25 @@ int main(int argc, char** argv) {
     auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now(); 
 
+    InputReader _ireader(std::cin);
+    std::string line;
+
     while (true) {
 
+        // handle serial output
+        if(_ser_open) {
+            // do something
+
+            // TBD
+        }
+        
+        // Handle inputs from stdin
+        if(!_ireader.get(line)) {
+            continue;
+        } 
+
         char _inbuf[255];
-        fgets(_inbuf, 255, stdin);
-        // std::cout << (uint8_t)cmd << std::endl;
+        memcpy(_inbuf, line.c_str(), line.length() + 2);
 
         switch(_inbuf[0]) {
             case 'S':
@@ -169,8 +239,10 @@ int main(int argc, char** argv) {
                     char serial_open_err = Serial.openDevice(sbuf, 115200);
                     if (serial_open_err != 1) {
                         printf(".SERIAL_BAD\n");
+                        _ser_open = false;
                     } else {
                         printf(".SERIAL_OK\n");
+                        _ser_open = true;
                     }
                     fflush(stdout);
                 }
@@ -267,6 +339,13 @@ int main(int argc, char** argv) {
                     fflush(stdout);
                     if (!inptr) {
                         std::cerr << "No file specified" << std::endl;
+                        printf(".ERR no_ifs\n");
+                        break;
+                    }
+
+                    if (!_ser_open) {
+                        std::cerr << "No serial open" << std::endl;
+                        printf(".ERR no_ser\n");
                         break;
                     }
 
