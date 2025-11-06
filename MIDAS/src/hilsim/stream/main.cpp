@@ -305,14 +305,14 @@ int main(int argc, char** argv) {
                 }
                 break;
             case 'N':
-                // debug: NEXT <n> gets n lines
+                // NEXT <n> skips n lines
                 int n;
                 sscanf(_inbuf + 1, " %i", &n);
                 
                 if (inptr) {
                     for(int a = 0; a < n; a++) {
                         if(read_entry(entry)) {
-                            printf("DEBUG ENTRY [%u]: (%u) <size: %uB> (CRC 0x%x)\n", entry.ts, entry.disc, entry._data_size, entry.crc);
+                            // printf("DEBUG ENTRY [%u]: (%u) <size: %uB> (CRC 0x%x)\n", entry.ts, entry.disc, entry._data_size, entry.crc);
                         }
                     } 
                 } else {
