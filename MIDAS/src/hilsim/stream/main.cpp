@@ -196,7 +196,6 @@ int main(int argc, char** argv) {
     setup_ssizes();
 
     serialib Serial;
-    bool _ser_open = false;
 
     printf("Awaiting commands from stdin...\n");
 
@@ -215,7 +214,7 @@ int main(int argc, char** argv) {
     while (true) {
 
         // handle serial output
-        if(_ser_open) {
+        if(Serial.isDeviceOpen()) {
             // do something
 
             // TBD
@@ -235,14 +234,11 @@ int main(int argc, char** argv) {
                 {
                     char sbuf[128];
                     sscanf(_inbuf + 1, " %s", &sbuf);
-
                     char serial_open_err = Serial.openDevice(sbuf, 115200);
                     if (serial_open_err != 1) {
                         printf(".SERIAL_BAD\n");
-                        _ser_open = false;
                     } else {
                         printf(".SERIAL_OK\n");
-                        _ser_open = true;
                     }
                     fflush(stdout);
                 }
@@ -343,7 +339,7 @@ int main(int argc, char** argv) {
                         break;
                     }
 
-                    if (!_ser_open) {
+                    if (!Serial.isDeviceOpen()) {
                         std::cerr << "No serial open" << std::endl;
                         printf(".ERR no_ser\n");
                         break;
