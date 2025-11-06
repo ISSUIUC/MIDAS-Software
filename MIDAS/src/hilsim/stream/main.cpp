@@ -175,7 +175,7 @@ int main(int argc, char** argv) {
                 sscanf(_inbuf + 1, " %s", &inbuf);
 
                 printf("LOAD  %s\n", inbuf);
-                inptr = fopen(inbuf, "r");
+                inptr = fopen(inbuf, "rb");
                 
                 if (inptr == NULL) {
                     std::cerr << "Error opening file " << inbuf << std::endl;
@@ -213,13 +213,12 @@ int main(int argc, char** argv) {
                     for(int a = 0; a < n; a++) {
                         if(read_entry(entry)) {
                             printf("DEBUG ENTRY [%u]: (%u) <size: %uB> (CRC 0x%x)\n", entry.ts, entry.disc, entry._data_size, entry.crc);
-                            fflush(stdin);
                         }
                     } 
                 } else {
                     std::cerr << "No file specified" << std::endl;
                 }
-                fflush(stdin);
+                fflush(stdout);
                 break;
             case 's':
                 // s(tream) -- stream all data to com port as fast as possible
