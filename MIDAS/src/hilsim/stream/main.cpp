@@ -27,7 +27,7 @@ typedef struct {
 } entry_t;
 
 void print_usage() {
-    std::cerr << "Usage: kserial <serial_port>" << std::endl;
+    std::cerr << "Usage: kserial    (NO ARGS)" << std::endl;
 }
 
 int wrap_err(int code) {
@@ -122,7 +122,7 @@ void send_data(serialib& s, entry_t& dat) {
 
 int main(int argc, char** argv) {
     
-    if(argc != 2) {
+    if(argc != 1) {
         print_usage();
         return 1;
     }
@@ -131,13 +131,6 @@ int main(int argc, char** argv) {
 
     serialib Serial;
 
-    char* serial_port = argv[1];
-    printf("Attempting connection to %s\n", serial_port);
-    // char serial_open_err = Serial.openDevice(serial_port, 115200);
-
-    // if (serial_open_err != 1) return wrap_err(serial_open_err);
-
-    printf("Successful connection to %s\n", serial_port);
     printf("Awaiting commands from stdin...\n");
 
     fflush(stdout);
@@ -153,6 +146,20 @@ int main(int argc, char** argv) {
         scanf("%c", &cmd);
 
         switch(cmd) {
+            case 'S':
+                // (S)erial <COM>: Set serial port
+                {
+                char sbuf[128];
+                scanf(" %s", &sbuf);
+                printf("SERIAL  %s", sbuf);
+
+                char serial_open_err = Serial.openDevice(sbuf, 115200);
+                if (serial_open_err != 1) return wrap_err(serial_open_err);
+                printf("Successful connection to %s\n", sbuf);
+
+                fflush(stdout);
+                }
+                break;
             case 'd':
                 // debug: discriminant <num>
                 int discrim_int;
