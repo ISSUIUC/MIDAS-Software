@@ -336,12 +336,14 @@ int main(int argc, char** argv) {
                     if (!inptr) {
                         std::cerr << "No file specified" << std::endl;
                         printf(".ERR no_ifs\n");
+                        fflush(stdout);
                         break;
                     }
 
                     if (!Serial.isDeviceOpen()) {
                         std::cerr << "No serial open" << std::endl;
                         printf(".ERR no_ser\n");
+                        fflush(stdout);
                         break;
                     }
 
