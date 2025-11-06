@@ -163,13 +163,16 @@ int main(int argc, char** argv) {
             case 'S':
                 // (S)erial <COM>: Set serial port
                 {
-                char sbuf[128];
-                sscanf(_inbuf + 1, " %s", &sbuf);
+                    char sbuf[128];
+                    sscanf(_inbuf + 1, " %s", &sbuf);
 
-                char serial_open_err = Serial.openDevice(sbuf, 115200);
-                if (serial_open_err != 1) return wrap_err(serial_open_err);
-                printf("SERIAL OK\n", sbuf);
-                fflush(stdout);
+                    char serial_open_err = Serial.openDevice(sbuf, 115200);
+                    if (serial_open_err != 1) {
+                        printf(".SERIAL_BAD\n");
+                    } else {
+                        printf(".SERIAL_OK\n");
+                    }
+                    fflush(stdout);
                 }
                 break;
             case 'o':
