@@ -23,6 +23,7 @@ void k_init_sensordata() {
     ASSOCIATE(arg->fsm_state, ID_FSM);
     ASSOCIATE(arg->kalman, ID_KALMAN);
     ASSOCIATE(arg->pyro, ID_PYRO);
+    ASSOCIATE(arg->camera_state, ID_CAMERADATA);
 }
 
 // ---- Kamaji Thread ----
