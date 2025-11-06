@@ -284,6 +284,9 @@ int main(int argc, char** argv) {
                     // }
                 }
                 break;
+            case '\r':
+                // discard
+                break;
             case '\n':
                 // discard
                 break;
@@ -291,6 +294,8 @@ int main(int argc, char** argv) {
                 std::cerr << "Invalid command " << cmd << std::endl;
         }
 
+        
+        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\r');
         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     }
 
