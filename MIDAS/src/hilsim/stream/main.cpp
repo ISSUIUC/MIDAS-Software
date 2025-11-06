@@ -48,6 +48,7 @@ void setup_ssizes() {
     ASSOCIATE(FSMState, ID_FSM);
     ASSOCIATE(KalmanData, ID_KALMAN);
     ASSOCIATE(PyroState, ID_PYRO);
+    ASSOCIATE(CameraData, ID_CAMERADATA);
 }
 
 size_t get_size(uint8_t discriminant) {
