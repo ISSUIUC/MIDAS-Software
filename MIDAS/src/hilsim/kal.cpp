@@ -126,7 +126,7 @@ void k_run() {
     k_push_event(k_get_checksum_evt());
 
     // Wait until start signal (newline written to serial)
-    // k_wait_until('\n');
+    k_wait_until('\n');
     k_ident();
     k_clear_inbuf();
 
