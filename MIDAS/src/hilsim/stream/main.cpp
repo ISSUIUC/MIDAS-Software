@@ -211,7 +211,9 @@ int main(int argc, char** argv) {
                         if(read_entry(entry)) {
                             printf("DEBUG ENTRY [%u]: (%u) <size: %uB> (CRC 0x%x)\n", entry.ts, entry.disc, entry._data_size, entry.crc);
                             fflush(stdin);
-                        } 
+                        } else {
+                            std::cerr << "oops" << std::endl;
+                        }
                     } 
                 } else {
                     std::cerr << "No file specified" << std::endl;
