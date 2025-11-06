@@ -45,7 +45,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: executable-native_hilsim_streamer
-          path: MIDAS/.pio/build/native_hilsim_streamer/program*.*
+          path: MIDAS/.pio/build/native_hilsim_streamer/program
 
 
   build_sustainer:
