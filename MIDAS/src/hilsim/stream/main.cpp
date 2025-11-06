@@ -151,12 +151,10 @@ int main(int argc, char** argv) {
                 {
                 char sbuf[128];
                 scanf(" %s", &sbuf);
-                printf("SERIAL  %s", sbuf);
 
                 char serial_open_err = Serial.openDevice(sbuf, 115200);
                 if (serial_open_err != 1) return wrap_err(serial_open_err);
-                printf("Successful connection to %s\n", sbuf);
-
+                printf("SERIAL OK\n", sbuf);
                 fflush(stdout);
                 }
                 break;
@@ -187,7 +185,7 @@ int main(int argc, char** argv) {
                 fread(&checksum, sizeof(uint32_t), 1, inptr);
                 // memcpy(&checksum, buf, sizeof(uint32_t));
 
-                printf("Read checksum: 0x%x\n", checksum);
+                printf(".CHECKSUM %x\n", checksum);
 
                 fflush(stdout);
                 break;
@@ -261,7 +259,7 @@ int main(int argc, char** argv) {
                         }
 
                     }
-                    printf("Done streaming!\n");
+                    printf(".DONE\n");
 
                     // while (true) {
                     //     while(cur_entry_time == 0 || millis > (cur_entry_time - first_entry_time)) {
