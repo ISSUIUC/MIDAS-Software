@@ -158,7 +158,29 @@ class InputReader {
     }
 };
 
+enum sys_instr_t {
+    RESERVED = 0,
+    REPORT_EN = 1,
+    VERIFY_CHECKSUM = 2,
+    FSM_SET = 3,
+};
 
+// System message: instruct the Kamaji driver to do something
+// # <INSTR> <data[13]>
+void send_sys_msg(serialib& s, sys_instr_t instr_t, uint8_t* dat, size_t dat_size) {
+    
+    uint8_t send_buf[17];
+    uint8_t instr_as_byte = (uint8_t) instr_t;
+    send_buf[0] = '#';
+    memcpy(send_buf + 1, &instr_as_byte, 1);
+    if (dat_size > 0) { memcpy(send_buf + 2, dat, dat_size); }
+    s.writeBytes(send_buf, sizeof(send_buf));
+
+}
+
+void set_fsm(serialib& s, uint8_t fsm_state) {
+    send_sys_msg(s, sys_instr_t::FSM_SET, &fsm_state, 1);
+}
 
 void send_data(serialib& s, entry_t& dat) {
     // $ 4 bytes ts, 1 byte disc, n bytes payload, 2 bytes crc
@@ -222,6 +244,14 @@ int main(int argc, char** argv) {
         if(Serial.isDeviceOpen()) {
             // do something
 
+            int av = Serial.available();
+            if (av) {
+                uint8_t buf[256];
+                Serial.readBytes(buf, 255);
+                buf[255] = '\0';
+                printf("from thingy: %s", (char*)buf);
+            }
+
             // TBD
         }
         
@@ -252,8 +282,27 @@ int main(int argc, char** argv) {
         // T <filter_thresh:float> - Entries will be probabilistically skipped if there is high latency. This sets the threshold (in seconds) at which 100% will be skipped.
         //    If unset / 0, then no entries are skipped
 
+        // F <state_id:int> - Set FSM state directly.
+
 
         switch(_inbuf[0]) {
+            case 'F':
+                    {
+                    uint8_t fsm_int;
+                    sscanf(_inbuf + 1, " %i", &fsm_int);
+
+                    if (!Serial.isDeviceOpen()) {
+                        std::cerr << "No serial open" << std::endl;
+                        fflush(stdout);
+                        break;
+                    }
+
+                    set_fsm(Serial, fsm_int);                    
+                    printf(".FSM %i\n", fsm_int);
+                    fflush(stdout);
+                }
+
+                break;
             case 'i':
                     {
                     int discrim_int;

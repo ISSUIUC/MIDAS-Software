@@ -27,7 +27,7 @@ void k_init_sensordata() {
 }
 
 // ---- Kamaji Thread ----
-DECLARE_THREAD(hilsim, void*arg) {
+DECLARE_THREAD(hilsim, RocketSystems* arg) {
     uint8_t header[5];
     uint8_t crc_buf[2];
     uint32_t timestamp;
@@ -35,6 +35,8 @@ DECLARE_THREAD(hilsim, void*arg) {
     size_t data_size;
     uint8_t data_buf[128];
     uint16_t crc;
+
+    sys_flags_t sflags;
     
     while (true) {
         int delim;
@@ -43,6 +45,11 @@ DECLARE_THREAD(hilsim, void*arg) {
             delim = Serial.read();
             THREAD_SLEEP(1);
 
+            if (sflags.fsm_target != FSMState::FSM_STATE_COUNT) {
+                arg->rocket_data.fsm_state.update(sflags.fsm_target);
+                sflags.fsm_target = FSMState::FSM_STATE_COUNT;
+            }
+
         } while(delim != '$' && delim != '#');
 
         if(delim == '#') {
@@ -50,7 +57,7 @@ DECLARE_THREAD(hilsim, void*arg) {
 
           // Sys message is 14 byte data, 2 byte crc  
           memcpy(&crc, data_buf + 14, sizeof(crc_buf));
-          k_handle_sys_msg(data_buf, crc);
+          k_handle_sys_msg(data_buf, crc, &sflags);
           continue;
         }
             
@@ -107,7 +114,7 @@ DECLARE_THREAD(hilsim, void*arg) {
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
-    START_THREAD(hilsim, DATA_CORE, nullptr, 1);
+    START_THREAD(hilsim, DATA_CORE, config, 1);
 
     config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
 
