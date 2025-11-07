@@ -285,7 +285,7 @@ int main(int argc, char** argv) {
                 {
                     char sbuf[128];
                     sscanf(_inbuf + 1, " %s", &sbuf);
-                    char serial_open_err = Serial.openDevice(sbuf, 115200);
+                    char serial_open_err = Serial.openDevice(sbuf, 921600);
                     if (serial_open_err != 1) {
                         printf(".SERIAL_BAD\n");
                     } else {
