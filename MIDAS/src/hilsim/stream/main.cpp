@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstdint>
 #include <cstring>
+#include <cstdlib>
 
 #include <thread>
 #include <queue>
@@ -19,7 +20,9 @@
 #define STR(x)  STR2(x)
 #pragma message "__cplusplus=" STR(__cplusplus)
 
-size_t struct_sizes[16];
+size_t struct_sizes[READING_DISC_COUNT];
+bool ignore_disc[READING_DISC_COUNT];
+
 
 #define ASSOCIATE(ty, id) struct_sizes[id] = sizeof(ty)
 // #define DEBUG
@@ -205,6 +208,8 @@ int main(int argc, char** argv) {
     size_t num_read = 0;
     uint32_t _inf_checksum;
 
+    float skip_threshold = 0;
+
     auto start_time = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now(); 
 
@@ -228,7 +233,53 @@ int main(int argc, char** argv) {
         char _inbuf[255];
         memcpy(_inbuf, line.c_str(), line.length() + 2);
 
+        for(int i = 0; i < READING_DISC_COUNT; i++) {
+            ignore_disc[i] = false;
+        }
+
+        // Command list
+        // S <COMport:str> - Set serial output
+        // o <Filepath:str> - Set output log file
+        // d <disc_id:int> - [DEBUG] get size of discrim
+        // l <Filepath:str> - load file for streaming
+        // n - [DEBUG] gets next line and prints
+        // N <num_lines:int> - Skips num_lines from the input
+        // s - Stream data as fast as possible
+        // r - Stream data in realtime
+
+        // i <disc_id:int> - Ignore this disc_id when streaming
+        // R <disc-id:int> <intv:float> - Enable this sensor report.
+        // T <filter_thresh:float> - Entries will be probabilistically skipped if there is high latency. This sets the threshold (in seconds) at which 100% will be skipped.
+        //    If unset / 0, then no entries are skipped
+
+
         switch(_inbuf[0]) {
+            case 'i':
+                    {
+                    int discrim_int;
+                    sscanf(_inbuf + 1, " %i", &discrim_int);
+
+                    if(discrim_int >= 1 && discrim_int < READING_DISC_COUNT) {
+                        ignore_disc[discrim_int] = true;
+                        printf(".IGNORE %i\n", discrim_int);
+                    }
+
+                    fflush(stdout);
+                }
+
+                break;
+            case 'T':
+                {
+                    float n;
+                    sscanf(_inbuf + 1, " %f", &n);
+                    if (n >= 0 && n < 100) {
+                        skip_threshold = n;
+                    }
+                    printf(".SKIP_T %f\n", skip_threshold);
+                    fflush(stdout);
+                }
+                break;
+
             case 'S':
                 // (S)erial <COM>: Set serial port
                 {
@@ -370,6 +421,7 @@ int main(int argc, char** argv) {
 
                     while (true) {
                         current_time = std::chrono::high_resolution_clock::now(); 
+
                         auto duration = current_time - start_time;
                         millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
                         
@@ -377,9 +429,19 @@ int main(int argc, char** argv) {
                             if(read_entry(entry)) {
                                 num_read++;
                                 cur_entry_time = entry.ts;
-                                // printf("[%u] {time: %u / %u}: (d%u) <size: %uB> (CRC 0x%x)\n", num_read, entry.ts, millis, entry.disc, entry._data_size, entry.crc);
-                                // fflush(stdout);
-                                send_data(Serial, entry);
+
+                                auto latency = millis - (cur_entry_time - first_entry_time);
+
+                                // check filter
+                                if(!ignore_disc[entry.disc]) {
+                                    float randm = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
+                                    int threshold_ms = (int)(skip_threshold * 1000);
+
+                                    if(latency < randm*threshold_ms) {
+                                        send_data(Serial, entry);
+                                    }
+                                }
+
                             } else {
                                 break;
                             }
