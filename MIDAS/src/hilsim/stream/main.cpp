@@ -422,7 +422,6 @@ int main(int argc, char** argv) {
 
                     while (true) {
                         current_time = std::chrono::high_resolution_clock::now(); 
-
                         auto duration = current_time - start_time;
                         millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
                         
@@ -430,6 +429,10 @@ int main(int argc, char** argv) {
                             if(read_entry(entry)) {
                                 num_read++;
                                 cur_entry_time = entry.ts;
+
+                                current_time = std::chrono::high_resolution_clock::now(); 
+                                duration = current_time - start_time;
+                                millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
 
                                 auto latency = millis - (cur_entry_time - first_entry_time);
                                 printf(".r %i\n", latency);
