@@ -210,7 +210,7 @@ int main(int argc, char** argv) {
 
     float skip_threshold = 0;
 
-    auto start_time = std::chrono::high_resolution_clock::now();
+    auto start_ts = std::chrono::high_resolution_clock::now();
     auto current_time = std::chrono::high_resolution_clock::now(); 
 
     InputReader _ireader(std::cin);
@@ -408,41 +408,39 @@ int main(int argc, char** argv) {
                         fflush(outptr);
                     }
 
-                    uint32_t cur_entry_time = 0;
-                    uint32_t first_entry_time = 0;
-                    long long millis = 0;
+                    int rows_read = 0;
+
+                    uint32_t next_ts = 0;
+                    uint32_t start_ts = 0;
 
                     // Read first entry and set it up
                     if(read_entry(entry)) {
-                        cur_entry_time = entry.ts;
-                        first_entry_time = entry.ts;
+                        start_ts = entry.ts;
+                        next_ts = entry.ts;
                     }
 
-                    start_time = std::chrono::high_resolution_clock::now();
+
+                    long long millis = 0;
+                    auto start_epoch = std::chrono::high_resolution_clock::now();
 
                     while (true) {
-                        current_time = std::chrono::high_resolution_clock::now(); 
-                        auto duration = current_time - start_time;
-                        millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
-                        
-                        while(millis > (cur_entry_time - first_entry_time)) {
+
+                        auto time_since_stream_start_ = std::chrono::high_resolution_clock::now() - start_epoch;
+                        long long time_since_stream_start = std::chrono::duration_cast<std::chrono::milliseconds>(time_since_stream_start_).count();
+                        auto time_elapsed_in_log = next_ts - start_ts;
+
+                        while (time_since_stream_start > time_elapsed_in_log) {
                             if(read_entry(entry)) {
-                                num_read++;
-                                cur_entry_time = entry.ts;
+                                rows_read++;
 
-                                current_time = std::chrono::high_resolution_clock::now(); 
-                                duration = current_time - start_time;
-                                millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+                                next_ts = entry.ts;
+                                time_elapsed_in_log = next_ts - start_ts;
 
-                                auto latency = millis - (cur_entry_time - first_entry_time);
-                                printf(".r %i\n", latency);
-                                fflush(stdout);
+                                auto time_since_stream_start_ = std::chrono::high_resolution_clock::now() - start_epoch;
+                                long long time_since_stream_start = std::chrono::duration_cast<std::chrono::milliseconds>(time_since_stream_start_).count();
 
-                                if (latency > (int)(skip_threshold*1000)) {
-                                    continue;
-                                }
+                                auto latency = time_since_stream_start - time_elapsed_in_log;
 
-                                // check filter
                                 if(!ignore_disc[entry.disc]) {
                                     float randm = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
                                     int threshold_ms = (int)(skip_threshold * 1000);
@@ -452,10 +450,49 @@ int main(int argc, char** argv) {
                                     }
                                 }
 
+                                if (rows_read % 200 == 0) {
+                                    printf("%i %i\n", time_since_stream_start, time_elapsed_in_log);
+                                    fflush(stdout);
+                                } 
+
+
                             } else {
-                                break;
+                                exit(2);
                             }
+
                         }
+
+                        // current_time = std::chrono::high_resolution_clock::now(); 
+                        // auto duration = current_time - start_ts;
+                        // millis = 
+                        
+                        // while(millis > (cur_entry_time - first_entry_time)) {
+                        //     if(read_entry(entry)) {
+                        //         num_read++;
+                        //         cur_entry_time = entry.ts;
+
+                        //         current_time = std::chrono::high_resolution_clock::now(); 
+                        //         duration = current_time - start_ts;
+                        //         millis = std::chrono::duration_cast<std::chrono::milliseconds>(duration).count();
+
+                        //         auto latency = millis - (cur_entry_time - first_entry_time);
+                        //         printf(".r %i\n", latency);
+                        //         fflush(stdout);
+
+                        //         // check filter
+                        //         if(!ignore_disc[entry.disc]) {
+                        //             float randm = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
+                        //             int threshold_ms = (int)(skip_threshold * 1000);
+
+                        //             if(latency < randm*threshold_ms) {
+                        //                 send_data(Serial, entry);
+                        //             }
+                        //         }
+
+                        //     } else {
+                        //         break;
+                        //     }
+                        // }
 
                     }
                     printf(".DONE\n");
