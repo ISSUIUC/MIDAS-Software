@@ -432,7 +432,7 @@ int main(int argc, char** argv) {
                                 cur_entry_time = entry.ts;
 
                                 auto latency = millis - (cur_entry_time - first_entry_time);
-                                printf(".r %i", latency);
+                                printf(".r %i\n", latency);
                                 fflush(stdout);
 
                                 // check filter
