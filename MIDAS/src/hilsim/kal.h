@@ -49,14 +49,23 @@ enum sys_instr_t {
     RESERVED = 0,
     REPORT_EN = 1,
     VERIFY_CHECKSUM = 2,
+    FSM_SET = 3,
 };
+
+struct sys_flags_t {
+    FSMState fsm_target = FSMState::FSM_STATE_COUNT;
+};
+
+
 
 // System message: instruct the Kamaji driver to do something
 // # <INSTR> <data[13]>
 // INSTR
 // - 0x00 --> reserved
 // - 0x01 --> REPORT_EN
-inline void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
+// - 0x02 --> VERIFY_CHECKSUM
+// - 0x03 --> FSM_SET
+inline void k_handle_sys_msg(uint8_t* data, uint16_t crc, sys_flags_t* sflags) {
     sys_instr_t instr = (sys_instr_t) data[0];
 
     switch(instr) {
@@ -75,6 +84,12 @@ inline void k_handle_sys_msg(uint8_t* data, uint16_t crc) {
                 if(checksum != LOG_CHECKSUM) {
                     k_INVALIDCHECKSUM();
                 }
+            }
+            break;
+        case (sys_instr_t::FSM_SET): 
+            {
+            FSMState new_fsm = (FSMState) data[1];
+            sflags->fsm_target = new_fsm;
             }
             break;
         default:
@@ -99,7 +114,7 @@ inline void k_clear_inbuf() {
 }
 
 // ---- Kamaji Thread ----
-void hilsim_thread(void* arg);
+void hilsim_thread(RocketSystems* arg);
 
 // Run the Kamaji process
 [[noreturn]] void k_start();
