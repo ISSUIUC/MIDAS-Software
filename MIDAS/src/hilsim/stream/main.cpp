@@ -438,6 +438,10 @@ int main(int argc, char** argv) {
                                 printf(".r %i\n", latency);
                                 fflush(stdout);
 
+                                if (latency > (int)(skip_threshold*1000)) {
+                                    continue;
+                                }
+
                                 // check filter
                                 if(!ignore_disc[entry.disc]) {
                                     float randm = static_cast<float>(rand())/static_cast<float>(RAND_MAX);

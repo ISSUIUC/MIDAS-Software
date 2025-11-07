@@ -119,7 +119,7 @@ DECLARE_THREAD(hilsim, void*arg) {
 
 // ---- ENTRY FUNCS ----
 void k_run() {
-    Serial.begin(115200);
+    Serial.begin(921600);
     // while(!Serial);
 
     k_push_event(K_START_E);
