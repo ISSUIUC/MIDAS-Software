@@ -399,6 +399,7 @@ int main(int argc, char** argv) {
                     }
 
                     printf(".BEGIN\n");
+                    fflush(stdout);
 
                     if (outptr) {
                         fputs(".KAMAJI_STREAM\n", outptr);
@@ -431,6 +432,8 @@ int main(int argc, char** argv) {
                                 cur_entry_time = entry.ts;
 
                                 auto latency = millis - (cur_entry_time - first_entry_time);
+                                printf(".r %i", latency);
+                                fflush(stdout);
 
                                 // check filter
                                 if(!ignore_disc[entry.disc]) {
