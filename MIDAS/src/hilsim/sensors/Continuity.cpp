@@ -1,10 +1,10 @@
 #include "sensors.h"
-#include "../global_packet.h"
+#include "../kamaji/kal_rocket.h"
 
 ErrorCode ContinuitySensor::init() {
     return ErrorCode::NoError;
 }
 
 Continuity ContinuitySensor::read() {
-    return Continuity{};
+    return GLOBAL_DATA.continuity;
 }
