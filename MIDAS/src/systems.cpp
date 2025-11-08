@@ -157,7 +157,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
+        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, arg->rocket_data);
 
         arg->rocket_data.fsm_state.update(next_state);
 
