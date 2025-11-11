@@ -240,5 +240,5 @@
 // (Core Setting)
 #define booster_main_jerk_threshold 300
 
-// Minimum time to wait before deciding to go from BURNOUT to FIRST_BOOST. (ms)
+// Minimum duration of sustained acceleration before fallback to boost (ms)
 #define sustainer_burnout_to_first_boost_time_threshold 250
