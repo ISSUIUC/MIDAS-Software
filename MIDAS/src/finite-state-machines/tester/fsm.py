@@ -92,7 +92,7 @@ class SustainerFSM:
                     reason_transition = f"Transitioned FIRST_BOOST TO BURNOUT due to low acceleration. Acceleration is currently {acceleration}m/s^2"
             case FSMState.STATE_BURNOUT:
                 #If we have acceptable acceleration, we reset the error
-                # timer for the acceleration                
+                # timer for the acceleration so that it doesn't carry over.         
                 if(acceleration < thresholds.SUSTAINER_COAST_DETECTION_ACCELERATION_THRESHOLD):
                     self.burnout_time_elapsed_with_sudden_acceleration_change = 0.0
                 #If we have a acceleration above the threshold
