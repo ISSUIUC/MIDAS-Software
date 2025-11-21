@@ -25,8 +25,8 @@ enum LSM6DSV320X_Regs {
 
     // FIFO Control Registers
     // ---------------------------------------------
-    LSM6DSV320X_FIFO_CTRL1,
-    LSM6DSV320X_FIFO_CTRL2,
+    LSM6DSV320X_FIFO_CTRL1 = 0x07,
+    LSM6DSV320X_FIFO_CTRL2 = 0x08,
     LSM6DSV320X_FIFO_CTRL3,
     LSM6DSV320X_FIFO_CTRL3,
     LSM6DSV320X_FIFO_CTRL4,
