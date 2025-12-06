@@ -184,6 +184,8 @@ struct CommandFlags {
  */
 struct RocketData {
 public:
+    SensorData<LSM> lsm;
+
     SensorData<KalmanData> kalman;
     SensorData<LowGData> low_g;
     BufferedSensorData<HighGData, 8> high_g;

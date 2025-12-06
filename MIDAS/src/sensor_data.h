@@ -108,6 +108,10 @@ struct LowGLSM {
     float az = 0;
 };
 
+struct LSM {
+
+};
+
 /**
  * @struct Barometer
  * 
@@ -238,6 +242,10 @@ struct Orientation {
 
     Quaternion orientation_quaternion;
 
+};
+
+struct LSM{ 
+    //????
 };
 
 /**
