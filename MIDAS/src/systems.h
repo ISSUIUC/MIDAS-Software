@@ -27,7 +27,7 @@
  * @brief holds all interfaces for all sensors on MIDAS
 */
 struct Sensors {
-    LSMSensor lsm;
+    IMUSensor imu;
 
     LowGSensor low_g;
     LowGLSMSensor low_g_lsm;

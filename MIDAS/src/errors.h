@@ -28,6 +28,7 @@ enum ErrorCode {
     SDCouldNotOpenFile = 20,
     LoraCouldNotBeInitialized = 21,
     LoraCommunicationFailed = 22,
+    IMUCouldNotBeInitialized = 23,
 };
 
 void update_error_LED(ErrorCode error);

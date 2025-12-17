@@ -244,8 +244,10 @@ struct Orientation {
 
 };
 
-struct LSM{ 
-    //????
+struct IMU{ 
+    Acceleration highg_acceleration;
+    Acceleration lowg_acceleration;
+    Velocity angular_velocity;
 };
 
 /**

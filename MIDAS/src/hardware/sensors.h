@@ -47,6 +47,14 @@ struct LowGLSMSensor {
 };
 
 /**
+ * @struct IMU interface
+ */
+struct IMUSensor {
+    ErrorCode init();
+    IMU read();
+};
+
+/**
  * @struct Continuity interface
  */
 struct ContinuitySensor {
