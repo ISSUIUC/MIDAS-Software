@@ -52,8 +52,8 @@ MS5611::MS5611(uint8_t CSn) {
     _cspin = CSn;
     pinMode(_cspin, OUTPUT);
     digitalWrite(_cspin, HIGH);
-    _temperature = -999;
-    _pressure = -999;
+    _temperature = -999;//celcius
+    _pressure = -999;//millibar
     // init();
 }
 
@@ -69,7 +69,7 @@ void MS5611::init() {
     C[4] = 23282;
     C[5] = 33464;
     C[6] = 28312;
-    C[7] = 0xF0F0;
+    C[7] = 0xF0F0;//sensor stuff dont change
 
     // Read all factory parameters C0 to C7 from PROM
     SPI.beginTransaction(settingsA);

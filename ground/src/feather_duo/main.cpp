@@ -170,6 +170,7 @@ void setup() {
     digitalWrite(Pins::LED_GREEN, HIGH);
 
 
+    Serial.println("Feather Duo Communication Established");
 
     while (true){
         const char message [] = "Hello";
@@ -182,14 +183,19 @@ void setup() {
         //     Serial.println("Send failed");
         // }
     
-        //delay(500); // allow time between send and receive
+        delay(500); // allow time between send and receive
     
         // Try receiving the packet on Radio1 (change to Radio0 if trying to receive from same freq as Radio0)
-        char recv_message [5] = "";
-        SX1268Error recv_status = Radio1.recv((uint8_t*)&recv_message, sizeof(recv_message), 1000);
+        char recv_message [sizeof(message)] = "";
+        SX1268Error recv_status = Radio0.recv((uint8_t*)&recv_message, sizeof(recv_message), 1000);
+
+        
+        //Serial.println("Relay Ready");
     
         if (recv_status == SX1268Error::NoError) {
-            Serial.print(recv_message);
+
+            Serial.println(recv_message);
+            //Serial.println("Message Received");
 
             //If received from Radio0 send to Radio1
             // SX1268Error send_status = Radio1.send((uint8_t*)&message, sizeof(message));
@@ -198,11 +204,14 @@ void setup() {
             // } else {
             //     Serial.println("Radio1 message send failed");
             // }
+
         } else {
             Serial.println("No packet received");
+
+            //Serial.println("No packet received");
         }
     
-        delay(2000);
+        //delay(2000);
     }
 
     RadioConfig booster_cfg{
