@@ -62,7 +62,22 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     }
 }
 
-DECLARE_THREAD(accelerometers, RocketSystems* arg) {
+//--------------------MIDAS MINI-----------------//
+
+ //Needs to work with imu sensor bc there is no separate highG and lowG sensor in 
+ //midas mini schematic but there is one in the midas schematic. 
+
+ //I feel like the best approach to this would be to have IMUData instead of the separate highG lowG data
+ //fields. 
+ //Data that is gathered together can safely be stored together OR in seperate structs...
+ //Data that is gathered asynchronously from multiple sensors or at different times from the same 
+ //sensor should avoid being in the same sensor data struct.
+
+ //We can determine this by the Output Data Rate (ODR) which, good news, can be set by us. Pls check data sheet.
+
+ //--------------------MIDAS MINI-----------------//
+
+DECLARE_THREAD(accelerometers, RocketSystems* arg) { //I would also refer to IMU.cpp to see how this works out
     while (true) {
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);

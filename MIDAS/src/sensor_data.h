@@ -197,7 +197,7 @@ enum class OrientationReadingType {
 /**
  * @struct Orientation
  * 
- * @brief data from the BNO
+ * @brief data from the BNO, --> The Orientation Data will have to become part of the IMU data
 */
 struct Orientation {
     bool has_data = false;

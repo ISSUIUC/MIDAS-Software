@@ -3,6 +3,8 @@
 #include "Arduino.h"
 #include <SPI.h>
 
+//good resource
+
 LSM6DSV320XClass::LSM6DSV320XClass(SPIClass& spi, int csPin, int irqPin):
     _spi(&spi), _csPin(csPin), _irqPin(irqPin), _spiSettings(10E6, MSBFIRST, SPI_MODE0)
 {

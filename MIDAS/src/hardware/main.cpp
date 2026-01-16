@@ -74,6 +74,8 @@ void setup()
         Serial.println(":(");
     }
 
+    //pinMode changes need to be made here for midas mini bc of new sensors.
+
     //set all chip selects high (deselected)
     pinMode(LSM6DS3_CS, OUTPUT);
 	pinMode(KX134_CS, OUTPUT);

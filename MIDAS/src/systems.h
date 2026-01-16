@@ -26,23 +26,33 @@
  * 
  * @brief holds all interfaces for all sensors on MIDAS
 */
+
+//Remove the low_g sensor and high_g sensor, we will be using the imu sensor for the midas mini.
+
+//Barometer (Still have to check where updates need to be made)
+//Magnetometer (Still have to check where updates need to be made)
+
 struct Sensors {
     IMUSensor imu;
 
     LowGSensor low_g;
     LowGLSMSensor low_g_lsm;
     HighGSensor high_g;
+
     BarometerSensor barometer;
+
     ContinuitySensor continuity;
     VoltageSensor voltage;
     OrientationSensor orientation;
+
     MagnetometerSensor magnetometer;
+
     Pyro pyro;
     GPSSensor gps;
 };
 
 /**
- * @struct RocketData
+ * @struct RocketSystems
  * 
  * @brief holds all information about the rocket, sensors, and controllers
 */

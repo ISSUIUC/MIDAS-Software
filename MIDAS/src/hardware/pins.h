@@ -11,7 +11,7 @@
 // gyro chip select
 #define LSM6DS3_CS 36
 
-// high g chip select
+// high g chip select 
 #define KX134_CS 40
 
 // low g chip select
