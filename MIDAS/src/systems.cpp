@@ -77,6 +77,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 
  //--------------------MIDAS MINI-----------------//
 
+
 DECLARE_THREAD(accelerometers, RocketSystems* arg) { //I would also refer to IMU.cpp to see how this works out
     while (true) {
         LowGData lowg = arg->sensors.low_g.read();
@@ -90,6 +91,7 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) { //I would also refer to IMU
     }
 }
 
+//This also needs to be changed
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
@@ -233,6 +235,7 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
+//Edit this thread so it uses new sensors instead. HighGData and Orientation data have to be refactored.
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     ekf.initialize(arg);
     // Serial.println("Initialized ekf :(");
@@ -246,8 +249,12 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         }
         // add the tick update function
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
+
+        //focus here
         Orientation current_orientation = arg->rocket_data.orientation.getRecent();
         HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
+        //focus here
+
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
