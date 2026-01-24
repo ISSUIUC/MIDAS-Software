@@ -69,7 +69,7 @@ struct euler_t {
 /**
  * @struct LowGData
  * 
- * @brief data from the LowG sensor
+ * @brief data from the LowG sensor -> This has to go
 */
 struct LowGData {
     float ax = 0;
@@ -83,7 +83,7 @@ struct LowGData {
 /**
  * @struct HighGData
  * 
- * @brief data from the HighG sensor
+ * @brief data from the HighG sensor -> This has to go
 */
 struct HighGData {
     float ax = 0;
@@ -97,7 +97,7 @@ struct HighGData {
 /**
  * @struct LowGLSM
  * 
- * @brief data from the Low G LSM sensor
+ * @brief data from the Low G LSM sensor ->This has to go
 */
 struct LowGLSM {
     float gx = 0;
@@ -106,10 +106,6 @@ struct LowGLSM {
     float ax = 0;
     float ay = 0;
     float az = 0;
-};
-
-struct LSM {
-
 };
 
 /**
@@ -197,8 +193,19 @@ enum class OrientationReadingType {
 /**
  * @struct Orientation
  * 
- * @brief data from the BNO, --> The Orientation Data will have to become part of the IMU data
+ * @brief data from the new LSM
+ * 
 */
+
+//new orientation struct
+//Quat ourFilter
+//Quat imuFil
+//float tilt
+//euler stuff
+
+
+
+//Must change orientation struct (we have to get rid of a bunch of things)
 struct Orientation {
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
@@ -216,8 +223,8 @@ struct Orientation {
     }
 
 
-    Velocity orientation_velocity;
-    Velocity angular_velocity;
+    Velocity orientation_velocity;//dont care check if there is an output for filter
+    Velocity angular_velocity;//this will be in IMU
 
     Velocity getVelocity() const {
         return orientation_velocity;
@@ -244,11 +251,23 @@ struct Orientation {
 
 };
 
+//throw out old orientation, make new orientation struct
+// Orientation (repurposed)  --> Stores filtered data
+// Quaternions from our own filtering
+// Quaternions from LSM6DSV320X filtering
+// Any derived values from the above
+// Tilt, euler angles, etc
+
+
+//add orientation to IMU
 struct IMU{ 
     Acceleration highg_acceleration;
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
+    
 };
+
+
 
 /**
  * @struct KalmanData

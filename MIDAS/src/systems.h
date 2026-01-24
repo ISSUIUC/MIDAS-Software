@@ -29,8 +29,8 @@
 
 //Remove the low_g sensor and high_g sensor, we will be using the imu sensor for the midas mini.
 
-//Barometer (Still have to check where updates need to be made)
-//Magnetometer (Still have to check where updates need to be made)
+//Barometer (Altitude from Barometer is bugged, need to fix)
+
 
 struct Sensors {
     IMUSensor imu;

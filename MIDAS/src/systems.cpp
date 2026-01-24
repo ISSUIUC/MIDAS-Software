@@ -64,16 +64,10 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 
 //--------------------MIDAS MINI-----------------//
 
- //Needs to work with imu sensor bc there is no separate highG and lowG sensor in 
- //midas mini schematic but there is one in the midas schematic. 
+//We have to remove the seperate ways of updating the acceleration data
+//Update IMU.highg / IMU.lowg stuff instead
 
- //I feel like the best approach to this would be to have IMUData instead of the separate highG lowG data
- //fields. 
- //Data that is gathered together can safely be stored together OR in seperate structs...
- //Data that is gathered asynchronously from multiple sensors or at different times from the same 
- //sensor should avoid being in the same sensor data struct.
-
- //We can determine this by the Output Data Rate (ODR) which, good news, can be set by us. Pls check data sheet.
+//update gyro data in here as well
 
  //--------------------MIDAS MINI-----------------//
 
@@ -91,7 +85,10 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) { //I would also refer to IMU
     }
 }
 
-//This also needs to be changed
+//read angular velocity and update quaternion data
+//handle mode switching from on pad madgwick to ekf?
+//quaternion -> euler for telem
+//orientation struct updated
 DECLARE_THREAD(orientation, RocketSystems* arg) {
     while (true) {
         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
