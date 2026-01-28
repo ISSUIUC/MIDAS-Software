@@ -203,10 +203,23 @@ enum class OrientationReadingType {
 //float tilt
 //euler stuff
 
+// Raw IMU data from the LS6DSV320X
+struct IMU{ 
+    Acceleration highg_acceleration;
+    Acceleration lowg_acceleration;
+    Velocity angular_velocity;
+};
 
+// SFLP IMU data from the LSM6DSV320X
+
+// Quaternion get is in line 4320 of the lsm6dsv320x.c file
+struct IMU_SFLP {
+
+};
 
 //Must change orientation struct (we have to get rid of a bunch of things)
 struct Orientation {
+    /* OLD DEFINITION
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
 
@@ -248,25 +261,19 @@ struct Orientation {
     float tilt = 0;
 
     Quaternion orientation_quaternion;
+    */
 
-};
-
-//throw out old orientation, make new orientation struct
-// Orientation (repurposed)  --> Stores filtered data
-// Quaternions from our own filtering
-// Quaternions from LSM6DSV320X filtering
-// Any derived values from the above
-// Tilt, euler angles, etc
-
-
-//add orientation to IMU
-struct IMU{ 
-    Acceleration highg_acceleration;
-    Acceleration lowg_acceleration;
-    Velocity angular_velocity;
     
-};
+    //throw out old orientation, make new orientation struct
+    // Orientation (repurposed)  --> Stores filtered data
+    // Quaternions from our own filtering
+    // Quaternions from LSM6DSV320X filtering
 
+    IMU_SFLP hardware_filtered;
+    IMU software_filtered;
+    // Any derived values from the above
+    // Tilt, euler angles, etc    
+};
 
 
 /**

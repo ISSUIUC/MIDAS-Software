@@ -34,7 +34,10 @@
 #define LSM6DSV320X_OUTX_L_G                       0x22U
 #define LSM6DSV320X_UI_INT_OIS                     0x6FU
 #define LSM6DSV320X_EMB_FUNC_CFG                   0x63U
-
+#define LSM6DSV320X_EMB_FUNC_EN_A                  0x4U
+#define LSM6DSV320X_SFLP_GRAVX_L                   0x1EU
+#define LSM6DSV320X_SFLP_GBIASX_L                  0x18U
+#define LSM6DSV320X_SFLP_QUATW_L                   0x2AU
 
 enum lsm6dsv320x_data_rate_t
 {
@@ -169,6 +172,22 @@ enum lsm6dsv320x_filt_xl_lp2_bandwidth_t
   LSM6DSV320X_XL_AGGRESSIVE  = 0x6,
   LSM6DSV320X_XL_XTREME      = 0x7,
 };
+
+typedef enum
+{
+  LSM6DSV320X_MAIN_MEM_BANK       = 0x0,
+  LSM6DSV320X_EMBED_FUNC_MEM_BANK = 0x1,
+  LSM6DSV320X_SENSOR_HUB_MEM_BANK = 0x2,
+} lsm6dsv320x_mem_bank_t;
+
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t sflp_quatw                   : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t sflp_quatw                   : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_sflp_quatw_l_t;
 
 typedef struct
 {
@@ -437,11 +456,52 @@ typedef struct
 typedef struct
 {
 #if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t not_used0                    : 1;
+  uint8_t sflp_game_en                 : 1;
+  uint8_t not_used2                    : 1;
+  uint8_t pedo_en                      : 1;
+  uint8_t tilt_en                      : 1;
+  uint8_t sign_motion_en               : 1;
+  uint8_t not_used1                    : 1;
+  uint8_t mlc_before_fsm_en            : 1;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t mlc_before_fsm_en            : 1;
+  uint8_t not_used1                    : 1;
+  uint8_t sign_motion_en               : 1;
+  uint8_t tilt_en                      : 1;
+  uint8_t pedo_en                      : 1;
+  uint8_t not_used2                    : 1;
+  uint8_t sflp_game_en                 : 1;
+  uint8_t not_used0                    : 1;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_emb_func_en_a_t;
+
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
   uint8_t outx_g                       : 8;
 #elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
   uint8_t outx_g                       : 8;
 #endif /* DRV_BYTE_ORDER */
 } lsm6dsv320x_outx_l_g_t;
+
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t sflp_gravx                   : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t sflp_gravx                   : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_sflp_gravx_l_t;
+
+typedef struct
+{
+#if DRV_BYTE_ORDER == DRV_LITTLE_ENDIAN
+  uint8_t sflp_gbiasx                  : 8;
+#elif DRV_BYTE_ORDER == DRV_BIG_ENDIAN
+  uint8_t sflp_gbiasx                  : 8;
+#endif /* DRV_BYTE_ORDER */
+} lsm6dsv320x_sflp_gbiasx_l_t;
 
 
 class LSM6DSV320XClass {
@@ -452,6 +512,7 @@ public:
 
     lsm6dsv320x_status_reg_t get_status();
     int32_t device_id_get(uint8_t *val);
+    int32_t mem_bank_set(lsm6dsv320x_mem_bank_t val);
 
     int32_t acceleration_raw_get(int16_t *val);
     int32_t hg_acceleration_raw_get(int16_t *val);
@@ -460,8 +521,9 @@ public:
     float from_fs2_to_mg(int16_t lsb);
     float from_fs2000_to_mdps(int16_t lsb);
 
-    int32_t xl_setup(lsm6dsv320x_data_rate_t xl_odr, lsm6dsv320x_xl_mode_t xl_mode);
+    int32_t xl_setup(lsm6dsv320x_data_rate_t xl_odr, lsm6dsv320x_xl_mode_t xl_mode);//Only sets up lowg
     int32_t gy_setup(lsm6dsv320x_data_rate_t gy_odr, lsm6dsv320x_gy_mode_t gy_mode);
+    int32_t hg_xl_data_rate_set(lsm6dsv320x_hg_xl_data_rate_t val, uint8_t reg_out_en);
 
     int32_t haodr_set(lsm6dsv320x_data_rate_t xl_odr, lsm6dsv320x_xl_mode_t xl_mode, lsm6dsv320x_data_rate_t gy_odr, lsm6dsv320x_gy_mode_t gy_mode);
 
@@ -478,6 +540,11 @@ public:
     int32_t filt_gy_lp1_bandwidth_set(lsm6dsv320x_filt_gy_lp1_bandwidth_t val);
     int32_t filt_xl_lp2_set(uint8_t val);
     int32_t filt_xl_lp2_bandwidth_set(lsm6dsv320x_filt_xl_lp2_bandwidth_t val);
+
+    int32_t sflp_enable_set(uint8_t val);
+    int32_t lsm6dsv320x_sflp_quaternion_raw_get(uint16_t *val);
+    int32_t sflp_gravity_raw_get(int16_t *val);
+    int32_t sflp_gbias_raw_get(int16_t *val);
  
 private:
     SPIClass * _spi;
