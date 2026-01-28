@@ -212,7 +212,11 @@ struct IMU{
 
 // SFLP IMU data from the LSM6DSV320X
 
-// Quaternion get is in line 4320 of the lsm6dsv320x.c file
+// add sflp_gbias_raw_get -> convert from hex
+
+// add sflp_gravity_raw_get -> convert from hex
+
+// add sflp_quaternion_raw_get -> convert from hex
 struct IMU_SFLP {
 
 };
