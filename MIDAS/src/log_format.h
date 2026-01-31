@@ -15,12 +15,10 @@ enum ReadingDiscriminant {
     ID_GPS = 5,
     ID_MAGNETOMETER = 6,
     ID_ORIENTATION = 7,
-    ID_LOWGLSM = 8,
+    ID_KALMAN = 8,
     ID_FSM = 9,
-    ID_KALMAN = 10,
-    ID_PYRO = 12,
-    ID_CAMERADATA = 13,
-    
+    ID_PYRO = 10,
+    ID_CAMERADATA = 11,
 };
 
 
@@ -40,15 +38,13 @@ struct LoggedReading {
     ReadingDiscriminant discriminant;
     uint32_t timestamp_ms;
     union {
-        LowGData low_g;
-        HighGData high_g;
+        IMU imu;
         Barometer barometer;
         Continuity continuity;
         Voltage voltage;
         GPS gps;
         Magnetometer magnetometer;
         Orientation orientation;
-        LowGLSM lowg_lsm;
         KalmanData kalman;
         FSMState fsm;
         PyroState pyro;
