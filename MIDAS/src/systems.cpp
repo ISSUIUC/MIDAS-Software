@@ -213,13 +213,11 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(kalman, RocketSystems* arg) {
-    ekf.initialize(arg);
-    // Serial.println("Initialized ekf :(");
-    TickType_t last = xTaskGetTickCount();
-    
+    kf.initialize(arg);
+    TickType_t last = xTaskGetTickCount(); 
     while (true) {
         if(arg->rocket_data.command_flags.should_reset_kf){
-            ekf.initialize(arg);
+            kf.initialize(arg);
             TickType_t last = xTaskGetTickCount();
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
@@ -233,15 +231,15 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .ay = current_accelerometer.ay,
             .az = current_accelerometer.az
         };
+        GPS current_gps = arg->rocket_data.gps.getRecent()
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
-        KalmanData current_state = ekf.getState();
+        kf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, current_gps, FSM_state);
+        KalmanData current_state = kf.getState();
 
         arg->rocket_data.kalman.update(current_state);
 
         last = xTaskGetTickCount();
-        // Serial.println("Kalman");
         THREAD_SLEEP(50);
     }
 }
