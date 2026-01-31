@@ -166,9 +166,9 @@ struct GPS {
  * @brief data from the magnetometer
 */
 struct Magnetometer {
-    float mx;
-    float my;
-    float mz;
+    double mx;
+    double my;
+    double mz;
 };
 
 struct Quaternion {
