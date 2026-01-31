@@ -8,17 +8,16 @@
  * @brief ID for each sensor, 0 is not used to make it easier to spot bugs
  */
 enum ReadingDiscriminant {
-    ID_LOWG = 1,
-    ID_HIGHG = 2,
-    ID_BAROMETER = 3,
-    ID_CONTINUITY = 4,
-    ID_VOLTAGE = 5,
-    ID_GPS = 6,
-    ID_MAGNETOMETER = 7,
-    ID_ORIENTATION = 8,
-    ID_LOWGLSM = 9,
-    ID_FSM = 10,
-    ID_KALMAN = 11,
+    ID_IMU = 1, 
+    ID_BAROMETER = 2,
+    ID_CONTINUITY = 3,
+    ID_VOLTAGE = 4,
+    ID_GPS = 5,
+    ID_MAGNETOMETER = 6,
+    ID_ORIENTATION = 7,
+    ID_LOWGLSM = 8,
+    ID_FSM = 9,
+    ID_KALMAN = 10,
     ID_PYRO = 12,
     ID_CAMERADATA = 13,
     

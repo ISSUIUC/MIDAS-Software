@@ -124,14 +124,25 @@ int32_t LSM6DSV320XClass::angular_rate_raw_get(int16_t *val)
   return ret;
 }
 
-float LSM6DSV320XClass::from_fs2_to_mg(int16_t lsb)
+
+float LSM6DSV320XClass::from_fs2_to_mg(int16_t lsb) //the _reg libraries have the functions, maybe use that. We can figure out.
 {
-  return ((float)lsb) * 0.061f;
+  return ((float)lsb) * 0.061f; //if you check the datasheet, you will see that for 64gs, we will have to use different conversion values.
+}
+
+float LSM6DSV320XClass::from_fs64_to_mg(int16_t lsb)
+{
+  return ((float)lsb) * 1.952f;
 }
 
 float LSM6DSV320XClass::from_fs2000_to_mdps(int16_t lsb)
 {
   return ((float)lsb) * 70.0f;
+}
+
+float LSM6DSV320XClass::from_sflp_to_mg(int16_t lsb)
+{
+  return ((float)lsb) * 0.061f;
 }
 
 /**

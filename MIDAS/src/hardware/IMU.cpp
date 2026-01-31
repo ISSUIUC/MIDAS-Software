@@ -41,29 +41,52 @@ IMU IMUSensor::read(){
         reading.angular_velocity.vz = LSM6DSV.from_fs2000_to_mdps(raw_av[2]) / 1000.0;
     }
 
+
+    
+    //Embedded SFLP
+    uint16_t val[4]; 
+
+	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get((int16_t*)&val);//4 elements
+
+    reading.hw_filtered.quaternion.w = LSM6DSV.from_sflp_to_mg(val[0]);
+    reading.hw_filtered.quaternion.x = LSM6DSV.from_sflp_to_mg(val[1]);
+    reading.hw_filtered.quaternion.y = LSM6DSV.from_sflp_to_mg(val[2]);
+    reading.hw_filtered.quaternion.z = LSM6DSV.from_sflp_to_mg(val[3]);
+
+    LSM6DSV.sflp_gbias_raw_get((int16_t*)&val);//3 elements
+    for(int i = 0; i<3; i++)
+        reading.hw_filtered.gbias[i] = LSM6DSV.from_sflp_to_mg(val[i]);
+
+
+    LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);//3 elements
+    for(int i = 0; i<3; i++)
+        reading.hw_filtered.gravity[i] = LSM6DSV.from_sflp_to_mg(val[i]);
+
     return reading;
 }
 
 ErrorCode IMUSensor::init(){
-    //platform_delay(BOOT_TIME)? Probably not.
-
-    uint8_t whoamI;
-    LSM6DSV.device_id_get(&whoamI);
-    if(whoamI != LSM6DSV320X_ID)
+    uint8_t whoami;
+    LSM6DSV.device_id_get(&whoami);
+    if(whoami != LSM6DSV320X_ID) 
         return IMUCouldNotBeInitialized;
 
-    //Default config (?)
+
+    //?????
     LSM6DSV.sw_por();
-
-    //Set data rate & scale
-    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_7Hz5, LSM6DSV320X_XL_NORMAL_MD);
+    
+    // the second parameter used to be normal instead of high-performance
+    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_7Hz5, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
     LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
-
-    LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);
+    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
+    
+    LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);
+    LSM6DSV.xl_full_scale_set(LSM6DSV320X_2g);
     LSM6DSV.gy_full_scale_set(LSM6DSV320X_2000dps);
+    
+    LSM6DSV.sflp_enable_set(1);
 
     //Filter initialization (I really have no idea)
-
     LSM6DSV.filt_settling_mask_set(false, false, false);
 
     // Low-pass filters:
@@ -71,6 +94,7 @@ ErrorCode IMUSensor::init(){
     //lsm6dsv320x_filt_gy_lp1_bandwidth_set(&dev_ctx, lsm6dsv320x_GY_ULTRA_LIGHT);
     LSM6DSV.filt_xl_lp2_set(PROPERTY_DISABLE);
     //lsm6dsv320x_filt_xl_lp2_bandwidth_set(&dev_ctx, lsm6dsv320x_XL_STRONG);
+
 
     return NoError;
 }

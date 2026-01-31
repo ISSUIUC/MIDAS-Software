@@ -178,8 +178,6 @@ struct Quaternion {
         return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
     }
 
-
-
 };
 
 /**
@@ -203,34 +201,49 @@ enum class OrientationReadingType {
 //float tilt
 //euler stuff
 
+
+/**
+ * @struct SFLP
+ * 
+ * @brief Data from the Sensor Fusion Low Power module
+ * 
+ */
 // Raw IMU data from the LS6DSV320X
+struct IMU_SFLP {
+    Quaternion quaternion;
+    uint16_t gravity[3];
+    uint16_t gbias[3];
+}
+
 struct IMU{ 
     Acceleration highg_acceleration;
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
+
+    IMU_SFLP hw_filtered;
 };
 
-// SFLP IMU data from the LSM6DSV320X
 
-// add sflp_gbias_raw_get -> convert from hex
-
-// add sflp_gravity_raw_get -> convert from hex
-
-// add sflp_quaternion_raw_get -> convert from hex
-struct IMU_SFLP {
-
-};
-
-//Must change orientation struct (we have to get rid of a bunch of things)
+/**
+ * @struct SFLP
+ * 
+ * @brief Data from the Sensor Fusion Low Power module
+ * 
+ */
 struct Orientation {
-    /* OLD DEFINITION
+    // Initalizing SFLP data structures
+    IMU_SFLP hw_filtered;
+
+    float tilt = 0;
+
+    // Orientation stuff
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
-
+    
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-    //For yessir.cpp
+    // For yessir.cpp
     euler_t getEuler() const {
         euler_t euler;
         euler.yaw = this->yaw;
@@ -238,17 +251,20 @@ struct Orientation {
         euler.roll = this->roll;
         return euler;
     }
+};
 
 
+/**
+ * 
+ * @brief Old, repurposed version of the IMU_SFLP
+ * 
+ */
+
+struct Old_Orientation {
     Velocity orientation_velocity;//dont care check if there is an output for filter
-    Velocity angular_velocity;//this will be in IMU
 
     Velocity getVelocity() const {
         return orientation_velocity;
-    }
-
-    Velocity getAngularVelocity() const {
-        return angular_velocity;
     }
 
     Acceleration orientation_acceleration;
@@ -262,16 +278,15 @@ struct Orientation {
     float temperature = 0;
     float pressure = 0;
 
-    float tilt = 0;
-
-    Quaternion orientation_quaternion;
-    */
-
+    /**
+     * 
+     * @brief TO-DO LIST FOR MIDAS MINI DATA
+     * 
+     */
     
-    //throw out old orientation, make new orientation struct
+     //throw out old orientation, make new orientation struct
     // Orientation (repurposed)  --> Stores filtered data
     // Quaternions from our own filtering
-    // Quaternions from LSM6DSV320X filtering
 
     IMU_SFLP hardware_filtered;
     IMU software_filtered;
