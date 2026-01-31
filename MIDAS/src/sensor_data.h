@@ -211,8 +211,8 @@ enum class OrientationReadingType {
 // Raw IMU data from the LS6DSV320X
 struct IMU_SFLP {
     Quaternion quaternion;
-    uint16_t gravity[3];
-    uint16_t gbias[3];
+    uint16_t gravity[3]; //represented in the body frame
+    uint16_t gyrobias[3];  
 }
 
 struct IMU{ 
@@ -220,7 +220,7 @@ struct IMU{
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
 
-    IMU_SFLP hw_filtered;
+    IMU_SFLP hw_filtered; //hardware filtered
 };
 
 
@@ -240,7 +240,7 @@ struct Orientation {
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
     
-    float yaw = 0;
+    float yaw = 0; //radians
     float pitch = 0;
     float roll = 0;
     // For yessir.cpp
@@ -306,6 +306,17 @@ struct KalmanData {
     Acceleration acceleration;
 
     float altitude;
+};
+
+/**
+ * @struct KalmanData
+ * 
+ * @brief data from the MQEKF thread
+*/
+struct AngularKalmanData {
+    Quaternion quaternion;
+    Acceleration acceleration;
+    uint16_t gyrobias[3];  
 };
 
 /**
