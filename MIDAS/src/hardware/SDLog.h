@@ -19,7 +19,9 @@ public:
 
     ErrorCode init() override;
     void write(const uint8_t* data, size_t size) override;
+    void write_meta(const uint8_t* data, size_t size) override;
 private:
     File file;
+    File meta;
     size_t unflushed_bytes = 0;
 };

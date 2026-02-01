@@ -22,11 +22,19 @@ ErrorCode SDSink::init() {
     }
 
     char file_name[16] = "data";
-    char ext[] = ".launch";
+    char meta_name[24];
+    char dfext[] = ".launch";
     sdFileNamer(file_name, ext, SD_MMC);
 
+    strcpy(meta_name, file_name);
+    char* extpos = strrchr(meta_name, '.');
+    if (extpos) {
+        strcpy(extpos, ".meta");
+    }
+
     file = SD_MMC.open(file_name, FILE_WRITE, true);
-    if (!file) {
+    meta = SD_MMC.open(meta_name, FILE_WRITE, true);
+    if (!file || !meta) {
         failed = true;
         return ErrorCode::SDCouldNotOpenFile;
     }
@@ -52,4 +60,12 @@ void SDSink::write(const uint8_t* data, size_t size) {
             unflushed_bytes = 0;
         }
     }
+}
+
+void SDSink::write_meta(const uint8_t* data, size_t size) {
+    if (failed) { return; }
+
+    file.write(data, size);
+    file.write('\n');
+    file.flush(); // Meta writes are infrequent, so flushing is OK.
 }

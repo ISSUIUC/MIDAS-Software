@@ -11,6 +11,9 @@
 //#include "hardware/Emmc.h"
 #endif
 
+
+
+
 /**
  * @class LogSink
  * 
@@ -22,6 +25,7 @@ public:
 
     virtual ErrorCode init() = 0;
     virtual void write(const uint8_t* data, size_t size) = 0;
+    virtual void write_meta(const uint8_t* data, size_t size) = 0;
 };
 
 void log_begin(LogSink& sink);

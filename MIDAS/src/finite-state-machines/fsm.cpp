@@ -84,7 +84,11 @@ StateEstimate::StateEstimate(RocketData& state) {
  * 
  * @return New FSM State
 */
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& commands) {
+FSMState FSM::tick_fsm(RocketData& sys) {
+    FSMState state = sys.fsm_state.getRecentUnsync();
+    StateEstimate state_estimate(sys);
+    CommandFlags& commands = sys.command_flags;
+    
     //get current time
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
@@ -338,7 +342,11 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
  * 
  * @return New FSM State
 */
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& commands) {
+FSMState FSM::tick_fsm(RocketData& sys) {
+    FSMState state = sys.fsm_state.getRecentUnsync();
+    StateEstimate state_estimate(sys);
+    CommandFlags& commands = sys.command_flags;
+
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     switch (state) {

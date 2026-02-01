@@ -21,14 +21,29 @@
  */
 DECLARE_THREAD(logger, RocketSystems* arg) {
     log_begin(arg->log_sink);
+    int meta_delay_ctr = 0; //  Will cause meta logs to write slower
     while (true) {
         log_data(arg->log_sink, arg->rocket_data);
 
         arg->rocket_data.log_latency.tick();
+        meta_delay_ctr++;
+
+        if (meta_delay_ctr >= 100) {
+            MetaLogging::MetaLogEntry entry;
+            if(arg->meta_log.get_queued(&entry)) {
+                uint8_t buf[72];
+                size_t total_size = sizeof(MetaDataCode) + entry.size;
+                memcpy(buf, &entry.log_type, sizeof(MetaDataCode));
+                memcpy(buf + sizeof(MetaDataCode), &entry.data, entry.size);
+                arg->log_sink.write_meta(buf, total_size);
+            }
+        }
 
         THREAD_SLEEP(1);
     }
 }
+
+
 
 DECLARE_THREAD(barometer, RocketSystems* arg) {
     // Reject single rogue barometer readings that are very different from the immediately prior reading
@@ -146,6 +161,35 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     }
 }
 
+void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems* sys, double current_time) {
+    // Do something, NO delays allowed!
+    Orientation cur_orientation = sys->rocket_data.orientation.getRecentUnsync();
+    switch (new_state) {
+        case FSMState::STATE_FIRST_BOOST:
+            sys->meta_logging.log_event(MetaDataCode::EVENT_TLAUNCH, current_time);
+            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_BARO, sys->rocket_data.barometer.getRecentUnsync());
+            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_GPS, sys->rocket_data.gps.getRecentUnsync());
+            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCH_INITIAL_TILT, cur_orientation.tilt);
+            break;
+        case FSMState::STATE_BURNOUT:
+            sys->meta_logging.log_event(MetaDataCode::EVENT_TBURNOUT, current_time);
+            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_BURNOUT, cur_orientation.tilt);
+            break;
+        case FSMState::STATE_SECOND_BOOST:
+            sys->meta_logging.log_event(MetaDataCode::EVENT_TIGNITION, current_time);
+            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_IGNITION, cur_orientation.tilt);
+            break;
+        case FSMState::STATE_DROGUE_DEPLOY:
+            sys->meta_logging.log_event(MetaDataCode::EVENT_TAPOGEE, current_time);
+            break;
+        case FSMState::STATE_MAIN_DEPLOY:
+            sys->meta_logging.log_event(MetaDataCode::EVENT_TMAIN, current_time);
+            break;
+        default:
+            break;
+    }
+}
+
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems* arg) {
     FSM fsm{};
@@ -160,6 +204,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
 
         arg->rocket_data.fsm_state.update(next_state);
+        if(current_state != next_state) {fsm_transitioned_to(next_state, current_state, arg, current_time);}
 
         if (current_state == FSMState::STATE_SAFE) {
             if((current_time - last_time_led_flash) > 250) {

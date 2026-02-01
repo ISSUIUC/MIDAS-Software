@@ -48,6 +48,7 @@ struct RocketSystems {
     Sensors sensors;
     RocketData rocket_data;
     LogSink& log_sink;
+    MetaLogging meta_logging;
     BuzzerController buzzer;
     LEDController led;
     Telemetry tlm;
