@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-EKF::EKF() : KalmanFilter()
+KF::KF() : KalmanFilter()
 {
     state = KalmanData();
 }
