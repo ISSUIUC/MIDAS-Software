@@ -182,21 +182,13 @@ struct CommandFlags {
  *  Normally, this would be considered a poor decision. However, the fact that all this data is here
  *  makes it easier to debug since all this data can be logged (and thus used when debugging).
  */
-
- //SensorData is essentially a wrapper class for any sensor data struct which allows for data queuing and asynchronous
- // reads (which is what the logging system uses)
-
- //just remove lowg, highg, lowglsm and replace with IMUData. The IMUData should also store the Orientation Data
-
 struct RocketData {
 public:
     SensorData<LSM> lsm;
 
     SensorData<KalmanData> kalman;
-    SensorData<LowGData> low_g;
-    BufferedSensorData<HighGData, 8> high_g;
+    SensorData<IMU> imu;
     BufferedSensorData<Barometer, 16> barometer;
-    SensorData<LowGLSM> low_g_lsm;
     SensorData<Continuity> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;

@@ -3,10 +3,8 @@
 #include "Arduino.h"
 #include <SPI.h>
 
-//good resource
-
 LSM6DSV320XClass::LSM6DSV320XClass(SPIClass& spi, int csPin, int irqPin):
-    _spi(&spi), _csPin(csPin), _irqPin(irqPin), _spiSettings(10E6, MSBFIRST, SPI_MODE0)
+    _spi(&spi), _csPin(csPin), _irqPin(irqPin), _spiSettings(1E6, MSBFIRST, SPI_MODE0)
 {
 }
 
@@ -126,14 +124,25 @@ int32_t LSM6DSV320XClass::angular_rate_raw_get(int16_t *val)
   return ret;
 }
 
-float LSM6DSV320XClass::from_fs2_to_mg(int16_t lsb)
+
+float LSM6DSV320XClass::from_fs2_to_mg(int16_t lsb) //the _reg libraries have the functions, maybe use that. We can figure out.
 {
-  return ((float)lsb) * 0.061f;
+  return ((float)lsb) * 0.061f; //if you check the datasheet, you will see that for 64gs, we will have to use different conversion values.
+}
+
+float LSM6DSV320XClass::from_fs64_to_mg(int16_t lsb)
+{
+  return ((float)lsb) * 1.952f;
 }
 
 float LSM6DSV320XClass::from_fs2000_to_mdps(int16_t lsb)
 {
   return ((float)lsb) * 70.0f;
+}
+
+float LSM6DSV320XClass::from_sflp_to_mg(int16_t lsb)
+{
+  return ((float)lsb) * 0.061f;
 }
 
 /**
@@ -731,5 +740,162 @@ int32_t LSM6DSV320XClass::filt_xl_lp2_bandwidth_set(lsm6dsv320x_filt_xl_lp2_band
     ret = LSM6DSV320XClass::write_reg(LSM6DSV320X_CTRL8, (uint8_t *)&ctrl8, 1);
   }
 
+  return ret;
+}
+
+int32_t LSM6DSV320XClass::sflp_enable_set(uint8_t val)
+{
+  lsm6dsv320x_emb_func_en_a_t emb_func_en_a;
+  int32_t ret;
+
+  ret = mem_bank_set(LSM6DSV320X_EMBED_FUNC_MEM_BANK);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  ret = read_reg(LSM6DSV320X_EMB_FUNC_EN_A, (uint8_t *)&emb_func_en_a, 1);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  emb_func_en_a.sflp_game_en = val;
+  ret += write_reg(LSM6DSV320X_EMB_FUNC_EN_A,
+                               (uint8_t *)&emb_func_en_a, 1);
+
+exit:
+  ret += mem_bank_set(LSM6DSV320X_MAIN_MEM_BANK);
+
+  return ret;
+}
+
+int32_t LSM6DSV320XClass::sflp_gravity_raw_get(int16_t *val)
+{
+  uint8_t buff[6];
+  int32_t ret;
+
+  ret = mem_bank_set(LSM6DSV320X_EMBED_FUNC_MEM_BANK);
+  ret += read_reg(LSM6DSV320X_SFLP_GRAVX_L, &buff[0], 6);
+  ret += mem_bank_set(LSM6DSV320X_MAIN_MEM_BANK);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val[0] = (int16_t)buff[1];
+  val[0] = (val[0] * 256) + (int16_t)buff[0];
+  val[1] = (int16_t)buff[3];
+  val[1] = (val[1] * 256) + (int16_t)buff[2];
+  val[2] = (int16_t)buff[5];
+  val[2] = (val[2] * 256) + (int16_t)buff[4];
+
+  return ret;
+}
+
+int32_t LSM6DSV320XClass::lsm6dsv320x_sflp_quaternion_raw_get(uint16_t *val)
+{
+  uint8_t buff[8];
+  int32_t ret;
+
+  ret = mem_bank_set(LSM6DSV320X_EMBED_FUNC_MEM_BANK);
+  ret += read_reg(LSM6DSV320X_SFLP_QUATW_L, &buff[0], 8);
+  ret += mem_bank_set(LSM6DSV320X_MAIN_MEM_BANK);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val[0] = (uint16_t)buff[1];
+  val[0] = (val[0] * 256) + (uint16_t)buff[0];
+  val[1] = (uint16_t)buff[3];
+  val[1] = (val[1] * 256) + (uint16_t)buff[2];
+  val[2] = (uint16_t)buff[5];
+  val[2] = (val[2] * 256) + (uint16_t)buff[4];
+  val[3] = (uint16_t)buff[7];
+  val[3] = (val[3] * 256) + (uint16_t)buff[6];
+
+  return ret;
+}
+
+int32_t LSM6DSV320XClass::sflp_gbias_raw_get(int16_t *val)
+{
+  uint8_t buff[6];
+  int32_t ret;
+
+  ret = mem_bank_set(LSM6DSV320X_EMBED_FUNC_MEM_BANK);
+  ret += read_reg(LSM6DSV320X_SFLP_GBIASX_L, &buff[0], 6);
+  ret += mem_bank_set(LSM6DSV320X_MAIN_MEM_BANK);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  val[0] = (int16_t)buff[1];
+  val[0] = (val[0] * 256) + (int16_t)buff[0];
+  val[1] = (int16_t)buff[3];
+  val[1] = (val[1] * 256) + (int16_t)buff[2];
+  val[2] = (int16_t)buff[5];
+  val[2] = (val[2] * 256) + (int16_t)buff[4];
+
+  return ret;
+}
+
+int32_t LSM6DSV320XClass::mem_bank_set(lsm6dsv320x_mem_bank_t val)
+{
+  lsm6dsv320x_func_cfg_access_t func_cfg_access;
+  int32_t ret;
+
+  ret = read_reg(LSM6DSV320X_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
+  if (ret != 0)
+  {
+    return ret;
+  }
+
+  func_cfg_access.shub_reg_access = ((uint8_t)val & 0x02U) >> 1;
+  func_cfg_access.emb_func_reg_access = (uint8_t)val & 0x01U;
+  ret = write_reg(LSM6DSV320X_FUNC_CFG_ACCESS, (uint8_t *)&func_cfg_access, 1);
+
+  return ret;
+}
+
+int32_t LSM6DSV320XClass::hg_xl_data_rate_set(lsm6dsv320x_hg_xl_data_rate_t val, uint8_t reg_out_en)
+{
+  lsm6dsv320x_ctrl1_t ctrl1;
+  lsm6dsv320x_ctrl2_t ctrl2;
+  lsm6dsv320x_ctrl1_xl_hg_t ctrl1_xl_hg;
+  int32_t ret;
+
+  ret = read_reg(LSM6DSV320X_CTRL1, (uint8_t *)&ctrl1, 1);
+  ret += read_reg(LSM6DSV320X_CTRL2, (uint8_t *)&ctrl2, 1);
+  ret += read_reg(LSM6DSV320X_CTRL1_XL_HG, (uint8_t *)&ctrl1_xl_hg, 1);
+  if (ret != 0)
+  {
+    goto exit;
+  }
+
+  if (val != LSM6DSV320X_HG_XL_ODR_OFF && ctrl1.odr_xl != LSM6DSV320X_ODR_OFF &&
+      ctrl1.op_mode_xl != LSM6DSV320X_XL_HIGH_PERFORMANCE_MD &&
+      ctrl1.op_mode_xl != LSM6DSV320X_XL_HIGH_ACCURACY_ODR_MD)
+  {
+    ret = -1;
+    goto exit;
+  }
+
+  // if xl or gy are ON in odr triggered mode, high-g xl cannot be turned on
+  if ((ctrl1.odr_xl != LSM6DSV320X_ODR_OFF &&
+       ctrl1.op_mode_xl == LSM6DSV320X_XL_ODR_TRIGGERED_MD) ||
+      (ctrl2.odr_g != LSM6DSV320X_ODR_OFF &&
+       ctrl2.op_mode_g == LSM6DSV320X_GY_ODR_TRIGGERED_MD))
+  {
+    ret = -1;
+    goto exit;
+  }
+
+  ctrl1_xl_hg.odr_xl_hg = (uint8_t)val & 0x07U;
+  ctrl1_xl_hg.xl_hg_regout_en = reg_out_en & 0x1U;
+  ret += write_reg(LSM6DSV320X_CTRL1_XL_HG, (uint8_t *)&ctrl1_xl_hg, 1);
+
+exit:
   return ret;
 }

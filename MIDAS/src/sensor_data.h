@@ -67,48 +67,6 @@ struct euler_t {
 */
 
 /**
- * @struct LowGData
- * 
- * @brief data from the LowG sensor -> This has to go
-*/
-struct LowGData {
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-
-    LowGData() = default;
-    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
-};
-
-/**
- * @struct HighGData
- * 
- * @brief data from the HighG sensor -> This has to go
-*/
-struct HighGData {
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-
-    HighGData() = default;
-    HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
-};
-
-/**
- * @struct LowGLSM
- * 
- * @brief data from the Low G LSM sensor ->This has to go
-*/
-struct LowGLSM {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-};
-
-/**
  * @struct Barometer
  * 
  * @brief data from the barometer
@@ -178,8 +136,6 @@ struct Quaternion {
         return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
     }
 
-
-
 };
 
 /**
@@ -204,16 +160,48 @@ enum class OrientationReadingType {
 //euler stuff
 
 
+/**
+ * @struct SFLP
+ * 
+ * @brief Data from the Sensor Fusion Low Power module
+ * 
+ */
+// Raw IMU data from the LS6DSV320X
+struct IMU_SFLP {
+    Quaternion quaternion;
+    uint16_t gravity[3];
+    uint16_t gbias[3];
+}
 
-//Must change orientation struct (we have to get rid of a bunch of things)
+struct IMU{ 
+    Acceleration highg_acceleration;
+    Acceleration lowg_acceleration;
+    Velocity angular_velocity;
+
+    IMU_SFLP hw_filtered;
+};
+
+
+/**
+ * @struct SFLP
+ * 
+ * @brief Data from the Sensor Fusion Low Power module
+ * 
+ */
 struct Orientation {
+    // Initalizing SFLP data structures
+    IMU_SFLP hw_filtered;
+
+    float tilt = 0;
+
+    // Orientation stuff
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
-
+    
     float yaw = 0;
     float pitch = 0;
     float roll = 0;
-    //For yessir.cpp
+    // For yessir.cpp
     euler_t getEuler() const {
         euler_t euler;
         euler.yaw = this->yaw;
@@ -221,17 +209,20 @@ struct Orientation {
         euler.roll = this->roll;
         return euler;
     }
+};
 
 
+/**
+ * 
+ * @brief Old, repurposed version of the IMU_SFLP
+ * 
+ */
+
+struct Old_Orientation {
     Velocity orientation_velocity;//dont care check if there is an output for filter
-    Velocity angular_velocity;//this will be in IMU
 
     Velocity getVelocity() const {
         return orientation_velocity;
-    }
-
-    Velocity getAngularVelocity() const {
-        return angular_velocity;
     }
 
     Acceleration orientation_acceleration;
@@ -245,28 +236,21 @@ struct Orientation {
     float temperature = 0;
     float pressure = 0;
 
-    float tilt = 0;
-
-    Quaternion orientation_quaternion;
-
-};
-
-//throw out old orientation, make new orientation struct
-// Orientation (repurposed)  --> Stores filtered data
-// Quaternions from our own filtering
-// Quaternions from LSM6DSV320X filtering
-// Any derived values from the above
-// Tilt, euler angles, etc
-
-
-//add orientation to IMU
-struct IMU{ 
-    Acceleration highg_acceleration;
-    Acceleration lowg_acceleration;
-    Velocity angular_velocity;
+    /**
+     * 
+     * @brief TO-DO LIST FOR MIDAS MINI DATA
+     * 
+     */
     
-};
+     //throw out old orientation, make new orientation struct
+    // Orientation (repurposed)  --> Stores filtered data
+    // Quaternions from our own filtering
 
+    IMU_SFLP hardware_filtered;
+    IMU software_filtered;
+    // Any derived values from the above
+    // Tilt, euler angles, etc    
+};
 
 
 /**

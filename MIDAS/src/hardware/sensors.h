@@ -6,7 +6,6 @@
 #include "TCAL9539.h"
 #include "rocket_state.h"
 
-//We wont be needing this Sensor interface anymore bc of IMU
 /**
  * @struct LowG interface
  */
@@ -15,7 +14,6 @@ struct LowGSensor {
     LowGData read();
 };
 
-//We wont be needing this Sensor interface anymore bc of IMU
 /**
  * @struct HighG interface
  */
@@ -32,7 +30,6 @@ struct MagnetometerSensor {
     Magnetometer read();
 };
 
-
 /**
  * @struct Barometer interface
  */
@@ -41,21 +38,12 @@ struct BarometerSensor {
     Barometer read();
 };
 
-//We wont be needing this Sensor interface anymore bc of IMU
 /**
  * @struct LowGLSM interface
  */
 struct LowGLSMSensor {
     ErrorCode init();
     LowGLSM read();
-};
-
-/**
- * @struct IMU interface
- */
-struct IMUSensor {
-    ErrorCode init();
-    IMU read();
 };
 
 /**
@@ -74,7 +62,6 @@ struct VoltageSensor {
     Voltage read();
 };
 
-//We wont be needing this Sensor interface anymore because we will be transferring it to the IMU
 /**
  * @struct BNO interface
  */

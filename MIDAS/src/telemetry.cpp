@@ -32,7 +32,7 @@ T inv_convert_range(float val, float range) {
  * 
  * @return tuple with packed data
 */
-std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) {
+std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) { //update parameter and function
     
     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);

@@ -111,11 +111,6 @@ void EKF::initialize(RocketSystems *args)
 
     Q = Q * spectral_density_;
 
-    // Wind vector
-    // Wind(0, 0) = 0.0; // wind in x direction
-    // Wind(1, 0) = 0.0; // wind in y direction
-    // Wind(2, 0) = 0.0; // wind in z direction
-
     P_k.setZero();
     P_k.block<3, 3>(0, 0) = Eigen::Matrix3f::Identity() * 1e-2f; // x block (pos,vel,acc)
     P_k.block<3, 3>(3, 3) = Eigen::Matrix3f::Identity() * 1e-2f; // y block
@@ -332,22 +327,6 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     state.velocity = (Velocity){kalman_state.state_est_vel_x, kalman_state.state_est_vel_y, kalman_state.state_est_vel_z};
     state.acceleration = (Acceleration){kalman_state.state_est_accel_x, kalman_state.state_est_accel_y, kalman_state.state_est_accel_z};
 
-    // if (FSM_state > FSMState::STATE_IDLE)
-    // {
-    //     current_vel += (s_dt)*y_k(1, 0);
-    //     Eigen::Matrix<float, 9, 1> measured_v = Eigen::Matrix<float, 9, 1>::Zero();
-    //     measured_v(0, 0) = current_vel;
-        // measured_v(0,0) = y_k(1) + (dt/2)*y_k(2);
-        // Eigen::Matrix<float, 9, 1> err = Eigen::Matrix<float, 9, 1>::Zero();
-        // err(0, 0) = measured_v(0, 0) - x_k(1, 0);
-        // Wind = Wind_alpha * Wind + (1 - Wind_alpha) * err;
-        // if (Wind.norm() > 15)
-        // {
-        //     Wind(0, 0) = 15.0;
-        //     Wind(1, 0) = 0.0;
-        //     Wind(2, 0) = 0.0;
-        // }
-    // }
 }
 
 /**
