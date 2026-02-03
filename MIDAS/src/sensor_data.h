@@ -225,14 +225,15 @@ struct IMU{
 
 
 /**
- * @struct SFLP
+ * @struct New Orientation (For Midas Mini)
  * 
- * @brief Data from the Sensor Fusion Low Power module
+ * @brief Orientation Data or the rocket, should contain - Hardware SFLP filter. Our IMU filter. Tilt. Euler Angles. -
  * 
  */
 struct Orientation {
     // Initalizing SFLP data structures
     IMU_SFLP hw_filtered;
+    IMU software_filtered;
 
     float tilt = 0;
 
@@ -251,12 +252,14 @@ struct Orientation {
         euler.roll = this->roll;
         return euler;
     }
+
+    
 };
 
 
 /**
  * 
- * @brief Old, repurposed version of the IMU_SFLP
+ * @brief Old, Probably need to get rid of this.
  * 
  */
 

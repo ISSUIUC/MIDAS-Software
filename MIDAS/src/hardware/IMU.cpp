@@ -28,7 +28,7 @@ IMU IMUSensor::read(){
     //High-G Acceleration
     if(status.xlhgda){
         LSM6DSV.hg_acceleration_raw_get(raw_accel_hg);
-        reading.highg_acceleration.ax = LSM6DSV.from_fs2_to_mg(raw_accel_hg[0]) / 1000.0;
+        reading.highg_acceleration.ax = LSM6DSV.from_fs2_to_mg(raw_accel_hg[0]) / 1000.0;//Edits needed? (Check)
         reading.highg_acceleration.ay = LSM6DSV.from_fs2_to_mg(raw_accel_hg[1]) / 1000.0;
         reading.highg_acceleration.az = LSM6DSV.from_fs2_to_mg(raw_accel_hg[2]) / 1000.0;
     }
@@ -36,7 +36,7 @@ IMU IMUSensor::read(){
     //Angular rate
     if(status.gda){
         LSM6DSV.angular_rate_raw_get(raw_av);
-        reading.angular_velocity.vx = LSM6DSV.from_fs2000_to_mdps(raw_av[0]) / 1000.0;
+        reading.angular_velocity.vx = LSM6DSV.from_fs2000_to_mdps(raw_av[0]) / 1000.0;//Edits needed? 
         reading.angular_velocity.vy = LSM6DSV.from_fs2000_to_mdps(raw_av[1]) / 1000.0;
         reading.angular_velocity.vz = LSM6DSV.from_fs2000_to_mdps(raw_av[2]) / 1000.0;
     }
@@ -80,8 +80,8 @@ ErrorCode IMUSensor::init(){
     LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
     LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
-    LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);
-    LSM6DSV.xl_full_scale_set(LSM6DSV320X_2g);
+    LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
+    LSM6DSV.xl_full_scale_set(LSM6DSV320X_2g);//lowg scale set
     LSM6DSV.gy_full_scale_set(LSM6DSV320X_2000dps);
     
     LSM6DSV.sflp_enable_set(1);

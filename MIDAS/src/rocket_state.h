@@ -190,13 +190,13 @@ struct CommandFlags {
 
 struct RocketData {
 public:
-    SensorData<LSM> lsm;
+    SensorData<IMU> lsm; //imudata
 
     SensorData<KalmanData> kalman;
-    SensorData<LowGData> low_g;
-    BufferedSensorData<HighGData, 8> high_g;
+    SensorData<LowGData> low_g;//gtg
+    BufferedSensorData<HighGData, 8> high_g;//gtg
     BufferedSensorData<Barometer, 16> barometer;
-    SensorData<LowGLSM> low_g_lsm;
+    SensorData<LowGLSM> low_g_lsm;//gtg
     SensorData<Continuity> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;

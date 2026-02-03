@@ -72,7 +72,7 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
  //--------------------MIDAS MINI-----------------//
 
 
-DECLARE_THREAD(accelerometers, RocketSystems* arg) { //I would also refer to IMU.cpp to see how this works out
+DECLARE_THREAD(accelerometers, RocketSystems* arg) { //This needs edits
     while (true) {
         LowGData lowg = arg->sensors.low_g.read();
         arg->rocket_data.low_g.update(lowg);

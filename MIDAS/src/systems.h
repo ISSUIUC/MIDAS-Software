@@ -36,7 +36,7 @@ struct Sensors {
     IMUSensor imu;
 
     LowGSensor low_g;
-    LowGLSMSensor low_g_lsm;
+    LowGLSMSensor low_g_lsm; //comment these out
     HighGSensor high_g;
 
     BarometerSensor barometer;
