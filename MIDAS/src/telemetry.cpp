@@ -82,12 +82,13 @@ void Telemetry::acknowledgeReceived() {
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
+    IMU imu = data.imu.getRecentUnsync();
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
     Continuity continuity = data.continuity.getRecentUnsync();
-    HighGData highg = data.high_g.getRecentUnsync();
+    //HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
     Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
@@ -102,9 +103,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
   
     //auto [ax,ay,az, tilt_extra] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023));
-    packet.highg_ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
-    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, MAX_ABS_ACCEL_RANGE_G);
-    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(highg.az, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_ax = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.ax, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.ay, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.az, MAX_ABS_ACCEL_RANGE_G);
 
     // Tilt & FSM State
     static_assert(FSMState::FSM_STATE_COUNT < 16);
@@ -117,7 +118,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, MAX_TELEM_VOLTAGE_V);
     
     // Roll rate
-    float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, MAX_ROLL_RATE_HZ);
+    float roll_rate_hz = std::clamp(std::abs(imu.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, MAX_ROLL_RATE_HZ);
     packet.roll_rate = roll_rate_hz / MAX_ROLL_RATE_HZ * 0xFF;
 
     // KF data
