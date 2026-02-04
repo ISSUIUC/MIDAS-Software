@@ -16,21 +16,21 @@ IMU IMUSensor::read(){
     lsm6dsv320x_status_reg_t status = LSM6DSV.get_status();
 
     IMU reading{};
-
+    
     //Acceleration
     if(status.xlda){
         LSM6DSV.acceleration_raw_get(raw_accel);
-        reading.highg_acceleration.ax = LSM6DSV.from_fs2_to_mg(raw_accel[0]) / 1000.0;
-        reading.highg_acceleration.ay = LSM6DSV.from_fs2_to_mg(raw_accel[1]) / 1000.0;
-        reading.highg_acceleration.az = LSM6DSV.from_fs2_to_mg(raw_accel[2]) / 1000.0;
+        reading.highg_acceleration.ax = LSM6DSV.from_fs64_to_mg(raw_accel[0]) / 1000.0;
+        reading.highg_acceleration.ay = LSM6DSV.from_fs64_to_mg(raw_accel[1]) / 1000.0;
+        reading.highg_acceleration.az = LSM6DSV.from_fs64_to_mg(raw_accel[2]) / 1000.0;
     }
 
     //High-G Acceleration
     if(status.xlhgda){
         LSM6DSV.hg_acceleration_raw_get(raw_accel_hg);
-        reading.highg_acceleration.ax = LSM6DSV.from_fs2_to_mg(raw_accel_hg[0]) / 1000.0;//Edits needed? (Check)
-        reading.highg_acceleration.ay = LSM6DSV.from_fs2_to_mg(raw_accel_hg[1]) / 1000.0;
-        reading.highg_acceleration.az = LSM6DSV.from_fs2_to_mg(raw_accel_hg[2]) / 1000.0;
+        reading.highg_acceleration.ax = LSM6DSV.from_fs64_to_mg(raw_accel_hg[0]) / 1000.0;//Edits needed? (Check)
+        reading.highg_acceleration.ay = LSM6DSV.from_fs64_to_mg(raw_accel_hg[1]) / 1000.0;
+        reading.highg_acceleration.az = LSM6DSV.from_fs64_to_mg(raw_accel_hg[2]) / 1000.0;
     }
 
     //Angular rate
