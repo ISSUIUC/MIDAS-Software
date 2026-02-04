@@ -147,13 +147,6 @@ enum class OrientationReadingType {
 };
 
 /**
- * @struct Orientation
- * 
- * @brief data from the new LSM
- * 
-*/
-
-/**
  * @struct SFLP
  * 
  * @brief Data from the Sensor Fusion Low Power module
@@ -164,8 +157,15 @@ struct IMU_SFLP {
     Quaternion quaternion;
     uint16_t gravity[3];
     uint16_t gbias[3];
-}
+};
 
+/**
+ * 
+ * @struct IMU
+ * 
+ * @brief IMU that stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP
+ * 
+ */
 struct IMU{ 
     Acceleration highg_acceleration;
     Acceleration lowg_acceleration;
@@ -174,13 +174,12 @@ struct IMU{
     IMU_SFLP hw_filtered;
 };
 
-
 /**
- * @struct SFLP
+ * @struct Orientation
  * 
- * @brief Data from the Sensor Fusion Low Power module
+ * @brief data from the new Orientation
  * 
- */
+*/
 struct Orientation {
     // Initalizing SFLP data structures
     IMU_SFLP hw_filtered;
@@ -206,8 +205,9 @@ struct Orientation {
 
 
 /**
+ * @struct Old Orientation
  * 
- * @brief Old, repurposed version of the IMU_SFLP
+ * @brief Old, repurposed version of the Orientation
  * 
  */
 
