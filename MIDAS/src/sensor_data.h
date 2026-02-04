@@ -153,13 +153,6 @@ enum class OrientationReadingType {
  * 
 */
 
-//new orientation struct
-//Quat ourFilter
-//Quat imuFil
-//float tilt
-//euler stuff
-
-
 /**
  * @struct SFLP
  * 
@@ -241,10 +234,6 @@ struct Old_Orientation {
      * @brief TO-DO LIST FOR MIDAS MINI DATA
      * 
      */
-    
-     //throw out old orientation, make new orientation struct
-    // Orientation (repurposed)  --> Stores filtered data
-    // Quaternions from our own filtering
 
     IMU_SFLP hardware_filtered;
     IMU software_filtered;
@@ -267,6 +256,17 @@ struct KalmanData {
 };
 
 /**
+ * @struct KalmanData
+ * 
+ * @brief data from the MQEKF thread
+*/
+struct AngularKalmanData {
+    Quaternion quaternion;
+    Acceleration acceleration;
+    uint16_t gyrobias[3];  
+};
+
+/**
  * @struct PyroState
  * 
  * @brief data regarding all pyro channels
@@ -282,7 +282,6 @@ struct PyroState {
      * [3] PYRO D / AUX
      */
 };
-
 
 
 struct CameraData {

@@ -6,20 +6,13 @@
 #include "TCAL9539.h"
 #include "rocket_state.h"
 
-/**
- * @struct LowG interface
- */
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
-};
 
 /**
- * @struct HighG interface
+ * @struct IMUSensor
  */
-struct HighGSensor {
+struct IMUSensor {
     ErrorCode init();
-    HighGData read();
+    IMU read();
 };
 
 /**
@@ -36,14 +29,6 @@ struct MagnetometerSensor {
 struct BarometerSensor {
     ErrorCode init();
     Barometer read();
-};
-
-/**
- * @struct LowGLSM interface
- */
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
 };
 
 /**
