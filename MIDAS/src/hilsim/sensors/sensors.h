@@ -8,10 +8,12 @@ struct LowGSensor {
     LowGData read();
 };
 
-struct HighGSensor {
+
+struct ImuSensor {
     ErrorCode init();
-    HighGData read();
+    IMU
 };
+
 
 struct MagnetometerSensor {
     ErrorCode init();
@@ -21,11 +23,6 @@ struct MagnetometerSensor {
 struct BarometerSensor {
     ErrorCode init();
     Barometer read();
-};
-
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
 };
 
 struct ContinuitySensor {

@@ -14,9 +14,6 @@ constexpr ReadingDiscriminant get_discriminant();
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
 //-------------IMU/Barometer/Magnetometer----------------// edits in here
-
-ASSOCIATE(LowGLSM, ID_LOWGLSM)
-
 ASSOCIATE(IMU, ID_IMU)
 
 ASSOCIATE(Barometer, ID_BAROMETER)
@@ -94,7 +91,6 @@ void log_begin(LogSink& sink) {
 */
 void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.imu);
-    log_from_sensor_data(sink, data.low_g_lsm);
     log_from_sensor_data(sink, data.barometer);
     log_from_sensor_data(sink, data.continuity);
     log_from_sensor_data(sink, data.voltage);

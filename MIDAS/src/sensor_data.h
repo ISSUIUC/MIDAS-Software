@@ -67,48 +67,6 @@ struct euler_t {
 */
 
 /**
- * @struct LowGData
- * 
- * @brief data from the LowG sensor -> This has to go
-*/
-struct LowGData {
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-
-    LowGData() = default;
-    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
-};
-
-/**
- * @struct HighGData
- * 
- * @brief data from the HighG sensor -> This has to go
-*/
-struct HighGData {
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-
-    HighGData() = default;
-    HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
-};
-
-/**
- * @struct LowGLSM
- * 
- * @brief data from the Low G LSM sensor ->This has to go
-*/
-struct LowGLSM {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-};
-
-/**
  * @struct Barometer
  * 
  * @brief data from the barometer
@@ -211,8 +169,8 @@ enum class OrientationReadingType {
 // Raw IMU data from the LS6DSV320X
 struct IMU_SFLP {
     Quaternion quaternion;
-    uint16_t gravity[3]; //represented in the body frame
-    uint16_t gyrobias[3];  
+    uint16_t gravity[3];
+    uint16_t gbias[3];
 }
 
 struct IMU{ 
@@ -220,20 +178,19 @@ struct IMU{
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
 
-    IMU_SFLP hw_filtered; //hardware filtered
+    IMU_SFLP hw_filtered;
 };
 
 
 /**
- * @struct New Orientation (For Midas Mini)
+ * @struct SFLP
  * 
- * @brief Orientation Data or the rocket, should contain - Hardware SFLP filter. Our IMU filter. Tilt. Euler Angles. -
+ * @brief Data from the Sensor Fusion Low Power module
  * 
  */
 struct Orientation {
     // Initalizing SFLP data structures
     IMU_SFLP hw_filtered;
-    IMU software_filtered;
 
     float tilt = 0;
 
@@ -241,7 +198,7 @@ struct Orientation {
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
     
-    float yaw = 0; //radians
+    float yaw = 0;
     float pitch = 0;
     float roll = 0;
     // For yessir.cpp
@@ -252,14 +209,12 @@ struct Orientation {
         euler.roll = this->roll;
         return euler;
     }
-
-    
 };
 
 
 /**
  * 
- * @brief Old, Probably need to get rid of this.
+ * @brief Old, repurposed version of the IMU_SFLP
  * 
  */
 
@@ -309,17 +264,6 @@ struct KalmanData {
     Acceleration acceleration;
 
     float altitude;
-};
-
-/**
- * @struct KalmanData
- * 
- * @brief data from the MQEKF thread
-*/
-struct AngularKalmanData {
-    Quaternion quaternion;
-    Acceleration acceleration;
-    uint16_t gyrobias[3];  
 };
 
 /**
