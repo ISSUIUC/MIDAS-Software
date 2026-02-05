@@ -157,14 +157,20 @@ struct IMU_SFLP {
     Quaternion quaternion;
     uint16_t gravity[3];
     uint16_t gbias[3];
-}
+};
 
+/**
+ * 
+ * @struct IMU
+ * 
+ * @brief IMU that stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP
+ * 
+ */
 struct IMU{ 
     Acceleration highg_acceleration;
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
 };
-
 
 /**
  * @struct KalmanData
