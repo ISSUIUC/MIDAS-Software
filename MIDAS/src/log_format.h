@@ -19,6 +19,8 @@ enum ReadingDiscriminant {
     ID_FSM = 9,
     ID_PYRO = 10,
     ID_CAMERADATA = 11,
+    ID_ANGULARKALMAN = 12,
+    ID_SFLPHW = 13,
 };
 
 
@@ -39,13 +41,15 @@ struct LoggedReading {
     uint32_t timestamp_ms;
     union {
         IMU imu;
+        IMU_SFLP hw_filt;
         Barometer barometer;
         Continuity continuity;
         Voltage voltage;
         GPS gps;
         Magnetometer magnetometer;
-        Orientation orientation;
+        //Orientation orientation;
         KalmanData kalman;
+        AngularKalmanData angular_kalman;
         FSMState fsm;
         PyroState pyro;
         CameraData cameradata;

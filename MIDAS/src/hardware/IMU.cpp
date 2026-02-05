@@ -12,23 +12,26 @@ int16_t raw_accel[3];
 int16_t raw_accel_hg[3];
 int16_t raw_av[3];
 
+unsigned long lastTime = 0;
+float deltaTime = 0;
+
 IMU IMUSensor::read(){
     lsm6dsv320x_status_reg_t status = LSM6DSV.get_status();
 
     IMU reading{};
     
-    //Acceleration
+    //Low-G Acceleration
     if(status.xlda){
         LSM6DSV.acceleration_raw_get(raw_accel);
-        reading.highg_acceleration.ax = LSM6DSV.from_fs64_to_mg(raw_accel[0]) / 1000.0;
-        reading.highg_acceleration.ay = LSM6DSV.from_fs64_to_mg(raw_accel[1]) / 1000.0;
-        reading.highg_acceleration.az = LSM6DSV.from_fs64_to_mg(raw_accel[2]) / 1000.0;
+        reading.lowg_acceleration.ax = LSM6DSV.from_fs2_to_mg(raw_accel[0]) / 1000.0;
+        reading.lowg_acceleration.ay = LSM6DSV.from_fs2_to_mg(raw_accel[1]) / 1000.0;
+        reading.lowg_acceleration.az = LSM6DSV.from_fs2_to_mg(raw_accel[2]) / 1000.0;
     }
 
     //High-G Acceleration
     if(status.xlhgda){
         LSM6DSV.hg_acceleration_raw_get(raw_accel_hg);
-        reading.highg_acceleration.ax = LSM6DSV.from_fs64_to_mg(raw_accel_hg[0]) / 1000.0;//Edits needed? (Check)
+        reading.highg_acceleration.ax = LSM6DSV.from_fs64_to_mg(raw_accel_hg[0]) / 1000.0;
         reading.highg_acceleration.ay = LSM6DSV.from_fs64_to_mg(raw_accel_hg[1]) / 1000.0;
         reading.highg_acceleration.az = LSM6DSV.from_fs64_to_mg(raw_accel_hg[2]) / 1000.0;
     }
@@ -41,29 +44,76 @@ IMU IMUSensor::read(){
         reading.angular_velocity.vz = LSM6DSV.from_fs2000_to_mdps(raw_av[2]) / 1000.0;
     }
 
+    return reading;
+}
 
-    
+IMU_SFLP IMUSensor::read_sflp() {
+
+    IMU_SFLP reading;
+
     //Embedded SFLP
     uint16_t val[4]; 
 
 	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get((int16_t*)&val);//4 elements
 
-    reading.hw_filtered.quaternion.w = LSM6DSV.from_sflp_to_mg(val[0]);
-    reading.hw_filtered.quaternion.x = LSM6DSV.from_sflp_to_mg(val[1]);
-    reading.hw_filtered.quaternion.y = LSM6DSV.from_sflp_to_mg(val[2]);
-    reading.hw_filtered.quaternion.z = LSM6DSV.from_sflp_to_mg(val[3]);
+    reading.quaternion.w = LSM6DSV.from_sflp_to_mg(val[0]);
+    reading.quaternion.x = LSM6DSV.from_sflp_to_mg(val[1]);
+    reading.quaternion.y = LSM6DSV.from_sflp_to_mg(val[2]);
+    reading.quaternion.z = LSM6DSV.from_sflp_to_mg(val[3]);
 
     LSM6DSV.sflp_gbias_raw_get((int16_t*)&val);//3 elements
+
     for(int i = 0; i<3; i++)
-        reading.hw_filtered.gbias[i] = LSM6DSV.from_sflp_to_mg(val[i]);
+        reading.gbias[i] = LSM6DSV.from_sflp_to_mg(val[i]);
 
 
     LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);//3 elements
     for(int i = 0; i<3; i++)
-        reading.hw_filtered.gravity[i] = LSM6DSV.from_sflp_to_mg(val[i]);
-
+        reading.gravity[i] = LSM6DSV.from_sflp_to_mg(val[i]);
+    
     return reading;
+
 }
+
+AngularKalmanData IMUSensor::read_Kalman_Angular() {
+
+    sh2_SensorValue_t event;
+    Vec3 euler;
+
+    Vec3 filtered_euler = {0, 0, 0};
+    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
+    unsigned long currentTime = millis();
+    deltaTime = (currentTime - lastTime) / 1000.0;
+    lastTime = currentTime;
+
+    if (imu.getSensorEvent(&event)) {
+        AngularKalmanData sensor_reading;
+        sensor_reading.has_data = true;
+        if (event.sensorId == SH2_ARVR_STABILIZED_RV) {
+            euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
+            sensor_reading.reading_type = OrientationReadingType::FULL_READING;
+            sensor_reading.quaternion.w = event.un.arvrStabilizedRV.real;
+            sensor_reading.quaternion.x = event.un.arvrStabilizedRV.i;
+            sensor_reading.quaternion.y = event.un.arvrStabilizedRV.j;
+            sensor_reading.quaternion.z = event.un.arvrStabilizedRV.k;
+            break;
+        }
+
+
+        sensor_reading.yaw = -euler.y;
+        sensor_reading.pitch = euler.x;
+        sensor_reading.roll = euler.z;
+
+        if (initial_flag == 0)
+        {
+            initial_orientation = sensor_reading;
+            initial_flag = 1;
+        }
+
+
+    }
+}
+
 
 ErrorCode IMUSensor::init(){
     uint8_t whoami;

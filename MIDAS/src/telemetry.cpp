@@ -83,6 +83,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
     IMU imu = data.imu.getRecentUnsync();
+    IMU_SFLP hw_filtered_data = data.hw_filtered.getRecentUnsync();
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
@@ -90,8 +91,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Continuity continuity = data.continuity.getRecentUnsync();
     //HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
-    Orientation orientation = data.orientation.getRecentUnsync();
+    //Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
+    AngularKalmanData angular_kalman = data.angular_kalman_data.getRecentUnsync();
     CameraData cam_data = data.cam_data.getRecentUnsync();
 
     packet.lat = gps.latitude;
@@ -107,11 +109,16 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.ay, MAX_ABS_ACCEL_RANGE_G);
     packet.highg_az = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.az, MAX_ABS_ACCEL_RANGE_G);
 
-    // Tilt & FSM State
+
+    //-------------------------------------------------------------------
+
+    // Tilt & FSM State --> NEEDS TO BE EDITED NO MORE ORIENTATION IS USED
     static_assert(FSMState::FSM_STATE_COUNT < 16);
     uint16_t tilt_norm = (orientation.tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
     packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
+
+    //-------------------------------------------------------------------
 
     //Serial.println(packet.tilt_fsm, 2);
     // Battery voltage

@@ -7,18 +7,18 @@
 /**
  * @struct LowG interface
  */
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
-};
+// struct LowGSensor {
+//     ErrorCode init();
+//     LowGData read();
+// };
 
 /**
  * @struct HighG interface
  */
-struct HighGSensor {
-    ErrorCode init();
-    HighGData read();
-};
+// struct HighGSensor {
+//     ErrorCode init();
+//     HighGData read();
+// };
 
 /**
  * @struct Magnetometer interface
@@ -39,10 +39,10 @@ struct BarometerSensor {
 /**
  * @struct LowGLSM interface
  */
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
-};
+// struct LowGLSMSensor {
+//     ErrorCode init();
+//     LowGLSM read();
+// };
 
 /**
  * @struct Continuity interface
@@ -63,12 +63,12 @@ struct VoltageSensor {
 /**
  * @struct BNO interface
  */
-struct OrientationSensor {
-    Orientation initial_orientation;
-    uint8_t initial_flag;
-    ErrorCode init();
-    Orientation read();
-};
+// struct OrientationSensor {
+//     Orientation initial_orientation;
+//     uint8_t initial_flag;
+//     ErrorCode init();
+//     Orientation read();
+// };
 
 /**
  * @struct GPS interface

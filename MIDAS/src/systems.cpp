@@ -72,14 +72,13 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
  //--------------------MIDAS MINI-----------------//
 
 
-DECLARE_THREAD(accelerometers, RocketSystems* arg) { //This needs edits
+DECLARE_THREAD(imuthread, RocketSystems* arg) { //This needs edits
     while (true) {
-        LowGData lowg = arg->sensors.low_g.read();
-        arg->rocket_data.low_g.update(lowg);
-        LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
-        arg->rocket_data.low_g_lsm.update(lowglsm);
-        HighGData highg = arg->sensors.high_g.read();
-        arg->rocket_data.high_g.update(highg);
+        
+        IMU imudata = arg->sensors.imu.read();
+        arg->rocket_data.imu.update(imudata);
+        IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
+        arg->rocket_data.hw_filtered.update(hw_filter);
 
         THREAD_SLEEP(5);
     }
@@ -89,31 +88,29 @@ DECLARE_THREAD(accelerometers, RocketSystems* arg) { //This needs edits
 //handle mode switching from on pad madgwick to ekf?
 //quaternion -> euler for telem
 //orientation struct updated
-DECLARE_THREAD(orientation, RocketSystems* arg) {
-    while (true) {
-        Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
-        Orientation reading = arg->sensors.orientation.read();
-        if (reading.has_data) {
-            if(reading.reading_type == OrientationReadingType::ANGULAR_VELOCITY_UPDATE) {
-                orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
-                orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
-                orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
-            } else {
-                float old_vx = orientation_holder.angular_velocity.vx;
-                float old_vy = orientation_holder.angular_velocity.vy;
-                float old_vz = orientation_holder.angular_velocity.vz;
-                orientation_holder = reading;
-                orientation_holder.angular_velocity.vx = old_vx;
-                orientation_holder.angular_velocity.vy = old_vy;
-                orientation_holder.angular_velocity.vz = old_vz;
-            }
-
-            arg->rocket_data.orientation.update(orientation_holder);
-        }
-
-        THREAD_SLEEP(5);
-    }
-}
+// DECLARE_THREAD(orientation, RocketSystems* arg) {
+//     while (true) {
+//         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
+//         Orientation reading = arg->sensors.orientation.read();
+//         if (reading.has_data) {
+//             if(reading.reading_type == OrientationReadingType::ANGULAR_VELOCITY_UPDATE) {
+//                 orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
+//                 orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
+//                 orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
+//             } else {
+//                 float old_vx = orientation_holder.angular_velocity.vx;
+//                 float old_vy = orientation_holder.angular_velocity.vy;
+//                 float old_vz = orientation_holder.angular_velocity.vz;
+//                 orientation_holder = reading;
+//                 orientation_holder.angular_velocity.vx = old_vx;
+//                 orientation_holder.angular_velocity.vy = old_vy;
+//                 orientation_holder.angular_velocity.vz = old_vz;
+//             }
+//             arg->rocket_data.orientation.update(orientation_holder);
+//         }
+//         THREAD_SLEEP(5);
+//     }
+// }
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
@@ -232,7 +229,16 @@ DECLARE_THREAD(buzzer, RocketSystems* arg) {
     }
 }
 
-//Edit this thread so it uses new sensors instead. HighGData and Orientation data have to be refactored.
+
+//angularkalmandata needs updates
+DECLARE_THREAD(angularkalman, RocketSystems* arg) { //
+    while (true) {
+        //Divij/Michael help here
+        THREAD_SLEEP(10);
+    }
+}
+
+//Need to edit this thread so it uses new sensors instead. HighGData and Orientation data have to be refactored.
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     ekf.initialize(arg);
     // Serial.println("Initialized ekf :(");
@@ -248,19 +254,30 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
 
         //focus here
-        Orientation current_orientation = arg->rocket_data.orientation.getRecent();
-        HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
+        IMU current_imu = arg->rocket_data.imu.getRecent();
+        Acceleration current_high_g = current_imu.highg_acceleration;
+        Acceleration current_low_g = current_imu.lowg_acceleration;
+
+        //Orientation current_orientation = arg->rocket_data.orientation.getRecent();
+        // current_accelerometer = arg->rocket_data.high_g.getRecent();
         //focus here
 
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+
+        
         Acceleration current_accelerations = {
-            .ax = current_accelerometer.ax,
-            .ay = current_accelerometer.ay,
-            .az = current_accelerometer.az
-        };
+            .ax = current_high_g.ax,
+            .ay = current_high_g.ay,
+            .az = current_high_g.az
+        };//
+
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
+
+        //Divij majic needs to be done here.
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);//new tick function push imu into that
+
+
         KalmanData current_state = ekf.getState();
 
         arg->rocket_data.kalman.update(current_state);
@@ -394,11 +411,11 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
-    INIT_SYSTEM(systems.sensors.low_g);
-    INIT_SYSTEM(systems.sensors.orientation);
+    INIT_SYSTEM(systems.sensors.imu);
+    //INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.log_sink);
-    INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    //INIT_SYSTEM(systems.sensors.high_g);
+    //INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.continuity);
@@ -436,9 +453,9 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    START_THREAD(orientation, SENSOR_CORE, config, 10);
+    //START_THREAD(orientation, SENSOR_CORE, config, 10);
     START_THREAD(logger, DATA_CORE, config, 15);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    START_THREAD(imuthread, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
     START_THREAD(gps, SENSOR_CORE, config, 8);
     START_THREAD(voltage, SENSOR_CORE, config, 9);
@@ -448,6 +465,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    START_THREAD(angularkalman, SENSOR_CORE, config, 7)
     #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
     #endif

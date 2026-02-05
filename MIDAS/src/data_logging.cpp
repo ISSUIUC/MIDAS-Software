@@ -13,27 +13,21 @@ constexpr ReadingDiscriminant get_discriminant();
 */
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
-//-------------IMU/Barometer/Magnetometer----------------// edits in here
+
 ASSOCIATE(IMU, ID_IMU)
-
 ASSOCIATE(Barometer, ID_BAROMETER)
-
 ASSOCIATE(Continuity, ID_CONTINUITY)
 ASSOCIATE(Voltage, ID_VOLTAGE)
 ASSOCIATE(GPS, ID_GPS)
-
 ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
-
-ASSOCIATE(Orientation, ID_ORIENTATION) 
-
-//-------------IMU/Barometer/Magnetometer/Orientation(probably remove orientation)----------------//
-
-
-ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
+ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(PyroState, ID_PYRO)
-
 ASSOCIATE(CameraData, ID_CAMERADATA)
+ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN)
+ASSOCIATE(IMU_SFLP, ID_SFLPHW)
+
+
 
 
 
@@ -91,14 +85,16 @@ void log_begin(LogSink& sink) {
 */
 void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.imu);
+    log_from_sensor_data(sink, data.hw_filtered);
     log_from_sensor_data(sink, data.barometer);
     log_from_sensor_data(sink, data.continuity);
     log_from_sensor_data(sink, data.voltage);
     log_from_sensor_data(sink, data.gps);
     log_from_sensor_data(sink, data.magnetometer);
-    log_from_sensor_data(sink, data.orientation);
+    //log_from_sensor_data(sink, data.orientation);
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
+    log_from_sensor_data(sink, data.angular_kalman_data);
     log_from_sensor_data(sink, data.pyro);
 
     //log_from_sensor_data(sink, data.quaternions);

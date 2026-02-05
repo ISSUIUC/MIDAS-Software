@@ -13,6 +13,7 @@
 struct IMUSensor {
     ErrorCode init();
     IMU read();
+    IMU_SFLP read_sflp();
 };
 
 /**
@@ -47,22 +48,22 @@ struct VoltageSensor {
     Voltage read();
 };
 
-/**
- * @struct BNO interface
- */
-struct OrientationSensor {
-    Orientation initial_orientation;
-    Quaternion initial_quaternion;
-    uint8_t initial_flag;
+// /**
+//  * @struct BNO interface
+//  */
+// struct OrientationSensor {
+//     Orientation initial_orientation;
+//     Quaternion initial_quaternion;
+//     uint8_t initial_flag;
 
-    float prev_x = 0;
-    float prev_y = 0;
-    float prev_z = 0;
-    float prev_tilt = 0;
+//     float prev_x = 0;
+//     float prev_y = 0;
+//     float prev_z = 0;
+//     float prev_tilt = 0;
 
-    ErrorCode init();
-    Orientation read();
-};
+//     ErrorCode init();
+//     Orientation read();
+// };
 
 /**
  * @struct GPS interface

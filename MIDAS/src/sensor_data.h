@@ -147,19 +147,12 @@ enum class OrientationReadingType {
 };
 
 /**
- * @struct Orientation
- * 
- * @brief data from the new LSM
- * 
-*/
-
-/**
  * @struct SFLP
  * 
  * @brief Data from the Sensor Fusion Low Power module
  * 
  */
-// Raw IMU data from the LS6DSV320X
+// Raw IMU data from the LS6DSV320X this is hw filtered
 struct IMU_SFLP {
     Quaternion quaternion;
     uint16_t gravity[3];
@@ -170,24 +163,30 @@ struct IMU{
     Acceleration highg_acceleration;
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
-
-    IMU_SFLP hw_filtered;
 };
 
 
 /**
- * @struct SFLP
+ * @struct KalmanData
  * 
- * @brief Data from the Sensor Fusion Low Power module
+ * @brief data from the Kalman thread
+*/
+struct KalmanData {
+    Position position;
+    Velocity velocity;
+    Acceleration acceleration;
+};
+
+/**
+ * @struct KalmanData
  * 
- */
-struct Orientation {
-    // Initalizing SFLP data structures
-    IMU_SFLP hw_filtered;
-
-    float tilt = 0;
-
-    // Orientation stuff
+ * @brief data from the MQEKF thread
+*/
+struct AngularKalmanData {
+    Quaternion quaternion;
+    uint16_t gyrobias[3];
+    double comp_tilt = 0.0;
+    double mq_tilt = 0.0;
     bool has_data = false;
     OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
     
@@ -202,68 +201,7 @@ struct Orientation {
         euler.roll = this->roll;
         return euler;
     }
-};
-
-
-/**
- * 
- * @brief Old, repurposed version of the IMU_SFLP
- * 
- */
-
-struct Old_Orientation {
-    Velocity orientation_velocity;//dont care check if there is an output for filter
-
-    Velocity getVelocity() const {
-        return orientation_velocity;
-    }
-
-    Acceleration orientation_acceleration;
-
-    Acceleration linear_acceleration;
-
-    float gx = 0, gy = 0, gz = 0;
-
-    Magnetometer magnetometer;
-
-    float temperature = 0;
-    float pressure = 0;
-
-    /**
-     * 
-     * @brief TO-DO LIST FOR MIDAS MINI DATA
-     * 
-     */
-
-    IMU_SFLP hardware_filtered;
-    IMU software_filtered;
-    // Any derived values from the above
-    // Tilt, euler angles, etc    
-};
-
-
-/**
- * @struct KalmanData
- * 
- * @brief data from the Kalman thread
-*/
-struct KalmanData {
-    Position position;
-    Velocity velocity;
-    Acceleration acceleration;
-
-    float altitude;
-};
-
-/**
- * @struct KalmanData
- * 
- * @brief data from the MQEKF thread
-*/
-struct AngularKalmanData {
-    Quaternion quaternion;
-    Acceleration acceleration;
-    uint16_t gyrobias[3];  
+    
 };
 
 /**

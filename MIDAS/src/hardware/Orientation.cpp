@@ -13,6 +13,7 @@ Adafruit_BNO08x imu(BNO086_RESET);
 // Stabilized RV vector report interval [40ms] --> sensor report for absolute angles (expensive)
 #define REPORT_INTERVAL_STAB_US 40000
 
+//why do we do stuff like this??
 
 unsigned long lastTime = 0;
 float deltaTime = 0;
