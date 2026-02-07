@@ -84,5 +84,5 @@ struct GPSSensor {
  */
 struct Pyro {
     ErrorCode init();
-    PyroState tick(FSMState fsm_state, Orientation orientation);
+    PyroState tick(FSMState fsm_state, AngularKalmanData angularkalman);
 };

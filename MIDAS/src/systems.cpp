@@ -62,15 +62,6 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
     }
 }
 
-//--------------------MIDAS MINI-----------------//
-
-//We have to remove the seperate ways of updating the acceleration data
-//Update IMU.highg / IMU.lowg stuff instead
-
-//update gyro data in here as well
-
- //--------------------MIDAS MINI-----------------//
-
 
 DECLARE_THREAD(imuthread, RocketSystems* arg) { //This needs edits
     while (true) {
@@ -136,7 +127,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         CommandFlags& command_flags = arg->rocket_data.command_flags;
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.orientation.getRecentUnsync(), command_flags);
+        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.angular_kalman_data.getRecentUnsync(), command_flags);
         arg->rocket_data.pyro.update(new_pyro_state);
 
         arg->led.update();
@@ -238,7 +229,7 @@ DECLARE_THREAD(angularkalman, RocketSystems* arg) { //
     }
 }
 
-//Need to edit this thread so it uses new sensors instead. HighGData and Orientation data have to be refactored.
+
 DECLARE_THREAD(kalman, RocketSystems* arg) {
     ekf.initialize(arg);
     // Serial.println("Initialized ekf :(");
@@ -250,17 +241,13 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             TickType_t last = xTaskGetTickCount();
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
-        // add the tick update function
+        
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
 
-        //focus here
+        
         IMU current_imu = arg->rocket_data.imu.getRecent();
         Acceleration current_high_g = current_imu.highg_acceleration;
         Acceleration current_low_g = current_imu.lowg_acceleration;
-
-        //Orientation current_orientation = arg->rocket_data.orientation.getRecent();
-        // current_accelerometer = arg->rocket_data.high_g.getRecent();
-        //focus here
 
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
 

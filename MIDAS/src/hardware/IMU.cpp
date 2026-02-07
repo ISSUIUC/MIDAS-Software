@@ -75,44 +75,38 @@ IMU_SFLP IMUSensor::read_sflp() {
 
 }
 
-AngularKalmanData IMUSensor::read_Kalman_Angular() {
+//dont need this anymore
 
-    sh2_SensorValue_t event;
-    Vec3 euler;
-
-    Vec3 filtered_euler = {0, 0, 0};
-    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
-    unsigned long currentTime = millis();
-    deltaTime = (currentTime - lastTime) / 1000.0;
-    lastTime = currentTime;
-
-    if (imu.getSensorEvent(&event)) {
-        AngularKalmanData sensor_reading;
-        sensor_reading.has_data = true;
-        if (event.sensorId == SH2_ARVR_STABILIZED_RV) {
-            euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
-            sensor_reading.reading_type = OrientationReadingType::FULL_READING;
-            sensor_reading.quaternion.w = event.un.arvrStabilizedRV.real;
-            sensor_reading.quaternion.x = event.un.arvrStabilizedRV.i;
-            sensor_reading.quaternion.y = event.un.arvrStabilizedRV.j;
-            sensor_reading.quaternion.z = event.un.arvrStabilizedRV.k;
-            break;
-        }
-
-
-        sensor_reading.yaw = -euler.y;
-        sensor_reading.pitch = euler.x;
-        sensor_reading.roll = euler.z;
-
-        if (initial_flag == 0)
-        {
-            initial_orientation = sensor_reading;
-            initial_flag = 1;
-        }
-
-
-    }
-}
+// AngularKalmanData IMUSensor::read_Kalman_Angular() {
+//     sh2_SensorValue_t event;
+//     Vec3 euler;
+//     Vec3 filtered_euler = {0, 0, 0};
+//     const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
+//     unsigned long currentTime = millis();
+//     deltaTime = (currentTime - lastTime) / 1000.0;
+//     lastTime = currentTime;
+//     if (imu.getSensorEvent(&event)) {
+//         AngularKalmanData sensor_reading;
+//         sensor_reading.has_data = true;
+//         if (event.sensorId == SH2_ARVR_STABILIZED_RV) {
+//             euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
+//             sensor_reading.reading_type = OrientationReadingType::FULL_READING;
+//             sensor_reading.quaternion.w = event.un.arvrStabilizedRV.real;
+//             sensor_reading.quaternion.x = event.un.arvrStabilizedRV.i;
+//             sensor_reading.quaternion.y = event.un.arvrStabilizedRV.j;
+//             sensor_reading.quaternion.z = event.un.arvrStabilizedRV.k;
+//             break;
+//         }
+//         sensor_reading.yaw = -euler.y;
+//         sensor_reading.pitch = euler.x;
+//         sensor_reading.roll = euler.z;
+//         if (initial_flag == 0)
+//         {
+//             initial_orientation = sensor_reading;
+//             initial_flag = 1;
+//         }
+//     }
+// }
 
 
 ErrorCode IMUSensor::init(){

@@ -166,7 +166,7 @@ struct IMU_SFLP {
  * @brief IMU that stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP
  * 
  */
-struct IMU{ 
+struct IMU { 
     Acceleration highg_acceleration;
     Acceleration lowg_acceleration;
     Velocity angular_velocity;

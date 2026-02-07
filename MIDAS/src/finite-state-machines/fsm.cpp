@@ -59,14 +59,14 @@ double sensor_derivative(BufferedSensorData<T, count>& sensor, double (* get_ite
  * @brief Populates StateEstimate struct with the correct values for accel, alt, jerk, and speed
 */
 StateEstimate::StateEstimate(RocketData& state) {
-    acceleration = sensor_average<HighGData, 8>(state.high_g, [](HighGData& data) {
-        return (double) data.ax;
+    acceleration = sensor_average<IMU, 8>(state.imu, [](IMU& data) {
+        return (double) data.highg_acceleration.ax; //CHECK WITH DIVIJ/MICHAEL
     });
     altitude = sensor_average<Barometer, 16>(state.barometer, [](Barometer& data) {
         return (double) data.altitude;
     });
-    jerk = sensor_derivative<HighGData, 8>(state.high_g, [](HighGData& data) {
-        return (double) data.ax;
+    jerk = sensor_derivative<IMU, 8>(state.high_g, [](IMU& data) {
+        return (double) data.highg_acceleration.ax; //CHECK WITH DIVIJ/MICHAEL
     });
     vertical_speed = sensor_derivative<Barometer, 16>(state.barometer, [](Barometer& data) {
         return (double) data.altitude;
