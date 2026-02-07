@@ -10,6 +10,8 @@
 #define PROPERTY_DISABLE                (0U)
 #define PROPERTY_ENABLE                 (1U)
 
+//ISS Custom
+#define NUM_DIRECTIONS                             3
 
 //Device ID
 #define LSM6DSV320X_ID                             0x73U
@@ -519,9 +521,18 @@ public:
     int32_t angular_rate_raw_get(int16_t *val);
 
     float from_fs2_to_mg(int16_t lsb);
+    float from_fs8_to_mg(int16_t lsb);
+    float from_fs16_to_mg(int16_t lsb);
     float from_fs64_to_mg(int16_t lsb);
     float from_fs2000_to_mdps(int16_t lsb);
-    float from_sflp_to_mg(int16_t lsb);
+  
+    void get_lowg_acceleration_from_fs2_to_g(float *ax, float *ay, float *az);
+    void get_highg_acceleration_from_fs64_to_g(float *ax, float *ay, float *az);
+    void get_angular_velocity_from_fs2000_to_dps(float *vx, float *vy, float *vz);
+    
+    float sflp_gbias_raw_to_mdps(int16_t raw);
+    float sflp_quaternion_raw_to_float(int16_t raw);
+    float sflp_gravity_raw_to_mg(int16_t raw);
 
     int32_t xl_setup(lsm6dsv320x_data_rate_t xl_odr, lsm6dsv320x_xl_mode_t xl_mode);//Only sets up lowg
     int32_t gy_setup(lsm6dsv320x_data_rate_t gy_odr, lsm6dsv320x_gy_mode_t gy_mode);

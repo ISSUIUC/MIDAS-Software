@@ -32,7 +32,7 @@ int read_pwr_monitor_register(int reg, int bytes) {
  * @return Error code
 */
 ErrorCode ContinuitySensor::init() {
-    // ADS7138Init();              // Ask ADS to init the pins, we still need to get the device to actually read
+    // ADS7138Init();              // Ask AƒDS to init the pins, we still need to get the device to actually read
     // Configure the INA745b        MODE:ContTCV  VBUS:1052us  VSEN:1052us  TCT:1052us   AVG:128
     constexpr uint16_t INA_config = (0xF << 12) | (0x5 << 9) | (0x5 << 6) | (0x5 << 3) | (0x4);
 

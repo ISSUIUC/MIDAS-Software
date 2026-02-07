@@ -152,11 +152,19 @@ enum class OrientationReadingType {
  * @brief Data from the Sensor Fusion Low Power module
  * 
  */
+
+/**
+*
+* @brief Implementing obtaining SFLP data from FIFO
+*
+*
+*/
+
 // Raw IMU data from the LS6DSV320X this is hw filtered
 struct IMU_SFLP {
     Quaternion quaternion;
-    uint16_t gravity[3];
-    uint16_t gbias[3];
+    Acceleration gravity;
+    Velocity gyro_bias;
 };
 
 /**
@@ -171,6 +179,87 @@ struct IMU {
     Acceleration lowg_acceleration;
     Velocity angular_velocity;
 };
+
+// adding this to dissect how to get FIFO
+/*
+    lsm6dsv320x_fifo_out_raw_t f_data;      __initial variable
+
+      lsm6dsv320x_fifo_out_raw_get(&dev_ctx, &f_data);    __function for getting the data || put this in fifo_out_raw_get  
+      datax = (int16_t *)&f_data.data[0];
+      datay = (int16_t *)&f_data.data[2];
+      dataz = (int16_t *)&f_data.data[4];      
+      
+      ts = (int32_t *)&f_data.data[0];      
+
+
+    All of the sums are for an average
+
+    __GBIAS
+
+    axis = &f_data.data[0];
+    gbias_mdps[0] = lsm6dsv320x_from_fs125_to_mdps(axis[0] | (axis[1] << 8));   __getting the gbias (x, y, z)
+    gbias_mdps[1] = lsm6dsv320x_from_fs125_to_mdps(axis[2] | (axis[3] << 8));
+    gbias_mdps[2] = lsm6dsv320x_from_fs125_to_mdps(axis[4] | (axis[5] << 8));
+
+    gbias_sum[0] += gbias_mdps[0];
+    gbias_sum[1] += gbias_mdps[1];
+    gbias_sum[2] += gbias_mdps[2];
+    
+    remove {
+    gbias_cnt++;    __this gets the count to eventually divide the average, we do not need these
+    break;
+    }
+
+
+    __GRAVITY VECTOR
+
+    axis = &f_data.data[0];
+    gravity_mg[0] = lsm6dsv320x_from_sflp_to_mg(axis[0] | (axis[1] << 8));
+    gravity_mg[1] = lsm6dsv320x_from_sflp_to_mg(axis[2] | (axis[3] << 8));
+    gravity_mg[2] = lsm6dsv320x_from_sflp_to_mg(axis[4] | (axis[5] << 8));
+
+    gravity_sum[0] += gravity_mg[0];
+    gravity_sum[1] += gravity_mg[1];
+    gravity_sum[2] += gravity_mg[2];
+    
+    // remove {
+    gravity_cnt++;
+    break;
+
+
+    __QUATERNION
+
+        uint16_t *sflp = (uint16_t *)&f_data.data[2];
+
+        if (f_data.data[0] == 0x00) {
+
+            __game rotation first word
+          quat[0] = npy_half_to_float(sflp[0]);
+          quat[1] = npy_half_to_float(sflp[1]);
+        } else if (f_data.data[0] == 0x01) {
+            
+        __game rotation second word 
+          quat[2] = npy_half_to_float(sflp[0]);
+          quat[3] = npy_half_to_float(sflp[1]);
+
+          rot_sum[0] += quat[0];
+          rot_sum[1] += quat[1];
+          rot_sum[2] += quat[2];
+          rot_sum[3] += quat[3];
+
+          rot_cnt++;
+        } else {
+
+            __error
+          snprintf((char *)tx_buffer, sizeof(tx_buffer), "[%02x - %02x] wrong word \r\n", f_data.data[0], f_data.data[1]);
+          tx_com(tx_buffer, strlen((char const *)tx_buffer));
+       }
+
+        break;
+      }
+    
+}
+*/
 
 /**
  * @struct KalmanData

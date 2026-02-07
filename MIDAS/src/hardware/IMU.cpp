@@ -5,12 +5,13 @@
 
 #define IMU_CS_PIN 39
 #define IMU_IRQ_PIN 19
+#define NUM_DIRECTIONS 3
 
 LSM6DSV320XClass LSM6DSV(SPI, IMU_CS_PIN, IMU_IRQ_PIN);
 
-int16_t raw_accel[3];
-int16_t raw_accel_hg[3];
-int16_t raw_av[3];
+int16_t raw_accel[NUM_DIRECTIONS];
+int16_t raw_accel_hg[NUM_DIRECTIONS];
+int16_t raw_av[NUM_DIRECTIONS];
 
 unsigned long lastTime = 0;
 float deltaTime = 0;
@@ -22,26 +23,23 @@ IMU IMUSensor::read(){
     
     //Low-G Acceleration
     if(status.xlda){
-        LSM6DSV.acceleration_raw_get(raw_accel);
-        reading.lowg_acceleration.ax = LSM6DSV.from_fs2_to_mg(raw_accel[0]) / 1000.0;
-        reading.lowg_acceleration.ay = LSM6DSV.from_fs2_to_mg(raw_accel[1]) / 1000.0;
-        reading.lowg_acceleration.az = LSM6DSV.from_fs2_to_mg(raw_accel[2]) / 1000.0;
+        LSM6DSV.get_lowg_acceleration_from_fs2_to_g(&reading.lowg_acceleration.ax, 
+                                                    &reading.lowg_acceleration.ay, 
+                                                    &reading.lowg_acceleration.az);
     }
 
     //High-G Acceleration
     if(status.xlhgda){
-        LSM6DSV.hg_acceleration_raw_get(raw_accel_hg);
-        reading.highg_acceleration.ax = LSM6DSV.from_fs64_to_mg(raw_accel_hg[0]) / 1000.0;
-        reading.highg_acceleration.ay = LSM6DSV.from_fs64_to_mg(raw_accel_hg[1]) / 1000.0;
-        reading.highg_acceleration.az = LSM6DSV.from_fs64_to_mg(raw_accel_hg[2]) / 1000.0;
+        LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax, 
+                                                    &reading.highg_acceleration.ay, 
+                                                    &reading.highg_acceleration.az);
     }
 
     //Angular rate
     if(status.gda){
-        LSM6DSV.angular_rate_raw_get(raw_av);
-        reading.angular_velocity.vx = LSM6DSV.from_fs2000_to_mdps(raw_av[0]) / 1000.0;//Edits needed? 
-        reading.angular_velocity.vy = LSM6DSV.from_fs2000_to_mdps(raw_av[1]) / 1000.0;
-        reading.angular_velocity.vz = LSM6DSV.from_fs2000_to_mdps(raw_av[2]) / 1000.0;
+        LSM6DSV.get_angular_velocity_from_fs2000_to_dps(&reading.angular_velocity.vx, 
+                                                    &reading.angular_velocity.vy, 
+                                                    &reading.angular_velocity.vz);
     }
 
     return reading;
@@ -51,28 +49,30 @@ IMU_SFLP IMUSensor::read_sflp() {
 
     IMU_SFLP reading;
 
-    //Embedded SFLP
-    uint16_t val[4]; 
+    uint16_t val[4];
 
 	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get((int16_t*)&val);//4 elements
 
-    reading.quaternion.w = LSM6DSV.from_sflp_to_mg(val[0]);
-    reading.quaternion.x = LSM6DSV.from_sflp_to_mg(val[1]);
-    reading.quaternion.y = LSM6DSV.from_sflp_to_mg(val[2]);
-    reading.quaternion.z = LSM6DSV.from_sflp_to_mg(val[3]);
+    reading.quaternion.w = LSM6DSV.sflp_quaternion_raw_to_float(val[0]);//Will have to find a half to single precision conversion function somewhere
+    reading.quaternion.x = LSM6DSV.sflp_quaternion_raw_to_float(val[1]);
+    reading.quaternion.y = LSM6DSV.sflp_quaternion_raw_to_float(val[2]);
+    reading.quaternion.z = LSM6DSV.sflp_quaternion_raw_to_float(val[3]);
 
+    //UPDATE TO USE FIFO
     LSM6DSV.sflp_gbias_raw_get((int16_t*)&val);//3 elements
 
-    for(int i = 0; i<3; i++)
-        reading.gbias[i] = LSM6DSV.from_sflp_to_mg(val[i]);
+    reading.gyro_bias.vx = LSM6DSV.sflp_gbias_raw_to_mdps(val[0]);
+    reading.gyro_bias.vy = LSM6DSV.sflp_gbias_raw_to_mdps(val[1]);
+    reading.gyro_bias.vz = LSM6DSV.sflp_gbias_raw_to_mdps(val[2]);
 
-
+    //UPDATE TO USE FIFO
     LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);//3 elements
-    for(int i = 0; i<3; i++)
-        reading.gravity[i] = LSM6DSV.from_sflp_to_mg(val[i]);
+    
+    reading.gravity.ax = LSM6DSV.sflp_gravity_raw_to_mg(val[0]);
+    reading.gravity.ay = LSM6DSV.sflp_gravity_raw_to_mg(val[1]);
+    reading.gravity.az = LSM6DSV.sflp_gravity_raw_to_mg(val[2]);
     
     return reading;
-
 }
 
 //dont need this anymore
@@ -114,7 +114,6 @@ ErrorCode IMUSensor::init(){
     LSM6DSV.device_id_get(&whoami);
     if(whoami != LSM6DSV320X_ID) 
         return IMUCouldNotBeInitialized;
-
 
     //?????
     LSM6DSV.sw_por();
