@@ -24,9 +24,9 @@ bool error_is_failure(GpioError error_code) {
  * 
  * @return True if acceptable, false if not.
  */
-bool can_fire_igniter(Orientation orientation) {
+bool can_fire_igniter(AngularKalmanData angular_kalman_data) {
     // With new GNC orientation code we can add a simple check.
-    return orientation.tilt < MAXIMUM_TILT_ANGLE;
+    return angular_kalman_data.comp_tilt < MAXIMUM_TILT_ANGLE; // comp_tilt or mq_tilt?
 }
 
 
@@ -84,7 +84,7 @@ void Pyro::reset_pyro_safety() {
  * 
  * @return A pyro struct indicating which pyro channels are armed and/or firing.
  */
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands) {
+PyroState Pyro::tick(FSMState fsm_state, AngularKalmanData angular_kalman_data, CommandFlags& telem_commands) {
     PyroState new_pyro_state = PyroState();
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
@@ -155,7 +155,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
         case FSMState::STATE_SUSTAINER_IGNITION:
             // Fire "Pyro C" to ignite sustainer (Pyro C is motor channel)
             // Additionally, check if orientation allows for firing
-            if (can_fire_igniter(orientation)) {
+            if (can_fire_igniter(angular_kalman_data)) {
                 new_pyro_state.channel_firing[2] = true;
                 gpioDigitalWrite(PYROC_FIRE_PIN, HIGH);
             }
@@ -188,7 +188,7 @@ PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& 
  * 
  * @return A new pyro struct, with data depending on whether or not each pyro channel should be firing.
 */
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands) {
+PyroState Pyro::tick(FSMState fsm_state, AngularKalmanData angular_kalman_data, CommandFlags& telem_commands) {
     PyroState new_pyro_state = PyroState();
     double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 

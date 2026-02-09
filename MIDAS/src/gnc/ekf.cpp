@@ -1,5 +1,6 @@
 #include "ekf.h"
 #include "finite-state-machines/fsm_states.h"
+#include "rocket_state.h"
 
 extern const std::map<float, float> O5500X_data;
 extern const std::map<float, float> M685W_data;
@@ -7,7 +8,7 @@ extern const std::map<std::string, std::map<float, float>> motor_data;
 
 EKF::EKF() : KalmanFilter()
 {
-    state = KalmanData();
+    state = KalmanData(); // does this need to change?
 }
 
 /**
@@ -37,17 +38,17 @@ void EKF::priori() {};
  */
 void EKF::initialize(RocketSystems *args)
 {
-    Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
+    AngularKalmanData angular_kalman = args->rocket_data.angular_kalman_data.getRecentUnsync();
     float sum = 0;
 
     for (int i = 0; i < 30; i++)
     {
         Barometer barometer = args->rocket_data.barometer.getRecent();
-        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
+        IMU initial_accelerometer = args->rocket_data.imu.getRecent(); //lowg
         Acceleration accelerations = {
-            .ax = initial_accelerometer.ax,
-            .ay = initial_accelerometer.ay,
-            .az = initial_accelerometer.az};
+            .ax = initial_accelerometer.lowg_acceleration.ax,
+            .ay = initial_accelerometer.lowg_acceleration.ay,
+            .az = initial_accelerometer.lowg_acceleration.az}; //please check axis divij
         sum += barometer.altitude;
 
         // init_accel(0, 0) += -accelerations.ax;
@@ -60,7 +61,7 @@ void EKF::initialize(RocketSystems *args)
     // init_accel(1, 0) /= 30;
     // init_accel(2, 0) /= 30;
 
-    euler_t euler = orientation.getEuler();
+    euler_t euler = angular_kalman.getEuler();
     // euler.yaw = -euler.yaw;
 
     // set x_k
@@ -134,14 +135,14 @@ void EKF::initialize(RocketSystems *args)
  * it extrapolates the state at time n+1 based on the state at time n.
  */
 
-void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
+void EKF::priori(float dt, IMU &imudata, FSMState fsm, AngularKalmanData &angularkalman)
 {
     Eigen::Matrix<float, 9, 1> xdot = Eigen::Matrix<float, 9, 1>::Zero();
 
     // angular states from sensors
-    Velocity omega_rps = orientation.getAngularVelocity(); // rads per sec
+    Velocity omega_rps = imudata.angular_velocity; // rads per sec
 
-    euler_t angles_rad = orientation.getEuler();
+    euler_t angles_rad = angularkalman.getEuler();
 
     // ignore effects of gravity when on pad
     Eigen::Matrix<float, 3, 1> g_global = Eigen::Matrix<float, 3, 1>::Zero();
@@ -250,7 +251,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm)
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
-void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state)
+void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state)
 {
     // if on pad -> take last 10 barometer measurements for init state
     if (FSM_state == FSMState::STATE_IDLE)
@@ -287,7 +288,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
     (sensor_accel_global_g)(1, 0) = acceleration.ay - 0.065;
     (sensor_accel_global_g)(2, 0) = acceleration.az - 0.06;
 
-    euler_t angles_rad = orientation.getEuler();
+    euler_t angles_rad = angularkalman.getEuler();
     // angles_rad.yaw = -angles_rad.yaw; // coordinate frame match
 
     BodyToGlobal(angles_rad, sensor_accel_global_g);
@@ -336,10 +337,10 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
  * @param sd Spectral density of the noise
  * @param &barometer Data of the current barometer
  * @param acceleration Current acceleration
- * @param &orientation Current orientation
+ * @param &orientation Current orientation 
  * @param current_state Current FSM_state
  */
-void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state)
+void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, IMU &imudata ,AngularKalmanData &angularkalman, FSMState FSM_state)
 {
     if (FSM_state >= FSMState::STATE_IDLE) //
     {
@@ -351,8 +352,8 @@ void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration accelerati
         stage_timestamp += dt;
         // setF(dt, orientation.roll, orientation.pitch, orientation.yaw);
         setQ(dt, sd);
-        priori(dt, orientation, FSM_state);
-        update(barometer, acceleration, orientation, FSM_state);
+        priori(dt, imudata, FSM_state, angularkalman);
+        update(barometer, acceleration, angularkalman, FSM_state);
     }
 }
 

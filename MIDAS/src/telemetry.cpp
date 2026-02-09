@@ -32,19 +32,19 @@ T inv_convert_range(float val, float range) {
  * 
  * @return tuple with packed data
 */
-std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) { //update parameter and function
+// std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) { //update parameter and function
     
-    uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
-    uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
-    uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
+//     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
+//     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
+//     uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
 
-    uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
-    uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
-    uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
-    uint16_t q = (tilt >> 6) & 15;
+//     uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
+//     uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
+//     uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
+//     uint16_t q = (tilt >> 6) & 15;
 
-    return {x,y,z,q};
-}
+//     return {x,y,z,q};
+// }
 
 /**
  * @brief move constructor for the telemetry backend
@@ -112,9 +112,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     //-------------------------------------------------------------------
 
-    // Tilt & FSM State --> NEEDS TO BE EDITED NO MORE ORIENTATION IS USED
+    // Tilt & FSM State --> comp_tilt vs mq_tilt
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint16_t tilt_norm = (orientation.tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
+    uint16_t tilt_norm = (angular_kalman.comp_tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
     packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 

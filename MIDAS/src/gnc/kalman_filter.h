@@ -58,7 +58,7 @@ public:
     
     virtual void initialize(RocketSystems* args) = 0;
     virtual void priori() = 0;
-    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) = 0;
+    virtual void update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) = 0;
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanState state) = 0;
 };

@@ -58,14 +58,14 @@ IMU_SFLP IMUSensor::read_sflp() {
     reading.quaternion.y = LSM6DSV.sflp_quaternion_raw_to_float(val[2]);
     reading.quaternion.z = LSM6DSV.sflp_quaternion_raw_to_float(val[3]);
 
-    //UPDATE TO USE FIFO
+    //(Feature) UPDATE TO USE FIFO -> If the readings are currently okay, this wont be a priority. Circular Buffer FIFO will be a feature
     LSM6DSV.sflp_gbias_raw_get((int16_t*)&val);//3 elements
 
     reading.gyro_bias.vx = LSM6DSV.sflp_gbias_raw_to_mdps(val[0]);
     reading.gyro_bias.vy = LSM6DSV.sflp_gbias_raw_to_mdps(val[1]);
     reading.gyro_bias.vz = LSM6DSV.sflp_gbias_raw_to_mdps(val[2]);
 
-    //UPDATE TO USE FIFO
+    //UPDATE TO USE FIFO -> If the readings are currently okay, Circular Buffer FIFO will be a feature
     LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);//3 elements
     
     reading.gravity.ax = LSM6DSV.sflp_gravity_raw_to_mg(val[0]);

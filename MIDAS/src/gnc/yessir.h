@@ -14,7 +14,7 @@ public:
     Yessir();
     void initialize(RocketSystems* args) override; 
     void priori() override; 
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
+    void update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) override;
 
     void setQ(float dt, float sd);
     void setF(float dt); 
@@ -23,7 +23,7 @@ public:
     KalmanData getState() override;
     void setState(KalmanState state) override;
 
-    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
+    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, IMU &imudata, AngularKalmanData &angularkalman, FSMState FSM_state);
    
 private:
     float s_dt = 0.05f;

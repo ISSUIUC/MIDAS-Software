@@ -249,6 +249,8 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         Acceleration current_high_g = current_imu.highg_acceleration;
         Acceleration current_low_g = current_imu.lowg_acceleration;
 
+        AngularKalmanData current_angular_kalman = args->rocket_data.angular_kalman_data.getRecent()
+
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
 
         
@@ -260,9 +262,9 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-
-        //Divij majic needs to be done here.
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);//new tick function push imu into that
+ 
+        //Check with Divij
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_imu, current_angular_kalman, FSM_state);
 
 
         KalmanData current_state = ekf.getState();
