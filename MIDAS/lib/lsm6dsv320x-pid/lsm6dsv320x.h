@@ -525,6 +525,8 @@ public:
     float from_fs16_to_mg(int16_t lsb);
     float from_fs64_to_mg(int16_t lsb);
     float from_fs2000_to_mdps(int16_t lsb);
+
+    uint32_t half_to_float(uint16_t h);
   
     void get_lowg_acceleration_from_fs2_to_g(float *ax, float *ay, float *az);
     void get_highg_acceleration_from_fs64_to_g(float *ax, float *ay, float *az);
