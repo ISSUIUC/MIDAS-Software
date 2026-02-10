@@ -27,7 +27,7 @@ EKF::EKF() : KalmanFilter()
  */
 void EKF::initialize(RocketSystems *args)
 {
-    Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
+    // Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
     float sum = 0;
 
     for (int i = 0; i < 30; i++)
@@ -72,7 +72,7 @@ void EKF::initialize(RocketSystems *args)
  * it extrapolates the state at time n+1 based on the state at time n.
  */
 
-void EKF::priori(float dt, Orientation &orientation, FSMState fsm, Acceleration acceleration)
+void EKF::priori(float dt, AngularKalmanData &orientation, FSMState fsm, Acceleration acceleration)
 {
     setF(dt);
     setB(dt);
@@ -81,8 +81,8 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm, Acceleration 
     sensor_accel_global_g(0, 0) = acceleration.ax + 0.045f;
     sensor_accel_global_g(1, 0) = acceleration.ay - 0.065f;
     sensor_accel_global_g(2, 0) = acceleration.az - 0.06f;
-    // euler_t angles_rad = orientation.getEuler();
-    // BodyToGlobal(angles_rad, sensor_accel_global_g);
+    euler_t angles_rad = orientation.getEuler();
+    BodyToGlobal(angles_rad, sensor_accel_global_g);
     // Do not apply gravity if on pad
     float g_ms2 = (fsm > FSMState::STATE_IDLE) ? gravity_ms2 : 0.0f;
     u_control(0, 0) = sensor_accel_global_g(0, 0) * g_ms2;
@@ -100,7 +100,7 @@ void EKF::priori(float dt, Orientation &orientation, FSMState fsm, Acceleration 
  * Updates with barometer (always) and GPS (if available).
  *
  */
-void EKF::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state, GPS &gps)
+void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanData orientation, FSMState FSM_state, GPS &gps)
 {
     // if on pad take last 10 barometer measurements for init state
     if (FSM_state == FSMState::STATE_IDLE)
@@ -234,7 +234,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, Orientation ori
  * @param &orientation Current orientation
  * @param current_state Current FSM_state
  */
-void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state, GPS &gps)
+void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, AngularKalmanData &orientation, FSMState FSM_state, GPS &gps)
 {
 
     if (FSM_state >= FSMState::STATE_IDLE) //
