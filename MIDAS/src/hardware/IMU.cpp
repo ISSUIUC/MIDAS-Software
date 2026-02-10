@@ -23,7 +23,7 @@ IMU IMUSensor::read(){
     
     //Low-G Acceleration
     if(status.xlda){
-        LSM6DSV.get_lowg_acceleration_from_fs2_to_g(&reading.lowg_acceleration.ax, 
+        LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax, 
                                                     &reading.lowg_acceleration.ay, 
                                                     &reading.lowg_acceleration.az);
     }
@@ -51,7 +51,7 @@ IMU_SFLP IMUSensor::read_sflp() {
 
     uint16_t val[4];
 
-	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get((int16_t*)&val);//4 elements
+	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get(val);//4 elements
 
     reading.quaternion.w = LSM6DSV.sflp_quaternion_raw_to_float(val[0]);//Will have to find a half to single precision conversion function somewhere
     reading.quaternion.x = LSM6DSV.sflp_quaternion_raw_to_float(val[1]);
@@ -124,7 +124,7 @@ ErrorCode IMUSensor::init(){
     LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
     LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
-    LSM6DSV.xl_full_scale_set(LSM6DSV320X_2g);//lowg scale set
+    LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//lowg scale set
     LSM6DSV.gy_full_scale_set(LSM6DSV320X_2000dps);
     
     LSM6DSV.sflp_enable_set(1);

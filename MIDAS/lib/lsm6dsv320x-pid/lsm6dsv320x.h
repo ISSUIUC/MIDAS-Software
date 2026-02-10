@@ -528,7 +528,7 @@ public:
 
     uint32_t half_to_float(uint16_t h);
   
-    void get_lowg_acceleration_from_fs2_to_g(float *ax, float *ay, float *az);
+    void get_lowg_acceleration_from_fs8_to_g(float *ax, float *ay, float *az);
     void get_highg_acceleration_from_fs64_to_g(float *ax, float *ay, float *az);
     void get_angular_velocity_from_fs2000_to_dps(float *vx, float *vy, float *vz);
     

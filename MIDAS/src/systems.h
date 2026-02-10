@@ -39,7 +39,7 @@ struct Sensors {
 
     ContinuitySensor continuity;
     VoltageSensor voltage;
-    OrientationSensor orientation;
+    //OrientationSensor orientation;
 
     MagnetometerSensor magnetometer;
 
