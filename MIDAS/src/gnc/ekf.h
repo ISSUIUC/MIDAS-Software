@@ -22,8 +22,8 @@ public:
     EKF();
     void initialize(RocketSystems* args) override;
     // void priori();
-    void priori(float dt, Orientation &orientation, FSMState fsm, Acceleration acceleration); 
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state, GPS &gps) override;
+    void priori(float dt, AngularKalmanData &orientation, FSMState fsm, Acceleration acceleration); 
+    void update(Barometer barometer, Acceleration acceleration, AngularKalmanData orientation, FSMState state, GPS &gps) override;
 
     void setQ(float dt, float sd);
     void setF(float dt);
@@ -33,7 +33,7 @@ public:
     void setState(KalmanState state) override;
     void reference_GPS(GPS &gps, FSMState fsm); 
 
-    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state, GPS &gps);
+    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, AngularKalmanData &orientation, FSMState state, GPS &gps);
    
     bool should_reinit = false;
     float current_vel = 0.0f;
