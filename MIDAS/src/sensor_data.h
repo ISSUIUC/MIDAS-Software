@@ -279,7 +279,7 @@ struct KalmanData {
 */
 struct AngularKalmanData {
     Quaternion quaternion;
-    uint16_t gyrobias[3];
+    float gyrobias[3];
     double comp_tilt = 0.0;
     double mq_tilt = 0.0;
     bool has_data = false;

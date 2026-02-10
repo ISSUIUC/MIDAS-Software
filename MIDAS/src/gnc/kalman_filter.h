@@ -6,8 +6,9 @@
 #undef B1
 
 #include <Eigen/Eigen>
-#include "sensor_data.h"
-#include "systems.h"
+// #include "systems.h"
+#include "sensor_data.h" // For sim 
+#include "systems.h" // for sim
 
 
 struct KalmanState {
@@ -57,8 +58,10 @@ public:
     }
     
     virtual void initialize(RocketSystems* args) = 0;
-    virtual void priori() = 0;
-    virtual void update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) = 0;
+    // virtual void priori() = 0;
+    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state,GPS &gps) = 0;
+    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state,GPS &gps) = 0;
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanState state) = 0;
+    
 };
