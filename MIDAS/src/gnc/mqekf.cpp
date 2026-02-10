@@ -1,18 +1,18 @@
 #include "mqekf.h"
-#include "sensor_data.h"
-
+#include "fsm_states.h"
 void QuaternionMEKF::initialize(RocketSystems *args)
 {
-    Eigen::Matrix<float, 3, 1> sigma_a = {300 * sqrt(100.0f) * 1e-6 * 9.81, 300 * sqrt(100.0f) * 1e-6 * 9.81, 300 * sqrt(100.0f) * 1e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
-    Eigen::Matrix<float, 3, 1> sigma_g = {0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180};                                                 // 0.1 deg/s
-    Eigen::Matrix<float, 3, 1> sigma_m = {-3.2e-4 / sqrt(3), 3.2e-4 / sqrt(3), 4.1e-4 / sqrt(3)};
-
     float Pq0 = 1e-6;
     float Pb0 = 1e-1;
     Q = initialize_Q(sigma_g);
 
     Eigen::Matrix<float, 6, 1> sigmas;
     sigmas << sigma_a, sigma_m;
+
+    Eigen::Matrix<float, 3, 1> sigma_a = {300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81, 300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81, 300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
+    Eigen::Matrix<float, 3, 1> sigma_g = {0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180};                                              // 0.1 deg/s
+    Eigen::Matrix<float, 3, 1> sigma_m = {-3.2e-4 / sqrt(3), 3.2e-4 / sqrt(3), 4.1e-4 / sqrt(3)};                                                                              // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
+
     R = sigmas.array().square().matrix().asDiagonal();
 
     qref.setIdentity(); // 1,0,0,0
@@ -74,20 +74,24 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
         // update(barometer, acceleration, orientation, FSM_state, gps);
 
         time_update(angular_velocity, dt)
-        measurement_update(acceleration, magnetometer);
-        Eigen<float,4,1> curr_quat = quat(); // w,x,y,z
+            measurement_update(acceleration, magnetometer);
+        Eigen<float, 4, 1> curr_quat = quat(); // w,x,y,z
 
-        state.quat.w = curr_quat(0,0);
-        state.quat.x = curr_quat(1,0);
-        state.quat.y = curr_quat(2,0);
-        state.quat.z = curr_quat(3,0);
+        state.quat.w = curr_quat(0, 0);
+        state.quat.x = curr_quat(1, 0);
+        state.quat.y = curr_quat(2, 0);
+        state.quat.z = curr_quat(3, 0);
         state.has_data = true; // not sure what this is
 
-        Eigen::Matrix<float,3,1> orientation= quatToEuler(quat); 
-        state.roll = orientation(0,0);
-        state.pitch = orientation(1,0);
-        state.yaw = orientation(2,0);
-        
+        Eigen::Matrix<float, 3, 1> orientation = quatToEuler(quat);
+        state.roll = orientation(0, 0);
+        state.pitch = orientation(1, 0);
+        state.yaw = orientation(2, 0);
+
+        Eigen::Matrix<float, 3, 1> bias_gyro = gyroscope_bias();
+        state.gyrobias[0] = bias_gyro(0, 0);
+        state.gyrobias[1] = bias_gyro(1, 0);
+        state.gyrobias[2] = bias_gyro(2, 0);
     }
 }
 
@@ -96,9 +100,9 @@ void QuaternionMEKF::time_update(Velocity const &gyro, float Ts)
     // Conversion from degrees/s to radians/s
 
     Eigen::Matrix<float, 3, 1> gyr;
-    gyr(0, 0) = gyro.vx * (M_PI / 180.0f);
-    gyr(1, 0) = gyro.vy * (M_PI / 180.0f);
-    gyr(2, 0) = gyro.vz * (M_PI / 180.0f);
+    gyr(0, 0) = gyro.vx * (pi / 180.0f);
+    gyr(1, 0) = gyro.vy * (pi / 180.0f);
+    gyr(2, 0) = gyro.vz * (pi / 180.0f);
 
     set_transition_matrix(gyr - x.tail(3), Ts);
 
@@ -317,7 +321,7 @@ Eigen::Matrix<float, 3, 1> QuaternionMEKF::quatToEuler(const Eigen::Matrix<float
     double sinp = 2.0 * (w * y - z * x);
     double pitch;
     if (std::abs(sinp) >= 1)
-        pitch = std::copysign(M_PI / 2, sinp);
+        pitch = std::copysign(pi / 2, sinp);
     else
         pitch = std::asin(sinp);
 
