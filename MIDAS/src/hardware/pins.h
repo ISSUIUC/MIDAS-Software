@@ -60,9 +60,9 @@
 #define E22_RESET 6
 
 // LEDs
-#define LED_BLUE   8
-#define LED_GREEN  9
-#define LED_ORANGE 10
+#define LED_BLUE   8 
+#define LED_GREEN  9 
+#define LED_ORANGE 10 
 #define LED_RED    11
 
 // FLASH memory pins
