@@ -188,7 +188,7 @@ public:
 
     SensorData<KalmanData> kalman;
     SensorData<AngularKalmanData> angular_kalman_data;
-    SensorData<IMU> imu;
+    BufferedSensorData<IMU, 16> imu;
     SensorData<IMU_SFLP> hw_filtered;
     BufferedSensorData<Barometer, 16> barometer;
     SensorData<Continuity> continuity;
