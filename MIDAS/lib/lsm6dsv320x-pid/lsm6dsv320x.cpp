@@ -1,5 +1,6 @@
 #include "lsm6dsv320x.h"
 
+#include "Eigen.h"
 #include "Arduino.h"
 #include <SPI.h>
 
@@ -165,34 +166,34 @@ float LSM6DSV320XClass::sflp_gravity_raw_to_mg(int16_t raw){
   return static_cast<float>(raw) * 0.061f;
 }
 
-void get_lowg_acceleration_from_fs2_to_g(float *ax, float *ay, float *az) {
+void LSM6DSV320XClass::get_lowg_acceleration_from_fs2_to_g(float *ax, float *ay, float *az) {
   int16_t raw_accel[NUM_DIRECTIONS];
   
-  LSM6DSV.acceleration_raw_get(raw_accel);
+  acceleration_raw_get(raw_accel);
 
-  *ax = LSM6DSV.from_fs2_to_mg(raw_accel[0]) / 1000.0;
-  *ay = LSM6DSV.from_fs2_to_mg(raw_accel[1]) / 1000.0;
-  *az = LSM6DSV.from_fs2_to_mg(raw_accel[2]) / 1000.0;
+  *ax = from_fs2_to_mg(raw_accel[0]) / 1000.0;
+  *ay = from_fs2_to_mg(raw_accel[1]) / 1000.0;
+  *az = from_fs2_to_mg(raw_accel[2]) / 1000.0;
 }
 
-void get_highg_acceleration_from_fs64_to_g(float *ax, float *ay, float *az) {
+void LSM6DSV320XClass::get_highg_acceleration_from_fs64_to_g(float *ax, float *ay, float *az) {
   int16_t raw_accel_hg[NUM_DIRECTIONS];
   
-  LSM6DSV.hg_acceleration_raw_get(raw_accel_hg);
+  hg_acceleration_raw_get(raw_accel_hg);
   
-  *ax = LSM6DSV.from_fs64_to_mg(raw_accel_hg[0]) / 1000.0;
-  *ay = LSM6DSV.from_fs64_to_mg(raw_accel_hg[1]) / 1000.0;
-  *az = LSM6DSV.from_fs64_to_mg(raw_accel_hg[2]) / 1000.0;
+  *ax = from_fs64_to_mg(raw_accel_hg[0]) / 1000.0;
+  *ay = from_fs64_to_mg(raw_accel_hg[1]) / 1000.0;
+  *az = from_fs64_to_mg(raw_accel_hg[2]) / 1000.0;
 }
 
-void get_angular_velocity_from_fs2000_to_dps(float *vx, float *vy, float *vz) {
+void LSM6DSV320XClass::get_angular_velocity_from_fs2000_to_dps(float *vx, float *vy, float *vz) {
   int16_t raw_av[NUM_DIRECTIONS];
   
-  LSM6DSV.angular_rate_raw_get(raw_av);
+  angular_rate_raw_get(raw_av);
   
-  *vx = LSM6DSV.from_fs2000_to_mdps(raw_av[0]) / 1000.0;
-  *vy = LSM6DSV.from_fs2000_to_mdps(raw_av[1]) / 1000.0;
-  *vz = LSM6DSV.from_fs2000_to_mdps(raw_av[2]) / 1000.0;
+  *vx = from_fs2000_to_mdps(raw_av[0]) / 1000.0;
+  *vy = from_fs2000_to_mdps(raw_av[1]) / 1000.0;
+  *vz = from_fs2000_to_mdps(raw_av[2]) / 1000.0;
 }
 
 /**
