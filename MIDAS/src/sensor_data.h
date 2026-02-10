@@ -190,6 +190,28 @@ enum class OrientationReadingType {
     ANGULAR_VELOCITY_UPDATE = 1
 };
 
+struct AngularKalmanData {
+    Quaternion quaternion;
+    uint16_t gyrobias[3];
+    double comp_tilt = 0.0;
+    double mq_tilt = 0.0;
+    bool has_data = false;
+    OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
+    
+    float yaw = 0;
+    float pitch = 0;
+    float roll = 0;
+    // For yessir.cpp
+    euler_t getEuler() const {
+        euler_t euler;
+        euler.yaw = this->yaw;
+        euler.pitch = this->pitch;
+        euler.roll = this->roll;
+        return euler;
+    }
+    
+};
+
 /**
  * @struct Orientation
  * 

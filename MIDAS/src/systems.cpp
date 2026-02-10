@@ -2,6 +2,7 @@
 #include "sensor_data.h"
 #include "hal.h"
 #include "gnc/ekf.h"
+#include "gnc/mqekf.h"
 
 #include <TCAL9539.h>
 
@@ -230,18 +231,18 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
         // add the tick update function
+        GPS current_gps = arg->rocket_data.gps.getRecent();
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
         Orientation current_orientation = arg->rocket_data.orientation.getRecent();
         HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState fsm_state = arg->rocket_data.fsm_state.getRecent();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
             .ay = current_accelerometer.ay,
             .az = current_accelerometer.az
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, fsm_state, current_gps);
         KalmanData current_state = ekf.getState();
 
         arg->rocket_data.kalman.update(current_state);
@@ -249,6 +250,22 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
         THREAD_SLEEP(50);
+    }
+}
+
+DECLARE_THREAD(angular_kalman, RocketSystems* arg) {
+    qmekf.initialize(arg);
+    while (true) {
+        Orientation current_orientation = arg->rocket_data.orientation.getRecent();
+        HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
+        Magnetometer current_magnetometer = arg->sensors.magnetometer.read();
+        Acceleration current_accelerations = {
+            .ax = current_accelerometer.ax,
+            .ay = current_accelerometer.ay,
+            .az = current_accelerometer.az
+        };
+        float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
+        qmekf.tick(dt, &current_orientation, &current_accelerations, &current_magnetometer);
     }
 }
 
@@ -427,6 +444,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
     START_THREAD(cam, SENSOR_CORE, config, 16);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
+    START_THREAD(angular_kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     #ifdef ENABLE_TELEM
