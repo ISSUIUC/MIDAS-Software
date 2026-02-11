@@ -17,4 +17,4 @@ const float accel_noise_density_x = 1000; // ug/sqrt(hz) from the accelerometer 
 const float accel_noise_density_y = 1000; // ug/sqrt(hz) from the accelerometer on MIDAS MINI
 const float accel_noise_density_z = 1000; // ug/sqrt(hz) from the accelerometer on MIDAS MINI
 const float gyro_RMS_noise = 0.1; // Need to get this data from the datasheet
-const float mag_RMS_noise = ; //mG
+const float mag_RMS_noise = 0; //mG
