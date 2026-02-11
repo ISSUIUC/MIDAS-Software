@@ -61,16 +61,16 @@ IMU_SFLP IMUSensor::read_sflp() {
     //(Feature) UPDATE TO USE FIFO -> If the readings are currently okay, this wont be a priority. Circular Buffer FIFO will be a feature
     LSM6DSV.sflp_gbias_raw_get((int16_t*)&val);//3 elements
 
-    reading.gyro_bias.vx = LSM6DSV.sflp_gbias_raw_to_mdps(val[0]);
-    reading.gyro_bias.vy = LSM6DSV.sflp_gbias_raw_to_mdps(val[1]);
-    reading.gyro_bias.vz = LSM6DSV.sflp_gbias_raw_to_mdps(val[2]);
+    reading.gyro_bias.vx = LSM6DSV.sflp_gbias_raw_to_mdps(val[0]) / 1000.0;
+    reading.gyro_bias.vy = LSM6DSV.sflp_gbias_raw_to_mdps(val[1]) / 1000.0;
+    reading.gyro_bias.vz = LSM6DSV.sflp_gbias_raw_to_mdps(val[2]) / 1000.0;
 
     //UPDATE TO USE FIFO -> If the readings are currently okay, Circular Buffer FIFO will be a feature
     LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);//3 elements
     
-    reading.gravity.ax = LSM6DSV.sflp_gravity_raw_to_mg(val[0]);
-    reading.gravity.ay = LSM6DSV.sflp_gravity_raw_to_mg(val[1]);
-    reading.gravity.az = LSM6DSV.sflp_gravity_raw_to_mg(val[2]);
+    reading.gravity.ax = LSM6DSV.sflp_gravity_raw_to_mg(val[0]) / 1000.0;
+    reading.gravity.ay = LSM6DSV.sflp_gravity_raw_to_mg(val[1]) / 1000.0;
+    reading.gravity.az = LSM6DSV.sflp_gravity_raw_to_mg(val[2]) / 1000.0;
     
     return reading;
 }

@@ -152,8 +152,15 @@ float LSM6DSV320XClass::from_fs2000_to_mdps(int16_t lsb)
   return static_cast<float>(lsb) * 70.0f;
 }
 
-uint32_t LSM6DSV320XClass::half_to_float(uint16_t h)
+typedef union {
+    uint32_t float_bits;
+    float f;
+} float_conv;
+
+float LSM6DSV320XClass::half_to_float(uint16_t h)
 {
+
+    float_conv result;
   uint16_t h_exp = (h & 0x7c00u);
   uint32_t f_sgn = ((uint32_t)h & 0x8000u) << 16;
   switch (h_exp)
@@ -175,15 +182,17 @@ uint32_t LSM6DSV320XClass::half_to_float(uint16_t h)
       }
       uint32_t f_exp = ((uint32_t)(127 - 15 - h_exp)) << 23;
       uint32_t f_sig = ((uint32_t)(h_sig & 0x03ffu)) << 13;
-      return f_sgn + f_exp + f_sig;
+      result.float_bits = f_sgn + f_exp + f_sig;
     }
     case 0x7c00u: // inf or NaN
       // All-ones exponent and a copy of the significand
-      return f_sgn + 0x7f800000u + (((uint32_t)(h & 0x03ffu)) << 13);
+      result.float_bits = f_sgn + 0x7f800000u + (((uint32_t)(h & 0x03ffu)) << 13);
     default: // normalized
       // Just need to adjust the exponent and shift
-      return f_sgn + (((uint32_t)(h & 0x7fffu) + 0x1c000u) << 13);
+      result.float_bits = f_sgn + (((uint32_t)(h & 0x7fffu) + 0x1c000u) << 13);
   }
+
+  return result.f;
 }
 
 float LSM6DSV320XClass::sflp_quaternion_raw_to_float(int16_t raw){
