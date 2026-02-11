@@ -44,13 +44,6 @@ struct BarometerSensor {
 //     LowGLSM read();
 // };
 
-/**
- * @struct Continuity interface
- */
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
-};
 
 /**
  * @struct Voltage interface

@@ -18,14 +18,6 @@ LowGLSM LowGLSMSensor::read() {
     return { .gx = 0, .gy = 0, .gz = 0, .ax = 0, .ay = 0, .az =0 };
 }
 
-ErrorCode ContinuitySensor::init() {
-    return ErrorCode::NoError;
-}
-
-Continuity ContinuitySensor::read() {
-    return { };
-}
-
 ErrorCode HighGSensor::init() {
     return ErrorCode::NoError;
 }
@@ -68,7 +60,7 @@ ErrorCode VoltageSensor::init() {
 }
 
 Voltage VoltageSensor::read() {
-    return { .voltage = 9 };
+    return { .continuity = {}, .v_Bat = 0, .v_Pyro = 0 };
 }
 
 ErrorCode MagnetometerSensor::init() {

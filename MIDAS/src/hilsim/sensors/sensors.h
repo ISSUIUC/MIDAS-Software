@@ -25,11 +25,6 @@ struct BarometerSensor {
     Barometer read();
 };
 
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
-};
-
 struct VoltageSensor {
     ErrorCode init();
     Voltage read();

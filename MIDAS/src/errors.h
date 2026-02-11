@@ -17,7 +17,6 @@ enum ErrorCode {
     GyroCouldNotBeInitialized = 8,
     PyroGPIOCouldNotBeInitialized = 9,
     GPSCouldNotBeInitialized = 10,
-    ContinuityCouldNotBeInitialized = 11,
     RadioInitFailed = 12,
     RadioSetFrequencyFailed = 13,
     CannotConnectBNO = 14,
