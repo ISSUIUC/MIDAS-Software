@@ -88,12 +88,12 @@ void update_error_LED(ErrorCode error) {
             digitalWrite(LED_ORANGE, LOW);
             digitalWrite(LED_RED, HIGH);
             break; 
-        case ContinuityCouldNotBeInitialized:
-            digitalWrite(LED_BLUE, LOW);
-            digitalWrite(LED_GREEN, LOW);
-            digitalWrite(LED_ORANGE, HIGH);
-            digitalWrite(LED_RED, HIGH);
-            break; 
+        // case ContinuityCouldNotBeInitialized:
+        //     digitalWrite(LED_BLUE, LOW);
+        //     digitalWrite(LED_GREEN, LOW);
+        //     digitalWrite(LED_ORANGE, HIGH);
+        //     digitalWrite(LED_RED, HIGH);
+        //     break; 
         case CannotConnectBNO:
             digitalWrite(LED_BLUE, HIGH);
             digitalWrite(LED_GREEN, HIGH);

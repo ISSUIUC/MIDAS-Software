@@ -37,7 +37,7 @@ struct Sensors {
 
     BarometerSensor barometer;
 
-    ContinuitySensor continuity;
+    //ContinuitySensor continuity;
     VoltageSensor voltage;
     //OrientationSensor orientation;
 

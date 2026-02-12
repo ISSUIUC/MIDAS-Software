@@ -88,7 +88,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    Continuity continuity = data.continuity.getRecentUnsync();
+    //Continuity continuity = data.continuity.getRecentUnsync();
     //HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
     //Orientation orientation = data.orientation.getRecentUnsync();
@@ -122,7 +122,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     //Serial.println(packet.tilt_fsm, 2);
     // Battery voltage
-    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, MAX_TELEM_VOLTAGE_V);
+    packet.batt_volt = inv_convert_range<uint8_t>(voltage.v_Bat, MAX_TELEM_VOLTAGE_V);
     
     // Roll rate
     float roll_rate_hz = std::clamp(std::abs(imu.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, MAX_ROLL_RATE_HZ);
@@ -143,10 +143,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     
     //Pyro A0 | B1 | C2 | D3
     // This is what we're telemetering for MIDAS mk2
-    packet.pyro |= ((((uint32_t) (std::round(continuity.pins[0]))) & 0x7F) << (0 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[1] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (1 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[2] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (2 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[3] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (3 * 7));
+    packet.pyro |= ((((uint32_t) (std::round(voltage.continuity[0]))) & 0x7F) << (0 * 7));
+    packet.pyro |= ((((uint32_t) (voltage.continuity[1] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (1 * 7));
+    packet.pyro |= ((((uint32_t) (voltage.continuity[2] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (2 * 7));
+    packet.pyro |= ((((uint32_t) (voltage.continuity[3] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (3 * 7));
 
     // This is what we want for MIDAS mk3
     // packet.pyro |= (uint8_t)inv_convert_range<int8_t>(pins[0], MAX_TELEM_VOLTAGE_V);

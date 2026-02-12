@@ -95,8 +95,9 @@ struct Continuity {
  * @brief data about battery voltage
 */
 struct Voltage {
-    float voltage = 0;
-    float current = 0;
+    float continuity[4];
+    float v_Bat = 0;
+    float v_Pyro = 0;
 };
 
 /**
@@ -124,9 +125,9 @@ struct GPS {
  * @brief data from the magnetometer
 */
 struct Magnetometer {
-    float mx;
-    float my;
-    float mz;
+    double mx;
+    double my;
+    double mz;
 };
 
 struct Quaternion {
