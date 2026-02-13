@@ -18,7 +18,8 @@
 #define ADXL355_CS 44
 
 // magnetometer chip select
-#define LIS3MDL_CS 35
+#define MMC5983_CS 4
+#define MMC5983_INT 7
 
 // orientation chip select, interrupt
 #define BNO086_CS 48

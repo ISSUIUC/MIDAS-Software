@@ -78,7 +78,7 @@ void setup()
     pinMode(LSM6DS3_CS, OUTPUT);
 	pinMode(KX134_CS, OUTPUT);
 	pinMode(ADXL355_CS, OUTPUT);
-	pinMode(LIS3MDL_CS, OUTPUT);
+	pinMode(MMC5983_CS, OUTPUT);
 	pinMode(BNO086_CS, OUTPUT);
 	pinMode(BNO086_RESET, OUTPUT);
 	pinMode(CAN_CS, OUTPUT);
@@ -89,7 +89,7 @@ void setup()
 	digitalWrite(LSM6DS3_CS, HIGH);
 	digitalWrite(KX134_CS, HIGH);
 	digitalWrite(ADXL355_CS, HIGH);
-	digitalWrite(LIS3MDL_CS, HIGH);
+	digitalWrite(MMC5983_CS, HIGH);
 	digitalWrite(BNO086_CS, HIGH);
 	digitalWrite(CAN_CS, HIGH);
 	digitalWrite(E22_CS, HIGH);
