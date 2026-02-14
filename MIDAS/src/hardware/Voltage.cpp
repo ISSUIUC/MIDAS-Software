@@ -4,6 +4,11 @@
 #include <Wire.h>
 
 #define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
+#define PYRO_VOLTAGE_DIVIDER (18.0/(100.0+18.0))
+#define PYRO_BATT_VOLTAGE_DIVIDER (100.0/(100.0+560.0))
+#define BATT_VOLTAGE_DIVIDER (100.0/(100.0+100.0))
+#define VOLTAGE_SCALE 3.3
+#define VOLTAGE_REG_WIDTH (1<<16)
 
 int read_board_pwr_monitor_register(int reg, int bytes) {
     Wire1.beginTransmission(0x44);
@@ -65,47 +70,42 @@ Voltage VoltageSensor::read() {
 
     //Converts ADC value to voltage for each pin
     if(sensorBat.error == AdcError::NoError){
-        float Bat_value = sensorBat.value;
-        float Bat_voltage = (((float)Bat_value / 65535) * 3.3) * 2.0; 
+        float Bat_voltage = ((static_cast<float>(sensorBat.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / BATT_VOLTAGE_DIVIDER; 
         voltage.v_Bat = Bat_voltage;
         Serial.print("VBAT: ");
         Serial.println(Bat_voltage); 
     }
 
     if(sensorPyro.error == AdcError::NoError){
-        float Pyro_voltage = (((float)sensorPyro.value / 65535) * 3.3)/(100.0/660); //Accounting for voltage divider on MIDAS mini
+        float Pyro_voltage = ((static_cast<float>(sensorPyro.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE)/(PYRO_BATT_VOLTAGE_DIVIDER); //Accounting for voltage divider on MIDAS mini
         voltage.v_Pyro = Pyro_voltage;
         Serial.print("PYRO: ");
         Serial.println(Pyro_voltage);
     }
 
     if(sensorA.error == AdcError::NoError){
-        float A_value = sensorA.value* (100000.0/118000);                         //accounting for the resisters
-        float A_voltage = (((float)A_value / 65535) * 3.3)/(18.0/100);
+        float A_voltage = ((static_cast<float>(sensorA.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[0] = A_voltage;
         Serial.print("A: ");
         Serial.println(A_voltage);
     }
 
     if(sensorB.error == AdcError::NoError){
-        uint16_t B_value = sensorB.value* (100000.0/118000);                       //accounting for the resisters
-        float B_voltage = (((float)B_value / 65535) * 3.3)/(18.0/100);
+        float B_voltage = ((static_cast<float>(sensorB.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[1] = B_voltage;
         Serial.print("B: ");
         Serial.println(B_voltage);
     }
 
     if(sensorC.error == AdcError::NoError){
-        uint16_t C_value = sensorC.value*(100000.0/118000);                      //accounting for the resisters
-        float C_voltage = (((float)C_value / 65535) * 3.3)/(18.0/100);
+        float C_voltage = ((static_cast<float>(sensorC.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[2] = C_voltage;
         Serial.print("C: ");
         Serial.println(C_voltage);
     }
 
     if(sensorD.error == AdcError::NoError){
-        uint16_t D_value = sensorD.value*(100000.0/118000);                     //accounting for the resisters
-        float D_voltage = (((float)D_value / 65535) * 3.3)/(18.0/100);
+        float D_voltage = ((static_cast<float>(sensorD.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[3] = D_voltage;
         Serial.print("D: ");
         Serial.println(D_voltage);
