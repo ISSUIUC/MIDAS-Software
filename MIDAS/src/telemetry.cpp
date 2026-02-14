@@ -139,17 +139,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     
     //Pyro A0 | B1 | C2 | D3
-    // This is what we're telemetering for MIDAS mk2
-    packet.pyro |= ((((uint32_t) (std::round(voltage.continuity[0]))) & 0x7F) << (0 * 7));
-    packet.pyro |= ((((uint32_t) (voltage.continuity[1] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (1 * 7));
-    packet.pyro |= ((((uint32_t) (voltage.continuity[2] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (2 * 7));
-    packet.pyro |= ((((uint32_t) (voltage.continuity[3] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (3 * 7));
-
-    // This is what we want for MIDAS mk3
-    // packet.pyro |= (uint8_t)inv_convert_range<int8_t>(pins[0], MAX_TELEM_VOLTAGE_V);
-    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[1], (float)std::numeric_limits<float>::max()) & 0xFF) << (1*8);
-    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[2], (float)std::numeric_limits<float>::max()) & 0xFF) << (2*8);
-    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[3], (float)std::numeric_limits<float>::max()) & 0xFF) << (3*8);
+    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[0], MAX_TELEM_VOLTAGE_V) & 0xFF) << (0*8);
+    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[1], MAX_TELEM_VOLTAGE_V) & 0xFF) << (1*8);
+    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[2], MAX_TELEM_VOLTAGE_V) & 0xFF) << (2*8);
+    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[3], MAX_TELEM_VOLTAGE_V) & 0xFF) << (3*8);
 
     // GPS state & Callsign
     // 0000 | 000 | 0
