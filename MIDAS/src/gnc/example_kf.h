@@ -11,7 +11,7 @@ public:
     void initialize(RocketSystems* args) override;
     //virtual void initialize(Orientation &orientation, Barometer &barometer, Acceleration &Acceleration);
     void priori() override;
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state) override;
+    void update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) override;
 
     KalmanData getState() override;
     void setState(KalmanState state) override;

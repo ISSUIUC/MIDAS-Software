@@ -10,7 +10,7 @@ void ExampleKalmanFilter::priori() {
     P_priori = (F_mat * P_k * F_mat.transpose()) + Q;
 }
 
-void ExampleKalmanFilter::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_stat) {}
+void ExampleKalmanFilter::update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) {}
 
 void ExampleKalmanFilter::setQ(float dt, float sd) {}
 

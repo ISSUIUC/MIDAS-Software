@@ -25,18 +25,17 @@ Yessir::Yessir() : KalmanFilter() {
  */
 
 void Yessir::initialize(RocketSystems* args) {
-    Orientation orientation = args->rocket_data.orientation.getRecentUnsync();
+    AngularKalmanData angular_kalman = args->rocket_data.angular_kalman_data.getRecentUnsync();
     
     float sum = 0;
     
     for (int i = 0; i < 30; i++) {
         Barometer barometer = args->rocket_data.barometer.getRecent();
-        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
+        IMU initial_accelerometer = args->rocket_data.imu.getRecent(); //lowg
         Acceleration accelerations = {
-            .ax = initial_accelerometer.ax,
-            .ay = initial_accelerometer.ay,
-            .az = initial_accelerometer.az
-        };
+            .ax = initial_accelerometer.lowg_acceleration.ax,
+            .ay = initial_accelerometer.lowg_acceleration.ay,
+            .az = initial_accelerometer.lowg_acceleration.az}; //please check axis divij
         sum += barometer.altitude;
 
         init_accel(0, 0) += accelerations.az;
@@ -49,7 +48,7 @@ void Yessir::initialize(RocketSystems* args) {
     init_accel(1, 0) /= 30;
     init_accel(2, 0) /= 30;
 
-    euler_t euler = orientation.getEuler();
+    euler_t euler = angular_kalman.getEuler();
     euler.yaw = -euler.yaw;
     world_accel = BodyToGlobal(euler, init_accel);
 
@@ -139,7 +138,7 @@ void Yessir::priori() {
  * the new sensor data is. After updating the gain, the state estimate is updated.
  *
  */
-void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState FSM_state) {
+void Yessir::update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) {
     if (FSM_state == FSMState::STATE_FIRST_BOOST || FSM_state == FSMState::STATE_SECOND_BOOST) { 
         float sum = 0;
         float data[10];
@@ -165,7 +164,7 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
     accel(1, 0) = acceleration.ay - 0.065;
     accel(2, 0) = -acceleration.ax - 0.06;
 
-    euler_t angles = orientation.getEuler();
+    euler_t angles = angularkalman.getEuler();
     angles.yaw = -angles.yaw;
 
     Eigen::Matrix<float, 3, 1> acc = BodyToGlobal(angles, accel);
@@ -209,12 +208,14 @@ void Yessir::update(Barometer barometer, Acceleration acceleration, Orientation 
  * @param &orientation Current orientation
  * @param current_state Current FSM_state
  */
-void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState FSM_state) {
+
+
+void Yessir::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, IMU &imudata, AngularKalmanData &angularkalman, FSMState FSM_state) {
     if (FSM_state >= FSMState::STATE_IDLE) {
         setF(dt / 1000);
         setQ(dt / 1000, sd);
         priori();
-        update(barometer, acceleration, orientation, FSM_state);
+        update(barometer, acceleration, angularkalman, FSM_state);
     }
 }
 

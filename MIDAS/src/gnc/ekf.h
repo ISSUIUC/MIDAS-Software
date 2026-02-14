@@ -11,7 +11,7 @@
 #define NUM_SENSOR_INPUTS 4
 #define ALTITUDE_BUFFER_SIZE 10
 
-// Number of entries for aerodynamic data table
+// Number of entries for aerodynamic data table 
 #define AERO_DATA_SIZE (sizeof(aero_data) / sizeof(aero_data[0]))
 
 class EKF : public KalmanFilter<NUM_STATES, NUM_SENSOR_INPUTS>
@@ -20,8 +20,8 @@ public:
     EKF();
     void initialize(RocketSystems* args) override;
     void priori();
-    void priori(float dt, Orientation &orientation, FSMState fsm); 
-    void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState state) override;
+    void priori(float dt, IMU &imudata, FSMState fsm, AngularKalmanData &angularkalman);
+    void update(Barometer barometer, Acceleration acceleration, AngularKalmanData angularkalman, FSMState FSM_state) override;
 
     void setQ(float dt, float sd);
     void setF(float dt, float w_x, float w_y, float w_z, float coeff, float v_x,float v_y, float v_z); 
@@ -34,7 +34,7 @@ public:
 
     void getThrust(float timestamp, const euler_t& angles, FSMState FSM_state, Eigen::Vector3f& thrust_out);
 
-    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, Orientation &orientation, FSMState state);
+    void tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, IMU &imudata ,AngularKalmanData &angularkalman, FSMState FSM_state);
    
     bool should_reinit = false;
     float current_vel = 0.0f;

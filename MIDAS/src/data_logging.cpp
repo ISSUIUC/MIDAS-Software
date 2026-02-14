@@ -13,20 +13,21 @@ constexpr ReadingDiscriminant get_discriminant();
 */
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
-ASSOCIATE(LowGData, ID_LOWG)
-ASSOCIATE(LowGLSM, ID_LOWGLSM)
-ASSOCIATE(HighGData, ID_HIGHG)
+
+ASSOCIATE(IMU, ID_IMU)
 ASSOCIATE(Barometer, ID_BAROMETER)
 ASSOCIATE(Continuity, ID_CONTINUITY)
 ASSOCIATE(Voltage, ID_VOLTAGE)
 ASSOCIATE(GPS, ID_GPS)
 ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
-ASSOCIATE(Orientation, ID_ORIENTATION)
-ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
+ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(PyroState, ID_PYRO)
-
 ASSOCIATE(CameraData, ID_CAMERADATA)
+ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN)
+ASSOCIATE(IMU_SFLP, ID_SFLPHW)
+
+
 
 
 
@@ -83,17 +84,17 @@ void log_begin(LogSink& sink) {
  * @param data the rocket which holds all the sensor data to write
 */
 void log_data(LogSink& sink, RocketData& data) {
-    log_from_sensor_data(sink, data.low_g);
-    log_from_sensor_data(sink, data.low_g_lsm);
-    log_from_sensor_data(sink, data.high_g);
+    log_from_sensor_data(sink, data.imu);
+    log_from_sensor_data(sink, data.hw_filtered);
     log_from_sensor_data(sink, data.barometer);
     log_from_sensor_data(sink, data.continuity);
     log_from_sensor_data(sink, data.voltage);
     log_from_sensor_data(sink, data.gps);
     log_from_sensor_data(sink, data.magnetometer);
-    log_from_sensor_data(sink, data.orientation);
+    //log_from_sensor_data(sink, data.orientation);
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
+    log_from_sensor_data(sink, data.angular_kalman_data);
     log_from_sensor_data(sink, data.pyro);
 
     //log_from_sensor_data(sink, data.quaternions);

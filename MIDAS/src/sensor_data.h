@@ -67,48 +67,6 @@ struct euler_t {
 */
 
 /**
- * @struct LowGData
- * 
- * @brief data from the LowG sensor
-*/
-struct LowGData {
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-
-    LowGData() = default;
-    LowGData(float x, float y, float z) : ax(x), ay(y), az(z) {};
-};
-
-/**
- * @struct HighGData
- * 
- * @brief data from the HighG sensor
-*/
-struct HighGData {
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-
-    HighGData() = default;
-    HighGData(float x, float y, float z) : ax(x), ay(y), az(z) {}
-};
-
-/**
- * @struct LowGLSM
- * 
- * @brief data from the Low G LSM sensor
-*/
-struct LowGLSM {
-    float gx = 0;
-    float gy = 0;
-    float gz = 0;
-    float ax = 0;
-    float ay = 0;
-    float az = 0;
-};
-
-/**
  * @struct Barometer
  * 
  * @brief data from the barometer
@@ -178,8 +136,6 @@ struct Quaternion {
         return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
     }
 
-
-
 };
 
 /**
@@ -191,54 +147,119 @@ enum class OrientationReadingType {
 };
 
 /**
- * @struct Orientation
+ * @struct SFLP
  * 
- * @brief data from the BNO
+ * @brief Data from the Sensor Fusion Low Power module
+ * 
+ */
+
+/**
+*
+* @brief Implementing obtaining SFLP data from FIFO
+*
+*
 */
-struct Orientation {
-    bool has_data = false;
-    OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
 
-    float yaw = 0;
-    float pitch = 0;
-    float roll = 0;
-    //For yessir.cpp
-    euler_t getEuler() const {
-        euler_t euler;
-        euler.yaw = this->yaw;
-        euler.pitch = this->pitch;
-        euler.roll = this->roll;
-        return euler;
-    }
-
-
-    Velocity orientation_velocity;
-    Velocity angular_velocity;
-
-    Velocity getVelocity() const {
-        return orientation_velocity;
-    }
-
-    Velocity getAngularVelocity() const {
-        return angular_velocity;
-    }
-
-    Acceleration orientation_acceleration;
-
-    Acceleration linear_acceleration;
-
-    float gx = 0, gy = 0, gz = 0;
-
-    Magnetometer magnetometer;
-
-    float temperature = 0;
-    float pressure = 0;
-
-    float tilt = 0;
-
-    Quaternion orientation_quaternion;
-
+// Raw IMU data from the LS6DSV320X this is hw filtered
+struct IMU_SFLP {
+    Quaternion quaternion;
+    Acceleration gravity;
+    Velocity gyro_bias;
 };
+
+/**
+ * 
+ * @struct IMU
+ * 
+ * @brief IMU that stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP
+ * 
+ */
+struct IMU { 
+    Acceleration highg_acceleration;
+    Acceleration lowg_acceleration;
+    Velocity angular_velocity;
+};
+
+// adding this to dissect how to get FIFO
+/*
+    lsm6dsv320x_fifo_out_raw_t f_data;      __initial variable
+
+      lsm6dsv320x_fifo_out_raw_get(&dev_ctx, &f_data);    __function for getting the data || put this in fifo_out_raw_get  
+      datax = (int16_t *)&f_data.data[0];
+      datay = (int16_t *)&f_data.data[2];
+      dataz = (int16_t *)&f_data.data[4];      
+      
+      ts = (int32_t *)&f_data.data[0];      
+
+
+    All of the sums are for an average
+
+    __GBIAS
+
+    axis = &f_data.data[0];
+    gbias_mdps[0] = lsm6dsv320x_from_fs125_to_mdps(axis[0] | (axis[1] << 8));   __getting the gbias (x, y, z)
+    gbias_mdps[1] = lsm6dsv320x_from_fs125_to_mdps(axis[2] | (axis[3] << 8));
+    gbias_mdps[2] = lsm6dsv320x_from_fs125_to_mdps(axis[4] | (axis[5] << 8));
+
+    gbias_sum[0] += gbias_mdps[0];
+    gbias_sum[1] += gbias_mdps[1];
+    gbias_sum[2] += gbias_mdps[2];
+    
+    remove {
+    gbias_cnt++;    __this gets the count to eventually divide the average, we do not need these
+    break;
+    }
+
+
+    __GRAVITY VECTOR
+
+    axis = &f_data.data[0];
+    gravity_mg[0] = lsm6dsv320x_from_sflp_to_mg(axis[0] | (axis[1] << 8));
+    gravity_mg[1] = lsm6dsv320x_from_sflp_to_mg(axis[2] | (axis[3] << 8));
+    gravity_mg[2] = lsm6dsv320x_from_sflp_to_mg(axis[4] | (axis[5] << 8));
+
+    gravity_sum[0] += gravity_mg[0];
+    gravity_sum[1] += gravity_mg[1];
+    gravity_sum[2] += gravity_mg[2];
+    
+    // remove {
+    gravity_cnt++;
+    break;
+
+
+    __QUATERNION
+
+        uint16_t *sflp = (uint16_t *)&f_data.data[2];
+
+        if (f_data.data[0] == 0x00) {
+
+            __game rotation first word
+          quat[0] = npy_half_to_float(sflp[0]);
+          quat[1] = npy_half_to_float(sflp[1]);
+        } else if (f_data.data[0] == 0x01) {
+            
+        __game rotation second word 
+          quat[2] = npy_half_to_float(sflp[0]);
+          quat[3] = npy_half_to_float(sflp[1]);
+
+          rot_sum[0] += quat[0];
+          rot_sum[1] += quat[1];
+          rot_sum[2] += quat[2];
+          rot_sum[3] += quat[3];
+
+          rot_cnt++;
+        } else {
+
+            __error
+          snprintf((char *)tx_buffer, sizeof(tx_buffer), "[%02x - %02x] wrong word \r\n", f_data.data[0], f_data.data[1]);
+          tx_com(tx_buffer, strlen((char const *)tx_buffer));
+       }
+
+        break;
+      }
+    
+}
+*/
 
 /**
  * @struct KalmanData
@@ -249,8 +270,33 @@ struct KalmanData {
     Position position;
     Velocity velocity;
     Acceleration acceleration;
+};
 
-    float altitude;
+/**
+ * @struct KalmanData
+ * 
+ * @brief data from the MQEKF thread
+*/
+struct AngularKalmanData {
+    Quaternion quaternion;
+    uint16_t gyrobias[3];
+    double comp_tilt = 0.0;
+    double mq_tilt = 0.0;
+    bool has_data = false;
+    OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
+    
+    float yaw = 0;
+    float pitch = 0;
+    float roll = 0;
+    // For yessir.cpp
+    euler_t getEuler() const {
+        euler_t euler;
+        euler.yaw = this->yaw;
+        euler.pitch = this->pitch;
+        euler.roll = this->roll;
+        return euler;
+    }
+    
 };
 
 /**
@@ -269,7 +315,6 @@ struct PyroState {
      * [3] PYRO D / AUX
      */
 };
-
 
 
 struct CameraData {

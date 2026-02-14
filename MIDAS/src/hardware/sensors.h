@@ -6,20 +6,14 @@
 #include "TCAL9539.h"
 #include "rocket_state.h"
 
-/**
- * @struct LowG interface
- */
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
-};
 
 /**
- * @struct HighG interface
+ * @struct IMUSensor
  */
-struct HighGSensor {
+struct IMUSensor {
     ErrorCode init();
-    HighGData read();
+    IMU read();
+    IMU_SFLP read_sflp();
 };
 
 /**
@@ -39,14 +33,6 @@ struct BarometerSensor {
 };
 
 /**
- * @struct LowGLSM interface
- */
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
-};
-
-/**
  * @struct Continuity interface
  */
 struct ContinuitySensor {
@@ -62,22 +48,22 @@ struct VoltageSensor {
     Voltage read();
 };
 
-/**
- * @struct BNO interface
- */
-struct OrientationSensor {
-    Orientation initial_orientation;
-    Quaternion initial_quaternion;
-    uint8_t initial_flag;
+// /**
+//  * @struct BNO interface
+//  */
+// struct OrientationSensor {
+//     Orientation initial_orientation;
+//     Quaternion initial_quaternion;
+//     uint8_t initial_flag;
 
-    float prev_x = 0;
-    float prev_y = 0;
-    float prev_z = 0;
-    float prev_tilt = 0;
+//     float prev_x = 0;
+//     float prev_y = 0;
+//     float prev_z = 0;
+//     float prev_tilt = 0;
 
-    ErrorCode init();
-    Orientation read();
-};
+//     ErrorCode init();
+//     Orientation read();
+// };
 
 /**
  * @struct GPS interface
@@ -94,7 +80,7 @@ struct GPSSensor {
  */
 struct Pyro {
     ErrorCode init();
-    PyroState tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands);
+    PyroState tick(FSMState fsm_state, AngularKalmanData angular_kalman_data, CommandFlags& telem_commands);
 
     void set_pyro_safety(); // Sets pyro_start_firing_time and has_fired_pyros.
     void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros.
