@@ -3,8 +3,6 @@
 #include "errors.h"
 #include "sensors.h" 
 
-#define IMU_CS_PIN 43
-#define IMU_IRQ_PIN 15
 #define NUM_DIRECTIONS 3
 
 LSM6DSV320XClass LSM6DSV(SPI, IMU_CS_PIN, IMU_IRQ_PIN);

@@ -13,9 +13,8 @@
 #define MMC5983_INT 7
 
 // IMU chip select, interrupt
-#define LSM_INT1 15
-#define LSM_INT2 42
-#define LSM_CS 43
+#define IMU_CS_PIN 43
+#define IMU_IRQ_PIN 15
 
 // i2c bus pins
 #define I2C_SDA 21
