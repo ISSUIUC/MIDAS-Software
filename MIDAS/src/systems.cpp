@@ -138,10 +138,7 @@ DECLARE_THREAD(pyro, RocketSystems* arg) {
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        Continuity reading = arg->sensors.continuity.read();
-        Voltage reading2 = arg->sensors.voltage.read();;
-
-        arg->rocket_data.continuity.update(reading);
+        Voltage reading2 = arg->sensors.voltage.read();
         arg->rocket_data.voltage.update(reading2);
 
         THREAD_SLEEP(100);
@@ -407,7 +404,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     //INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);

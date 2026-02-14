@@ -1,4 +1,4 @@
-#include "silsim/emulation.h"
+//#include "silsim/emulation.h"
 #include "systems.h"
 #include "FileSink.h"
 
@@ -12,7 +12,6 @@ Sensors create_sensors_attached_to(SimulatedRocket* sim, bool should_be_continuo
             LowGLSMSensor { sim },
             HighGSensor { sim },
             BarometerSensor { sim },
-            ContinuitySensor { should_be_continuous },
             VoltageSensor { sim },
             OrientationSensor { sim },
             MagnetometerSensor { sim },
