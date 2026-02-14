@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <SPI.h>
-#include "TCAL9539.h"
+#include "TCAL9538.h"
 
 #include "systems.h"
 #include "hardware/pins.h"
@@ -69,7 +69,7 @@ void setup()
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL, 100000);
 
-    if (!TCAL9539Init(EXP_RESET)) {
+    if (!TCAL9538Init(EXP_RESET)) {
         Serial.println(":(");
     }
 
