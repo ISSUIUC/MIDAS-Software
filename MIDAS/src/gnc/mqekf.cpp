@@ -385,3 +385,5 @@ void QuaternionMEKF::calculate_tilt()
     // Serial.print("TILT: ");
     // Serial.println(filtered_tilt * (180/3.14f));
 }
+
+QuaternionMEKF mqekf;
