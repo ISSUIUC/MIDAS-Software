@@ -254,18 +254,32 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(angular_kalman, RocketSystems* arg) {
-    qmekf.initialize(arg);
+    mqekf.initialize(arg);
+    TickType_t last = xTaskGetTickCount();
     while (true) {
+        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        if (arg->rocket_data.command_flags.should_reset_kf)
+        {
+            mqekf.initialize(arg);
+            TickType_t last = xTaskGetTickCount();
+            arg->rocket_data.command_flags.should_reset_kf = false;
+        }
         Orientation current_orientation = arg->rocket_data.orientation.getRecent();
         HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
-        Magnetometer current_magnetometer = arg->sensors.magnetometer.read();
+        Magnetometer current_magnetometer = arg->rocket_data.magnetometer.getRecent();
+        Velocity current_angular_velocity = current_orientation.getAngularVelocity();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
             .ay = current_accelerometer.ay,
             .az = current_accelerometer.az
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        qmekf.tick(dt, &current_orientation, &current_accelerations, &current_magnetometer);
+        float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
+        mqekf.tick(dt, current_magnetometer, current_angular_velocity, current_accelerations, FSM_state);
+        AngularKalmanData current_state = mqekf.getState();
+        arg->rocket_data.angular_kalman.update(current_state);
+        last = xTaskGetTickCount();
+        THREAD_SLEEP(50);
     }
 }
 

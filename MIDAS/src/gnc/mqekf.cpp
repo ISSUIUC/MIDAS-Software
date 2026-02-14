@@ -1,18 +1,26 @@
 #include "mqekf.h"
-#include "fsm_states.h"
+
+/*
+    mag
+    y -> -x
+    x -> y
+    z -> -z
+
+    acc
+    pitch -> roll
+    roll -> pitch
+*/
+
 void QuaternionMEKF::initialize(RocketSystems *args)
 {
     float Pq0 = 1e-6;
     float Pb0 = 1e-1;
-    Q = initialize_Q(sigma_g);
-
-    Eigen::Matrix<float, 6, 1> sigmas;
-    sigmas << sigma_a, sigma_m;
-
     Eigen::Matrix<float, 3, 1> sigma_a = {300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81, 300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81, 300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
     Eigen::Matrix<float, 3, 1> sigma_g = {0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180};                                              // 0.1 deg/s
-    Eigen::Matrix<float, 3, 1> sigma_m = {-3.2e-4 / sqrt(3), 3.2e-4 / sqrt(3), 4.1e-4 / sqrt(3)};                                                                              // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
-
+    Eigen::Matrix<float, 3, 1> sigma_m = {-3.2e-4 / sqrt(3), 3.2e-4 / sqrt(3), 4.1e-4 / sqrt(3)};                                                                              // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3                                                                                                     // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
+    Q = initialize_Q(sigma_g);
+    Eigen::Matrix<float, 6, 1> sigmas;
+    sigmas << sigma_a, sigma_m;
     R = sigmas.array().square().matrix().asDiagonal();
 
     qref.setIdentity(); // 1,0,0,0
@@ -23,27 +31,44 @@ void QuaternionMEKF::initialize(RocketSystems *args)
 
     Acceleration accel, accel_sum;
     Magnetometer mag, mag_sum;
-    FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+    FSMState FSM_state = args->rocket_data.fsm_state.getRecent();
     if (FSM_state == FSMState::STATE_IDLE)
     {
         for (int i = 0; i < 10; i++)
         {
-            accel = args->rocket_data.imu.highg_acceleration.getRecent();
-            accel_sum += accel;
-            mag = args->rocket_data.magnetometer.getRecent();
-            mag_sum += mag;
-        }
-        accel = accel_sum /= 10;
-        else
-        {
-            accel = args->rocket_data.imu.highg_acceleration.getRecent();
-            mag = args->rocket_data.magnetometer.getRecent();
-        }
+            HighGData highg = args->rocket_data.high_g.getRecent();
+            accel_sum.ax += highg.ax;
+            accel_sum.ay += highg.ay;
+            accel_sum.az += highg.az;
 
-        // MagnetometerSensor mag = mag_sum / 10; // args->rocket_data.magnetometer.getRecentUnsync();
-        // Acceleration accel = accel_sum / 10;   // args->rocket_data.imu.Velocity.getRecent();
-        initialize_from_acc_mag(accel, mag);
+            mag = args->rocket_data.magnetometer.getRecent();
+
+            mag_sum.mx += mag.mx;
+            mag_sum.my += mag.my;
+            mag_sum.mz += mag.mz;
+        }
+        accel.ax = accel_sum.ax / 10;
+        accel.ay = accel_sum.ay / 10;
+        accel.az = accel_sum.az / 10;
+
+        mag.mx = mag_sum.mx / 10;
+        mag.my = mag_sum.my / 10;
+        mag.mz = mag_sum.mz / 10;
     }
+    else
+    {
+        HighGData highg = args->rocket_data.high_g.getRecent();
+        accel = {
+            .ax = highg.ax,
+            .ay = highg.ay,
+            .az = highg.az
+        };
+        mag = args->rocket_data.magnetometer.getRecent();
+    }
+
+    // MagnetometerSensor mag = mag_sum / 10; // args->rocket_data.magnetometer.getRecentUnsync();
+    // Acceleration accel = accel_sum / 10;   // args->rocket_data.imu.Velocity.getRecent();
+    initialize_from_acc_mag(accel, mag);
 }
 
 QuaternionMEKF::QuaternionMEKF()
@@ -55,35 +80,22 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
 {
     if (FSM_state >= FSMState::STATE_IDLE) //
     {
-        if (FSM_state != last_fsm)
-        {
-            stage_timestamp = 0;
-            last_fsm = FSM_state;
-            // Reset landed state tracking when FSM changes
-            if (FSM_state != FSMState::STATE_LANDED)
-            {
-                landed_state_duration = 0.0f;
-                was_landed_last = false;
-            }
-        }
-        stage_timestamp += dt;
-        s_dt = dt; // Store dt for use in update
 
         // setQ(dt, sd);
         // priori(dt, orientation, FSM_state, acceleration);
         // update(barometer, acceleration, orientation, FSM_state, gps);
 
-        time_update(angular_velocity, dt)
-            measurement_update(acceleration, magnetometer);
-        Eigen<float, 4, 1> curr_quat = quat(); // w,x,y,z
+        time_update(angular_velocity, dt);
+        measurement_update(acceleration, magnetometer);
+        Eigen::Matrix<float, 4, 1> curr_quat = quaternion(); // w,x,y,z
 
-        state.quat.w = curr_quat(0, 0);
-        state.quat.x = curr_quat(1, 0);
-        state.quat.y = curr_quat(2, 0);
-        state.quat.z = curr_quat(3, 0);
+        state.quaternion.w = curr_quat(0, 0);
+        state.quaternion.x = curr_quat(1, 0);
+        state.quaternion.y = curr_quat(2, 0);
+        state.quaternion.z = curr_quat(3, 0);
         state.has_data = true; // not sure what this is
 
-        Eigen::Matrix<float, 3, 1> orientation = quatToEuler(quat);
+        Eigen::Matrix<float, 3, 1> orientation = quatToEuler(curr_quat);
         state.roll = orientation(0, 0);
         state.pitch = orientation(1, 0);
         state.yaw = orientation(2, 0);
@@ -121,7 +133,7 @@ void QuaternionMEKF::time_update(Velocity const &gyro, float Ts)
     P = F_a * P * F_a.transpose() + Q; // P update
 }
 
-void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer const &magn)
+void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer const &mag_input)
 {
     // accel measurements
     Eigen::Matrix<float, 3, 1> acc;
@@ -130,9 +142,9 @@ void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer 
     acc(2, 0) = accel.az;
 
     Eigen::Matrix<float, 3, 1> mag;
-    mag(0, 0) = magn.mx;
-    mag(1, 0) = magn.my;
-    mag(2, 0) = magm.mz;
+    mag(0, 0) = mag_input.mx;
+    mag(1, 0) = mag_input.my;
+    mag(2, 0) = mag_input.mz;
 
     Eigen::Matrix<float, 3, 1> const v1hat = accelerometer_measurement_func();
     Eigen::Matrix<float, 3, 1> const v2hat = magnetometer_measurement_func();
@@ -279,8 +291,12 @@ Eigen::Matrix<float, 6, 6> QuaternionMEKF::initialize_Q(Eigen::Matrix<float, 3, 
     return Q;
 }
 
-void QuaternionMEKF::initialize_from_acc_mag(Eigen::Matrix<float, 3, 1> const &acc, Eigen::Matrix<float, 3, 1> const &mag)
+void QuaternionMEKF::initialize_from_acc_mag(Acceleration const &acc_struct, Magnetometer const &mag_struct)
 {
+    Eigen::Matrix<float, 3, 1> acc;
+    acc << acc_struct.ax, acc_struct.ay, acc_struct.az;
+    Eigen::Matrix<float, 3, 1> mag;
+    mag << mag_struct.mx, mag_struct.my, mag_struct.mz;
     float const anorm = acc.norm();
     v1ref << anorm, 0, 0;
 
@@ -330,3 +346,46 @@ Eigen::Matrix<float, 3, 1> QuaternionMEKF::quatToEuler(const Eigen::Matrix<float
     double yaw = std::atan2(siny_cosp, cosy_cosp);
     return Eigen::Matrix<float, 3, 1>(roll, pitch, yaw);
 }
+
+AngularKalmanData QuaternionMEKF::getState()
+{
+    return state;
+}
+
+void QuaternionMEKF::calculate_tilt()
+{
+
+    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
+
+    // The guess & check method!
+    // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
+
+    Eigen::Quaternion<float>
+        ref = Eigen::Quaternionf(1, 0, 0, 0);
+
+    Eigen::Quaternion<float> rotated = qref * ref * qref.conjugate();
+
+    Eigen::Matrix<float, 1, 3> reference_vector = {0, 0, -1};
+    Eigen::Matrix<float, 1, 3> rotated_vector = {rotated.x(), rotated.y(), rotated.z()};
+
+    float dot = rotated_vector.dot(reference_vector);
+    float cur_mag = rotated_vector.norm();
+    float ref_mag = reference_vector.norm();
+
+    float tilt = 0;
+    if (cur_mag != 0 && ref_mag != 0)
+    {
+        tilt = acos(dot / (cur_mag * ref_mag));
+    }
+
+    const float gain = 0.2;
+    // Arthur's Comp Filter
+    float filtered_tilt = gain * tilt + (1 - gain) * prev_tilt;
+    prev_tilt = filtered_tilt;
+    state.mq_tilt = filtered_tilt;
+
+    // Serial.print("TILT: ");
+    // Serial.println(filtered_tilt * (180/3.14f));
+}
+
+QuaternionMEKF mqekf;

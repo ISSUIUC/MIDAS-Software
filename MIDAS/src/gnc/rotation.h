@@ -3,8 +3,8 @@
 
 // Used in ekf.cpp for ECEF and ENU conversions
 #define A 6378137.0                      // Equatorial radius
-#define F (1.0 / 298.257223563)          // Flattening factor
-#define B (A * (1 - F))                  // Polar radius
+#define Flat (1.0 / 298.257223563)          // Flattening factor
+#define B (A * (1 - Flat))                  // Polar radius
 #define E_SQ ((A * A - B * B) / (A * A)) // Eccentricity squared
 #define pi 3.1415
 
