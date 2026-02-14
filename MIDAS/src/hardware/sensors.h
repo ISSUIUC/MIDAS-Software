@@ -58,7 +58,7 @@ struct Pyro {
     PyroState tick(FSMState fsm_state, AngularKalmanData angular_kalman_data, CommandFlags& telem_commands);
 
     void set_pyro_safety(); // Sets pyro_start_firing_time and has_fired_pyros.
-    void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros.
+    void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros. 
     
     private:
     void disarm_all_channels(PyroState& prev_state);
