@@ -30,6 +30,11 @@ struct TelemetryPacket {
     
     uint16_t tilt_fsm; //12 bits tilt | 4 bits FSM
     uint8_t batt_volt;
+
+    uint16_t roll;
+    uint16_t pitch;
+    uint16_t yaw;
+
     
     // If callsign bit (highest bit of fsm_callsign_satcount) is set, the callsign is KD9ZMJ
     //

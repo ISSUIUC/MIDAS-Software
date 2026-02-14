@@ -254,6 +254,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
 }
 
 DECLARE_THREAD(angular_kalman, RocketSystems* arg) {
+    Serial.println("starting mqekf thread");
     mqekf.initialize(arg);
     TickType_t last = xTaskGetTickCount();
     while (true) {

@@ -13,10 +13,11 @@
 
 void QuaternionMEKF::initialize(RocketSystems *args)
 {
+    Serial.println("Intialize MQEKF");
     float Pq0 = 1e-6;
     float Pb0 = 1e-1;
     Eigen::Matrix<float, 3, 1> sigma_a = {300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81, 300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81, 300 / sqrt(3) * sqrt(100.0f) * 1e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
-    Eigen::Matrix<float, 3, 1> sigma_g = {0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180, 0.03 / sqrt(3) * M_PI / 180};                                              // 0.1 deg/s
+    Eigen::Matrix<float, 3, 1> sigma_g = {0.03 / sqrt(3), 0.03 / sqrt(3), 0.03 / sqrt(3)};                                              // 0.1 deg/s
     Eigen::Matrix<float, 3, 1> sigma_m = {-3.2e-4 / sqrt(3), 3.2e-4 / sqrt(3), 4.1e-4 / sqrt(3)};                                                                              // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3                                                                                                     // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
     Q = initialize_Q(sigma_g);
     Eigen::Matrix<float, 6, 1> sigmas;
@@ -100,6 +101,12 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
         state.pitch = orientation(1, 0);
         state.yaw = orientation(2, 0);
 
+        Serial.print(state.roll);
+        Serial.print(" ");
+        Serial.print(state.pitch);
+        Serial.print(" ");
+        Serial.println(state.yaw);
+
         Eigen::Matrix<float, 3, 1> bias_gyro = gyroscope_bias();
         state.gyrobias[0] = bias_gyro(0, 0);
         state.gyrobias[1] = bias_gyro(1, 0);
@@ -112,9 +119,9 @@ void QuaternionMEKF::time_update(Velocity const &gyro, float Ts)
     // Conversion from degrees/s to radians/s
 
     Eigen::Matrix<float, 3, 1> gyr;
-    gyr(0, 0) = gyro.vx * (pi / 180.0f);
-    gyr(1, 0) = gyro.vy * (pi / 180.0f);
-    gyr(2, 0) = gyro.vz * (pi / 180.0f);
+    gyr(0, 0) = gyro.vx;
+    gyr(1, 0) = gyro.vy;
+    gyr(2, 0) = gyro.vz;
 
     set_transition_matrix(gyr - x.tail(3), Ts);
 

@@ -92,6 +92,11 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
     CameraData cam_data = data.cam_data.getRecentUnsync();
+    AngularKalmanData angular_kalman = data.angular_kalman.getRecentUnsync();
+
+    packet.roll = angular_kalman.roll;
+    packet.yaw = angular_kalman.yaw;
+    packet.pitch = angular_kalman.pitch;
 
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
