@@ -1,5 +1,5 @@
 #include "errors.h"
-#include "TCAL9539.h"
+#include <Arduino.h>
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
@@ -24,7 +24,6 @@
  */
 
 #ifndef SILSIM
-#include <TCAL9539.h>
 #include "hardware/pins.h"
 
 /**

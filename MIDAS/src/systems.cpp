@@ -3,7 +3,6 @@
 #include "hal.h"
 #include "gnc/ekf.h"
 
-#include <TCAL9539.h>
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -74,34 +73,6 @@ DECLARE_THREAD(imuthread, RocketSystems* arg) { //This needs edits
         THREAD_SLEEP(5);
     }
 }
-
-//read angular velocity and update quaternion data
-//handle mode switching from on pad madgwick to ekf?
-//quaternion -> euler for telem
-//orientation struct updated
-// DECLARE_THREAD(orientation, RocketSystems* arg) {
-//     while (true) {
-//         Orientation orientation_holder = arg->rocket_data.orientation.getRecent();
-//         Orientation reading = arg->sensors.orientation.read();
-//         if (reading.has_data) {
-//             if(reading.reading_type == OrientationReadingType::ANGULAR_VELOCITY_UPDATE) {
-//                 orientation_holder.angular_velocity.vx = reading.angular_velocity.vx;
-//                 orientation_holder.angular_velocity.vy = reading.angular_velocity.vy;
-//                 orientation_holder.angular_velocity.vz = reading.angular_velocity.vz;
-//             } else {
-//                 float old_vx = orientation_holder.angular_velocity.vx;
-//                 float old_vy = orientation_holder.angular_velocity.vy;
-//                 float old_vz = orientation_holder.angular_velocity.vz;
-//                 orientation_holder = reading;
-//                 orientation_holder.angular_velocity.vx = old_vx;
-//                 orientation_holder.angular_velocity.vy = old_vy;
-//                 orientation_holder.angular_velocity.vz = old_vz;
-//             }
-//             arg->rocket_data.orientation.update(orientation_holder);
-//         }
-//         THREAD_SLEEP(5);
-//     }
-// }
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
@@ -255,7 +226,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             .ax = current_high_g.ax,
             .ay = current_high_g.ay,
             .az = current_high_g.az
-        };//
+        };
 
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
@@ -398,10 +369,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
 ErrorCode init_systems(RocketSystems& systems) {
     digitalWrite(LED_ORANGE, HIGH);
     INIT_SYSTEM(systems.sensors.imu);
-    //INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.log_sink);
-    //INIT_SYSTEM(systems.sensors.high_g);
-    //INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.voltage);
@@ -438,7 +406,6 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    //START_THREAD(orientation, SENSOR_CORE, config, 10);
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(imuthread, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
