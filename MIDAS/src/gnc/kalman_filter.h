@@ -6,12 +6,11 @@
 #undef B1
 
 #include <Eigen/Eigen>
-// #include "systems.h"
-#include "sensor_data.h" // For sim 
-#include "systems.h" // for sim
+#include "sensor_data.h"
+#include "systems.h"
 
-
-struct KalmanState {
+struct KalmanState
+{
     float state_est_pos_x;
     float state_est_vel_x;
     float state_est_accel_x;
@@ -56,12 +55,10 @@ public:
 
         B = Eigen::Matrix<float, _NumStates, _NumInputs>::Zero();
     }
-    
-    virtual void initialize(RocketSystems* args) = 0;
+
+    virtual void initialize(RocketSystems *args) = 0;
     // virtual void priori() = 0;
-    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state,GPS &gps) = 0;
-    virtual void update(Barometer barometer, Acceleration acceleration, Orientation orientation, FSMState current_state,GPS &gps) = 0;
+    virtual void update(Barometer barometer, Acceleration acceleration, AngularKalmanData orientation, FSMState current_state, GPS &gps) = 0;
     virtual KalmanData getState() = 0;
     virtual void setState(KalmanState state) = 0;
-    
 };

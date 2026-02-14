@@ -1,3 +1,5 @@
+#pragma once
+
 // constants
 const float pi = 3.14159268;
 const float a = 343.0;                // (m/s) speed of sound

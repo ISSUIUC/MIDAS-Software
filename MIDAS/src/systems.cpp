@@ -268,11 +268,11 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         Acceleration current_high_g = current_imu.highg_acceleration;
         Acceleration current_low_g = current_imu.lowg_acceleration;
         Magnetometer current_mag = arg->rocket_data.magnetometer.getRecent();
-        Velocity current_angular_velocity = current_imu.angular_velocity(); // degrees
+        Velocity current_angular_velocity = current_imu.angular_velocity; // degrees
 
-        AngularKalmanData current_angular_kalman = args->rocket_data.angular_kalman_data.getRecent()
+        AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
-                                                       Acceleration current_accelerations = {
+        Acceleration current_accelerations = {
             .ax = current_high_g.ax,
             .ay = current_high_g.ay,
             .az = current_high_g.az}; //
@@ -281,7 +281,7 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
 
         // Check with Divij
-        mqekf.tick(dt, current_mag, current_angular_velocity,current_accelerations);
+        mqekf.tick(dt, current_mag, current_angular_velocity,current_accelerations, FSM_state);
 
         AngularKalmanData current_state = mqekf.getState();
 
@@ -328,7 +328,7 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
 
         // Check with Divij
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_imu, current_angular_kalman, FSM_state, current_gps);
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_angular_kalman, FSM_state, current_gps);
 
         KalmanData current_state = ekf.getState();
 
@@ -542,7 +542,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
-    START_THREAD(angularkalman, SENSOR_CORE, config, 7)
+    START_THREAD(angularkalman, SENSOR_CORE, config, 7);
 #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 #endif
