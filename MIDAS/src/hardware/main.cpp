@@ -76,11 +76,11 @@ void setup()
     //pinMode changes need to be made here for midas mini bc of new sensors.
 
     //set all chip selects high (deselected)
-	pinMode(E22_CS, OUTPUT);
-	pinMode(MS5611_CS, OUTPUT);
+	  pinMode(E22_CS, OUTPUT);
+	  pinMode(MS5611_CS, OUTPUT);
 
-	digitalWrite(MS5611_CS, HIGH);
-	digitalWrite(E22_CS, HIGH);
+	  digitalWrite(MS5611_CS, HIGH);
+	  digitalWrite(E22_CS, HIGH);
 
     //configure output leds
     pinMode(LED_BLUE, OUTPUT);
