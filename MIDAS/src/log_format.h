@@ -10,11 +10,9 @@
 enum ReadingDiscriminant {
     ID_IMU = 1, 
     ID_BAROMETER = 2,
-    //ID_CONTINUITY = 3,
     ID_VOLTAGE = 4,
     ID_GPS = 5,
     ID_MAGNETOMETER = 6,
-    ID_ORIENTATION = 7,
     ID_KALMAN = 8,
     ID_FSM = 9,
     ID_PYRO = 10,
@@ -43,7 +41,6 @@ struct LoggedReading {
         IMU imu;
         IMU_SFLP hw_filt;
         Barometer barometer;
-        //Continuity continuity;
         Voltage voltage;
         GPS gps;
         Magnetometer magnetometer;

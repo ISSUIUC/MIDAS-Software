@@ -191,12 +191,10 @@ public:
     BufferedSensorData<IMU, 16> imu;
     SensorData<IMU_SFLP> hw_filtered;
     BufferedSensorData<Barometer, 16> barometer;
-    //SensorData<Continuity> continuity;
     SensorData<PyroState> pyro;
     SensorData<FSMState> fsm_state;
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
-    //SensorData<Orientation> orientation;
     SensorData<Voltage> voltage;
     SensorData<CameraData> cam_data;
     

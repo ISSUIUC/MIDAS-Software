@@ -36,10 +36,7 @@ struct Sensors {
     IMUSensor imu;
 
     BarometerSensor barometer;
-
-    //ContinuitySensor continuity;
     VoltageSensor voltage;
-    //OrientationSensor orientation;
 
     MagnetometerSensor magnetometer;
 

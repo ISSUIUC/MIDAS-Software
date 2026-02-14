@@ -9,8 +9,8 @@
 #define MS5611_CS 44
 
 // magnetometer chip select
-#define MAG_CS 4//
-#define MAG_INT 7//
+#define MMC5983_CS 4
+#define MMC5983_INT 7
 
 // IMU chip select, interrupt
 #define LSM_INT1 15
@@ -75,5 +75,5 @@
 #define FLASH_DAT3 17
 
 //Board to Board pins
-#define B2B_EN 36//
-#define B2B_READY 35//
+#define B2B_EN 36
+#define B2B_READY 35

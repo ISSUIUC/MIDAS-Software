@@ -88,10 +88,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    //Continuity continuity = data.continuity.getRecentUnsync();
-    //HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
-    //Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
     AngularKalmanData angular_kalman = data.angular_kalman_data.getRecentUnsync();
     CameraData cam_data = data.cam_data.getRecentUnsync();

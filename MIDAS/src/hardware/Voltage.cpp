@@ -98,7 +98,6 @@ Voltage VoltageSensor::read() {
     }
 
     if(sensorC.error == AdcError::NoError){
-                    
         float C_voltage = ((static_cast<float>(sensorC.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[2] = C_voltage;
         Serial.print("C: ");

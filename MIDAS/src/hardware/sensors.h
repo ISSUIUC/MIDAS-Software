@@ -32,14 +32,6 @@ struct BarometerSensor {
     Barometer read();
 };
 
-// /**
-//  * @struct Continuity interface
-//  */
-// struct ContinuitySensor {
-//     ErrorCode init();
-//     Continuity read();
-// };
-
 /**
  * @struct Voltage interface
  */
@@ -47,23 +39,6 @@ struct VoltageSensor {
     ErrorCode init();
     Voltage read();
 };
-
-// /**
-//  * @struct BNO interface
-//  */
-// struct OrientationSensor {
-//     Orientation initial_orientation;
-//     Quaternion initial_quaternion;
-//     uint8_t initial_flag;
-
-//     float prev_x = 0;
-//     float prev_y = 0;
-//     float prev_z = 0;
-//     float prev_tilt = 0;
-
-//     ErrorCode init();
-//     Orientation read();
-// };
 
 /**
  * @struct GPS interface

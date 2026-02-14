@@ -152,8 +152,7 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        Voltage reading2 = arg->sensors.voltage.read();;
-
+        Voltage reading2 = arg->sensors.voltage.read();
         arg->rocket_data.voltage.update(reading2);
 
         THREAD_SLEEP(100);
@@ -494,7 +493,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     // INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    //INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
@@ -543,7 +541,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(angularkalman, SENSOR_CORE, config, 7);
-#ifdef ENABLE_TELEM
+    #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 #endif
 

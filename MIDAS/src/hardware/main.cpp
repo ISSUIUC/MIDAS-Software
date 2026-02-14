@@ -68,7 +68,6 @@ void setup()
     //begin I2C bus
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL, 100000);
-    //Wire1.begin(PYRO_SDA, PYRO_SCL, 400000);
 
     if (!TCAL9539Init(EXP_RESET)) {
         Serial.println(":(");
@@ -77,32 +76,11 @@ void setup()
     //pinMode changes need to be made here for midas mini bc of new sensors.
 
     //set all chip selects high (deselected)
-    pinMode(LSM_CS, OUTPUT);
-	pinMode(MAG_CS, OUTPUT);
+	  pinMode(E22_CS, OUTPUT);
+	  pinMode(MS5611_CS, OUTPUT);
 
-	//pinMode(ADXL355_CS, OUTPUT);
-	//pinMode(LIS3MDL_CS, OUTPUT);
-	//pinMode(BNO086_CS, OUTPUT);//
-	//pinMode(BNO086_RESET, OUTPUT);//
-	//pinMode(CAN_CS, OUTPUT);
-
-	pinMode(E22_CS, OUTPUT);
-	pinMode(MS5611_CS, OUTPUT);
-
-	digitalWrite(MS5611_CS, HIGH);
-
-	digitalWrite(LSM_CS, HIGH);
-	digitalWrite(MAG_CS, HIGH);
-
-	// digitalWrite(ADXL355_CS, HIGH);
-	// digitalWrite(LIS3MDL_CS, HIGH);
-	// digitalWrite(BNO086_CS, HIGH);
-	// digitalWrite(CAN_CS, HIGH);
-
-	digitalWrite(E22_CS, HIGH);
-
-    //digitalWrite(BNO086_RESET, HIGH);
-
+	  digitalWrite(MS5611_CS, HIGH);
+	  digitalWrite(E22_CS, HIGH);
 
     //configure output leds
     pinMode(LED_BLUE, OUTPUT);

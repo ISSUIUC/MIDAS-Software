@@ -80,14 +80,6 @@ struct Barometer {
     Barometer(float t, float p, float a) : temperature(t), pressure(p), altitude(a) {}
 };
 
-/**
- * @struct Continuity
- * 
- * @brief data about pyro continuity
-*/
-struct Continuity {
-    float pins[4];
-};
 
 /**
  * @struct Voltage

@@ -16,7 +16,6 @@ constexpr ReadingDiscriminant get_discriminant();
 
 ASSOCIATE(IMU, ID_IMU)
 ASSOCIATE(Barometer, ID_BAROMETER)
-//ASSOCIATE(Continuity, ID_CONTINUITY)
 ASSOCIATE(Voltage, ID_VOLTAGE)
 ASSOCIATE(GPS, ID_GPS)
 ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
@@ -87,7 +86,6 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.imu);
     log_from_sensor_data(sink, data.hw_filtered);
     log_from_sensor_data(sink, data.barometer);
-    //log_from_sensor_data(sink, data.continuity);
     log_from_sensor_data(sink, data.voltage);
     log_from_sensor_data(sink, data.gps);
     log_from_sensor_data(sink, data.magnetometer);
