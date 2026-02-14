@@ -55,6 +55,7 @@ private:
     void set_transition_matrix(const Eigen::Ref<const Eigen::Matrix<float, 3, 1>> &gyr, float Ts);
     Eigen::Matrix<float, 3, 3> skew_symmetric_matrix(const Eigen::Ref<const Eigen::Matrix<float, 3, 1>> &vec) const;
     Eigen::Matrix<float, 3, 1> magnetometer_measurement_func() const;
+    void calculate_tilt();
 
     static Eigen::Matrix<float, 6, 6> initialize_Q(Eigen::Matrix<float, 3, 1> sigma_g);
 };

@@ -22,8 +22,8 @@ void QuaternionMEKF::initialize(RocketSystems *args)
     sigmas << sigma_a, sigma_m;
 
     sigma_a = {accel_noise_density_x * sqrt(100.0f) * 1e-6 * 9.81, accel_noise_density_y * sqrt(100.0f) * 1e-6 * 9.81, accel_noise_density_z * sqrt(100.0f) * 1e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
-    sigma_g = {0.1 * pi / 180, 0.1 * pi / 180, 0.1 * pi / 180};                                                       // 0.1 deg/s
-    sigma_m = {0.4e-4 / sqrt(3), 0.4e-4 / sqrt(3), 0.4e-4 / sqrt(3)};                                                 // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
+    sigma_g = {0.1 * pi / 180, 0.1 * pi / 180, 0.1 * pi / 180};                                                                                                             // 0.1 deg/s
+    sigma_m = {0.4e-4 / sqrt(3), 0.4e-4 / sqrt(3), 0.4e-4 / sqrt(3)};                                                                                                       // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
 
     R = sigmas.array().square().matrix().asDiagonal();
 
@@ -341,4 +341,42 @@ Eigen::Matrix<float, 3, 1> QuaternionMEKF::quatToEuler(const Eigen::Matrix<float
     double cosy_cosp = 1.0 - 2.0 * (y * y + z * z);
     double yaw = std::atan2(siny_cosp, cosy_cosp);
     return Eigen::Matrix<float, 3, 1>(roll, pitch, yaw);
+}
+
+void QuaternionMEKF::calculate_tilt()
+{
+
+    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
+    unsigned long currentTime = millis();
+    deltaTime = (currentTime - lastTime) / 1000.0;
+    lastTime = currentTime;
+
+    // The guess & check method!
+    // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
+
+    Eigen::Quaternion<float>
+        ref = Eigen::Quaternion(1, 0, 0, 0);
+
+    Eigen::Quaternion<float> rotated = qref * ref * qref.conjugate();
+
+    Eigen::Matrix<float, 1, 3> reference_vector = {0, 0, -1};
+    Eigen::Matrix<float, 1, 3> rotated_vector = {rotated[0], rotated[1], rotated[2]};
+
+    float dot = rotated_vector.dot(reference_vector);
+    float cur_mag = rotated_vector.norm();
+    float ref_mag = reference_vector.norm();
+
+    sensor_reading.tilt = 0;
+    if (cur_mag != 0 && ref_mag != 0)
+    {
+        sensor_reading.tilt = acos(dot / (cur_mag * ref_mag));
+    }
+
+    const float alpha = 0.2;
+    // Arthur's Comp Filter
+    float filtered_tilt = alpha * sensor_reading.tilt + (1 - alpha) * prev_tilt;
+    state.mq_tilt = filtered_tilt;
+
+    // Serial.print("TILT: ");
+    // Serial.println(filtered_tilt * (180/3.14f));
 }
