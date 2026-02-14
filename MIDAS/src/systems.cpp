@@ -249,7 +249,7 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         Acceleration current_high_g = current_imu.highg_acceleration;
         Acceleration current_low_g = current_imu.lowg_acceleration;
 
-        AngularKalmanData current_angular_kalman = args->rocket_data.angular_kalman_data.getRecent()
+        AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
 
@@ -399,7 +399,7 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  *        Turns on the Orange LED while initialization is running.
  */
 ErrorCode init_systems(RocketSystems& systems) {
-    gpioDigitalWrite(LED_ORANGE, HIGH);
+    digitalWrite(LED_ORANGE, HIGH);
     INIT_SYSTEM(systems.sensors.imu);
     //INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.log_sink);
@@ -417,7 +417,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         INIT_SYSTEM(systems.tlm);
     #endif
     INIT_SYSTEM(systems.sensors.gps);
-    gpioDigitalWrite(LED_ORANGE, LOW);
+    digitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
 #undef INIT_SYSTEM
