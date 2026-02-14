@@ -454,7 +454,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
-    START_THREAD(angularkalman, SENSOR_CORE, config, 7)
+    START_THREAD(angularkalman, SENSOR_CORE, config, 7);
     #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
     #endif
