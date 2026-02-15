@@ -21,7 +21,7 @@ IMU IMUSensor::read(){
 
     //Low-G Acceleration
 
-    //status.xlda is failing wtf
+    
 
 
     if(status.xlda){
@@ -127,10 +127,10 @@ ErrorCode IMUSensor::init(){
     
     
     // the second parameter used to be normal instead of high-performance
-    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_7Hz5, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
+    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_480Hz, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
     LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
 
-    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
+    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_480Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
     LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
     LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//lowg scale set
