@@ -108,3 +108,33 @@ void printPacketJson(FullTelemetryData const& packet) {
     // printJSONField("pyro_d", packet.pyros[3], false);
     // Serial.println("}}");
 }
+
+void printDronePacketJson(FullTelemetryData const& packet) {
+    bool is_heartbeat = packet.FSM_State == static_cast<uint8_t>(-1);
+    char buff[1024]{}; // Leaving the same buffer size as PacketJson
+    
+    int len = sprintf(buff, R"({"type": "data", "value": 
+        {"barometer_altitude": %f, "latitude": %f, 
+        "longitude": %f, "altitude": %i, 
+        "FSM_State": %i, "tilt_angle": %f, 
+        "frequency": %f, "RSSI": %f, 
+        "sat_count": %i, "is_sustainer": %i,
+        }})",
+    
+    // Barometer
+    packet.barometer_altitude,
+    
+    // GPS
+    packet.latitude,
+    packet.longitude,
+    packet.altitude,
+    // Other data
+    packet.FSM_State,
+    packet.tilt_angle,
+    packet.freq,
+    packet.rssi,
+    packet.sat_count,
+    packet.is_sustainer
+    );
+    Serial.println(buff);
+}

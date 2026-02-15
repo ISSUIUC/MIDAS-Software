@@ -83,3 +83,25 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
 
     return data;
 }
+
+FullTelemetryData DecodeDronePacket(const DroneTelemetryPacket& packet, float frequency) {
+    int64_t start_printing = millis();
+    FullTelemetryData data;
+    // GPS
+    data.altitude = static_cast<float>(packet.alt & 0xfffe); // Only convert top 15 bits
+    data.latitude = ConvertGPS(packet.lat);
+    data.longitude = ConvertGPS(packet.lon);
+    data.cmd_ack = packet.alt & 1; // Ack bit
+    // Barometer
+    data.barometer_altitude = convert_range<int16_t>(packet.baro_alt, 1 << 17);
+    // Tilt & FSM
+    data.tilt_angle = ((float)((packet.tilt_fsm >> 4) & 0x0fff) / 0x0fff) * 180;
+    data.FSM_State = packet.tilt_fsm & 0x000f;
+    
+    // Other data
+    data.gps_fixtype = packet.callsign_gpsfix_satcount >> 1 & 0b0111;
+    data.is_sustainer = (packet.callsign_gpsfix_satcount & 0b1);
+    data.sat_count = (packet.callsign_gpsfix_satcount >> 4) & 0b1111;
+    data.freq = frequency;
+    return data;
+}
