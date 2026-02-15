@@ -77,13 +77,13 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
         arg->rocket_data.hw_filtered.update(hw_filter);
 
-        Serial.println("IMU Thread: ");
-        Serial.println("ax: ");
-        Serial.print(imudata.highg_acceleration.ax);
-        Serial.println("ay: ");
-        Serial.print(imudata.highg_acceleration.ay);
-        Serial.println("az: ");
-        Serial.print(imudata.highg_acceleration.az);
+        // Serial.println("IMU Thread: ");
+        // Serial.println("ax: ");
+        // Serial.print(imudata.highg_acceleration.ax);
+        // Serial.println("ay: ");
+        // Serial.print(imudata.highg_acceleration.ay);
+        // Serial.println("az: ");
+        // Serial.print(imudata.highg_acceleration.az);
 
         THREAD_SLEEP(300);
     }

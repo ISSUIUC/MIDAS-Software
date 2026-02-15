@@ -25,7 +25,7 @@ IMU IMUSensor::read(){
 
 
     if(status.xlda){
-        Serial.println("oh we are lowg");
+        //Serial.println("oh we are lowg");
         LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax, 
                                                     &reading.lowg_acceleration.ay, 
                                                     &reading.lowg_acceleration.az);
@@ -33,7 +33,7 @@ IMU IMUSensor::read(){
 
     //High-G Acceleration
     if(status.xlhgda){
-        Serial.println("oh we are highg");
+        //Serial.println("oh we are highg");
         LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax, 
                                                     &reading.highg_acceleration.ay, 
                                                     &reading.highg_acceleration.az);
@@ -41,7 +41,7 @@ IMU IMUSensor::read(){
 
     //Angular rate
     if(status.gda){
-        Serial.println("oh we are angular");
+        //Serial.println("oh we are angular");
         LSM6DSV.get_angular_velocity_from_fs2000_to_dps(&reading.angular_velocity.vx, 
                                                     &reading.angular_velocity.vy, 
                                                     &reading.angular_velocity.vz);
