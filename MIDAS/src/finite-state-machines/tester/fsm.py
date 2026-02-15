@@ -50,6 +50,7 @@ class SustainerFSM:
 
     launch_time: float = 0.0
     burnout_time: float = 0.0
+    burnout_time_elapsed_with_sudden_acceleration_change: float = 0.0
     sustainer_ignition_time: float = 0.0
     second_boost_time: float = 0.0
     coast_time: float = 0.0
@@ -90,13 +91,24 @@ class SustainerFSM:
                     self.state = FSMState.STATE_BURNOUT
                     reason_transition = f"Transitioned FIRST_BOOST TO BURNOUT due to low acceleration. Acceleration is currently {acceleration}m/s^2"
             case FSMState.STATE_BURNOUT:
-                # if low acceleration is too brief than go on to the previous state
-                if ((acceleration >= thresholds.SUSTAINER_COAST_DETECTION_ACCELERATION_THRESHOLD) and ((current_time - self.burnout_time) < thresholds.SUSTAINER_COAST_TIME)):
-                    self.state = FSMState.STATE_FIRST_BOOST
-                    reason_transition = f"Transitioned BURNOUT TO FIRST_BOOST due to short dip of acceleration. Acceleration is currently {acceleration}m/s^2 and it has been {current_time - self.burnout_time}ms since burnout_time"
+                #If we have acceptable acceleration, we reset the error
+                # timer for the acceleration so that it doesn't carry over.         
+                if(acceleration < thresholds.SUSTAINER_COAST_DETECTION_ACCELERATION_THRESHOLD):
+                    self.burnout_time_elapsed_with_sudden_acceleration_change = 0.0
+                #If we have a acceleration above the threshold
+                # We check if the timer has started. 
+                # If it hasn't, we start it, if it has, we see if we need to go back to first boost.  
+                elif ((acceleration >= thresholds.SUSTAINER_COAST_DETECTION_ACCELERATION_THRESHOLD) and ((current_time - self.burnout_time) < thresholds.SUSTAINER_COAST_TIME)):
+                    if self.burnout_time_elapsed_with_sudden_acceleration_change == 0.0:
+                        self.burnout_time_elapsed_with_sudden_acceleration_change = current_time
+                    else:
+                        if current_time - self.burnout_time_elapsed_with_sudden_acceleration_change > thresholds.SUSTAINER_BURNOUT_TO_FIRST_BOOST_TIME_THRESHOLD:
+                            self.state = FSMState.STATE_FIRST_BOOST
+                            reason_transition = f"Transitioned BURNOUT TO FIRST_BOOST due to short dip of acceleration. Acceleration is currently {acceleration}m/s^2 and it has been {current_time - self.burnout_time}ms since burnout_time"
                 
                 # if in burnout for long enough then go on to the next state (time transition)
-                elif ((current_time - self.burnout_time) > thresholds.SUSTAINER_COAST_TIME):
+                #Despite our timer, we want to check if we need to transition to the next state.
+                if ((current_time - self.burnout_time) > thresholds.SUSTAINER_COAST_TIME):
                     self.sustainer_ignition_time = current_time
                     self.state = FSMState.STATE_SUSTAINER_IGNITION
                     reason_transition = f"Transitioned BURNOUT TO SUSTAINER_IGNITION due to long enough time after burnout. It has been {current_time - self.burnout_time}ms since burnout_time"

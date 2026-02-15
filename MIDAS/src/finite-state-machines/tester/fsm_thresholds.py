@@ -153,3 +153,6 @@ BOOSTER_DROGUE_JERK_THRESHOLD = 200
 
 # Stores a small jerk value (m/s^3)
 BOOSTER_MAIN_JERK_THRESHOLD = 300
+
+#Minimum duration of sustained acceleration before fallback to boost (ms)
+SUSTAINER_BURNOUT_TO_FIRST_BOOST_TIME_THRESHOLD = 250
