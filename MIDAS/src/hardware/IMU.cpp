@@ -18,9 +18,14 @@ IMU IMUSensor::read(){
     lsm6dsv320x_status_reg_t status = LSM6DSV.get_status();
 
     IMU reading{};
-    
+
     //Low-G Acceleration
+
+    //status.xlda is failing wtf
+
+
     if(status.xlda){
+        Serial.println("oh we are lowg");
         LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax, 
                                                     &reading.lowg_acceleration.ay, 
                                                     &reading.lowg_acceleration.az);
@@ -28,6 +33,7 @@ IMU IMUSensor::read(){
 
     //High-G Acceleration
     if(status.xlhgda){
+        Serial.println("oh we are highg");
         LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax, 
                                                     &reading.highg_acceleration.ay, 
                                                     &reading.highg_acceleration.az);
@@ -35,6 +41,7 @@ IMU IMUSensor::read(){
 
     //Angular rate
     if(status.gda){
+        Serial.println("oh we are angular");
         LSM6DSV.get_angular_velocity_from_fs2000_to_dps(&reading.angular_velocity.vx, 
                                                     &reading.angular_velocity.vy, 
                                                     &reading.angular_velocity.vz);
@@ -109,20 +116,25 @@ IMU_SFLP IMUSensor::read_sflp() {
 
 ErrorCode IMUSensor::init(){
     uint8_t whoami;
+
+    //LSM6DSV.sw_por();
+
     LSM6DSV.device_id_get(&whoami);
     if(whoami != LSM6DSV320X_ID) 
         return IMUCouldNotBeInitialized;
 
     //?????
-    LSM6DSV.sw_por();
+    
     
     // the second parameter used to be normal instead of high-performance
     LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_7Hz5, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
     LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
+
     LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
     LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
     LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//lowg scale set
+
     LSM6DSV.gy_full_scale_set(LSM6DSV320X_2000dps);
     
     LSM6DSV.sflp_enable_set(1);

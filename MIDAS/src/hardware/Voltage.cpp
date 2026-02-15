@@ -72,43 +72,43 @@ Voltage VoltageSensor::read() {
     if(sensorBat.error == AdcError::NoError){
         float Bat_voltage = ((static_cast<float>(sensorBat.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / BATT_VOLTAGE_DIVIDER; 
         voltage.v_Bat = Bat_voltage;
-        Serial.print("VBAT: ");
-        Serial.println(Bat_voltage); 
+        //Serial.print("VBAT: ");
+        //Serial.println(Bat_voltage); 
     }
 
     if(sensorPyro.error == AdcError::NoError){
         float Pyro_voltage = ((static_cast<float>(sensorPyro.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE)/(PYRO_BATT_VOLTAGE_DIVIDER); //Accounting for voltage divider on MIDAS mini
         voltage.v_Pyro = Pyro_voltage;
-        Serial.print("PYRO: ");
-        Serial.println(Pyro_voltage);
+        //Serial.print("PYRO: ");
+        //Serial.println(Pyro_voltage);
     }
 
     if(sensorA.error == AdcError::NoError){
         float A_voltage = ((static_cast<float>(sensorA.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[0] = A_voltage;
-        Serial.print("A: ");
-        Serial.println(A_voltage);
+        //Serial.print("A: ");
+        //Serial.println(A_voltage);
     }
 
     if(sensorB.error == AdcError::NoError){
         float B_voltage = ((static_cast<float>(sensorB.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[1] = B_voltage;
-        Serial.print("B: ");
-        Serial.println(B_voltage);
+        //Serial.print("B: ");
+        //Serial.println(B_voltage);
     }
 
     if(sensorC.error == AdcError::NoError){
         float C_voltage = ((static_cast<float>(sensorC.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[2] = C_voltage;
-        Serial.print("C: ");
-        Serial.println(C_voltage);
+        //Serial.print("C: ");
+        //Serial.println(C_voltage);
     }
 
     if(sensorD.error == AdcError::NoError){
         float D_voltage = ((static_cast<float>(sensorD.value) / VOLTAGE_REG_WIDTH) * VOLTAGE_SCALE) / PYRO_VOLTAGE_DIVIDER;
         voltage.continuity[3] = D_voltage;
-        Serial.print("D: ");
-        Serial.println(D_voltage);
+        //Serial.print("D: ");
+        //Serial.println(D_voltage);
     }
 
     return voltage;

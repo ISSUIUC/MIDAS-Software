@@ -77,7 +77,15 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
         arg->rocket_data.hw_filtered.update(hw_filter);
 
-        THREAD_SLEEP(5);
+        Serial.println("IMU Thread: ");
+        Serial.println("ax: ");
+        Serial.print(imudata.highg_acceleration.ax);
+        Serial.println("ay: ");
+        Serial.print(imudata.highg_acceleration.ay);
+        Serial.println("az: ");
+        Serial.print(imudata.highg_acceleration.az);
+
+        THREAD_SLEEP(300);
     }
 }
 
@@ -243,7 +251,7 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         Acceleration current_accelerations = {
             .ax = current_high_g.ax,
             .ay = current_high_g.ay,
-            .az = current_high_g.az}; //
+            .az = current_high_g.az};
 
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
