@@ -25,6 +25,7 @@
 #define LSM6DSV320X_HAODR_CFG                      0x62U
 #define LSM6DSV320X_CTRL1                          0x10U
 #define LSM6DSV320X_CTRL2                          0x11U
+#define LSM6DSV320X_CTRL3                          0x12U
 #define LSM6DSV320X_CTRL4                          0x13U
 #define LSM6DSV320X_CTRL6                          0x15U
 #define LSM6DSV320X_CTRL7                          0x16U
@@ -561,6 +562,9 @@ public:
     int32_t sflp_gravity_raw_get(int16_t *val);
     int32_t sflp_gbias_raw_get(int16_t *val);
  
+    int32_t read_reg(uint8_t reg, uint8_t *data, uint16_t len);
+    int32_t write_reg(uint8_t reg, uint8_t *data, uint16_t len);
+
 private:
     SPIClass * _spi;
     uint8_t _slaveAddress;
@@ -570,9 +574,6 @@ private:
     SPISettings _spiSettings;
 
     static void bytecpy(uint8_t *target, uint8_t *source);
-
-    int32_t read_reg(uint8_t reg, uint8_t *data, uint16_t len);
-    int32_t write_reg(uint8_t reg, uint8_t *data, uint16_t len);
 
     int32_t _set_filter_settling_mask(lsm6dsv320x_filt_settling_mask_t val);//Helper for public version
 };

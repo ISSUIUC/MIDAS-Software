@@ -77,6 +77,14 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
         arg->rocket_data.hw_filtered.update(hw_filter);
 
+        Serial.print("Accel [G]: ");
+        Serial.print("ax: ");
+        Serial.print(imudata.highg_acceleration.ax);
+        Serial.print("  ay: ");
+        Serial.print(imudata.highg_acceleration.ay);
+        Serial.print("  az: ");
+        Serial.println(imudata.highg_acceleration.az);
+
         // Serial.println("IMU Thread: ");
         // Serial.println("ax: ");
         // Serial.print(imudata.highg_acceleration.ax);
@@ -523,9 +531,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     while (true)
     {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
     }
 }
 

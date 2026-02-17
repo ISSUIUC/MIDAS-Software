@@ -262,5 +262,5 @@ private:
 	int prev_signal_rssi;
 	int prev_rx_error;
 	bool busy_fault;
-	SPISettings spiSettings = SPISettings(10000000, MSBFIRST, SPI_MODE0);
+	SPISettings spiSettings = SPISettings(1000000, MSBFIRST, SPI_MODE0);
 };

@@ -20,22 +20,16 @@ IMU IMUSensor::read(){
     IMU reading{};
 
     //Low-G Acceleration
-
-    
-
-
     if(status.xlda){
-        //Serial.println("oh we are lowg");
-        LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax, 
-                                                    &reading.lowg_acceleration.ay, 
+        LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax,
+                                                    &reading.lowg_acceleration.ay,
                                                     &reading.lowg_acceleration.az);
     }
 
     //High-G Acceleration
     if(status.xlhgda){
-        //Serial.println("oh we are highg");
-        LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax, 
-                                                    &reading.highg_acceleration.ay, 
+        LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax,
+                                                    &reading.highg_acceleration.ay,
                                                     &reading.highg_acceleration.az);
     }
 
@@ -117,24 +111,21 @@ IMU_SFLP IMUSensor::read_sflp() {
 ErrorCode IMUSensor::init(){
     uint8_t whoami;
 
-    //LSM6DSV.sw_por();
+    
 
     LSM6DSV.device_id_get(&whoami);
     if(whoami != LSM6DSV320X_ID) 
         return IMUCouldNotBeInitialized;
 
-    //?????
-    
-    
-    // the second parameter used to be normal instead of high-performance
-    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_480Hz, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
-    LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
+    LSM6DSV.sw_por();
 
-    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_480Hz, 1);//xl_setup only handles lowg, this should also set the enable register
+    // the second parameter used to be normal instead of high-performance
+    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_7Hz5, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
+    LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
+    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
     LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
-    LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//lowg scale set
-
+    LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//low scale set
     LSM6DSV.gy_full_scale_set(LSM6DSV320X_2000dps);
     
     LSM6DSV.sflp_enable_set(1);
@@ -146,8 +137,6 @@ ErrorCode IMUSensor::init(){
     LSM6DSV.filt_gy_lp1_set(PROPERTY_DISABLE);
     //lsm6dsv320x_filt_gy_lp1_bandwidth_set(&dev_ctx, lsm6dsv320x_GY_ULTRA_LIGHT);
     LSM6DSV.filt_xl_lp2_set(PROPERTY_DISABLE);
-    //lsm6dsv320x_filt_xl_lp2_bandwidth_set(&dev_ctx, lsm6dsv320x_XL_STRONG);
-
 
     return NoError;
 }
