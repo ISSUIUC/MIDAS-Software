@@ -4,6 +4,8 @@
 #include "gnc/ekf.h"
 #include "gnc/mqekf.h"
 
+static StaticSemaphore_t spi_mutex_buffer;
+SemaphoreHandle_t spi_mutex;
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -44,7 +46,9 @@ DECLARE_THREAD(barometer, RocketSystems *arg)
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true)
     {
+        // xSemaphoreTake(spi_mutex, portMAX_DELAY);
         Barometer reading = arg->sensors.barometer.read();
+        // xSemaphoreGive(spi_mutex);
         bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
         // std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
         // std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
@@ -71,10 +75,12 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
 { // This needs edits
     while (true)
     {
-
+        xSemaphoreTake(spi_mutex, portMAX_DELAY);
         IMU imudata = arg->sensors.imu.read();
-        arg->rocket_data.imu.update(imudata);
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
+        xSemaphoreGive(spi_mutex);
+
+        arg->rocket_data.imu.update(imudata);
         arg->rocket_data.hw_filtered.update(hw_filter);
 
         Serial.print("Accel [G]: ");
@@ -93,13 +99,15 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         // Serial.println("az: ");
         // Serial.print(imudata.highg_acceleration.az);
 
-        THREAD_SLEEP(300);
+        THREAD_SLEEP(5);
     }
 }
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
+        // xSemaphoreTake(spi_mutex, portMAX_DELAY);
         Magnetometer reading = arg->sensors.magnetometer.read();
+        // xSemaphoreGive(spi_mutex);
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);
     }
@@ -418,7 +426,9 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
     while (true)
     {
 
+        xSemaphoreTake(spi_mutex, portMAX_DELAY);
         arg->tlm.transmit(arg->rocket_data, arg->led);
+        xSemaphoreGive(spi_mutex);
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -442,7 +452,10 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000)
         {
             TelemetryCommand command;
-            if (arg->tlm.receive(&command, 200))
+            xSemaphoreTake(spi_mutex, portMAX_DELAY);
+            bool received = arg->tlm.receive(&command, 200);
+            xSemaphoreGive(spi_mutex);
+            if (received)
             {
                 if (command.valid())
                 {
@@ -509,6 +522,8 @@ ErrorCode init_systems(RocketSystems& systems) {
         {
         }
     }
+
+    spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
 
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(imuthread, SENSOR_CORE, config, 13);
