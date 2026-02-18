@@ -3,12 +3,12 @@
 #include <ads7138-q1.h>
 #include <Wire.h>
 
-#define VOLTAGE_DIVIDER (5.0 / (5.0 + 20.0))
-#define PYRO_VOLTAGE_DIVIDER (18.0/(100.0+18.0))
-#define PYRO_BATT_VOLTAGE_DIVIDER (100.0/(100.0+560.0))
-#define BATT_VOLTAGE_DIVIDER (100.0/(100.0+100.0))
-#define VOLTAGE_SCALE 3.3
-#define VOLTAGE_REG_WIDTH (1<<16)
+constexpr float VOLTAGE_DIVIDER = (5.0 / (5.0 + 20.0));
+constexpr float PYRO_VOLTAGE_DIVIDER = (18.0/(100.0+18.0));
+constexpr float PYRO_BATT_VOLTAGE_DIVIDER = (100.0/(100.0+560.0));
+constexpr float BATT_VOLTAGE_DIVIDER = (100.0/(100.0+100.0));
+constexpr float VOLTAGE_SCALE = 3.3;
+constexpr int VOLTAGE_REG_WIDTH = (1<<16);
 
 constexpr ADCAddress pinA = {SENSE_A};
 constexpr ADCAddress pinB = {SENSE_B};
