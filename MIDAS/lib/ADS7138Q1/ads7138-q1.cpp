@@ -45,13 +45,21 @@ static AdcError adc_reg_write(uint8_t address, uint8_t reg_address, uint8_t data
   return AdcError::NoError;
 }
 
-AdcReadResult adcAnalogRead(ADCAddress pin){ 
+bool adcSetOutput(ADCAddress pin){
     if(pin.pin_id < 0 || pin.pin_id >= 8){
-        return AdcReadResult{.value=0, .error=AdcError::InvalidPinError};
+        return false;
     }
 
     adc_reg_write(ADC_ADDR, ADC_MANUAL_CH_SEL, pin.pin_id);
-    
+
+    return true;
+}
+
+AdcReadResult adcAnalogRead(ADCAddress pin){ 
+    if(!adcSetOutput(pin)){
+        return AdcReadResult{.value=0, .error=AdcError::InvalidPinError};
+    }
+
     int ct = WIRE.requestFrom((int)ADC_ADDR, 2, 1);
     if(ct != 2){
         return AdcReadResult{.value=0, .error=AdcError::I2CError};
