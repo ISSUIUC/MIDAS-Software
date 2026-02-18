@@ -73,6 +73,7 @@ DECLARE_THREAD(barometer, RocketSystems *arg)
 
 DECLARE_THREAD(imuthread, RocketSystems *arg)
 { // This needs edits
+
     while (true)
     {
         xSemaphoreTake(spi_mutex, portMAX_DELAY);
@@ -80,9 +81,21 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
         xSemaphoreGive(spi_mutex);
 
+        // Sensor biases
+        Acceleration bias = arg->sensors.imu.calibration_sensor_bias;
+
+        imudata.highg_acceleration.ax = imudata.highg_acceleration.ax + bias.ax;
+        imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
+        imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
+
         arg->rocket_data.imu.update(imudata);
         arg->rocket_data.hw_filtered.update(hw_filter);
 
+        // Sensor calibration, if it is triggered.
+        if(arg->sensors.imu.calibration_state != IMUSensor::IMUCalibrationState::NONE) {
+            arg->sensors.imu.calib_reading(imudata.lowg_acceleration, imudata.highg_acceleration, arg->buzzer);
+        }
+        
         THREAD_SLEEP(5);
     }
 }
@@ -310,6 +323,7 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         arg->rocket_data.kalman.update(current_state);
 
+
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
         THREAD_SLEEP(50);
@@ -371,6 +385,9 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
     case CommandType::TOGGLE_CAM_VMUX:
         arg->b2b.camera.vmux_toggle();
         break;
+    case CommandType::CALIB_ACCEL:
+        arg->sensors.imu.begin_calibration(arg->buzzer);
+        break;
     default:
         break; // how
     }
@@ -410,9 +427,7 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
     while (true)
     {
 
-        xSemaphoreTake(spi_mutex, portMAX_DELAY);
         arg->tlm.transmit(arg->rocket_data, arg->led);
-        xSemaphoreGive(spi_mutex);
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -436,10 +451,7 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
         if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000)
         {
             TelemetryCommand command;
-            xSemaphoreTake(spi_mutex, portMAX_DELAY);
-            bool received = arg->tlm.receive(&command, 200);
-            xSemaphoreGive(spi_mutex);
-            if (received)
+            if (arg->tlm.receive(&command, 200))
             {
                 if (command.valid())
                 {
@@ -493,6 +505,8 @@ ErrorCode init_systems(RocketSystems& systems) {
 [[noreturn]] void begin_systems(RocketSystems *config)
 {
     Serial.println("Starting Systems...");
+    spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
+
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError)
     {
@@ -506,8 +520,6 @@ ErrorCode init_systems(RocketSystems& systems) {
         {
         }
     }
-
-    spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
 
     START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(imuthread, SENSOR_CORE, config, 13);

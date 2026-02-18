@@ -4,7 +4,7 @@
 #include <SPI.h>
 
 LSM6DSV320XClass::LSM6DSV320XClass(SPIClass& spi, int csPin, int irqPin):
-    _spi(&spi), _csPin(csPin), _irqPin(irqPin), _spiSettings(1E6, MSBFIRST, SPI_MODE0)
+    _spi(&spi), _csPin(csPin), _irqPin(irqPin), _spiSettings(8E6, MSBFIRST, SPI_MODE0)
 {
 }
 
