@@ -111,8 +111,6 @@ IMU_SFLP IMUSensor::read_sflp() {
 ErrorCode IMUSensor::init(){
     uint8_t whoami;
 
-    
-
     LSM6DSV.device_id_get(&whoami);
     if(whoami != LSM6DSV320X_ID) 
         return IMUCouldNotBeInitialized;
@@ -120,9 +118,9 @@ ErrorCode IMUSensor::init(){
     LSM6DSV.sw_por();
 
     // the second parameter used to be normal instead of high-performance
-    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_7Hz5, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
-    LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
-    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_960Hz, 1);//xl_setup only handles lowg, this should also set the enable register
+    LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_240Hz, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
+    LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_240Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
+    LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_480Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
     LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
     LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//low scale set
