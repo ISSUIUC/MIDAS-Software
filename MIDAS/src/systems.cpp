@@ -83,22 +83,6 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         arg->rocket_data.imu.update(imudata);
         arg->rocket_data.hw_filtered.update(hw_filter);
 
-        Serial.print("Accel [G]: ");
-        Serial.print("ax: ");
-        Serial.print(imudata.highg_acceleration.ax);
-        Serial.print("  ay: ");
-        Serial.print(imudata.highg_acceleration.ay);
-        Serial.print("  az: ");
-        Serial.println(imudata.highg_acceleration.az);
-
-        // Serial.println("IMU Thread: ");
-        // Serial.println("ax: ");
-        // Serial.print(imudata.highg_acceleration.ax);
-        // Serial.println("ay: ");
-        // Serial.print(imudata.highg_acceleration.ay);
-        // Serial.println("az: ");
-        // Serial.print(imudata.highg_acceleration.az);
-
         THREAD_SLEEP(5);
     }
 }

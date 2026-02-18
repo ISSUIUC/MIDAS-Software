@@ -561,9 +561,6 @@ public:
     int32_t lsm6dsv320x_sflp_quaternion_raw_get(uint16_t *val);
     int32_t sflp_gravity_raw_get(int16_t *val);
     int32_t sflp_gbias_raw_get(int16_t *val);
- 
-    int32_t read_reg(uint8_t reg, uint8_t *data, uint16_t len);
-    int32_t write_reg(uint8_t reg, uint8_t *data, uint16_t len);
 
 private:
     SPIClass * _spi;
@@ -574,6 +571,9 @@ private:
     SPISettings _spiSettings;
 
     static void bytecpy(uint8_t *target, uint8_t *source);
+
+    int32_t read_reg(uint8_t reg, uint8_t *data, uint16_t len);
+    int32_t write_reg(uint8_t reg, uint8_t *data, uint16_t len);
 
     int32_t _set_filter_settling_mask(lsm6dsv320x_filt_settling_mask_t val);//Helper for public version
 };
