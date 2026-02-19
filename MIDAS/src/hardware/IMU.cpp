@@ -114,8 +114,16 @@ IMU_SFLP IMUSensor::read_sflp() {
 
 Sound xl_calib_rdy[C_XL_LENGTH] = {XLC_TONE_PITCH, XLC_TONE_WAIT, XLC_TONE_PITCH};
 Sound xl_calib_next_axis[C_XL_LENGTH] = {XLC_TONE_PITCH, XLC_TONE_WAIT, XLC_TONE_WAIT};
-Sound xl_calib_done[C_XL_LENGTH] = {XLC_TONE_PITCH_LONG, XLC_TONE_PITCH_LONG, XLC_TONE_WAIT};
+Sound xl_calib_done[C_XL_LENGTH] = {XLC_TONE_PITCH_LONG, XLC_TONE_PITCH, XLC_TONE_WAIT};
+Sound xl_calib_abort[C_XL_LENGTH] = {XLC_TONE_PITCH_LONG, XLC_TONE_PITCH_LONG, XLC_TONE_PITCH_LONG};
 
+void IMUSensor::abort_calibration(BuzzerController& buzzer, EEPROMController& eeprom) {
+    buzzer.play_tune(xl_calib_abort, C_XL_LENGTH);
+    calibration_state = IMUSensor::IMUCalibrationState::NONE;
+
+    // Read back the calibration data from EEPROM:
+    calibration_sensor_bias = eeprom.data.lsm6dsv320x_hg_xl_bias;
+}
 
 void IMUSensor::begin_calibration(BuzzerController& buzzer) {
     if(calibration_state != IMUSensor::IMUCalibrationState::NONE) {
@@ -123,6 +131,7 @@ void IMUSensor::begin_calibration(BuzzerController& buzzer) {
     }
 
     buzzer.play_tune(xl_calib_rdy, C_XL_LENGTH);
+    _calib_begin_timestamp = millis();
 
     calibration_state = IMUSensor::IMUCalibrationState::CALIB_PX;
 }
@@ -132,10 +141,13 @@ bool IMUSensor::accept_calib_reading(float lowg_axis_reading, float nominal_axis
     return std::abs(lowg_axis_reading - nominal_axis_value) < kLowgMaxDeviation;
 }
 
-void IMUSensor::next_calib(BuzzerController& buzzer) {
+void IMUSensor::next_calib(BuzzerController& buzzer, EEPROMController& eeprom) {
     IMUCalibrationState next_state = static_cast<IMUCalibrationState>(static_cast<int>(calibration_state) + 1);
     if (next_state == IMUCalibrationState::CALIB_DONE) {
+        // Calibration is finished, we will commit to EEPROM
         calibration_state = IMUCalibrationState::NONE;
+        eeprom.data.lsm6dsv320x_hg_xl_bias = calibration_sensor_bias;
+        eeprom.commit();
         buzzer.play_tune(xl_calib_done, C_XL_LENGTH);
     } else {
         calibration_state = next_state;
@@ -144,9 +156,7 @@ void IMUSensor::next_calib(BuzzerController& buzzer) {
     _calib_valid_readings = 0;
 }
 
-void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator) {
-
-    
+void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator, EEPROMController& eeprom) {
 
     switch (calibration_state) {
         case IMUSensor::IMUCalibrationState::CALIB_PX:
@@ -158,7 +168,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                 
                 if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
                     Serial.println("[+X] Good");
-                    next_calib(buzzer_indicator);
+                    next_calib(buzzer_indicator, eeprom);
                 }
             }
             break;
@@ -173,7 +183,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                     Serial.println("[-X] Good.");
                     calibration_sensor_bias.ax = overall_offset;
                     _calib_average = 0.0;
-                    next_calib(buzzer_indicator);
+                    next_calib(buzzer_indicator, eeprom);
                 }
             }
             break;
@@ -186,7 +196,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                 
                 if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
                     Serial.println("[+Y] Good");
-                    next_calib(buzzer_indicator);
+                    next_calib(buzzer_indicator, eeprom);
                 }
             }
             break;
@@ -201,7 +211,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                     Serial.println("[-Y] Good.");
                     calibration_sensor_bias.ay = overall_offset;
                     _calib_average = 0.0;
-                    next_calib(buzzer_indicator);
+                    next_calib(buzzer_indicator, eeprom);
                 }
             }
             break;
@@ -215,7 +225,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                 
                 if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
                     Serial.println("[+Z] Good");
-                    next_calib(buzzer_indicator);
+                    next_calib(buzzer_indicator, eeprom);
                 }
             }
             break;
@@ -230,7 +240,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                     Serial.println("[-Z] Good.");
                     calibration_sensor_bias.az = overall_offset;
                     _calib_average = 0.0;
-                    next_calib(buzzer_indicator);
+                    next_calib(buzzer_indicator, eeprom);
                 }
             }
             break;

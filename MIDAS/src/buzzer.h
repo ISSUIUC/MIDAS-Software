@@ -53,3 +53,4 @@ extern Sound land_tone[LAND_TONE_LENGTH];
 extern Sound xl_calib_rdy[C_XL_LENGTH];
 extern Sound xl_calib_next_axis[C_XL_LENGTH];
 extern Sound xl_calib_done[C_XL_LENGTH];
+extern Sound xl_calib_abort[C_XL_LENGTH];

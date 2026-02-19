@@ -5,6 +5,7 @@
 #include "hardware/pins.h"
 #include "TCAL9538.h"
 #include "rocket_state.h"
+#include "esp_eeprom.h"
 #include "buzzer.h"
 
 
@@ -28,7 +29,9 @@ struct IMUSensor {
     IMU read();
     IMU_SFLP read_sflp();
     void begin_calibration(BuzzerController& buzzer);
-    void calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator);
+    void calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator, EEPROMController& eeprom);
+    unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+    void abort_calibration(BuzzerController& buzzer, EEPROMController& eeprom);
     
     IMUCalibrationState calibration_state = IMUCalibrationState::NONE;
     Acceleration calibration_sensor_bias = {0.0, 0.0, 0.0};
@@ -36,9 +39,11 @@ struct IMUSensor {
     private:
     int _calib_valid_readings = 0;
     float _calib_average = 0.0;
+    unsigned long _calib_begin_timestamp;
 
     bool accept_calib_reading(float lowg_axis_reading, float nominal_axis_value);
-    void next_calib(BuzzerController& buzzer);
+    void next_calib(BuzzerController& buzzer, EEPROMController& eeprom);
+
 
 };
 

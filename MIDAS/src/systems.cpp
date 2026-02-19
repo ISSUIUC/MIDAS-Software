@@ -93,7 +93,12 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
 
         // Sensor calibration, if it is triggered.
         if(arg->sensors.imu.calibration_state != IMUSensor::IMUCalibrationState::NONE) {
-            arg->sensors.imu.calib_reading(imudata.lowg_acceleration, imudata.highg_acceleration, arg->buzzer);
+            arg->sensors.imu.calib_reading(imudata.lowg_acceleration, imudata.highg_acceleration, arg->buzzer, arg->eeprom);
+
+            if(arg->sensors.imu.get_time_since_calibration_start() > 60000) {
+                // Abort calibration if it isn't finished in 60s.
+                arg->sensors.imu.abort_calibration(arg->buzzer, arg->eeprom);
+            }
         }
         
         THREAD_SLEEP(5);
@@ -323,6 +328,9 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         arg->rocket_data.kalman.update(current_state);
 
+        Serial.print("MQ tilt: ");
+        Serial.println(current_angular_kalman.mq_tilt);
+        Serial.println();
 
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
@@ -480,8 +488,9 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
  */
 ErrorCode init_systems(RocketSystems& systems) {
     digitalWrite(LED_ORANGE, HIGH);
-    INIT_SYSTEM(systems.sensors.imu);
+    INIT_SYSTEM(systems.eeprom);
     INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.sensors.imu);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.voltage);
