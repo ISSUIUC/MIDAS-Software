@@ -28,6 +28,6 @@ Magnetometer MagnetometerSensor::read() {
     Y = ((double)cy - sf)/sf;
     Z = ((double)cz - sf)/sf;
     
-    Magnetometer reading{X, Y, Z};
+    Magnetometer reading{Y, -X, -Z};
     return reading;
 }

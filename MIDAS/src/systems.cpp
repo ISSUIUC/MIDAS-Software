@@ -269,9 +269,9 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
         Acceleration current_accelerations = {
-            .ax = current_high_g.ax,
-            .ay = current_high_g.ay,
-            .az = current_high_g.az};
+            .ax = current_low_g.ax,
+            .ay = current_low_g.ay,
+            .az = current_low_g.az};
 
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;

@@ -1,5 +1,5 @@
 #include "mqekf.h"
-
+#include "constants.h"
 /*
     mag
     y -> -x
@@ -38,7 +38,7 @@ void QuaternionMEKF::initialize(RocketSystems *args)
         {
             IMU imu_data = args->rocket_data.imu.getRecent();
 
-            Acceleration accel = imu_data.highg_acceleration;
+            Acceleration accel = imu_data.lowg_acceleration;
             accel_sum.ax += accel.ax;
             accel_sum.ay += accel.ay;
             accel_sum.az += accel.az;
@@ -60,7 +60,7 @@ void QuaternionMEKF::initialize(RocketSystems *args)
     else
     {
         IMU imu_data = args->rocket_data.imu.getRecent();
-        accel = imu_data.highg_acceleration;
+        accel = imu_data.lowg_acceleration;
         mag = args->rocket_data.magnetometer.getRecent();
     }
 
@@ -85,6 +85,7 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
 
         time_update(angular_velocity, dt);
         measurement_update(acceleration, magnetometer);
+        calculate_tilt();
         Eigen::Matrix<float, 4, 1> curr_quat = quaternion(); // w,x,y,z
 
         state.quaternion.w = curr_quat(0, 0);
@@ -301,9 +302,9 @@ void QuaternionMEKF::initialize_from_acc_mag(Acceleration const &acc_struct, Mag
     Eigen::Matrix<float, 3, 1> const acc_normalized = acc / anorm;
     Eigen::Matrix<float, 3, 1> const mag_normalized = mag.normalized();
 
-    Eigen::Matrix<float, 3, 1> const Rz = -acc_normalized;
-    Eigen::Matrix<float, 3, 1> const Ry = Rz.cross(mag_normalized).normalized();
-    Eigen::Matrix<float, 3, 1> const Rx = Ry.cross(Rz).normalized();
+    Eigen::Matrix<float, 3, 1> const Rx = acc_normalized;
+    Eigen::Matrix<float, 3, 1> const Rz = Rx.cross(mag_normalized).normalized();
+    Eigen::Matrix<float, 3, 1> const Ry = Rz.cross(Rx).normalized();
 
     // Construct the rotation matrix
     Eigen::Matrix<float, 3, 3> const R = (Eigen::Matrix<float, 3, 3>() << Rx, Ry, Rz).finished();
@@ -359,11 +360,11 @@ void QuaternionMEKF::calculate_tilt()
     // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
 
     Eigen::Quaternion<float>
-        ref = Eigen::Quaternionf(1, 0, 0, 0);
+        ref = Eigen::Quaternionf(0,0, 0, 1);
 
     Eigen::Quaternion<float> rotated = qref * ref * qref.conjugate();
 
-    Eigen::Matrix<float, 1, 3> reference_vector = {0, 0, -1};
+    Eigen::Matrix<float, 1, 3> reference_vector = {0,0,1};
     Eigen::Matrix<float, 1, 3> rotated_vector = {rotated.x(), rotated.y(), rotated.z()};
 
     float dot = rotated_vector.dot(reference_vector);
@@ -376,14 +377,14 @@ void QuaternionMEKF::calculate_tilt()
         tilt = acos(dot / (cur_mag * ref_mag));
     }
 
-    const float gain = 0.2;
-    // Arthur's Comp Filter
-    float filtered_tilt = gain * tilt + (1 - gain) * prev_tilt;
-    prev_tilt = filtered_tilt;
-    state.mq_tilt = filtered_tilt;
+    // const float gain = 0.2;
+    // // Arthur's Comp Filter
+    // float filtered_tilt = gain * tilt + (1 - gain) * prev_tilt;
+    // prev_tilt = filtered_tilt;
+    state.mq_tilt = tilt;
 
     // Serial.print("TILT: ");
-    // Serial.println(filtered_tilt * (180/3.14f));
+    Serial.println(tilt * 180/pi);
 }
 
 QuaternionMEKF mqekf;
