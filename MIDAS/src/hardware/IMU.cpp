@@ -185,7 +185,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                 if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
                     float overall_offset = _calib_average / (NUM_READINGS_FOR_CALIB*2);
                     Serial.println("[-X] Good.");
-                    calibration_sensor_bias.ax += overall_offset;
+                    calibration_sensor_bias.ax = overall_offset;
                     _calib_average = 0.0;
                     next_calib(buzzer_indicator, eeprom);
                 }
@@ -213,7 +213,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                 if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
                     float overall_offset = _calib_average / (NUM_READINGS_FOR_CALIB*2);
                     Serial.println("[-Y] Good.");
-                    calibration_sensor_bias.ay += overall_offset;
+                    calibration_sensor_bias.ay = overall_offset;
                     _calib_average = 0.0;
                     next_calib(buzzer_indicator, eeprom);
                 }
@@ -242,7 +242,7 @@ void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_read
                 if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
                     float overall_offset = _calib_average / (NUM_READINGS_FOR_CALIB*2);
                     Serial.println("[-Z] Good.");
-                    calibration_sensor_bias.az += overall_offset;
+                    calibration_sensor_bias.az = overall_offset;
                     _calib_average = 0.0;
                     next_calib(buzzer_indicator, eeprom);
                 }
