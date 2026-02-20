@@ -415,6 +415,9 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
     case CommandType::CALIB_ACCEL:
         arg->sensors.imu.begin_calibration(arg->buzzer);
         break;
+    case CommandType::CALIB_MAG:
+        arg->sensors.magnetometer.begin_calibration();
+        break;
     default:
         break; // how
     }
