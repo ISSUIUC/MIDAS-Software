@@ -1,7 +1,7 @@
 #include <esp_eeprom.h>
 
 constexpr size_t EEPROM_SIZE = sizeof(MIDASEEPROM);
-constexpr size_t EEPROM_MAX_SIZE = 512;
+constexpr size_t EEPROM_MAX_SIZE = 512; // https://randomnerdtutorials.com/esp32-flash-memory/
 
 bool EEPROMController::read() {
     MIDASEEPROM _read;
