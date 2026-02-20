@@ -74,6 +74,8 @@ DECLARE_THREAD(barometer, RocketSystems *arg)
 DECLARE_THREAD(imuthread, RocketSystems *arg)
 { // This needs edits
 
+    arg->sensors.imu.restore_calibration(arg->eeprom);
+
     while (true)
     {
         xSemaphoreTake(spi_mutex, portMAX_DELAY);

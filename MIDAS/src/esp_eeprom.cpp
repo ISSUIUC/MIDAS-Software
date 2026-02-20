@@ -32,15 +32,22 @@ bool EEPROMController::commit() {
         EEPROM.write(i, buf[i]);
     }
 
+    EEPROM.commit();
+
     return read();
 }
 
 ErrorCode EEPROMController::init() {
+
+    EEPROM.begin((size_t)EEPROM_SIZE);
+
     if (!read()) {
         // The current eeprom format is incompatible, so we're going to default initialize MIDASEEPROM
         MIDASEEPROM empty_setting;
         empty_setting.checksum = EEPROM_CHECKSUM;
         data = empty_setting;
+        Serial.println("EEPROM INITIAL READ FAILED");
+        commit(); // should we do this? essentially wipes eeprom. probably doesn't matter though if format is incompatible
     }
 
     return ErrorCode::NoError;

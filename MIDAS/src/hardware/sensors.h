@@ -31,6 +31,7 @@ struct IMUSensor {
     void begin_calibration(BuzzerController& buzzer);
     void calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator, EEPROMController& eeprom);
     unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+    void restore_calibration(EEPROMController& eeprom);
     void abort_calibration(BuzzerController& buzzer, EEPROMController& eeprom);
     
     IMUCalibrationState calibration_state = IMUCalibrationState::NONE;
