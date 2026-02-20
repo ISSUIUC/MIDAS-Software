@@ -1,6 +1,7 @@
 #include <esp_eeprom.h>
 
 constexpr size_t EEPROM_SIZE = sizeof(MIDASEEPROM);
+constexpr size_t EEPROM_MAX_SIZE = 512;
 
 bool EEPROMController::read() {
     MIDASEEPROM _read;
@@ -38,7 +39,7 @@ bool EEPROMController::commit() {
 }
 
 ErrorCode EEPROMController::init() {
-
+    static_assert(EEPROM_SIZE <= EEPROM_MAX_SIZE);
     EEPROM.begin((size_t)EEPROM_SIZE);
 
     if (!read()) {
