@@ -109,6 +109,7 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     arg->sensors.magnetometer.restore_calibration(arg->eeprom);
+    int i = 0;
     while (true) {
         // xSemaphoreTake(spi_mutex, portMAX_DELAY);
         Magnetometer reading = arg->sensors.magnetometer.read();
@@ -116,7 +117,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
 
         // Sensor calibration
         if(arg->sensors.magnetometer.in_calibration_mode) {
-            arg->sensors.magnetometer.calib_reading(reading, arg->eeprom);
+            arg->sensors.magnetometer.calib_reading(reading, arg->eeprom, arg->buzzer);
             // Mag calibration handles its own calibration timing.
         }
 
@@ -128,6 +129,22 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         reading.mz = (reading.mz - b.mz) / s.mz;
 
         arg->rocket_data.magnetometer.update(reading);
+
+        // Serial.print("CALIB: (b) X: "); Serial.print(b.mx);
+        // Serial.print(" Y: "); Serial.print(b.my);
+        // Serial.print(" Z: "); Serial.print(b.mz);
+        // Serial.print("  (s) X: "); Serial.print(s.mx);
+        // Serial.print(" Y: "); Serial.print(s.my);
+        // Serial.print(" Z: "); Serial.println(s.mz);
+
+        i++;
+        if(i % 25 == 0) {
+            i = 0;
+            Serial.print("DATA X:");Serial.print(reading.mx);
+            Serial.print(" Y:"); Serial.print(reading.my);
+            Serial.print(" Z:"); Serial.println(reading.mz);
+        }
+
 
 
         THREAD_SLEEP(50);
@@ -347,9 +364,9 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         arg->rocket_data.kalman.update(current_state);
 
-        Serial.print("MQ tilt: ");
-        Serial.println(current_angular_kalman.mq_tilt);
-        Serial.println();
+        // Serial.print("MQ tilt: ");
+        // Serial.println(current_angular_kalman.mq_tilt);
+        // Serial.println();
 
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
@@ -416,7 +433,7 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
         arg->sensors.imu.begin_calibration(arg->buzzer);
         break;
     case CommandType::CALIB_MAG:
-        arg->sensors.magnetometer.begin_calibration();
+        arg->sensors.magnetometer.begin_calibration(arg->buzzer);
         break;
     default:
         break; // how
