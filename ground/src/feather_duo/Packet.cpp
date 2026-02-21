@@ -60,7 +60,9 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     data.pyros[3] = ((float) ((packet.pyro >> 24) & (0xFF)) / 255.) * MAX_TELEM_VOLTAGE_V;
 
     // kalman filter    
-    data.kf_px = convert_range<int16_t>(packet.kf_px, MAX_KF_XPOSITION_M);
+    data.kf_px = convert_range<int16_t>(packet.kf_px, MAX_KF_VPOSITION_M);
+    data.kf_py = convert_range<int16_t>(packet.kf_py, MAX_KF_LPOSITION_M);
+    data.kf_pz = convert_range<int16_t>(packet.kf_pz, MAX_KF_LPOSITION_M);
     data.kf_vx = convert_range<int16_t>(packet.kf_vx, MAX_KF_XVELOCITY_MS);
 
     // Camera state
