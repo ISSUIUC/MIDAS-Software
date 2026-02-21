@@ -130,23 +130,6 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
 
         arg->rocket_data.magnetometer.update(reading);
 
-        // Serial.print("CALIB: (b) X: "); Serial.print(b.mx);
-        // Serial.print(" Y: "); Serial.print(b.my);
-        // Serial.print(" Z: "); Serial.print(b.mz);
-        // Serial.print("  (s) X: "); Serial.print(s.mx);
-        // Serial.print(" Y: "); Serial.print(s.my);
-        // Serial.print(" Z: "); Serial.println(s.mz);
-
-        i++;
-        if(i % 25 == 0) {
-            i = 0;
-            Serial.print("DATA X:");Serial.print(reading.mx);
-            Serial.print(" Y:"); Serial.print(reading.my);
-            Serial.print(" Z:"); Serial.println(reading.mz);
-        }
-
-
-
         THREAD_SLEEP(50);
     }
 }
