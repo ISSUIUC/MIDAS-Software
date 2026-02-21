@@ -83,16 +83,6 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
         xSemaphoreGive(spi_mutex);
 
-        // Sensor biases
-        Acceleration bias = arg->sensors.imu.calibration_sensor_bias;
-
-        imudata.highg_acceleration.ax = imudata.highg_acceleration.ax + bias.ax;
-        imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
-        imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
-
-        arg->rocket_data.imu.update(imudata);
-        arg->rocket_data.hw_filtered.update(hw_filter);
-
         // Sensor calibration, if it is triggered.
         if(arg->sensors.imu.calibration_state != IMUSensor::IMUCalibrationState::NONE) {
             arg->sensors.imu.calib_reading(imudata.lowg_acceleration, imudata.highg_acceleration, arg->buzzer, arg->eeprom);
@@ -102,6 +92,16 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
                 arg->sensors.imu.abort_calibration(arg->buzzer, arg->eeprom);
             }
         }
+
+        // Sensor biases
+        Acceleration bias = arg->sensors.imu.calibration_sensor_bias;
+
+        imudata.highg_acceleration.ax = imudata.highg_acceleration.ax + bias.ax;
+        imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
+        imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
+
+        arg->rocket_data.imu.update(imudata);
+        arg->rocket_data.hw_filtered.update(hw_filter);
         
         THREAD_SLEEP(5);
     }
@@ -269,9 +269,9 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
         Acceleration current_accelerations = {
-            .ax = current_high_g.ax,
-            .ay = current_high_g.ay,
-            .az = current_high_g.az};
+            .ax = current_low_g.ax,
+            .ay = current_low_g.ay,
+            .az = current_low_g.az};
 
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;

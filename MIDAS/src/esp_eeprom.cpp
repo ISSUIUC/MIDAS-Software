@@ -46,8 +46,9 @@ ErrorCode EEPROMController::init() {
         MIDASEEPROM empty_setting;
         empty_setting.checksum = EEPROM_CHECKSUM;
         data = empty_setting;
-        Serial.println("EEPROM INITIAL READ FAILED");
-        commit(); // should we do this? essentially wipes eeprom. probably doesn't matter though if format is incompatible
+        Serial.println("EEPROM CHECKSUM INCOMPATIBLE");
+        // Clear EEPROM and write correct checksum
+        commit();
     }
 
     return ErrorCode::NoError;
