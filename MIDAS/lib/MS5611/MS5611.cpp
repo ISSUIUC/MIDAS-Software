@@ -1,231 +1,531 @@
 //
-//    FILE: MS5611.cpp
+//    FILE: MS5611_SPI.cpp
 //  AUTHOR: Rob Tillaart
-//          Erni - testing/fixes
-//          Roy van der Kraan - partial rewrite (mainly for SPI use)
-// VERSION: 0.1.9
-// PURPOSE: MS5611 Temperature & Atmospheric Pressure library for Arduino
-//     URL:
-//
-// POST FORK HISTOTY
-// 0.1.9  2019-01-17 modified for SPI
-//                   replaced all floating point with integer arithmatic
-//
-// PRE-FORK HISTORY:
-// 0.1.8  fix #109 incorrect constants (thanks to flauth)
-// 0.1.7  revert double to float (issue 33)
-// 0.1.6  2015-07-12 refactor
-// 0.1.05 moved 6 float multiplies to init  [adds ~70 bytes !!!]
-//        moved the MS5611_LIB_VERSION to PROGMEM
-// 0.1.04 changed float to double (for platforms which support it)
-//        changed divisions in multiplications
-//        fixed uint32_t readADC()
-//        reduced size of C array by 1 float
-//        added second order temperature compensation
-// 0.1.03 changed math to float [test version]
-// 0.1.02 fixed bug return value read()
-//        fixed bug #bits D2
-//        added MS5611_READ_OK
-//        added inline getters for temp & pres & lastresult.
-//        adjusted delay's based on datasheet
-//        merged convert functions
-//        fixed offset in readProm()
-// 0.1.01 small refactoring
-// 0.1.00 added temperature and Pressure code
-// 0.0.00 initial version by Rob Tillaart (15-okt-2014)
-//
-// Released to the public domain
-//
+// VERSION: 0.4.1
+// PURPOSE: Arduino library for MS5611 (SPI) temperature and pressure sensor
+//     URL: https://github.com/RobTillaart/MS5611_SPI
+
 
 #include "MS5611.h"
 
-#include <SPI.h>
-SPISettings settingsA(
-    1000000, MSBFIRST,
-    SPI_MODE0);  // define SPI settings; limit SPI communication to 1MHz
+
+// datasheet page 10
+#define MS5611_CMD_READ_ADC       0x00
+#define MS5611_CMD_READ_PROM      0xA0
+#define MS5611_CMD_RESET          0x1E
+#define MS5611_CMD_CONVERT_D1     0x40
+#define MS5611_CMD_CONVERT_D2     0x50
+
 
 /////////////////////////////////////////////////////
 //
-// PUBLIC
+//  PUBLIC
 //
-MS5611::MS5611(uint8_t CSn) {
-    _cspin = CSn;
-    pinMode(_cspin, OUTPUT);
-    digitalWrite(_cspin, HIGH);
-    _temperature = -999;
-    _pressure = -999;
-    // init();
+MS5611_SPI::MS5611_SPI(uint8_t select, __SPI_CLASS__ * mySPI)
+{
+  //  _address           = deviceAddress;  // TODO
+  _samplingRate      = OSR_ULTRA_LOW;
+  _temperature       = MS5611_NOT_READ;
+  _pressure          = MS5611_NOT_READ;
+  _result            = MS5611_NOT_READ;
+  _lastRead          = 0;
+  _deviceID          = 0;
+  _pressureOffset    = 0;
+  _temperatureOffset = 0;
+  _compensation      = true;
+
+  //  SPI
+  _select   = select;
+  _dataIn   = 255;
+  _dataOut  = 255;
+  _clock    = 255;
+  _hwSPI    = true;
+  _mySPI    = mySPI;
 }
 
-void MS5611::init() {
-    reset();
 
-    // Default values (C1 t/m C6 taken from example column in datasheet to test
-    // calculations):
-    C[0] = 1;
-    C[1] = 40127;
-    C[2] = 36924;
-    C[3] = 23317;
-    C[4] = 23282;
-    C[5] = 33464;
-    C[6] = 28312;
-    C[7] = 0xF0F0;
+MS5611_SPI::MS5611_SPI(uint8_t select, uint8_t dataOut, uint8_t dataIn, uint8_t clock)
+{
+  //  _address           = deviceAddress;  // TODO
+  _samplingRate      = OSR_ULTRA_LOW;
+  _temperature       = MS5611_NOT_READ;
+  _pressure          = MS5611_NOT_READ;
+  _result            = MS5611_NOT_READ;
+  _lastRead          = 0;
+  _deviceID          = 0;
+  _pressureOffset    = 0;
+  _temperatureOffset = 0;
+  _compensation      = false;
 
-    // Read all factory parameters C0 to C7 from PROM
-    SPI.beginTransaction(settingsA);
-    for (uint8_t reg = 0; reg < 8; reg++) {
-        C[reg] = readProm(reg);
-    }
-    SPI.endTransaction();
+  //  SPI
+  _select   = select;
+  _dataIn   = dataIn;
+  _dataOut  = dataOut;
+  _clock    = clock;
+  _hwSPI    = false;
+  _mySPI    = NULL;
 }
 
-int MS5611::read(uint8_t bits) {
-    // VARIABLES NAMES BASED ON DATASHEET  <- Nice!
-    convert(0x40, bits);
-    uint32_t D1 = readADC();
 
-    convert(0x50, bits);
-    uint32_t D2 = readADC();
+bool MS5611_SPI::begin()
+{
+  //  print experimental message.
+  //  Serial.println(MS5611_SPI_LIB_VERSION);
 
-    // TODO the multiplications of these constants can be done in init()
-    // but first they need to be verified.
+  pinMode(_select, OUTPUT);
+  digitalWrite(_select, HIGH);
 
-    // TEMP & PRESS MATH - PAGE 7/20 of the datasheet
-    //  - avoiding float type to make running on Tiny's not-impossible
-    //  - running into issues with uint64_t so using uint32_t with adjustments
-    //      (at the cost of reduced resolution for temperature).
-    uint32_t Tref, dT;
-    uint32_t dTC6;
-    int32_t TEMP;
-    Tref = C[5] * 256UL;
-    if (D2 <
-        Tref) {  // (to avoid signed int so we can bit-shift for divisioning)
-        dT = Tref - D2;
-        dTC6 = ((uint64_t)dT * (uint64_t)C[6]) >> 23;
-        TEMP = 2000 - dTC6;
-    } else {
-        dT = D2 - Tref;
-        dTC6 = ((uint64_t)dT * (uint64_t)C[6]) >> 23;
-        TEMP = 2000 + dTC6;
-    }
+  setSPIspeed(_SPIspeed);
 
-    // OFF = offT1 + TCO * dT = C2 * 2^16 + (C4 * dT ) / 2^7
-    uint64_t offT1 = (uint64_t)C[2] << 16;
-    uint64_t TCOdT = ((uint64_t)C[4] * (uint64_t)dT) >> 7;
-    int64_t OFF;
-    if (D2 < Tref) {
-        OFF = offT1 - TCOdT;
-    } else {
-        OFF = offT1 + TCOdT;
-    }
+  if(_hwSPI)
+  {
+    //  _mySPI->begin();  //  FIX #6  
+    //  _mySPI->end();
+    //  _mySPI->begin();
+    //  delay(1);
+  }
+  else
+  {
+    //  Serial.println("SW_SPI");
+    pinMode(_dataIn,  INPUT);
+    pinMode(_dataOut, OUTPUT);
+    pinMode(_clock,   OUTPUT);
+    digitalWrite(_dataOut, LOW);
+    digitalWrite(_clock,   LOW);
+  }
 
-    // SENSE = sensT1 + TCS * dT = C1 * 2^15 + (C3 * dT ) / 2^8
-    uint64_t sensT1 = (uint64_t)C[1] << 15;
-    uint64_t TCSdT = ((uint64_t)C[3] * (uint64_t)dT) >> 8;
-    int64_t SENS;
-    if (D2 < Tref) {
-        SENS = sensT1 - TCSdT;
-    } else {
-        SENS = sensT1 + TCSdT;
-    }
-
-    // SECOND ORDER COMPENSATION - PAGE 8/20 of the datasheet
-    // COMMENT OUT < 2000 CORRECTION IF NOT NEEDED
-    // NOTE TEMPERATURE IS IN 0.01 C
-    uint32_t T2 = 0;
-    uint32_t OFF2 = 0;
-    uint32_t SENS2 = 0;
-    if (TEMP < 2000) {
-        uint64_t tSQ;
-        T2 = ((uint64_t)dT * (uint64_t)dT) >> 31;
-        tSQ = (int32_t)TEMP - 2000L;
-        tSQ *= tSQ;
-        OFF2 = (5ULL * (uint64_t)tSQ) >> 1;
-        SENS2 = (5ULL * (uint64_t)tSQ) >> 2;
-        // COMMENT OUT < -1500 CORRECTION IF NOT NEEDED
-        if (TEMP < -1500) {
-            tSQ = (int32_t)TEMP - 2000L;
-            tSQ *= tSQ;
-            OFF2 += 7ULL * (uint64_t)tSQ;
-            SENS2 += (11ULL * (uint64_t)tSQ) >> 1;
-        }
-    }
-
-    TEMP -= T2;
-    OFF -= OFF2;
-    SENS -= SENS2;
-    //
-    // END SECOND ORDER COMPENSATION
-    //
-
-    int64_t P = (int64_t)D1 * SENS;
-    P /= 2097152LL;
-    P -= OFF;
-    P /= 32768LL;
-
-    _temperature = TEMP;
-    _pressure = (uint32_t)P;
-
-    return 0;
+  return reset(0);  //  MS5611 has mathMode 0, see datasheet + initConstants.
 }
+
+
+bool MS5611_SPI::isConnected()
+{
+  int rv = read();
+  return (rv == MS5611_READ_OK);
+}
+
+
+bool MS5611_SPI::reset(uint8_t mathMode)
+{
+  command(MS5611_CMD_RESET);
+  uint32_t start = micros();
+
+  //  while loop prevents blocking RTOS
+  while (micros() - start < 3000)  //  increased as first ROM values were missed.
+  {
+    yield();
+    delayMicroseconds(10);
+  }
+
+  //  initialize the C[] array
+  initConstants(mathMode);
+
+  //  read factory calibrations from EEPROM.
+  bool ROM_OK = true;
+  for (uint8_t reg = 0; reg < 7; reg++)
+  {
+    //  used indices match datasheet.
+    //  C[0] == manufacturer - read but not used;
+    //  C[7] == CRC - skipped.
+    uint16_t tmp = readProm(reg);
+    C[reg] *= tmp;
+    //  _deviceID is a SHIFT XOR merge of 7 PROM registers, reasonable unique
+    _deviceID <<= 4;
+    _deviceID ^= tmp;
+    //  Serial.println(readProm(reg));
+    if (reg > 0)
+    {
+      ROM_OK = ROM_OK && (tmp != 0);
+    }
+  }
+  return ROM_OK;
+}
+
+
+int MS5611_SPI::read(uint8_t bits)
+{
+  //  VARIABLES NAMES BASED ON DATASHEET
+  //  ALL MAGIC NUMBERS ARE FROM DATASHEET
+
+  convert(MS5611_CMD_CONVERT_D1, bits);
+  if (_result) return _result;
+  //  NOTE: D1 and D2 seem reserved in MBED (NANO BLE)
+  uint32_t _D1 = readADC();
+  if (_result) return _result;
+
+  convert(MS5611_CMD_CONVERT_D2, bits);
+  if (_result) return _result;
+  uint32_t _D2 = readADC();
+  if (_result) return _result;
+
+  //  Serial.println(_D1);
+  //  Serial.println(_D2);
+
+  //  TEST VALUES - comment lines above
+  //  uint32_t _D1 = 9085466;
+  //  uint32_t _D2 = 8569150;
+
+  //  TEMP & PRESS MATH - PAGE 7/20
+  float dT = _D2 - C[5];
+  _temperature = 2000 + dT * C[6];
+
+  float offset =  C[2] + dT * C[4];
+  float sens = C[1] + dT * C[3];
+
+  if (_compensation)
+  {
+    //  SECOND ORDER COMPENSATION - PAGE 8/20
+    //  COMMENT OUT < 2000 CORRECTION IF NOT NEEDED
+    //  NOTE TEMPERATURE IS IN 0.01 C
+    if (_temperature < 2000)
+    {
+      float T2 = dT * dT * 4.6566128731E-10;
+      float t = (_temperature - 2000) * (_temperature - 2000);
+      float offset2 = 2.5 * t;
+      float sens2 = 1.25 * t;
+      //  COMMENT OUT < -1500 CORRECTION IF NOT NEEDED
+      if (_temperature < -1500)
+      {
+        t = (_temperature + 1500) * (_temperature + 1500);
+        offset2 += 7 * t;
+        sens2 += 5.5 * t;
+      }
+      _temperature -= T2;
+      offset -= offset2;
+      sens -= sens2;
+    }
+    //  END SECOND ORDER COMPENSATION
+  }
+
+  _pressure = (_D1 * sens * 4.76837158205E-7 - offset) * 3.051757813E-5;
+
+  _lastRead = millis();
+  return MS5611_READ_OK;
+}
+
+
+void MS5611_SPI::setOversampling(osr_t samplingRate)
+{
+  _samplingRate = (uint8_t) samplingRate;
+}
+
+
+osr_t MS5611_SPI::getOversampling() const
+{
+  return (osr_t) _samplingRate;
+}
+
+
+float MS5611_SPI::getTemperature() const
+{
+  if (_temperatureOffset == 0) return _temperature * 0.01;
+  return _temperature * 0.01 + _temperatureOffset;
+}
+
+
+//  milliBar
+float MS5611_SPI::getPressure() const
+{
+  if (_pressureOffset == 0) return _pressure * 0.01;
+  return _pressure * 0.01 + _pressureOffset;
+}
+
+
+//  Pascal SI-unit.
+float MS5611_SPI::getPressurePascal() const
+{
+  if (_pressureOffset == 0) return _pressure;
+  return _pressure + _pressureOffset * 100.0;
+}
+
+void MS5611_SPI::setPressureOffset(float offset)
+{
+  _pressureOffset = offset;
+}
+
+
+float MS5611_SPI::getPressureOffset()
+{
+  return _pressureOffset;
+}
+
+
+void MS5611_SPI::setTemperatureOffset(float offset)
+{
+  _temperatureOffset = offset;
+}
+
+
+float MS5611_SPI::getTemperatureOffset()
+{
+  return _temperatureOffset;
+}
+
+
+//  (from MS5837)
+//  https://www.mide.com/air-pressure-at-altitude-calculator
+//  https://community.bosch-sensortec.com/t5/Question-and-answers/How-to-calculate-the-altitude-from-the-pressure-sensor-data/qaq-p/5702 (stale link).
+//  https://en.wikipedia.org/wiki/Pressure_altitude
+float MS5611_SPI::getAltitude(float airPressure)
+{
+  //  NOTE: _pressure is in Pascal (#44) and airPressure is in mBar.
+  float ratio = _pressure * 0.01 / airPressure;
+  return 44307.694 * (1 - pow(ratio, 0.190284));
+}
+
+
+float MS5611_SPI::getAltitudeFeet(float airPressure)
+{
+  float ratio = _pressure * 0.01 / airPressure;
+  return 145366.45 * (1 - pow(ratio, 0.190284));
+}
+
+
+//  returns mBar; pressure == mBar; altitude == meter
+float MS5611_SPI::getSeaLevelPressure(float pressure, float altitude)
+{
+  float x = 1 - altitude * 2.256944358E-5;  //  == altitude / 44307.694
+  float ratio = pow(x, 5.2553026);          //  == (1.0 / 0.190284));
+  float seaLevelPressure = pressure / ratio;
+  return seaLevelPressure;
+}
+
+
+int MS5611_SPI::getLastResult() const
+{
+  return _result;
+}
+
+
+uint32_t MS5611_SPI::lastRead() const
+{
+  return _lastRead;
+}
+
+
+uint32_t MS5611_SPI::getDeviceID() const
+{
+  return _deviceID;
+}
+
+
+void MS5611_SPI::setCompensation(bool flag)
+{
+  _compensation = flag;
+}
+
+
+bool MS5611_SPI::getCompensation()
+{
+  return _compensation;
+}
+
+
+//       EXPERIMENTAL
+uint16_t MS5611_SPI::getManufacturer()
+{
+  return readProm(0);
+}
+
+//       EXPERIMENTAL
+uint16_t MS5611_SPI::getSerialCode()
+{
+  return readProm(7) >> 4;
+}
+
+//       DEVELOP
+uint16_t MS5611_SPI::getProm(uint8_t index)
+{
+  return readProm(index);
+}
+
+//       DEVELOP
+uint16_t MS5611_SPI::getCRC()
+{
+  return readProm(7) & 0x0F;
+}
+
+
+void MS5611_SPI::setSPIspeed(uint32_t speed)
+{
+  _SPIspeed = speed;
+  _spi_settings = SPISettings(_SPIspeed, MSBFIRST, SPI_MODE0);
+}
+
+
+uint32_t MS5611_SPI::getSPIspeed()
+{
+  return _SPIspeed;
+}
+
+
+bool MS5611_SPI::usesHWSPI()
+{
+  return _hwSPI;
+}
+
 
 /////////////////////////////////////////////////////
 //
-// PRIVATE
+//  PROTECTED
 //
-void MS5611::reset() {
-    SPI.begin();                      // Begin SPI
-    SPI.beginTransaction(settingsA);  // start SPI transaction
-    digitalWrite(_cspin, LOW);        // pull CS line low
-    SPI.transfer(0x1E);               // send reset command
-    delay(4);
-    digitalWrite(_cspin, HIGH);  // pull CS line high
-    SPI.endTransaction();        // end SPI transaction
-}
-#include"../../src/hal.h"
-void MS5611::convert(const uint8_t addr, uint8_t bits) {
-    uint8_t del[5] = {1, 2, 3, 5,
-                      10};  // array of MS5611 conversion time (in ms)
-    bits = constrain(bits, 8, 12);
-    uint8_t offset = (bits - 8) * 2;
-    SPI.beginTransaction(settingsA);  // start SPI transaction
-    digitalWrite(_cspin, LOW);        // pull CS line low
-    SPI.transfer(addr + offset);      // send command
-    digitalWrite(_cspin, HIGH);
-    SPI.endTransaction();        // end SPI transaction
-    THREAD_SLEEP(del[offset /
-              2]);  // MS5611 needs some time for conversion; wait for this...
-    // digitalWrite(_cspin, HIGH);  // pull CS line high
-    // SPI.endTransaction();        // end SPI transaction
+void MS5611_SPI::convert(const uint8_t addr, uint8_t bits)
+{
+  uint8_t index = bits;
+  if (index < 8) index = 8;
+  else if (index > 12) index = 12;
+  index -= 8;
+  uint8_t offset = index * 2;
+  command(addr + offset);
+
+  //  values from page 3 datasheet - MAX column (rounded up)
+  uint16_t del[5] = {600, 1200, 2300, 4600, 9100};
+
+  uint16_t waitTime = del[index];
+  uint32_t start = micros();
+  //  while loop prevents blocking RTOS
+  while (micros() - start < waitTime)
+  {
+    yield();
+    delayMicroseconds(10);
+  }
 }
 
-uint16_t MS5611::readProm(uint8_t reg) {
-    // read two bytes from SPI and return accumulated value
-    reg = min(reg, (uint8_t)7);
-    uint8_t offset = reg * 2;
-    uint16_t val = 0;
-    SPI.beginTransaction(settingsA);  // start SPI transaction
-    digitalWrite(_cspin, LOW);       // pull CS line low
-    SPI.transfer(0xA0 + offset);     // send command
-    val = SPI.transfer(0x00) * 256;  // read 8 bits of data (MSB)
-    val += SPI.transfer(0x00);       // read 8 bits of data (LSB)
-    digitalWrite(_cspin, HIGH);      // pull CS line high
-    SPI.endTransaction();
-    return val;
+
+uint16_t MS5611_SPI::readProm(uint8_t reg)
+{
+  //  last EEPROM register is CRC - Page 13 datasheet.
+  uint8_t promCRCRegister = 7;
+  if (reg > promCRCRegister) return 0;
+
+  uint16_t value = 0;
+  digitalWrite(_select, LOW);
+  if (_hwSPI)
+  {
+    _mySPI->beginTransaction(_spi_settings);
+    _mySPI->transfer(MS5611_CMD_READ_PROM + reg * 2);
+    value += _mySPI->transfer(0x00);
+    value <<= 8;
+    value += _mySPI->transfer(0x00);
+    _mySPI->endTransaction();
+  }
+  else      //  Software SPI
+  {
+    swSPI_transfer(MS5611_CMD_READ_PROM + reg * 2);
+    value += swSPI_transfer(0x00);
+    value <<= 8;
+    value += swSPI_transfer(0x00);
+  }
+  digitalWrite(_select, HIGH);
+  return value;
 }
 
-uint32_t MS5611::readADC() {
-    // read three bytes from SPI and return accumulated value
-    uint32_t val = 0UL;
-    SPI.beginTransaction(settingsA);     // start SPI transaction
-    digitalWrite(_cspin, LOW);           // pull CS line low
-    SPI.transfer(0x00);                  // send command
-    val = SPI.transfer(0x00) * 65536UL;  // read 8 bits of data (MSB)
-    val += SPI.transfer(0x00) * 256UL;   // read 8 bits of data
-    val += SPI.transfer(0x00);           // read 8 bits of data (LSB)
-    digitalWrite(_cspin, HIGH);          // pull CS line high
-    SPI.endTransaction();                // end SPI transaction
-    return val;
+
+uint32_t MS5611_SPI::readADC()
+{
+  //  command(MS5611_CMD_READ_ADC);
+
+  uint32_t value = 0;
+
+  digitalWrite(_select, LOW);
+  if (_hwSPI)
+  {
+    _mySPI->beginTransaction(_spi_settings);
+    _mySPI->transfer(0x00);
+    value += _mySPI->transfer(0x00);
+    value <<= 8;
+    value += _mySPI->transfer(0x00);
+    value <<= 8;
+    value += _mySPI->transfer(0x00);
+    _mySPI->endTransaction();
+  }
+  else      //  Software SPI
+  {
+    swSPI_transfer(0x00);
+    value += swSPI_transfer(0x00);
+    value <<= 8;
+    value += swSPI_transfer(0x00);
+    value <<= 8;
+    value += swSPI_transfer(0x00);
+  }
+  digitalWrite(_select, HIGH);
+  //  Serial.println(value, HEX);
+  return value;
 }
 
-// END OF FILE
+
+int MS5611_SPI::command(const uint8_t command)
+{
+  yield();
+  digitalWrite(_select, LOW);
+  if (_hwSPI)
+  {
+    _mySPI->beginTransaction(_spi_settings);
+    _mySPI->transfer(command);
+    _mySPI->endTransaction();
+  }
+  else      //  Software SPI
+  {
+    swSPI_transfer(command);
+  }
+  digitalWrite(_select, HIGH);
+  return 0;
+}
+
+
+//  simple one mode version
+uint8_t MS5611_SPI::swSPI_transfer(uint8_t val)
+{
+  uint8_t clk = _clock;
+  uint8_t dao = _dataOut;
+  uint8_t dai = _dataIn;
+  uint8_t value = 0;
+  for (uint8_t mask = 0x80; mask; mask >>= 1)
+  {
+    digitalWrite(dao,(val & mask));
+    digitalWrite(clk, HIGH);
+    value <<= 1;
+    if (digitalRead(dai) != 0) value += 1;
+    digitalWrite(clk, LOW);
+  }
+  digitalWrite(dao, LOW);
+  //  Serial.print(" # ");
+  //  Serial.println(value, HEX);
+  return value;
+}
+
+
+void MS5611_SPI::initConstants(uint8_t mathMode)
+{
+  //  constants that were multiplied in read() - datasheet page 8
+  //  do this once and you save CPU cycles
+  //
+  //                               datasheet ms5611     |    appNote
+  //                                mode = 0;           |    mode = 1
+  C[0] = 1;
+  C[1] = 32768L;          //  SENSt1   = C[1] * 2^15    |    * 2^16
+  C[2] = 65536L;          //  OFFt1    = C[2] * 2^16    |    * 2^17
+  C[3] = 3.90625E-3;      //  TCS      = C[3] / 2^8     |    / 2^7
+  C[4] = 7.8125E-3;       //  TCO      = C[4] / 2^7     |    / 2^6
+  C[5] = 256;             //  Tref     = C[5] * 2^8     |    * 2^8
+  C[6] = 1.1920928955E-7; //  TEMPSENS = C[6] / 2^23    |    / 2^23
+
+  if (mathMode == 1)      //  Appnote version for pressure.
+  {
+    C[1] = 65536L;        //  SENSt1
+    C[2] = 131072L;       //  OFFt1
+    C[3] = 7.8125E-3;     //  TCS
+    C[4] = 1.5625e-2;     //  TCO
+  }
+}
+
+
+///////////////////////////////////////////////////////////////////
+//
+//  DERIVED CLASSES
+//
+//  TODO ?
+
+
+//  -- END OF FILE --
+
