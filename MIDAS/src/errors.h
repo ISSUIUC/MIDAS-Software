@@ -28,7 +28,6 @@ enum ErrorCode {
     LoraCouldNotBeInitialized = 21,
     LoraCommunicationFailed = 22,
     IMUCouldNotBeInitialized = 23,
-    BarometerCoultNotBeInitialized = 24,
 };
 
 void update_error_LED(ErrorCode error);

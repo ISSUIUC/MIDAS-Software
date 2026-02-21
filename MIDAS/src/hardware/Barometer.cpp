@@ -1,7 +1,7 @@
 #include "sensors.h"
 #include <MS5611.h>
 
-MS5611_SPI MS(MS5611_CS);       //singleton object for the MS sensor
+MS5611 MS(MS5611_CS);       //singleton object for the MS sensor
 
 /**
  * @brief Initializes barometer, returns NoError
@@ -9,16 +9,7 @@ MS5611_SPI MS(MS5611_CS);       //singleton object for the MS sensor
  * @return Error code
 */
 ErrorCode BarometerSensor::init() {
-    if(!MS.begin()) {
-        return ErrorCode::BarometerCoultNotBeInitialized;
-    }
-
-    if(!MS.isConnected()) {
-        return ErrorCode::BarometerCoultNotBeInitialized;
-    }
-
-    MS.setOversampling(OSR_ULTRA_HIGH);
-    MS.reset(1); // https://github.com/RobTillaart/MS5611/issues/47
+    MS.init();
 
     return ErrorCode::NoError;
 }
@@ -29,11 +20,17 @@ ErrorCode BarometerSensor::init() {
  * @return Barometer data packet
 */
 Barometer BarometerSensor::read() {
-    MS.read();
+    MS.read(12);
 
-    float pressure = MS.getPressure();
-    float temperature = MS.getTemperature();
-    float altitude = MS.getAltitude();
+    /*
+     * TODO: Switch to latest version of library (0.3.9) when we get hardware to verify
+     * Equation derived from https://en.wikipedia.org/wiki/Atmospheric_pressure#Altitude_variation
+    */
+    float pressure = static_cast<float>(MS.getPressure() * 0.01 + 26.03); // getPressure is in milibars so it's milibars * 0.01?
+    float temperature = static_cast<float>(MS.getTemperature() * 0.01); // Celcius
+
+    
+    float altitude = static_cast<float>(-log(pressure * 0.000987) * (temperature + 273.15) * 29.254);
     
     return Barometer(temperature, pressure, altitude);
 }
