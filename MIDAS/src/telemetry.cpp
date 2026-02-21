@@ -127,8 +127,8 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     // KF data
     packet.kf_px = inv_convert_range<int16_t>(kalman.position.px, MAX_KF_VPOSITION_M); // We should eventually switch this to unsigned, once we fix baro.
-    packet.kf_px = inv_convert_range<int16_t>(kalman.position.py, MAX_KF_LPOSITION_M);
-    packet.kf_px = inv_convert_range<int16_t>(kalman.position.pz, MAX_KF_LPOSITION_M);
+    packet.kf_py = inv_convert_range<int16_t>(kalman.position.py, MAX_KF_LPOSITION_M);
+    packet.kf_pz = inv_convert_range<int16_t>(kalman.position.pz, MAX_KF_LPOSITION_M);
 
     packet.kf_vx = inv_convert_range<int16_t>(kalman.velocity.vx, MAX_KF_XVELOCITY_MS);
 
