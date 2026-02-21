@@ -12,6 +12,7 @@
 #include "finite-state-machines/fsm.h"
 #include "b2b_interface.h"
 #include "esp_eeprom.h"
+#include "hardware/SDLog.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"

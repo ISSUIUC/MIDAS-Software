@@ -12,7 +12,7 @@
  * @return Error Code
 */
 ErrorCode SDSink::init() {
-    Serial.println("Connecting to SD...");
+    Serial.println("[SD] Connecting to SD...");
     if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
         return ErrorCode::SDBeginFailed;
     }
@@ -20,10 +20,27 @@ ErrorCode SDSink::init() {
         failed = true;
         return ErrorCode::SDBeginFailed;
     }
+    Serial.println("[SD] Startup OK");
 
     char file_name[16] = "data";
     char ext[] = ".launch";
-    sdFileNamer(file_name, ext, SD_MMC);
+    Serial.println("[SD] Determining output file");
+    Serial.println(current_file_no);
+
+    if(current_file_no != 0) {
+        Serial.print("[SD] EEPROM log file recovered: "); Serial.println(current_file_no);
+    }
+
+    int filenumber = 0;
+    sdFileNamer(file_name, ext, SD_MMC, current_file_no, &filenumber);
+    current_file_no = static_cast<uint16_t>(filenumber);
+    
+    if(current_file_no != 0) {
+        Serial.print("[SD] Beginning log: "); Serial.println(current_file_no);
+    } else {
+        failed = true;
+        return ErrorCode::SDBeginFailed;
+    }
 
     file = SD_MMC.open(file_name, FILE_WRITE, true);
     if (!file) {
@@ -31,6 +48,7 @@ ErrorCode SDSink::init() {
         return ErrorCode::SDCouldNotOpenFile;
     }
 
+    Serial.println("[SD] Init done");
     return ErrorCode::NoError;
 }
 

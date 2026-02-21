@@ -22,6 +22,8 @@ public:
 
     virtual ErrorCode init() = 0;
     virtual void write(const uint8_t* data, size_t size) = 0;
+
+    uint16_t current_file_no = 0;
 };
 
 void log_begin(LogSink& sink);
@@ -64,5 +66,5 @@ private:
 
 #ifndef SILSIM
 #include <FS.h>
-char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs);
+char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t file_num, int* fileno_out);
 #endif

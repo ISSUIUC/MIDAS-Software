@@ -5,5 +5,7 @@
 struct MIDASEEPROM {
     uint32_t checksum;
 
+    uint16_t sd_file_num_last = 0;
+
     Acceleration lsm6dsv320x_hg_xl_bias;
 };
