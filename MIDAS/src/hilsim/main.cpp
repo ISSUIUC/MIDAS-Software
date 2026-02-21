@@ -7,7 +7,7 @@
 
 HILSIMPacket global_packet = HILSIMPacket_init_zero;
 
-MultipleLogSink<> sink;
+SDSink sink;
 RocketSystems systems{.log_sink = sink};
 
 DECLARE_THREAD(hilsim, void*arg) {

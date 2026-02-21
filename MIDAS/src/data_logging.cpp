@@ -27,12 +27,6 @@ ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN)
 ASSOCIATE(IMU_SFLP, ID_SFLPHW)
 
 
-
-
-
-
-
-
 /**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
  * 
@@ -112,7 +106,7 @@ void log_data(LogSink& sink, RocketData& data) {
  * 
  * @return buffer contianing string of file name
 */
-char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
+char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t file_num, int* fileno_out) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);
 
@@ -126,7 +120,8 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
 
     if (exists) {
         bool fileExists = false;
-        int i = 1;
+        // We will start at file_num, which is default 0 if eeprom is erased
+        int i = file_num;
         while (!fileExists) {
             if (i > MAX_FILES) {
                 // max number of files reached. Don't want to overflow
@@ -136,6 +131,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
                 strcat(inputName, fileName);
                 strcat(inputName, "999");
                 strcat(inputName, fileExtension);
+                *fileno_out = 999;
                 break;
             }
 
@@ -151,6 +147,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
 
             if (!fs.exists(inputName)) {
                 fileExists = true;
+                *fileno_out = i;
             }
 
             i++;

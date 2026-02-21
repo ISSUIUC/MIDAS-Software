@@ -330,9 +330,9 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         arg->rocket_data.kalman.update(current_state);
 
-        Serial.print("MQ tilt: ");
-        Serial.println(current_angular_kalman.mq_tilt);
-        Serial.println();
+        // Serial.print("MQ tilt: ");
+        // Serial.println(current_angular_kalman.mq_tilt);
+        // Serial.println();
 
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
@@ -491,7 +491,15 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
 ErrorCode init_systems(RocketSystems& systems) {
     digitalWrite(LED_ORANGE, HIGH);
     INIT_SYSTEM(systems.eeprom);
+
+    // To init log sink fast, we'll set its filenumber before initing it.
+    systems.log_sink.current_file_no = systems.eeprom.data.sd_file_num_last;
+
     INIT_SYSTEM(systems.log_sink);
+
+    // Then, after initing we will read back the filenumber to EEPROM.
+    systems.eeprom.data.sd_file_num_last = systems.log_sink.current_file_no;
+
     INIT_SYSTEM(systems.sensors.imu);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
@@ -504,6 +512,9 @@ ErrorCode init_systems(RocketSystems& systems) {
     INIT_SYSTEM(systems.tlm);
 #endif
     INIT_SYSTEM(systems.sensors.gps);
+
+    // Update eeprom
+    systems.eeprom.commit();
     digitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
