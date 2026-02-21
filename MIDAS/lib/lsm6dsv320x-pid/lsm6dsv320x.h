@@ -25,6 +25,7 @@
 #define LSM6DSV320X_HAODR_CFG                      0x62U
 #define LSM6DSV320X_CTRL1                          0x10U
 #define LSM6DSV320X_CTRL2                          0x11U
+#define LSM6DSV320X_CTRL3                          0x12U
 #define LSM6DSV320X_CTRL4                          0x13U
 #define LSM6DSV320X_CTRL6                          0x15U
 #define LSM6DSV320X_CTRL7                          0x16U
@@ -560,7 +561,7 @@ public:
     int32_t lsm6dsv320x_sflp_quaternion_raw_get(uint16_t *val);
     int32_t sflp_gravity_raw_get(int16_t *val);
     int32_t sflp_gbias_raw_get(int16_t *val);
- 
+
 private:
     SPIClass * _spi;
     uint8_t _slaveAddress;

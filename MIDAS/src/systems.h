@@ -11,6 +11,7 @@
 #include "telemetry.h"
 #include "finite-state-machines/fsm.h"
 #include "b2b_interface.h"
+#include "esp_eeprom.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
@@ -56,6 +57,7 @@ struct RocketSystems {
     LEDController led;
     Telemetry tlm;
     B2BInterface b2b;
+    EEPROMController eeprom;
 };
 
 [[noreturn]] void begin_systems(RocketSystems* config);

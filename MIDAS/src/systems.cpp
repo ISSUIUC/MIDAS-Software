@@ -4,6 +4,8 @@
 #include "gnc/ekf.h"
 #include "gnc/mqekf.h"
 
+static StaticSemaphore_t spi_mutex_buffer;
+SemaphoreHandle_t spi_mutex;
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -44,7 +46,9 @@ DECLARE_THREAD(barometer, RocketSystems *arg)
     unsigned int rejects = maxConsecutiveRejects; // Always accept first reading
     while (true)
     {
+        // xSemaphoreTake(spi_mutex, portMAX_DELAY);
         Barometer reading = arg->sensors.barometer.read();
+        // xSemaphoreGive(spi_mutex);
         bool is_rogue = std::abs(prev_reading.altitude - reading.altitude) > altChgThreshold;
         // std::abs(prev_reading.pressure - reading.pressure) > presChgThreshold ||
         // std::abs(prev_reading.temperature - reading.temperature) > tempChgThreshold;
@@ -69,29 +73,45 @@ DECLARE_THREAD(barometer, RocketSystems *arg)
 
 DECLARE_THREAD(imuthread, RocketSystems *arg)
 { // This needs edits
+
+    arg->sensors.imu.restore_calibration(arg->eeprom);
+
     while (true)
     {
-
+        xSemaphoreTake(spi_mutex, portMAX_DELAY);
         IMU imudata = arg->sensors.imu.read();
-        arg->rocket_data.imu.update(imudata);
         IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
+        xSemaphoreGive(spi_mutex);
+
+        // Sensor calibration, if it is triggered.
+        if(arg->sensors.imu.calibration_state != IMUSensor::IMUCalibrationState::NONE) {
+            arg->sensors.imu.calib_reading(imudata.lowg_acceleration, imudata.highg_acceleration, arg->buzzer, arg->eeprom);
+
+            if(arg->sensors.imu.get_time_since_calibration_start() > 60000) {
+                // Abort calibration if it isn't finished in 60s.
+                arg->sensors.imu.abort_calibration(arg->buzzer, arg->eeprom);
+            }
+        }
+
+        // Sensor biases
+        Acceleration bias = arg->sensors.imu.calibration_sensor_bias;
+
+        imudata.highg_acceleration.ax = imudata.highg_acceleration.ax + bias.ax;
+        imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
+        imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
+
+        arg->rocket_data.imu.update(imudata);
         arg->rocket_data.hw_filtered.update(hw_filter);
-
-        // Serial.println("IMU Thread: ");
-        // Serial.println("ax: ");
-        // Serial.print(imudata.highg_acceleration.ax);
-        // Serial.println("ay: ");
-        // Serial.print(imudata.highg_acceleration.ay);
-        // Serial.println("az: ");
-        // Serial.print(imudata.highg_acceleration.az);
-
-        THREAD_SLEEP(300);
+        
+        THREAD_SLEEP(5);
     }
 }
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
     while (true) {
+        // xSemaphoreTake(spi_mutex, portMAX_DELAY);
         Magnetometer reading = arg->sensors.magnetometer.read();
+        // xSemaphoreGive(spi_mutex);
         arg->rocket_data.magnetometer.update(reading);
         THREAD_SLEEP(50);
     }
@@ -310,6 +330,10 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         arg->rocket_data.kalman.update(current_state);
 
+        Serial.print("MQ tilt: ");
+        Serial.println(current_angular_kalman.mq_tilt);
+        Serial.println();
+
         last = xTaskGetTickCount();
         // Serial.println("Kalman");
         THREAD_SLEEP(50);
@@ -370,6 +394,9 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
         break;
     case CommandType::TOGGLE_CAM_VMUX:
         arg->b2b.camera.vmux_toggle();
+        break;
+    case CommandType::CALIB_ACCEL:
+        arg->sensors.imu.begin_calibration(arg->buzzer);
         break;
     default:
         break; // how
@@ -463,8 +490,9 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
  */
 ErrorCode init_systems(RocketSystems& systems) {
     digitalWrite(LED_ORANGE, HIGH);
-    INIT_SYSTEM(systems.sensors.imu);
+    INIT_SYSTEM(systems.eeprom);
     INIT_SYSTEM(systems.log_sink);
+    INIT_SYSTEM(systems.sensors.imu);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.voltage);
@@ -488,6 +516,8 @@ ErrorCode init_systems(RocketSystems& systems) {
 [[noreturn]] void begin_systems(RocketSystems *config)
 {
     Serial.println("Starting Systems...");
+    spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
+
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError)
     {
@@ -523,9 +553,6 @@ ErrorCode init_systems(RocketSystems& systems) {
     while (true)
     {
         THREAD_SLEEP(1000);
-        Serial.print("Running (Log Latency: ");
-        Serial.print(config->rocket_data.log_latency.getLatency());
-        Serial.println(")");
     }
 }
 

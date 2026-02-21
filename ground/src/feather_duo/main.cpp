@@ -144,6 +144,8 @@ void handle_serial(const String& key) {
         command.command = CommandType::CAM_OFF;
     } else if (cmd_name == "VMUXT") {
         command.command = CommandType::TOGGLE_CAM_VMUX;
+    } else if (cmd_name == "CXL") {
+        command.command = CommandType::CALIB_ACCEL;
     } else {
         Serial.println(json_command_bad);
         return;

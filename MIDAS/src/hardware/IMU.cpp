@@ -4,6 +4,7 @@
 #include "sensors.h" 
 
 #define NUM_DIRECTIONS 3
+#define NUM_READINGS_FOR_CALIB 50
 
 LSM6DSV320XClass LSM6DSV(SPI, IMU_CS_PIN, IMU_IRQ_PIN);
 
@@ -20,22 +21,16 @@ IMU IMUSensor::read(){
     IMU reading{};
 
     //Low-G Acceleration
-
-    
-
-
     if(status.xlda){
-        //Serial.println("oh we are lowg");
-        LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax, 
-                                                    &reading.lowg_acceleration.ay, 
+        LSM6DSV.get_lowg_acceleration_from_fs8_to_g(&reading.lowg_acceleration.ax,
+                                                    &reading.lowg_acceleration.ay,
                                                     &reading.lowg_acceleration.az);
     }
 
     //High-G Acceleration
     if(status.xlhgda){
-        //Serial.println("oh we are highg");
-        LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax, 
-                                                    &reading.highg_acceleration.ay, 
+        LSM6DSV.get_highg_acceleration_from_fs64_to_g(&reading.highg_acceleration.ax,
+                                                    &reading.highg_acceleration.ay,
                                                     &reading.highg_acceleration.az);
     }
 
@@ -113,28 +108,168 @@ IMU_SFLP IMUSensor::read_sflp() {
 //     }
 // }
 
+#define XLC_TONE_PITCH Sound{3000, 65}
+#define XLC_TONE_PITCH_LONG Sound{3000, 250}
+#define XLC_TONE_WAIT Sound{0, 50}
+
+Sound xl_calib_rdy[C_XL_LENGTH] = {XLC_TONE_PITCH, XLC_TONE_WAIT, XLC_TONE_PITCH};
+Sound xl_calib_next_axis[C_XL_LENGTH] = {XLC_TONE_PITCH, XLC_TONE_WAIT, XLC_TONE_WAIT};
+Sound xl_calib_done[C_XL_LENGTH] = {XLC_TONE_PITCH_LONG, XLC_TONE_PITCH, XLC_TONE_WAIT};
+Sound xl_calib_abort[C_XL_LENGTH] = {XLC_TONE_PITCH_LONG, XLC_TONE_PITCH_LONG, XLC_TONE_PITCH_LONG};
+
+void IMUSensor::restore_calibration(EEPROMController& eeprom) {
+    calibration_state = IMUSensor::IMUCalibrationState::NONE;
+
+    // Read back the calibration data from EEPROM:
+    calibration_sensor_bias = eeprom.data.lsm6dsv320x_hg_xl_bias;
+}
+
+void IMUSensor::abort_calibration(BuzzerController& buzzer, EEPROMController& eeprom) {
+    buzzer.play_tune(xl_calib_abort, C_XL_LENGTH);
+    restore_calibration(eeprom);
+}
+
+void IMUSensor::begin_calibration(BuzzerController& buzzer) {
+    if(calibration_state != IMUSensor::IMUCalibrationState::NONE) {
+        return; // Already in calibration mode..
+    }
+
+    buzzer.play_tune(xl_calib_rdy, C_XL_LENGTH);
+    _calib_begin_timestamp = millis();
+
+    calibration_state = IMUSensor::IMUCalibrationState::CALIB_PX;
+}
+
+bool IMUSensor::accept_calib_reading(float lowg_axis_reading, float nominal_axis_value) {
+    constexpr static float kLowgMaxDeviation = 0.012;
+    return std::abs(lowg_axis_reading - nominal_axis_value) < kLowgMaxDeviation;
+}
+
+void IMUSensor::next_calib(BuzzerController& buzzer, EEPROMController& eeprom) {
+    IMUCalibrationState next_state = static_cast<IMUCalibrationState>(static_cast<int>(calibration_state) + 1);
+    if (next_state == IMUCalibrationState::CALIB_DONE) {
+        // Calibration is finished, we will commit to EEPROM
+        calibration_state = IMUCalibrationState::NONE;
+        eeprom.data.lsm6dsv320x_hg_xl_bias = calibration_sensor_bias;
+        eeprom.commit();
+        buzzer.play_tune(xl_calib_done, C_XL_LENGTH);
+    } else {
+        calibration_state = next_state;
+        buzzer.play_tune(xl_calib_next_axis, C_XL_LENGTH);
+    }
+    _calib_valid_readings = 0;
+}
+
+void IMUSensor::calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator, EEPROMController& eeprom) {
+
+    switch (calibration_state) {
+        case IMUSensor::IMUCalibrationState::CALIB_PX:
+
+            if(accept_calib_reading(lowg_reading.ax, 1.0)) {
+                float cur_offset = 1.0 - highg_reading.ax;
+                _calib_valid_readings++;
+                _calib_average += cur_offset;
+                
+                if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
+                    Serial.println("[+X] Good");
+                    next_calib(buzzer_indicator, eeprom);
+                }
+            }
+            break;
+        case IMUSensor::IMUCalibrationState::CALIB_NX:
+            if(accept_calib_reading(lowg_reading.ax, -1.0)) {
+                float cur_offset = -1.0 - highg_reading.ax;
+                _calib_valid_readings++;
+                _calib_average += cur_offset;
+                
+                if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
+                    float overall_offset = _calib_average / (NUM_READINGS_FOR_CALIB*2);
+                    Serial.println("[-X] Good.");
+                    calibration_sensor_bias.ax = overall_offset;
+                    _calib_average = 0.0;
+                    next_calib(buzzer_indicator, eeprom);
+                }
+            }
+            break;
+        case IMUSensor::IMUCalibrationState::CALIB_PY:
+
+            if(accept_calib_reading(lowg_reading.ay, 1.0)) {
+                float cur_offset = 1.0 - highg_reading.ay;
+                _calib_valid_readings++;
+                _calib_average += cur_offset;
+                
+                if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
+                    Serial.println("[+Y] Good");
+                    next_calib(buzzer_indicator, eeprom);
+                }
+            }
+            break;
+        case IMUSensor::IMUCalibrationState::CALIB_NY:
+            if(accept_calib_reading(lowg_reading.ay, -1.0)) {
+                float cur_offset = -1.0 - highg_reading.ay;
+                _calib_valid_readings++;
+                _calib_average += cur_offset;
+                
+                if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
+                    float overall_offset = _calib_average / (NUM_READINGS_FOR_CALIB*2);
+                    Serial.println("[-Y] Good.");
+                    calibration_sensor_bias.ay = overall_offset;
+                    _calib_average = 0.0;
+                    next_calib(buzzer_indicator, eeprom);
+                }
+            }
+            break;
+
+        case IMUSensor::IMUCalibrationState::CALIB_PZ:
+
+            if(accept_calib_reading(lowg_reading.az, 1.0)) {
+                float cur_offset = 1.0 - highg_reading.az;
+                _calib_valid_readings++;
+                _calib_average += cur_offset;
+                
+                if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
+                    Serial.println("[+Z] Good");
+                    next_calib(buzzer_indicator, eeprom);
+                }
+            }
+            break;
+        case IMUSensor::IMUCalibrationState::CALIB_NZ:
+            if(accept_calib_reading(lowg_reading.az, -1.0)) {
+                float cur_offset = -1.0 - highg_reading.az;
+                _calib_valid_readings++;
+                _calib_average += cur_offset;
+                
+                if (_calib_valid_readings >= NUM_READINGS_FOR_CALIB) {
+                    float overall_offset = _calib_average / (NUM_READINGS_FOR_CALIB*2);
+                    Serial.println("[-Z] Good.");
+                    calibration_sensor_bias.az = overall_offset;
+                    _calib_average = 0.0;
+                    next_calib(buzzer_indicator, eeprom);
+                }
+            }
+            break;
+        default:
+            calibration_state = IMUCalibrationState::NONE;
+            break;
+    }
+}
 
 ErrorCode IMUSensor::init(){
     uint8_t whoami;
-
-    //LSM6DSV.sw_por();
 
     LSM6DSV.device_id_get(&whoami);
     if(whoami != LSM6DSV320X_ID) 
         return IMUCouldNotBeInitialized;
 
-    //?????
-    
-    
+    LSM6DSV.sw_por();
+
     // the second parameter used to be normal instead of high-performance
     LSM6DSV.xl_setup(LSM6DSV320X_ODR_AT_480Hz, LSM6DSV320X_XL_HIGH_PERFORMANCE_MD);
-    LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_15Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
-
+    LSM6DSV.gy_setup(LSM6DSV320X_ODR_AT_480Hz, LSM6DSV320X_GY_HIGH_PERFORMANCE_MD);
     LSM6DSV.hg_xl_data_rate_set(LSM6DSV320X_HG_XL_ODR_AT_480Hz, 1);//xl_setup only handles lowg, this should also set the enable register
     
     LSM6DSV.hg_xl_full_scale_set(LSM6DSV320X_64g);//highg scale set
-    LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//lowg scale set
-
+    LSM6DSV.xl_full_scale_set(LSM6DSV320X_8g);//low scale set
     LSM6DSV.gy_full_scale_set(LSM6DSV320X_2000dps);
     
     LSM6DSV.sflp_enable_set(1);
@@ -146,8 +281,6 @@ ErrorCode IMUSensor::init(){
     LSM6DSV.filt_gy_lp1_set(PROPERTY_DISABLE);
     //lsm6dsv320x_filt_gy_lp1_bandwidth_set(&dev_ctx, lsm6dsv320x_GY_ULTRA_LIGHT);
     LSM6DSV.filt_xl_lp2_set(PROPERTY_DISABLE);
-    //lsm6dsv320x_filt_xl_lp2_bandwidth_set(&dev_ctx, lsm6dsv320x_XL_STRONG);
-
 
     return NoError;
 }

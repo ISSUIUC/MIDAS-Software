@@ -1,4 +1,5 @@
 #include"E22.h"
+#include"hal.h"
 
 #define DBG_PRINT(x) (void) 0
 #define SX1268Check(x) if((x) == SX1268Error::BusyTimeout) { return SX1268Error::BusyTimeout; }
@@ -23,15 +24,18 @@ SX1268Error SX1268::write_command(RadioCommands_t command, uint8_t* buffer, size
     DBG_PRINT("write command start");
     SX1268Check(wait_on_busy());
 
-    digitalWrite(pin_cs, LOW);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi.beginTransaction(spiSettings);
+    digitalWrite(pin_cs, LOW);
     spi.transfer((uint8_t)command);
     for(size_t i = 0; i < size; i++){
         spi.transfer(buffer[i]);
     }
-    spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-    DBG_PRINT("write command end");
+    spi.endTransaction();
+    xSemaphoreGive(spi_mutex);
+
+    // DBG_PRINT("write command end");
     SX1268Check(wait_on_busy());
 
     return SX1268Error::NoError;
@@ -41,16 +45,19 @@ SX1268Error SX1268::read_command(RadioCommands_t command, uint8_t* buffer, size_
     DBG_PRINT("read command start");
     SX1268Check(wait_on_busy());
 
-    digitalWrite(pin_cs, LOW);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi.beginTransaction(spiSettings);
+    digitalWrite(pin_cs, LOW);
     spi.transfer((uint8_t)command);
     spi.transfer(0x00);
     for(size_t i = 0; i < size; i++){
         buffer[i] = spi.transfer(0x00);
     }
-    spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-    DBG_PRINT("read command end");
+    spi.endTransaction();
+    xSemaphoreGive(spi_mutex);
+
+    // DBG_PRINT("read command end");
     SX1268Check(wait_on_busy());
 
     return SX1268Error::NoError;
@@ -60,16 +67,19 @@ SX1268Error SX1268::write_buffer(uint8_t offest, const uint8_t* buffer, size_t s
     DBG_PRINT("write buffer start");
     SX1268Check(wait_on_busy());
 
-    digitalWrite(pin_cs, LOW);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi.beginTransaction(spiSettings);
+    digitalWrite(pin_cs, LOW);
     spi.transfer(RADIO_WRITE_BUFFER);
     spi.transfer(offest);
     for(size_t i = 0; i < size; i++) {
         spi.transfer(buffer[i]);
     }
-    spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-    DBG_PRINT("write buffer end");
+    spi.endTransaction();
+    xSemaphoreGive(spi_mutex);
+
+    // DBG_PRINT("write buffer end");
     SX1268Check(wait_on_busy());
 
     return SX1268Error::NoError;
@@ -79,8 +89,9 @@ SX1268Error SX1268::write_registers(uint16_t address, uint8_t* buffer, size_t si
     DBG_PRINT("write register start");
     SX1268Check(wait_on_busy());
 
-    digitalWrite(pin_cs, LOW);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi.beginTransaction(spiSettings);
+    digitalWrite(pin_cs, LOW);
     spi.transfer(RADIO_WRITE_REGISTER);
     spi.transfer((address & 0xFF00) >> 8);
     spi.transfer(address & 0x00FF);
@@ -88,10 +99,11 @@ SX1268Error SX1268::write_registers(uint16_t address, uint8_t* buffer, size_t si
     for(size_t i = 0; i < size; i++){
         spi.transfer(buffer[i]);
     }
-
-    spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-    DBG_PRINT("write buffer end");
+    spi.endTransaction();
+    xSemaphoreGive(spi_mutex);
+
+    // DBG_PRINT("write buffer end");
     SX1268Check(wait_on_busy());
 
     return SX1268Error::NoError;
@@ -101,18 +113,20 @@ SX1268Error SX1268::read_buffer(uint8_t offset, uint8_t* buffer, size_t size) {
     DBG_PRINT("read buffer start");
     SX1268Check(wait_on_busy());
 
-    digitalWrite(pin_cs, LOW);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi.beginTransaction(spiSettings);
+    digitalWrite(pin_cs, LOW);
     spi.transfer(RADIO_READ_BUFFER);
-    spi.transfer(offset); 
+    spi.transfer(offset);
     spi.transfer(0x0);
     for(size_t i = 0; i < size; i++){
         buffer[i] = spi.transfer(0x0);
     }
-
-    spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-    DBG_PRINT("write buffer end");
+    spi.endTransaction();
+    xSemaphoreGive(spi_mutex);
+
+    // DBG_PRINT("write buffer end");
     SX1268Check(wait_on_busy());
 
     return SX1268Error::NoError;
@@ -122,8 +136,9 @@ SX1268Error SX1268::read_registers(uint16_t address, uint8_t* buffer, size_t siz
     DBG_PRINT("read registers start");
     SX1268Check(wait_on_busy());
 
-    digitalWrite(pin_cs, LOW);
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
     spi.beginTransaction(spiSettings);
+    digitalWrite(pin_cs, LOW);
     spi.transfer(RADIO_READ_REGISTER);
     spi.transfer((address & 0xFF00) >> 8);
     spi.transfer(address & 0x00FF);
@@ -131,9 +146,11 @@ SX1268Error SX1268::read_registers(uint16_t address, uint8_t* buffer, size_t siz
     for(size_t i = 0; i < size; i++){
         buffer[i] = spi.transfer(0x00);
     }
-    spi.endTransaction();
     digitalWrite(pin_cs, HIGH);
-    DBG_PRINT("read registers end");
+    spi.endTransaction();
+    xSemaphoreGive(spi_mutex);
+
+    // DBG_PRINT("read registers end");
     SX1268Check(wait_on_busy());
 
     return SX1268Error::NoError;
@@ -366,7 +383,6 @@ SX1268Error SX1268::recv(uint8_t* data, size_t len, size_t timeout_ms) {
         (uint8_t)((timeout >> 8) & 0xFF),
         (uint8_t)((timeout >> 0) & 0xFF)
     };
-
 
     SX1268Check(write_command(RADIO_SET_RX, timeout_buf, sizeof(timeout)));
     for(int i = 0; i < timeout + 10; i++){
