@@ -19,3 +19,5 @@ struct AdcReadResult {
 
 AdcReadResult adcAnalogRead(ADCAddress pin);
 bool ADS7138Init();
+
+bool adcSetOutput(ADCAddress pin);

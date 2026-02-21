@@ -139,10 +139,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     
     //Pyro A0 | B1 | C2 | D3
-    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[0], MAX_TELEM_VOLTAGE_V) & 0xFF) << (0*8);
-    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[1], MAX_TELEM_VOLTAGE_V) & 0xFF) << (1*8);
-    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[2], MAX_TELEM_VOLTAGE_V) & 0xFF) << (2*8);
-    packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(voltage.continuity[3], MAX_TELEM_VOLTAGE_V) & 0xFF) << (3*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[0], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (0*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[1], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (1*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[2], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (2*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[3], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (3*8);
 
     // GPS state & Callsign
     // 0000 | 000 | 0
