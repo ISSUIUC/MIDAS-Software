@@ -45,6 +45,7 @@ public:
 #define LAND_TONE_LENGTH 11
 
 #define C_XL_LENGTH 3
+#define C_MG_LENGTH 5
 
 extern Sound free_bird[FREE_BIRD_LENGTH];
 extern Sound warn_tone[WARN_TONE_LENGTH];
@@ -54,3 +55,8 @@ extern Sound xl_calib_rdy[C_XL_LENGTH];
 extern Sound xl_calib_next_axis[C_XL_LENGTH];
 extern Sound xl_calib_done[C_XL_LENGTH];
 extern Sound xl_calib_abort[C_XL_LENGTH];
+
+extern Sound mg_calib_rdy[C_MG_LENGTH];
+extern Sound mg_calib_done[C_MG_LENGTH];
+extern Sound mg_calib_inp[C_MG_LENGTH];
+extern Sound mg_calib_bad[C_MG_LENGTH];

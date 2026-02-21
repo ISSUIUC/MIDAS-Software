@@ -5,5 +5,7 @@
 struct MIDASEEPROM {
     uint32_t checksum;
 
-    Acceleration lsm6dsv320x_hg_xl_bias;
+    Acceleration lsm6dsv320x_hg_xl_bias = {0.0f, 0.0f, 0.0f};
+    Magnetometer mmc5983ma_softiron_bias = {1.0f, 1.0f, 1.0f};
+    Magnetometer mmc5983ma_hardiron_bias = {0.0f, 0.0f, 0.0f};
 };
