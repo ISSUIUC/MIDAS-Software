@@ -29,7 +29,7 @@ class MS5611 {
 
     void init();
     int read(uint8_t bits = 8);
-    inline int32_t getTemperature() const { return _temperature; };
+    inline float getTemperature() const { return static_cast<float>(_temperature)*0.01; };
     inline uint32_t getPressure() const { return _pressure; };
     float getAltitude(float airPressure = 1013.25);
     inline int getLastResult() const { return _result; };
