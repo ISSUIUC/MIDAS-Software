@@ -266,11 +266,64 @@ float MS5611_SPI::getTemperatureOffset()
 //  https://www.mide.com/air-pressure-at-altitude-calculator
 //  https://community.bosch-sensortec.com/t5/Question-and-answers/How-to-calculate-the-altitude-from-the-pressure-sensor-data/qaq-p/5702 (stale link).
 //  https://en.wikipedia.org/wiki/Pressure_altitude
-float MS5611_SPI::getAltitude(float airPressure)
+
+
+/*
+
+New model valid to 86 km
+
+
+*/
+
+
+/*
+
+
+
+*/
+
+
+
+float MS5611_SPI::getAltitude(float airPressure) // altitude in meters
 {
+  // Old altitude formula, valid to 11km
+
+  /*
   //  NOTE: _pressure is in Pascal (#44) and airPressure is in mBar.
   float ratio = _pressure * 0.01 / airPressure;
   return 44307.694 * (1 - pow(ratio, 0.190284));
+  */
+
+
+  // New formula
+
+  // Using the ICAO standard atmospheric model
+  // valid for altitudes 0-71+ km
+  // assumes a piecewise model of the atmosphere, where each
+  // layer has a constant temperature lapse rate
+  // Use pressure to find layer, and then altitude
+  // TODO: Adjustment from actual temperature vs. expected
+  // Adjust layer base values
+
+  https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
+
+  int b = 0; // which layer are we in
+  while(b < 6)
+  {
+    if(_pressure >= P[b + 1])
+    {
+        break;
+    }
+    ++b;
+  }
+  if (b == 1 || b == 4) // isothermal, tropopause/stratopause
+  {
+    return H[b] - log(_pressure / P[b]) * r * T[b] / g;
+  }
+  else // constant temperature gradient
+  {
+    return H[b] + (pow(_pressure / P[b], -L[b] * r / g) - 1) * T[b] / L[b];
+  }
 }
 
 

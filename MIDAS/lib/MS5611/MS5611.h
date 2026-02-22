@@ -165,7 +165,7 @@ protected:
   uint8_t  _address;
   uint8_t  _samplingRate;
   int32_t  _temperature;
-  int32_t  _pressure;
+  int32_t  _pressure; // Pa
   float    _pressureOffset;
   float    _temperatureOffset;
   int      _result;
@@ -184,6 +184,15 @@ protected:
 
   __SPI_CLASS__ * _mySPI;
   SPISettings   _spi_settings;
+
+  float H[7] = {0, 11000, 20000, 32000, 47000, 51000, 71000}; // base heights of each atmospheric layer (m)
+  float P[7] = {101335, 22632.04, 5474.88, 868.016, 111.09, 66.9385, 3.95639}; // base pressures (Pa)
+  float T[7] = {288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65}; // base temperatures (K)
+  float L[7] = {-0.0065, 0, 0.001, 0.0028, 0, -0.0028, -0.002}; // base lapse rates (K/m)
+  // https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
+
+  float r = 287.05287 // specific gas constant, Jkg/K
+  float g = 9.90665 // gravity
 };
 
 
