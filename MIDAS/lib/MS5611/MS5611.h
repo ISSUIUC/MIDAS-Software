@@ -191,8 +191,8 @@ protected:
   float L[7] = {-0.0065, 0, 0.001, 0.0028, 0, -0.0028, -0.002}; // base lapse rates (K/m)
   // https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
 
-  float r = 287.05287 // specific gas constant, Jkg/K
-  float g = 9.90665 // gravity
+  float r = 287.05287; // specific gas constant, Jkg/K
+  float g = 9.90665; // gravity
 };
 
 
