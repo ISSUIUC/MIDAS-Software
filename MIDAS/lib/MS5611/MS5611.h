@@ -32,6 +32,7 @@ class MS5611 {
     inline float getTemperature() const { return static_cast<float>(_temperature)*0.01; };
     inline uint32_t getPressure() const { return _pressure; };
     float getAltitude(float airPressure = 1013.25);
+    float getAltitudeExtendedModel();
     inline int getLastResult() const { return _result; };
     inline uint16_t getPromValue(uint8_t p) const { return C[p]; };
 

@@ -39,6 +39,17 @@
 
 #include "MS5611.h"
 
+#define MINIMUM_PRESSURE    0.3734
+#define MAXIMUM_ALTITUDE		84852.0
+#define AIR_GAS_CONSTANT		287.053
+#define GRAVITATIONAL_ACCELERATION	-9.90665
+
+static const float H[7] = {0, 11000, 20000, 32000, 47000, 51000, 71000}; // base heights of each atmospheric layer (m)
+static const  float P[7] = {101335, 22632.04, 5474.88, 868.016, 111.09, 66.9385, 3.95639}; // base pressures (Pa)
+static const  float T[7] = {288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65}; // base temperatures (K)
+static const  float Lapse_Rate[7] = {-0.0065, 0, 0.001, 0.0028, 0, -0.0028, -0.002}; // base lapse rates (K/m)
+// https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
+
 #include <SPI.h>
 SPISettings settingsA(
     1000000, MSBFIRST,
@@ -240,7 +251,7 @@ float MS5611::getAltitude(float airPressure)
 }
 
 
-float MS5611_SPI::getAltitudeExtendedModel() // altitude in meters
+float MS5611::getAltitudeExtendedModel() // altitude in meters
 {
   // New formula
 
