@@ -239,4 +239,46 @@ float MS5611::getAltitude(float airPressure)
   return 44307.694 * (1 - pow(ratio, 0.190284));
 }
 
+
+float MS5611_SPI::getAltitudeExtendedModel() // altitude in meters
+{
+  // New formula
+
+  // Using the ICAO standard atmospheric model
+  // valid for altitudes 0-84 km
+  // assumes a piecewise model of the atmosphere, where each
+  // layer has a constant temperature lapse rate
+  // Use pressure to find layer, and then altitude
+  // TODO: Adjustment from actual temperature vs. expected
+  // Adjust layer base values
+
+  https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
+
+  if(_pressure < MINIMUM_PRESSURE)
+  {
+    return MAXIMUM_ALTITUDE;
+  }
+
+  int b = 0; // which layer are we in
+  while(b < 6)
+  {
+    if(_pressure >= P[b + 1])
+    {
+        break;
+    }
+    ++b;
+  }
+  if (b == 1 || b == 4) // isothermal, tropopause/stratopause
+  {
+    return H[b] + log(_pressure / P[b]) * AIR_GAS_CONSTANT * T[b] / GRAVITATIONAL_ACCELERATION;
+  }
+  else // constant temperature gradient
+  {
+    return H[b] + (pow(_pressure / P[b], Lapse_Rate[b] * AIR_GAS_CONSTANT / GRAVITATIONAL_ACCELERATION) - 1) * T[b] / Lapse_Rate[b];
+  }
+}
+
+
 // END OF FILE
+
+
