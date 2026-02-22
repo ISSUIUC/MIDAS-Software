@@ -54,6 +54,33 @@ struct IMUSensor {
 struct MagnetometerSensor {
     ErrorCode init();
     Magnetometer read();
+
+    // Calibration functions
+    bool in_calibration_mode = false;
+    void begin_calibration(BuzzerController& buzzer);
+    void calib_reading(Magnetometer& reading, EEPROMController& eeprom, BuzzerController& buzzer);
+    void restore_calibration(EEPROMController& eeprom);
+
+    Magnetometer calibration_bias_hardiron = {0.0, 0.0, 0.0}; // hard iron offset -- "recenters" data on origin (0,0,0).
+    Magnetometer calibration_bias_softiron = {1.0, 1.0, 1.0}; // soft iron offset -- scales per-axis data (Should be 3x3, but we'll try 1x3 for now.)
+
+    unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+
+    private:
+    void commit_calibration(EEPROMController& eeprom, BuzzerController& buzzer); // Calculate and commit the calibration to memory
+    bool calibration_valid(const Magnetometer& b, const Magnetometer& s); // Calculate and sanity check calibration data
+    /* Maximum value per-axis during calibration */
+    Magnetometer _calib_max_axis; 
+    /* Minimum value per-axis during calibration */
+    Magnetometer _calib_min_axis;
+    unsigned long _calib_begin_timestamp;
+    double _calib_magnitude_sum = 0.0;
+    int _calib_num_datapoints = 0;
+    int _calib_beeping = 0;
+    /* Magnetometer calibration isn't based on a per-axis calibration, but on getting as many datapoints as possible.
+    For now let's try 60 sec */
+    const unsigned long _calib_time = 60000;
+
 };
 
 /**

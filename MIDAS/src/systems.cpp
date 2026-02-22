@@ -108,11 +108,28 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
 }
 
 DECLARE_THREAD(magnetometer, RocketSystems* arg) {
+    arg->sensors.magnetometer.restore_calibration(arg->eeprom);
+    int i = 0;
     while (true) {
         // xSemaphoreTake(spi_mutex, portMAX_DELAY);
         Magnetometer reading = arg->sensors.magnetometer.read();
         // xSemaphoreGive(spi_mutex);
+
+        // Sensor calibration
+        if(arg->sensors.magnetometer.in_calibration_mode) {
+            arg->sensors.magnetometer.calib_reading(reading, arg->eeprom, arg->buzzer);
+            // Mag calibration handles its own calibration timing.
+        }
+
+        // Sensor biases
+        Magnetometer b = arg->sensors.magnetometer.calibration_bias_hardiron; // "Hard iron" / origin offset.
+        Magnetometer s = arg->sensors.magnetometer.calibration_bias_softiron; // "Soft iron" / scale offset.
+        reading.mx = (reading.mx - b.mx) / s.mx;
+        reading.my = (reading.my - b.my) / s.my;
+        reading.mz = (reading.mz - b.mz) / s.mz;
+
         arg->rocket_data.magnetometer.update(reading);
+
         THREAD_SLEEP(50);
     }
 }
@@ -397,6 +414,9 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
         break;
     case CommandType::CALIB_ACCEL:
         arg->sensors.imu.begin_calibration(arg->buzzer);
+        break;
+    case CommandType::CALIB_MAG:
+        arg->sensors.magnetometer.begin_calibration(arg->buzzer);
         break;
     default:
         break; // how

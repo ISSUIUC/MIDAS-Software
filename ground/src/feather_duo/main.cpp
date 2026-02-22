@@ -146,6 +146,8 @@ void handle_serial(const String& key) {
         command.command = CommandType::TOGGLE_CAM_VMUX;
     } else if (cmd_name == "CXL") {
         command.command = CommandType::CALIB_ACCEL;
+    } else if (cmd_name == "CMG") {
+        command.command = CommandType::CALIB_MAG;
     } else {
         Serial.println(json_command_bad);
         return;

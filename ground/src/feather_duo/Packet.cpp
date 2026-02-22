@@ -53,18 +53,11 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
     data.is_sustainer = (packet.callsign_gpsfix_satcount & 0b1);
     data.sat_count = (packet.callsign_gpsfix_satcount >> 4) & 0b1111;
 
-    //Pyros
-    data.pyros[0] = (packet.pyro >> 0) & (0x7F);
-    data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * MAX_TELEM_CONT_I;
-    data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * MAX_TELEM_CONT_I;
-    data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
-
-    // TODO: MIDAS MK3 will have proper pyro telem reporting.
-    
-    // data.pyros[0] = (packet.pyro >> 0) & (0x7F);
-    // data.pyros[1] = ((float) ((packet.pyro >> 7) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
-    // data.pyros[2] = ((float) ((packet.pyro >> 14) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
-    // data.pyros[3] = ((float) ((packet.pyro >> 21) & (0x7F)) / 127.) * MAX_TELEM_VOLTAGE_V;
+    // Pyro Continuity
+    data.pyros[0] = ((float) ((packet.pyro >> 0) & (0xFF)) / 255.) * MAX_TELEM_VOLTAGE_V;
+    data.pyros[1] = ((float) ((packet.pyro >> 8) & (0xFF)) / 255.) * MAX_TELEM_VOLTAGE_V;
+    data.pyros[2] = ((float) ((packet.pyro >> 16) & (0xFF)) / 255.) * MAX_TELEM_VOLTAGE_V;
+    data.pyros[3] = ((float) ((packet.pyro >> 24) & (0xFF)) / 255.) * MAX_TELEM_VOLTAGE_V;
 
     // kalman filter    
     data.kf_px = convert_range<int16_t>(packet.kf_px, MAX_KF_XPOSITION_M);
