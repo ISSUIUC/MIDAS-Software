@@ -228,4 +228,15 @@ uint32_t MS5611::readADC() {
     return val;
 }
 
+//  (from MS5837)
+//  https://www.mide.com/air-pressure-at-altitude-calculator
+//  https://community.bosch-sensortec.com/t5/Question-and-answers/How-to-calculate-the-altitude-from-the-pressure-sensor-data/qaq-p/5702 (stale link).
+//  https://en.wikipedia.org/wiki/Pressure_altitude
+float MS5611::getAltitude(float airPressure)
+{
+  //  NOTE: _pressure is in Pascal (#44) and airPressure is in mBar.
+  float ratio = _pressure * 0.01 / airPressure;
+  return 44307.694 * (1 - pow(ratio, 0.190284));
+}
+
 // END OF FILE
