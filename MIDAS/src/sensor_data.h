@@ -73,7 +73,7 @@ struct euler_t {
 */
 struct Barometer {
     float temperature = 0; // Temperature in Celcius
-    float pressure = 0; // Pressure in millibars
+    uint32_t pressure = 0; // Pressure in Pascals
     float altitude = 0; // Altitude in meters (above sea level?)
 
     Barometer() = default;
