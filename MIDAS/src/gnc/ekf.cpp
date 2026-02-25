@@ -82,7 +82,7 @@ void EKF::priori(float dt, AngularKalmanData &orientation, FSMState fsm, Acceler
     sensor_accel_global_g(2, 0) = acceleration.az - 0.06f;
     euler_t angles_rad = orientation.getEuler();
     BodyToGlobal(angles_rad, sensor_accel_global_g);
-    // Do not apply gravity if on pad
+    // Do not apply acceleration if on pad
     float g_ms2 = (fsm > FSMState::STATE_IDLE) ? gravity_ms2 : 0.0f;
     u_control(0, 0) = sensor_accel_global_g(0, 0) * g_ms2;
     u_control(1, 0) = sensor_accel_global_g(1, 0) * g_ms2;
