@@ -239,3 +239,6 @@
 // The minimum expected jerk for a main deployment event (m/s^3)
 // (Core Setting)
 #define booster_main_jerk_threshold 300
+
+// Minimum duration of sustained acceleration before fallback to boost (ms)
+#define sustainer_burnout_to_first_boost_time_threshold 250
