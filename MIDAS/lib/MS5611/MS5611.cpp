@@ -39,6 +39,17 @@
 
 #include "MS5611.h"
 
+#define MINIMUM_PRESSURE    0.3734
+#define MAXIMUM_ALTITUDE		84852.0
+#define AIR_GAS_CONSTANT		287.053
+#define GRAVITATIONAL_ACCELERATION	-9.90665
+
+static const float H[7] = {0, 11000, 20000, 32000, 47000, 51000, 71000}; // base heights of each atmospheric layer (m)
+static const  float P[7] = {101335, 22632.04, 5474.88, 868.016, 111.09, 66.9385, 3.95639}; // base pressures (Pa)
+static const  float T[7] = {288.15, 216.65, 216.65, 228.65, 270.65, 270.65, 214.65}; // base temperatures (K)
+static const  float Lapse_Rate[7] = {-0.0065, 0, 0.001, 0.0028, 0, -0.0028, -0.002}; // base lapse rates (K/m)
+// https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
+
 #include <SPI.h>
 SPISettings settingsA(
     1000000, MSBFIRST,
@@ -228,4 +239,57 @@ uint32_t MS5611::readADC() {
     return val;
 }
 
+//  (from MS5837)
+//  https://www.mide.com/air-pressure-at-altitude-calculator
+//  https://community.bosch-sensortec.com/t5/Question-and-answers/How-to-calculate-the-altitude-from-the-pressure-sensor-data/qaq-p/5702 (stale link).
+//  https://en.wikipedia.org/wiki/Pressure_altitude
+float MS5611::getAltitude(float airPressure)
+{
+  //  NOTE: _pressure is in Pascal (#44) and airPressure is in mBar.
+  float ratio = _pressure * 0.01 / airPressure;
+  return 44307.694 * (1 - pow(ratio, 0.190284));
+}
+
+
+float MS5611::getAltitudeExtendedModel() // altitude in meters
+{
+  // New formula
+
+  // Using the ICAO standard atmospheric model
+  // valid for altitudes 0-84 km
+  // assumes a piecewise model of the atmosphere, where each
+  // layer has a constant temperature lapse rate
+  // Use pressure to find layer, and then altitude
+  // TODO: Adjustment from actual temperature vs. expected
+  // Adjust layer base values
+
+  https://www.sensorsone.com/icao-standard-atmosphere-altitude-pressure-calculator/
+
+  if(_pressure < MINIMUM_PRESSURE)
+  {
+    return MAXIMUM_ALTITUDE;
+  }
+
+  int b = 0; // which layer are we in
+  while(b < 6)
+  {
+    if(_pressure >= P[b + 1])
+    {
+        break;
+    }
+    ++b;
+  }
+  if (b == 1 || b == 4) // isothermal, tropopause/stratopause
+  {
+    return H[b] + log(_pressure / P[b]) * AIR_GAS_CONSTANT * T[b] / GRAVITATIONAL_ACCELERATION;
+  }
+  else // constant temperature gradient
+  {
+    return H[b] + (pow(_pressure / P[b], Lapse_Rate[b] * AIR_GAS_CONSTANT / GRAVITATIONAL_ACCELERATION) - 1) * T[b] / Lapse_Rate[b];
+  }
+}
+
+
 // END OF FILE
+
+
