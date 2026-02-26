@@ -147,11 +147,13 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t fil
 
             if (!fs.exists(inputName)) {
                 fileExists = true;
-                *fileno_out = i;
+                *fileno_out = i + 1;
             }
 
             i++;
         }
+    } else {
+        *fileno_out = 0;
     }
 
     strcpy(fileName, inputName);

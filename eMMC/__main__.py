@@ -20,7 +20,7 @@ with serial.Serial(port, 9600) as ser:
     while True:
         command = input(">> ")
         if command == "help":
-            print("Available commands: ls, help, quit, dump <file>")
+            print("Available commands: ls, help, quit, dump <file>, rmall")
         elif command == "quit":
             break
         elif command == "ls":
@@ -59,6 +59,15 @@ with serial.Serial(port, 9600) as ser:
             if line != b"<done>\r\n":
                 raise Exception(f"Fatal error when reading file! (Got {line!r})")
             print(f"Wrote into {current_root / file_name}!")
+        elif command == "rmall":
+            if input("rmall deletes all files, are you sure? (y/n): ") == "y":
+                ser.write(b"rmall\n")
+                text = ser.readline()
+                while text != b"" and text != b"<done>\r\n":
+                    print(text[:-1].decode("utf-8", errors="ignore"))
+                    text = ser.readline()
+            else:
+                print("invalid / no response, try again.")
         elif command == "":
             pass
         else:
