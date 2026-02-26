@@ -47,7 +47,6 @@ private:
     float Cn = 0;
     float Wind_alpha = 0.85f;
     float Cp = 0;
-    float curr_mass_kg = mass_full; //(kg) Sustainer + Booster, but value changes over time.
     std::vector<float> starting_gps;    // latitude, longitude, altitude
     std::vector<float> starting_ecef;   // x, y, z
 
