@@ -31,11 +31,11 @@ ErrorCode SDSink::init() {
         Serial.print("[SD] EEPROM log file recovered: "); Serial.println(current_file_no);
     }
 
-    int filenumber = 0;
+    int filenumber = -1;
     sdFileNamer(file_name, ext, SD_MMC, current_file_no, &filenumber);
-    current_file_no = static_cast<uint16_t>(filenumber);
     
-    if(current_file_no != 0) {
+    
+    if(filenumber != -1) {
         Serial.print("[SD] Beginning log: "); Serial.println(current_file_no);
     } else {
         failed = true;
@@ -47,6 +47,9 @@ ErrorCode SDSink::init() {
         failed = true;
         return ErrorCode::SDCouldNotOpenFile;
     }
+
+    // Set the internal file number
+    current_file_no = static_cast<uint16_t>(filenumber);
 
     Serial.println("[SD] Init done");
     return ErrorCode::NoError;
