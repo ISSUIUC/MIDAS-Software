@@ -14,7 +14,7 @@
 
 void QuaternionMEKF::initialize(RocketSystems *args)
 {
-    float Pq0 = 1e-6;
+    float Pq0 = 1e-4;
     float Pb0 = 1e-1;
     sigma_a = {accel_noise_density_x * sqrt(20.0f) * 1.0e-6 * 9.81, accel_noise_density_y * sqrt(20.0f) * 1.0e-6 * 9.81, accel_noise_density_z * sqrt(20.0f) * 1.0e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
     sigma_g = {gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f)};
@@ -104,6 +104,10 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
         state.gyrobias[0] = bias_gyro(0, 0);
         state.gyrobias[1] = bias_gyro(1, 0);
         state.gyrobias[2] = bias_gyro(2, 0);
+        Serial.print("BIAS 0: ");
+        Serial.print(state.gyrobias[0]);
+        Serial.print("    BIAS 1: ");
+        Serial.println(state.gyrobias[1]);
     }
 }
 
@@ -115,7 +119,7 @@ void QuaternionMEKF::time_update(Velocity const &gyro, float Ts)
     gyr(0, 0) = gyro.vx * (pi / 180.0f);
     gyr(1, 0) = gyro.vy * (pi / 180.0f);
     gyr(2, 0) = gyro.vz * (pi / 180.0f);
-
+    
     set_transition_matrix(gyr - x.tail(3), Ts);
 
     Eigen::Vector4f q; // necessary to reorder to w,x,y,z
@@ -287,7 +291,7 @@ Eigen::Matrix<float, 6, 6> QuaternionMEKF::initialize_Q(Eigen::Matrix<float, 3, 
 {
     Eigen::Matrix<float, 6, 6> Q = Eigen::Matrix<float, 6, 6>::Zero();
     Q.block<3, 3>(0, 0) = sigma_g.array().square().matrix().asDiagonal();
-    Q.block<3, 3>(3, 3) = 1e-12 * Eigen::Matrix3f::Identity();
+    Q.block<3, 3>(3, 3) = 1e-2 * Eigen::Matrix3f::Identity();
     return Q;
 }
 
