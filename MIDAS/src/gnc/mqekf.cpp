@@ -17,7 +17,7 @@ void QuaternionMEKF::initialize(RocketSystems *args)
     float Pq0 = 1e-6;
     float Pb0 = 1e-1;
     sigma_a = {accel_noise_density_x * sqrt(20.0f) * 1.0e-6 * 9.81, accel_noise_density_y * sqrt(20.0f) * 1.0e-6 * 9.81, accel_noise_density_z * sqrt(20.0f) * 1.0e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
-    sigma_g = {gyro_RMS_noise * pow(10.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(10.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(10.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f)};
+    sigma_g = {gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f)};
     sigma_m = {mag_noise * 1.0e-4 / sqrt(3), mag_noise * 1.0e-4 / sqrt(3), mag_noise * 1.0e-4 / sqrt(3)}; // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3                                                                                           // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
     Q = initialize_Q(sigma_g);
     Eigen::Matrix<float, 6, 1> sigmas;
@@ -39,7 +39,7 @@ void QuaternionMEKF::initialize(RocketSystems *args)
         {
             IMU imu_data = args->rocket_data.imu.getRecent();
 
-            Acceleration accel = imu_data.lowg_acceleration;
+            Acceleration accel = imu_data.highg_acceleration;
             accel_sum.ax += accel.ax;
             accel_sum.ay += accel.ay;
             accel_sum.az += accel.az;
@@ -61,7 +61,7 @@ void QuaternionMEKF::initialize(RocketSystems *args)
     else
     {
         IMU imu_data = args->rocket_data.imu.getRecent();
-        accel = imu_data.lowg_acceleration;
+        accel = imu_data.highg_acceleration;
         mag = args->rocket_data.magnetometer.getRecent();
     }
 

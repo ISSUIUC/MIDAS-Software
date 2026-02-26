@@ -286,7 +286,7 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
         Acceleration current_accelerations = {
-            .ax = current_high_g.ax,
+            .ax = current_high_g.ax;
             .ay = current_high_g.ay,
             .az = current_high_g.az};
 

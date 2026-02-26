@@ -42,7 +42,7 @@ Magnetometer MagnetometerSensor::read() {
     
     // We multiply by 8, which is the full scale of the mag.
     // https://github.com/sparkfun/SparkFun_MMC5983MA_Magnetometer_Arduino_Library/blob/main/examples/Example4-SPI_Simple_measurement/Example4-SPI_Simple_measurement.ino
-    Magnetometer reading{X*8, Y*8, Z*8};
+    Magnetometer reading{Y*8, -X*8, -Z*8};
     return reading;
 }
 
