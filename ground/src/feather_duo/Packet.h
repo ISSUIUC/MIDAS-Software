@@ -5,8 +5,8 @@ typedef uint32_t systime_t;
 
 #define MAX_TELEM_VOLTAGE_V 6.0f
 #define MAX_TELEM_CONT_I 0.2f
-#define MAX_KF_VPOSITION_M 30000.0f
-#define MAX_KF_LPOSITION_M 20000.0f
+#define MAX_KF_VPOSITION_M 100000.0f
+#define MAX_KF_LPOSITION_M 100000.0f
 #define MAX_ROLL_RATE_HZ 10.0f
 #define MAX_ABS_ACCEL_RANGE_G 64
 #define MAX_KF_XVELOCITY_MS 2000.0f
