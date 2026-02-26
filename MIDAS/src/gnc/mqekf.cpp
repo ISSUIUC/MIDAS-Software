@@ -173,7 +173,7 @@ void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer 
     // x * A = b
     // Which can be solved with the code below
     Eigen::FullPivLU<Eigen::Matrix<float, 6, 6>> lu(s); //  LU decomposition of s
-    if (lu.isInvertible())
+    if (lu.determinant() != 0)                                 // change from invertible to allow tiny determinant to pass through 
     {
         Eigen::Matrix<float, 6, 6> const K = P * C.transpose() * lu.inverse(); // gain
 
