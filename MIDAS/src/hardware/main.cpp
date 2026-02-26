@@ -86,6 +86,11 @@ void setup()
     digitalWrite(IMU_CS_PIN, HIGH);
     digitalWrite(MMC5983_CS, HIGH);
 
+    // b2b pins
+    pinMode(B2B_EN, OUTPUT);
+    pinMode(B2B_READY, INPUT);
+    digitalWrite(B2B_EN, HIGH); // Enables the B2B bus
+
     //configure output leds
     pinMode(LED_BLUE, OUTPUT);
     pinMode(LED_GREEN, OUTPUT);
