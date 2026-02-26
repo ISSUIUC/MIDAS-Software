@@ -230,18 +230,18 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
         // add the tick update function
+        GPS current_gps = arg->rocket_data.gps.getRecent();
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
         Orientation current_orientation = arg->rocket_data.orientation.getRecent();
         HighGData current_accelerometer = arg->rocket_data.high_g.getRecent();
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState fsm_state = arg->rocket_data.fsm_state.getRecent();
         Acceleration current_accelerations = {
             .ax = current_accelerometer.ax,
             .ay = current_accelerometer.ay,
             .az = current_accelerometer.az
         };
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
-        float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
-        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, FSM_state);
+        ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_orientation, fsm_state, current_gps);
         KalmanData current_state = ekf.getState();
 
         arg->rocket_data.kalman.update(current_state);
@@ -251,8 +251,6 @@ DECLARE_THREAD(kalman, RocketSystems* arg) {
         THREAD_SLEEP(50);
     }
 }
-
-
 void handle_tlm_command(TelemetryCommand& command, RocketSystems* arg, FSMState current_state) {
     // maybe we should move this somewhere else but it can stay here for now
     switch(command.command) {
