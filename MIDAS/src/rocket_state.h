@@ -6,6 +6,10 @@
 #include "hal.h"
 #include "Buffer.h"
 
+// temprary macro
+// originally declared in data_loggng_meta.h
+#define META_LOGGING_MAX_SIZE 64
+
 /** 
  * @brief The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -153,6 +157,8 @@ public:
     }
 };
 
+#define META_LOGGING_MAX_SIZE 64
+
 enum MetaDataCode {
     // Launch events
     EVENT_TLAUNCH,
@@ -201,7 +207,6 @@ struct MetaLogging {
         _q.send(entry);
     }
 };
-
 
 /**
  * @struct CommandFlags

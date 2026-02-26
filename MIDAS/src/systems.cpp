@@ -30,7 +30,7 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
 
         if (meta_delay_ctr >= 100) {
             MetaLogging::MetaLogEntry entry;
-            if(arg->meta_log.get_queued(&entry)) {
+            if(arg->meta_logging.get_queued(&entry)) {
                 uint8_t buf[72];
                 size_t total_size = sizeof(MetaDataCode) + entry.size;
                 memcpy(buf, &entry.log_type, sizeof(MetaDataCode));

@@ -34,6 +34,10 @@ public:
 
     FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
 
+    // Constructor for the metadata
+    // Created so that FSMState, StateEstimate, and CommandFlags objects can supercede the mutex lock
+    FSMState tick_fsm(RocketData& sys);
+
 private:
     double launch_time;
     double burnout_time;

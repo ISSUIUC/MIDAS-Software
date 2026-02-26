@@ -24,7 +24,7 @@ ErrorCode SDSink::init() {
     char file_name[16] = "data";
     char meta_name[24];
     char dfext[] = ".launch";
-    sdFileNamer(file_name, ext, SD_MMC);
+    sdFileNamer(file_name, dfext, SD_MMC);
 
     strcpy(meta_name, file_name);
     char* extpos = strrchr(meta_name, '.');
