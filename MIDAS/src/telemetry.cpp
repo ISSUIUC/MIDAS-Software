@@ -109,15 +109,14 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     //-------------------------------------------------------------------
 
-    // Tilt & FSM State --> comp_tilt vs mq_tilt
+    // Tilt & FSM State
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint16_t tilt_norm = (angular_kalman.comp_tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
+    uint16_t tilt_norm = (angular_kalman.mq_tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
     packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 
     //-------------------------------------------------------------------
 
-    //Serial.println(packet.tilt_fsm, 2);
     // Battery voltage
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.v_Bat, MAX_TELEM_VOLTAGE_V);
     
