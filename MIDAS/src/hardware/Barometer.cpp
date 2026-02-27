@@ -28,7 +28,7 @@ Barometer BarometerSensor::read() {
     */
     uint32_t pressure = MS.getPressure(); // Pascals
     float temperature = MS.getTemperature(); // Celcius
-    float altitude = MS.getAltitude();
+    float altitude = MS.getAltitudeExtendedModel();
     
     return Barometer(temperature, pressure, altitude);
 }
