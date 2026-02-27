@@ -22,6 +22,6 @@ Magnetometer MagnetometerSensor::read() {
     float mx = LIS3MDL.x_gauss;
     float my = LIS3MDL.y_gauss;
     float mz = LIS3MDL.z_gauss;
-    Magnetometer reading{mx, my, mz};
+    Magnetometer reading{-mx, my, -mz};
     return reading;
 }
