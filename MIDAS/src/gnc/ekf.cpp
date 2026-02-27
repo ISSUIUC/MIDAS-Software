@@ -43,7 +43,7 @@ void EKF::initialize(RocketSystems *args)
     for (int i = 0; i < 30; i++)
     {
         Barometer barometer = args->rocket_data.barometer.getRecent();
-        LowGData initial_accelerometer = args->rocket_data.low_g.getRecent();
+        HighGData initial_accelerometer = args->rocket_data.high_g.getRecent();
         Acceleration accelerations = {
             .ax = initial_accelerometer.ax,
             .ay = initial_accelerometer.ay,

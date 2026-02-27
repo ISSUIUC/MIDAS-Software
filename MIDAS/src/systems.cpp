@@ -64,10 +64,10 @@ DECLARE_THREAD(barometer, RocketSystems* arg) {
 
 DECLARE_THREAD(accelerometers, RocketSystems* arg) {
     while (true) {
-        LowGData lowg = arg->sensors.low_g.read();
-        arg->rocket_data.low_g.update(lowg);
-        LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
-        arg->rocket_data.low_g_lsm.update(lowglsm);
+        // LowGData lowg = arg->sensors.low_g.read();
+        // arg->rocket_data.low_g.update(lowg);
+        // LowGLSM lowglsm = arg->sensors.low_g_lsm.read();
+        // arg->rocket_data.low_g_lsm.update(lowglsm);
         HighGData highg = arg->sensors.high_g.read();
         arg->rocket_data.high_g.update(highg);
 
@@ -375,13 +375,13 @@ DECLARE_THREAD(telemetry, RocketSystems* arg) {
  */
 ErrorCode init_systems(RocketSystems& systems) {
     gpioDigitalWrite(LED_ORANGE, HIGH);
-    INIT_SYSTEM(systems.sensors.low_g);
+    // INIT_SYSTEM(systems.sensors.low_g);
     INIT_SYSTEM(systems.sensors.orientation);
     INIT_SYSTEM(systems.log_sink);
     INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
+    // INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
-    INIT_SYSTEM(systems.sensors.magnetometer);
+    // INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.pyro);
@@ -424,7 +424,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(gps, SENSOR_CORE, config, 8);
     START_THREAD(voltage, SENSOR_CORE, config, 9);
     START_THREAD(pyro, SENSOR_CORE, config, 14);
-    START_THREAD(magnetometer, SENSOR_CORE, config, 11);
+    // START_THREAD(magnetometer, SENSOR_CORE, config, 11);
     START_THREAD(cam, SENSOR_CORE, config, 16);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
