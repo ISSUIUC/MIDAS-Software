@@ -24,7 +24,7 @@ ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(PyroState, ID_PYRO)
 ASSOCIATE(CameraData, ID_CAMERADATA)
 ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN)
-ASSOCIATE(IMU_SFLP, ID_SFLPHW)
+ASSOCIATE(IMU_SFLP, ID_SFLP)
 
 
 /**
@@ -83,15 +83,11 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.voltage);
     log_from_sensor_data(sink, data.gps);
     log_from_sensor_data(sink, data.magnetometer);
-    //log_from_sensor_data(sink, data.orientation);
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
     log_from_sensor_data(sink, data.angular_kalman_data);
     log_from_sensor_data(sink, data.pyro);
-
-    //log_from_sensor_data(sink, data.quaternions);
     log_from_sensor_data(sink, data.cam_data);
-
 }
 
 #ifndef SILSIM
