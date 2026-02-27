@@ -122,7 +122,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.batt_volt = inv_convert_range<uint8_t>(voltage.v_Bat, MAX_TELEM_VOLTAGE_V);
     
     // Roll rate
-    float roll_rate_hz = std::clamp(std::abs(imu.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, MAX_ROLL_RATE_HZ);
+    float roll_rate_hz = std::clamp(std::abs(imu.angular_velocity.vx) / 360.0f, 0.0f, MAX_ROLL_RATE_HZ); // divide by 360 to convert from dps to Hz
     packet.roll_rate = roll_rate_hz / MAX_ROLL_RATE_HZ * 0xFF;
 
     // KF data
