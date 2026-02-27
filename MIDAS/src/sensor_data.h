@@ -153,7 +153,7 @@ enum class OrientationReadingType {
 *
 */
 
-// Raw IMU data from the LS6DSV320X this is hw filtered
+// LSM6DSV320X sensor fusion data 
 struct IMU_SFLP {
     Quaternion quaternion;
     Acceleration gravity;

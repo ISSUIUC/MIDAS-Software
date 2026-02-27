@@ -61,12 +61,7 @@ DECLARE_THREAD(barometer, RocketSystems *arg)
             arg->rocket_data.barometer.update(reading);
             prev_reading = reading; // Only update prev_reading with accepted readings
         }
-        // Serial.print("Barometer ");
-        // Serial.print(reading.altitude);
-        // Serial.print(" ");
-        // Serial.print(reading.pressure);
-        // Serial.print(" ");
-        // Serial.println(reading.temperature);
+
         THREAD_SLEEP(6);
     }
 }
@@ -263,7 +258,7 @@ DECLARE_THREAD(buzzer, RocketSystems *arg)
 DECLARE_THREAD(angularkalman, RocketSystems *arg)
 { //
     mqekf.initialize(arg);
-    // Serial.println("Initialized ekf :(");
+    // Serial.println("Initialized mqekf :(");
     TickType_t last = xTaskGetTickCount();
 
     while (true)
@@ -301,7 +296,7 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         arg->rocket_data.angular_kalman_data.update(current_state);
 
         last = xTaskGetTickCount();
-        // Serial.println("Angular Kalman");
+
         THREAD_SLEEP(50);
     }
 }
@@ -347,12 +342,8 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         arg->rocket_data.kalman.update(current_state);
 
-        // Serial.print("MQ tilt: ");
-        // Serial.println(current_angular_kalman.mq_tilt);
-        // Serial.println();
-
         last = xTaskGetTickCount();
-        // Serial.println("Kalman");
+
         THREAD_SLEEP(50);
     }
 }

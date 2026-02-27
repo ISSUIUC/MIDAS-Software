@@ -36,7 +36,6 @@ IMU IMUSensor::read(){
 
     //Angular rate
     if(status.gda){
-        //Serial.println("oh we are angular");
         LSM6DSV.get_angular_velocity_from_fs2000_to_dps(&reading.angular_velocity.vx, 
                                                     &reading.angular_velocity.vy, 
                                                     &reading.angular_velocity.vz);
