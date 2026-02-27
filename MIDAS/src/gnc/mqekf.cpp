@@ -104,10 +104,6 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
         state.gyrobias[0] = bias_gyro(0, 0);
         state.gyrobias[1] = bias_gyro(1, 0);
         state.gyrobias[2] = bias_gyro(2, 0);
-        Serial.print("BIAS 0: ");
-        Serial.print(state.gyrobias[0]);
-        Serial.print("    BIAS 1: ");
-        Serial.println(state.gyrobias[1]);
     }
 }
 
@@ -389,7 +385,6 @@ void QuaternionMEKF::calculate_tilt()
     state.mq_tilt = tilt;
 
     // Serial.print("TILT: ");
-    Serial.println(tilt * 180.0f / pi);
 }
 
 QuaternionMEKF mqekf;
