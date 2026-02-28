@@ -6,7 +6,7 @@
 #define MAX_TELEM_VOLTAGE_V 6.0f
 #define MAX_TELEM_CONT_I 0.2f
 #define MAX_KF_VPOSITION_M 100000.0f   // Max vertical position of KF data (m)
-#define MAX_KF_LPOSITION_M 100000.0f   // Max lateral position of KF data (m)
+#define MAX_KF_LPOSITION_M 50000.0f   // Max lateral position of KF data (m)
 #define MAX_ROLL_RATE_HZ 10.0f
 #define MAX_ABS_ACCEL_RANGE_G 64
 #define MAX_KF_XVELOCITY_MS 2000.0f
@@ -43,7 +43,7 @@ struct TelemetryPacket {
     uint16_t kf_py; // 16 bit meters
     uint16_t kf_pz; // 16 bit meters
 
-    uint32_t pyro; // 7 bit continuity x 4 channels, 4 bit unused
+    uint32_t pyro; // 8 bit continuity x 4 channels
     
     uint8_t roll_rate;
     uint8_t camera_state;

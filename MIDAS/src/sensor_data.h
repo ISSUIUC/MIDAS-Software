@@ -142,18 +142,9 @@ enum class OrientationReadingType {
 /**
  * @struct SFLP
  * 
- * @brief Data from the Sensor Fusion Low Power module
+ * @brief Data from the LSM6DSV320X Sensor Fusion Low Power module
  * 
  */
-
-/**
-*
-* @brief Implementing obtaining SFLP data from FIFO
-*
-*
-*/
-
-// Raw IMU data from the LS6DSV320X this is hw filtered
 struct IMU_SFLP {
     Quaternion quaternion;
     Acceleration gravity;
@@ -273,11 +264,9 @@ struct KalmanData {
 struct AngularKalmanData {
     Quaternion quaternion;
     float gyrobias[3];
-    double sflp_tilt = 0.0; 
-    // double comp_tilt = 0.0;
+    double sflp_tilt = 0.0;
     double mq_tilt = 0.0;
     bool has_data = false;
-    OrientationReadingType reading_type = OrientationReadingType::FULL_READING;
     
     float yaw = 0;
     float pitch = 0;
