@@ -211,7 +211,7 @@ Orientation OrientationSensor::read()
         sensor_reading.roll = filtered_euler.z;
         */
 
-        sensor_reading.yaw = -euler.y;
+        sensor_reading.yaw = -euler.y; //this is wrong, but not changing for Feb launch because it's unnecessary.
         sensor_reading.pitch = euler.x;
         sensor_reading.roll = euler.z;
 
