@@ -57,8 +57,8 @@ void EKF::initialize(RocketSystems *args)
     P_k.block<2, 2>(4, 4) = Eigen::Matrix2f::Identity() * 1e-2f; // z block (pos,vel)
 
     // set Measurement Noise Matrix
-    R(0, 0) = 1.9;  // barometer noise
-    R(1, 1) = 4.0f;  // GPS altitude noise (lower trust)
+    R(0, 0) = 0.1;  // barometer noise
+    R(1, 1) = 1.5f;  // GPS altitude noise (lower trust)
     R(2, 2) = 3.0f; // GPS east noise 
     R(3, 3) = 3.0f; // GPS north noise 
 }
@@ -77,11 +77,11 @@ void EKF::priori(float dt, AngularKalmanData &orientation, FSMState fsm, Acceler
     setB(dt);
     // Compute control input at current time step
     Eigen::Matrix<float, 3, 1> sensor_accel_global_g = Eigen::Matrix<float, 3, 1>::Zero();
-    sensor_accel_global_g(0, 0) = acceleration.ax + 0.045f;
-    sensor_accel_global_g(1, 0) = acceleration.ay - 0.065f;
-    sensor_accel_global_g(2, 0) = acceleration.az - 0.06f;
-    euler_t angles_rad = orientation.getEuler();
-    BodyToGlobal(angles_rad, sensor_accel_global_g);
+    sensor_accel_global_g(0, 0) = acceleration.ax ;
+    sensor_accel_global_g(1, 0) = acceleration.ay ;
+    sensor_accel_global_g(2, 0) = acceleration.az ;
+    // euler_t angles_rad = orientation.getEuler();
+    // BodyToGlobal(angles_rad, sensor_accel_global_g);
     // Do not apply acceleration if on pad
     float g_ms2 = (fsm > FSMState::STATE_IDLE) ? gravity_ms2 : 0.0f;
     u_control(0, 0) = sensor_accel_global_g(0, 0) * g_ms2;
@@ -192,20 +192,12 @@ void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanDa
             landed_state_duration = s_dt;  // Reset timer
         }
         
-        // Only reset velocities if we've been landed for at least 0.5 seconds
-        if (landed_state_duration >= 0.5f)
-        {
-            x_k(3, 0) = 0.0f;  // velocity y (vy) = 0 when landed
-            x_k(5, 0) = 0.0f;  // velocity z (vz) = 0 when landed
-        }
-    }
-    else
-    {
-        // Negate velocity z if it's negative (so negative becomes positive)
-        if (x_k(5, 0) < 0)  // velocity z (vz)
-        {
-            x_k(5, 0) = -x_k(5, 0);  // Negate negative velocity z to make it positive
-        }
+        // // Only reset velocities if we've been landed for at least 0.5 seconds
+        // if (landed_state_duration >= 0.5f)
+        // {
+        //     x_k(3, 0) = 0.0f;  // velocity y (vy) = 0 when landed
+        //     x_k(5, 0) = 0.0f;  // velocity z (vz) = 0 when landed
+        // }
     }
 
     // Update output state structure

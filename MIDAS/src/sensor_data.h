@@ -122,7 +122,7 @@ struct Magnetometer {
     double mz;
 };
 
-struct Quaternion {
+struct Quaternion { //long term, remove or rename this struct, it will conflict with libraries where Quaternion is well defined. 
     float w, x, y, z;
 
     static float dot(const Quaternion& q1, const Quaternion& q2) {
@@ -264,6 +264,7 @@ struct KalmanData {
 struct AngularKalmanData {
     Quaternion quaternion;
     float gyrobias[3];
+    double sflp_tilt = 0.0;
     double mq_tilt = 0.0;
     bool has_data = false;
     
