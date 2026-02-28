@@ -30,6 +30,11 @@ void EKF::initialize(RocketSystems *args)
     for (int i = 0; i < 30; i++)
     {
         Barometer barometer = args->rocket_data.barometer.getRecent();
+        HighGData initial_accelerometer = args->rocket_data.high_g.getRecent();
+        Acceleration accelerations = {
+            .ax = initial_accelerometer.ax,
+            .ay = initial_accelerometer.ay,
+            .az = initial_accelerometer.az};
         sum += barometer.altitude;
     }
 
