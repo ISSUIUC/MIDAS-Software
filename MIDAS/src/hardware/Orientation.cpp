@@ -211,29 +211,29 @@ Orientation OrientationSensor::read()
         sensor_reading.roll = filtered_euler.z;
         */
 
-        sensor_reading.yaw = -euler.y;
+        sensor_reading.yaw = -euler.y; //this is wrong, but not changing for Feb launch because it's unnecessary.
         sensor_reading.pitch = euler.x;
         sensor_reading.roll = euler.z;
 
-        sensor_reading.linear_acceleration.ax = -event.un.accelerometer.y;
-        sensor_reading.linear_acceleration.ay = event.un.accelerometer.x;
-        sensor_reading.linear_acceleration.az = event.un.accelerometer.z;
-
+        sensor_reading.linear_acceleration.ax = -event.un.accelerometer.x;
+        sensor_reading.linear_acceleration.ay = event.un.accelerometer.y;
+        sensor_reading.linear_acceleration.az = -event.un.accelerometer.z;
+ 
         Velocity velocity;
-        velocity.vx = sensor_reading.linear_acceleration.ax * deltaTime + velocity.vx;
+        velocity.vx = sensor_reading.linear_acceleration.ax * deltaTime + velocity.vx; //this is bad. velocity.vx is 0 anyways. not sure what intent was here.  
         velocity.vy = sensor_reading.linear_acceleration.ay * deltaTime + velocity.vy;
         velocity.vz = sensor_reading.linear_acceleration.az * deltaTime + velocity.vz;
 
 
         sensor_reading.orientation_velocity = velocity;
         
-        sensor_reading.gx = -event.un.gyroscope.y;
-        sensor_reading.gy = event.un.gyroscope.x;
-        sensor_reading.gz = event.un.gyroscope.z;
+        sensor_reading.gx = -event.un.gyroscope.x;
+        sensor_reading.gy = event.un.gyroscope.y;
+        sensor_reading.gz = -event.un.gyroscope.z;
 
-        sensor_reading.magnetometer.mx = -event.un.magneticField.y;
-        sensor_reading.magnetometer.my = event.un.magneticField.x;
-        sensor_reading.magnetometer.mz = event.un.magneticField.z;
+        sensor_reading.magnetometer.mx = -event.un.magneticField.x;
+        sensor_reading.magnetometer.my = event.un.magneticField.y;
+        sensor_reading.magnetometer.mz = -event.un.magneticField.z;
 
         sensor_reading.temperature = event.un.temperature.value;
         sensor_reading.pressure = event.un.pressure.value;
