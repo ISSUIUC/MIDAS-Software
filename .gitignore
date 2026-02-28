@@ -2,3 +2,4 @@
 .vscode/
 outputs/*
 ground/outputs/*
+MIDAS/src/esp_eeprom_checksum.h
