@@ -32,10 +32,6 @@ bool TCAL9538Init(int reset_pin){
         TwoWire& wire = tcal_get_wire_by_id(i);
         uint8_t addr = addrs[i];
 
-        // remove this when done
-        Serial.print("Testing ");
-        Serial.println(addr);
-
         wire.beginTransmission(addr);
         wire.write(REG_OUTPUT);
         if(wire.endTransmission() != 0){
