@@ -75,7 +75,7 @@ QuaternionMEKF::QuaternionMEKF()
     state = AngularKalmanData();
 }
 
-void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angular_velocity, Acceleration &acceleration, FSMState FSM_state)
+void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angular_velocity, Acceleration &acceleration, FSMState FSM_state, Velocity &gyro_bias_sflp)
 {
     if (FSM_state >= FSMState::STATE_IDLE) //
     {
@@ -83,9 +83,12 @@ void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angula
         // setQ(dt, sd);
         // priori(dt, orientation, FSM_state, acceleration);
         // update(barometer, acceleration, orientation, FSM_state, gps);
-
+        x(3) = gyro_bias_sflp.vx * pi/180;
+        x(4) = gyro_bias_sflp.vy* pi/180;
+        x(5) = gyro_bias_sflp.vz* pi/180;
         time_update(angular_velocity, dt);
         measurement_update(acceleration, magnetometer);
+        
         calculate_tilt();
         Eigen::Matrix<float, 4, 1> curr_quat = quaternion(); // w,x,y,z
 
@@ -355,11 +358,6 @@ AngularKalmanData QuaternionMEKF::getState()
 void QuaternionMEKF::calculate_tilt()
 {
 
-    const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
-
-    // The guess & check method!
-    // Quat --> euler --> rotation matrix --> reference&cur vector --> dot product for angle!
-
     Eigen::Quaternion<float>
         ref = Eigen::Quaternionf(0, 0, 0, 1);
 
@@ -379,12 +377,33 @@ void QuaternionMEKF::calculate_tilt()
     }
 
     // const float gain = 0.2;
-    // // Arthur's Comp Filter
+    // Arthur's Comp Filter
     // float filtered_tilt = gain * tilt + (1 - gain) * prev_tilt;
     // prev_tilt = filtered_tilt;
     state.mq_tilt = tilt;
+}
 
-    // Serial.print("TILT: ");
+
+void QuaternionMEKF::calculate_tilt(IMU_SFLP imu_sflp)
+{
+
+    Eigen::Vector3f ref(1,0,0);
+
+    Eigen::Quaternion<float> sflp_quat = Eigen::Quaternionf(imu_sflp.quaternion.w,imu_sflp.quaternion.x,imu_sflp.quaternion.y,imu_sflp.quaternion.z);
+    sflp_quat.normalize();
+    
+    Eigen::Vector3f rotated_vector = sflp_quat * ref;
+
+    Eigen::Vector3f world_vertical(0, 0, 1);
+    float dot = rotated_vector.dot(world_vertical);
+    float cur_mag = rotated_vector.norm();
+    float tilt = 0;
+    if (cur_mag != 0)
+    {
+        tilt = acos(dot / (cur_mag));
+    }
+
+    state.sflp_tilt = tilt;
 }
 
 QuaternionMEKF mqekf;

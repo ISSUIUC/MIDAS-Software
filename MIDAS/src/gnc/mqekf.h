@@ -23,7 +23,7 @@ public:
         Eigen::Ref<Eigen::Matrix<float, 3, 1> const> const &vhat,
         Eigen::Ref<Eigen::Matrix<float, 3, 3> const> const &Rm);
         
-    void tick(float dt, Magnetometer &magnetometer, Velocity &angular_velocity, Acceleration &acceleration, FSMState FSM_state);
+    void tick(float dt, Magnetometer &magnetometer, Velocity &angular_velocity, Acceleration &acceleration, FSMState FSM_state, Velocity &gyro_bias_sflp);
     Eigen::Matrix<float, 4, 1> quaternion();
     Eigen::Matrix<float, 6, 6> covariance();
     Eigen::Matrix<float, 3, 1> gyroscope_bias();
@@ -32,7 +32,8 @@ public:
     AngularKalmanData getState();
     Eigen::Matrix<float, 3, 1> quatToEuler(const Eigen::Matrix<float, 4, 1> &q);
     // void tick(float dt, float sd, );
-    void calculate_tilt();
+    void calculate_tilt(); //using internal quaternion
+    void calculate_tilt(IMU_SFLP imu_sflp); //using SFLP quaternion
     void set_transition_matrix(const Eigen::Ref<const Eigen::Matrix<float, 3, 1>> &gyr, float Ts);
     Eigen::Matrix<float, 3, 3> skew_symmetric_matrix(const Eigen::Ref<const Eigen::Matrix<float, 3, 1>> &vec) const;
     Eigen::Matrix<float, 3, 1> magnetometer_measurement_func() const;

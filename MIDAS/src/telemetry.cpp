@@ -83,7 +83,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
     IMU imu = data.imu.getRecentUnsync();
-    IMU_SFLP hw_filtered_data = data.hw_filtered.getRecentUnsync();
+    IMU_SFLP sflp_data = data.sflp.getRecentUnsync();
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
@@ -111,7 +111,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     // Tilt & FSM State --> comp_tilt vs mq_tilt
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint16_t tilt_norm = (angular_kalman.mq_tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
+    uint16_t tilt_norm = (angular_kalman.sflp_tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
     packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 

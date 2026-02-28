@@ -26,7 +26,7 @@ bool error_is_failure(GpioError error_code) {
  */
 bool can_fire_igniter(AngularKalmanData angular_kalman_data) {
     // With new GNC orientation code we can add a simple check.
-    return angular_kalman_data.comp_tilt < MAXIMUM_TILT_ANGLE; // comp_tilt or mq_tilt?
+    return angular_kalman_data.sflp_tilt < MAXIMUM_TILT_ANGLE; 
 }
 
 

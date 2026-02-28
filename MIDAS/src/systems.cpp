@@ -80,7 +80,7 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
     {
         xSemaphoreTake(spi_mutex, portMAX_DELAY);
         IMU imudata = arg->sensors.imu.read();
-        IMU_SFLP hw_filter = arg->sensors.imu.read_sflp();
+        IMU_SFLP sflp = arg->sensors.imu.read_sflp();
         xSemaphoreGive(spi_mutex);
 
         // Sensor calibration, if it is triggered.
@@ -101,7 +101,7 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
 
         arg->rocket_data.imu.update(imudata);
-        arg->rocket_data.hw_filtered.update(hw_filter);
+        arg->rocket_data.sflp.update(sflp);
         
         THREAD_SLEEP(5);
     }
@@ -276,13 +276,13 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
             TickType_t last = xTaskGetTickCount();
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
-
+        IMU_SFLP current_imu_sflp = arg->rocket_data.sflp.getRecent();
         IMU current_imu = arg->rocket_data.imu.getRecent();
         Acceleration current_high_g = current_imu.highg_acceleration;
         Acceleration current_low_g = current_imu.lowg_acceleration;
         Magnetometer current_mag = arg->rocket_data.magnetometer.getRecent();
         Velocity current_angular_velocity = current_imu.angular_velocity; // degrees
-
+        Velocity current_gyro_bias = current_imu_sflp.gyro_bias;
         AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
         Acceleration current_accelerations = {
@@ -294,8 +294,8 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
 
         // Check with Divij
-        mqekf.tick(dt, current_mag, current_angular_velocity,current_accelerations, FSM_state);
-
+        mqekf.tick(dt, current_mag, current_angular_velocity, current_accelerations, FSM_state, current_gyro_bias);
+        mqekf.calculate_tilt(current_imu_sflp);    
         AngularKalmanData current_state = mqekf.getState();
 
         arg->rocket_data.angular_kalman_data.update(current_state);

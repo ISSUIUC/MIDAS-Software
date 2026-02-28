@@ -78,7 +78,7 @@ void log_begin(LogSink& sink) {
 */
 void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.imu);
-    log_from_sensor_data(sink, data.hw_filtered);
+    log_from_sensor_data(sink, data.sflp);
     log_from_sensor_data(sink, data.barometer);
     log_from_sensor_data(sink, data.voltage);
     log_from_sensor_data(sink, data.gps);
