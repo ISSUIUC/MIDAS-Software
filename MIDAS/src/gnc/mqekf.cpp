@@ -149,7 +149,7 @@ void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer 
     mag(1, 0) = mag_input.my;
     mag(2, 0) = mag_input.mz;
     
-    if (acc(0) < 0 ) // Check if the norm of the accelerometer measurement is in boost
+    if (acc(0,0) < 0 ) // Check if the norm of the accelerometer measurement is in boost
     {
        Eigen::Matrix<float, 3, 3> Rm = sigma_m.array().square().matrix().asDiagonal(); 
        measurement_update_partial(mag, magnetometer_measurement_func(), Rm);
