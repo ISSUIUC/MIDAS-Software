@@ -14,8 +14,8 @@
 
 void QuaternionMEKF::initialize(RocketSystems *args)
 {
-    float Pq0 = 1e-4;
-    float Pb0 = 1e-1;
+    float Pq0 = 1e-4; // test it 
+    float Pb0 = 1e-1; // test it 
     sigma_a = {accel_noise_density_x * sqrt(20.0f) * 1.0e-6 * 9.81, accel_noise_density_y * sqrt(20.0f) * 1.0e-6 * 9.81, accel_noise_density_z * sqrt(20.0f) * 1.0e-6 * 9.81}; // ug/sqrt(Hz) *sqrt(hz). values are from datasheet
     sigma_g = {gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f), gyro_RMS_noise * pow(1.0f, -3.0f) * pi / 180.0f * pow(20.0f, 0.5f)};
     sigma_m = {mag_noise * 1.0e-4 / sqrt(3), mag_noise * 1.0e-4 / sqrt(3), mag_noise * 1.0e-4 / sqrt(3)}; // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3                                                                                           // 0.4 mG -> T, it is 0.4 total so we divide by sqrt3
@@ -148,6 +148,13 @@ void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer 
     mag(0, 0) = mag_input.mx;
     mag(1, 0) = mag_input.my;
     mag(2, 0) = mag_input.mz;
+    
+    if (acc(0) < 0 ) // Check if the norm of the accelerometer measurement is in boost
+    {
+       Eigen::Matrix<float, 3, 3> Rm = sigma_m.array().square().matrix().asDiagonal(); 
+       measurement_update_partial(mag, magnetometer_measurement_func(), Rm);
+       return; 
+    }
 
     Eigen::Matrix<float, 3, 1> const v1hat = accelerometer_measurement_func();
     Eigen::Matrix<float, 3, 1> const v2hat = magnetometer_measurement_func();
@@ -178,7 +185,7 @@ void QuaternionMEKF::measurement_update(Acceleration const &accel, Magnetometer 
     // x * A = b
     // Which can be solved with the code below
     Eigen::FullPivLU<Eigen::Matrix<float, 6, 6>> lu(s); //  LU decomposition of s
-    if (lu.isInvertible())
+    if (lu.determinant() != 0)
     {
         Eigen::Matrix<float, 6, 6> const K = P * C.transpose() * lu.inverse(); // gain
 
@@ -219,7 +226,7 @@ void QuaternionMEKF::measurement_update_partial(
 
     // K = P * C.T * s^-1
     Eigen::FullPivLU<Eigen::Matrix<float, 3, 3>> lu(s);
-    if (lu.isInvertible())
+    if (lu.determinant() != 0)
     {
         Eigen::Matrix<float, 6, 3> const K = P * C.transpose() * lu.inverse();
 
