@@ -28,8 +28,9 @@ DECLARE_THREAD(logger, RocketSystems* arg) {
         arg->rocket_data.log_latency.tick();
         meta_delay_ctr++;
 
+        MetaLogging::MetaLogEntry entry;
+
         if (meta_delay_ctr >= 100) {
-            MetaLogging::MetaLogEntry entry;
             if(arg->meta_logging.get_queued(&entry)) {
                 uint8_t buf[72];
                 size_t total_size = sizeof(MetaDataCode) + entry.size;
@@ -201,7 +202,7 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         CommandFlags& telemetry_commands = arg->rocket_data.command_flags;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
+        FSMState next_state = fsm.tick_fsm(arg->rocket_data);
 
         arg->rocket_data.fsm_state.update(next_state);
         if(current_state != next_state) {fsm_transitioned_to(next_state, current_state, arg, current_time);}

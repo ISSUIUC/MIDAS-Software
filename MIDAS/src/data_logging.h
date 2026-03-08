@@ -41,6 +41,8 @@ public:
     };
 
     void write(const uint8_t* data, size_t size) override {};
+
+    void write_meta(const uint8_t* data, size_t size) override {};
 };
 
 template<typename Sink, typename... Sinks>
@@ -57,6 +59,11 @@ public:
         return sinks.init();
     };
     void write(const uint8_t* data, size_t size) override {
+        sink.write(data, size);
+        sinks.write(data, size);
+    };
+
+    void write_meta(const uint8_t* data, size_t size) override {
         sink.write(data, size);
         sinks.write(data, size);
     };

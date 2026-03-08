@@ -60,6 +60,8 @@ void SDSink::write(const uint8_t* data, size_t size) {
             unflushed_bytes = 0;
         }
     }
+
+    return;
 }
 
 void SDSink::write_meta(const uint8_t* data, size_t size) {
@@ -68,4 +70,6 @@ void SDSink::write_meta(const uint8_t* data, size_t size) {
     file.write(data, size);
     file.write('\n');
     file.flush(); // Meta writes are infrequent, so flushing is OK.
+
+    return;
 }

@@ -32,7 +32,7 @@ class FSM {
 public:
     FSM() = default;
 
-    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
+    //  FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
 
     // Constructor for the metadata
     // Created so that FSMState, StateEstimate, and CommandFlags objects can supercede the mutex lock

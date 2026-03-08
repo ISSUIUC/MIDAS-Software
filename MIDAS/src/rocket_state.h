@@ -6,10 +6,6 @@
 #include "hal.h"
 #include "Buffer.h"
 
-// temprary macro
-// originally declared in data_loggng_meta.h
-#define META_LOGGING_MAX_SIZE 64
-
 /** 
  * @brief The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.
  *
@@ -176,36 +172,35 @@ enum MetaDataCode {
 };
 
 struct MetaLogging {
-    private:
-    struct MetaLogEntry {
-        MetaDataCode log_type;
-        char data[64];
-        size_t size;
-    };
-
-    Queue<MetaLogEntry> _q;
-
     public:
-    bool get_queued(MetaLogEntry* out) { return _q.receive(out); }
+        struct MetaLogEntry {
+            MetaDataCode log_type;
+            size_t size;
+            char data[META_LOGGING_MAX_SIZE];
+        };
 
-    void log_event(MetaDataCode event_type, uint32_t timestamp) {
-        MetaLogEntry entry{event_type, 0, 0};
-        entry.size = sizeof(uint32_t);
-        memcpy(entry.data, &timestamp, entry.size);
-        _q.send(entry);
-    }
+        Queue<MetaLogEntry> _q;
 
-    template <typename T>
-    void log_data(MetaDataCode data_type, const T& data) {
+        bool get_queued(MetaLogEntry* out) { return _q.receive(out); }
 
-        // double check...
-        static_assert(sizeof(T) <= META_LOGGING_MAX_SIZE, "Datatype for log_data too large");
+        void log_event(MetaDataCode event_type, uint32_t timestamp) {
+            MetaLogEntry entry{event_type, 0, 0};
+            entry.size = sizeof(uint32_t);
+            memcpy(entry.data, &timestamp, entry.size);
+            _q.send(entry);
+        }
 
-        MetaLogEntry entry{data_type, 0, 0};
-        entry.size = sizeof(T);
-        memcpy(entry.data, &data, entry.size);
-        _q.send(entry);
-    }
+        template <typename T>
+        void log_data(MetaDataCode data_type, const T& data) {
+
+            // double check...
+            static_assert(sizeof(T) <= META_LOGGING_MAX_SIZE, "Datatype for log_data too large");
+
+            MetaLogEntry entry{data_type, 0, 0};
+            entry.size = sizeof(T);
+            memcpy(entry.data, &data, entry.size);
+            _q.send(entry);
+        }
 };
 
 /**
