@@ -15,8 +15,8 @@ import sys
 import queue
 
 
-def get_ports():
-    return [port.device for port in comports()]
+def get_non_bluetooth_ports():
+    return [port.device for port in comports() if "bluetooth" not in port.description.lower()]
 
 def is_port_taken(port):
     """
@@ -236,7 +236,7 @@ class DeviceApp(tk.Tk):
 
     def update_devices(self):
         global devices
-        ports = get_ports()
+        ports = get_non_bluetooth_ports()
         existing_ports = [d.get_port() for d in devices]
 
         # Remove old ports that aren't connected
@@ -251,7 +251,6 @@ class DeviceApp(tk.Tk):
                         _window.destroy()
 
         devices = [d for d in devices if d.get_port() in ports]
-
         for p in ports:
             # Check if this port is already in devices:
             if p not in existing_ports:
