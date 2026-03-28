@@ -16,9 +16,9 @@ import queue
 
 
 def get_non_bluetooth_ports():
-    # print([port.hwid for port in comports()])
+    # print([port.pid for port in comports()])
 
-    return [port.device for port in comports() if "VID:PID=303A:1001" in port.hwid]
+    return [port.device for port in comports() if port.pid == 4097]
 
 def is_port_taken(port):
     """
