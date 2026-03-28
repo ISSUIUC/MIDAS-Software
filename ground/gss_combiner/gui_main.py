@@ -15,8 +15,15 @@ import sys
 import queue
 
 
-def get_ports():
-    return [port.device for port in comports()]
+def get_feather_duo_ports():
+    """
+    Gets the ports of connected Feather Duos
+
+    Returns:
+        list: list of connected Feather Duos
+    """
+    FEATHER_DUO_PID = 4097
+    return [port.device for port in comports() if port.pid == FEATHER_DUO_PID]
 
 def is_port_taken(port):
     """
@@ -236,7 +243,7 @@ class DeviceApp(tk.Tk):
 
     def update_devices(self):
         global devices
-        ports = get_ports()
+        ports = get_feather_duo_ports()
         existing_ports = [d.get_port() for d in devices]
 
         # Remove old ports that aren't connected
@@ -251,7 +258,6 @@ class DeviceApp(tk.Tk):
                         _window.destroy()
 
         devices = [d for d in devices if d.get_port() in ports]
-
         for p in ports:
             # Check if this port is already in devices:
             if p not in existing_ports:
