@@ -16,8 +16,12 @@ import queue
 
 
 def get_feather_duo_ports():
-    # print([port.pid for port in comports()])
+    """
+    Gets the ports of connected Feather Duos
 
+    Returns:
+    list: list of connected Feather Duos
+    """
     return [port.device for port in comports() if port.pid == 4097]
 
 def is_port_taken(port):
