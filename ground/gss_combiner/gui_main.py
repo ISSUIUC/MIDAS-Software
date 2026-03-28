@@ -20,7 +20,7 @@ def get_feather_duo_ports():
     Gets the ports of connected Feather Duos
 
     Returns:
-    list: list of connected Feather Duos
+        list: list of connected Feather Duos
     """
     return [port.device for port in comports() if port.pid == 4097]
 
