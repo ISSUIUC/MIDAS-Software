@@ -16,8 +16,8 @@ import queue
 
 
 def get_non_bluetooth_ports():
-    # print([port.description for port in comports()])
-    return [port.device for port in comports() if "bluetooth" not in port.description.lower()]
+    # print([port.device for port in comports()])
+    return [port.device for port in comports() if "/dev/cu.usbmodem1101" in port.device.lower()]
 
 def is_port_taken(port):
     """
