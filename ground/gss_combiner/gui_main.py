@@ -15,7 +15,7 @@ import sys
 import queue
 
 
-def get_non_bluetooth_ports():
+def get_feather_duo_ports():
     # print([port.pid for port in comports()])
 
     return [port.device for port in comports() if port.pid == 4097]
@@ -238,7 +238,7 @@ class DeviceApp(tk.Tk):
 
     def update_devices(self):
         global devices
-        ports = get_non_bluetooth_ports()
+        ports = get_feather_duo_ports()
         existing_ports = [d.get_port() for d in devices]
 
         # Remove old ports that aren't connected
