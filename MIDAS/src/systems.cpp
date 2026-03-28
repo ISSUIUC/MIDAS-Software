@@ -13,6 +13,8 @@
 
 #define ENABLE_TELEM
 
+#define METALOG_TEST
+
 /**
  * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
@@ -205,7 +207,44 @@ DECLARE_THREAD(fsm, RocketSystems* arg) {
         FSMState next_state = fsm.tick_fsm(arg->rocket_data);
 
         arg->rocket_data.fsm_state.update(next_state);
-        if(current_state != next_state) {fsm_transitioned_to(next_state, current_state, arg, current_time);}
+
+        #ifdef METALOG_TEST
+        /*
+        -- MetaLogging States --
+        EVENT_TLAUNCH,
+        EVENT_TBURNOUT,
+        EVENT_TIGNITION,
+        EVENT_TAPOGEE,
+        EVENT_TMAIN,
+
+        // Non-events
+        DATA_LAUNCHSITE_BARO,
+        DATA_LAUNCHSITE_GPS,
+        DATA_LAUNCH_INITIAL_TILT,
+        DATA_TILT_AT_BURNOUT,
+        DATA_TILT_AT_IGNITION
+        */
+        
+        // Manually transition the times
+        if(current_state == FSMState::STATE_FIRST_BOOST){
+            next_state = FSMState::STATE_BURNOUT;
+        } else if (current_state == FSMState::STATE_BURNOUT) {
+            next_state = FSMState::STATE_SECOND_BOOST;
+        } else if (current_state == FSMState::STATE_SECOND_BOOST){
+            next_state = FSMState::STATE_DROGUE_DEPLOY;
+        } else if (current_state == FSMState::STATE_DROGUE_DEPLOY) {
+            next_state = FSMState::STATE_MAIN_DEPLOY;
+        } else if (current_state == FSMState::STATE_MAIN_DEPLOY) {
+            next_state = FSMState::STATE_FIRST_BOOST;
+        }
+        
+        // Sleep the thread to see the difference in time within the metalogs
+        THREAD_SLEEP(2000);
+        #endif
+
+        if(current_state != next_state) {
+            fsm_transitioned_to(next_state, current_state, arg, current_time);       
+        }
 
         if (current_state == FSMState::STATE_SAFE) {
             if((current_time - last_time_led_flash) > 250) {

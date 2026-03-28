@@ -111,8 +111,11 @@ void setup()
 
     // init and start threads
     begin_systems(&systems);
+
+    loop();
 }
 
 void loop()
 {
+    printf("\nHI!");
 }

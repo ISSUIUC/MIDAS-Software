@@ -200,6 +200,8 @@ struct MetaLogging {
             entry.size = sizeof(T);
             memcpy(entry.data, &data, entry.size);
             _q.send(entry);
+
+            fprintf(stderr, "Data has been logged: %c", entry.data);
         }
 };
 
