@@ -13,6 +13,7 @@
 #include "b2b_interface.h"
 #include "esp_eeprom.h"
 #include "hardware/SDLog.h"
+#include "midas_shell.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
@@ -59,6 +60,9 @@ struct RocketSystems {
     Telemetry tlm;
     B2BInterface b2b;
     EEPROMController eeprom;
+    MShell* shell;
 };
 
-[[noreturn]] void begin_systems(RocketSystems* config);
+[[noreturn]] void begin_systems(RocketSystems *config);
+
+void NewFunction();

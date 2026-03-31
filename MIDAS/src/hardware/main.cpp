@@ -27,7 +27,7 @@ RocketSystems systems{.log_sink = sink};
 void setup()
 {
     // begin serial port
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     delay(200);
 
