@@ -3,10 +3,15 @@
 #include "hal.h"
 #include "gnc/ekf.h"
 #include "gnc/mqekf.h"
+<<<<<<< HEAD
 #include "log_format_AUTOGEN.h"
+=======
+#include "midas_shell_commands.h"
+>>>>>>> 2a0b2ec (midas shell v1.0)
 
 static StaticSemaphore_t spi_mutex_buffer;
 SemaphoreHandle_t spi_mutex;
+
 
 #if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
 #error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
@@ -287,47 +292,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         FSMState next_state = fsm.tick_fsm(arg->rocket_data);
 
         arg->rocket_data.fsm_state.update(next_state);
-
-        //#ifdef METALOG_TEST
-        /*
-        -- MetaLogging States --
-        EVENT_TLAUNCH,
-        EVENT_TBURNOUT,
-        EVENT_TIGNITION,
-        EVENT_TAPOGEE,
-        EVENT_TMAIN,
-
-        // Non-events
-        DATA_LAUNCHSITE_BARO,
-        DATA_LAUNCHSITE_GPS,
-        DATA_LAUNCH_INITIAL_TILT,
-        DATA_TILT_AT_BURNOUT,
-        DATA_TILT_AT_IGNITION
-        */
         
-        // Manually transition the times
-        // Serial.print("HI\n\n");
-        // if (current_state == FSMState::STATE_BURNOUT) {
-        //     next_state = FSMState::STATE_SECOND_BOOST;
-        //     Serial.print("HI2\n\n");
-        // } else if (current_state == FSMState::STATE_SECOND_BOOST){
-        //     next_state = FSMState::STATE_DROGUE_DEPLOY;
-        //     Serial.print("HI3\n\n");
-        // } else if (current_state == FSMState::STATE_DROGUE_DEPLOY) {
-        //     next_state = FSMState::STATE_MAIN_DEPLOY;
-        //     Serial.print("HI4\n\n");
-        // } else if (current_state == FSMState::STATE_MAIN_DEPLOY) {
-        //     next_state = FSMState::STATE_FIRST_BOOST;
-        //     Serial.print("HI5\n\n");
-        // } else if(current_state != FSMState::STATE_FIRST_BOOST){
-        //     next_state = FSMState::STATE_BURNOUT;
-        //     Serial.print("HI1.1\n\n");
-        // } 
-        
-        // // Sleep the thread to see the difference in time within the metalogs
-        // THREAD_SLEEP(2000);
-        // #endif
-
         if(current_state != next_state) {
             fsm_transitioned_to(next_state, current_state, arg, current_time);       
         }
@@ -626,6 +591,83 @@ DECLARE_THREAD(cam, RocketSystems *arg)
     }
 }
 
+DECLARE_THREAD(shell, RocketSystems *arg)
+{
+    char line_buf[MShell::max_line_len];
+    char tmp_buf[MShell::max_line_len];
+    uint8_t d_read = 0;
+
+    while(true) {
+        // Wait for STATE_SAFE before activating shell
+        while(arg->rocket_data.fsm_state.getRecentUnsync() != FSMState::STATE_SAFE) {
+            THREAD_SLEEP(1000);
+        }
+
+        if(arg->shell->settings.echo) {
+            Serial.print("> ");
+            Serial.flush();
+        }
+
+        while (arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_SAFE)
+        {
+            uint8_t num_bytes_avail = Serial.available();
+
+            if(num_bytes_avail > 0) {
+                Serial.read(tmp_buf, num_bytes_avail);
+                for(int i = 0; i < num_bytes_avail; i++) {
+
+                    if(tmp_buf[i] == '\r') {
+                        continue;
+                    }
+
+                    if(tmp_buf[i] == '\b' || tmp_buf[i] == 0x7F) {
+                        if(d_read > 0) {
+                            d_read--;
+                            if(arg->shell->settings.echo) {
+                                Serial.print("\b \b"); // erase character on terminal
+                            }
+                        }
+                        continue;
+                    }
+
+                    if(arg->shell->settings.echo) {
+                        Serial.print(tmp_buf[i]);
+                    }
+
+                    if(tmp_buf[i] == '\n') {
+                        // Process the line instead of adding it!
+                        line_buf[d_read] = '\0'; // Null terminate command
+                        d_read = 0;
+
+                        MCommandExecutionResult c_res = arg->shell->execute_line(line_buf, arg);
+                        Serial.print("<done> ");
+                        Serial.println(static_cast<int>(c_res));
+
+                        if(arg->shell->settings.echo) {
+                            Serial.print("> ");
+                            Serial.flush();
+                        }
+
+                        continue;
+                    }
+
+                    if(d_read >= MShell::max_line_len - 1) {
+                        continue;
+                    }
+
+                    // Otherwise add to the buf
+                    line_buf[d_read++] = tmp_buf[i];
+                }
+                Serial.flush();
+            }
+
+            // do stuff here
+
+            THREAD_SLEEP(10);
+        }
+    }
+}
+
 DECLARE_THREAD(telemetry, RocketSystems *arg)
 {
     double launch_time = 0;
@@ -713,6 +755,11 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     // Update eeprom
     systems.eeprom.commit();
+
+    m_shell_setup(); // Set up the MIDAS shell
+    systems.shell = &m_shell_inst;
+    m_shell_init_commands(systems.shell);
+
     digitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
@@ -726,6 +773,7 @@ ErrorCode init_systems(RocketSystems& systems) {
 {
     Serial.println("Starting Systems...");
     spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
+
 
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError)
@@ -753,6 +801,8 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(angularkalman, SENSOR_CORE, config, 7);
+    START_THREAD(shell, DATA_CORE, config, 5);
+
     #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 #endif
