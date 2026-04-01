@@ -5,7 +5,8 @@
 
 #define MAX_TELEM_VOLTAGE_V 6.0f
 #define MAX_TELEM_CONT_I 0.2f
-#define MAX_KF_XPOSITION_M 20000.0f
+#define MAX_KF_VPOSITION_M 100000.0f   // Max vertical position of KF data (m)
+#define MAX_KF_LPOSITION_M 50000.0f   // Max lateral position of KF data (m)
 #define MAX_ROLL_RATE_HZ 10.0f
 #define MAX_ABS_ACCEL_RANGE_G 64
 #define MAX_KF_XVELOCITY_MS 2000.0f
@@ -38,9 +39,11 @@ struct TelemetryPacket {
 
     uint8_t callsign_gpsfix_satcount; //3 bits gpsfix, 4 bits sat count, 1 bit is_sustainer_callsign
     uint16_t kf_vx; // 16 bit meters/second
-    uint16_t kf_px;  // 16 bit meters
+    uint16_t kf_px; // 16 bit meters
+    uint16_t kf_py; // 16 bit meters
+    uint16_t kf_pz; // 16 bit meters
 
-    uint32_t pyro; // 7 bit continuity x 4 channels, 4 bit unused
+    uint32_t pyro; // 8 bit continuity x 4 channels
     
     uint8_t roll_rate;
     uint8_t camera_state;
@@ -50,7 +53,7 @@ struct TelemetryPacket {
 
 
 // Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX, CALIB_ACCEL, CALIB_MAG };
 
 /**
  * @struct TelemetryCommand

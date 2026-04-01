@@ -66,3 +66,9 @@
  * @param millis The time to delay in milliseconds.
 */
 #define THREAD_SLEEP(millis) vTaskDelay(pdMS_TO_TICKS(millis))
+
+/**
+ * Mutex to prevent clashing between the E22 & LSM6DSV320X
+ * Initialized in begin_systems() before threads start.
+ */
+extern SemaphoreHandle_t spi_mutex;

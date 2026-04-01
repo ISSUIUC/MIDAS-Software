@@ -1,5 +1,5 @@
 #include "errors.h"
-#include "TCAL9539.h"
+#include <Arduino.h>
 
 /**
  * If an error during initialization was detected, some combination of the blue, green, orange, and red LEDs will be on,
@@ -24,7 +24,6 @@
  */
 
 #ifndef SILSIM
-#include <TCAL9539.h>
 #include "hardware/pins.h"
 
 /**
@@ -35,82 +34,76 @@
 void update_error_LED(ErrorCode error) {
     switch (error) {
         case LowGCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, LOW);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, LOW);
             break;
         case SDBeginFailed:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, LOW);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, LOW);
             break;
         case LowGRangeCouldNotBeSet:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, LOW);
+            digitalWrite(LED_GREEN, LOW);
+            digitalWrite(LED_ORANGE, HIGH);
+            digitalWrite(LED_RED, LOW);
             break;
         case LowGODRLPFCouldNotBeSet:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            digitalWrite(LED_BLUE, LOW);
+            digitalWrite(LED_GREEN, LOW);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, HIGH);
             break;
         case HighGCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, LOW);
             break;   
         case HighGCouldNotUpdateDataRate:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, LOW);
+            digitalWrite(LED_ORANGE, HIGH);
+            digitalWrite(LED_RED, LOW);
             break;
         case MagnetometerCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, LOW);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, HIGH);
             break;
         case GyroCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, LOW);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, HIGH);
+            digitalWrite(LED_RED, LOW);
             break; 
         case GPSCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
-            break; 
-        case ContinuityCouldNotBeInitialized:
-            gpioDigitalWrite(LED_BLUE, LOW);
-            gpioDigitalWrite(LED_GREEN, LOW);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, HIGH);
+            digitalWrite(LED_BLUE, LOW);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, HIGH);
             break; 
         case CannotConnectBNO:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, LOW);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, HIGH);
+            digitalWrite(LED_RED, LOW);
             break; 
         case CannotInitBNO:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, LOW);
-            gpioDigitalWrite(LED_RED, HIGH);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, LOW);
+            digitalWrite(LED_RED, HIGH);
             break; 
         default:
-            gpioDigitalWrite(LED_BLUE, HIGH);
-            gpioDigitalWrite(LED_GREEN, HIGH);
-            gpioDigitalWrite(LED_ORANGE, HIGH);
-            gpioDigitalWrite(LED_RED, HIGH);
+            digitalWrite(LED_BLUE, HIGH);
+            digitalWrite(LED_GREEN, HIGH);
+            digitalWrite(LED_ORANGE, HIGH);
+            digitalWrite(LED_RED, HIGH);
             break;
     }
 }

@@ -36,7 +36,7 @@ struct BarometerSensor {
 
 struct ContinuitySensor {
     ErrorCode init();
-    Continuity read();
+    Voltage read();
 
     bool should_be_continous;
 };

@@ -32,19 +32,19 @@ T inv_convert_range(float val, float range) {
  * 
  * @return tuple with packed data
 */
-std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) {
+// std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) { //update parameter and function
     
-    uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
-    uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
-    uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
+//     uint16_t ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, 32);
+//     uint16_t ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, 32);
+//     uint16_t az = (uint16_t)inv_convert_range<int16_t>(highg.az, 32);
 
-    uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
-    uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
-    uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
-    uint16_t q = (tilt >> 6) & 15;
+//     uint16_t x = (ax & 0xfffc) | ((tilt >> 0) & 0x3);
+//     uint16_t y = (ay & 0xfffc) | ((tilt >> 2) & 0x3);
+//     uint16_t z = (az & 0xfffc) | ((tilt >> 4) & 0x3);
+//     uint16_t q = (tilt >> 6) & 15;
 
-    return {x,y,z,q};
-}
+//     return {x,y,z,q};
+// }
 
 /**
  * @brief move constructor for the telemetry backend
@@ -82,15 +82,15 @@ void Telemetry::acknowledgeReceived() {
 TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     TelemetryPacket packet { };
+    IMU imu = data.imu.getRecentUnsync();
+    IMU_SFLP sflp_data = data.sflp.getRecentUnsync();
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
     FSMState fsm = data.fsm_state.getRecentUnsync();
-    Continuity continuity = data.continuity.getRecentUnsync();
-    HighGData highg = data.high_g.getRecentUnsync();
     PyroState pyro = data.pyro.getRecentUnsync();
-    Orientation orientation = data.orientation.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
+    AngularKalmanData angular_kalman = data.angular_kalman_data.getRecentUnsync();
     CameraData cam_data = data.cam_data.getRecentUnsync();
 
     packet.lat = gps.latitude;
@@ -102,28 +102,32 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.baro_alt = inv_convert_range<int16_t>(barometer.altitude, 1 << 17);
   
     //auto [ax,ay,az, tilt_extra] = pack_highg_tilt(highg, map(static_cast<long>(orientation.tilt * 100),0, 314, 0, 1023));
-    packet.highg_ax = (uint16_t)inv_convert_range<int16_t>(highg.ax, MAX_ABS_ACCEL_RANGE_G);
-    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(highg.ay, MAX_ABS_ACCEL_RANGE_G);
-    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(highg.az, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_ax = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.ax, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_ay = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.ay, MAX_ABS_ACCEL_RANGE_G);
+    packet.highg_az = (uint16_t)inv_convert_range<int16_t>(imu.highg_acceleration.az, MAX_ABS_ACCEL_RANGE_G);
+
+
+    //-------------------------------------------------------------------
 
     // Tilt & FSM State
     static_assert(FSMState::FSM_STATE_COUNT < 16);
-    uint16_t tilt_norm = (orientation.tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
+    uint16_t tilt_norm = (angular_kalman.sflp_tilt / M_PI) * 0x0fff; // Encodes tilt value 0-1 into range 0x0000 - 0x0fff
     packet.tilt_fsm |= ((tilt_norm << 4) & 0xfff0);
     packet.tilt_fsm |= ((uint16_t)fsm & 0x000f);
 
-    //Serial.println(packet.tilt_fsm, 2);
+    //-------------------------------------------------------------------
+
     // Battery voltage
-    packet.batt_volt = inv_convert_range<uint8_t>(voltage.voltage, MAX_TELEM_VOLTAGE_V);
+    packet.batt_volt = inv_convert_range<uint8_t>(voltage.v_Bat, MAX_TELEM_VOLTAGE_V);
     
     // Roll rate
-    float roll_rate_hz = std::clamp(std::abs(orientation.angular_velocity.vx) / (2.0f*static_cast<float>(PI)), 0.0f, MAX_ROLL_RATE_HZ);
+    float roll_rate_hz = std::clamp(std::abs(imu.angular_velocity.vx) / 360.0f, 0.0f, MAX_ROLL_RATE_HZ); // divide by 360 to convert from dps to Hz
     packet.roll_rate = roll_rate_hz / MAX_ROLL_RATE_HZ * 0xFF;
 
     // KF data
-    packet.kf_px = inv_convert_range<int16_t>(kalman.position.px, MAX_KF_XPOSITION_M);
-
-    // Serial.println(kalman.position.px);
+    packet.kf_px = inv_convert_range<int16_t>(kalman.position.px, MAX_KF_VPOSITION_M); // We should eventually switch this to unsigned, once we fix baro.
+    packet.kf_py = inv_convert_range<int16_t>(kalman.position.py, MAX_KF_LPOSITION_M);
+    packet.kf_pz = inv_convert_range<int16_t>(kalman.position.pz, MAX_KF_LPOSITION_M);
 
     packet.kf_vx = inv_convert_range<int16_t>(kalman.velocity.vx, MAX_KF_XVELOCITY_MS);
 
@@ -134,17 +138,10 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
 
     
     //Pyro A0 | B1 | C2 | D3
-    // This is what we're telemetering for MIDAS mk2
-    packet.pyro |= ((((uint32_t) (std::round(continuity.pins[0]))) & 0x7F) << (0 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[1] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (1 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[2] / MAX_TELEM_CONT_I * 127)) & 0x7F) << (2 * 7));
-    packet.pyro |= ((((uint32_t) (continuity.pins[3] / MAX_TELEM_VOLTAGE_V * 127)) & 0x7F) << (3 * 7));
-
-    // This is what we want for MIDAS mk3
-    // packet.pyro |= (uint8_t)inv_convert_range<int8_t>(pins[0], MAX_TELEM_VOLTAGE_V);
-    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[1], (float)std::numeric_limits<float>::max()) & 0xFF) << (1*8);
-    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[2], (float)std::numeric_limits<float>::max()) & 0xFF) << (2*8);
-    // packet.pyro |= ((uint32_t)inv_convert_range<int8_t>(pins[3], (float)std::numeric_limits<float>::max()) & 0xFF) << (3*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[0], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (0*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[1], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (1*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[2], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (2*8);
+    packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[3], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (3*8);
 
     // GPS state & Callsign
     // 0000 | 000 | 0

@@ -17,7 +17,6 @@ enum ErrorCode {
     GyroCouldNotBeInitialized = 8,
     PyroGPIOCouldNotBeInitialized = 9,
     GPSCouldNotBeInitialized = 10,
-    ContinuityCouldNotBeInitialized = 11,
     RadioInitFailed = 12,
     RadioSetFrequencyFailed = 13,
     CannotConnectBNO = 14,
@@ -28,6 +27,7 @@ enum ErrorCode {
     SDCouldNotOpenFile = 20,
     LoraCouldNotBeInitialized = 21,
     LoraCommunicationFailed = 22,
+    IMUCouldNotBeInitialized = 23,
 };
 
 void update_error_LED(ErrorCode error);

@@ -1,5 +1,4 @@
 #include "led.h"
-#include "TCAL9539.h"
 #include "hardware/pins.h"
 
 /**
@@ -7,7 +6,7 @@
  * 
  * @brief struct representing the LED pins
 */
-static GpioAddress LED_pins[4] = {
+static uint8_t LED_pins[4] = {
     LED_BLUE,
     LED_RED,
     LED_ORANGE,
@@ -50,7 +49,7 @@ void LEDController::set(LED led, int state) {
 void LEDController::update() {
     for (int i = 0; i < 4; i++) {
         if (targets[i] != states[i]) {
-            gpioDigitalWrite(LED_pins[i], targets[i]);
+            digitalWrite(LED_pins[i], targets[i]);
             states[i] = targets[i];
         }
     }

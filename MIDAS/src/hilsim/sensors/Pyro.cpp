@@ -5,7 +5,7 @@ ErrorCode Pyro::init() {
     return ErrorCode::NoError;
 }
 
-PyroState Pyro::tick(FSMState fsm_state, Orientation orientation) {
+PyroState Pyro::tick(FSMState fsm_state, AngularKalmanData angularkalman) {
     return PyroState();
     //tick
 } // No new line for rhbog >:(

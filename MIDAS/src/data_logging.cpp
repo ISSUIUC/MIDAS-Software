@@ -13,24 +13,18 @@ constexpr ReadingDiscriminant get_discriminant();
 */
 #define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
 
-ASSOCIATE(LowGData, ID_LOWG)
-ASSOCIATE(LowGLSM, ID_LOWGLSM)
-ASSOCIATE(HighGData, ID_HIGHG)
+
+ASSOCIATE(IMU, ID_IMU)
 ASSOCIATE(Barometer, ID_BAROMETER)
-ASSOCIATE(Continuity, ID_CONTINUITY)
 ASSOCIATE(Voltage, ID_VOLTAGE)
 ASSOCIATE(GPS, ID_GPS)
 ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
-ASSOCIATE(Orientation, ID_ORIENTATION)
-ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(KalmanData, ID_KALMAN)
+ASSOCIATE(FSMState, ID_FSM)
 ASSOCIATE(PyroState, ID_PYRO)
-
 ASSOCIATE(CameraData, ID_CAMERADATA)
-
-
-
-
+ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN)
+ASSOCIATE(IMU_SFLP, ID_SFLP)
 
 
 /**
@@ -83,22 +77,17 @@ void log_begin(LogSink& sink) {
  * @param data the rocket which holds all the sensor data to write
 */
 void log_data(LogSink& sink, RocketData& data) {
-    log_from_sensor_data(sink, data.low_g);
-    log_from_sensor_data(sink, data.low_g_lsm);
-    log_from_sensor_data(sink, data.high_g);
+    log_from_sensor_data(sink, data.imu);
+    log_from_sensor_data(sink, data.sflp);
     log_from_sensor_data(sink, data.barometer);
-    log_from_sensor_data(sink, data.continuity);
     log_from_sensor_data(sink, data.voltage);
     log_from_sensor_data(sink, data.gps);
     log_from_sensor_data(sink, data.magnetometer);
-    log_from_sensor_data(sink, data.orientation);
     log_from_sensor_data(sink, data.fsm_state);
     log_from_sensor_data(sink, data.kalman);
+    log_from_sensor_data(sink, data.angular_kalman_data);
     log_from_sensor_data(sink, data.pyro);
-
-    //log_from_sensor_data(sink, data.quaternions);
     log_from_sensor_data(sink, data.cam_data);
-
 }
 
 
@@ -115,7 +104,7 @@ void log_data(LogSink& sink, RocketData& data) {
  * 
  * @return buffer contianing string of file name
 */
-char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
+char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t file_num, int* fileno_out) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);
 
@@ -129,7 +118,8 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
 
     if (exists) {
         bool fileExists = false;
-        int i = 1;
+        // We will start at file_num, which is default 0 if eeprom is erased
+        int i = file_num;
         while (!fileExists) {
             if (i > MAX_FILES) {
                 // max number of files reached. Don't want to overflow
@@ -139,6 +129,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
                 strcat(inputName, fileName);
                 strcat(inputName, "999");
                 strcat(inputName, fileExtension);
+                *fileno_out = 999;
                 break;
             }
 
@@ -154,10 +145,13 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs) {
 
             if (!fs.exists(inputName)) {
                 fileExists = true;
+                *fileno_out = i + 1;
             }
 
             i++;
         }
+    } else {
+        *fileno_out = 0;
     }
 
     strcpy(fileName, inputName);

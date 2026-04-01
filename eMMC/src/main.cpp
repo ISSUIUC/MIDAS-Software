@@ -2,12 +2,12 @@
 #include <SD_MMC.h>
 #include <stdint.h>
 
-#define FLASH_CMD 14
-#define FLASH_CLK 18
-#define FLASH_DAT0 13
-#define FLASH_DAT1 12
-#define FLASH_DAT2 15
-#define FLASH_DAT3 16
+#define FLASH_CMD 47
+#define FLASH_CLK 16
+#define FLASH_DAT0 33
+#define FLASH_DAT1 34
+#define FLASH_DAT2 18
+#define FLASH_DAT3 17
 
 #define EMMC_CLK 38
 #define EMMC_CMD 39
@@ -25,9 +25,9 @@ void setup() {
 
     while (!Serial) { }
 
-    Serial.println("setup");
+    // Serial.println("setup");
 
-    Serial.println("Connecting to SD...");
+    // Serial.println("Connecting to SD...");
     if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
         Serial.println("Pin change failed!");
         return;
@@ -53,7 +53,7 @@ void setup() {
     //     return;
     // }
 
-    Serial.println("success!");
+    // Serial.println("success!");
 }
 
 

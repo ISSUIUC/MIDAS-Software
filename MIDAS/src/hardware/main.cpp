@@ -1,6 +1,6 @@
 #include <Wire.h>
 #include <SPI.h>
-#include "TCAL9539.h"
+#include "TCAL9538.h"
 
 #include "systems.h"
 #include "hardware/pins.h"
@@ -19,7 +19,7 @@ MultipleLogSink<SDSink> sinks;
 // #else
 // MultipleLogSink<> sinks;
 // #endif
-RocketSystems systems{.log_sink = sinks};
+RocketSystems systems{.log_sink = sink};
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
  */
@@ -68,38 +68,34 @@ void setup()
     //begin I2C bus
     Serial.println("Starting I2C...");
     Wire.begin(I2C_SDA, I2C_SCL, 100000);
-    Wire1.begin(PYRO_SDA, PYRO_SCL, 400000);
 
-    if (!TCAL9539Init(GPIO_RESET)) {
+    if (!TCAL9538Init(EXP_RESET)) {
         Serial.println(":(");
     }
 
+    //pinMode changes need to be made here for midas mini bc of new sensors.
+
     //set all chip selects high (deselected)
-    pinMode(LSM6DS3_CS, OUTPUT);
-	pinMode(KX134_CS, OUTPUT);
-	pinMode(ADXL355_CS, OUTPUT);
-	pinMode(LIS3MDL_CS, OUTPUT);
-	pinMode(BNO086_CS, OUTPUT);
-	pinMode(BNO086_RESET, OUTPUT);
-	pinMode(CAN_CS, OUTPUT);
 	pinMode(E22_CS, OUTPUT);
 	pinMode(MS5611_CS, OUTPUT);
+    pinMode(IMU_CS_PIN, OUTPUT);
+    pinMode(MMC5983_CS, OUTPUT);
 
 	digitalWrite(MS5611_CS, HIGH);
-	digitalWrite(LSM6DS3_CS, HIGH);
-	digitalWrite(KX134_CS, HIGH);
-	digitalWrite(ADXL355_CS, HIGH);
-	digitalWrite(LIS3MDL_CS, HIGH);
-	digitalWrite(BNO086_CS, HIGH);
-	digitalWrite(CAN_CS, HIGH);
 	digitalWrite(E22_CS, HIGH);
+    digitalWrite(IMU_CS_PIN, HIGH);
+    digitalWrite(MMC5983_CS, HIGH);
 
-    digitalWrite(BNO086_RESET, HIGH);
+    // b2b pins
+    pinMode(B2B_EN, OUTPUT);
+    pinMode(B2B_READY, INPUT);
+    digitalWrite(B2B_EN, HIGH); // Enables the B2B bus
+
     //configure output leds
-    gpioPinMode(LED_BLUE, OUTPUT);
-    gpioPinMode(LED_GREEN, OUTPUT);
-    gpioPinMode(LED_ORANGE, OUTPUT);
-    gpioPinMode(LED_RED, OUTPUT);
+    pinMode(LED_BLUE, OUTPUT);
+    pinMode(LED_GREEN, OUTPUT);
+    pinMode(LED_ORANGE, OUTPUT);
+    pinMode(LED_RED, OUTPUT);
 
     gpioPinMode(PYROA_FIRE_PIN, OUTPUT);
     gpioPinMode(PYROB_FIRE_PIN, OUTPUT);

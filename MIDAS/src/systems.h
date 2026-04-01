@@ -11,11 +11,12 @@
 #include "telemetry.h"
 #include "finite-state-machines/fsm.h"
 #include "b2b_interface.h"
+#include "esp_eeprom.h"
+#include "hardware/SDLog.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
 #elif defined(HILSIM)
-#include "TCAL9539.h"
 #include "hilsim/sensors.h"
 #else
 #include "hardware/sensors.h"
@@ -26,21 +27,26 @@
  * 
  * @brief holds all interfaces for all sensors on MIDAS
 */
+
+//Remove the low_g sensor and high_g sensor, we will be using the imu sensor for the midas mini.
+
+//Barometer (Altitude from Barometer is bugged, need to fix)
+
+
 struct Sensors {
-    LowGSensor low_g;
-    LowGLSMSensor low_g_lsm;
-    HighGSensor high_g;
+    IMUSensor imu;
+
     BarometerSensor barometer;
-    ContinuitySensor continuity;
     VoltageSensor voltage;
-    OrientationSensor orientation;
+
     MagnetometerSensor magnetometer;
+
     Pyro pyro;
     GPSSensor gps;
 };
 
 /**
- * @struct RocketData
+ * @struct RocketSystems
  * 
  * @brief holds all information about the rocket, sensors, and controllers
 */
@@ -53,6 +59,7 @@ struct RocketSystems {
     LEDController led;
     Telemetry tlm;
     B2BInterface b2b;
+    EEPROMController eeprom;
 };
 
 [[noreturn]] void begin_systems(RocketSystems* config);

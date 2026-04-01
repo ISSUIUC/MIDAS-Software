@@ -3,23 +3,49 @@
 #include "errors.h"
 #include "sensor_data.h"
 #include "hardware/pins.h"
-#include "TCAL9539.h"
+#include "TCAL9538.h"
 #include "rocket_state.h"
+#include "esp_eeprom.h"
+#include "buzzer.h"
+
 
 /**
- * @struct LowG interface
+ * @struct IMUSensor
  */
-struct LowGSensor {
-    ErrorCode init();
-    LowGData read();
-};
+struct IMUSensor {
 
-/**
- * @struct HighG interface
- */
-struct HighGSensor {
+    enum IMUCalibrationState {
+        NONE = 0,
+        CALIB_PX = 1,
+        CALIB_NX = 2,
+        CALIB_PY = 3,
+        CALIB_NY = 4,
+        CALIB_PZ = 5,
+        CALIB_NZ = 6,
+        CALIB_DONE = 7
+    };
+
     ErrorCode init();
-    HighGData read();
+    IMU read();
+    IMU_SFLP read_sflp();
+    void begin_calibration(BuzzerController& buzzer);
+    void calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator, EEPROMController& eeprom);
+    unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+    void restore_calibration(EEPROMController& eeprom);
+    void abort_calibration(BuzzerController& buzzer, EEPROMController& eeprom);
+    
+    IMUCalibrationState calibration_state = IMUCalibrationState::NONE;
+    Acceleration calibration_sensor_bias = {0.0, 0.0, 0.0};
+
+    private:
+    int _calib_valid_readings = 0;
+    float _calib_average = 0.0;
+    unsigned long _calib_begin_timestamp;
+
+    bool accept_calib_reading(float lowg_axis_reading, float nominal_axis_value);
+    void next_calib(BuzzerController& buzzer, EEPROMController& eeprom);
+
+
 };
 
 /**
@@ -28,6 +54,33 @@ struct HighGSensor {
 struct MagnetometerSensor {
     ErrorCode init();
     Magnetometer read();
+
+    // Calibration functions
+    bool in_calibration_mode = false;
+    void begin_calibration(BuzzerController& buzzer);
+    void calib_reading(Magnetometer& reading, EEPROMController& eeprom, BuzzerController& buzzer);
+    void restore_calibration(EEPROMController& eeprom);
+
+    Magnetometer calibration_bias_hardiron = {0.0, 0.0, 0.0}; // hard iron offset -- "recenters" data on origin (0,0,0).
+    Magnetometer calibration_bias_softiron = {1.0, 1.0, 1.0}; // soft iron offset -- scales per-axis data (Should be 3x3, but we'll try 1x3 for now.)
+
+    unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+
+    private:
+    void commit_calibration(EEPROMController& eeprom, BuzzerController& buzzer); // Calculate and commit the calibration to memory
+    bool calibration_valid(const Magnetometer& b, const Magnetometer& s); // Calculate and sanity check calibration data
+    /* Maximum value per-axis during calibration */
+    Magnetometer _calib_max_axis; 
+    /* Minimum value per-axis during calibration */
+    Magnetometer _calib_min_axis;
+    unsigned long _calib_begin_timestamp;
+    double _calib_magnitude_sum = 0.0;
+    int _calib_num_datapoints = 0;
+    int _calib_beeping = 0;
+    /* Magnetometer calibration isn't based on a per-axis calibration, but on getting as many datapoints as possible.
+    For now let's try 60 sec */
+    const unsigned long _calib_time = 60000;
+
 };
 
 /**
@@ -39,44 +92,11 @@ struct BarometerSensor {
 };
 
 /**
- * @struct LowGLSM interface
- */
-struct LowGLSMSensor {
-    ErrorCode init();
-    LowGLSM read();
-};
-
-/**
- * @struct Continuity interface
- */
-struct ContinuitySensor {
-    ErrorCode init();
-    Continuity read();
-};
-
-/**
  * @struct Voltage interface
  */
 struct VoltageSensor {
     ErrorCode init();
     Voltage read();
-};
-
-/**
- * @struct BNO interface
- */
-struct OrientationSensor {
-    Orientation initial_orientation;
-    Quaternion initial_quaternion;
-    uint8_t initial_flag;
-
-    float prev_x = 0;
-    float prev_y = 0;
-    float prev_z = 0;
-    float prev_tilt = 0;
-
-    ErrorCode init();
-    Orientation read();
 };
 
 /**
@@ -94,10 +114,10 @@ struct GPSSensor {
  */
 struct Pyro {
     ErrorCode init();
-    PyroState tick(FSMState fsm_state, Orientation orientation, CommandFlags& telem_commands);
+    PyroState tick(FSMState fsm_state, AngularKalmanData angular_kalman_data, CommandFlags& telem_commands);
 
     void set_pyro_safety(); // Sets pyro_start_firing_time and has_fired_pyros.
-    void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros.
+    void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros. 
     
     private:
     void disarm_all_channels(PyroState& prev_state);

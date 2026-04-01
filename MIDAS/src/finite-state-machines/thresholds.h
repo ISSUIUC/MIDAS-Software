@@ -185,7 +185,7 @@
 //       This value should always be set at (launch site ASL) + (desired altitude AGL)
 // (Flight Parameter)
 // [STARGAZER 1.4] This is a "dontcare" value --> The booster does not have a drogue, we transition immediately to MAIN
-#define booster_main_deploy_altitude_threshold 545
+#define booster_main_deploy_altitude_threshold 490
 
 // The minimum delay between drogue deployment and main deployment (ms)
 // @REC: This is a safety feature to prevent overpressurization or internal firing, and forces MAIN_DEPLOY to wait at least this much time,
@@ -208,7 +208,7 @@
 // Amount of time after booster burn that the stage separation event should trigger (ms)
 // @SDA
 // (Flight parameter)
-#define booster_first_boost_to_burnout_time_threshold 1000
+#define booster_first_boost_to_burnout_time_threshold 500
 
 // Transition to LANDED from MAIN if vertical speed is less than this threshold (m/s)
 // @REC: This number should be below the MINIMUM descent velocity of the vehicle with significant margin.

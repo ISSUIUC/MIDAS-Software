@@ -3,7 +3,6 @@
 #include "errors.h"
 #include "hal.h"
 #include "pins.h"
-#include <TCAL9539.h>
 
 #include "E22.h"
 

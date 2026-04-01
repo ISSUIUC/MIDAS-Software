@@ -1,6 +1,7 @@
 .pio
 .vscode
 /src/log_checksum.h
+/src/esp_eeprom_checksum.h
 **/.DS_Store
 *.launch
 *.pyc
