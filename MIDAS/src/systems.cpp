@@ -248,17 +248,23 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         */
         
         // Manually transition the times
-        if(current_state == FSMState::STATE_FIRST_BOOST){
-            next_state = FSMState::STATE_BURNOUT;
-        } else if (current_state == FSMState::STATE_BURNOUT) {
+        Serial.print("HI\n\n");
+        if (current_state == FSMState::STATE_BURNOUT) {
             next_state = FSMState::STATE_SECOND_BOOST;
+            Serial.print("HI2\n\n");
         } else if (current_state == FSMState::STATE_SECOND_BOOST){
             next_state = FSMState::STATE_DROGUE_DEPLOY;
+            Serial.print("HI3\n\n");
         } else if (current_state == FSMState::STATE_DROGUE_DEPLOY) {
             next_state = FSMState::STATE_MAIN_DEPLOY;
+            Serial.print("HI4\n\n");
         } else if (current_state == FSMState::STATE_MAIN_DEPLOY) {
             next_state = FSMState::STATE_FIRST_BOOST;
-        }
+            Serial.print("HI5\n\n");
+        } else if(current_state != FSMState::STATE_FIRST_BOOST){
+            next_state = FSMState::STATE_BURNOUT;
+            Serial.print("HI1.1\n\n");
+        } 
         
         // Sleep the thread to see the difference in time within the metalogs
         THREAD_SLEEP(2000);
