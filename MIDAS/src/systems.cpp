@@ -186,21 +186,21 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
 
 void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems* sys, double current_time) {
     // Do something, NO delays allowed!
-    Orientation cur_orientation = sys->rocket_data.orientation.getRecentUnsync();
+    AngularKalmanData cur_orientation = sys->rocket_data.angular_kalman_data.getRecentUnsync();
     switch (new_state) {
         case FSMState::STATE_FIRST_BOOST:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TLAUNCH, current_time);
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_BARO, sys->rocket_data.barometer.getRecentUnsync());
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_GPS, sys->rocket_data.gps.getRecentUnsync());
-            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCH_INITIAL_TILT, cur_orientation.tilt);
+            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCH_INITIAL_TILT, cur_orientation.sflp_tilt);
             break;
         case FSMState::STATE_BURNOUT:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TBURNOUT, current_time);
-            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_BURNOUT, cur_orientation.tilt);
+            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_BURNOUT, cur_orientation.sflp_tilt);
             break;
         case FSMState::STATE_SECOND_BOOST:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TIGNITION, current_time);
-            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_IGNITION, cur_orientation.tilt);
+            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_IGNITION, cur_orientation.sflp_tilt);
             break;
         case FSMState::STATE_DROGUE_DEPLOY:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TAPOGEE, current_time);

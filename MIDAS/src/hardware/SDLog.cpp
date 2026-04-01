@@ -34,7 +34,6 @@ ErrorCode SDSink::init() {
     int filenumber = -1;
     sdFileNamer(file_name, ext, SD_MMC, current_file_no, &filenumber);
     
-    
     if(filenumber != -1) {
         Serial.print("[SD] Beginning log: "); Serial.println(current_file_no);
     } else {
@@ -42,10 +41,12 @@ ErrorCode SDSink::init() {
         return ErrorCode::SDBeginFailed;
     }
 
+    char meta_name[255] = {0};
     strcpy(meta_name, file_name);
     char* extpos = strrchr(meta_name, '.');
     if (extpos) {
         strcpy(extpos, ".meta");
+    }
 
     file = SD_MMC.open(file_name, FILE_WRITE, true);
     meta = SD_MMC.open(meta_name, FILE_WRITE, true);
