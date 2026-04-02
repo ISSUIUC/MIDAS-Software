@@ -2,6 +2,7 @@
 .vscode
 /src/log_checksum.h
 /src/esp_eeprom_checksum.h
+/src/log_format_AUTOGEN.h
 **/.DS_Store
 *.launch
 *.pyc
