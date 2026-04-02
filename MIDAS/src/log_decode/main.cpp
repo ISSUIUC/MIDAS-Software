@@ -3,6 +3,6 @@
 #include <iostream>
 
 int main() {
-    std::cout << "to be done" std::endl;
+    std::cout << "to be done" << std::endl;
     return 0;
 }
