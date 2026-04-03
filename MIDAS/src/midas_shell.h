@@ -13,7 +13,8 @@ enum class MCommandExecutionResult {
     ERR_INVALID_CMD = 2,    // The command given was not of a valid format
     ERR_NO_CMD = 3,         // The command given was not one that exists (but is of a valid format)
     ERR_INVAL_ARGC = 4,     // The amount of arguments is incorrect for the current function.
-    ERR_INVAL_ARGUMENT = 5  // One or more arguments is invalid (generic)
+    ERR_INVAL_ARGUMENT = 5, // One or more arguments is invalid (generic)
+    ERR_INVAL_ARG_RANGE = 6 // One or more arguments is out of range
     
     // Command specific
 };
