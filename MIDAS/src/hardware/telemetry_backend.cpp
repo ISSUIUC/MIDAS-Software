@@ -70,7 +70,7 @@ int16_t TelemetryBackend::getRecentRssi() {
 /**
  * @brief Sets new frequency for the LoRa module
  *
- * @param freq New frequency to set the LoRa module to
+ * @param freq New frequency to set the LoRa module to (MHz)
 */
 ErrorCode TelemetryBackend::setFrequency(float freq) {
     if(lora.set_frequency((uint32_t) (freq * 1e6)) != SX1268Error::NoError) {

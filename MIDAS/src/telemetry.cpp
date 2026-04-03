@@ -75,6 +75,15 @@ void Telemetry::acknowledgeReceived() {
 }
 
 /**
+ * @brief Sets new frequency for the LoRa module
+ *
+ * @param freq New frequency to set the LoRa module to (MHz)
+*/
+ErrorCode Telemetry::setFrequency(float freq){
+    return backend.setFrequency(freq);
+}
+
+/**
  * @brief creates the packet to send through the telemetry system
  * 
  * @param data the data to serialize into a packet
