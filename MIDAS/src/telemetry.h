@@ -28,6 +28,7 @@ public:
     void transmit(RocketData& rocket_data, LEDController& led);
     bool receive(TelemetryCommand* command, int wait_milliseconds);
     void acknowledgeReceived();
+    ErrorCode setFrequency(float frequency);
 private:
     int received_count;
     TelemetryPacket makePacket(RocketData& data);

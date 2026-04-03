@@ -532,6 +532,10 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
     double launch_time = 0;
     bool has_triggered_vmux_fallback = false;
 
+    // Restore frequency from EEPROM
+    // maybe have a check to make sure frequency value is in the 420-450 MHz range?
+    arg->tlm.setFrequency(arg->eeprom.data.frequency);
+
     arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true)
     {

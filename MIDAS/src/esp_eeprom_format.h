@@ -9,6 +9,8 @@ struct MIDASEEPROM {
 
     uint8_t serial = 0;
 
+    float frequency = 421.15;
+
     Acceleration lsm6dsv320x_hg_xl_bias = {0.0f, 0.0f, 0.0f};
     Magnetometer mmc5983ma_softiron_bias = {1.0f, 1.0f, 1.0f};
     Magnetometer mmc5983ma_hardiron_bias = {0.0f, 0.0f, 0.0f};
