@@ -367,7 +367,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         if(!has_logged) {
             if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_DESCENT_RATE, max_descent_rate);
-                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_DESCENT_RATE, max_decent_rate_time);
+                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_DESCENT_RATE, max_descent_rate_time);
                 has_logged = true;
             }
         }
