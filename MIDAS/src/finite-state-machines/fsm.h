@@ -23,6 +23,31 @@ struct StateEstimate {
     explicit StateEstimate(RocketData& state);
 };
 
+struct FSMPyroAction {
+    bool enable;
+    FSMState fsm_trigger;
+    float delay;
+    float max_tilt;
+    uint8_t after_motor;
+    float launch_t_gt;
+    float launch_t_lt;
+    float vx_min;
+    float vx_max;
+};
+
+struct FSMUserThresholds {
+    float pyro_fire_t; 
+    float main_alt;
+    bool cruise_lockout_en;
+};
+
+struct FSMConfiguration {
+    FSMUserThresholds thresholds;
+    FSMPyroAction pyro_actions[4];
+    uint8_t version_num;
+    uint32_t crc32;
+};
+
 /**
  * @class FSM
  * 
@@ -33,6 +58,10 @@ public:
     FSM() = default;
 
     FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
+
+    const FSMConfiguration& get_cfg() const {return config;};
+
+    bool set_cfg(const FSMConfiguration& new_cfg) {return false;};
 
 private:
     double launch_time;
@@ -49,4 +78,6 @@ private:
     double pyro_test_entry_time;
 
     bool landing_lockout_triggered = false;
+
+    FSMConfiguration config;
 };
