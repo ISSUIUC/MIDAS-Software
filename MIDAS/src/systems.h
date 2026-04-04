@@ -62,6 +62,7 @@ struct RocketSystems {
     B2BInterface b2b;
     EEPROMController eeprom;
     MShell* shell;
+    FSM fsm;
 };
 
 [[noreturn]] void begin_systems(RocketSystems *config);
