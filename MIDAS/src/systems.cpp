@@ -304,6 +304,8 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         arg->rocket_data.err_flags.fsm_crc_err = true;
     }
 
+    m_shell_load_fsm_config(cfg);
+
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
     
@@ -663,7 +665,7 @@ DECLARE_THREAD(shell, RocketSystems *arg)
 
     while(true) {
         // Wait for STATE_SAFE before activating shell
-        while(arg->rocket_data.fsm_state.getRecentUnsync() != FSMState::STATE_SAFE) {
+        while(arg->rocket_data.fsm_state.getRecentUnsync().state != FSMState::STATE_SAFE) {
             THREAD_SLEEP(1000);
         }
 
@@ -672,7 +674,7 @@ DECLARE_THREAD(shell, RocketSystems *arg)
             Serial.flush();
         }
 
-        while (arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_SAFE)
+        while (arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_SAFE)
         {
             uint8_t num_bytes_avail = Serial.available();
 
@@ -740,8 +742,6 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
     // Restore frequency from EEPROM
     // maybe have a check to make sure frequency value is in the 420-450 MHz range?
     arg->tlm.setFrequency(arg->eeprom.data.frequency);
-
-    arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
     while (true)
     {
 

@@ -1,10 +1,11 @@
 #include <systems.h>
+#include <string>
 
 
 FSMConfiguration shell_cfg;
 
 enum class DataType {
-    FLOAT, BOOL, UINT8, FSMSTATE
+    FLOAT, DOUBLE, BOOL, UINT8, FSMSTATE
 };
 
 struct MapEntry {
@@ -159,6 +160,15 @@ MCommandExecutionResult fsm_version(const MShellContext& ctx){
         return MCommandExecutionResult::OK;
     }
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+}
+
+MCommandExecutionResult fsm_calculate(const MShellContext& ctx){
+    RocketSystems* arg = (RocketSystems*) ctx.sysarg;
+    // Expecting just "fsm calculate"
+    if(ctx.argc > 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint32_t my_fsm_crc = FSMConfiguration::calculate_crc(shell_cfg);
+    Serial.println(my_fsm_crc);
+    return MCommandExecutionResult::OK;
 }
 
 MCommandExecutionResult fsm_threshold(const MShellContext& ctx){
@@ -325,6 +335,13 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
                 Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
+            case DataType::DOUBLE:{
+                double val = atof(ctx.argv[3]);
+                memcpy((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, &val, sizeof(double));
+                Serial.print("Queued: ");
+                Serial.println(*(double*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                return MCommandExecutionResult::OK;
+            }
             case DataType::FSMSTATE:{
                 FSMState val = (FSMState)atoi(ctx.argv[3]);
 
@@ -376,13 +393,28 @@ MCommandExecutionResult fsm(const MShellContext& ctx){
     else if (!strcmp(ctx.argv[1], "version")){
         return fsm_version(ctx);
     }
+    else if (!strcmp(ctx.argv[1], "calculate")) {
+        return fsm_calculate(ctx);
+    }
     else if (!strcmp(ctx.argv[1], "crc")){
         Serial.print("FSM CRC: ");
         Serial.println(arg->fsm.get_cfg().crc32);
         return MCommandExecutionResult::OK;
     }
     else if (!strcmp(ctx.argv[1], "commit")){
-        if(arg->fsm.set_cfg(shell_cfg)) {return MCommandExecutionResult::OK;}
+        // Set the config's crc
+        uint32_t crc = std::stoul(ctx.argv[2]);
+        shell_cfg.crc32 = crc;
+        if(arg->fsm.set_cfg(shell_cfg)) {
+            arg->led.set(LED::RED, LOW);
+            arg->rocket_data.err_flags.fsm_crc_err = false; // Clear CRC error flag
+
+            // Commit to EEPROM
+            arg->eeprom.data.fsm_config = arg->fsm.get_cfg();
+            arg->eeprom.commit();
+
+            return MCommandExecutionResult::OK;
+        }
         return MCommandExecutionResult::ERR_INVAL_FSM;
     }
     else if (!strcmp(ctx.argv[1], "help")){
@@ -391,8 +423,12 @@ MCommandExecutionResult fsm(const MShellContext& ctx){
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+void m_shell_load_fsm_config(const FSMConfiguration& fsm_cfg) {
+    shell_cfg = fsm_cfg;
+}
+
 void m_shell_init_commands(MShell* sh) {
-    sh->register_command("setfsm", set_fsm, "\tsetfsm <state:int> - Sets the FSM state to state <state>");
+    // sh->register_command("setfsm", set_fsm, "\tsetfsm <state:int> - Sets the FSM state to state <state>");
     sh->register_command("hi", hi_midas, "\t\thi <string> - Prints hi <string>");
     sh->register_command("serial", serial, "\tserial get - Get MIDAS serial number\n\t\tserial set <serialnumber:int> - Set MIDAS serial number");
     sh->register_command("frequency", frequency, "\tfrequency get - Get MIDAS telemetry frequency (in MHz)\n\t\tfrequency set <freq:float> - Set MIDAS telemetry frequency (in MHz)");

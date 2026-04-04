@@ -76,11 +76,11 @@ StateEstimate::StateEstimate(RocketData& state) {
 
 bool FSM::set_cfg(const FSMConfiguration& new_cfg) {
     // Check if the new config has a valid CRC.
+    
     uint32_t cfg_crc = new_cfg.crc32;
     uint32_t calculated_crc = FSMConfiguration::calculate_crc(new_cfg);
 
     if(cfg_crc != calculated_crc) { return false; }
-
     config = new_cfg;
     return true;
 }
