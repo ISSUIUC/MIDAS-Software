@@ -86,6 +86,9 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
 { // This needs edits
 
     arg->sensors.imu.restore_calibration(arg->eeprom);
+    float max_accel = 0;
+    bool has_logged = false;
+    double max_accel_time = 0;
 
     while (true)
     {
@@ -107,9 +110,28 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         // Sensor biases
         Acceleration bias = arg->sensors.imu.calibration_sensor_bias;
 
+        float prev_accel = arg->rocket_data.imu.getRecentUnsync().highg_acceleration.ax;
+        
+
         imudata.highg_acceleration.ax = imudata.highg_acceleration.ax + bias.ax;
         imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
         imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
+
+        if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_FIRST_BOOST) { // max accel can be during second boost, 
+            // but once the new fsm is implemented this will be changed to just "boost" and work (i think) - mihir
+            if(prev_accel < imudata.highg_acceleration.ax) {
+                max_accel = imudata.highg_acceleration.ax;
+                max_accel_time = pdTICKS_TO_MS(xTaskGetTickCount());
+            }
+        }
+
+        if(!has_logged) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
+                arg->meta_logging.log_data(MetaDataCode::DATA_MAX_ACCEL, max_accel);
+                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_accel_time);
+                has_logged = true;
+            }
+        }
 
         arg->rocket_data.imu.update(imudata);
         arg->rocket_data.sflp.update(sflp);
@@ -184,6 +206,8 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     }
 }
 
+//run threads
+
 void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems* sys, double current_time) {
     // Do something, NO delays allowed!
     AngularKalmanData cur_orientation = sys->rocket_data.angular_kalman_data.getRecentUnsync();
@@ -230,7 +254,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
 
         arg->rocket_data.fsm_state.update(next_state);
 
-        #ifdef METALOG_TEST
+        //#ifdef METALOG_TEST
         /*
         -- MetaLogging States --
         EVENT_TLAUNCH,
@@ -248,27 +272,27 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         */
         
         // Manually transition the times
-        Serial.print("HI\n\n");
-        if (current_state == FSMState::STATE_BURNOUT) {
-            next_state = FSMState::STATE_SECOND_BOOST;
-            Serial.print("HI2\n\n");
-        } else if (current_state == FSMState::STATE_SECOND_BOOST){
-            next_state = FSMState::STATE_DROGUE_DEPLOY;
-            Serial.print("HI3\n\n");
-        } else if (current_state == FSMState::STATE_DROGUE_DEPLOY) {
-            next_state = FSMState::STATE_MAIN_DEPLOY;
-            Serial.print("HI4\n\n");
-        } else if (current_state == FSMState::STATE_MAIN_DEPLOY) {
-            next_state = FSMState::STATE_FIRST_BOOST;
-            Serial.print("HI5\n\n");
-        } else if(current_state != FSMState::STATE_FIRST_BOOST){
-            next_state = FSMState::STATE_BURNOUT;
-            Serial.print("HI1.1\n\n");
-        } 
+        // Serial.print("HI\n\n");
+        // if (current_state == FSMState::STATE_BURNOUT) {
+        //     next_state = FSMState::STATE_SECOND_BOOST;
+        //     Serial.print("HI2\n\n");
+        // } else if (current_state == FSMState::STATE_SECOND_BOOST){
+        //     next_state = FSMState::STATE_DROGUE_DEPLOY;
+        //     Serial.print("HI3\n\n");
+        // } else if (current_state == FSMState::STATE_DROGUE_DEPLOY) {
+        //     next_state = FSMState::STATE_MAIN_DEPLOY;
+        //     Serial.print("HI4\n\n");
+        // } else if (current_state == FSMState::STATE_MAIN_DEPLOY) {
+        //     next_state = FSMState::STATE_FIRST_BOOST;
+        //     Serial.print("HI5\n\n");
+        // } else if(current_state != FSMState::STATE_FIRST_BOOST){
+        //     next_state = FSMState::STATE_BURNOUT;
+        //     Serial.print("HI1.1\n\n");
+        // } 
         
-        // Sleep the thread to see the difference in time within the metalogs
-        THREAD_SLEEP(2000);
-        #endif
+        // // Sleep the thread to see the difference in time within the metalogs
+        // THREAD_SLEEP(2000);
+        // #endif
 
         if(current_state != next_state) {
             fsm_transitioned_to(next_state, current_state, arg, current_time);       
@@ -394,6 +418,12 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
     // Serial.println("Initialized ekf :(");
     TickType_t last = xTaskGetTickCount();
 
+    
+    float max_vel = 0;
+    bool has_logged = false;
+    double max_vel_time = 0;
+
+
     while (true)
     {
         if (arg->rocket_data.command_flags.should_reset_kf)
@@ -431,6 +461,21 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         last = xTaskGetTickCount();
 
+        //float prev_vel = current_state.velocity.vx;
+        if(arg->rocket_data.fsm_state.getRecentUnsync() >= FSMState::STATE_FIRST_BOOST && arg->rocket_data.fsm_state.getRecentUnsync() < FSMState::STATE_APOGEE) {
+            if(max_vel < current_state.velocity.vx) {
+                max_vel = current_state.velocity.vx;
+                max_vel_time = pdTICKS_TO_MS(xTaskGetTickCount());
+            }
+        }
+
+        if(!has_logged) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
+                arg->meta_logging.log_data(MetaDataCode::DATA_MAX_VEL, max_vel);
+                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_vel_time);
+                has_logged = true;
+            }
+        }
         THREAD_SLEEP(50);
     }
 }
