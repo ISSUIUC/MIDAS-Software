@@ -147,14 +147,38 @@ DECLARE_THREAD(gps, RocketSystems *arg)
 
 DECLARE_THREAD(pyro, RocketSystems *arg)
 {
+
     while (true)
     {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMData current_fsm = arg->rocket_data.fsm_state.getRecentUnsync();
+        AngularKalmanData akf_data = arg->rocket_data.angular_kalman_data.getRecentUnsync();
+        KalmanData ekf_data = arg->rocket_data.kalman.getRecentUnsync();
         CommandFlags &command_flags = arg->rocket_data.command_flags;
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+        double launch_time = arg->fsm.get_launch_time();
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.angular_kalman_data.getRecentUnsync(), command_flags);
+        double time_since_launch = (current_time - launch_time);
+        const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
+
+        PyroTickData tick_data = {
+            current_fsm,
+            akf_data,
+            ekf_data,
+            fsm_cfg,
+            command_flags,
+            current_time,
+            time_since_launch
+        };
+
+        PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data);
+
+        // Actually update the pyro state!
+        gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW);
+        for(int i = 0; i < MIDAS_NUM_PYROS; i++) {
+            gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW);
+        }
+
         arg->rocket_data.pyro.update(new_pyro_state);
-
         arg->led.update();
 
         THREAD_SLEEP(10);
@@ -174,19 +198,44 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems *arg)
 {
-    FSM fsm{};
+    FSM& fsm = arg->fsm;
+
+    // Read in data from EEPROM
+    FSMConfiguration cfg = arg->eeprom.data.fsm_config;
+    if(!fsm.set_cfg(cfg)) {
+        fsm.set_crc_fail();
+        arg->rocket_data.err_flags.fsm_crc_err = true;
+    }
+
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+    double last_time_err_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+    arg->rocket_data.fsm_state.update(FSMData{FSMState::STATE_SAFE, 0});
     while (true)
     {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMData current_state_data = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
         CommandFlags &telemetry_commands = arg->rocket_data.command_flags;
+        KalmanData kfd = arg->rocket_data.kalman.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+        const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
+        FSMState current_state = current_state_data.state;
+
+        FSMTickData tick_data = {current_state_data, telemetry_commands, state_estimate, kfd, fsm_cfg, current_time};
+
+        FSMData next_state = fsm.tick_fsm(tick_data);
 
         arg->rocket_data.fsm_state.update(next_state);
+
+        if(fsm_cfg.crc32 == FSM_CRC_FAIL_STATE) {
+            if ((current_time - last_time_err_flash) > 100)
+            {
+                // Fast flash red LED if crc err
+                last_time_err_flash = current_time;
+                arg->led.toggle(LED::RED);
+            }
+        }
 
         if (current_state == FSMState::STATE_SAFE)
         {
@@ -203,7 +252,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             arg->led.set(LED::GREEN, LOW);
         }
 
-        if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing())
+        if ((current_state == FSMState::STATE_PYRO_TEST) && !arg->buzzer.is_playing())
         {
             arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
         }
@@ -213,7 +262,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             arg->buzzer.play_tune(land_tone, LAND_TONE_LENGTH);
         }
 
-        if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird)
+        if (current_state == FSMState::STATE_BOOST && next_state.current_motor == 2 && !already_played_freebird)
         {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
@@ -250,10 +299,25 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
 
 DECLARE_THREAD(buzzer, RocketSystems *arg)
 {
+    double last_beep_beep = pdMS_TO_TICKS(xTaskGetTickCount());
     while (true)
     {
-        arg->buzzer.tick();
+        double cur_time = pdMS_TO_TICKS(xTaskGetTickCount());
+        if(cur_time - last_beep_beep > 8000 && arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_ARMED) {
+            // Get cont and fsm failure data
+            bool cont[4] = {false, false, false, false};
+            bool fsm_fail = arg->fsm.get_cfg().crc32 == FSM_CRC_FAIL_STATE;
 
+            Voltage v = arg->rocket_data.voltage.getRecentUnsync();
+            for (int i = 0; i < 4; i++) {
+                cont[i] = v.continuity[i] > 3.0;
+            }
+
+            arg->buzzer.report_beeps(cont, fsm_fail);
+            last_beep_beep = cur_time;
+        }
+
+        arg->buzzer.tick();
         THREAD_SLEEP(10);
     }
 }
@@ -267,7 +331,7 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
 
     while (true)
     {
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent().state;
 
         if (arg->rocket_data.command_flags.should_reset_kf)
         {
@@ -328,7 +392,7 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent().state;
         GPS current_gps = arg->rocket_data.gps.getRecent();
 
         Acceleration current_accelerations = {
@@ -367,8 +431,8 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
         arg->rocket_data.command_flags.should_transition_pyro_test = true;
         Serial.println("Changing to pyro test");
         break;
-    case CommandType::SWITCH_TO_IDLE:
-        arg->rocket_data.command_flags.should_transition_idle = true;
+    case CommandType::SWITCH_TO_ARMED:
+        arg->rocket_data.command_flags.should_transition_armed = true;
         break;
     case CommandType::FIRE_PYRO_A:
         if (current_state == FSMState::STATE_PYRO_TEST)
@@ -542,11 +606,11 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
 
         arg->tlm.transmit(arg->rocket_data, arg->led);
 
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync().state;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
-        if (current_state <= FSMState::STATE_IDLE)
+        // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_ARMED.
+        if (current_state <= FSMState::STATE_ARMED)
         {
             launch_time = current_time;
             has_triggered_vmux_fallback = false;
@@ -561,7 +625,7 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
 
-        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000)
+        if (current_state == FSMState::STATE_ARMED || current_state == FSMState::STATE_SAFE || current_state == FSMState::STATE_PYRO_TEST || (current_time - launch_time) > 1800000)
         {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 200))

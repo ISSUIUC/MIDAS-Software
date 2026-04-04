@@ -2,6 +2,7 @@
 
 #include "fsm.h"
 #include "thresholds.h"
+#include "rocket_state.h"
 
 /**
  * @brief Helper to calculate the average value of a buffered sensor data
@@ -73,28 +74,41 @@ StateEstimate::StateEstimate(RocketData& state) {
     });
 }
 
+bool FSM::set_cfg(const FSMConfiguration& new_cfg) {
+    // Check if the new config has a valid CRC.
+    uint32_t cfg_crc = new_cfg.crc32;
+    uint32_t calculated_crc = FSMConfiguration::calculate_crc(new_cfg);
 
-#ifdef IS_SUSTAINER
+    if(cfg_crc != calculated_crc) { return false; }
+
+    config = new_cfg;
+    return true;
+}
 
 /**
- * @brief Sustainer FSM tick function, which will advance the current state if necessary
+ * @brief FSM tick function, which will advance the current state if necessary
  * 
  * @param state current FSM state
- * @param state_estimate StateEstimate struct for the current estimate for accel, alt, jerk, and speed
+ * @param fsm_data Struct containing all data for FSM transitions
  * 
  * @return New FSM State
 */
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& commands) {
-    //get current time
-    double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
+    double current_time = fsm_data.cur_time;
+    FSMData& state_data = fsm_data.cur_state;
+    FSMState& state = state_data.state;
+    uint8_t& current_motor = state_data.current_motor;
+    CommandFlags& commands = fsm_data.commands;
+    const StateEstimate& state_estimate = fsm_data.state_estimate;
+    const FSMConfiguration& config = fsm_data.fsm_config;
+    const KalmanData& kf_data = fsm_data.kf_data;
 
-    switch (state) {
-
+    switch(state) {
         case FSMState::STATE_SAFE:
-            // Deconflict if multip commands are processed
+            // Deconflict if multiple commands are processed
             if(commands.should_transition_safe) {
                 commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
+                commands.should_transition_armed = false;
                 commands.should_transition_safe = false;
                 break;
             }
@@ -106,10 +120,10 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 commands.should_transition_pyro_test = false;
             }
 
-            // Only switch to STATE_IDLE if triggered wirelessly.
-            if(commands.should_transition_idle) {
-                state = FSMState::STATE_IDLE;
-                commands.should_transition_idle = false;
+            // Only switch to STATE_ARMED if triggered wirelessly.
+            if(commands.should_transition_armed) {
+                state = FSMState::STATE_ARMED;
+                commands.should_transition_armed = false;
             }
 
             break;
@@ -119,407 +133,152 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
                 commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
+                commands.should_transition_armed = false;
                 commands.should_transition_safe = false;
                 break;
             }
 
             // Switch back to STATE_SAFE after a certain amount of time passes 
-            if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
+            if((current_time - pyro_test_entry_time) > fsms_pt_disarm_t) {
                 commands.should_transition_pyro_test = false;
                 state = FSMState::STATE_SAFE;
             }
 
             break;
-
-        case FSMState::STATE_IDLE:
+        case FSMState::STATE_ARMED:
 
             // Force transtion to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
                 commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
+                commands.should_transition_armed = false;
                 commands.should_transition_safe = false;
                 break;
             }
 
             // once a significant amount of acceleration is detected change states
-            if (state_estimate.acceleration > sustainer_idle_to_first_boost_acceleration_threshold) {
-                launch_time = current_time;
-                commands.FSM_should_set_cam_feed_cam1 = true;
-                state = FSMState::STATE_FIRST_BOOST;
+            if (state_estimate.acceleration > fsms_boost_xl) {
+                launch_time = current_time;                    // Record launch time
+                time_entered_cur_state = current_time;         // Record time for false boost detect
+                commands.FSM_should_set_cam_feed_cam1 = true;  // Set camera to side cam
+                cur_state_lockin = false;                      // Reset "state lock in" flag for boost detect
+                state = FSMState::STATE_BOOST;
             }
 
             break;
-
-        case FSMState::STATE_FIRST_BOOST:
-            // if acceleration spike was too brief then go back to idle
-            if ((state_estimate.acceleration < sustainer_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < sustainer_idle_to_first_boost_time_threshold)) {
-                state = FSMState::STATE_IDLE;
-                break;
+        case FSMState::STATE_BOOST:
+            // -- BEGIN FALSE MOTOR DETECTION --
+            if(!cur_state_lockin && (current_time - time_entered_cur_state) < fsms_boost_lockin_t) {
+                // The state has not been locked in yet, so we should check if we still meet the conditions
+                if(state_estimate.acceleration < fsms_boost_xl) {
+                    state = (current_motor == 0) ? FSMState::STATE_ARMED : FSMState::STATE_COAST;
+                    time_entered_cur_state = current_time;
+                    break;
+                }
+            } else {
+                if(!cur_state_lockin) {
+                    current_motor++; // When "BOOST" gets locked in, we increment the current motor.
+                    cur_state_lockin = true;
+                }
             }
+            // -- END FALSE MOTOR DETECTION --
 
-            // once acceleartion decreases to a the threshold go on the next state
-            if (state_estimate.acceleration < sustainer_coast_detection_acceleration_threshold) {
-                burnout_time = current_time;
-                state = FSMState::STATE_BURNOUT;
+
+            // Burnout detection
+            if (state_estimate.acceleration < fsms_burnout_xl) {
+                time_entered_cur_state = current_time;
+                state = FSMState::STATE_COAST;
+                cur_state_lockin = false; // Reset "state lock in" flag for false burnout detection
             }
             break;
-
-        case FSMState::STATE_BURNOUT:
+        case FSMState::STATE_COAST: {
             // if low acceleration is too brief than go on to the previous state
-            if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_coast_time)) {
-                state = FSMState::STATE_FIRST_BOOST;
-                break;
+
+            // -- BEGIN FALSE BURNOUT DETECTION --
+            if(!cur_state_lockin && (current_time - time_entered_cur_state) < fsms_burnout_lockin_t) {
+                // The state has not been locked in yet, so we should check if we still meet the conditions
+                if(state_estimate.acceleration >= fsms_burnout_xl) {
+                    state = FSMState::STATE_BOOST;
+                    // Note: We do not reset the "time since entering current state" timer, as we're assuming we're still in the previous boost phase.
+                    cur_state_lockin = true; // We are going back to a previously "locked-in" state.
+                    break;
+                }
+            } else {
+                cur_state_lockin = true;
             }
+            // -- END FALSE BURNOUT DETECTION --
 
-            // if in burnout for long enough then go on to the next state (time transition)
-            if ((current_time - burnout_time) > sustainer_coast_time) {
-                sustainer_ignition_time = current_time;
-                state = FSMState::STATE_SUSTAINER_IGNITION;
-            }
-            break;
+            // -- BEGIN APOGEE DETECT --
+            // Condition 1: Vertical speed low
+            bool apog_detect_low_speed = (state_estimate.vertical_speed <= fsms_apogee_detect_spd);
 
-        case FSMState::STATE_SUSTAINER_IGNITION:
-            // This state probably does not need a pyro lockout, since we have a back-transition from STATE_SECOND_BOOST
-            // another time transition into coast after a certain amount of time
-            if ((current_time - sustainer_ignition_time) > sustainer_ignition_to_coast_timer_threshold) {
-                coast_time = current_time;
-                state = FSMState::STATE_COAST;
-                break;
-            }
+            // Condition 2: Cruise lockout
+            bool apog_detect_cruise_lockout = (!config.thresholds.cruise_lockout_en || kf_data.velocity.vx <= fsms_cruise_lockout_spd);
+            // Note: This evaluates to TRUE (no lockout) if the lockout is disabled, OR if the condition is met
 
-            // once a high enough acceleration is detected then go to next state
-            if (state_estimate.acceleration > sustainer_ignition_to_second_boost_acceleration_threshold) {
-                second_boost_time = current_time;
-                state = FSMState::STATE_SECOND_BOOST;
-            }
 
-            break;
-
-        case FSMState::STATE_SECOND_BOOST:
-            // if high accleration is too brief then return to previous state
-            if ((state_estimate.acceleration < sustainer_ignition_to_second_boost_acceleration_threshold) && ((current_time - second_boost_time) < sustainer_ignition_to_second_boost_time_threshold)) {
-                state = FSMState::STATE_SUSTAINER_IGNITION;
-                break;
-            }
-
-            // if low acceleration detected go to next state
-            if (state_estimate.acceleration < sustainer_coast_detection_acceleration_threshold) {
-                coast_time = current_time;
-                state = FSMState::STATE_COAST;
-            }
-            break;
-
-        case FSMState::STATE_COAST:
-            // if the low acceleration detected was too brief then return to previous state
-            if ((state_estimate.acceleration > sustainer_coast_detection_acceleration_threshold) && ((current_time - coast_time) < sustainer_second_boost_to_coast_time_threshold)) {
-                state = FSMState::STATE_SECOND_BOOST;
-                break;
-            }
-
-            // if speed slows down enough then go on to the next stage
-            if (state_estimate.vertical_speed <= sustainer_coast_to_apogee_vertical_speed_threshold) {
-                apogee_time = current_time;
+            if (apog_detect_low_speed && apog_detect_cruise_lockout) {
+                // Begin apogee detect
+                time_entered_cur_state = current_time;
+                // Note: The apogee does not have a "lock in" feature, as it just transitions to DROGUE when the timer expires.
+                //       In order to preserve this state's "lock in" in case of erroneous apogee detection, the flag is not reset.
                 state = FSMState::STATE_APOGEE;
+
+                // And swap camera feed
                 commands.FSM_should_swap_camera_feed = true;
             }
+            // -- END APOGEE DETECT --
             break;
+        }
 
-        case FSMState::STATE_APOGEE:
-            // if the slow speed was too brief then return to previous state
-            if ((state_estimate.vertical_speed) > sustainer_apogee_backto_coast_vertical_speed_threshold && ((current_time - apogee_time) < sustainer_apogee_check_threshold)) {
+        case FSMState::STATE_APOGEE: {
+            // We run the apogee detection algorithm above again. Read above for explanation
+            bool apog_detect_low_speed = (state_estimate.vertical_speed <= fsms_apogee_detect_spd);
+            bool apog_detect_cruise_lockout = (!config.thresholds.cruise_lockout_en || kf_data.velocity.vx <= fsms_cruise_lockout_spd);
+
+            // If either condition is not met, go back to COAST.
+            if (!apog_detect_low_speed || !apog_detect_cruise_lockout) {
                 state = FSMState::STATE_COAST;
+                // Note: We do not reset the lock in flag, as we assume the COAST state is locked in.
                 break;
             }
 
-            // transition to next state after a certain amount of time
-            if ((current_time - apogee_time) > sustainer_apogee_timer_threshold) {
-                drogue_time = current_time;
-                state = FSMState::STATE_DROGUE_DEPLOY;
-            }
-            break;
-
-        case FSMState::STATE_DROGUE_DEPLOY:
-            // if detected a sharp change in jerk then go to next state
-            // Drogue deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
-            if((current_time - drogue_time) < sustainer_pyro_firing_time_minimum) {
-                break;
-            }
-
-            if (abs(state_estimate.jerk) > sustainer_drogue_jerk_threshold) {
-                state = FSMState::STATE_DROGUE;
-                break;
-            }
-
-            // if no transtion after a certain amount of time then just move on to next state
-            if ((current_time - drogue_time) > sustainer_drogue_timer_threshold) {
-                state = FSMState::STATE_DROGUE;
-            }
-
-            break;
-
-        case FSMState::STATE_DROGUE:
-            // if altitude low enough then next state
-            // Also, wait at least 1 second after drogue deploy to deploy main.
-            if (state_estimate.altitude <= sustainer_main_deploy_altitude_threshold && (current_time - drogue_time) > sustainer_main_deploy_delay_after_drogue) {
-                state = FSMState::STATE_MAIN_DEPLOY;
-                main_time = current_time;
-            }
-            break;
-
-        case FSMState::STATE_MAIN_DEPLOY:
-            // Main deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
-            if((current_time - drogue_time) < sustainer_pyro_firing_time_minimum) {
-                break;
-            }
-
-            // if detected a sharp change in jerk then go to the next state
-            if (abs(state_estimate.jerk) > sustainer_main_jerk_threshold) {
-                state = FSMState::STATE_MAIN;
-                main_deployed_time = current_time;
-                break;
-            }
-
-            // if no transtion after a certain amount of time then just move on to next state
-            if ((current_time - main_time) > sustainer_main_to_main_deploy_timer_threshold) {
-                state = FSMState::STATE_MAIN;
-            }
-            break;
-
-        case FSMState::STATE_MAIN:
-            // if slowed down enough then go on to the next state
-            if ((abs(state_estimate.vertical_speed) <= sustainer_landed_vertical_speed_threshold) && (current_time - main_deployed_time) > sustainer_main_to_landed_lockout) {
-                landed_time = current_time;
-                state = FSMState::STATE_LANDED;
-            }
-            break;
-
-        case FSMState::STATE_LANDED:
-
-            if((current_time - landed_time) > sustainer_landed_time_lockout) {
-                
-                if(!landing_lockout_triggered) {
-                    landing_lockout_triggered = true;
-                    commands.FSM_should_power_save = true;
-                }
-
-                // Check for any telem transitions
-                // Force transtion to safe if requested + clear all transition flags.
-                if(commands.should_transition_safe) {
-                    state = FSMState::STATE_SAFE;
-                    commands.should_transition_pyro_test = false;
-                    commands.should_transition_idle = false;
-                    commands.should_transition_safe = false;
-                }
-
-                break;
-            }
-
-            // if the slow speed was too brief then return to previous state
-            if ((abs(state_estimate.vertical_speed) > sustainer_landed_to_main_vertical_speed_threshold) && ((current_time - landed_time) > sustainer_landed_timer_threshold)) {
-                state = FSMState::STATE_MAIN;
-            }
-            break;
-
-    }
-    return state;
-}
-
-#else
-
-/**
- * @brief Booster FSM tick function, which will advance the current state if necessary
- * 
- * This is similar to the previous function but contains less states
- * 
- * @param state current FSM state
- * @param state_estimate StateEstimate struct for the current estimate for accel, alt, jerk, and speed
- * 
- * @return New FSM State
-*/
-FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFlags& commands) {
-    double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
-
-    switch (state) {
-         case FSMState::STATE_SAFE:
-            // Deconflict if multip commands are processed
-            if(commands.should_transition_safe) {
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
-                break;
-            }
-
-            // Only switch to STATE_PYRO_TEST if triggered wirelessly
-            if(commands.should_transition_pyro_test) {
-                state = FSMState::STATE_PYRO_TEST;
-                pyro_test_entry_time = current_time;
-                commands.should_transition_pyro_test = false;
-            }
-
-            // Only switch to STATE_IDLE if triggered wirelessly.
-            if(commands.should_transition_idle) {
-                state = FSMState::STATE_IDLE;
-                commands.should_transition_idle = false;
-            }
-
-            break;
-        case FSMState::STATE_PYRO_TEST:
-
-            // Force transtion to safe if requested + clear all transition flags.
-            if(commands.should_transition_safe) {
-                state = FSMState::STATE_SAFE;
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
-                break;
-            }
-
-            // Switch back to STATE_SAFE after a certain amount of time passes 
-            if((current_time - pyro_test_entry_time) > safety_pyro_test_disarm_time) {
-                commands.should_transition_pyro_test = false;
-                state = FSMState::STATE_SAFE;
-            }
-
-            break;
-
-        case FSMState::STATE_IDLE:
-            // Force transtion to safe if requested + clear all transition flags.
-            if(commands.should_transition_safe) {
-                state = FSMState::STATE_SAFE;
-                commands.should_transition_pyro_test = false;
-                commands.should_transition_idle = false;
-                commands.should_transition_safe = false;
-                break;
-            }
-
-            // once a significant amount of acceleration is detected change states
-            if (state_estimate.acceleration > booster_idle_to_first_boost_acceleration_threshold) {
-                launch_time = current_time;
-                commands.FSM_should_set_cam_feed_cam1 = true;
-                state = FSMState::STATE_FIRST_BOOST;
-            }
-
-            break;
-        case FSMState::STATE_FIRST_BOOST:
-            if ((state_estimate.acceleration < booster_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < booster_idle_to_first_boost_time_threshold)) {
-                state = FSMState::STATE_IDLE;
-                break;
-            }
-            if (state_estimate.acceleration < booster_coast_detection_acceleration_threshold) {
-                burnout_time = current_time;
-                state = FSMState::STATE_BURNOUT;
-            }
-
-            break;
-
-        case FSMState::STATE_BURNOUT:
-            if ((state_estimate.acceleration >= booster_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < booster_first_boost_to_burnout_time_threshold)) {
-                state = FSMState::STATE_FIRST_BOOST;
-                break;
-            }
-
-            if ((current_time - burnout_time) > booster_first_boost_to_burnout_time_threshold) {
-                first_separation_time = current_time;
-                state = FSMState::STATE_FIRST_SEPARATION;
-            }
-            break;
-
-        case FSMState::STATE_FIRST_SEPARATION:
-
-            // Stage sep should ALWAYS stay for at least some time, due to a lack of a back-transition from STAGE_FIRST_SEPARATION
-            if((current_time - first_separation_time) < booster_pyro_firing_time_minimum) {
-                break;
-            }
-
-            if (abs(state_estimate.jerk) < booster_first_separation_jerk_threshold) {
-                state = FSMState::STATE_COAST;
-                break;
-            }
-
-            if ((current_time - first_separation_time) > booster_first_seperation_time_threshold) {
-                state = FSMState::STATE_COAST;
-            }
-
-            break;
-
-        case FSMState::STATE_COAST:
-            if (state_estimate.vertical_speed <= booster_coast_to_apogee_vertical_speed_threshold) {
+            // If we are still in this state after the apogee lock in timer, go straight to DROGUE, do not pass GO.
+            if(current_time - time_entered_cur_state > fsms_apogee_lockin_t) {
+                time_entered_cur_state = current_time;
                 apogee_time = current_time;
-                state = FSMState::STATE_APOGEE;
-            }
-            break;
-
-        case FSMState::STATE_APOGEE:
-            if (state_estimate.vertical_speed > booster_coast_to_apogee_vertical_speed_threshold && ((current_time - apogee_time) < booster_apogee_check_threshold)) {
-                state = FSMState::STATE_COAST;
-                break;
-            }
-
-            if ((current_time - apogee_time) > booster_apogee_timer_threshold) {
-                drogue_time = current_time;
-                state = FSMState::STATE_DROGUE_DEPLOY;
-            }
-            break;
-
-        case FSMState::STATE_DROGUE_DEPLOY:
-
-            // Drogue deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
-            if((current_time - drogue_time) < booster_pyro_firing_time_minimum) {
-                break;
-            }
-
-            if (abs(state_estimate.jerk) > booster_drogue_jerk_threshold) {
-                state = FSMState::STATE_DROGUE;
-                break;
-            }
-            if ((current_time - drogue_time) > booster_drogue_timer_threshold) {
                 state = FSMState::STATE_DROGUE;
             }
-
             break;
+        }
 
         case FSMState::STATE_DROGUE:
-            // if altitude low enough then next state
-            // Also, wait at least 1 second after drogue deploy to deploy main.
-            if (state_estimate.altitude <= booster_main_deploy_altitude_threshold && (current_time - drogue_time) > booster_main_deploy_delay_after_drogue) {
-                state = FSMState::STATE_MAIN_DEPLOY;
-                main_time = current_time;
-            }
-            break;
+            // Simple: If we hit the main threshold, deploy main.
+            // Make sure to respect the MAIN_LOCKOUT_T rule.
 
-        case FSMState::STATE_MAIN_DEPLOY:
-
-            // Main deploy should ALWAYS stay for at least some time, due to a lack of a back-transition from STATE_DROGUE
-            if((current_time - main_time) < booster_pyro_firing_time_minimum) {
-                break;
-            }
-
-            if (abs(state_estimate.jerk) > booster_main_jerk_threshold) {
-                state = FSMState::STATE_MAIN;
-                main_deployed_time = current_time;
-                break;
-            }
-
-            if ((current_time - main_time) > booster_main_to_main_deploy_timer_threshold) {
+            if(state_estimate.altitude <= config.thresholds.main_alt && (current_time - time_entered_cur_state) > fsms_main_lockout_t) {
+                time_entered_cur_state = current_time;
                 state = FSMState::STATE_MAIN;
             }
             break;
 
         case FSMState::STATE_MAIN:
-            if (abs(state_estimate.vertical_speed) <= booster_landed_vertical_speed_threshold && (current_time - main_deployed_time) > booster_main_to_landed_lockout) {
-                landed_time = current_time;
+            // If we detect very low vertical movement, assume we are LANDED.
+            // In case of deployments close to apogee, prevent transitions to LANDED for some time to allow systemt to settle into parachute descent.
+            // 200ms debounce timer to prevent ping-ponging between MAIN and LANDED.
+            if ((abs(state_estimate.vertical_speed) <= fsms_landed_detect_spd) && (current_time - apogee_time) > fsms_landed_t_lockout && (current_time - time_entered_cur_state) > 200) {
+                time_entered_cur_state = current_time;
+                cur_state_lockin = false; // Reset flag for landing state lock in logic
                 state = FSMState::STATE_LANDED;
             }
             break;
 
         case FSMState::STATE_LANDED:
-
-            if((current_time - landed_time) > booster_landed_time_lockout) {
-
-                if(!landing_lockout_triggered) {
-                    landing_lockout_triggered = true;
+            // Landing lock-in
+            if((current_time - time_entered_cur_state) > fsms_landed_t) {
+                
+                if(!cur_state_lockin) {
+                    cur_state_lockin = true;
                     commands.FSM_should_power_save = true;
                 }
 
@@ -528,19 +287,21 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
                 if(commands.should_transition_safe) {
                     state = FSMState::STATE_SAFE;
                     commands.should_transition_pyro_test = false;
-                    commands.should_transition_idle = false;
+                    commands.should_transition_armed = false;
                     commands.should_transition_safe = false;
                 }
 
                 break;
             }
 
-            if ((abs(state_estimate.vertical_speed) > booster_landed_to_main_vertical_speed_threshold) && ((current_time - landed_time) > booster_landed_timer_threshold)) {
+            // If we still detect falling movement, go back to MAIN.
+            if (abs(state_estimate.vertical_speed) > fsms_landed_detect_spd) {
                 state = FSMState::STATE_MAIN;
+                time_entered_cur_state = current_time;
             }
-            break;
 
+            break;
     }
-    return state;
+
+    return state_data;
 }
-#endif

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "TCAL9538.h"
+
 // SPI sensor bus
 #define SPI_MISO 3
 #define SPI_MOSI 2
@@ -33,10 +35,13 @@
 
 // pyro pins
 #define PYRO_GLOBAL_ARM_PIN GpioAddress(0, 3)
-#define PYROA_FIRE_PIN GpioAddress(0, 0)
-#define PYROB_FIRE_PIN GpioAddress(0, 1)
-#define PYROC_FIRE_PIN GpioAddress(0, 7)
-#define PYROD_FIRE_PIN GpioAddress(0, 6)
+#define MIDAS_NUM_PYROS 4
+constexpr GpioAddress PYRO_PINS[MIDAS_NUM_PYROS] = {
+    GpioAddress(0, 0),
+    GpioAddress(0, 1),
+    GpioAddress(0, 7),
+    GpioAddress(0, 6)
+};
 #define PYRO_PG GpioAddress(0, 4)
 
 // Continuity pins (on the ADC)

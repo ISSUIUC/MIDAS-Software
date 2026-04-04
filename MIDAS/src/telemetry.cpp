@@ -96,7 +96,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     GPS gps = data.gps.getRecentUnsync();
     Voltage voltage = data.voltage.getRecentUnsync();
     Barometer barometer = data.barometer.getRecentUnsync();
-    FSMState fsm = data.fsm_state.getRecentUnsync();
+    FSMState fsm = data.fsm_state.getRecentUnsync().state;
     PyroState pyro = data.pyro.getRecentUnsync();
     KalmanData kalman = data.kalman.getRecentUnsync();
     AngularKalmanData angular_kalman = data.angular_kalman_data.getRecentUnsync();
@@ -161,6 +161,9 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     #ifdef IS_SUSTAINER
     packet.callsign_gpsfix_satcount |= 0b1;
     #endif
+
+    // Set error flags
+    packet.error_flags = data.err_flags;
 
     return packet;
 }

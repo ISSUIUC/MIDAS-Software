@@ -162,7 +162,7 @@ public:
 struct CommandFlags {
     bool should_reset_kf = false;               // CommandType::RESET_KF
     bool should_transition_safe = false;        // CommandType::SWITCH_TO_SAFE
-    bool should_transition_idle = false;        // CommandType::SWITCH_TO_IDLE
+    bool should_transition_armed = false;       // CommandType::SWITCH_TO_ARMED
     bool should_transition_pyro_test = false;   // CommandType::SWITCH_TO_PYRO_TEST
     bool should_fire_pyro_a = false;            // CommandType::FIRE_PYRO_A
     bool should_fire_pyro_b = false;            // CommandType::FIRE_PYRO_B
@@ -173,6 +173,12 @@ struct CommandFlags {
     bool FSM_should_power_save = false;         // Triggered after 60 seconds in LANDED state.
     bool FSM_should_swap_camera_feed = false;   // Triggered COAST --> APOGEE
 };
+
+struct MErrorFlags {
+    uint8_t fsm_crc_err  : 1 = 0;
+    uint8_t reserved     : 7 = 0;
+};
+
 /**
  * @struct RocketData
  * 
@@ -191,12 +197,13 @@ public:
     SensorData<IMU_SFLP> sflp;
     BufferedSensorData<Barometer, 16> barometer;
     SensorData<PyroState> pyro;
-    SensorData<FSMState> fsm_state;
+    SensorData<FSMData> fsm_state;
     SensorData<GPS> gps;
     SensorData<Magnetometer> magnetometer;
     SensorData<Voltage> voltage;
     SensorData<CameraData> cam_data;
     
     CommandFlags command_flags;
+    MErrorFlags err_flags;
     Latency log_latency;
 };

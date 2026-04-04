@@ -1,5 +1,6 @@
 #pragma once
 #include <sensor_data.h>
+#include "finite-state-machines/fsm.h"
 /* @brief This file stores the schema for MIDAS EEPROM data. It is used to generate the EEPROM checksum */
 
 struct MIDASEEPROM {
@@ -14,4 +15,6 @@ struct MIDASEEPROM {
     Acceleration lsm6dsv320x_hg_xl_bias = {0.0f, 0.0f, 0.0f};
     Magnetometer mmc5983ma_softiron_bias = {1.0f, 1.0f, 1.0f};
     Magnetometer mmc5983ma_hardiron_bias = {0.0f, 0.0f, 0.0f};
+
+    FSMConfiguration fsm_config;
 };

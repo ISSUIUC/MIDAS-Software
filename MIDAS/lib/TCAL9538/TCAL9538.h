@@ -10,7 +10,7 @@ static constexpr int I2C_BUS_Map[] = {0};
 static constexpr int GPIO_BIT_COUNT = 8;
 
 struct GpioAddress {
-    GpioAddress(int gpio_id, int pin_id);
+    constexpr GpioAddress(int gpio_id, int pin_id);
     uint8_t gpio_id; //id of the expander
     uint8_t gpio_address; //i2c address of expander
     uint8_t pin_id; // pin_id 0-7
@@ -18,7 +18,7 @@ struct GpioAddress {
 };
 
 
-inline GpioAddress::GpioAddress(int gpio_id, int pin_id): gpio_id(gpio_id), gpio_address(0), pin_id(pin_id), is_valid(false) {
+constexpr GpioAddress::GpioAddress(int gpio_id, int pin_id): gpio_id(gpio_id), gpio_address(0), pin_id(pin_id), is_valid(false) {
     if(gpio_id == 0){
         gpio_address = GPIO0_ADDRESS;
     } 

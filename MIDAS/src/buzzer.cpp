@@ -1,4 +1,5 @@
 #include "buzzer.h"
+#include <cstring>
 #include <hardware/pins.h>
 
 /**
@@ -7,8 +8,9 @@
  * @param tune Song to be played
  * @param length Length of song to be played
 */
-void BuzzerController::play_tune(Sound* tune, uint32_t length) {
-    current_tune_ = tune;
+void BuzzerController::play_tune(const Sound* tune, uint32_t length) {
+    if (length > MAX_TUNE_LENGTH) length = MAX_TUNE_LENGTH;
+    memcpy(tune_buffer_, tune, length * sizeof(Sound));
     index_ = 0;
     length_ = length;
     new_tune_started = true;
@@ -25,23 +27,23 @@ void BuzzerController::tick() {
  * @brief Returns whether the buzzer is currently playing a tune
  */
 bool BuzzerController::is_playing() {
-    return (current_tune_ != nullptr);
+    return (length_ > 0);
 }
 
 /**
  * @brief ticks the bizzer, plays next note/ starts new song if applicable
 */
 void BuzzerController::tick_sounds() {
-    if (current_tune_ == nullptr) {
+    if (length_ == 0) {
         return;
     }
 
-    Sound& current_sound = current_tune_[index_];
+    Sound& current_sound = tune_buffer_[index_];
 
     uint32_t current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
     if (new_tune_started) {
-        Sound& next_sound = current_tune_[index_];
+        Sound& next_sound = tune_buffer_[index_];
         ledcWriteTone(BUZZER_CHANNEL, next_sound.frequency);
 
         when_sound_started_ = current_time;
@@ -49,13 +51,12 @@ void BuzzerController::tick_sounds() {
     } else if (current_time - when_sound_started_ >= current_sound.duration_ms) {
         index_++;
         if (index_ >= length_) {
-            current_tune_ = nullptr;
             index_ = 0;
             length_ = 0;
 
             ledcWriteTone(BUZZER_CHANNEL, 0);
         } else {
-            Sound& next_sound = current_tune_[index_];
+            Sound& next_sound = tune_buffer_[index_];
             ledcWriteTone(BUZZER_CHANNEL, next_sound.frequency);
 
             when_sound_started_ = current_time;
@@ -105,6 +106,15 @@ ErrorCode BuzzerController::init() {
 #define LAND_TONE_PITCH Sound{2730, 250}
 #define LAND_TONE_WAIT Sound{0, 250}
 
+#define REPORT_WARN Sound{2730, 200}
+#define REPORT_CONTHIGH Sound{3000, 100}
+#define REPORT_CONTLOW Sound{2500, 100}
+#define REPORT_PAUSES Sound{0, 50}
+#define REPORT_PAUSEL Sound{0, 200}
+
+#define REPORT_ERRFSM0 Sound{3000, 150}
+#define REPORT_ERRFSM1 Sound{2800, 150}
+
 /**
  * @brief free bird solo song, to be played on startup/ second stage iginition
 */
@@ -121,3 +131,25 @@ Sound warn_tone[WARN_TONE_LENGTH] = {WARN_TONE_PITCH};
  * @brief Land state tone, played whenever the board is in the "LANDED" state to provide a audio indicator to recovery parties
  */
 Sound land_tone[LAND_TONE_LENGTH] = {WARN_TONE_PITCH, WARN_TONE_PITCH, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT, LAND_TONE_WAIT};
+
+void BuzzerController::report_beeps(bool* cont, bool fsm_fail) {
+    constexpr uint8_t report_tone_len = 16;
+    // Build the tone based off of report data
+    
+    Sound report_tone[report_tone_len] = {
+        REPORT_WARN,
+        REPORT_PAUSEL,
+        cont[0] ? REPORT_CONTHIGH : REPORT_CONTLOW, REPORT_PAUSES,
+        cont[1] ? REPORT_CONTHIGH : REPORT_CONTLOW, REPORT_PAUSES,
+        cont[2] ? REPORT_CONTHIGH : REPORT_CONTLOW, REPORT_PAUSES,
+        cont[3] ? REPORT_CONTHIGH : REPORT_CONTLOW, REPORT_PAUSES,
+        REPORT_PAUSEL,
+        fsm_fail ? REPORT_ERRFSM0 : REPORT_PAUSES,
+        fsm_fail ? REPORT_ERRFSM1 : REPORT_PAUSES,
+        fsm_fail ? REPORT_ERRFSM0 : REPORT_PAUSES,
+        fsm_fail ? REPORT_ERRFSM1 : REPORT_PAUSES,
+        REPORT_PAUSES
+    };
+
+    play_tune(report_tone, report_tone_len);
+}

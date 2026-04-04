@@ -32,8 +32,6 @@
 //Remove the low_g sensor and high_g sensor, we will be using the imu sensor for the midas mini.
 
 //Barometer (Altitude from Barometer is bugged, need to fix)
-
-
 struct Sensors {
     IMUSensor imu;
 
@@ -58,6 +56,7 @@ struct RocketSystems {
     BuzzerController buzzer;
     LEDController led;
     Telemetry tlm;
+    FSM fsm;
     B2BInterface b2b;
     EEPROMController eeprom;
     MShell* shell;
