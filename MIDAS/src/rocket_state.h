@@ -164,6 +164,7 @@ enum MetaDataCode {
     EVENT_TMAIN,
     EVENT_TMAX_ACCEL,
     EVENT_TMAX_VEL,
+    EVENT_TMAX_DESCENT_RATE,
 
     // Non-events
     DATA_LAUNCHSITE_BARO,
@@ -173,6 +174,8 @@ enum MetaDataCode {
     DATA_TILT_AT_IGNITION,
     DATA_MAX_ACCEL,
     DATA_MAX_VEL,
+    DATA_ALT_AT_BURNOUT,
+    DATA_MAX_DESCENT_RATE
 };
 
 struct MetaLogging {

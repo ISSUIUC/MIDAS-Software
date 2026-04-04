@@ -221,6 +221,7 @@ void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems
         case FSMState::STATE_BURNOUT:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TBURNOUT, current_time);
             sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_BURNOUT, cur_orientation.sflp_tilt);
+            sys->meta_logging.log_data(MetaDataCode::DATA_ALT_AT_BURNOUT, sys->rocket_data.barometer.getRecentUnsync().altitude);
             break;
         case FSMState::STATE_SECOND_BOOST:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TIGNITION, current_time);
@@ -243,6 +244,11 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
     FSM fsm{};
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+    
+    float max_descent_rate = 0;
+    bool has_logged = false;
+    double max_descent_rate_time = 0;
+    
     while (true)
     {
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
@@ -350,7 +356,21 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
             arg->b2b.camera.vmux_set(BULKHEAD_CAMERA);
         }
+        //MAX DESCENT RATE METADATA LOGGING - incomplete
+        if(arg->rocket_data.fsm_state.getRecentUnsync() >= FSMState::STATE_APOGEE && arg->rocket_data.fsm_state.getRecentUnsync() < FSMState::STATE_LANDED) {
+            if(max_descent_rate < state_estimate.vertical_speed) {
+                max_descent_rate = state_estimate.vertical_speed;
+                max_descent_rate_time = pdTICKS_TO_MS(xTaskGetTickCount());
+            }
+        }
 
+        if(!has_logged) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
+                arg->meta_logging.log_data(MetaDataCode::DATA_MAX_DESCENT_RATE, max_descent_rate);
+                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_DESCENT_RATE, max_decent_rate_time);
+                has_logged = true;
+            }
+        }
         THREAD_SLEEP(50);
     }
 }
