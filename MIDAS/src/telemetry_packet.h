@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include "rocket_state.h"
 
 #define MAX_TELEM_VOLTAGE_V 6.0f
 #define MAX_TELEM_CONT_I 0.2f
@@ -44,6 +45,9 @@ struct TelemetryPacket {
     uint16_t kf_pz; // 16 bit meters
 
     uint32_t pyro; // 8 bit continuity x 4 channels
+
+    // Global error flags
+    MErrorFlags error_flags; 
     
     uint8_t roll_rate;
     uint8_t camera_state;
@@ -52,8 +56,9 @@ struct TelemetryPacket {
 };
 
 
+
 // Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX, CALIB_ACCEL, CALIB_MAG };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_ARMED, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX, CALIB_ACCEL, CALIB_MAG };
 
 /**
  * @struct TelemetryCommand

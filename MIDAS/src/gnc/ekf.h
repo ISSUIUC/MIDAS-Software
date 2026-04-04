@@ -52,7 +52,7 @@ private:
 
     // Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
     KalmanState kalman_state;
-    FSMState last_fsm = FSMState::STATE_IDLE;
+    FSMState last_fsm = FSMState::STATE_ARMED;
     float stage_timestamp = 0;
     
     // Track how long we've been in LANDED state to avoid false positives

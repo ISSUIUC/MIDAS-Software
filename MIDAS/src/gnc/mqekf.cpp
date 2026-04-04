@@ -32,8 +32,8 @@ void QuaternionMEKF::initialize(RocketSystems *args)
 
     Acceleration accel, accel_sum;
     Magnetometer mag, mag_sum;
-    FSMState FSM_state = args->rocket_data.fsm_state.getRecent();
-    if (FSM_state == FSMState::STATE_IDLE)
+    FSMState FSM_state = args->rocket_data.fsm_state.getRecent().state;
+    if (FSM_state == FSMState::STATE_ARMED)
     {
         for (int i = 0; i < 10; i++)
         {
@@ -77,7 +77,7 @@ QuaternionMEKF::QuaternionMEKF()
 
 void QuaternionMEKF::tick(float dt, Magnetometer &magnetometer, Velocity &angular_velocity, Acceleration &acceleration, FSMState FSM_state, Velocity &gyro_bias_sflp)
 {
-    if (FSM_state >= FSMState::STATE_IDLE) //
+    if (FSM_state >= FSMState::STATE_ARMED) //
     {
 
         // setQ(dt, sd);

@@ -4,9 +4,8 @@
 #include <cstdint>
 #include <algorithm>
 
-#include "finite-state-machines/fsm_states.h"
+#include "finite-state-machines/fsm.h"
 
-//#define CONTINUITY_PIN_COUNT 5
 
 /**
  * @brief
@@ -289,7 +288,9 @@ struct AngularKalmanData {
 */
 struct PyroState {
     bool is_global_armed = false;
-    bool channel_firing[4];
+    bool channel_firing[MIDAS_NUM_PYROS];      // Whether the pyro is currently firing
+    bool pyro_event_consumed[MIDAS_NUM_PYROS]; // Whether the pyro has attempted to fire in flight already.
+
     /**
      * By convention, the pyro states are as follows:
      * [0] PYRO A / APOGEE

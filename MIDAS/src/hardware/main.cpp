@@ -97,10 +97,9 @@ void setup()
     pinMode(LED_ORANGE, OUTPUT);
     pinMode(LED_RED, OUTPUT);
 
-    gpioPinMode(PYROA_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYROB_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYROC_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYROD_FIRE_PIN, OUTPUT);
+    for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
+        gpioPinMode(PYRO_PINS[i], OUTPUT);
+    }
     gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT);
 
     delay(200);
