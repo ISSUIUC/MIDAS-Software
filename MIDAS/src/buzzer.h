@@ -40,7 +40,7 @@ public:
     bool is_playing();
 };
 
-#define FREE_BIRD_LENGTH 31
+#define FREE_BIRD_LENGTH 48
 #define JAMES_BOND_LENGTH 27
 #define WARN_TONE_LENGTH 1
 #define LAND_TONE_LENGTH 11
