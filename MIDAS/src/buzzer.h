@@ -40,7 +40,8 @@ public:
     bool is_playing();
 };
 
-#define FREE_BIRD_LENGTH 11
+#define FREE_BIRD_LENGTH 31
+#define JAMES_BOND_LENGTH 27
 #define WARN_TONE_LENGTH 1
 #define LAND_TONE_LENGTH 11
 
@@ -48,6 +49,7 @@ public:
 #define C_MG_LENGTH 5
 
 extern Sound free_bird[FREE_BIRD_LENGTH];
+extern Sound james_bond[JAMES_BOND_LENGTH];
 extern Sound warn_tone[WARN_TONE_LENGTH];
 extern Sound land_tone[LAND_TONE_LENGTH];
 
