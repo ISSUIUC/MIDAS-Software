@@ -1,9 +1,9 @@
 from mido import MidiFile
 
-FILE_NAME = "freebird.mid"
+FILE_NAME = "heyjude.mid"
 # you can set this to be whatever midi file you want
 
-mid = MidiFile("midi-files/{FILE_NAME}") 
+mid = MidiFile(f"midi-files/{FILE_NAME}") 
 # for i in range(1, 5):
 track_num = 1
 
