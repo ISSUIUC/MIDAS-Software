@@ -132,10 +132,6 @@ public:
     // Sets CRC to the fail state, preventing any pyro action.
     void set_crc_fail() { config.crc32 = FSM_CRC_FAIL_STATE; };
 
-    const FSMConfiguration& get_cfg() const {return config;};
-
-    bool set_cfg(const FSMConfiguration& new_cfg) {return false;};
-
 private:
     FSMConfiguration config;
     double pyro_test_entry_time;
