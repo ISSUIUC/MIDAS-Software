@@ -11,24 +11,37 @@ struct MapEntry {
     const char* name;
     size_t offset;
     DataType type;
+    const char* unit;
 };
 
 static constexpr MapEntry threshold_map[] = {
-    {"PYRO_FIRE_T", offsetof(FSMUserThresholds, pyro_fire_t), DataType::FLOAT},
-    {"MAIN_ALT", offsetof(FSMUserThresholds, main_alt), DataType::FLOAT},
-    {"CRUISE_LOCKOUT_EN", offsetof(FSMUserThresholds, cruise_lockout_en), DataType::BOOL},
+    {"PYRO_FIRE_T", offsetof(FSMUserThresholds, pyro_fire_t), DataType::FLOAT, "ms"},
+    {"MAIN_ALT", offsetof(FSMUserThresholds, main_alt), DataType::FLOAT, "m"},
+    {"CRUISE_LOCKOUT_EN", offsetof(FSMUserThresholds, cruise_lockout_en), DataType::BOOL, ""},
 };
 
 static constexpr MapEntry channel_map[] = {
-    {"ENABLE", offsetof(FSMPyroAction, enable), DataType::BOOL},
-    {"FSM_TRIGGER", offsetof(FSMPyroAction, fsm_trigger), DataType::FSMSTATE},
-    {"DELAY", offsetof(FSMPyroAction, delay), DataType::FLOAT},
-    {"MAX_TILT", offsetof(FSMPyroAction, max_tilt), DataType::FLOAT},
-    {"AFTER_MOTOR", offsetof(FSMPyroAction, after_motor), DataType::UINT8},
-    {"LAUNCH_T_GT", offsetof(FSMPyroAction, launch_t_gt), DataType::FLOAT},
-    {"LAUNCH_T_LT", offsetof(FSMPyroAction, launch_t_lt), DataType::FLOAT},
-    {"VX_MIN", offsetof(FSMPyroAction, vx_min), DataType::FLOAT},
-    {"VX_MAX", offsetof(FSMPyroAction, vx_max), DataType::FLOAT},
+    {"ENABLE", offsetof(FSMPyroAction, enable), DataType::BOOL, ""},
+    {"FSM_TRIGGER", offsetof(FSMPyroAction, fsm_trigger), DataType::FSMSTATE, ""},
+    {"DELAY", offsetof(FSMPyroAction, delay), DataType::FLOAT, "ms"},
+    {"MAX_TILT", offsetof(FSMPyroAction, max_tilt), DataType::FLOAT, "degrees"},
+    {"AFTER_MOTOR", offsetof(FSMPyroAction, after_motor), DataType::UINT8, ""},
+    {"LAUNCH_T_GT", offsetof(FSMPyroAction, launch_t_gt), DataType::FLOAT, "ms"},
+    {"LAUNCH_T_LT", offsetof(FSMPyroAction, launch_t_lt), DataType::FLOAT, "ms"},
+    {"VX_MIN", offsetof(FSMPyroAction, vx_min), DataType::FLOAT, "m/s"},
+    {"VX_MAX", offsetof(FSMPyroAction, vx_max), DataType::FLOAT, "m/s"},
+};
+
+static constexpr const char * state_names[] = {
+    "SAFE",
+    "PYRO_TEST",
+    "ARMED",
+    "BOOST",
+    "COAST",
+    "APOGEE",
+    "DROGUE",
+    "MAIN",
+    "LANDED",
 };
 
 static constexpr FSMState allowed_trigger_states[] = {
@@ -53,10 +66,17 @@ void print_serial(uint8_t serial){
 MCommandExecutionResult set_fsm(const MShellContext& ctx) {
     // fix this command cause it's stupid
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
-    if(ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
-
+    if(ctx.argc < 2 || ctx.argc > 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     int st = atoi(ctx.argv[1]);
-    arg->rocket_data.fsm_state.update((FSMState)st);
+
+    // two arguments: motor number = 0
+    if(ctx.argc == 2) {arg->rocket_data.fsm_state.update({(FSMState)st,0});}
+
+    // three arguments: motor number given
+    else if (ctx.argc == 3) {
+        uint8_t motor = atoi(ctx.argv[2]);
+        arg->rocket_data.fsm_state.update({(FSMState)st, motor});
+    }
     return MCommandExecutionResult::OK;
 }
 
@@ -83,7 +103,6 @@ MCommandExecutionResult serial(const MShellContext& ctx){
         return MCommandExecutionResult::OK;
     }
     else if(!strcmp(ctx.argv[1], "get")){
-        Serial.print("Serial Number: ");
         print_serial(arg->eeprom.data.serial);
         return MCommandExecutionResult::OK;
     }
@@ -116,9 +135,8 @@ MCommandExecutionResult frequency(const MShellContext& ctx){
         return MCommandExecutionResult::OK;
     }
     else if(!strcmp(ctx.argv[1], "get")){
-        Serial.print("Frequency: ");
         Serial.print(arg->eeprom.data.frequency);
-        Serial.println("MHz");
+        Serial.println(" MHz");
         return MCommandExecutionResult::OK;
     }
     else{
@@ -131,7 +149,6 @@ MCommandExecutionResult fsm_version(const MShellContext& ctx){
     // expecting 2 (get) or 3 (set) arguments
     if(ctx.argc > 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     if(ctx.argc == 2){
-        Serial.print("FSM Version: ");
         Serial.println(arg->fsm.get_cfg().version_num);
         return MCommandExecutionResult::OK;
     }
@@ -164,19 +181,26 @@ MCommandExecutionResult fsm_threshold(const MShellContext& ctx){
             case DataType::BOOL:{
                 bool val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset, sizeof(bool));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" ");
+                const char * tf = val ? "(true)" : "(false)";
+                Serial.println(tf);
                 return MCommandExecutionResult::OK;
             }
             case DataType::UINT8:{
                 uint8_t val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset, sizeof(uint8_t));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FLOAT:{
                 float val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset, sizeof(float));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
         }
@@ -188,21 +212,28 @@ MCommandExecutionResult fsm_threshold(const MShellContext& ctx){
                 bool val = atoi(ctx.argv[3]) ? true : false;
                 memcpy((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset, &val, sizeof(bool));
                 Serial.print("Queued: ");
-                Serial.println(*(bool*)((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset));
+                Serial.print(*(bool*)((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset));
+                Serial.print(" ");
+                const char * tf = val ? "(true)" : "(false)";
+                Serial.println(tf);
                 return MCommandExecutionResult::OK;
             }
             case DataType::UINT8:{
                 uint8_t val = atoi(ctx.argv[3]);
                 memcpy((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset, &val, sizeof(uint8_t));
                 Serial.print("Queued: ");
-                Serial.println(*(uint8_t*)((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset));
+                Serial.print(*(uint8_t*)((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset));
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FLOAT:{
                 float val = atoff(ctx.argv[3]);
                 memcpy((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset, &val, sizeof(float));
                 Serial.print("Queued: ");
-                Serial.println(*(float*)((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset));
+                Serial.print(*(float*)((uint8_t*)(&shell_cfg.thresholds)+threshold_map[map_idx].offset));
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
         }
@@ -230,25 +261,35 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
             case DataType::BOOL:{
                 bool val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(bool));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" ");
+                const char * tf = val ? "(true)" : "(false)";
+                Serial.println(tf);
                 return MCommandExecutionResult::OK;
             }
             case DataType::UINT8:{
                 uint8_t val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(uint8_t));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FLOAT:{
                 float val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(float));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FSMSTATE:{
                 FSMState val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(FSMState));
-                Serial.println(val);
+                Serial.print(val);
+                Serial.print(" (");
+                Serial.print(state_names[val]);
+                Serial.println(")");
                 return MCommandExecutionResult::OK;
             }
         }
@@ -260,21 +301,28 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
                 bool val = atoi(ctx.argv[3]) ? true : false;
                 memcpy((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, &val, sizeof(bool));
                 Serial.print("Queued: ");
-                Serial.println(*(bool*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(*(bool*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(" ");
+                const char * tf = val ? "(true)" : "(false)";
+                Serial.println(tf);
                 return MCommandExecutionResult::OK;
             }
             case DataType::UINT8:{
                 uint8_t val = atoi(ctx.argv[3]);
                 memcpy((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, &val, sizeof(uint8_t));
                 Serial.print("Queued: ");
-                Serial.println(*(uint8_t*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(*(uint8_t*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FLOAT:{
                 float val = atoff(ctx.argv[3]);
                 memcpy((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, &val, sizeof(float));
                 Serial.print("Queued: ");
-                Serial.println(*(float*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(*(float*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(" ");
+                Serial.println(threshold_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FSMSTATE:{
@@ -289,12 +337,22 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
 
                 memcpy((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, &val, sizeof(FSMState));
                 Serial.print("Queued: ");
-                Serial.println(*(FSMState*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(*(FSMState*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(" (");
+                Serial.print(state_names[val]);
+                Serial.println(")");
                 return MCommandExecutionResult::OK;
             }
         }
     }
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+}
+
+MCommandExecutionResult fsm_help(){
+    Serial.println("FSM Configuration: ");
+    // insert more here
+
+    return MCommandExecutionResult::OK;
 }
 
 MCommandExecutionResult fsm(const MShellContext& ctx){
@@ -327,6 +385,9 @@ MCommandExecutionResult fsm(const MShellContext& ctx){
         if(arg->fsm.set_cfg(shell_cfg)) {return MCommandExecutionResult::OK;}
         return MCommandExecutionResult::ERR_INVAL_FSM;
     }
+    else if (!strcmp(ctx.argv[1], "help")){
+        return fsm_help();
+    }
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
@@ -335,6 +396,6 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("hi", hi_midas, "\t\thi <string> - Prints hi <string>");
     sh->register_command("serial", serial, "\tserial get - Get MIDAS serial number\n\t\tserial set <serialnumber:int> - Set MIDAS serial number");
     sh->register_command("frequency", frequency, "\tfrequency get - Get MIDAS telemetry frequency (in MHz)\n\t\tfrequency set <freq:float> - Set MIDAS telemetry frequency (in MHz)");
-    sh->register_command("fsm", fsm, "\t\tThis command is only supported when used with the official MIDAS-Base software package.");
+    sh->register_command("fsm", fsm, "\t\tThis command is used to configure the MIDAS FSM thresholds and pyro firing events. \n\t\tUse through the official MIDAS-Base software package is recommended, or experienced users may enter \"fsm help\" for more information.");
     // add calibration commands
 }
