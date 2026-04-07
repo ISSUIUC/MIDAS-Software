@@ -282,21 +282,33 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
                 memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(uint8_t));
                 Serial.print(val);
                 Serial.print(" ");
-                Serial.println(threshold_map[map_idx].unit);
+                Serial.println(channel_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FLOAT:{
                 float val;
-                memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(float));
+                memcpy(&val, (uint8_t*)(&arg->fsm.get_cfg().pyro_actions[ch])+channel_map[map_idx].offset, sizeof(float));
                 Serial.print(val);
                 Serial.print(" ");
-                Serial.println(threshold_map[map_idx].unit);
+                Serial.println(channel_map[map_idx].unit);
+                return MCommandExecutionResult::OK;
+            }
+            case DataType::DOUBLE:{
+                double val;
+                memcpy(&val, (uint8_t*)(&arg->fsm.get_cfg().pyro_actions[ch])+channel_map[map_idx].offset, sizeof(double));
+                Serial.print(val);
+                Serial.print(" ");
+                Serial.println(channel_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FSMSTATE:{
                 FSMState val;
                 memcpy(&val, (uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, sizeof(FSMState));
                 Serial.print(val);
+                if (val >= FSMState::FSM_STATE_COUNT || val < 0) {
+                    Serial.println(""); 
+                    return MCommandExecutionResult::ERR_INVAL_EEPROM;
+                }
                 Serial.print(" (");
                 Serial.print(state_names[val]);
                 Serial.println(")");
@@ -323,7 +335,7 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
                 Serial.print("Queued: ");
                 Serial.print(*(uint8_t*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
                 Serial.print(" ");
-                Serial.println(threshold_map[map_idx].unit);
+                Serial.println(channel_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FLOAT:{
@@ -332,14 +344,16 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
                 Serial.print("Queued: ");
                 Serial.print(*(float*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
                 Serial.print(" ");
-                Serial.println(threshold_map[map_idx].unit);
+                Serial.println(channel_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::DOUBLE:{
                 double val = atof(ctx.argv[3]);
                 memcpy((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset, &val, sizeof(double));
                 Serial.print("Queued: ");
-                Serial.println(*(double*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(*(double*)((uint8_t*)(&shell_cfg.pyro_actions[ch])+channel_map[map_idx].offset));
+                Serial.print(" ");
+                Serial.println(channel_map[map_idx].unit);
                 return MCommandExecutionResult::OK;
             }
             case DataType::FSMSTATE:{
@@ -365,9 +379,50 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+MCommandExecutionResult fsm_commit(const MShellContext& ctx){
+    if (ctx.argc != 3) {return MCommandExecutionResult::ERR_INVAL_ARGC;}
+    RocketSystems* arg = (RocketSystems*) ctx.sysarg;
+
+    // Set the config's crc
+    uint32_t crc = std::stoul(ctx.argv[2]);
+    shell_cfg.crc32 = crc;
+    if(arg->fsm.set_cfg(shell_cfg)) {
+        arg->led.set(LED::RED, LOW);
+        arg->rocket_data.err_flags.fsm_crc_err = false; // Clear CRC error flag
+
+        // Commit to EEPROM
+        arg->eeprom.data.fsm_config = arg->fsm.get_cfg();
+        arg->eeprom.commit();
+
+        return MCommandExecutionResult::OK;
+    }
+    return MCommandExecutionResult::ERR_INVAL_FSM;
+}
+
 MCommandExecutionResult fsm_help(){
-    Serial.println("FSM Configuration: ");
-    // insert more here
+    Serial.println("FSM Configuration Help:\n");
+
+    Serial.println("General FSM Commands:");
+    Serial.println("\tfsm commit [uint32_t crc] - save queued FSM config to EEPROM");
+    Serial.println("\tfsm calculate - calculate crc for queued FSM config");
+    Serial.println("\tfsm crc - display crc for current FSM config");
+    Serial.println("\tfsm version [OPTIONAL uint8_t version] - display current FSM version or queue new version");
+    
+    Serial.println("FSM Threshold Configuration:");
+    Serial.println("\tfsm threshold CRUISE_LOCKOUT_EN [OPTIONAL bool] - get current cruise lockout status or queue new value");
+    Serial.println("\tfsm threshold MAIN_ALT [OPTIONAL float] - get current main deploy altitude (m) or queue new value");
+    Serial.println("\tfsm threshold PYRO_FIRE_T [OPTIONAL float] - get current pyro firing time (ms) or set new value");
+
+    Serial.println("FSM Channel Configuration:");
+    Serial.println("\tfsm [A/B/C/D] ENABLE [OPTIONAL bool] - get current channel enable status or queue new value");
+    Serial.println("\tfsm [A/B/C/D] FSM_TRIGGER [OPTIONAL int] - get current channel trigger state or queue new value");
+    Serial.println("\tfsm [A/B/C/D] DELAY [OPTIONAL double] - get current channel firing delay or queue new value");
+    Serial.println("\tfsm [A/B/C/D] MAX_TILT [OPTIONAL float] - get current channel maximum tilt requirement or queue new value");
+    Serial.println("\tfsm [A/B/C/D] AFTER_MOTOR [OPTIONAL int] - get current channel motor count requirement or queue new value");
+    Serial.println("\tfsm [A/B/C/D] LAUNCH_T_GT [OPTIONAL float] - get current channel minimum launch time requirement or queue new value");
+    Serial.println("\tfsm [A/B/C/D] LAUNCH_T_LT [OPTIONAL float] - get current channel maximum launch time requirement or queue new value");
+    Serial.println("\tfsm [A/B/C/D] VX_MIN [OPTIONAL float] - get current channel minimum velocity requirement or queue new value");
+    Serial.println("\tfsm [A/B/C/D] VX_MAX [OPTIONAL float] - get current channel maximum velocity requirement or queue new value");
 
     return MCommandExecutionResult::OK;
 }
@@ -397,25 +452,11 @@ MCommandExecutionResult fsm(const MShellContext& ctx){
         return fsm_calculate(ctx);
     }
     else if (!strcmp(ctx.argv[1], "crc")){
-        Serial.print("FSM CRC: ");
         Serial.println(arg->fsm.get_cfg().crc32);
         return MCommandExecutionResult::OK;
     }
     else if (!strcmp(ctx.argv[1], "commit")){
-        // Set the config's crc
-        uint32_t crc = std::stoul(ctx.argv[2]);
-        shell_cfg.crc32 = crc;
-        if(arg->fsm.set_cfg(shell_cfg)) {
-            arg->led.set(LED::RED, LOW);
-            arg->rocket_data.err_flags.fsm_crc_err = false; // Clear CRC error flag
-
-            // Commit to EEPROM
-            arg->eeprom.data.fsm_config = arg->fsm.get_cfg();
-            arg->eeprom.commit();
-
-            return MCommandExecutionResult::OK;
-        }
-        return MCommandExecutionResult::ERR_INVAL_FSM;
+        return fsm_commit(ctx);
     }
     else if (!strcmp(ctx.argv[1], "help")){
         return fsm_help();
