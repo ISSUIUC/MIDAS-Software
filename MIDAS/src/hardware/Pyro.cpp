@@ -5,7 +5,7 @@
 
 #include "TCAL9538.h"
 #include <rocket_state.h>
-#include "pyro_eval.h"
+#include "finite-state-machines/pyro_eval.h"
 
 
 // Fire the pyros for this time during PYRO_TEST (ms)
