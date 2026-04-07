@@ -1,0 +1,16 @@
+{
+  "name": "Sawa III Nominal",
+  "description": "Nominal flight on SAWA III",
+  "input_csv": "../data/sawaiii_telemega.csv",
+  "transitions": [
+    {"state": "BOOST",  "time_ms": 0,   "tolerance_ms": 500},
+    {"state": "COAST",  "time_ms": 5850,  "tolerance_ms": 500},
+    {"state": "DROGUE", "time_ms": 22050,  "tolerance_ms": 2000},
+    {"state": "MAIN",   "time_ms": 143768, "tolerance_ms": 2000},
+    {"state": "LANDED", "time_ms": 182000, "tolerance_ms": 5000}
+  ],
+  "pyro_fires": [
+    {"channel": 0, "time_ms": 22050,  "tolerance_ms": 2000},
+    {"channel": 1, "time_ms": 143768, "tolerance_ms": 2000}
+  ]
+}
