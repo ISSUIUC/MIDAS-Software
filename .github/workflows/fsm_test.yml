@@ -69,7 +69,6 @@ jobs:
             if python test/fsm_test/tester/run_test.py "$tc" \
               --save-plot "test/fsm_test/plots/${name}.png"; then
               PASS=$((PASS + 1))
-              PASS=$((PASS + 1))
             else
               FAIL=$((FAIL + 1))
               FAILED="${FAILED}${name}, "
