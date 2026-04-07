@@ -15,7 +15,8 @@ enum class MCommandExecutionResult {
     ERR_INVAL_ARGC = 4,     // The amount of arguments is incorrect for the current function.
     ERR_INVAL_ARGUMENT = 5, // One or more arguments is invalid (generic)
     ERR_INVAL_ARG_RANGE = 6,// One or more arguments is out of range
-    ERR_INVAL_FSM = 7       // FSM commit failed
+    ERR_INVAL_FSM = 7,      // FSM commit failed
+    ERR_INVAL_EEPROM = 8,   // EEPROM has garbage values
     
     // Command specific
 };
