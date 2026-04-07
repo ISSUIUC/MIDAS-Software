@@ -1,0 +1,16 @@
+{
+  "name": "Cassie Nominal",
+  "description": "Nominal Cassie flight",
+  "input_csv": "../data/cassie_telemega.csv",
+  "transitions": [
+    {"state": "BOOST",  "time_ms": 0,   "tolerance_ms": 500},
+    {"state": "COAST",  "time_ms": 3200,  "tolerance_ms": 500},
+    {"state": "DROGUE", "time_ms": 38000,  "tolerance_ms": 2000},
+    {"state": "MAIN",   "time_ms": 468000, "tolerance_ms": 2000},
+    {"state": "LANDED", "time_ms": 526000, "tolerance_ms": 5000}
+  ],
+  "pyro_fires": [
+    {"channel": 0, "time_ms": 38100,  "tolerance_ms": 2000},
+    {"channel": 1, "time_ms": 468000, "tolerance_ms": 2000}
+  ]
+}

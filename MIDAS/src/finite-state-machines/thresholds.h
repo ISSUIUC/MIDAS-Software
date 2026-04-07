@@ -25,6 +25,9 @@
 //       (Configure this value to prevent overpressure events)
 #define fsms_main_lockout_t 1000
 
+// (ms)  Amount of time for which LANDED criteria have to be met to transition initially into the LANDED state
+#define fsms_landed_entry_t 1000
+
 // (ms)  Time for which the LANDED criteria have to be met to prevent back-transition into MAIN
 #define fsms_landed_t 5000
 
