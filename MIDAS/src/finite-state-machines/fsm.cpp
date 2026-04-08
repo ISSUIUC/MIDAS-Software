@@ -214,6 +214,17 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             }
             // -- END FALSE BURNOUT DETECTION --
 
+            // -- BEGIN NEXT STAGE IGNITION DETECT --
+            // After burnout is confirmed, check for another motor ignition (multistage)
+            if(cur_state_lockin && state_estimate.acceleration > fsms_boost_xl) {
+                time_entered_cur_state = current_time;
+                cur_state_lockin = false;
+                apogee_detect_start = 0; // Reset apogee detection
+                state = FSMState::STATE_BOOST;
+                break;
+            }
+            // -- END NEXT STAGE IGNITION DETECT --
+
             // -- BEGIN APOGEE DETECT --
             // Condition 1: Vertical speed low
             bool apog_detect_low_speed = (state_estimate.vertical_speed <= fsms_apogee_detect_spd);

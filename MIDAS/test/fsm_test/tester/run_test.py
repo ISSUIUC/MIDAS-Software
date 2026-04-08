@@ -13,9 +13,11 @@ import argparse
 import json
 import os
 import pathlib
+import shutil
 import subprocess
 import sys
-from dataclasses import dataclass
+import tempfile
+from dataclasses import dataclass, field
 
 import pandas as pd
 
@@ -46,6 +48,7 @@ class TestCase:
     name: str
     description: str
     input_csv: pathlib.Path
+    cfg: list[str]
     expected_transitions: list[ExpectedTransition]
     expected_pyro_fires: list[ExpectedPyroFire]
 
@@ -59,6 +62,7 @@ def load_test_case(json_path):
         name=data.get("name", json_path.stem),
         description=data.get("description", ""),
         input_csv=json_dir / data["input_csv"],
+        cfg=data.get("cfg", []),
         expected_transitions=[
             ExpectedTransition(STATE_TO_NUM[t["state"]], t["time_ms"], t.get("tolerance_ms", 500.0))
             for t in data.get("transitions", [])
@@ -70,14 +74,27 @@ def load_test_case(json_path):
     )
 
 
+def prepare_sim_input(tc, output_dir):
+    """Prepend #cfg: lines to the data CSV, return path to the prepared file."""
+    if not tc.cfg:
+        return tc.input_csv
+
+    prepared = output_dir / f"{tc.name}_input.csv"
+    with open(prepared, "w") as out:
+        for line in tc.cfg:
+            out.write(f"#cfg:{line}\n")
+        with open(tc.input_csv) as src:
+            shutil.copyfileobj(src, out)
+    print(f"Generated PF-in: {str(prepared)}")
+    return prepared
+
+
 def detect_transitions(df):
-    seen = set()
     transitions = []
     prev = None
     for _, row in df.iterrows():
         s = int(row["state"])
-        if s != prev and s not in seen:
-            seen.add(s)
+        if s != prev:
             transitions.append((s, float(row["timestamp_ms"])))
         prev = s
     return transitions
@@ -101,20 +118,26 @@ def validate(transitions, pyro_fires, tc):
     ok = True
     msgs = []
 
-    by_state = dict(transitions)
     if tc.expected_transitions:
         msgs.append("Transitions:")
+        actual_idx = 0
         for exp in tc.expected_transitions:
             name = NUM_TO_STATE.get(exp.state, str(exp.state))
-            actual = by_state.get(exp.state)
-            if actual is None:
+            # Find the next actual transition matching this state
+            found = False
+            while actual_idx < len(transitions):
+                s, t = transitions[actual_idx]
+                actual_idx += 1
+                if s == exp.state:
+                    delta = t - exp.time_ms
+                    status = "PASS" if abs(delta) <= exp.tolerance_ms else "FAIL"
+                    if status == "FAIL": ok = False
+                    msgs.append(f"{status}: {name} at {t:.0f}ms (expected {exp.time_ms:.0f}ms, delta {delta:+.0f}ms, tol +/-{exp.tolerance_ms:.0f}ms)")
+                    found = True
+                    break
+            if not found:
                 msgs.append(f"FAIL: {name} -- never reached (expected ~{exp.time_ms:.0f}ms)")
                 ok = False
-            else:
-                delta = actual - exp.time_ms
-                status = "PASS" if abs(delta) <= exp.tolerance_ms else "FAIL"
-                if status == "FAIL": ok = False
-                msgs.append(f"{status}: {name} at {actual:.0f}ms (expected {exp.time_ms:.0f}ms, delta {delta:+.0f}ms, tol +/-{exp.tolerance_ms:.0f}ms)")
 
     by_ch = dict(pyro_fires)
     if tc.expected_pyro_fires:
@@ -129,6 +152,12 @@ def validate(transitions, pyro_fires, tc):
                 status = "PASS" if abs(delta) <= exp.tolerance_ms else "FAIL"
                 if status == "FAIL": ok = False
                 msgs.append(f"{status}: ch{exp.channel} at {actual:.0f}ms (expected {exp.time_ms:.0f}ms, delta {delta:+.0f}ms, tol +/-{exp.tolerance_ms:.0f}ms)")
+
+        expected_channels = {exp.channel for exp in tc.expected_pyro_fires}
+        for ch, t in pyro_fires:
+            if ch not in expected_channels:
+                msgs.append(f"FAIL: ch{ch} fired unexpectedly at {t:.0f}ms")
+                ok = False
 
     return ok, msgs
 
@@ -161,8 +190,10 @@ def main():
         output_csv = args.output or FSM_TEST_DIR / "output" / f"{tc.name}.csv"
         output_csv.parent.mkdir(parents=True, exist_ok=True)
 
-        if not args.skip_sim and not run_simulator(tc.input_csv, output_csv):
-            return 1
+        if not args.skip_sim:
+            sim_input = prepare_sim_input(tc, output_csv.parent)
+            if not run_simulator(sim_input, output_csv):
+                return 1
         if not output_csv.exists():
             print(f"Output not found: {output_csv}")
             return 1

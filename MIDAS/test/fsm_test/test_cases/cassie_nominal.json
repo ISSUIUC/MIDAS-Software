@@ -2,6 +2,14 @@
   "name": "Cassie Nominal",
   "description": "Nominal Cassie flight",
   "input_csv": "../data/cassie_telemega.csv",
+  "cfg": [
+    "initial_state=2",
+    "main_alt=800",
+    "cruise_lockout_en=false",
+    "pyro_fire_t=200",
+    "pyro_0=enable=true,fsm_trigger=5,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100",
+    "pyro_1=enable=true,fsm_trigger=6,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100"
+  ],
   "transitions": [
     {"state": "BOOST",  "time_ms": 0,   "tolerance_ms": 500},
     {"state": "COAST",  "time_ms": 3200,  "tolerance_ms": 500},

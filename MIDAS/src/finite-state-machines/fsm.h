@@ -55,7 +55,7 @@ struct FSMPyroAction {
         if (!enable) { return false; }
         if (fsm_state != fsm_trigger) { return false; }
         if(max_tilt != -1 && cur_tilt > max_tilt) { return false; }
-        if(after_motor != 0 && cur_motor <= after_motor) { return false; }
+        if(after_motor != 0 && cur_motor < after_motor) { return false; }
         if(launch_t_gt != -1 && cur_time_since_launch < launch_t_gt) { return false; }
         if(launch_t_lt != -1 && cur_time_since_launch > launch_t_lt) { return false; }
         if(vx_min != -1 && cur_vx < vx_min) { return false; }

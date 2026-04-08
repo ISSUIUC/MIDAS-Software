@@ -16,6 +16,7 @@ struct PyroEvalState {
 };
 
 struct PyroEvalResult {
+    bool event_triggered[MIDAS_NUM_PYROS] = {};
     bool channel_firing[MIDAS_NUM_PYROS] = {};
     bool event_consumed[MIDAS_NUM_PYROS] = {};
 };
@@ -30,6 +31,7 @@ inline PyroEvalResult pyro_eval(const FSMConfiguration& config, const FSMData& f
         result.event_consumed[i] = state.event_consumed[i];
         if (state.event_consumed[i]) {
             result.channel_firing[i] = false;
+            result.event_triggered[i] = false;
             continue;
         }
 
@@ -38,8 +40,10 @@ inline PyroEvalResult pyro_eval(const FSMConfiguration& config, const FSMData& f
         if (state.trigger_times[i] == 0) {
             if (act.conditions_met(fsm.state, tilt_deg, fsm.current_motor, time_since_launch, vx)) {
                 state.trigger_times[i] = current_time;
+                result.event_triggered[i] = true;
             }
         } else {
+            result.event_triggered[i] = true;
             if (current_time - state.trigger_times[i] >= act.delay) {
                 if (!state.event_check[i] && !act.conditions_met(fsm.state, tilt_deg, fsm.current_motor, time_since_launch, vx)) {
                     state.event_consumed[i] = true;

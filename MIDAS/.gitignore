@@ -5,3 +5,4 @@
 **/.DS_Store
 *.launch
 *.pyc
+/test/fsm_test/output/*
