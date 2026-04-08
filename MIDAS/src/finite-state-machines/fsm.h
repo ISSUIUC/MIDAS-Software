@@ -32,7 +32,7 @@ struct StateEstimate {
 
     explicit StateEstimate(RocketData& state);
 
-#ifdef FSM_SILSIM_TEST
+#ifdef FSM_SIMULATOR
     StateEstimate(double alt, double accel, double jrk, double vspd)
         : altitude(alt), acceleration(accel), jerk(jrk), vertical_speed(vspd) {}
 #endif

@@ -164,13 +164,13 @@ def validate(transitions, pyro_fires, tc):
 
 def run_simulator(input_csv, output_csv):
     print("Building FSM simulator...")
-    build = subprocess.run(["pio", "run", "-e", "fsm_silsim_test"], cwd=PROJECT_ROOT)
+    build = subprocess.run(["pio", "run", "-e", "fsm_sim"], cwd=PROJECT_ROOT)
     if build.returncode != 0:
         print("Build failed.")
         return False
 
     exe_name = "program.exe" if os.name == "nt" else "program"
-    exe = PROJECT_ROOT / ".pio" / "build" / "fsm_silsim_test" / exe_name
+    exe = PROJECT_ROOT / ".pio" / "build" / "fsm_sim" / exe_name
     print(f"Running: {input_csv} -> {output_csv}")
     return subprocess.run([str(exe), str(input_csv), str(output_csv)], cwd=PROJECT_ROOT).returncode == 0
 
