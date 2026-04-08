@@ -1,0 +1,27 @@
+{
+  "name": "Aether Nominal",
+  "description": "2 stage - Aether nominal flight (sustainer)",
+  "input_csv": "../data/aetherii_telemega_s.csv",
+  "cfg": [
+    "initial_state=2",
+    "main_alt=1350",
+    "cruise_lockout_en=true",
+    "pyro_fire_t=200",
+    "pyro_0=enable=true,fsm_trigger=5,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100",
+    "pyro_1=enable=true,fsm_trigger=6,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100",
+    "pyro_2=enable=true,fsm_trigger=4,max_tilt=30,after_motor=1,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=6000"
+  ],
+  "transitions": [
+    {"state": "BOOST",  "time_ms": 0,   "tolerance_ms": 500},
+    {"state": "COAST",  "time_ms": 3550,  "tolerance_ms": 200},
+    {"state": "BOOST",  "time_ms": 10800,   "tolerance_ms": 500},
+    {"state": "COAST",  "time_ms": 19800,  "tolerance_ms": 500},
+    {"state": "DROGUE", "time_ms": 68690,  "tolerance_ms": 5000},
+    {"state": "MAIN", "time_ms": 1616800,  "tolerance_ms": 5000}
+  ],
+  "pyro_fires": [
+    {"channel": 0, "time_ms": 68690,  "tolerance_ms": 2000},
+    {"channel": 1, "time_ms": 1616800, "tolerance_ms": 2000},
+    {"channel": 2, "time_ms": 9550, "tolerance_ms": 500}
+  ]
+}

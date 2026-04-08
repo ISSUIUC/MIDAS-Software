@@ -97,7 +97,7 @@ int main(int argc, char** argv) {
 
     fprintf(out_fp, "timestamp_ms,state,acceleration_g,altitude_m,vertical_speed_mps,vx_mps,tilt_deg,cruise_lockout");
     for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
-        fprintf(out_fp, ",pyro_%d_firing,pyro_%d_consumed", i, i);
+        fprintf(out_fp, ",pyro_%d_triggered,pyro_%d_firing,pyro_%d_consumed", i, i, i);
     }
     fprintf(out_fp, "\n");
 
@@ -153,7 +153,8 @@ int main(int argc, char** argv) {
                 acceleration_g, altitude_m, vertical_speed_mps, vx_mps, tilt_deg,
                 cruise_lockout ? 1 : 0);
         for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
-            fprintf(out_fp, ",%d,%d",
+            fprintf(out_fp, ",%d,%d,%d",
+                    pyro_result.event_triggered[i] ? 1 : 0,
                     pyro_result.channel_firing[i] ? 1 : 0,
                     pyro_result.event_consumed[i] ? 1 : 0);
         }

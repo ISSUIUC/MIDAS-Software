@@ -11,6 +11,7 @@ PYRO_COLORS = ["tab:red", "tab:purple", "tab:orange", "tab:brown"]
 
 def _add_pyro_lines(ax, time_s, df):
     for i in range(4):
+        triggered_col = f"pyro_{i}_triggered"
         firing_col = f"pyro_{i}_firing"
         consumed_col = f"pyro_{i}_consumed"
         if firing_col not in df.columns:
@@ -20,15 +21,27 @@ def _add_pyro_lines(ax, time_s, df):
         firing = df[firing_col].astype(bool)
         consumed = df[consumed_col].astype(bool)
 
+        # Triggered: conditions met, delay started (dotted line)
+        if triggered_col in df.columns:
+            triggered = df[triggered_col].astype(bool)
+            trig_edges = triggered & ~triggered.shift(1, fill_value=False)
+            for j in trig_edges[trig_edges].index:
+                ax.axvline(time_s.iloc[j], color=color, linestyle="--", alpha=0.7, linewidth=1.5,
+                           label=f"Pyro {i} triggered" if j == trig_edges[trig_edges].index[0] else None)
+
+        # Fired: pyro actually firing (solid line)
         fired_edges = firing & ~firing.shift(1, fill_value=False)
         for j in fired_edges[fired_edges].index:
             ax.axvline(time_s.iloc[j], color=color, linestyle="-", alpha=0.8, linewidth=1.5,
                        label=f"Pyro {i} fired" if j == fired_edges[fired_edges].index[0] else None)
 
-        consumed_edges = consumed & ~consumed.shift(1, fill_value=False) & ~firing
-        for j in consumed_edges[consumed_edges].index:
-            ax.axvline(time_s.iloc[j], color=color, linestyle="--", alpha=0.6, linewidth=1.5,
-                       label=f"Pyro {i} consumed" if j == consumed_edges[consumed_edges].index[0] else None)
+        # Consumed without firing: conditions failed (dashed line)
+        # Only show if the channel never actually fired
+        if not firing.any():
+            consumed_edges = consumed & ~consumed.shift(1, fill_value=False)
+            for j in consumed_edges[consumed_edges].index:
+                ax.axvline(time_s.iloc[j], color=color, linestyle="--", alpha=0.6, linewidth=1.5,
+                           label=f"Pyro {i} consumed" if j == consumed_edges[consumed_edges].index[0] else None)
 
 
 def plot(df, title="FSM SILSIM", save_path=None):
@@ -69,8 +82,9 @@ def plot(df, title="FSM SILSIM", save_path=None):
 
     if "cruise_lockout" in df.columns:
         lockout = df["cruise_lockout"].astype(bool)
-        host.fill_between(time_s, 0, 1, where=lockout, transform=host.get_xaxis_transform(),
-                          color="tab:red", alpha=0.06)
+        if lockout.any():
+            host.fill_between(time_s, 0, 1, where=lockout, transform=host.get_xaxis_transform(),
+                              color="tab:red", alpha=0.06, label="Cruise lockout")
 
     _add_pyro_lines(host, time_s, df)
 
