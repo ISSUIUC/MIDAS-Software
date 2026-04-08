@@ -3,7 +3,7 @@
 #include "fsm.h"
 #include "thresholds.h"
 
-#ifdef FSM_SILSIM_TEST
+#ifdef FSM_SIMULATOR
 #include "sensor_data.h"
 #include "command_flags.h"
 #else
