@@ -52,7 +52,7 @@ jobs:
           pip install --upgrade platformio pandas matplotlib
 
       - name: Build FSM simulator
-        run: pio run -e fsm_silsim_test
+        run: pio run -e fsm_sim
 
       - name: Run tests
         id: tests
