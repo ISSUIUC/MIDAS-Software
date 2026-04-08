@@ -1,7 +1,7 @@
 {
   "name": "Aether No fire (SAFE)",
   "description": "Checks that pyros don't fire in SAFE ever, 2 stage data",
-  "input_csv": "../data/aetherii_telemega.csv",
+  "input_csv": "../data/aetherii_telemega_s.csv",
   "cfg": [
     "initial_state=0",
     "main_alt=800",
