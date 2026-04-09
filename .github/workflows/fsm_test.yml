@@ -1,0 +1,116 @@
+name: CI -- FSM SILSIM Tests
+
+on:
+  push:
+    branches:
+      - '**'
+    paths:
+      - 'MIDAS/src/finite-state-machines/**'
+      - 'MIDAS/test/fsm_test/**'
+      - 'MIDAS/src/rocket_state.h'
+      - 'MIDAS/src/command_flags.h'
+  pull_request:
+    paths:
+      - 'MIDAS/src/finite-state-machines/**'
+      - 'MIDAS/test/fsm_test/**'
+      - 'MIDAS/src/rocket_state.h'
+      - 'MIDAS/src/command_flags.h'
+  workflow_dispatch:
+
+jobs:
+  fsm_test:
+    name: FSM SILSIM Tests
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: MIDAS
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Cache pip
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
+          restore-keys: ${{ runner.os }}-pip-
+
+      - name: Cache PlatformIO
+        uses: actions/cache@v3
+        with:
+          path: ~/.platformio
+          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
+          restore-keys: ${{ runner.os }}-pio-
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install --upgrade platformio pandas matplotlib
+
+      - name: Build FSM simulator
+        run: pio run -e fsm_sim
+
+      - name: Run tests
+        id: tests
+        run: |
+          mkdir -p test/fsm_test/plots
+          PASS=0
+          FAIL=0
+          FAILED=""
+
+          for tc in test/fsm_test/test_cases/*.json; do
+            name=$(basename "$tc" .json)
+            echo "::group::Test: $name"
+
+            if python test/fsm_test/tester/run_test.py "$tc" \
+              --save-plot "test/fsm_test/plots/${name}.png"; then
+              PASS=$((PASS + 1))
+            else
+              FAIL=$((FAIL + 1))
+              FAILED="${FAILED}${name}, "
+            fi
+            echo "::endgroup::"
+          done
+
+          TOTAL=$((PASS + FAIL))
+          if [ $FAIL -eq 0 ]; then
+            SUMMARY="checkmark"
+          else
+            SUMMARY="failed: ${FAILED%, }"
+          fi
+          echo "pass=$PASS" >> "$GITHUB_OUTPUT"
+          echo "total=$TOTAL" >> "$GITHUB_OUTPUT"
+          echo "summary=$SUMMARY" >> "$GITHUB_OUTPUT"
+
+          [ $FAIL -eq 0 ]
+
+      - name: Upload plots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fsm-silsim-plots
+          path: MIDAS/test/fsm_test/plots/*.png
+
+      - name: Find existing comment
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/find-comment@v3
+        id: find-comment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: 'github-actions[bot]'
+          body-includes: '<!-- fsm-silsim-results -->'
+
+      - name: Comment on PR
+        if: always() && github.event_name == 'pull_request'
+        uses: peter-evans/create-or-update-comment@v4
+        with:
+          comment-id: ${{ steps.find-comment.outputs.comment-id }}
+          issue-number: ${{ github.event.pull_request.number }}
+          edit-mode: replace
+          body: |
+            <!-- fsm-silsim-results -->
+            **FSM SILSIM:** ${{ steps.tests.outputs.pass }}/${{ steps.tests.outputs.total }} passed ${{ steps.tests.outputs.summary == 'checkmark' && '&#10003;' || format('({0})', steps.tests.outputs.summary) }} — [plots](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})

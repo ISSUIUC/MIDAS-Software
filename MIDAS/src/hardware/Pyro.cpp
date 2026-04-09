@@ -5,12 +5,11 @@
 
 #include "TCAL9538.h"
 #include <rocket_state.h>
+#include "finite-state-machines/pyro_eval.h"
 
 
 // Fire the pyros for this time during PYRO_TEST (ms)
 #define PYRO_TEST_FIRE_TIME 100
-
-#define MAXIMUM_TILT_ANGLE (M_PI/8)    // 22.5 degrees
 
 /**
  * @brief Returns true if the error_code signals failure.
@@ -18,17 +17,6 @@
 bool error_is_failure(GpioError error_code) {
     return error_code != GpioError::NoError;
 }
-
-/**
- * @brief Determines if orientation is in an acceptable range to ignite second stage.
- * 
- * @return True if acceptable, false if not.
- */
-bool can_fire_igniter(AngularKalmanData angular_kalman_data) {
-    // With new GNC orientation code we can add a simple check.
-    return angular_kalman_data.sflp_tilt < MAXIMUM_TILT_ANGLE; 
-}
-
 
 /**
  * @brief Initializes the pyro thread. The main initialization will be done by the GPIO expander, so the pyro thread doesn't
@@ -139,43 +127,29 @@ PyroState Pyro::tick(PyroTickData& data) {
         return new_pyro_state;
     }
 
-    for(int i = 0; i < MIDAS_NUM_PYROS; i++) {
-        // If the pyro has already attempted to fire in this flight, do not attempt to fire again.
-        new_pyro_state.pyro_event_consumed[i] = pyro_event_consumed[i];
-        if(pyro_event_consumed[i]) {
-            new_pyro_state.channel_firing[i] = false;
-            continue; // Do not attempt to fire, and disarm the channel for good measure.
-        }
+    // Load state
+    PyroEvalState eval_state;
+    for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
+        eval_state.trigger_times[i] = pyro_trigger_times[i];
+        eval_state.event_check[i] = pyro_event_check[i];
+        eval_state.event_consumed[i] = pyro_event_consumed[i];
+    }
 
-        // For each pyro, check that the pyro condition is met.
-        double tilt_deg = data.akf.mq_tilt * (180/M_PI);
-        const FSMPyroAction& act = data.fsm_configuration.pyro_actions[i];
-        if(pyro_trigger_times[i] == 0) { // 0 on pyro trigger time indicates the check has not triggered yet.
-            if(act.conditions_met(data.fsm.state, tilt_deg, data.fsm.current_motor, data.time_since_launch, data.ekf.velocity.vx)) {
-                // Trigger the timer
-                pyro_trigger_times[i] = current_time;
-            }
-        } else {
-            // The pyro check has already been triggered, so we instead wait until the delay expires!
-            if(current_time - pyro_trigger_times[i] >= act.delay) {
+    // Calculate new state
+    double tilt_deg = data.akf.mq_tilt * (180.0 / M_PI);
+    PyroEvalResult eval = pyro_eval(
+        data.fsm_configuration, data.fsm, tilt_deg,
+        data.time_since_launch, data.ekf.velocity.vx,
+        current_time, eval_state
+    );
 
-                if(!pyro_event_check[i] && !act.conditions_met(data.fsm.state, tilt_deg, data.fsm.current_motor, data.time_since_launch, data.ekf.velocity.vx)) {
-                    // The condition has failed, so we should consume the pyro event & disarm the channel.
-                    pyro_event_consumed[i] = true;
-                    new_pyro_state.channel_firing[i] = false;
-                    continue;
-                }
-
-                pyro_event_check[i] = true; // We have checked the pyro conditions already.
-                // We are free to fire the pyro channel until the pyro fire time expires, since all pyro conditions are met.
-                new_pyro_state.channel_firing[i] = true;
-
-                if(current_time - pyro_trigger_times[i] >= act.delay + data.fsm_configuration.thresholds.pyro_fire_t) {
-                    pyro_event_consumed[i] = true;
-                    new_pyro_state.channel_firing[i] = false;
-                }   
-            }
-        }
+    // Write back state
+    for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
+        pyro_trigger_times[i] = eval_state.trigger_times[i];
+        pyro_event_check[i] = eval_state.event_check[i];
+        pyro_event_consumed[i] = eval_state.event_consumed[i];
+        new_pyro_state.channel_firing[i] = eval.channel_firing[i];
+        new_pyro_state.pyro_event_consumed[i] = eval.event_consumed[i];
     }
 
     return new_pyro_state;

@@ -2,14 +2,19 @@
 
 #include "fsm.h"
 #include "thresholds.h"
+
+#ifdef FSM_SIMULATOR
+#include "sensor_data.h"
+#include "command_flags.h"
+#else
 #include "rocket_state.h"
 
 /**
  * @brief Helper to calculate the average value of a buffered sensor data
- * 
+ *
  * @param sensor Buffered sensor struct
- * @param get_item Lambda get function 
- * 
+ * @param get_item Lambda get function
+ *
  * @return Average value
 */
 template<typename T, size_t count>
@@ -24,10 +29,10 @@ double sensor_average(BufferedSensorData<T, count>& sensor, double (* get_item)(
 
 /**
  * @brief Helper to calculate the derivative over a buffered sensor data
- * 
+ *
  * @param sensor Buffered sensor struct
- * @param get_item Lambda get function 
- * 
+ * @param get_item Lambda get function
+ *
  * @return Derivative
 */
 template<typename T, size_t count>
@@ -73,6 +78,7 @@ StateEstimate::StateEstimate(RocketData& state) {
         return (double) data.altitude;
     });
 }
+#endif
 
 bool FSM::set_cfg(const FSMConfiguration& new_cfg) {
     // Check if the new config has a valid CRC.
@@ -208,6 +214,17 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             }
             // -- END FALSE BURNOUT DETECTION --
 
+            // -- BEGIN NEXT STAGE IGNITION DETECT --
+            // After burnout is confirmed, check for another motor ignition (multistage)
+            if(cur_state_lockin && state_estimate.acceleration > fsms_boost_xl) {
+                time_entered_cur_state = current_time;
+                cur_state_lockin = false;
+                apogee_detect_start = 0; // Reset apogee detection
+                state = FSMState::STATE_BOOST;
+                break;
+            }
+            // -- END NEXT STAGE IGNITION DETECT --
+
             // -- BEGIN APOGEE DETECT --
             // Condition 1: Vertical speed low
             bool apog_detect_low_speed = (state_estimate.vertical_speed <= fsms_apogee_detect_spd);
@@ -216,39 +233,26 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             bool apog_detect_cruise_lockout = (!config.thresholds.cruise_lockout_en || kf_data.velocity.vx <= fsms_cruise_lockout_spd);
             // Note: This evaluates to TRUE (no lockout) if the lockout is disabled, OR if the condition is met
 
-
             if (apog_detect_low_speed && apog_detect_cruise_lockout) {
-                // Begin apogee detect
-                time_entered_cur_state = current_time;
-                // Note: The apogee does not have a "lock in" feature, as it just transitions to DROGUE when the timer expires.
-                //       In order to preserve this state's "lock in" in case of erroneous apogee detection, the flag is not reset.
-                state = FSMState::STATE_APOGEE;
+                // Start the consecutive timer if not already running
+                if (apogee_detect_start == 0) {
+                    apogee_detect_start = current_time;
+                }
 
-                // And swap camera feed
-                commands.FSM_should_swap_camera_feed = true;
+                // Transition to DROGUE only after conditions are met for fsms_apogee_lockin_t consecutive ms
+                if (current_time - apogee_detect_start >= fsms_apogee_lockin_t) {
+                    time_entered_cur_state = current_time;
+                    apogee_time = current_time;
+                    state = FSMState::STATE_DROGUE;
+                    apogee_detect_start = 0;
+
+                    commands.FSM_should_swap_camera_feed = true;
+                }
+            } else {
+                // Conditions not met: reset the timer
+                apogee_detect_start = 0;
             }
             // -- END APOGEE DETECT --
-            break;
-        }
-
-        case FSMState::STATE_APOGEE: {
-            // We run the apogee detection algorithm above again. Read above for explanation
-            bool apog_detect_low_speed = (state_estimate.vertical_speed <= fsms_apogee_detect_spd);
-            bool apog_detect_cruise_lockout = (!config.thresholds.cruise_lockout_en || kf_data.velocity.vx <= fsms_cruise_lockout_spd);
-
-            // If either condition is not met, go back to COAST.
-            if (!apog_detect_low_speed || !apog_detect_cruise_lockout) {
-                state = FSMState::STATE_COAST;
-                // Note: We do not reset the lock in flag, as we assume the COAST state is locked in.
-                break;
-            }
-
-            // If we are still in this state after the apogee lock in timer, go straight to DROGUE, do not pass GO.
-            if(current_time - time_entered_cur_state > fsms_apogee_lockin_t) {
-                time_entered_cur_state = current_time;
-                apogee_time = current_time;
-                state = FSMState::STATE_DROGUE;
-            }
             break;
         }
 
@@ -262,16 +266,26 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             }
             break;
 
-        case FSMState::STATE_MAIN:
-            // If we detect very low vertical movement, assume we are LANDED.
-            // In case of deployments close to apogee, prevent transitions to LANDED for some time to allow systemt to settle into parachute descent.
-            // 200ms debounce timer to prevent ping-ponging between MAIN and LANDED.
-            if ((abs(state_estimate.vertical_speed) <= fsms_landed_detect_spd) && (current_time - apogee_time) > fsms_landed_t_lockout && (current_time - time_entered_cur_state) > 200) {
-                time_entered_cur_state = current_time;
-                cur_state_lockin = false; // Reset flag for landing state lock in logic
-                state = FSMState::STATE_LANDED;
+        case FSMState::STATE_MAIN: {
+            bool landed_speed = (abs(state_estimate.vertical_speed) <= fsms_landed_detect_spd);
+            bool landed_lockout_passed = (current_time - apogee_time) > fsms_landed_t_lockout;
+
+            if (landed_speed && landed_lockout_passed) {
+                if (landed_detect_start == 0) {
+                    landed_detect_start = current_time;
+                }
+
+                if (current_time - landed_detect_start >= fsms_landed_entry_t) {
+                    time_entered_cur_state = current_time;
+                    cur_state_lockin = false;
+                    state = FSMState::STATE_LANDED;
+                    landed_detect_start = 0;
+                }
+            } else {
+                landed_detect_start = 0;
             }
             break;
+        }
 
         case FSMState::STATE_LANDED:
             // Landing lock-in

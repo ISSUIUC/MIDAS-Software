@@ -31,6 +31,11 @@ struct StateEstimate {
     double vertical_speed;
 
     explicit StateEstimate(RocketData& state);
+
+#ifdef FSM_SIMULATOR
+    StateEstimate(double alt, double accel, double jrk, double vspd)
+        : altitude(alt), acceleration(accel), jerk(jrk), vertical_speed(vspd) {}
+#endif
 };
 
 struct FSMPyroAction {
@@ -50,7 +55,7 @@ struct FSMPyroAction {
         if (!enable) { return false; }
         if (fsm_state != fsm_trigger) { return false; }
         if(max_tilt != -1 && cur_tilt > max_tilt) { return false; }
-        if(after_motor != 0 && cur_motor <= after_motor) { return false; }
+        if(after_motor != 0 && cur_motor < after_motor) { return false; }
         if(launch_t_gt != -1 && cur_time_since_launch < launch_t_gt) { return false; }
         if(launch_t_lt != -1 && cur_time_since_launch > launch_t_lt) { return false; }
         if(vx_min != -1 && cur_vx < vx_min) { return false; }
@@ -58,6 +63,15 @@ struct FSMPyroAction {
 
         return true;
     };
+
+    // Checks that conditions that- need to be met the entire "delay" time are met.
+    // If these conditions aren't met, the pyro event is reset without consuming it
+    bool soft_conditions_met(FSMState fsm_state) const {
+        if (!enable) { return false; }
+        if (fsm_state != fsm_trigger) { return false; }
+
+        return true;
+    }
 };
 
 struct FSMUserThresholds {
@@ -138,6 +152,8 @@ private:
     double launch_time;
     double apogee_time;
     double time_entered_cur_state;
+    double apogee_detect_start = 0;  // (0 = not active)
+    double landed_detect_start = 0; // (0 = not active)
     bool cur_state_lockin;
 };
 
