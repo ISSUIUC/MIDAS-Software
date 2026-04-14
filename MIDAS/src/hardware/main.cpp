@@ -13,9 +13,8 @@
  * Sets the config file and then starts all the threads using the config.
  */
 
-// #ifdef IS_SUSTAINER
-//MultipleLogSink<EMMCSink> sinks;
-MultipleLogSink<SDSink> sinks;
+// MultipleLogSink<EMMCSink> sinks;
+SDSink sink;
 // #else
 // MultipleLogSink<> sinks;
 // #endif
@@ -36,7 +35,7 @@ void setup()
     digitalWrite(BUZZER_PIN, LOW);
     ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
 
-    #ifdef IS_SUSTAINER
+    // Startup beeps
     ledcWriteTone(BUZZER_CHANNEL, 3200);
     delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
@@ -44,21 +43,6 @@ void setup()
     ledcWriteTone(BUZZER_CHANNEL, 3200);
     delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
-    #endif
-
-    #ifdef IS_BOOSTER
-    ledcWriteTone(BUZZER_CHANNEL, 2600);
-    delay(150);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    delay(75);
-    ledcWriteTone(BUZZER_CHANNEL, 2600);
-    delay(150);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    delay(75);
-    ledcWriteTone(BUZZER_CHANNEL, 2600);
-    delay(150);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    #endif
 
 
     // begin sensor SPI bus

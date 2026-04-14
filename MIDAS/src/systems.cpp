@@ -9,13 +9,6 @@
 static StaticSemaphore_t spi_mutex_buffer;
 SemaphoreHandle_t spi_mutex;
 
-
-#if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
-#error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
-#elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
-#error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
-#endif
-
 #define ENABLE_TELEM
 
 #define METALOG_TEST
@@ -745,7 +738,7 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
     while (true)
     {
 
-        arg->tlm.transmit(arg->rocket_data, arg->led);
+        arg->tlm.transmit(arg->rocket_data, arg->eeprom.data, arg->led);
 
         FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync().state;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());

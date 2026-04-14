@@ -38,7 +38,8 @@ struct TelemetryPacket {
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
 
-    uint8_t callsign_gpsfix_satcount; //3 bits gpsfix, 4 bits sat count, 1 bit is_sustainer_callsign
+    uint8_t gpsfix_satcount; // 3 bits gpsfix, 5 bits sat count
+    uint8_t serial; // MIDAS Serial no
     uint16_t kf_vx; // 16 bit meters/second
     uint16_t kf_px; // 16 bit meters
     uint16_t kf_py; // 16 bit meters
@@ -70,10 +71,6 @@ struct TelemetryCommand {
     std::array<char, 3> verify;
 
     bool valid() {
-        #ifdef IS_SUSTAINER
         return verify == std::array<char, 3>{{'B','R','K'}};
-        #elif IS_BOOSTER
-        return verify == std::array<char, 3>{{'A','R','K'}};
-        #endif
     }
 };

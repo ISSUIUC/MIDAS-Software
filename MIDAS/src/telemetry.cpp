@@ -57,10 +57,10 @@ Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) {
  * @param rocket_data rocket_data to transmit
  * @param led led state to transmit
 */
-void Telemetry::transmit(RocketData& rocket_data, LEDController& led) {
+void Telemetry::transmit(RocketData& rocket_data, const MIDASEEPROM& eeprom, LEDController& led) {
     // static_assert(sizeof(TelemetryPacket) == 20);
 
-    TelemetryPacket packet = makePacket(rocket_data);
+    TelemetryPacket packet = makePacket(rocket_data, eeprom);
     led.toggle(LED::BLUE);
 
     backend.send(packet);
@@ -88,7 +88,7 @@ ErrorCode Telemetry::setFrequency(float freq){
  * 
  * @param data the data to serialize into a packet
 */
-TelemetryPacket Telemetry::makePacket(RocketData& data) {
+TelemetryPacket Telemetry::makePacket(RocketData& data, const MIDASEEPROM& eeprom) {
 
     TelemetryPacket packet { };
     IMU imu = data.imu.getRecentUnsync();
@@ -152,15 +152,14 @@ TelemetryPacket Telemetry::makePacket(RocketData& data) {
     packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[2], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (2*8);
     packet.pyro |= (uint32_t)((std::clamp(voltage.continuity[3], 0.0f, MAX_TELEM_VOLTAGE_V) / MAX_TELEM_VOLTAGE_V) * 255) << (3*8);
 
-    // GPS state & Callsign
-    // 0000 | 000 | 0
-    // SATC | FT  | C
-    packet.callsign_gpsfix_satcount |= (gps.fix_type & 0x07) << 1;
-    packet.callsign_gpsfix_satcount |= (gps.sats_in_view & 0x0F) << 4;
+    // GPS State
+    // 00000 | 000
+    // SATC  | FT
+    packet.gpsfix_satcount |= (gps.fix_type & 0x07);
+    packet.gpsfix_satcount |= (gps.sats_in_view & 0x1F) << 5;
 
-    #ifdef IS_SUSTAINER
-    packet.callsign_gpsfix_satcount |= 0b1;
-    #endif
+    packet.serial = eeprom.serial;
+
 
     // Set error flags
     packet.error_flags = data.err_flags;
