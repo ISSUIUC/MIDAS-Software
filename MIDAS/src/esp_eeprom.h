@@ -7,7 +7,6 @@
 #include <Arduino.h>
 #include <EEPROM.h>
 
-
 class EEPROMController {
     public:
     /* Reads the on-board EEPROM memory and updates `data`. Returns `true` if data was successfully read from EEPROM. Only updates `data` if successfully read. */
@@ -23,3 +22,6 @@ class EEPROMController {
     /* The actual EEPROM data. Only updated by the driver if `read_flash()` is called (also after a `commit()`) */
     MIDASEEPROM data;
 };
+
+constexpr size_t EEPROM_SIZE = sizeof(MIDASEEPROM);
+constexpr size_t EEPROM_MAX_SIZE = 512; // https://randomnerdtutorials.com/esp32-flash-memory/

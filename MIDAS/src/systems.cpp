@@ -3,6 +3,7 @@
 #include "hal.h"
 #include "gnc/ekf.h"
 #include "gnc/mqekf.h"
+#include "log_format_AUTOGEN.h"
 
 static StaticSemaphore_t spi_mutex_buffer;
 SemaphoreHandle_t spi_mutex;
@@ -17,6 +18,17 @@ SemaphoreHandle_t spi_mutex;
 
 #define METALOG_TEST
 
+void log_parse_tree(LogSink& log, size_t node_size, size_t node_count, uint8_t* data) {
+    // To recreate log formats, we need data to reconstruct the parse tree for log format
+    // This means knowing the size of each node and the pre-order traversal.
+    // We will store first the size of the node (each entry type), then a byte array of the pre order traversal.
+    // This lets us recreate the tree by converting the byte array into an array of nodes, then recreating the preorder traversal.
+    // For degenerate trees (lists), we will do the same thing, but they will be decoded as a list instead.
+    log.write_meta((uint8_t*)&node_size, sizeof(size_t)); // Store the node size
+    log.write_meta((uint8_t*)&node_count, sizeof(size_t)); // Store number of nodes
+    log.write_meta(data, node_size * node_count); // Store raw parse tree data
+}
+
 /**
  * @brief These are all the functions that will run in each task
  * Each function has a `while (true)` loop within that should not be returned out of or yielded in any way
@@ -26,7 +38,23 @@ SemaphoreHandle_t spi_mutex;
 DECLARE_THREAD(logger, RocketSystems *arg)
 {
     log_begin(arg->log_sink);
-    int meta_delay_ctr = 0; //  Will cause meta logs to write slower
+    int meta_delay_ctr = 0; //  Will cause meta logs to write slower intentionally
+
+    constexpr size_t meta_logging_header_size = (sizeof(size_t)*8) + EEPROM_SIZE + sizeof(LogFormatMetaEntry)*(LOG_META_ENTRY_COUNT+EEPROM_META_ENTRY_COUNT) + sizeof(LogDiscMapEntry)*LOG_DISCMAP_COUNT;
+
+    // Write header size
+    arg->log_sink.write_meta((uint8_t*)&meta_logging_header_size, sizeof(size_t));
+
+    // Write meta log data + EEPROM
+    // We first write the EEPROM data, prefixed by the EEPROM size.
+    arg->log_sink.write_meta((uint8_t*)&EEPROM_SIZE, sizeof(size_t));
+    arg->log_sink.write_meta((uint8_t*)&arg->eeprom.data, EEPROM_SIZE);
+
+    // Log the formats themselves
+    log_parse_tree(arg->log_sink, sizeof(LogFormatMetaEntry), LOG_META_ENTRY_COUNT, (uint8_t*)LOG_META_ENTRIES);
+    log_parse_tree(arg->log_sink, sizeof(LogDiscMapEntry), LOG_DISCMAP_COUNT, (uint8_t*)LOG_DISCMAP_TABLE);
+    log_parse_tree(arg->log_sink, sizeof(LogFormatMetaEntry), EEPROM_META_ENTRY_COUNT, (uint8_t*)EEPROM_META_ENTRIES);
+
     while (true) {
         log_data(arg->log_sink, arg->rocket_data);
 

@@ -1,5 +1,5 @@
 #pragma once
-#include <sensor_data.h>
+#include "sensor_data.h"
 /* @brief This file stores the schema for MIDAS EEPROM data. It is used to generate the EEPROM checksum */
 
 struct MIDASEEPROM {

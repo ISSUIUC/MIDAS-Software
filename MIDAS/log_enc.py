@@ -689,7 +689,7 @@ STD_HEADERS = {
     "<cmath>": "",
     "<cstdint>": "",
     "<math.h>": "",
-    "<algorithm>": ""
+    "<algorithm>": "",
 }
 
 
@@ -837,9 +837,10 @@ def build_variant_table(entries, associations, disc_enum):
     return table
 
 
-def write_autogen(entries, variant_table, out_path: Path):
+def write_autogen(entries, eeprom_entries, variant_table, out_path: Path):
     type_enum = "\n".join(f"    LOG_TYPE_{m.name} = {m.value}," for m in TypeID)
     meta_rows = "\n".join(f'    {{"{n[:31]}", LOG_TYPE_{t.name}, {c}}},' for n, t, c in entries)
+    eeprom_rows = "\n".join(f'    {{"{n[:31]}", LOG_TYPE_{t.name}, {c}}},' for n, t, c in eeprom_entries)
     variant_rows = "\n".join(f"    {{{dv}, {idx}}}," for dv, idx in variant_table)
 
     out_path.write_text(f"""\
@@ -857,6 +858,11 @@ struct LogDiscMapEntry {{ uint16_t discriminant; uint16_t entry_index; }};
 
 #define LOG_META_ENTRY_COUNT {len(entries)}
 #define LOG_DISCMAP_COUNT {len(variant_table)}
+#define EEPROM_META_ENTRY_COUNT {len(eeprom_entries)}
+
+const LogFormatMetaEntry EEPROM_META_ENTRIES[EEPROM_META_ENTRY_COUNT] = {{
+{eeprom_rows}
+}};
 
 const LogFormatMetaEntry LOG_META_ENTRIES[LOG_META_ENTRY_COUNT] = {{
 {meta_rows}
@@ -865,12 +871,16 @@ const LogFormatMetaEntry LOG_META_ENTRIES[LOG_META_ENTRY_COUNT] = {{
 const LogDiscMapEntry LOG_DISCMAP_TABLE[LOG_DISCMAP_COUNT] = {{
 {variant_rows}
 }};
-""")
-    print(f"Generated {len(entries)} entries + {len(variant_table)} discriminant mappings")
+""")   
+    print(f"Generated {(len(entries) + len(eeprom_entries))} entries + {len(variant_table)} discriminant mappings")
 
 
 def main():
     ctxt, associations = parse_file(Path("src") / "log_format.h")
+    ctxt_eeprom, assoc_eeprom = parse_file(Path("src") / "esp_eeprom_format.h")
+
+    eeprom_format = ctxt_eeprom.types["MIDASEEPROM"]
+    eeprom_entries = flatten("MIDASEEPROM", eeprom_format)
 
     logged_reading = ctxt.types["LoggedReading"]
     disc_enum = ctxt.types["ReadingDiscriminant"]
@@ -879,7 +889,7 @@ def main():
     vtable = build_variant_table(entries, associations, disc_enum)
     autogen_file = Path("src") / "log_format_AUTOGEN.h"
 
-    write_autogen(entries, vtable, autogen_file)
+    write_autogen(entries, eeprom_entries, vtable, autogen_file)
     print(f"Successfully wrote log format to {str(autogen_file)}!")
 
 main()
