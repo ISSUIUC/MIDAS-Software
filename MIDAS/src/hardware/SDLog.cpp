@@ -23,7 +23,7 @@ ErrorCode SDSink::init() {
     Serial.println("[SD] Startup OK");
 
     char file_name[16] = "data";
-    char ext[] = ".launch";
+    char ext[] = ".bin";
     Serial.println("[SD] Determining output file");
     Serial.println(current_file_no);
 

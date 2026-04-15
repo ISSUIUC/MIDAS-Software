@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sensor_data.h"
+#define LOG_FMT_VERSION 1
 
 /**
  * @enum ReadingDiscriminant

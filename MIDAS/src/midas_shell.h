@@ -8,17 +8,16 @@
 
 enum class MCommandExecutionResult {
     // Generic
-    OK = 0,                 // The command was successful
-    ERR_UNSPECIFIED = 1,    // The execution returned an unspecified error
-    ERR_INVALID_CMD = 2,    // The command given was not of a valid format
-    ERR_NO_CMD = 3,         // The command given was not one that exists (but is of a valid format)
-    ERR_INVAL_ARGC = 4,     // The amount of arguments is incorrect for the current function.
-    ERR_INVAL_ARGUMENT = 5, // One or more arguments is invalid (generic)
-    ERR_INVAL_ARG_RANGE = 6,// One or more arguments is out of range
-    ERR_INVAL_FSM = 7,      // FSM commit failed
-    ERR_INVAL_EEPROM = 8,   // EEPROM has garbage values
-    
-    // Command specific
+    OK = 0,                  // The command was successful
+    ERR_UNSPECIFIED = 1,     // The execution returned an unspecified error
+    ERR_INVALID_CMD = 2,     // The command given was not of a valid format
+    ERR_NO_CMD = 3,          // The command given was not one that exists (but is of a valid format)
+    ERR_INVAL_ARGC = 4,      // The amount of arguments is incorrect for the current function.
+    ERR_INVAL_ARGUMENT = 5,  // One or more arguments is invalid (generic)
+    ERR_INVAL_ARG_RANGE = 6, // One or more arguments is out of range
+    ERR_INVAL_FSM = 7,       // FSM commit failed
+    ERR_INVAL_EEPROM = 8,    // EEPROM has garbage values
+    ERR_FS_FAIL_OPEN = 9     // A file or directory failed to open in the mFS
 };
 
 struct MShellContext {

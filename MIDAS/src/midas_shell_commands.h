@@ -1,6 +1,9 @@
 #include <systems.h>
 #include <string>
-
+#include <SD_MMC.h>
+#include <log_format.h>
+#include "log_checksum.h"
+#include "esp_eeprom_checksum.h"
 
 FSMConfiguration shell_cfg;
 
@@ -468,11 +471,194 @@ void m_shell_load_fsm_config(const FSMConfiguration& fsm_cfg) {
     shell_cfg = fsm_cfg;
 }
 
+MCommandExecutionResult cmd_ls(const MShellContext& ctx) {
+    if(ctx.argc != 1) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    File root = SD_MMC.open("/");
+
+    if(!root) {
+        Serial.println("Failed to open /");
+        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+    }
+    
+    uint64_t used_size = SD_MMC.usedBytes();
+    uint64_t card_size = SD_MMC.totalBytes();
+
+    Serial.print("Memory Usage: ");
+    Serial.print(used_size);
+    Serial.print("B / ");
+    Serial.print(card_size);
+    Serial.println("B");
+
+    Serial.println(" | name (size) ");
+    Serial.println("-+-------------");
+    File file = root.openNextFile();
+    while (file) {
+        Serial.print(" | ");
+        Serial.print(file.name());
+        Serial.print(" (");
+        Serial.print(file.size());
+        Serial.println(" bytes)");
+        file.close();
+        file = root.openNextFile();
+    }
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult cmd_read(const MShellContext& ctx) {
+    if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+
+    File file = SD_MMC.open(ctx.argv[1], FILE_READ);
+
+    if(!file) {
+        Serial.print("Failed to open ");
+        Serial.println(ctx.argv[1]);
+        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+    }
+
+    while(file.available()) {
+        Serial.write(file.read());
+    }
+    file.close();
+    return MCommandExecutionResult::OK;
+}
+
+bool delete_all_flash() {
+    File root = SD_MMC.open("/");
+    while (true) {
+        File file = root.openNextFile();
+        if (!file) {
+            break; // No more files
+        }
+        Serial.print("Deleting file: ");
+        Serial.println(file.path());
+        String fullpath = "/" + String(file.name());
+        file.close();
+        file.flush();
+        if(!SD_MMC.remove(fullpath.c_str())) {
+            Serial.print("Failed to delete ");
+            Serial.println(fullpath);
+            return false;
+        }
+    }
+    return true;
+}
+
+MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
+    // Launch File Dump: Outputs a .launch file as binary data over serial
+
+    // The new .launch format is as follows:
+    // LAUNCH <version_no>
+    // FILE <original_filename>
+    // CHECKSUM <log_checksum> <eeprom_checksum>
+    // META <meta file size>
+    // BIN <bin file size>
+    // <meta file content>
+    // <bin file content>
+
+    if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+
+    String bin_path = "/" + String(ctx.argv[1]) + ".bin";
+    String meta_path = "/" + String(ctx.argv[1]) + ".meta";
+    File bin_file = SD_MMC.open(bin_path.c_str(), FILE_READ);
+    File meta_file = SD_MMC.open(meta_path.c_str(), FILE_READ);
+
+    if(!bin_file) {
+        Serial.println("Failed to open .bin file!");
+        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+    }
+
+    if(!meta_file) {
+        Serial.println("Failed to open .meta file!");
+        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+    }
+    
+    // Start writing header
+    Serial.write("LAUNCH "); Serial.write(LOG_FMT_VERSION); Serial.write('\n');
+    Serial.write("FILE "); Serial.write(ctx.argv[1]); Serial.write('\n');
+    Serial.write("CHECKSUM "); Serial.write(LOG_CHECKSUM); Serial.write(" "); Serial.write(EEPROM_CHECKSUM); Serial.write('\n');
+    Serial.write("META "); Serial.write(meta_file.size()); Serial.write('\n');
+    Serial.write("BIN "); Serial.write(bin_file.size()); Serial.write('\n');
+    Serial.flush();
+
+    // Then dump meta and bin files
+    while(meta_file.available()) {
+        Serial.write(meta_file.read());
+    }
+    meta_file.close();
+
+    while(bin_file.available()) {
+        Serial.write(bin_file.read());
+    }
+    bin_file.close();
+
+    Serial.flush();
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult cmd_rm(const MShellContext& ctx) {
+    if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+
+    // Special case: doing `rm *` removes all files:
+    if (!strcmp(ctx.argv[1], "*")) {  
+        if(!delete_all_flash()) {
+            return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+        }
+        return MCommandExecutionResult::OK;
+    }
+
+    if(!SD_MMC.remove(ctx.argv[1])) {
+        Serial.print("Failed to delete ");
+        Serial.println(ctx.argv[1]);
+        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+    }
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult cmd_mv(const MShellContext& ctx) {
+    if (ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+
+    if(!SD_MMC.rename(ctx.argv[1], ctx.argv[2])) {
+        Serial.print("Failed to rename ");
+        Serial.println(ctx.argv[1]);
+        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+    }
+    return MCommandExecutionResult::OK;
+}
+
+
+
+MCommandExecutionResult calibration(const MShellContext& ctx) {
+    if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    RocketSystems* arg = (RocketSystems*) ctx.sysarg;
+
+    if (!strcmp(ctx.argv[1], "xl") || !strcmp(ctx.argv[1], "accel") || !strcmp(ctx.argv[1], "accelerometer")){
+        arg->sensors.imu.begin_calibration(arg->buzzer);
+        return MCommandExecutionResult::OK;
+    }
+    else if (!strcmp(ctx.argv[1], "mag") || !strcmp(ctx.argv[1], "magnetometer")){
+        arg->sensors.magnetometer.begin_calibration(arg->buzzer);
+        return MCommandExecutionResult::OK;
+    }
+    
+    return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+}
+
 void m_shell_init_commands(MShell* sh) {
     // sh->register_command("setfsm", set_fsm, "\tsetfsm <state:int> - Sets the FSM state to state <state>");
     sh->register_command("hi", hi_midas, "\t\thi <string> - Prints hi <string>");
     sh->register_command("serial", serial, "\tserial get - Get MIDAS serial number\n\t\tserial set <serialnumber:int> - Set MIDAS serial number");
     sh->register_command("frequency", frequency, "\tfrequency get - Get MIDAS telemetry frequency (in MHz)\n\t\tfrequency set <freq:float> - Set MIDAS telemetry frequency (in MHz)");
     sh->register_command("fsm", fsm, "\t\tThis command is used to configure the MIDAS FSM thresholds and pyro firing events. \n\t\tUse through the official MIDAS-Base software package is recommended, or experienced users may enter \"fsm help\" for more information.");
-    // add calibration commands
+
+    // File commands
+    sh->register_command("ls", cmd_ls, "\tls - List all files in the mounted LogSink");
+    sh->register_command("read", cmd_read, "\tread <file> - Reads a file from the mounted LogSink");
+    sh->register_command("lfd", cmd_lfd, "\tlfd <dataf> - Given a data file string (i.e. 'data17'), does a 'launch file dump', outputting a .launch file");
+    sh->register_command("rm", cmd_rm, "\trm <file> - Deletes a file from the mounted LogSink");
+    sh->register_command("mv", cmd_mv, "\tmv <file> <new_name> - Renames a file to new_name.");
+
+    // sensor calibration
+    sh->register_command("calibrate", calibration, "\tcalibrate <sensor> - Inits calibration for a sensor, accepts sensor shorthand, i.e. 'xl' or 'mag'");
 }
