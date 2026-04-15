@@ -39,13 +39,13 @@ jobs:
           pip install --upgrade platformio
       - name: PlatformIO version
         run: pio --version
-      - name: Build mcu_main_sustainer
-        run: pio run -e mcu_main_sustainer
-      - name: Upload Artifact for mcu_main_sustainer
+      - name: Build mcu_main
+        run: pio run -e mcu_main
+      - name: Upload Artifact for mcu_main
         uses: actions/upload-artifact@v4
         with:
-          name: firmware-mcu_main_sustainer
-          path: MIDAS/.pio/build/mcu_main_sustainer/firmware*.*
+          name: firmware-mcu_main
+          path: MIDAS/.pio/build/mcu_main/firmware*.*
 
   build_feather_duo:
     name: Build ground:feather_duo
@@ -129,14 +129,14 @@ jobs:
 
   notify:
     name: Slack Notification Summary (main)
-    needs: [build_fsw, build_booster, build_feather_duo, build_cam]
+    needs: [build_fsw, build_feather_duo, build_cam]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
       - name: Send Slack Summary
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: ${{ (needs.build_fsw.result == 'success' && needs.build_booster.result == 'success' && needs.build_feather_duo.result == 'success' && needs.build_cam.result == 'success') && 'good' || 'danger' }}
+          SLACK_COLOR: ${{ (needs.build_fsw.result == 'success' && needs.build_feather_duo.result == 'success' && needs.build_cam.result == 'success') && 'good' || 'danger' }}
           SLACK_TITLE: "Firmware Build Summary"
           SLACK_MESSAGE: |
             Build results:
