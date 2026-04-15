@@ -11,6 +11,22 @@ typedef uint32_t systime_t;
 #define MAX_ABS_ACCEL_RANGE_G 64
 #define MAX_KF_XVELOCITY_MS 2000.0f
 
+struct MErrorFlags {
+    uint8_t fsm_crc_err  : 1 = 0;
+    uint8_t reserved     : 7 = 0;
+
+    uint8_t encode() const {
+        uint8_t dat = 0;
+        dat = (fsm_crc_err & 0x01) << 7;
+
+        return dat;
+    }
+
+    void decode(uint8_t dat) {
+        fsm_crc_err = (dat >> 7) & 0x01;
+    }
+};
+
 /**
  * @struct TelemetryPacket
  * 
@@ -37,20 +53,23 @@ struct TelemetryPacket {
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
 
-    uint8_t callsign_gpsfix_satcount; //3 bits gpsfix, 4 bits sat count, 1 bit is_sustainer_callsign
+    uint8_t gpsfix_satcount; // 3 bits gpsfix, 5 bits sat count
+    uint8_t serial; // MIDAS Serial no
     uint16_t kf_vx; // 16 bit meters/second
     uint16_t kf_px; // 16 bit meters
     uint16_t kf_py; // 16 bit meters
     uint16_t kf_pz; // 16 bit meters
 
-    uint32_t pyro; // 7 bit continuity x 4 channels, 4 bit unused
+    uint32_t pyro; // 8 bit continuity x 4 channels
+
+    // Global error flags
+    MErrorFlags error_flags; 
     
     uint8_t roll_rate;
     uint8_t camera_state;
     uint8_t camera_batt_volt;
+    
 };
-
-
 
 
 struct FullTelemetryData {
@@ -79,7 +98,8 @@ struct FullTelemetryData {
     
     float pyros[4]; // 4-channel pyro continuity. // Pyro A number of continuous channels, Pyro B is measured current, Pyro C is expected current per channel, and Pyro D is pyro battery voltage 
 
-    bool is_sustainer; // same as callsign
+    uint8_t serial_no;
+    MErrorFlags midas_errs;
 
     float kf_vx; // kalman filter stuff
     float kf_px;

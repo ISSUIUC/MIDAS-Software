@@ -26,4 +26,16 @@ struct CommandFlags {
 struct MErrorFlags {
     uint8_t fsm_crc_err  : 1 = 0;
     uint8_t reserved     : 7 = 0;
+
+    uint8_t encode() const {
+        uint8_t dat = 0;
+        dat = (fsm_crc_err & 0x01) << 7;
+
+        return dat;
+    }
+
+    void decode(uint8_t dat) {
+        fsm_crc_err = (dat >> 7) & 0x01;
+    }
 };
+
