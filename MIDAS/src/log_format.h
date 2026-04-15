@@ -46,7 +46,7 @@ struct LoggedReading {
         Magnetometer magnetometer;
         KalmanData kalman;
         AngularKalmanData angular_kalman;
-        FSMState fsm;
+        FSMData fsm;
         PyroState pyro;
         CameraData cameradata;
     } data;
@@ -72,6 +72,6 @@ ASSOCIATE(GPS, ID_GPS, gps)
 ASSOCIATE(Magnetometer, ID_MAGNETOMETER, magnetometer)
 ASSOCIATE(KalmanData, ID_KALMAN, kalman)
 ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN, angular_kalman)
-ASSOCIATE(FSMState, ID_FSM, fsm)
+ASSOCIATE(FSMData, ID_FSM, fsm)
 ASSOCIATE(PyroState, ID_PYRO, pyro)
 ASSOCIATE(CameraData, ID_CAMERADATA, cameradata)

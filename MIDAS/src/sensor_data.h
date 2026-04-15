@@ -4,7 +4,7 @@
 #include <cstdint>
 #include <algorithm>
 
-#include "finite-state-machines/fsm.h"
+#include "finite-state-machines/fsm_config.h"
 
 
 /**

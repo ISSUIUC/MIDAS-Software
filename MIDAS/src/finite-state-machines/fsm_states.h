@@ -1,8 +1,10 @@
 #pragma once
 
+#include <cstdint>
+
 /**
  * @enum FSMState
- * 
+ *
  * @brief Enum for the different FSM states
 */
 
@@ -16,6 +18,11 @@ enum FSMState {
     STATE_MAIN,
     STATE_LANDED,
     FSM_STATE_COUNT
+};
+
+struct FSMData {
+    FSMState state;
+    uint8_t current_motor;
 };
 
 // enum FSMState {

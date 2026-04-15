@@ -6,6 +6,7 @@
 #include "hal.h"
 #include "Buffer.h"
 #include "data_logging_meta.h"
+#include "finite-state-machines/fsm.h"
 
 /** 
  * @brief The RocketState struct stores everything that is needed by more than one system/thread of the Rocket.

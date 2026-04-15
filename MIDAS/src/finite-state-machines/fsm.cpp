@@ -1,7 +1,43 @@
 #include <cmath>
+#include <cstring>
 
 #include "fsm.h"
 #include "thresholds.h"
+#include "CRC.h"
+
+bool FSMPyroAction::conditions_met(FSMState fsm_state, float cur_tilt, uint8_t cur_motor, float cur_time_since_launch, float cur_vx) const {
+    if (!enable) { return false; }
+    if (fsm_state != fsm_trigger) { return false; }
+    if (max_tilt != -1 && cur_tilt > max_tilt) { return false; }
+    if (after_motor != 0 && cur_motor < after_motor) { return false; }
+    if (launch_t_gt != -1 && cur_time_since_launch < launch_t_gt) { return false; }
+    if (launch_t_lt != -1 && cur_time_since_launch > launch_t_lt) { return false; }
+    if (vx_min != -1 && cur_vx < vx_min) { return false; }
+    if (vx_max != -1 && cur_vx > vx_max) { return false; }
+    return true;
+}
+
+bool FSMPyroAction::soft_conditions_met(FSMState fsm_state) const {
+    if (!enable) { return false; }
+    if (fsm_state != fsm_trigger) { return false; }
+    return true;
+}
+
+uint32_t FSMConfiguration::calculate_crc(const FSMConfiguration& cfg) {
+    constexpr size_t FSMConfigurationCRCSize = sizeof(FSMUserThresholds) + (sizeof(FSMPyroAction) * MIDAS_NUM_PYROS) + sizeof(uint8_t);
+    uint8_t crc_buf[FSMConfigurationCRCSize];
+
+    size_t ptr = 0;
+    memcpy(crc_buf + ptr, &cfg.thresholds, sizeof(FSMUserThresholds)); ptr += sizeof(FSMUserThresholds);
+    for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
+        memcpy(crc_buf + ptr, &cfg.pyro_actions[i], sizeof(FSMPyroAction)); ptr += sizeof(FSMPyroAction);
+    }
+    memcpy(crc_buf + ptr, &cfg.version_num, sizeof(uint8_t));
+
+    return CRC::Calculate(crc_buf, FSMConfigurationCRCSize, CRC::CRC_32());
+}
+
+static_assert(sizeof(FSMConfiguration) <= 256);
 
 #ifdef FSM_SIMULATOR
 #include "sensor_data.h"

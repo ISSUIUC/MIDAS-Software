@@ -140,7 +140,7 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
         imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
 
-        if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_FIRST_BOOST) { // max accel can be during second boost, 
+        if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_BOOST) { // max accel can be during second boost, 
             // but once the new fsm is implemented this will be changed to just "boost" and work (i think) - mihir
             if(prev_accel < imudata.highg_acceleration.ax) {
                 max_accel = imudata.highg_acceleration.ax;
@@ -149,7 +149,7 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         }
 
         if(!has_logged) {
-            if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_ACCEL, max_accel);
                 arg->meta_logging.log_event(MetaDataCode::EVENT_TMAX_ACCEL, max_accel_time);
                 has_logged = true;
@@ -259,25 +259,25 @@ void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems
     // Do something, NO delays allowed!
     AngularKalmanData cur_orientation = sys->rocket_data.angular_kalman_data.getRecentUnsync();
     switch (new_state) {
-        case FSMState::STATE_FIRST_BOOST:
+        case FSMState::STATE_BOOST:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TLAUNCH, current_time);
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_BARO, sys->rocket_data.barometer.getRecentUnsync());
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_GPS, sys->rocket_data.gps.getRecentUnsync());
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCH_INITIAL_TILT, cur_orientation.sflp_tilt);
             break;
-        case FSMState::STATE_BURNOUT:
+        case FSMState::STATE_COAST:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TBURNOUT, current_time);
             sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_BURNOUT, cur_orientation.sflp_tilt);
             sys->meta_logging.log_data(MetaDataCode::DATA_ALT_AT_BURNOUT, sys->rocket_data.barometer.getRecentUnsync().altitude);
             break;
-        case FSMState::STATE_SECOND_BOOST:
-            sys->meta_logging.log_event(MetaDataCode::EVENT_TIGNITION, current_time);
-            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_IGNITION, cur_orientation.sflp_tilt);
-            break;
-        case FSMState::STATE_DROGUE_DEPLOY:
+        // case FSMState::STATE_SECOND_BOOST:
+        //     sys->meta_logging.log_event(MetaDataCode::EVENT_TIGNITION, current_time);
+        //     sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_IGNITION, cur_orientation.sflp_tilt);
+        //     break;
+        case FSMState::STATE_DROGUE:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TAPOGEE, current_time);
             break;
-        case FSMState::STATE_MAIN_DEPLOY:
+        case FSMState::STATE_MAIN:
             sys->meta_logging.log_event(MetaDataCode::EVENT_TMAIN, current_time);
             break;
         default:
@@ -325,8 +325,8 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
 
         arg->rocket_data.fsm_state.update(next_state);
         
-        if(current_state != next_state) {
-            fsm_transitioned_to(next_state, current_state, arg, current_time);       
+        if(current_state != next_state.state) {
+            fsm_transitioned_to(next_state.state, current_state, arg, current_time);       
         }
 
         if(fsm_cfg.crc32 == FSM_CRC_FAIL_STATE) {
@@ -394,7 +394,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             arg->b2b.camera.vmux_set(BULKHEAD_CAMERA);
         }
         //MAX DESCENT RATE METADATA LOGGING - incomplete
-        if(arg->rocket_data.fsm_state.getRecentUnsync() >= FSMState::STATE_APOGEE && arg->rocket_data.fsm_state.getRecentUnsync() < FSMState::STATE_LANDED) {
+        if(arg->rocket_data.fsm_state.getRecentUnsync().state >= FSMState::STATE_DROGUE && arg->rocket_data.fsm_state.getRecentUnsync().state < FSMState::STATE_LANDED) {
             if(max_descent_rate < state_estimate.vertical_speed) {
                 max_descent_rate = state_estimate.vertical_speed;
                 max_descent_rate_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -402,7 +402,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         }
 
         if(!has_logged) {
-            if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_DESCENT_RATE, max_descent_rate);
                 arg->meta_logging.log_event(MetaDataCode::EVENT_TMAX_DESCENT_RATE, max_descent_rate_time);
                 has_logged = true;
@@ -534,7 +534,7 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
         last = xTaskGetTickCount();
 
         //float prev_vel = current_state.velocity.vx;
-        if(arg->rocket_data.fsm_state.getRecentUnsync() >= FSMState::STATE_FIRST_BOOST && arg->rocket_data.fsm_state.getRecentUnsync() < FSMState::STATE_APOGEE) {
+        if(arg->rocket_data.fsm_state.getRecentUnsync().state >= FSMState::STATE_BOOST && arg->rocket_data.fsm_state.getRecentUnsync().state < FSMState::STATE_MAIN) {
             if(max_vel < current_state.velocity.vx) {
                 max_vel = current_state.velocity.vx;
                 max_vel_time = pdTICKS_TO_MS(xTaskGetTickCount());
@@ -542,7 +542,7 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
         }
 
         if(!has_logged) {
-            if(arg->rocket_data.fsm_state.getRecentUnsync() == FSMState::STATE_LANDED) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_VEL, max_vel);
                 arg->meta_logging.log_event(MetaDataCode::EVENT_TMAX_ACCEL, max_vel_time);
                 has_logged = true;

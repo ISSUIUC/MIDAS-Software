@@ -43,7 +43,7 @@ struct: "struct" IDENTIFIER struct_items ";"
 struct_items: "{" struct_item* "}"
 struct_item: type field_decl ("," field_decl)* ";" -> fields
            | IDENTIFIER parenthesized ("=" "default" | initializer_list block) ";"? -> constructor
-           | "static"? type IDENTIFIER parenthesized "const"? block -> method
+           | "static"? type IDENTIFIER parenthesized "const"? (block | ";") -> method
 
 field_decl: decl (("=" (const_expr | block)) | block)?
 decl: IDENTIFIER ("[" const_expr "]")*
@@ -701,6 +701,7 @@ class Preprocessor:
         self.included_files: dict[Path, str] = {}
         self.pragma_once: set[str] = set()
         self.associations: dict[str, str] = {}  # union field -> discriminant name
+        self.defines: dict[str, int] = {}       # simple integer `#define NAME VALUE` macros
 
     def include_file(self, path: Path) -> str:
         path = path.absolute()
@@ -747,7 +748,12 @@ class Preprocessor:
                 else:
                     raise Exception(f"Malformed line {i+1} of file {file_path}")
             elif parts[:1] == ["#define"]:
-                pass  # strip macro defs
+                # capture simple integer defines — they can appear as array counts in struct fields
+                if len(parts) == 3:
+                    try:
+                        self.defines[parts[1]] = int(parts[2], 0)
+                    except ValueError:
+                        pass
             else:
                 raise Exception(f"Malformed line {i + 1} of file {file_path} (directive not supported yet)")
             processed += "\n"
@@ -764,6 +770,7 @@ def parse_file(file: Path) -> tuple[Context, dict[str, str]]:
     except Exception as e:
         raise Exception(f"Could not parse {file}") from e
     ctxt = BASE_CTXT.clone()
+    ctxt.names.update(preprocessor.defines)
     Calculate(ctxt).visit(tree)
 
     return ctxt, preprocessor.associations

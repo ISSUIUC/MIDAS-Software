@@ -18,7 +18,7 @@ SDSink sink;
 // #else
 // MultipleLogSink<> sinks;
 // #endif
-RocketSystems systems{.log_sink = sinks};
+RocketSystems systems{.log_sink = sink};
 /**
  * @brief Sets up pinmodes for all sensors and starts threads
  */
