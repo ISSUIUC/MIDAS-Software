@@ -13,10 +13,10 @@
 */
 ErrorCode SDSink::init() {
     Serial.println("[SD] Connecting to SD...");
-    if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
+    if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0, FLASH_DAT1, FLASH_DAT2, FLASH_DAT3)) {
         return ErrorCode::SDBeginFailed;
     }
-    if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
+    if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_26M, 5)) {
         failed = true;
         return ErrorCode::SDBeginFailed;
     }
