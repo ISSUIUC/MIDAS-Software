@@ -332,10 +332,10 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             fsm_transitioned_to(next_state.state, current_state, arg, current_time);       
         }
 
-        if(fsm_cfg.crc32 == FSM_CRC_FAIL_STATE) {
+        if(arg->rocket_data.err_flags.encode() != 0) {
             if ((current_time - last_time_err_flash) > 100)
             {
-                // Fast flash red LED if crc err
+                // Fast flash red LED if any midas err, including crc err!
                 last_time_err_flash = current_time;
                 arg->led.toggle(LED::RED);
             }
@@ -672,7 +672,7 @@ DECLARE_THREAD(shell, RocketSystems *arg)
 
         while (arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_SAFE)
         {
-            uint8_t num_bytes_avail = Serial.available();
+            int num_bytes_avail = Serial.available();
 
             if(num_bytes_avail > 0) {
                 Serial.read(tmp_buf, num_bytes_avail);

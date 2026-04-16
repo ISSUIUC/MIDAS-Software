@@ -46,7 +46,7 @@
  * @param arg Argument passed in to the `param` argument of `DECLARE_THREAD`.
  * @param prio Priority of the thread.
  */
-#define START_THREAD(name, core, arg, prio) StaticTask_t name##_task;                \
+#define START_THREAD(name, core, arg, prio) static StaticTask_t name##_task;         \
                                       static unsigned char name##_stack[STACK_SIZE];            \
                                       xTaskCreateStaticPinnedToCore(((TaskFunction_t) name##_thread), #name, STACK_SIZE, arg, tskIDLE_PRIORITY + prio, name##_stack, &name##_task, core)
 /*

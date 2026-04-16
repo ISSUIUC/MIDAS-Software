@@ -16,7 +16,7 @@ ErrorCode SDSink::init() {
     if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0, FLASH_DAT1, FLASH_DAT2, FLASH_DAT3)) {
         return ErrorCode::SDBeginFailed;
     }
-    if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_26M, 5)) {
+    if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
         failed = true;
         return ErrorCode::SDBeginFailed;
     }
@@ -84,9 +84,9 @@ void SDSink::write(const uint8_t* data, size_t size) {
 void SDSink::write_meta(const uint8_t* data, size_t size) {
     if (failed) { return; }
 
-    size_t bytes_written = file.write(data, size);
-    file.write('\n');
-    file.flush(); // Meta writes are infrequent, so flushing is OK.
+    size_t bytes_written = meta.write(data, size);
+    meta.write('\n');
+    meta.flush(); // Meta writes are infrequent, so flushing is OK.
 
     if(bytes_written != size) {
         failed_mr = true;
