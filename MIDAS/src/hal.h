@@ -7,8 +7,6 @@
 #include <Arduino.h>
 #endif
 
-#include "FreeRTOSConfig.h"
-
 #include "Mutex.h"
 #include "Queue.h"
 

@@ -22,7 +22,7 @@ public:
 */
 struct BuzzerController {
 private:
-    static constexpr uint32_t MAX_TUNE_LENGTH = 16;
+    static constexpr uint32_t MAX_TUNE_LENGTH = 32;
     Sound tune_buffer_[MAX_TUNE_LENGTH];
     uint32_t index_ = 0;
     uint32_t length_ = 0;
