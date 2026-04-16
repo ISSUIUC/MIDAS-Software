@@ -84,21 +84,33 @@ ErrorCode BuzzerController::init() {
 */
 #define MS_PER_4BEAT 6000
 
-#define rest Sound{0, 10}
-#define d4_eight Sound{294, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
-#define g4_eight Sound{392, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
-#define f_nat_4_eight Sound{350, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
 #define b_flat_4_eight Sound{466, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
+
 #define e4_eight Sound{330, static_cast<uint8_t>(0.125 * MS_PER_4BEAT)}
 #define d4_quart Sound{294, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
 #define g4_quart Sound{392, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
 #define f_nat_4_quart Sound{350, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
+
 #define b_flat_4_quart Sound{466, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
 #define e4_quart Sound{330, static_cast<uint8_t>(0.25 * MS_PER_4BEAT)}
 #define d4_fifth Sound{294, static_cast<uint8_t>(0.05 * MS_PER_4BEAT)}
 #define f_nat_4_fifth Sound{350, static_cast<uint8_t>(0.05 * MS_PER_4BEAT)}
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
+
+#define d4_eight Sound{294, static_cast<uint8_t>(240/1.3)}
+#define g4_eight Sound{392, static_cast<uint8_t>(240/1.3)}
+#define something Sound{393, static_cast<uint8_t>(255/1.3)}
+#define somethingdiv2 Sound{393, static_cast<uint8_t>(220/1.3)}
+#define f_nat_4_quart2 Sound{350, static_cast<uint8_t>(220/1.3)}
+#define f_nat_4_eight2 Sound{350, static_cast<uint8_t>(220/1.3)}
+#define d4_eight2 Sound{294, static_cast<uint8_t>(220/1.3)}
+#define g4_eight2 Sound{392, static_cast<uint8_t>(220/1.3)}
+#define high Sound{467, static_cast<uint8_t>(150/1.3)}
+#define low Sound{393, static_cast<uint8_t>(200/1.3)}
+
+#define longrest Sound{0, 0}
+#define rest Sound{0, static_cast<uint8_t>(10/1)}
 
 #define WARN_TONE_PITCH Sound{2730, 125} // 2730 is the resonant frequency of the buzzer, thus it will be loudest here.
 #define WARN_TONE_BLANK Sound{0, 125}
@@ -118,9 +130,21 @@ ErrorCode BuzzerController::init() {
 /**
  * @brief free bird solo song, to be played on startup/ second stage iginition
 */
-Sound free_bird[FREE_BIRD_LENGTH] = {/*measure 1*/ d4_eight, g4_eight, d4_eight,
-    /*measure 2*/ f_nat_4_eight, g4_eight, f_nat_4_quart, rest, f_nat_4_quart, rest, f_nat_4_eight, d4_eight
+
+Sound free_bird[FREE_BIRD_LENGTH] = {d4_eight2, rest, g4_eight2, rest, d4_eight2, 
+    something, something, rest, something, something, rest, something, something, 
+    f_nat_4_quart2, rest, d4_eight2, rest, f_nat_4_eight2, rest, somethingdiv2, rest, f_nat_4_eight2, rest, d4_eight2, rest, somethingdiv2, somethingdiv2, 
 };
+
+// rest of the song
+// rest, f_nat_4_quart2, rest, d4_eight2, somethingdiv2, somethingdiv2, rest, rest, rest, high, high, low, low, rest, high, high, low, low, rest, high, high, low, low
+
+/**
+ * @brief James Bond theme, only to be played on Midas Mini 007
+ */
+Sound james_bond[JAMES_BOND_LENGTH] = {Sound{330, static_cast<uint8_t>(240)}, Sound{392, static_cast<uint8_t>(255)}, Sound{392, static_cast<uint8_t>(109)}, Sound{622, static_cast<uint8_t>(148)}, Sound{587, static_cast<uint8_t>(255)}, Sound{587, static_cast<uint8_t>(255)}, Sound{587, static_cast<uint8_t>(112)}, Sound{392, static_cast<uint8_t>(174)}, Sound{466, static_cast<uint8_t>(255)}, Sound{466, static_cast<uint8_t>(3)}, Sound{494, static_cast<uint8_t>(255)}, Sound{494, static_cast<uint8_t>(255)}, Sound{494, static_cast<uint8_t>(255)}, Sound{494, static_cast<uint8_t>(255)}, Sound{494, static_cast<uint8_t>(140)}, Sound{392, static_cast<uint8_t>(255)}, Sound{392, static_cast<uint8_t>(33)}, Sound{440, static_cast<uint8_t>(64)}, Sound{392, static_cast<uint8_t>(64)}, Sound{370, static_cast<uint8_t>(255)}, Sound{370, static_cast<uint8_t>(255)}, Sound{370, static_cast<uint8_t>(255)}, Sound{370, static_cast<uint8_t>(67)}, Sound{330, static_cast<uint8_t>(255)}, Sound{330, static_cast<uint8_t>(1)}, Sound{277, static_cast<uint8_t>(255)}, Sound{277, static_cast<uint8_t>(245)}};
+
+
 
 /**
  * @brief Warn tone, to be played in "unsafe" non-flight states (STATE_IDLE, STATE_PYRO_TEST)
