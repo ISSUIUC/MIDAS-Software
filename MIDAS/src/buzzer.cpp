@@ -97,10 +97,6 @@ ErrorCode BuzzerController::init() {
 #define d4_2fifth Sound{294, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 #define f_nat_4_2fifth Sound{350, static_cast<uint8_t>(0.1 * MS_PER_4BEAT)}
 
-
-// STUFF I ACTUALLY USE!!!!
-
-
 #define d4_eight Sound{294, static_cast<uint8_t>(240/1.3)}
 #define g4_eight Sound{392, static_cast<uint8_t>(240/1.3)}
 #define something Sound{393, static_cast<uint8_t>(255/1.3)}
@@ -124,9 +120,6 @@ ErrorCode BuzzerController::init() {
 /**
  * @brief free bird solo song, to be played on startup/ second stage iginition
 */
-
-// Sound free_bird[FREE_BIRD_LENGTH] = {Sound{587, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(192)}, Sound{587, static_cast<uint8_t>(192)}, 
-// Sound{784, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(129)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(129)}, Sound{698, static_cast<uint8_t>(192)}, Sound{587, static_cast<uint8_t>(192)}, Sound{698, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(192)}, Sound{698, static_cast<uint8_t>(192)}, Sound{587, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(129)}, Sound{698, static_cast<uint8_t>(192)}, Sound{587, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(129)}, Sound{932, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(129)}, Sound{932, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(129)}, Sound{932, static_cast<uint8_t>(192)}, Sound{784, static_cast<uint8_t>(255)}, Sound{784, static_cast<uint8_t>(245)}};
 
 Sound free_bird[FREE_BIRD_LENGTH] = {d4_eight2, rest, g4_eight2, rest, d4_eight2, 
     something, something, rest, something, something, rest, something, something, 

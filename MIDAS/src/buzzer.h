@@ -44,7 +44,6 @@ public:
 #define JAMES_BOND_LENGTH 27
 #define WARN_TONE_LENGTH 1
 #define LAND_TONE_LENGTH 11
-#define HEY_JUDE_LENGTH 750
 
 #define C_XL_LENGTH 3
 #define C_MG_LENGTH 5
