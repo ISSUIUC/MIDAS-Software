@@ -2,7 +2,6 @@
 
 #include <numeric>
 
-#include "FreeRTOSConfig.h"
 #include "fsm_config.h"
 #include "thresholds.h"
 #include "Buffer.h"
