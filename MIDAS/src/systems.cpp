@@ -870,8 +870,12 @@ ErrorCode init_systems(RocketSystems& systems) {
     #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 #endif
-
-    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+// play James Bond theme for MIDAS 007
+    if (config->eeprom.data.serial == 007) {
+        config->buzzer.play_tune(james_bond, JAMES_BOND_LENGTH);
+    } else {
+        config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    }
 
     while (true)
     {
