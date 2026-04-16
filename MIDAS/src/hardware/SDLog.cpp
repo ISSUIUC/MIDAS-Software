@@ -69,27 +69,28 @@ ErrorCode SDSink::init() {
  * @param size size of buffer 
 */
 void SDSink::write(const uint8_t* data, size_t size) {
-    if (failed) {
-
-    } else {
-        file.write(data, size);
-        unflushed_bytes += size;
-        if(unflushed_bytes > 32768){
-//        Serial.println("Flushed");
-            file.flush();
-            unflushed_bytes = 0;
-        }
+    size_t bytes_written = file.write(data, size);
+    unflushed_bytes += size;
+    if(unflushed_bytes > 32768){
+        file.flush();
+        unflushed_bytes = 0;
     }
 
-    return;
+    if(bytes_written != size) {
+        failed_wr = true;
+    }
 }
 
 void SDSink::write_meta(const uint8_t* data, size_t size) {
     if (failed) { return; }
 
-    file.write(data, size);
+    size_t bytes_written = file.write(data, size);
     file.write('\n');
     file.flush(); // Meta writes are infrequent, so flushing is OK.
+
+    if(bytes_written != size) {
+        failed_mr = true;
+    }
 
     return;
 }

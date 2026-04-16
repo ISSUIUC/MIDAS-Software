@@ -68,6 +68,9 @@ DECLARE_THREAD(logger, RocketSystems *arg)
             }
         }
 
+        arg->rocket_data.err_flags.log_wr_err = arg->log_sink.failed_wr;
+        arg->rocket_data.err_flags.log_mr_err = arg->log_sink.failed_mr;
+
         THREAD_SLEEP(1);
     }
 }

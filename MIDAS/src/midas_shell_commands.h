@@ -627,9 +627,7 @@ MCommandExecutionResult cmd_mv(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
-
-
-MCommandExecutionResult calibration(const MShellContext& ctx) {
+MCommandExecutionResult m_calibration(const MShellContext& ctx) {
     if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
 
@@ -645,12 +643,91 @@ MCommandExecutionResult calibration(const MShellContext& ctx) {
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+MCommandExecutionResult calibset_help(){
+    Serial.println("CalibSet Help:\n");
+
+    Serial.println("\tcalibset help - shows this menu\n");
+    
+    Serial.println("Accelerometer (LSM6DSV320X)");
+    Serial.println("\tcalibset accelerometer [x/y/z] [float] - Sets the LSM6DSV320X's high g accelerometer offset along an axis (x/y/z)");
+    Serial.println("\tcalibset accel [x/y/z] [float] - Macro for 'calibset accelerometer'");
+    Serial.println("\tcalibset xl [x/y/z] [float] - Macro for 'calibset accelerometer'");
+    
+    Serial.println("Magnetometer (MMC5983MA)");
+    Serial.println("\tcalibset magnetometer si.[x/y/z] [float] - Sets the MMC5983MA's 'soft iron' offset along an axis (x/y/z)");
+    Serial.println("\tcalibset magnetometer hi.[x/y/z] [float] - Sets the MMC5983MA's 'hard iron' offset along an axis (x/y/z)");
+    Serial.println("\tcalibset mag [si/hi].[x/y/z] [float] - Macro for 'calibset magnetometer'");
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult m_calibset(const MShellContext& ctx) {
+
+    if (ctx.argc < 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    if (!strcmp(ctx.argv[1], "help")){
+        return calibset_help();
+    }
+
+    if (ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    RocketSystems* arg = (RocketSystems*) ctx.sysarg;
+
+    if (!strcmp(ctx.argv[1], "xl") || !strcmp(ctx.argv[1], "accel") || !strcmp(ctx.argv[1], "accelerometer")){
+        Acceleration cur_bias =  arg->sensors.imu.calibration_sensor_bias;
+        float val = atoff(ctx.argv[3]);
+        if(!strcmp(ctx.argv[2], "x")) { cur_bias.ax = val; }
+        else if(!strcmp(ctx.argv[2], "y")) { cur_bias.ay = val; }
+        else if(!strcmp(ctx.argv[2], "z")) { cur_bias.az = val; }
+        else { return MCommandExecutionResult::ERR_INVAL_ARGUMENT; }
+        arg->sensors.imu.calibration_sensor_bias = cur_bias;
+        arg->eeprom.data.lsm6dsv320x_hg_xl_bias = cur_bias;
+        arg->eeprom.commit();
+        return MCommandExecutionResult::OK;
+    }
+    else if (!strcmp(ctx.argv[1], "mag") || !strcmp(ctx.argv[1], "magnetometer")){
+        Magnetometer cur_hi =  arg->sensors.magnetometer.calibration_bias_hardiron;
+        Magnetometer cur_si =  arg->sensors.magnetometer.calibration_bias_softiron;
+        float val = atoff(ctx.argv[3]);
+        if(!strcmp(ctx.argv[2], "si.x")) { cur_si.mx = val; }
+        else if(!strcmp(ctx.argv[2], "si.y")) { cur_si.my = val; }
+        else if(!strcmp(ctx.argv[2], "si.z")) { cur_si.mz = val; }
+        else if(!strcmp(ctx.argv[2], "hi.x")) { cur_hi.mx = val; }
+        else if(!strcmp(ctx.argv[2], "hi.y")) { cur_hi.my = val; }
+        else if(!strcmp(ctx.argv[2], "hi.z")) { cur_hi.mz = val; }
+        else { return MCommandExecutionResult::ERR_INVAL_ARGUMENT; }
+        arg->eeprom.data.mmc5983ma_softiron_bias = cur_si;
+        arg->eeprom.data.mmc5983ma_softiron_bias = cur_hi;
+        arg->sensors.magnetometer.calibration_bias_softiron = cur_si;
+        arg->sensors.magnetometer.calibration_bias_hardiron = cur_hi;
+        arg->eeprom.commit();
+        return MCommandExecutionResult::OK;
+    }
+    
+    return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+}
+
+MCommandExecutionResult m_sdfn(const MShellContext& ctx) {
+    RocketSystems* arg = (RocketSystems*) ctx.sysarg;
+    if(ctx.argc == 1) {
+        Serial.println(arg->eeprom.data.sd_file_num_last);
+        return MCommandExecutionResult::OK;
+    }
+
+    if(ctx.argc == 2) {
+        uint16_t val = atoi(ctx.argv[3]);
+        arg->eeprom.data.sd_file_num_last = val;
+        arg->eeprom.commit();
+        return MCommandExecutionResult::OK;
+    }
+    return MCommandExecutionResult::ERR_INVAL_ARGC;
+}
+
 void m_shell_init_commands(MShell* sh) {
     // sh->register_command("setfsm", set_fsm, "\tsetfsm <state:int> - Sets the FSM state to state <state>");
     sh->register_command("hi", hi_midas, "\t\thi <string> - Prints hi <string>");
     sh->register_command("serial", serial, "\tserial get - Get MIDAS serial number\n\t\tserial set <serialnumber:int> - Set MIDAS serial number");
     sh->register_command("frequency", frequency, "\tfrequency get - Get MIDAS telemetry frequency (in MHz)\n\t\tfrequency set <freq:float> - Set MIDAS telemetry frequency (in MHz)");
     sh->register_command("fsm", fsm, "\t\tThis command is used to configure the MIDAS FSM thresholds and pyro firing events. \n\t\tUse through the official MIDAS-Base software package is recommended, or experienced users may enter \"fsm help\" for more information.");
+    sh->register_command("sdfn", m_sdfn, "\tsdfn - SD File Number, used to get or set the 'last SD fileno' value, used for seeking the next data file name");
 
     // File commands
     sh->register_command("ls", cmd_ls, "\tls - List all files in the mounted LogSink");
@@ -660,5 +737,6 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("mv", cmd_mv, "\tmv <file> <new_name> - Renames a file to new_name.");
 
     // sensor calibration
-    sh->register_command("calibrate", calibration, "\tcalibrate <sensor> - Inits calibration for a sensor, accepts sensor shorthand, i.e. 'xl' or 'mag'");
+    sh->register_command("calibrate", m_calibration, "\tcalibrate <sensor> - Inits calibration for a sensor, accepts sensor shorthand, i.e. 'xl' or 'mag'");
+    sh->register_command("calibset", m_calibset, "\tcalibset <sensor> <axis> <value> - Sets a calibration value for a sensor's axis.\n\tcalibset help - Display calibset's possible options");
 }

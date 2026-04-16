@@ -22,6 +22,9 @@ class LogSink {
 public:
     LogSink() = default;
 
+    bool failed_wr = false; // Failed a write
+    bool failed_mr = false; // Failed a meta write
+
     virtual ErrorCode init() = 0;
     virtual void write(const uint8_t* data, size_t size) = 0;
 
