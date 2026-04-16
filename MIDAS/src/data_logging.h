@@ -30,6 +30,8 @@ public:
 
     virtual void write_meta(const uint8_t* data, size_t size) = 0;
     uint16_t current_file_no = 0;
+    char active_bin_name[20] = {0};   // basename of currently-open .bin (no leading '/')
+    char active_meta_name[20] = {0};  // basename of currently-open .meta
 };
 
 void log_begin(LogSink& sink);

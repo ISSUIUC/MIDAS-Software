@@ -17,7 +17,8 @@ enum class MCommandExecutionResult {
     ERR_INVAL_ARG_RANGE = 6, // One or more arguments is out of range
     ERR_INVAL_FSM = 7,       // FSM commit failed
     ERR_INVAL_EEPROM = 8,    // EEPROM has garbage values
-    ERR_FS_FAIL_OPEN = 9     // A file or directory failed to open in the mFS
+    ERR_FS_FAIL_OPEN = 9,    // A file or directory failed to open in the mFS
+    ERR_FORBIDDEN = 10       // Action is not allowed 
 };
 
 struct MShellContext {

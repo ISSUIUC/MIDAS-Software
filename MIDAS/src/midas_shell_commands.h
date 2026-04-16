@@ -523,18 +523,36 @@ MCommandExecutionResult cmd_read(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
-bool delete_all_flash() {
+// Returns true if the path refers to an active logfile. Compares basenames so
+// any number of leading slashes is tolerated.
+static bool is_active_log(RocketSystems* arg, const char* path) {
+    const char* basename = strrchr(path, '/');
+    basename = basename ? basename + 1 : path;
+
+    char bin[20];
+    char meta[20];
+    snprintf(bin,  sizeof(bin),  "data%u.bin",  arg->log_sink.current_file_no - 1);
+    snprintf(meta, sizeof(meta), "data%u.meta", arg->log_sink.current_file_no - 1);
+    return !strcmp(basename, bin) || !strcmp(basename, meta);
+}
+
+bool delete_all_flash(RocketSystems* arg) {
     File root = SD_MMC.open("/");
     while (true) {
         File file = root.openNextFile();
         if (!file) {
             break; // No more files
         }
-        Serial.print("Deleting file: ");
-        Serial.println(file.path());
         String fullpath = "/" + String(file.name());
         file.close();
         file.flush();
+        if (is_active_log(arg, fullpath.c_str())) {
+            Serial.print("Skipping active log: ");
+            Serial.println(fullpath);
+            continue;
+        }
+        Serial.print("Deleting file: ");
+        Serial.println(fullpath);
         if(!SD_MMC.remove(fullpath.c_str())) {
             Serial.print("Failed to delete ");
             Serial.println(fullpath);
@@ -599,28 +617,24 @@ MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
 
 MCommandExecutionResult cmd_rm(const MShellContext& ctx) {
     if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    RocketSystems* arg = (RocketSystems*) ctx.sysarg;
 
     // Special case: doing `rm *` removes all files:
-    if (!strcmp(ctx.argv[1], "*")) {  
-        if(!delete_all_flash()) {
+    if (!strcmp(ctx.argv[1], "*")) {
+        if(!delete_all_flash(arg)) {
             return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
         }
         return MCommandExecutionResult::OK;
     }
 
+    if (is_active_log(arg, ctx.argv[1])) {
+        Serial.print("File is currently being written to (forbidden): ");
+        Serial.println(ctx.argv[1]);
+        return MCommandExecutionResult::ERR_FORBIDDEN;
+    }
+
     if(!SD_MMC.remove(ctx.argv[1])) {
         Serial.print("Failed to delete ");
-        Serial.println(ctx.argv[1]);
-        return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
-    }
-    return MCommandExecutionResult::OK;
-}
-
-MCommandExecutionResult cmd_mv(const MShellContext& ctx) {
-    if (ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
-
-    if(!SD_MMC.rename(ctx.argv[1], ctx.argv[2])) {
-        Serial.print("Failed to rename ");
         Serial.println(ctx.argv[1]);
         return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
     }
@@ -734,7 +748,6 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("read", cmd_read, "\tread <file> - Reads a file from the mounted LogSink");
     sh->register_command("lfd", cmd_lfd, "\tlfd <dataf> - Given a data file string (i.e. 'data17'), does a 'launch file dump', outputting a .launch file");
     sh->register_command("rm", cmd_rm, "\trm <file> - Deletes a file from the mounted LogSink");
-    sh->register_command("mv", cmd_mv, "\tmv <file> <new_name> - Renames a file to new_name.");
 
     // sensor calibration
     sh->register_command("calibrate", m_calibration, "\tcalibrate <sensor> - Inits calibration for a sensor, accepts sensor shorthand, i.e. 'xl' or 'mag'");
