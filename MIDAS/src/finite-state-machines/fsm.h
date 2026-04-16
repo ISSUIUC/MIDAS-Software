@@ -49,8 +49,6 @@ class FSM {
 public:
     FSM() = default;
 
-    // FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
-
     FSMData tick_fsm(FSMTickData& fsm_data);
 
     double get_launch_time() { return launch_time; }
