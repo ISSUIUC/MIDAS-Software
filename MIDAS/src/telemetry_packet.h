@@ -68,9 +68,10 @@ enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST,
 */
 struct TelemetryCommand {
     CommandType command;
-    std::array<char, 3> verify;
+    uint8_t serial;
+    uint8_t serial_check;
 
     bool valid() {
-        return verify == std::array<char, 3>{{'B','R','K'}};
+        return serial == (serial_check ^ 0xF2);
     }
 };

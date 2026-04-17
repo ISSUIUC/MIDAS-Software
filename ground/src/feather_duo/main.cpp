@@ -8,23 +8,17 @@
 #include"Command.h"
 #include"Queue.h"
 
-constexpr uint32_t BOOSTER_FREQ = 425150000;
-constexpr uint32_t SUSTAINER_FREQ = 421150000;
-Queue<TelemetryCommand> booster_cmds;
-Queue<TelemetryCommand> sustainer_cmds;
-
-
-enum class Stage {
-    Booster,
-    Sustainer
-};
+constexpr uint32_t RADIO0_FREQ = 425150000;
+constexpr uint32_t RADIO1_FREQ = 421150000;
+Queue<TelemetryCommand> radio0_cmds;
+Queue<TelemetryCommand> radio1_cmds;
 
 struct RadioConfig
 {
     SX1268 * radio;
     Queue<TelemetryCommand>* cmd_queue;
     uint32_t frequency;
-    Stage stage;
+    uint8_t serial;
     uint8_t indicator_led;
 };
 
@@ -43,8 +37,7 @@ void Radio_Rx_Thread(void * arg) {
     bool led_state = false;
     bool reset_state = false;
     bool initial_ack_flag = true;
-    TelemetryCommand to_send;
-    to_send.command = CommandType::EMPTY;
+    TelemetryCommand to_send = buildTelemCmd(CommandType::EMPTY, cfg->serial);
 
     while(true) {
         TelemetryPacket packet{};
@@ -74,13 +67,6 @@ void Radio_Rx_Thread(void * arg) {
             }
 
             if(to_send.command != CommandType::EMPTY) {
-
-                if (cfg->stage == Stage::Booster) {
-                    to_send.verify[0] = 'A';
-                } else if (cfg->stage == Stage::Sustainer) {
-                    to_send.verify[0] = 'B';
-                }
-
                 (void)cfg->radio->send((uint8_t*)&to_send, sizeof(to_send));
                 Serial.println(json_command_sent);
             }
@@ -106,18 +92,6 @@ void handle_serial(const String& key) {
     if(key.length() < 1) {
         Serial.println(json_command_bad);
         return;
-    }
-    Stage stage;
-    switch(key[0]) {
-        case '0':
-            stage = Stage::Booster;
-            break;
-        case '1':
-            stage = Stage::Sustainer;
-            break;
-        default:
-            Serial.println(json_command_bad);
-            return;
     }
 
     String cmd_name = key.substring(1);
@@ -153,11 +127,11 @@ void handle_serial(const String& key) {
         return;
     }
 
-    if(stage == Stage::Booster) {
-        booster_cmds.send(command);
+    if(key[0] == 0) {
+        radio0_cmds.send(command);
     }
-    if(stage == Stage::Sustainer) {
-        sustainer_cmds.send(command);
+    if(key[0] == 1) {
+        radio1_cmds.send(command);
     }
 
     Serial.println(json_command_success);
@@ -200,31 +174,31 @@ void setup() {
     SPI0.begin(Pins::SPI_SCK_0, Pins::SPI_MISO_0, Pins::SPI_MOSI_0);
     SPI1.begin(Pins::SPI_SCK_1, Pins::SPI_MISO_1, Pins::SPI_MOSI_1);
     
-    if(!init_radio(Radio0, BOOSTER_FREQ)) Serial.println(json_init_failure);
-    if(!init_radio(Radio1, SUSTAINER_FREQ)) Serial.println(json_init_failure);
+    if(!init_radio(Radio0, RADIO0_FREQ)) Serial.println(json_init_failure);
+    if(!init_radio(Radio1, RADIO1_FREQ)) Serial.println(json_init_failure);
     Serial.println(json_init_success);
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
 
 
-    RadioConfig booster_cfg{
+    RadioConfig radio0_cfg{
         .radio=&Radio0,
-        .cmd_queue=&booster_cmds,
-        .frequency=BOOSTER_FREQ,
-        .stage=Stage::Booster,
+        .cmd_queue=&radio0_cmds,
+        .frequency=RADIO0_FREQ,
+        .serial=0,
         .indicator_led=Pins::LED_ORANGE,
     };
 
-    RadioConfig sustainer_cfg{
+    RadioConfig radio1_cfg{
         .radio=&Radio1,
-        .cmd_queue=&sustainer_cmds,
-        .frequency=SUSTAINER_FREQ,
-        .stage=Stage::Sustainer,
+        .cmd_queue=&radio1_cmds,
+        .frequency=RADIO1_FREQ,
+        .serial=1,
         .indicator_led=Pins::LED_BLUE,
     };
 
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &radio0_cfg, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &radio1_cfg, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
     while(true) {
         delay(10000);

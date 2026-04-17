@@ -6,5 +6,14 @@ enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST,
 // Commands transmitted from ground station to rocket
 struct TelemetryCommand {
     CommandType command;
-    std::array<char, 3> verify = {{'_', 'R', 'K'}};
+    uint8_t serial;
+    uint8_t serial_check;
 };
+
+TelemetryCommand buildTelemCmd(CommandType command, uint8_t serial){
+    TelemetryCommand cmd;
+    cmd.command = command;
+    cmd.serial = serial;
+    cmd.serial_check = serial ^ 0xF2;
+    return cmd;
+}

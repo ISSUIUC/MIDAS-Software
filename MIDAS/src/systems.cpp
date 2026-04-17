@@ -767,7 +767,7 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 200))
             {
-                if (command.valid())
+                if (command.valid() && command.serial == arg->eeprom.data.serial)
                 {
                     arg->tlm.acknowledgeReceived();
                     handle_tlm_command(command, arg, current_state);
