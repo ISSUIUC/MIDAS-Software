@@ -8,12 +8,9 @@ struct TelemetryCommand {
     CommandType command;
     uint8_t serial;
     uint8_t serial_check;
-};
 
-TelemetryCommand buildTelemCmd(CommandType command, uint8_t serial){
-    TelemetryCommand cmd;
-    cmd.command = command;
-    cmd.serial = serial;
-    cmd.serial_check = serial ^ 0xF2;
-    return cmd;
-}
+    void setSerial(uint8_t sn){
+        serial = sn;
+        serial_check = sn ^ 0xF2;
+    }
+};

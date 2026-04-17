@@ -37,7 +37,8 @@ void Radio_Rx_Thread(void * arg) {
     bool led_state = false;
     bool reset_state = false;
     bool initial_ack_flag = true;
-    TelemetryCommand to_send = buildTelemCmd(CommandType::EMPTY, cfg->serial);
+    TelemetryCommand to_send;
+    to_send.command = CommandType::EMPTY;
 
     while(true) {
         TelemetryPacket packet{};
@@ -67,6 +68,7 @@ void Radio_Rx_Thread(void * arg) {
             }
 
             if(to_send.command != CommandType::EMPTY) {
+                to_send.setSerial(cfg->serial);
                 (void)cfg->radio->send((uint8_t*)&to_send, sizeof(to_send));
                 Serial.println(json_command_sent);
             }
