@@ -615,6 +615,10 @@ MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
+MCommandExecutionResult ident_midas(const MShellContext& ctx) {
+    Serial.println("IDENT_RESPONSE:MIDAS_MINI");
+}
+
 MCommandExecutionResult cmd_rm(const MShellContext& ctx) {
     if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -752,4 +756,7 @@ void m_shell_init_commands(MShell* sh) {
     // sensor calibration
     sh->register_command("calibrate", m_calibration, "\tcalibrate <sensor> - Inits calibration for a sensor, accepts sensor shorthand, i.e. 'xl' or 'mag'");
     sh->register_command("calibset", m_calibset, "\tcalibset <sensor> <axis> <value> - Sets a calibration value for a sensor's axis.\n\tcalibset help - Display calibset's possible options");
+    
+    //Identify
+    sh->register_command("IDENT", ident_midas, "\tIdentify MIDAS")
 }
