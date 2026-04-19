@@ -7,20 +7,15 @@
 #include"Output.h"
 #include"Command.h"
 #include"Queue.h"
+#include "midas_shell.h"
+#include "esp_eeprom.h"
+#include "duo.h"
 
 constexpr uint32_t RADIO0_FREQ = 425150000;
 constexpr uint32_t RADIO1_FREQ = 421150000;
 Queue<TelemetryCommand> radio0_cmds;
 Queue<TelemetryCommand> radio1_cmds;
 
-struct RadioConfig
-{
-    SX1268 * radio;
-    Queue<TelemetryCommand>* cmd_queue;
-    uint32_t frequency;
-    uint8_t serial;
-    uint8_t indicator_led;
-};
 
 
 bool init_radio(SX1268& radio, uint32_t frequency) {
@@ -81,7 +76,7 @@ void serial_identify() {
     Serial.println("IDENT_RESPONSE:FEATHER_DUO");
 }
 
-void handle_serial(const String& key) {
+void handle_serial(const String& key, DuoSystems * duo_sys) {
 
 
     if (key == "IDENT") {
@@ -124,7 +119,16 @@ void handle_serial(const String& key) {
         command.command = CommandType::CALIB_ACCEL;
     } else if (cmd_name == "CMG") {
         command.command = CommandType::CALIB_MAG;
-    } else {
+    } 
+    
+    else if (cmd_name == "FREQ"){
+        if (key[0] == 0) duo_sys->cfg0.desired_frequency
+    }
+    else if (cmd_name == "SERIAL"){
+        
+    }
+    
+    else {
         Serial.println(json_command_bad);
         return;
     }
@@ -140,6 +144,7 @@ void handle_serial(const String& key) {
 }
 
 void Management_Thread(void * arg) {
+    DuoSystems* duo_sys = (DuoSystems*)arg;
     String cur_input = "";
     bool led_state = false;
     while(true){
@@ -147,7 +152,7 @@ void Management_Thread(void * arg) {
             char input = Serial.read();
             if(input == '\n') {
                 cur_input.replace("\r", "");
-                handle_serial(cur_input);
+                handle_serial(cur_input, duo_sys);
                 cur_input = "";
             } else {
                 cur_input += input;
@@ -160,8 +165,77 @@ void Management_Thread(void * arg) {
 }
 
 
+void Shell_Thread(void *arg)
+{
+    char line_buf[MShell::max_line_len];
+    char tmp_buf[MShell::max_line_len];
+    uint8_t d_read = 0;
+
+    while(true) {
+        // if(shell->settings.echo) {
+        //     Serial.print("> ");
+        //     Serial.flush();
+        // }
+        int num_bytes_avail = Serial.available();
+
+        if(num_bytes_avail > 0) {
+            Serial.read(tmp_buf, num_bytes_avail);
+            for(int i = 0; i < num_bytes_avail; i++) {
+
+                if(tmp_buf[i] == '\r') {
+                    continue;
+                }
+
+                if(tmp_buf[i] == '\b' || tmp_buf[i] == 0x7F) {
+                    if(d_read > 0) {
+                        d_read--;
+                        if(arg->shell->settings.echo) {
+                            Serial.print("\b \b"); // erase character on terminal
+                        }
+                    }
+                    continue;
+                }
+
+                if(arg->shell->settings.echo) {
+                    Serial.print(tmp_buf[i]);
+                }
+
+                if(tmp_buf[i] == '\n') {
+                    // Process the line instead of adding it!
+                    line_buf[d_read] = '\0'; // Null terminate command
+                    d_read = 0;
+
+                    MCommandExecutionResult c_res = arg->shell->execute_line(line_buf, arg);
+                    Serial.print("<done> ");
+                    Serial.println(static_cast<int>(c_res));
+
+                    if(arg->shell->settings.echo) {
+                        Serial.print("> ");
+                        Serial.flush();
+                    }
+
+                    continue;
+                }
+
+                if(d_read >= MShell::max_line_len - 1) {
+                    continue;
+                }
+
+                // Otherwise add to the buf
+                line_buf[d_read++] = tmp_buf[i];
+            }
+            Serial.flush();
+        }
+
+        delay(10);
+    }
+}
+
+
 void setup() {
     Serial.begin(460800);
+
+    DuoSystems systems;
     
     SPIClass SPI0(HSPI);
     SPIClass SPI1(FSPI);
@@ -182,6 +256,15 @@ void setup() {
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
 
+    
+    systems.eeprom.init();
+
+    m_shell_setup(); // Set up the MIDAS shell
+    systems.shell = &m_shell_inst;
+    m_shell_init_commands(systems.shell);
+
+    // offload freq and SN from eeprom
+    // consider changing freq to be float (consistent w/ MIDAS)
 
     RadioConfig radio0_cfg{
         .radio=&Radio0,
@@ -199,9 +282,12 @@ void setup() {
         .indicator_led=Pins::LED_BLUE,
     };
 
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &radio0_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &radio1_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
+    systems.cfg0 = radio0_cfg;
+    systems.cfg1 = radio1_cfg;
+
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &systems.cfg0, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &systems.cfg1, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, &systems, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }
