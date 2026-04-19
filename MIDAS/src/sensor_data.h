@@ -3,9 +3,10 @@
 #include <cmath>
 #include <cstdint>
 #include <algorithm>
+#include <limits>
 
 #include "finite-state-machines/fsm_config.h"
-
+#include "data_logging_meta.h"
 
 /**
  * @brief
@@ -148,6 +149,75 @@ struct IMU_SFLP {
     Quaternion quaternion;
     Acceleration gravity;
     Velocity gyro_bias;
+};
+
+
+enum class MetalogSummaryEntryType{
+    CURRENT,
+    MAXIMUM,
+    MINIMUM,
+};
+
+template<typename T>
+class MetalogSummaryEntry {
+
+    public:
+
+    MetalogSummaryEntry(const MetaDataCode &code, const MetalogSummaryEntryType &type = MetalogSummaryEntryType::CURRENT, const T &default_val = T()){
+        code = code;
+        type = type;
+        data = default_val;
+    }
+
+    void update(const T &newval){
+        switch(type){
+            case MetalogSummaryEntryType::CURRENT:
+                data = newval;
+                break;
+            case MetalogSummaryEntryType::MAXIMUM:
+                if (newval > data){
+                    data = newval;
+                }
+                break;
+            case MetalogSummaryEntryType::MINIMUM:
+                if (newval < data){
+                    data = newval;
+                }
+                break;
+        }
+    }
+
+    void commit(MetaLogging &metalog){
+        metalog.log_data(code, data);
+    }
+
+    private:
+        T data;
+        MetaDataCode code;
+        MetalogSummaryEntryType type;  
+};
+
+struct MetalogSummary{
+    // Launch events
+    MetalogSummaryEntry<uint32_t> event_tlaunch {MetaDataCode::EVENT_TLAUNCH};
+    MetalogSummaryEntry<uint32_t> event_tburnout {MetaDataCode::EVENT_TBURNOUT};
+    MetalogSummaryEntry<uint32_t> event_tignition {MetaDataCode::EVENT_TIGNITION};
+    MetalogSummaryEntry<uint32_t> event_tapogee {MetaDataCode::EVENT_TAPOGEE};
+    MetalogSummaryEntry<uint32_t> event_tmain {MetaDataCode::EVENT_TMAIN};
+    MetalogSummaryEntry<uint32_t> event_tmax_accel {MetaDataCode::EVENT_TMAX_ACCEL};
+    MetalogSummaryEntry<uint32_t> event_tmax_vel {MetaDataCode::EVENT_TMAX_VEL};
+    MetalogSummaryEntry<uint32_t> event_tmax_descent_rate {MetaDataCode::EVENT_TMAX_DESCENT_RATE};
+
+    // Non-events
+    MetalogSummaryEntry<float> data_launchsite_baro {MetaDataCode::DATA_LAUNCHSITE_BARO};
+    MetalogSummaryEntry<float> data_launchsite_gps {MetaDataCode::DATA_LAUNCHSITE_GPS};
+    MetalogSummaryEntry<float> data_launch_initial_tilt {MetaDataCode::DATA_LAUNCH_INITIAL_TILT};
+    MetalogSummaryEntry<float> data_tilt_at_burnout {MetaDataCode::DATA_TILT_AT_BURNOUT};
+    MetalogSummaryEntry<float> data_tilt_at_ignition {MetaDataCode::DATA_TILT_AT_IGNITION};
+    MetalogSummaryEntry<float> data_max_accel {MetaDataCode::DATA_MAX_ACCEL, MetalogSummaryEntryType::MAXIMUM, -std::numeric_limits<float>::max()};
+    MetalogSummaryEntry<float> data_max_vel {MetaDataCode::DATA_MAX_VEL, MetalogSummaryEntryType::MAXIMUM, -std::numeric_limits<float>::max()};
+    MetalogSummaryEntry<float> data_alt_at_burnout {MetaDataCode::DATA_ALT_AT_BURNOUT};
+    MetalogSummaryEntry<float> data_max_descent_rate {MetaDataCode::DATA_MAX_DESCENT_RATE, MetalogSummaryEntryType::MAXIMUM, -std::numeric_limits<float>::max()};
 };
 
 /**
