@@ -1,3 +1,5 @@
+#pragma once
+
 #include<Arduino.h>
 #include"E22.h"
 #include"Command.h"

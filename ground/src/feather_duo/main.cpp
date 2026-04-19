@@ -7,7 +7,7 @@
 #include"Output.h"
 #include"Command.h"
 #include"Queue.h"
-#include "midas_shell.h"
+#include "midas_shell_commands.h"
 #include "esp_eeprom.h"
 #include "duo.h"
 
@@ -76,7 +76,7 @@ void serial_identify() {
     Serial.println("IDENT_RESPONSE:FEATHER_DUO");
 }
 
-void handle_serial(const String& key, DuoSystems * duo_sys) {
+void handle_serial(const String& key, DuoSystems * systems) {
 
 
     if (key == "IDENT") {
@@ -122,7 +122,7 @@ void handle_serial(const String& key, DuoSystems * duo_sys) {
     } 
     
     else if (cmd_name == "FREQ"){
-        if (key[0] == 0) duo_sys->cfg0.desired_frequency
+        if (key[0] == 0) systems->cfg0.desired_frequency = 0;
     }
     else if (cmd_name == "SERIAL"){
         
@@ -144,7 +144,7 @@ void handle_serial(const String& key, DuoSystems * duo_sys) {
 }
 
 void Management_Thread(void * arg) {
-    DuoSystems* duo_sys = (DuoSystems*)arg;
+    DuoSystems* systems = (DuoSystems*)arg;
     String cur_input = "";
     bool led_state = false;
     while(true){
@@ -152,7 +152,7 @@ void Management_Thread(void * arg) {
             char input = Serial.read();
             if(input == '\n') {
                 cur_input.replace("\r", "");
-                handle_serial(cur_input, duo_sys);
+                handle_serial(cur_input, systems);
                 cur_input = "";
             } else {
                 cur_input += input;
@@ -167,6 +167,8 @@ void Management_Thread(void * arg) {
 
 void Shell_Thread(void *arg)
 {
+    DuoSystems* systems = (DuoSystems*)arg;
+
     char line_buf[MShell::max_line_len];
     char tmp_buf[MShell::max_line_len];
     uint8_t d_read = 0;
@@ -189,14 +191,14 @@ void Shell_Thread(void *arg)
                 if(tmp_buf[i] == '\b' || tmp_buf[i] == 0x7F) {
                     if(d_read > 0) {
                         d_read--;
-                        if(arg->shell->settings.echo) {
+                        if(systems->shell->settings.echo) {
                             Serial.print("\b \b"); // erase character on terminal
                         }
                     }
                     continue;
                 }
 
-                if(arg->shell->settings.echo) {
+                if(systems->shell->settings.echo) {
                     Serial.print(tmp_buf[i]);
                 }
 
@@ -205,11 +207,11 @@ void Shell_Thread(void *arg)
                     line_buf[d_read] = '\0'; // Null terminate command
                     d_read = 0;
 
-                    MCommandExecutionResult c_res = arg->shell->execute_line(line_buf, arg);
+                    MCommandExecutionResult c_res = systems->shell->execute_line(line_buf, systems);
                     Serial.print("<done> ");
                     Serial.println(static_cast<int>(c_res));
 
-                    if(arg->shell->settings.echo) {
+                    if(systems->shell->settings.echo) {
                         Serial.print("> ");
                         Serial.flush();
                     }
@@ -288,6 +290,7 @@ void setup() {
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &systems.cfg0, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &systems.cfg1, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, &systems, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Shell_Thread, "Shell_thread", 8192, &systems, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }

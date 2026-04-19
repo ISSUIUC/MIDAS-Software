@@ -4,4 +4,4 @@
 .vscode/launch.json
 .vscode/ipch
 *.pyc
-/src/esp_eeprom_checksum.h
+/src/feather_duo/esp_eeprom_checksum.h

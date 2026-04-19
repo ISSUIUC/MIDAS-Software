@@ -1,4 +1,4 @@
-#include <esp_eeprom.h>
+#include "esp_eeprom.h"
 
 
 
@@ -37,7 +37,8 @@ bool EEPROMController::commit() {
     return read();
 }
 
-ErrorCode EEPROMController::init() {
+// originally returned errorcode
+void EEPROMController::init() {
     static_assert(EEPROM_SIZE <= EEPROM_MAX_SIZE);
     EEPROM.begin((size_t)EEPROM_SIZE);
 
@@ -51,6 +52,5 @@ ErrorCode EEPROMController::init() {
         commit();
     }
 
-    return ErrorCode::NoError;
 }
 

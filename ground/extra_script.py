@@ -7,7 +7,7 @@ assert sys.version_info >= (3, 5)
 
 Import("env")
 
-eeprom_format_text = (Path("src") / "esp_eeprom_format.h").read_text()
+eeprom_format_text = (Path("src/feather_duo") / "esp_eeprom_format.h").read_text()
 
 git_command = ["git", "log", "-n", "1", "--pretty=format:%H"]
 git_hash = subprocess.run(git_command, stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -20,5 +20,5 @@ file_eeprom = f"""\
 #define EEPROM_CHECKSUM (0x{checksum_eeprom:08x})
 """
 
-with Path("src/esp_eeprom_checksum.h").open("w") as checksum_file_eeprom:
+with Path("src/feather_duo/esp_eeprom_checksum.h").open("w") as checksum_file_eeprom:
     checksum_file_eeprom.write(file_eeprom)
