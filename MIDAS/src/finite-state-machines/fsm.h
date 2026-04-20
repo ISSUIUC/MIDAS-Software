@@ -8,6 +8,7 @@
 #include "sensor_data.h"
 #include "Buffer.h"
 #include "rocket_state.h"
+#include "MIDAS_Events.h"
 
 /**
  * @struct StateEstimate
@@ -32,7 +33,7 @@ class FSM {
 public:
     FSM() = default;
 
-    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, CommandFlags& commands);
+    FSMState tick_fsm(FSMState& curr_state, StateEstimate state_estimate, RocketData& rocket_data);
 
 private:
     double launch_time;
