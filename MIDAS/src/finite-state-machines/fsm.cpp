@@ -154,7 +154,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_FIRST_BOOST:
             // if acceleration spike was too brief then go back to idle
-            if ((state_estimate.acceleration < sustainer_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < sustainer_idle_to_first_boost_time_threshold)) {
+            if ((state_estimate.acceleration < sustainer_idle_to_first_boost_acceleration_threshold) && ((current_time - launch_time) < sustainer_burnout_to_first_boost_time_threshold)) {
                 state = FSMState::STATE_IDLE;
                 break;
             }
@@ -168,7 +168,7 @@ FSMState FSM::tick_fsm(FSMState& state, StateEstimate state_estimate, CommandFla
 
         case FSMState::STATE_BURNOUT:
             // if low acceleration is too brief than go on to the previous state
-            if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_coast_time)) {
+            if ((state_estimate.acceleration >= sustainer_coast_detection_acceleration_threshold) && ((current_time - burnout_time) < sustainer_coast_time && ((current_time - burnout_time) > sustainer_burnout_to_first_boost_time_threshold))) {
                 state = FSMState::STATE_FIRST_BOOST;
                 break;
             }
