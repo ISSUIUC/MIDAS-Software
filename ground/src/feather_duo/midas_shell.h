@@ -18,13 +18,14 @@ enum class MCommandExecutionResult {
     ERR_INVAL_FSM = 7,       // FSM commit failed
     ERR_INVAL_EEPROM = 8,    // EEPROM has garbage values
     ERR_FS_FAIL_OPEN = 9,    // A file or directory failed to open in the mFS
-    ERR_FORBIDDEN = 10       // Action is not allowed 
+    ERR_FORBIDDEN = 10,      // Action is not allowed
+    ERR_INVAL_SERIAL = 11,   // Given serial number is not currently used by either radio 
 };
 
 struct MShellContext {
     uint8_t argc;
     const char** argv;
-    const void* sysarg = nullptr; // This will ALWAYS be RocketSystems*, but the type isn't available to us at the moment.
+    const void* sysarg = nullptr; // This will ALWAYS be DuoSystems*, but the type isn't available to us at the moment.
 };
 
 using MShellExecutor = MCommandExecutionResult(*)(const MShellContext&);

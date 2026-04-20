@@ -122,7 +122,7 @@ void handle_serial(const String& key, DuoSystems * systems) {
     } 
     
     else if (cmd_name == "FREQ"){
-        if (key[0] == 0) systems->cfg0.desired_frequency = 0;
+        if (key[0] == 0) systems->cfg[0].desired_frequency = 0;
     }
     else if (cmd_name == "SERIAL"){
         
@@ -284,11 +284,11 @@ void setup() {
         .indicator_led=Pins::LED_BLUE,
     };
 
-    systems.cfg0 = radio0_cfg;
-    systems.cfg1 = radio1_cfg;
+    systems.cfg[0] = radio0_cfg;
+    systems.cfg[1] = radio1_cfg;
 
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &systems.cfg0, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &systems.cfg1, 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &systems.cfg[0], 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &systems.cfg[1], 0, nullptr, 1);
     xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, &systems, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Shell_Thread, "Shell_thread", 8192, &systems, 0, nullptr, 1);
     while(true) {

@@ -22,8 +22,7 @@ struct RadioConfig
 
 struct DuoSystems
 {
-    RadioConfig cfg0;
-    RadioConfig cfg1;
+    RadioConfig cfg[2];
     EEPROMController eeprom;
     MShell* shell;
 };

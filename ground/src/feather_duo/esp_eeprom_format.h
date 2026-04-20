@@ -5,9 +5,7 @@
 struct MIDASEEPROM {
     uint32_t checksum;
 
-    uint8_t serial0 = 0;
-    uint8_t serial1 = 0;
+    uint8_t serial[2] = {0,0};
 
-    float frequency0 = 425.15;
-    float frequency1 = 421.15;
+    float frequency[2] = {425.15,421.15};
 };
