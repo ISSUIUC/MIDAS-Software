@@ -143,7 +143,7 @@ MCommandExecutionResult pyro(const MShellContext& ctx){
 MCommandExecutionResult state(const MShellContext& ctx){
     DuoSystems* arg = (DuoSystems*) ctx.sysarg;
     // expecting 3 arguments
-    if(ctx.argc == 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     uint8_t serial = atoi(ctx.argv[1]);
     int8_t key = checkSerial(arg, serial);
     if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
@@ -169,7 +169,7 @@ MCommandExecutionResult state(const MShellContext& ctx){
 MCommandExecutionResult cam(const MShellContext& ctx){
     DuoSystems* arg = (DuoSystems*) ctx.sysarg;
     // expecting 3 arguments
-    if(ctx.argc == 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     uint8_t serial = atoi(ctx.argv[1]);
     int8_t key = checkSerial(arg, serial);
     if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
@@ -197,7 +197,7 @@ MCommandExecutionResult cam(const MShellContext& ctx){
 MCommandExecutionResult calib(const MShellContext& ctx){
     DuoSystems* arg = (DuoSystems*) ctx.sysarg;
     // expecting 3 arguments
-    if(ctx.argc == 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     uint8_t serial = atoi(ctx.argv[1]);
     int8_t key = checkSerial(arg, serial);
     if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
