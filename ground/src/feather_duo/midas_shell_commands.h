@@ -141,20 +141,80 @@ MCommandExecutionResult pyro(const MShellContext& ctx){
 
 
 MCommandExecutionResult state(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc == 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
 
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "SAFE")){
+        command.command = CommandType::SWITCH_TO_SAFE;
+    }
+    else if (!strcmp(ctx.argv[2], "ARMED")){
+        command.command = CommandType::SWITCH_TO_ARMED;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
 
     return MCommandExecutionResult::OK;
 }
 
 
 MCommandExecutionResult cam(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc == 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
 
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "on")){
+        command.command = CommandType::CAM_ON;
+    }
+    else if (!strcmp(ctx.argv[2], "off")){
+        command.command = CommandType::CAM_OFF;
+    }
+    else if (!strcmp(ctx.argv[2], "toggle")){
+        command.command = CommandType::TOGGLE_CAM_VMUX;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
 
     return MCommandExecutionResult::OK;
 }
 
 MCommandExecutionResult calib(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc == 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
 
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "xl") || !strcmp(ctx.argv[2], "accel") || !strcmp(ctx.argv[2], "accelerometer")){
+        command.command = CommandType::CALIB_ACCEL;
+    }
+    else if (!strcmp(ctx.argv[2], "mag") || !strcmp(ctx.argv[2], "magnetometer")){
+        command.command = CommandType::CALIB_MAG;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
 
     return MCommandExecutionResult::OK;
 }

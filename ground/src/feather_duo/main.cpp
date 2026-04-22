@@ -98,7 +98,7 @@ void handle_serial(const String& key, DuoSystems * systems) {
     } else if (cmd_name == "SAFE") {
         command.command = CommandType::SWITCH_TO_SAFE;
     } else if (cmd_name == "IDLE") {
-        command.command = CommandType::SWITCH_TO_IDLE;
+        command.command = CommandType::SWITCH_TO_ARMED;
     } else if (cmd_name == "PT") {
         command.command = CommandType::SWITCH_TO_PYRO_TEST;
     } else if (cmd_name == "PA") {
