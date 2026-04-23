@@ -7,5 +7,5 @@ struct MIDASEEPROM {
 
     uint8_t serial[2] = {0,0};
 
-    float frequency[2] = {425.15,421.15};
+    uint32_t frequency[2] = {425150000,421150000};
 };

@@ -62,9 +62,10 @@ MCommandExecutionResult frequency(const MShellContext& ctx){
 
     if(!strcmp(ctx.argv[2], "set")){
         if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
-        float frequency = atoff(ctx.argv[3]);
+        float freq_mhz = atoff(ctx.argv[3]);
+        uint32_t frequency = (uint32_t) (freq_mhz * 1e6);
         // ensure that given frequency is within the 70cm band 
-        if (frequency > 450.0 || frequency < 420.0) { return MCommandExecutionResult::ERR_INVAL_ARG_RANGE; }
+        if (freq_mhz > 450.0 || freq_mhz < 420.0) { return MCommandExecutionResult::ERR_INVAL_ARG_RANGE; }
         
         // set eeprom frequency
         arg->eeprom.data.frequency[key] = frequency;
@@ -219,6 +220,33 @@ MCommandExecutionResult calib(const MShellContext& ctx){
     return MCommandExecutionResult::OK;
 }
 
+MCommandExecutionResult kf(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
+
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "reset")){
+        command.command = CommandType::RESET_KF;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult identify(const MShellContext& ctx){
+    Serial.println("IDENT_RESPONSE:FEATHER_DUO");
+    return MCommandExecutionResult::OK;
+}
+
 
 void m_shell_init_commands(MShell* sh) {
     sh->register_command("hi", hi_feather, "\t\thi <string> - Prints hi <string>");
@@ -228,4 +256,9 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("state", state, "\tstate (serial) [SAFE|ARMED] - Set MIDAS FSM state");
     sh->register_command("cam", cam, "\tcam (serial) [on|off|toggle] - Send commands to CAM via MIDAS");
     sh->register_command("calib", calib, "\tcalib (serial) [mag|magnetometer|xl|accel|accelerometer] - Calibrate MIDAS sensors");
+    sh->register_command("kf", kf, "\tkf (serial) reset - Reset MIDAS Kalman Filter");
+    sh->register_command("ident", identify, "\tident - identify device over serial as a Feather Duo");
 }
+
+
+// should have a way to print json outputs based on success/failure of command in the shell. Maybe a better way than just copying it by every return so I will hold off for now

@@ -68,99 +68,15 @@ void Radio_Rx_Thread(void * arg) {
                 Serial.println(json_command_sent);
             }
         }
-    }
-}
 
-// Identifies this device over serial
-void serial_identify() {
-    Serial.println("IDENT_RESPONSE:FEATHER_DUO");
-}
-
-void handle_serial(const String& key, DuoSystems * systems) {
-
-
-    if (key == "IDENT") {
-        serial_identify();
-        return;
-    }
-
-    TelemetryCommand command{};
-
-    if(key.length() < 1) {
-        Serial.println(json_command_bad);
-        return;
-    }
-
-    String cmd_name = key.substring(1);
-
-    if (cmd_name == "RESET_KF") {
-        command.command = CommandType::RESET_KF;
-    } else if (cmd_name == "SAFE") {
-        command.command = CommandType::SWITCH_TO_SAFE;
-    } else if (cmd_name == "IDLE") {
-        command.command = CommandType::SWITCH_TO_ARMED;
-    } else if (cmd_name == "PT") {
-        command.command = CommandType::SWITCH_TO_PYRO_TEST;
-    } else if (cmd_name == "PA") {
-        command.command = CommandType::FIRE_PYRO_A;
-    } else if (cmd_name == "PB") {
-        command.command = CommandType::FIRE_PYRO_B;
-    } else if (cmd_name == "PC") {
-        command.command = CommandType::FIRE_PYRO_C;
-    } else if (cmd_name == "PD") {
-        command.command = CommandType::FIRE_PYRO_D;
-    } else if (cmd_name == "CAMON") {
-        command.command = CommandType::CAM_ON;
-    } else if (cmd_name == "CAMOFF") {
-        command.command = CommandType::CAM_OFF;
-    } else if (cmd_name == "VMUXT") {
-        command.command = CommandType::TOGGLE_CAM_VMUX;
-    } else if (cmd_name == "CXL") {
-        command.command = CommandType::CALIB_ACCEL;
-    } else if (cmd_name == "CMG") {
-        command.command = CommandType::CALIB_MAG;
-    } 
-    
-    else if (cmd_name == "FREQ"){
-        if (key[0] == 0) systems->cfg[0].desired_frequency = 0;
-    }
-    else if (cmd_name == "SERIAL"){
-        
-    }
-    
-    else {
-        Serial.println(json_command_bad);
-        return;
-    }
-
-    if(key[0] == 0) {
-        radio0_cmds.send(command);
-    }
-    if(key[0] == 1) {
-        radio1_cmds.send(command);
-    }
-
-    Serial.println(json_command_success);
-}
-
-void Management_Thread(void * arg) {
-    DuoSystems* systems = (DuoSystems*)arg;
-    String cur_input = "";
-    bool led_state = false;
-    while(true){
-        while(Serial.available()) {
-            char input = Serial.read();
-            if(input == '\n') {
-                cur_input.replace("\r", "");
-                handle_serial(cur_input, systems);
-                cur_input = "";
-            } else {
-                cur_input += input;
-            }
+        if(cfg->desired_frequency != cfg->frequency){
+            cfg->frequency = cfg->desired_frequency;
+            cfg->radio->set_frequency(cfg->frequency); // do we need to do any error checking on this? I assume no
         }
-        led_state = !led_state;
-        digitalWrite(Pins::LED_GREEN, led_state);
-        delay(10); 
+
+        if(cfg->desired_serial != cfg->serial){
+            cfg->serial = cfg->desired_serial;
+        }
     }
 }
 
@@ -289,7 +205,6 @@ void setup() {
 
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &systems.cfg[0], 0, nullptr, 1);
     xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &systems.cfg[1], 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, &systems, 0, nullptr, 1);
     xTaskCreatePinnedToCore(Shell_Thread, "Shell_thread", 8192, &systems, 0, nullptr, 1);
     while(true) {
         delay(10000);
