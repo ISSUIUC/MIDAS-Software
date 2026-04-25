@@ -1,5 +1,7 @@
 #include <string.h>
 #include <Queue.h>
+#include <algorithm>
+#include <limits>
 
 #define META_LOGGING_MAX_SIZE 64
 
@@ -26,11 +28,41 @@ enum MetaDataCode {
     DATA_MAX_DESCENT_RATE
 };
 
-
 enum class MetalogSummaryEntryType{
     CURRENT,
     MAXIMUM,
     MINIMUM,
+};
+
+struct MetalogSummary;
+
+struct MetaLogging {
+    public:
+        struct MetaLogEntry {
+            MetaDataCode log_type;
+            size_t size;
+            char data[META_LOGGING_MAX_SIZE];
+        };
+
+        MetalogSummary * summary;
+
+        Queue<MetaLogEntry> _q;
+
+        bool get_queued(MetaLogEntry* out) { return _q.receive(out); }
+
+        template <typename T>
+        void log_data(MetaDataCode data_type, const T& data) {
+
+            // double check...
+            static_assert(sizeof(T) <= META_LOGGING_MAX_SIZE, "Datatype for log_data too large");
+
+            MetaLogEntry entry{data_type, 0, 0};
+            entry.size = sizeof(T);
+            memcpy(entry.data, &data, entry.size);
+            _q.send(entry);
+
+            // fprintf(stderr, "Data has been logged: %c", entry.data);
+        }
 };
 
 template<typename T>
@@ -38,9 +70,9 @@ class MetalogSummaryEntry {
 
     public:
 
-    MetalogSummaryEntry(const MetaDataCode &code, const MetalogSummaryEntryType &type = MetalogSummaryEntryType::CURRENT, const T &default_val = T()){
-        code = code;
-        type = type;
+    MetalogSummaryEntry(const MetaDataCode &metacode, const MetalogSummaryEntryType &metatype = MetalogSummaryEntryType::CURRENT, const T &default_val = T()){
+        code = metacode;
+        type = metatype;
         data = default_val;
     }
 
@@ -62,9 +94,7 @@ class MetalogSummaryEntry {
         }
     }
 
-    void commit(MetaLogging &metalog){
-        metalog.log_data(code, data);
-    }
+    void commit(MetaLogging &metalog);
 
     private:
         T data;
@@ -95,31 +125,6 @@ struct MetalogSummary{
     MetalogSummaryEntry<float> data_max_descent_rate {MetaDataCode::DATA_MAX_DESCENT_RATE, MetalogSummaryEntryType::MAXIMUM, -std::numeric_limits<float>::max()};
 };
 
-struct MetaLogging {
-    public:
-        struct MetaLogEntry {
-            MetaDataCode log_type;
-            size_t size;
-            char data[META_LOGGING_MAX_SIZE];
-        };
+template <typename T>
+void MetalogSummaryEntry<T>::commit(MetaLogging &metalog){metalog.log_data(code, data);}
 
-        MetalogSummary summary;
-
-        Queue<MetaLogEntry> _q;
-
-        bool get_queued(MetaLogEntry* out) { return _q.receive(out); }
-
-        template <typename T>
-        void log_data(MetaDataCode data_type, const T& data) {
-
-            // double check...
-            static_assert(sizeof(T) <= META_LOGGING_MAX_SIZE, "Datatype for log_data too large");
-
-            MetaLogEntry entry{data_type, 0, 0};
-            entry.size = sizeof(T);
-            memcpy(entry.data, &data, entry.size);
-            _q.send(entry);
-
-            // fprintf(stderr, "Data has been logged: %c", entry.data);
-        }
-};

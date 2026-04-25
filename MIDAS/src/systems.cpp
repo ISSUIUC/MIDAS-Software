@@ -264,8 +264,10 @@ void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems
     switch (new_state) {
         case FSMState::STATE_BOOST:
         //only want to log this when first boost, not following
-            sys->meta_logging.log_data(MetaDataCode::EVENT_TLAUNCH, current_time);
-            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_BARO, sys->rocket_data.barometer.getRecentUnsync());
+            sys->meta_logging.summary->event_tlaunch.update(current_time);
+            sys->meta_logging.summary->data_launchsite_baro.update(sys->rocket_data.barometer.getRecentUnsync());
+
+            // sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_BARO, sys->rocket_data.barometer.getRecentUnsync());
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_GPS, sys->rocket_data.gps.getRecentUnsync());
             sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCH_INITIAL_TILT, cur_orientation.sflp_tilt);
             break;
