@@ -3,9 +3,9 @@
 #include <cmath>
 #include <cstdint>
 #include <algorithm>
+#include <limits>
 
 #include "finite-state-machines/fsm_config.h"
-
 
 /**
  * @brief
@@ -149,6 +149,7 @@ struct IMU_SFLP {
     Acceleration gravity;
     Velocity gyro_bias;
 };
+
 
 /**
  * 

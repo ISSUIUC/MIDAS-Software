@@ -690,6 +690,9 @@ STD_HEADERS = {
     "<cstdint>": "",
     "<math.h>": "",
     "<algorithm>": "",
+    "<limits>": "",
+    "<string.h>": "",
+    "<Queue.h>": "",
 }
 
 

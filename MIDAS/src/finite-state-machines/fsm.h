@@ -61,6 +61,8 @@ public:
     // Sets CRC to the fail state, preventing any pyro action.
     void set_crc_fail() { config.crc32 = FSM_CRC_FAIL_STATE; };
 
+    bool get_cur_state_lockin() { return cur_state_lockin; }
+
 private:
     FSMConfiguration config;
     double pyro_test_entry_time;
