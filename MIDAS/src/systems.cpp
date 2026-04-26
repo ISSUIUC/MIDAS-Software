@@ -35,6 +35,9 @@ DECLARE_THREAD(logger, RocketSystems *arg)
     log_begin(arg->log_sink);
     int meta_delay_ctr = 0; //  Will cause meta logs to write slower intentionally
 
+    MetalogSummary s;
+    arg->meta_logging.summary = &s;
+    
     constexpr size_t meta_logging_header_size = (sizeof(size_t)*8) + EEPROM_SIZE + sizeof(LogFormatMetaEntry)*(LOG_META_ENTRY_COUNT+EEPROM_META_ENTRY_COUNT) + sizeof(LogDiscMapEntry)*LOG_DISCMAP_COUNT;
 
     // Write header size
@@ -258,41 +261,96 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
 
 //run threads
 
-void fsm_transitioned_to(FSMState& new_state, FSMState& old_state, RocketSystems* sys, double current_time) {
+void fsm_transitioned_to(FSMData& new_state, FSMData& old_state, RocketSystems* sys, double current_time) {
     // Do something, NO delays allowed!
-    AngularKalmanData cur_orientation = sys->rocket_data.angular_kalman_data.getRecentUnsync();
-    switch (new_state) {
-        case FSMState::STATE_BOOST:
-        //only want to log this when first boost, not following
-            sys->meta_logging.summary->event_tlaunch.update(current_time);
-            sys->meta_logging.summary->data_launchsite_baro.update(sys->rocket_data.barometer.getRecentUnsync());
 
-            // sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_BARO, sys->rocket_data.barometer.getRecentUnsync());
-            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCHSITE_GPS, sys->rocket_data.gps.getRecentUnsync());
-            sys->meta_logging.log_data(MetaDataCode::DATA_LAUNCH_INITIAL_TILT, cur_orientation.sflp_tilt);
+    switch (new_state.state) {
+        case FSMState::STATE_BOOST:
+        //first stage specific logging
+            if(new_state.current_motor == 0){
+                sys->meta_logging.summary->event_tlaunch.update(current_time);
+                
+                sys->meta_logging.summary->data_launchsite_baro.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
+                
+                sys->meta_logging.summary->data_launchsite_gps_alt.update(sys->rocket_data.gps.getRecentUnsync().altitude);
+                sys->meta_logging.summary->data_launchsite_gps_lat.update(sys->rocket_data.gps.getRecentUnsync().latitude);
+                sys->meta_logging.summary->data_launchsite_gps_long.update(sys->rocket_data.gps.getRecentUnsync().longitude);
+                
+                sys->meta_logging.summary->data_launch_initial_tilt.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
+            }
+        //all other stages logging
+            else{
+                sys->meta_logging.summary->event_tignition.update(current_time);
+                sys->meta_logging.summary->data_tilt_at_ignition.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
+                sys->meta_logging.summary->data_baro_at_ignition.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
+
+            }
+
             break;
+
         case FSMState::STATE_COAST:
-            sys->meta_logging.log_data(MetaDataCode::EVENT_TBURNOUT, current_time);
-            sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_BURNOUT, cur_orientation.sflp_tilt);
-            sys->meta_logging.log_data(MetaDataCode::DATA_ALT_AT_BURNOUT, sys->rocket_data.barometer.getRecentUnsync().altitude);
+            sys->meta_logging.summary->event_tburnout.update(current_time);
+            sys->meta_logging.summary->data_tilt_at_burnout.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
+            sys->meta_logging.summary->data_alt_at_burnout.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
+
             break;
-        // case FSMState::STATE_SECOND_BOOST:
-        //     sys->meta_logging.log_event(MetaDataCode::EVENT_TIGNITION, current_time);
-        //     sys->meta_logging.log_data(MetaDataCode::DATA_TILT_AT_IGNITION, cur_orientation.sflp_tilt);
-        //     break;
+
         case FSMState::STATE_DROGUE:
-            sys->meta_logging.log_data(MetaDataCode::EVENT_TAPOGEE, current_time);
+            sys->meta_logging.summary->event_tapogee.update(current_time);
+
             break;
         case FSMState::STATE_MAIN:
-            sys->meta_logging.log_data(MetaDataCode::EVENT_TMAIN, current_time);
+            sys->meta_logging.summary->event_tmain.update(current_time);
             break;
         default:
             break;
     }
 }
 
-void fsm_state_commit(FSMState& current_state, RocketSystems* sys) {
+void fsm_state_commit(FSMData& current_state, RocketSystems* sys) {
+    // Do something, NO delays allowed!
 
+    switch (current_state.state) {
+        case FSMState::STATE_BOOST:
+        //first stage specific logging
+            if(current_state.current_motor == 0){
+                sys->meta_logging.summary->event_tlaunch.commit(sys->meta_logging);
+                
+                sys->meta_logging.summary->data_launchsite_baro.commit(sys->meta_logging);
+                
+                sys->meta_logging.summary->data_launchsite_gps_alt.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_launchsite_gps_lat.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_launchsite_gps_long.commit(sys->meta_logging);
+                
+                sys->meta_logging.summary->data_launch_initial_tilt.commit(sys->meta_logging);
+            }
+        //all other stages logging
+            else{
+                sys->meta_logging.summary->event_tignition.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_tilt_at_ignition.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_baro_at_ignition.commit(sys->meta_logging);
+
+            }
+
+            break;
+
+        case FSMState::STATE_COAST:
+            sys->meta_logging.summary->event_tburnout.commit(sys->meta_logging);
+            sys->meta_logging.summary->data_tilt_at_burnout.commit(sys->meta_logging);
+            sys->meta_logging.summary->data_alt_at_burnout.commit(sys->meta_logging);
+
+            break;
+
+        case FSMState::STATE_DROGUE:
+            sys->meta_logging.summary->event_tapogee.commit(sys->meta_logging);
+
+            break;
+        case FSMState::STATE_MAIN:
+            sys->meta_logging.summary->event_tmain.commit(sys->meta_logging);
+            break;
+        default:
+            break;
+    }
 }
 
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
@@ -338,11 +396,11 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         arg->rocket_data.fsm_state.update(next_state);
         
         if(current_state != next_state.state) {
-            fsm_transitioned_to(next_state.state, current_state, arg, current_time);       
+            fsm_transitioned_to(next_state, current_state_data, arg, current_time);       
         }
         else {
             if (last_lockin_state != fsm.get_cur_state_lockin() ) {
-                fsm_state_commit(current_state, arg);
+                fsm_state_commit(current_state_data, arg);
             }
 
         }
