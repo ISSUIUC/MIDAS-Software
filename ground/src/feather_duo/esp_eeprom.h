@@ -16,7 +16,7 @@ class EEPROMController {
 
 
     /* Will initialize the controller, and perform the first read. */
-    void init();
+    bool init();
 
     /* The actual EEPROM data. Only updated by the driver if `read_flash()` is called (also after a `commit()`) */
     MIDASEEPROM data;

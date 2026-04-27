@@ -11,8 +11,6 @@
 #include "esp_eeprom.h"
 #include "duo.h"
 
-constexpr uint32_t RADIO0_FREQ = 425150000;
-constexpr uint32_t RADIO1_FREQ = 421150000;
 Queue<TelemetryCommand> radio0_cmds;
 Queue<TelemetryCommand> radio1_cmds;
 
@@ -125,7 +123,8 @@ void Shell_Thread(void *arg)
 
                     MCommandExecutionResult c_res = systems->shell->execute_line(line_buf, systems);
                     Serial.print("<done> ");
-                    Serial.println(static_cast<int>(c_res));
+                    if (c_res == MCommandExecutionResult::OK) { Serial.print(json_command_success); }
+                    else { Serial.println(json_command_bad); }
 
                     if(systems->shell->settings.echo) {
                         Serial.print("> ");
@@ -168,35 +167,32 @@ void setup() {
     SPI0.begin(Pins::SPI_SCK_0, Pins::SPI_MISO_0, Pins::SPI_MOSI_0);
     SPI1.begin(Pins::SPI_SCK_1, Pins::SPI_MISO_1, Pins::SPI_MOSI_1);
     
-    if(!init_radio(Radio0, RADIO0_FREQ)) Serial.println(json_init_failure);
-    if(!init_radio(Radio1, RADIO1_FREQ)) Serial.println(json_init_failure);
+    if(!init_radio(Radio0, systems.eeprom.data.frequency[0])) Serial.println(json_init_failure);
+    if(!init_radio(Radio1, systems.eeprom.data.frequency[1])) Serial.println(json_init_failure);
     Serial.println(json_init_success);
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
 
     
-    systems.eeprom.init();
+    if(!systems.eeprom.init()) {digitalWrite(Pins::LED_RED, HIGH);}
 
     m_shell_setup(); // Set up the MIDAS shell
     systems.shell = &m_shell_inst;
     m_shell_init_commands(systems.shell);
 
-    // offload freq and SN from eeprom
-    // consider changing freq to be float (consistent w/ MIDAS)
-
     RadioConfig radio0_cfg{
         .radio=&Radio0,
         .cmd_queue=&radio0_cmds,
-        .frequency=RADIO0_FREQ,
-        .serial=0,
+        .frequency=systems.eeprom.data.frequency[0],
+        .serial=systems.eeprom.data.serial[0],
         .indicator_led=Pins::LED_ORANGE,
     };
 
     RadioConfig radio1_cfg{
         .radio=&Radio1,
         .cmd_queue=&radio1_cmds,
-        .frequency=RADIO1_FREQ,
-        .serial=1,
+        .frequency=systems.eeprom.data.frequency[1],
+        .serial=systems.eeprom.data.serial[1],
         .indicator_led=Pins::LED_BLUE,
     };
 

@@ -259,6 +259,3 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("kf", kf, "\tkf (serial) reset - Reset MIDAS Kalman Filter");
     sh->register_command("ident", identify, "\tident - identify device over serial as a Feather Duo");
 }
-
-
-// should have a way to print json outputs based on success/failure of command in the shell. Maybe a better way than just copying it by every return so I will hold off for now

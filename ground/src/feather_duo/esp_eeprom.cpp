@@ -38,7 +38,7 @@ bool EEPROMController::commit() {
 }
 
 // originally returned errorcode
-void EEPROMController::init() {
+bool EEPROMController::init() {
     static_assert(EEPROM_SIZE <= EEPROM_MAX_SIZE);
     EEPROM.begin((size_t)EEPROM_SIZE);
 
@@ -50,7 +50,9 @@ void EEPROMController::init() {
         Serial.println("EEPROM CHECKSUM INCOMPATIBLE");
         // Clear EEPROM and write correct checksum
         commit();
+        return false;
     }
 
+    return true;
 }
 
