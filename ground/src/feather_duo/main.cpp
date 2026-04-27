@@ -69,7 +69,7 @@ void Radio_Rx_Thread(void * arg) {
 
         if(cfg->desired_frequency != cfg->frequency){
             cfg->frequency = cfg->desired_frequency;
-            cfg->radio->set_frequency(cfg->frequency); // do we need to do any error checking on this? I assume no
+            cfg->radio->set_frequency(cfg->frequency);
         }
 
         if(cfg->desired_serial != cfg->serial){
