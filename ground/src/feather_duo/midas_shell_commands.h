@@ -34,7 +34,7 @@ MCommandExecutionResult serial(const MShellContext& ctx){
     if(key != 0 && key != 1) { return MCommandExecutionResult::ERR_INVAL_ARGUMENT; } 
 
     if(!strcmp(ctx.argv[2], "set")){
-        if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+        if(ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
         uint8_t serial = atoi(ctx.argv[3]);
         arg->eeprom.data.serial[key] = serial;
         arg->eeprom.commit();
@@ -61,7 +61,7 @@ MCommandExecutionResult frequency(const MShellContext& ctx){
     if(key != 0 && key != 1) { return MCommandExecutionResult::ERR_INVAL_ARGUMENT; } 
 
     if(!strcmp(ctx.argv[2], "set")){
-        if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+        if(ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
         float freq_mhz = atoff(ctx.argv[3]);
         uint32_t frequency = (uint32_t) (freq_mhz * 1e6);
         // ensure that given frequency is within the 70cm band 
@@ -75,12 +75,12 @@ MCommandExecutionResult frequency(const MShellContext& ctx){
         arg->cfg[key].desired_frequency = frequency;
 
         Serial.print("New Frequency: ");
-        Serial.print(arg->eeprom.data.frequency[key]);
+        Serial.print(arg->eeprom.data.frequency[key]/1e6);
         Serial.println("MHz");
         return MCommandExecutionResult::OK;
     }
     else if(!strcmp(ctx.argv[2], "get")){
-        Serial.print(arg->eeprom.data.frequency[key]);
+        Serial.print(arg->eeprom.data.frequency[key]/1e6);
         Serial.println(" MHz");
         return MCommandExecutionResult::OK;
     }
@@ -115,6 +115,7 @@ MCommandExecutionResult pyro(const MShellContext& ctx){
         command.command = CommandType::SWITCH_TO_PYRO_TEST;
     }
     else if (!strcmp(ctx.argv[2], "fire")){
+        if (ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
         if (!strcmp(ctx.argv[3], "A")){
             command.command = CommandType::FIRE_PYRO_A;
         }

@@ -123,7 +123,7 @@ void Shell_Thread(void *arg)
 
                     MCommandExecutionResult c_res = systems->shell->execute_line(line_buf, systems);
                     Serial.print("<done> ");
-                    if (c_res == MCommandExecutionResult::OK) { Serial.print(json_command_success); }
+                    if (c_res == MCommandExecutionResult::OK) { Serial.println(json_command_success); }
                     else { Serial.println(json_command_bad); }
 
                     if(systems->shell->settings.echo) {
@@ -184,7 +184,9 @@ void setup() {
         .radio=&Radio0,
         .cmd_queue=&radio0_cmds,
         .frequency=systems.eeprom.data.frequency[0],
+        .desired_frequency=systems.eeprom.data.frequency[0],
         .serial=systems.eeprom.data.serial[0],
+        .desired_serial=systems.eeprom.data.serial[0],
         .indicator_led=Pins::LED_ORANGE,
     };
 
@@ -192,7 +194,9 @@ void setup() {
         .radio=&Radio1,
         .cmd_queue=&radio1_cmds,
         .frequency=systems.eeprom.data.frequency[1],
+        .desired_frequency=systems.eeprom.data.frequency[1],
         .serial=systems.eeprom.data.serial[1],
+        .desired_serial=systems.eeprom.data.serial[1],
         .indicator_led=Pins::LED_BLUE,
     };
 
