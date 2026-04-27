@@ -54,6 +54,7 @@ enum sys_instr_t {
 
 struct sys_flags_t {
     FSMState fsm_target = FSMState::FSM_STATE_COUNT;
+    uint8_t fsm_target_motor = 0;
 };
 
 

@@ -51,19 +51,22 @@ int wrap_err(int code) {
     return code;
 }
 
+struct pstate_t {
+    bool is_global_armed = false;
+    bool channel_firing[MIDAS_NUM_PYROS];      // Whether the pyro is currently firing
+};
+
 void setup_ssizes() {
-    ASSOCIATE(LowGData, ID_LOWG);
-    ASSOCIATE(LowGLSM, ID_LOWGLSM);
-    ASSOCIATE(HighGData, ID_HIGHG);
+    ASSOCIATE(IMU, ID_IMU);
+    ASSOCIATE(IMU_SFLP, ID_SFLP);
     ASSOCIATE(Barometer, ID_BAROMETER);
-    ASSOCIATE(Continuity, ID_CONTINUITY);
     ASSOCIATE(Voltage, ID_VOLTAGE);
     ASSOCIATE(GPS, ID_GPS);
     ASSOCIATE(Magnetometer, ID_MAGNETOMETER);
-    ASSOCIATE(Orientation, ID_ORIENTATION);
-    ASSOCIATE(FSMState, ID_FSM);
     ASSOCIATE(KalmanData, ID_KALMAN);
-    ASSOCIATE(PyroState, ID_PYRO);
+    ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN);
+    ASSOCIATE(FSMState, ID_FSM);
+    ASSOCIATE(pstate_t, ID_PYRO);
     ASSOCIATE(CameraData, ID_CAMERADATA);
 }
 
@@ -201,11 +204,11 @@ void send_data(serialib& s, entry_t& dat) {
     }
 
     #ifdef DEBUG
-    // printf("$");
-    // for(int i = 1; i < dat.raw_data_stream_size + 2; i++) {
-    //     printf("%x", buf[i]);
-    // }
-    // printf("\n");
+    printf("$");
+    for(int i = 1; i < dat.raw_data_stream_size + 2; i++) {
+        printf("%x", buf[i]);
+    }
+    printf("\n");
     #else
     s.writeBytes(buf, size_of_send_buf);
     #endif
@@ -494,7 +497,7 @@ int main(int argc, char** argv) {
                                     float randm = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
                                     int threshold_ms = (int)(skip_threshold * 1000);
 
-                                    if(latency < randm*threshold_ms) {
+                                    if(threshold_ms == 0 || latency < randm*threshold_ms) {
                                         send_data(Serial, entry);
                                     }
                                 }

@@ -6,18 +6,14 @@
 struct KRocketData {
 public:
     KalmanData kalman;
-    LowGData low_g;
-    HighGData high_g;
+    IMU imu_data;
     Barometer barometer;
-    LowGLSM low_g_lsm;
-    Continuity continuity;
     PyroState pyro;
     FSMState fsm_state;
     GPS gps;
     Magnetometer magnetometer;
-    Orientation orientation;
+    AngularKalmanData angular_kalman;
     Voltage voltage;
-    
     CommandFlags command_flags;
     uint8_t camera_state = 127;
 

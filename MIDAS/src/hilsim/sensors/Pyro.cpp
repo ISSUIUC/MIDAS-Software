@@ -43,6 +43,6 @@ void Pyro::disarm_all_channels(PyroState& prev_state) {
     }
 }
 
-PyroState Pyro::tick(FSMState fsm_state, AngularKalmanData angularkalman) {
+PyroState Pyro::tick(PyroTickData& data) {
     return PyroState();
 }

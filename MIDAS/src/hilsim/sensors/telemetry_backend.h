@@ -3,7 +3,7 @@
 #include "errors.h"
 #include "hal.h"
 #include "hardware/pins.h"
-#include <TCAL9539.h>
+#include "TCAL9538.h"
 
 #include <E22.h>
 
@@ -19,6 +19,7 @@ public:
 
     int16_t getRecentRssi();
     ErrorCode setFrequency(float frequency);
+    void set_spi_mutex(SemaphoreHandle_t mtx) { lora.set_spi_mutex(mtx); }
 
     /**
      * @brief This function transmits data from the struct provided as
@@ -35,7 +36,7 @@ public:
     template<typename T>
     void send(const T& data) {
         static_assert(sizeof(T) <= 0xFF, "The data type to send is too large"); // Max payload is 255
-        gpioDigitalWrite(LED_BLUE, led_state);
+        digitalWrite(LED_BLUE, led_state);
         led_state = !led_state;
 
         SX1268Error result = lora.send((uint8_t*) &data, sizeof(T));

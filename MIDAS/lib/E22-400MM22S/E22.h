@@ -228,7 +228,13 @@ public:
 	[[nodiscard]] SX1268Error send(uint8_t* data, size_t len);
 	[[nodiscard]] SX1268Error recv(uint8_t* data, size_t len, size_t timeout_ms);
 
+	// Shared SPI mutex.
+	void set_spi_mutex(SemaphoreHandle_t mutex) { spi_mutex_ = mutex; }
+
 private:
+	void lock_spi()   { if (spi_mutex_) xSemaphoreTake(spi_mutex_, portMAX_DELAY); }
+	void unlock_spi() { if (spi_mutex_) xSemaphoreGive(spi_mutex_); }
+
 	[[nodiscard]] SX1268Error wait_on_busy();
 	[[nodiscard]] SX1268Error write_command(RadioCommands_t command, uint8_t* buffer, size_t size);
 	[[nodiscard]] SX1268Error read_command(RadioCommands_t command, uint8_t* buffer, size_t size);
@@ -263,4 +269,5 @@ private:
 	int prev_rx_error;
 	bool busy_fault;
 	SPISettings spiSettings = SPISettings(10000000, MSBFIRST, SPI_MODE0);
+	SemaphoreHandle_t spi_mutex_ = nullptr;
 };

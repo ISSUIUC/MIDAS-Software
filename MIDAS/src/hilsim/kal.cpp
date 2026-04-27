@@ -11,15 +11,10 @@ void k_init_sensordata() {
 
     // This list should run parallel to the list defined in data_logging. This macro will perform the opposite task,
     // mapping disc IDs to their locations in the struct.
-    ASSOCIATE(arg->low_g, ID_LOWG);
-    ASSOCIATE(arg->low_g_lsm, ID_LOWGLSM);
-    ASSOCIATE(arg->high_g, ID_HIGHG);
     ASSOCIATE(arg->barometer, ID_BAROMETER);
-    ASSOCIATE(arg->continuity, ID_CONTINUITY);
     ASSOCIATE(arg->voltage, ID_VOLTAGE);
     ASSOCIATE(arg->gps, ID_GPS);
     ASSOCIATE(arg->magnetometer, ID_MAGNETOMETER);
-    ASSOCIATE(arg->orientation, ID_ORIENTATION);
     ASSOCIATE(arg->fsm_state, ID_FSM);
     ASSOCIATE(arg->kalman, ID_KALMAN);
     ASSOCIATE(arg->pyro, ID_PYRO);
@@ -46,7 +41,7 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
             THREAD_SLEEP(1);
 
             if (sflags.fsm_target != FSMState::FSM_STATE_COUNT) {
-                arg->rocket_data.fsm_state.update(sflags.fsm_target);
+                arg->rocket_data.fsm_state.update({sflags.fsm_target, sflags.fsm_target_motor});
                 sflags.fsm_target = FSMState::FSM_STATE_COUNT;
             }
 
@@ -83,14 +78,14 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
 
 // Run the Kamaji process
 [[noreturn]] void k_start() {
+    // The IMU thread (and the lora's optional mutex) take spi_mutex; it normally gets
+    // created in begin_systems() but HILSIM bypasses that, so create it here.
+    static StaticSemaphore_t kal_spi_mutex_buffer;
+    spi_mutex = xSemaphoreCreateMutexStatic(&kal_spi_mutex_buffer);
+
     // real midas setup
-    INIT_SYSTEM(systems.sensors.low_g);
-    INIT_SYSTEM(systems.sensors.orientation);
-    INIT_SYSTEM(systems.sensors.high_g);
-    INIT_SYSTEM(systems.sensors.low_g_lsm);
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
-    INIT_SYSTEM(systems.sensors.continuity);
     INIT_SYSTEM(systems.sensors.voltage);
     INIT_SYSTEM(systems.sensors.pyro);
     INIT_SYSTEM(systems.led);
@@ -102,8 +97,7 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
     RocketSystems* config = &systems;
 
     // START_THREAD(logger, DATA_CORE, config, 15);
-    START_THREAD(orientation, SENSOR_CORE, config, 10);
-    START_THREAD(accelerometers, SENSOR_CORE, config, 13);
+    START_THREAD(imuthread, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
     START_THREAD(gps, SENSOR_CORE, config, 8);
     START_THREAD(voltage, SENSOR_CORE, config, 9);
@@ -113,6 +107,8 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
+    START_THREAD(angularkalman, SENSOR_CORE, config, 7);
+    // START_THREAD(shell, DATA_CORE, config, 5);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
     START_THREAD(hilsim, DATA_CORE, config, 1);
 

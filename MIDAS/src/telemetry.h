@@ -30,6 +30,7 @@ public:
     bool receive(TelemetryCommand* command, int wait_milliseconds);
     void acknowledgeReceived();
     ErrorCode setFrequency(float frequency);
+    void set_spi_mutex(SemaphoreHandle_t mtx) { backend.set_spi_mutex(mtx); }
 private:
     int received_count;
     TelemetryPacket makePacket(RocketData& data, const MIDASEEPROM& eeprom);

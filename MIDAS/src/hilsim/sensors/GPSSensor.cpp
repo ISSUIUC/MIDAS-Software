@@ -5,6 +5,10 @@ ErrorCode GPSSensor::init() {
     return ErrorCode::NoError;
 }
 
+bool GPSSensor::valid() {
+    return true;
+}
+
 GPS GPSSensor::read() {
     return GLOBAL_DATA.gps;
 }

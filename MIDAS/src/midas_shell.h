@@ -89,8 +89,7 @@ class MShell {
         return m_command.fn(ctx);
     }
 
-    void print_help(HWCDC* out) {
-        // Prints command help to the provided HWCDC.
+    void print_help(Stream* out) {
         for(int i = 0; i < cmd_count_; i++) {
             out->print(commands_[i].cmd);
             out->print(": ");

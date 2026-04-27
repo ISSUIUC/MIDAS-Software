@@ -723,6 +723,12 @@ class Preprocessor:
                 processed += "\n"
                 continue
 
+            # the grammar doesn't support constexpr variables (or static_cast),
+            # and log_enc.py doesn't need them — strip them out
+            if stripped.startswith("constexpr "):
+                processed += "\n"
+                continue
+
             m = ASSOCIATE_RE.match(stripped)
             if m:
                 _, disc_id, field_name = m.groups()
@@ -902,7 +908,11 @@ def main():
     write_autogen(entries, eeprom_entries, vtable, autogen_file)
     print(f"Successfully wrote log format to {str(autogen_file)}!")
 
-main()
+
+# Guard so other scripts (migrate_log.py) can import parse_file etc. without
+# triggering the full autogen pipeline. PlatformIO runs this as __main__.
+if __name__ == "__main__":
+    main()
 
 
 
