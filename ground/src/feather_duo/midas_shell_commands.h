@@ -101,36 +101,27 @@ int8_t checkSerial(DuoSystems* sys, uint8_t serial){
 }
 
 
-MCommandExecutionResult pyro(const MShellContext& ctx){
+MCommandExecutionResult fire(const MShellContext& ctx){
     DuoSystems* arg = (DuoSystems*) ctx.sysarg;
-    // expecting 3 (test) or 4 (fire) arguments
-    if(ctx.argc < 3 || ctx.argc > 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    // expecting 3 arguments
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     uint8_t serial = atoi(ctx.argv[1]);
     int8_t key = checkSerial(arg, serial);
     if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
 
     TelemetryCommand command{};
 
-    if (!strcmp(ctx.argv[2], "test")){
-        command.command = CommandType::SWITCH_TO_PYRO_TEST;
+    if (!strcmp(ctx.argv[2], "A")){
+        command.command = CommandType::FIRE_PYRO_A;
     }
-    else if (!strcmp(ctx.argv[2], "fire")){
-        if (ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
-        if (!strcmp(ctx.argv[3], "A")){
-            command.command = CommandType::FIRE_PYRO_A;
-        }
-        else if (!strcmp(ctx.argv[3], "B")){
-            command.command = CommandType::FIRE_PYRO_B;
-        }
-        else if (!strcmp(ctx.argv[3], "C")){
-            command.command = CommandType::FIRE_PYRO_C;
-        }
-        else if (!strcmp(ctx.argv[3], "D")){
-            command.command = CommandType::FIRE_PYRO_D;
-        }
-        else{
-            return MCommandExecutionResult::ERR_INVALID_CMD;
-        }
+    else if (!strcmp(ctx.argv[2], "B")){
+        command.command = CommandType::FIRE_PYRO_B;
+    }
+    else if (!strcmp(ctx.argv[2], "C")){
+        command.command = CommandType::FIRE_PYRO_C;
+    }
+    else if (!strcmp(ctx.argv[2], "D")){
+        command.command = CommandType::FIRE_PYRO_D;
     }
     else{
         return MCommandExecutionResult::ERR_INVALID_CMD;
@@ -141,30 +132,31 @@ MCommandExecutionResult pyro(const MShellContext& ctx){
     return MCommandExecutionResult::OK;
 }
 
-
-MCommandExecutionResult state(const MShellContext& ctx){
+MCommandExecutionResult basicCommand(const MShellContext& ctx, CommandType cmdtype){
     DuoSystems* arg = (DuoSystems*) ctx.sysarg;
-    // expecting 3 arguments
-    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    // expecting 2 arguments
+    if(ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     uint8_t serial = atoi(ctx.argv[1]);
     int8_t key = checkSerial(arg, serial);
     if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
 
     TelemetryCommand command{};
-
-    if (!strcmp(ctx.argv[2], "SAFE")){
-        command.command = CommandType::SWITCH_TO_SAFE;
-    }
-    else if (!strcmp(ctx.argv[2], "ARMED")){
-        command.command = CommandType::SWITCH_TO_ARMED;
-    }
-    else{
-        return MCommandExecutionResult::ERR_INVALID_CMD;
-    }
-
+    command.command = cmdtype;
     arg->cfg[key].cmd_queue->send(command);
 
     return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult safe(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::SWITCH_TO_SAFE);
+}
+
+MCommandExecutionResult pt(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::SWITCH_TO_PYRO_TEST);
+}
+
+MCommandExecutionResult arm(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::SWITCH_TO_ARMED);
 }
 
 
@@ -221,26 +213,8 @@ MCommandExecutionResult calib(const MShellContext& ctx){
     return MCommandExecutionResult::OK;
 }
 
-MCommandExecutionResult kf(const MShellContext& ctx){
-    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
-    // expecting 3 arguments
-    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
-    uint8_t serial = atoi(ctx.argv[1]);
-    int8_t key = checkSerial(arg, serial);
-    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
-
-    TelemetryCommand command{};
-
-    if (!strcmp(ctx.argv[2], "reset")){
-        command.command = CommandType::RESET_KF;
-    }
-    else{
-        return MCommandExecutionResult::ERR_INVALID_CMD;
-    }
-
-    arg->cfg[key].cmd_queue->send(command);
-
-    return MCommandExecutionResult::OK;
+MCommandExecutionResult kfr(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::RESET_KF);
 }
 
 MCommandExecutionResult identify(const MShellContext& ctx){
@@ -253,10 +227,12 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("hi", hi_feather, "\t\thi <string> - Prints hi <string>");
     sh->register_command("serial", serial, "\tserial (X) get - Get MIDAS serial number associated with radio X\n\t\tserial (X) set <serialnumber:int> - Set MIDAS serial number associated with radio X");
     sh->register_command("frequency", frequency, "\tfrequency (X) get - Get radio X frequency (in MHz)\n\t\tfrequency (X) set <freq:float> - Set radio X frequency (in MHz)");
-    sh->register_command("pyro", pyro, "\tpyro (serial) fire [A|B|C|D] - Fire pyro channel if in pyro test state\n\t\tpyro (serial) test - Put MIDAS into pyro test state");
-    sh->register_command("state", state, "\tstate (serial) [SAFE|ARMED] - Set MIDAS FSM state");
+    sh->register_command("fire", fire, "\tfire (serial) [A|B|C|D] - Fire pyro channel if in pyro test state");
+    sh->register_command("safe", safe, "\tsafe (serial) - Set MIDAS into safe state");
+    sh->register_command("pt", pt, "\tsafe (serial) - Set MIDAS into pyro test state");
+    sh->register_command("arm", arm, "\tarm (serial) - Set MIDAS into armed state");
     sh->register_command("cam", cam, "\tcam (serial) [on|off|toggle] - Send commands to CAM via MIDAS");
     sh->register_command("calib", calib, "\tcalib (serial) [mag|magnetometer|xl|accel|accelerometer] - Calibrate MIDAS sensors");
-    sh->register_command("kf", kf, "\tkf (serial) reset - Reset MIDAS Kalman Filter");
+    sh->register_command("kfr", kfr, "\tkfr (serial) - Reset MIDAS Kalman Filter");
     sh->register_command("ident", identify, "\tident - identify device over serial as a Feather Duo");
 }

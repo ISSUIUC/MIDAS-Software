@@ -17,7 +17,7 @@ MCommandExecutionResult _c_help(const MShellContext& ctx) {
 
 void m_shell_setup() {
     // Sets up internal shell commands for the global shell instance
-    m_shell_inst.register_command("echo", _c_echo, "\t\techo <0|1> - Enable/disable 'echo' during character input. (Default 0)");
+    m_shell_inst.register_command("echo", _c_echo, "\t\techo <0|1> - Enable/disable 'echo' during character input. (Default 1)");
     m_shell_inst.register_command("help", _c_help, "\t\thelp - Prints this menu");
 }
 
