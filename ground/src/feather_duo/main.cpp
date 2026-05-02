@@ -166,19 +166,18 @@ void setup() {
 
     SPI0.begin(Pins::SPI_SCK_0, Pins::SPI_MISO_0, Pins::SPI_MOSI_0);
     SPI1.begin(Pins::SPI_SCK_1, Pins::SPI_MISO_1, Pins::SPI_MOSI_1);
+
+    if(!systems.eeprom.init()) {digitalWrite(Pins::LED_RED, HIGH);}
+
+    m_shell_setup(); // Set up the MIDAS shell
+    systems.shell = &m_shell_inst;
+    m_shell_init_commands(systems.shell);
     
     if(!init_radio(Radio0, systems.eeprom.data.frequency[0])) Serial.println(json_init_failure);
     if(!init_radio(Radio1, systems.eeprom.data.frequency[1])) Serial.println(json_init_failure);
     Serial.println(json_init_success);
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
-
-    
-    if(!systems.eeprom.init()) {digitalWrite(Pins::LED_RED, HIGH);}
-
-    m_shell_setup(); // Set up the MIDAS shell
-    systems.shell = &m_shell_inst;
-    m_shell_init_commands(systems.shell);
 
     RadioConfig radio0_cfg{
         .radio=&Radio0,
