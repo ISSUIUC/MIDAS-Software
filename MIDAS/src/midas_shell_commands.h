@@ -574,7 +574,18 @@ MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
     // <meta file content>
     // <bin file content>
 
-    if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    if (ctx.argc != 2 && ctx.argc != 3) {  }
+    bool stop_after_header_print = false;
+    if(ctx.argc == 3) {
+        if(!strcmp(ctx.argv[2], "--head")) {
+            stop_after_header_print = true;
+        } else {
+            return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+        }
+    } else if (ctx.argc != 2) {
+        return MCommandExecutionResult::ERR_INVAL_ARGC;
+    }
+
 
     String bin_path = "/" + String(ctx.argv[1]) + ".bin";
     String meta_path = "/" + String(ctx.argv[1]) + ".meta";
@@ -590,14 +601,34 @@ MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
         Serial.println("Failed to open .meta file!");
         return MCommandExecutionResult::ERR_FS_FAIL_OPEN;
     }
+
+    size_t size_ptr = LOG_FMT_VERSION; // We write multiple uint32_ts, so for serial.write to print it properly we need to store it
     
     // Start writing header
-    Serial.write("LAUNCH "); Serial.write(LOG_FMT_VERSION); Serial.write('\n');
+    Serial.write("LAUNCH "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+
+    // File name
     Serial.write("FILE "); Serial.write(ctx.argv[1]); Serial.write('\n');
-    Serial.write("CHECKSUM "); Serial.write(LOG_CHECKSUM); Serial.write(" "); Serial.write(EEPROM_CHECKSUM); Serial.write('\n');
-    Serial.write("META "); Serial.write(meta_file.size()); Serial.write('\n');
-    Serial.write("BIN "); Serial.write(bin_file.size()); Serial.write('\n');
+    
+    // Log checksum
+    size_ptr = LOG_CHECKSUM;
+    Serial.write("CHECKSUM "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write(" "); 
+    
+    // EEPROM checksum
+    size_ptr = EEPROM_CHECKSUM;
+    Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+
+    // Meta file size
+    size_ptr = meta_file.size();
+    Serial.write("META "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+
+    // Binary file size
+    size_ptr = bin_file.size();
+    Serial.write("BIN "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+
     Serial.flush();
+
+    if(stop_after_header_print) { return MCommandExecutionResult::OK; }
 
     // Then dump meta and bin files
     while(meta_file.available()) {
