@@ -7,26 +7,13 @@
 #include"Output.h"
 #include"Command.h"
 #include"Queue.h"
+#include "midas_shell_commands.h"
+#include "esp_eeprom.h"
+#include "duo.h"
 
-constexpr uint32_t BOOSTER_FREQ = 425150000;
-constexpr uint32_t SUSTAINER_FREQ = 421150000;
-Queue<TelemetryCommand> booster_cmds;
-Queue<TelemetryCommand> sustainer_cmds;
+Queue<TelemetryCommand> radio0_cmds;
+Queue<TelemetryCommand> radio1_cmds;
 
-
-enum class Stage {
-    Booster,
-    Sustainer
-};
-
-struct RadioConfig
-{
-    SX1268 * radio;
-    Queue<TelemetryCommand>* cmd_queue;
-    uint32_t frequency;
-    Stage stage;
-    uint8_t indicator_led;
-};
 
 
 bool init_radio(SX1268& radio, uint32_t frequency) {
@@ -74,118 +61,98 @@ void Radio_Rx_Thread(void * arg) {
             }
 
             if(to_send.command != CommandType::EMPTY) {
-
-                if (cfg->stage == Stage::Booster) {
-                    to_send.verify[0] = 'A';
-                } else if (cfg->stage == Stage::Sustainer) {
-                    to_send.verify[0] = 'B';
-                }
-
+                to_send.setSerial(cfg->serial);
                 (void)cfg->radio->send((uint8_t*)&to_send, sizeof(to_send));
                 Serial.println(json_command_sent);
             }
         }
-    }
-}
 
-// Identifies this device over serial
-void serial_identify() {
-    Serial.println("IDENT_RESPONSE:FEATHER_DUO");
-}
-
-void handle_serial(const String& key) {
-
-
-    if (key == "IDENT") {
-        serial_identify();
-        return;
-    }
-
-    TelemetryCommand command{};
-
-    if(key.length() < 1) {
-        Serial.println(json_command_bad);
-        return;
-    }
-    Stage stage;
-    switch(key[0]) {
-        case '0':
-            stage = Stage::Booster;
-            break;
-        case '1':
-            stage = Stage::Sustainer;
-            break;
-        default:
-            Serial.println(json_command_bad);
-            return;
-    }
-
-    String cmd_name = key.substring(1);
-
-    if (cmd_name == "RESET_KF") {
-        command.command = CommandType::RESET_KF;
-    } else if (cmd_name == "SAFE") {
-        command.command = CommandType::SWITCH_TO_SAFE;
-    } else if (cmd_name == "IDLE") {
-        command.command = CommandType::SWITCH_TO_IDLE;
-    } else if (cmd_name == "PT") {
-        command.command = CommandType::SWITCH_TO_PYRO_TEST;
-    } else if (cmd_name == "PA") {
-        command.command = CommandType::FIRE_PYRO_A;
-    } else if (cmd_name == "PB") {
-        command.command = CommandType::FIRE_PYRO_B;
-    } else if (cmd_name == "PC") {
-        command.command = CommandType::FIRE_PYRO_C;
-    } else if (cmd_name == "PD") {
-        command.command = CommandType::FIRE_PYRO_D;
-    } else if (cmd_name == "CAMON") {
-        command.command = CommandType::CAM_ON;
-    } else if (cmd_name == "CAMOFF") {
-        command.command = CommandType::CAM_OFF;
-    } else if (cmd_name == "VMUXT") {
-        command.command = CommandType::TOGGLE_CAM_VMUX;
-    } else if (cmd_name == "CXL") {
-        command.command = CommandType::CALIB_ACCEL;
-    } else if (cmd_name == "CMG") {
-        command.command = CommandType::CALIB_MAG;
-    } else {
-        Serial.println(json_command_bad);
-        return;
-    }
-
-    if(stage == Stage::Booster) {
-        booster_cmds.send(command);
-    }
-    if(stage == Stage::Sustainer) {
-        sustainer_cmds.send(command);
-    }
-
-    Serial.println(json_command_success);
-}
-
-void Management_Thread(void * arg) {
-    String cur_input = "";
-    bool led_state = false;
-    while(true){
-        while(Serial.available()) {
-            char input = Serial.read();
-            if(input == '\n') {
-                cur_input.replace("\r", "");
-                handle_serial(cur_input);
-                cur_input = "";
-            } else {
-                cur_input += input;
-            }
+        if(cfg->desired_frequency != cfg->frequency){
+            cfg->frequency = cfg->desired_frequency;
+            cfg->radio->set_frequency(cfg->frequency);
         }
-        led_state = !led_state;
-        digitalWrite(Pins::LED_GREEN, led_state);
-        delay(10); 
+
+        if(cfg->desired_serial != cfg->serial){
+            cfg->serial = cfg->desired_serial;
+        }
+    }
+}
+
+
+void Shell_Thread(void *arg)
+{
+    DuoSystems* systems = (DuoSystems*)arg;
+
+    char line_buf[MShell::max_line_len];
+    char tmp_buf[MShell::max_line_len];
+    uint8_t d_read = 0;
+
+    while(true) {
+        // if(shell->settings.echo) {
+        //     Serial.print("> ");
+        //     Serial.flush();
+        // }
+        int num_bytes_avail = Serial.available();
+
+        if(num_bytes_avail > 0) {
+            Serial.read(tmp_buf, num_bytes_avail);
+            for(int i = 0; i < num_bytes_avail; i++) {
+
+                if(tmp_buf[i] == '\r') {
+                    continue;
+                }
+
+                if(tmp_buf[i] == '\b' || tmp_buf[i] == 0x7F) {
+                    if(d_read > 0) {
+                        d_read--;
+                        if(systems->shell->settings.echo) {
+                            Serial.print("\b \b"); // erase character on terminal
+                        }
+                    }
+                    continue;
+                }
+
+                if(systems->shell->settings.echo) {
+                    Serial.print(tmp_buf[i]);
+                }
+
+                if(tmp_buf[i] == '\n') {
+                    // Process the line instead of adding it!
+                    line_buf[d_read] = '\0'; // Null terminate command
+                    d_read = 0;
+
+                    MCommandExecutionResult c_res = systems->shell->execute_line(line_buf, systems);
+                    Serial.print("<done> ");
+                    if (c_res == MCommandExecutionResult::OK) { Serial.println(json_command_success); }
+                    else { Serial.println(json_command_bad); }
+
+                    if(systems->shell->settings.echo) {
+                        Serial.print("> ");
+                        Serial.flush();
+                    }
+
+                    continue;
+                }
+
+                if(d_read >= MShell::max_line_len - 1) {
+                    continue;
+                }
+
+                // Otherwise add to the buf
+                line_buf[d_read++] = tmp_buf[i];
+            }
+            Serial.flush();
+        }
+
+        delay(10);
     }
 }
 
 
 void setup() {
     Serial.begin(460800);
+
+    DuoSystems systems;
     
     SPIClass SPI0(HSPI);
     SPIClass SPI1(FSPI);
@@ -199,33 +166,45 @@ void setup() {
 
     SPI0.begin(Pins::SPI_SCK_0, Pins::SPI_MISO_0, Pins::SPI_MOSI_0);
     SPI1.begin(Pins::SPI_SCK_1, Pins::SPI_MISO_1, Pins::SPI_MOSI_1);
+
+    if(!systems.eeprom.init()) {digitalWrite(Pins::LED_RED, HIGH);}
+
+    m_shell_setup(); // Set up the MIDAS shell
+    systems.shell = &m_shell_inst;
+    m_shell_init_commands(systems.shell);
     
-    if(!init_radio(Radio0, BOOSTER_FREQ)) Serial.println(json_init_failure);
-    if(!init_radio(Radio1, SUSTAINER_FREQ)) Serial.println(json_init_failure);
+    if(!init_radio(Radio0, systems.eeprom.data.frequency[0])) Serial.println(json_init_failure);
+    if(!init_radio(Radio1, systems.eeprom.data.frequency[1])) Serial.println(json_init_failure);
     Serial.println(json_init_success);
     digitalWrite(Pins::LED_RED, LOW);
     digitalWrite(Pins::LED_GREEN, HIGH);
 
-
-    RadioConfig booster_cfg{
+    RadioConfig radio0_cfg{
         .radio=&Radio0,
-        .cmd_queue=&booster_cmds,
-        .frequency=BOOSTER_FREQ,
-        .stage=Stage::Booster,
+        .cmd_queue=&radio0_cmds,
+        .frequency=systems.eeprom.data.frequency[0],
+        .desired_frequency=systems.eeprom.data.frequency[0],
+        .serial=systems.eeprom.data.serial[0],
+        .desired_serial=systems.eeprom.data.serial[0],
         .indicator_led=Pins::LED_ORANGE,
     };
 
-    RadioConfig sustainer_cfg{
+    RadioConfig radio1_cfg{
         .radio=&Radio1,
-        .cmd_queue=&sustainer_cmds,
-        .frequency=SUSTAINER_FREQ,
-        .stage=Stage::Sustainer,
+        .cmd_queue=&radio1_cmds,
+        .frequency=systems.eeprom.data.frequency[1],
+        .desired_frequency=systems.eeprom.data.frequency[1],
+        .serial=systems.eeprom.data.serial[1],
+        .desired_serial=systems.eeprom.data.serial[1],
         .indicator_led=Pins::LED_BLUE,
     };
 
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &booster_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &sustainer_cfg, 0, nullptr, 1);
-    xTaskCreatePinnedToCore(Management_Thread, "Management_thread", 8192, nullptr, 0, nullptr, 1);
+    systems.cfg[0] = radio0_cfg;
+    systems.cfg[1] = radio1_cfg;
+
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio0_thread", 8192, &systems.cfg[0], 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Radio_Rx_Thread, "Radio1_thread", 8192, &systems.cfg[1], 0, nullptr, 1);
+    xTaskCreatePinnedToCore(Shell_Thread, "Shell_thread", 8192, &systems, 0, nullptr, 1);
     while(true) {
         delay(10000);
     }
