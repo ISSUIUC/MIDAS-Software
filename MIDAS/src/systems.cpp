@@ -202,11 +202,10 @@ DECLARE_THREAD(gps, RocketSystems *arg)
 {
     while (true)
     {
+        // GPS's internal operations have a xSemaphoreTake.
         if (arg->sensors.gps.valid())
         {
-            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             GPS reading = arg->sensors.gps.read();
-            xSemaphoreGive(i2c_mutex);
             arg->rocket_data.gps.update(reading);
         }
         // GPS waits internally
