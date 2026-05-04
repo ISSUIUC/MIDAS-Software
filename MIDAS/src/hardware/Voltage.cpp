@@ -24,7 +24,7 @@ int read_board_pwr_monitor_register(int reg, int bytes) {
         Serial.println("I2C Error");
     }
 
-    Wire1.requestFrom(0x44, bytes);
+    Wire1.requestFrom(0x44, bytes, 1);
     int val = 0;
 
     for(int i = 0; i < bytes; i++){

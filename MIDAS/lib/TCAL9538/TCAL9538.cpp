@@ -61,32 +61,34 @@ static uint8_t pin_state[1] = {0xff};
 static uint8_t pin_config[1] = {0xff};
 
 GpioError gpioDigitalWrite(GpioAddress addr, int mode){
-
-
     if(!addr.is_valid) {
         return GpioError::InvalidPinError;
     }
 
     TwoWire& wire = tcal_get_wire_by_id(addr.gpio_id);
 
-    uint8_t current_state = pin_state[addr.gpio_id];
+    uint8_t old_state = pin_state[addr.gpio_id];
+    uint8_t new_state = old_state;
     if(mode == HIGH){
-        current_state |= (1 << addr.pin_id);
+        new_state |= (1 << addr.pin_id);
     } else if(mode == LOW){
-        current_state &= ~(1 << addr.pin_id);
+        new_state &= ~(1 << addr.pin_id);
     } else {
         return GpioError::InvalidModeError;
     }
 
+    // if no change skip the i2c write
+    if(new_state == old_state) {
+        return GpioError::NoError;
+    }
+
     wire.beginTransmission(addr.gpio_address);
     wire.write(REG_OUTPUT);
-    wire.write(current_state);
-    pin_state[addr.gpio_id] = current_state;
-    int err = 0;
-    err = wire.endTransmission(true);
-    if(err != 0){
+    wire.write(new_state);
+    if(wire.endTransmission(true) != 0){
         return GpioError::I2CError;
     }
+    pin_state[addr.gpio_id] = new_state;
     return GpioError::NoError;
 }
 

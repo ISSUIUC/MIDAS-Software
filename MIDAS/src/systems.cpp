@@ -7,7 +7,9 @@
 #include "midas_shell_commands.h"
 
 static StaticSemaphore_t spi_mutex_buffer;
+static StaticSemaphore_t i2c_mutex_buffer;
 SemaphoreHandle_t spi_mutex;
+SemaphoreHandle_t i2c_mutex;
 
 #define ENABLE_TELEM
 
@@ -202,7 +204,9 @@ DECLARE_THREAD(gps, RocketSystems *arg)
     {
         if (arg->sensors.gps.valid())
         {
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             GPS reading = arg->sensors.gps.read();
+            xSemaphoreGive(i2c_mutex);
             arg->rocket_data.gps.update(reading);
         }
         // GPS waits internally
@@ -238,10 +242,12 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
         PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data);
 
         // Actually update the pyro state!
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
         gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW);
         for(int i = 0; i < MIDAS_NUM_PYROS; i++) {
             gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW);
         }
+        xSemaphoreGive(i2c_mutex);
 
         arg->rocket_data.pyro.update(new_pyro_state);
         arg->led.update();
@@ -252,7 +258,9 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
         Voltage reading2 = arg->sensors.voltage.read();
+        xSemaphoreGive(i2c_mutex);
         arg->rocket_data.voltage.update(reading2);
 
         THREAD_SLEEP(100);
@@ -706,6 +714,7 @@ DECLARE_THREAD(cam, RocketSystems *arg)
         }
 
         // Check if CAM specifically is on the I2C bus
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
         Wire.beginTransmission(0x69);
         byte error = Wire.endTransmission();
 
@@ -721,6 +730,7 @@ DECLARE_THREAD(cam, RocketSystems *arg)
             arg->rocket_data.cam_data.update(new_cam_data);
             THREAD_SLEEP(1800);
         }
+        xSemaphoreGive(i2c_mutex);
 
         THREAD_SLEEP(200);
     }
@@ -910,6 +920,7 @@ ErrorCode init_systems(RocketSystems& systems) {
 {
     Serial.println("Starting Systems...");
     spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
+    i2c_mutex = xSemaphoreCreateMutexStatic(&i2c_mutex_buffer);
 
 
     ErrorCode init_error_code = init_systems(*config);
@@ -933,12 +944,12 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(voltage, SENSOR_CORE, config, 9);
     START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(cam, SENSOR_CORE, config, 16);
+    START_THREAD(cam, SENSOR_CORE, config, 5);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(angularkalman, SENSOR_CORE, config, 7);
-    START_THREAD(shell, DATA_CORE, config, 5);
+    START_THREAD(shell, DATA_CORE, config, 4);
 
     #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
