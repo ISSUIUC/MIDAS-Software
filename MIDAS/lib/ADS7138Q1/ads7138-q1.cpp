@@ -37,9 +37,6 @@ bool ADS7138::init(TwoWire* i2c, uint8_t addr) {
     return false; // Failed to contact chip or failed to read
   }
 
-  Serial.print("ADC RES ");
-  Serial.println(res, HEX);
-
   // Set sequencing channels
   uint8_t enable_byte = 0b11110111; // All channels but channel 3
   if(!reg_write_single(ADC_AUTO_SEQ_CH_SEL, enable_byte)) {
