@@ -31,6 +31,7 @@ class ADS7138 {
     bool reg_read_single(uint8_t addr, uint8_t& outval);
     bool reg_read_block(uint8_t start_addr, size_t num_reg, uint8_t* out_buf);
     bool reg_write_single(uint8_t addr, uint8_t value);
+    bool reg_write_single_bitset(uint8_t addr, uint8_t setmask);
 
     public:
     bool init(TwoWire* i2c, uint8_t addr);

@@ -257,11 +257,8 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
         Voltage reading2 = arg->sensors.voltage.read();
-        xSemaphoreGive(i2c_mutex);
         arg->rocket_data.voltage.update(reading2);
-
         THREAD_SLEEP(100);
     }
 }

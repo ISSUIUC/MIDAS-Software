@@ -27,6 +27,8 @@ ErrorCode VoltageSensor::init() {
 Voltage VoltageSensor::read() {
     Voltage voltage;
 
+    ADC.tick();
+
     voltage.v_Bat = ADC.read(VBAT_SENSE);
     voltage.v_Pyro = ADC.read(PYRO_SENSE);
     voltage.continuity[0] = ADC.read(SENSE_A);

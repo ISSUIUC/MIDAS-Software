@@ -16,6 +16,9 @@ extern SemaphoreHandle_t i2c_mutex;
 #define ADC_REG_READ_CONTINUOUS 0x30
 #define ADC_REG_WRITE_CONTINUOUS 0x28
 #define ADC_SYSTEM_STATUS 0x00
+#define ADC_GENERAL_CFG 0x01
+#define ADC_OSR_CFG 0x03
+#define ADC_OPMODE_CFG 0x04
 #define ADC_MANUAL_CH_SEL 0x11
 #define ADC_SEQUENCE_CFG 0x10
 #define ADC_AUTO_SEQ_CH_SEL 0x12
@@ -34,9 +37,27 @@ bool ADS7138::init(TwoWire* i2c, uint8_t addr) {
     return false; // Failed to contact chip or failed to read
   }
 
+  Serial.print("ADC RES ");
+  Serial.println(res, HEX);
+
   // Set sequencing channels
   uint8_t enable_byte = 0b11110111; // All channels but channel 3
   if(!reg_write_single(ADC_AUTO_SEQ_CH_SEL, enable_byte)) {
+    return false;
+  }
+
+  // STATS_EN bit lets us read the RECENT_CH* channels
+  if(!reg_write_single_bitset(ADC_GENERAL_CFG, 0b00100000)) {
+    return false;
+  }
+
+  // CONV_MODE bit outputs values on internal clock
+  if(!reg_write_single_bitset(ADC_OPMODE_CFG, 0b00100000)) {
+    return false;
+  }
+
+  // Set OSR to 8 samples
+  if(!reg_write_single_bitset(ADC_OPMODE_CFG, 0b00000011)) {
     return false;
   }
 
@@ -54,7 +75,7 @@ void ADS7138::tick() {
   reg_read_block(ADC_CHANNEL_READ_START, 16, buf);
 
   for(int i = 0; i < 8; i++) {
-    _ch_readings[i] = buf[i] + (buf[i+1] << 8);
+    _ch_readings[i] = buf[i*2] + (buf[(i*2)+1] << 8);
   }
 }
 
@@ -90,6 +111,22 @@ bool ADS7138::reg_read_single(uint8_t addr, uint8_t& outval) {
     outval = WIRE.read();
     i2c_unlock();
     return true;
+}
+
+bool ADS7138::reg_write_single_bitset(uint8_t reg_address, uint8_t set_mask) {
+  i2c_lock();
+  _i2c->beginTransmission(_i2c_addr);
+  _i2c->write(ADC_SET_BIT);
+  _i2c->write(reg_address);
+  _i2c->write(set_mask);
+  if(_i2c->endTransmission(true) != 0){
+    i2c_unlock();
+    Serial.print("[ADS7138] Failed to write bit mask to addr 0x");
+    Serial.println(reg_address, HEX);
+    return false;
+  }
+  i2c_unlock();
+  return true;
 }
 
 bool ADS7138::reg_write_single(uint8_t reg_address, uint8_t data) {
@@ -144,6 +181,7 @@ bool ADS7138::reg_read_block(uint8_t start_addr, size_t num_reg, uint8_t* out_bu
 
 float ADS7138::read(uint8_t pin) {
   uint16_t raw_value = _ch_readings[pin];
+
   float abs_voltage = ((static_cast<float>(raw_value) / kADCRegisterWidth) * kADCVoltageReference) / kADCPinConversionFactors[pin];
   return abs_voltage;
 }
