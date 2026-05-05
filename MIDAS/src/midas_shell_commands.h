@@ -605,26 +605,26 @@ MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
     size_t size_ptr = LOG_FMT_VERSION; // We write multiple uint32_ts, so for serial.write to print it properly we need to store it
     
     // Start writing header
-    Serial.write("LAUNCH "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+    Serial.write("LAUNCH "); Serial.write((uint8_t*)&size_ptr, sizeof(size_t)); Serial.write('\n');
 
     // File name
     Serial.write("FILE "); Serial.write(ctx.argv[1]); Serial.write('\n');
     
     // Log checksum
     size_ptr = LOG_CHECKSUM;
-    Serial.write("CHECKSUM "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write(" "); 
+    Serial.write("CHECKSUM "); Serial.write((uint8_t*)&size_ptr, sizeof(size_t)); Serial.write(" "); 
     
     // EEPROM checksum
     size_ptr = EEPROM_CHECKSUM;
-    Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+    Serial.write((uint8_t*)&size_ptr, sizeof(size_t)); Serial.write('\n');
 
     // Meta file size
     size_ptr = meta_file.size();
-    Serial.write("META "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+    Serial.write("META "); Serial.write((uint8_t*)&size_ptr, sizeof(size_t)); Serial.write('\n');
 
     // Binary file size
     size_ptr = bin_file.size();
-    Serial.write("BIN "); Serial.write((uint8_t*)size_ptr, sizeof(size_t)); Serial.write('\n');
+    Serial.write("BIN "); Serial.write((uint8_t*)&size_ptr, sizeof(size_t)); Serial.write('\n');
 
     Serial.flush();
 
