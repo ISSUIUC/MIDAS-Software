@@ -732,7 +732,7 @@ MCommandExecutionResult m_sdfn(const MShellContext& ctx) {
     }
 
     if(ctx.argc == 2) {
-        uint16_t val = atoi(ctx.argv[2]);
+        int val = atoi(ctx.argv[1]);
         arg->eeprom.data.sd_file_num_last = val;
         arg->eeprom.commit();
         return MCommandExecutionResult::OK;

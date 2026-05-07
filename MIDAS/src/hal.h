@@ -70,3 +70,4 @@
  * Initialized in begin_systems() before threads start.
  */
 extern SemaphoreHandle_t spi_mutex;
+extern SemaphoreHandle_t i2c_mutex;

@@ -45,9 +45,7 @@ ErrorCode Pyro::init() {
 }
 
 void Pyro::disarm_all_channels(PyroState& prev_state) {
-    gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, LOW); // For good measure
     for(int i = 0; i < MIDAS_NUM_PYROS; ++i) {
-        gpioDigitalWrite(PYRO_PINS[i], LOW); // For good measure
         prev_state.channel_firing[i] = false;
     }
     prev_state.is_global_armed = false;
