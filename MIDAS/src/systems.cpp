@@ -209,7 +209,7 @@ DECLARE_THREAD(gps, RocketSystems *arg)
             arg->rocket_data.gps.update(reading);
         }
         // GPS waits internally
-        THREAD_SLEEP(1);
+        THREAD_SLEEP(25);
     }
 }
 

@@ -156,7 +156,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data, const MIDASEEPROM& eepro
     // 00000 | 000
     // SATC  | FT
     packet.gpsfix_satcount |= (gps.fix_type & 0x07);
-    packet.gpsfix_satcount |= (gps.sats_in_view & 0x1F) << 5;
+    packet.gpsfix_satcount |= (gps.sats_in_view & 0x1F) << 3;
 
     packet.serial = eeprom.serial;
 

@@ -49,8 +49,8 @@ FullTelemetryData DecodePacket(const TelemetryPacket& packet, float frequency) {
 
     // Other data
     data.battery_voltage = convert_range(packet.batt_volt, MAX_TELEM_VOLTAGE_V);
-    data.gps_fixtype = packet.gpsfix_satcount >> 1 & 0b0111;
-    data.sat_count = (packet.gpsfix_satcount >> 5) & 0x1F;
+    data.gps_fixtype = packet.gpsfix_satcount & 0b0111;
+    data.sat_count = (packet.gpsfix_satcount >> 3) & 0x1F;
 
     // Serial number
     data.serial_no = packet.serial;

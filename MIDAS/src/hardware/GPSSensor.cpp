@@ -41,12 +41,9 @@ ErrorCode GPSSensor::init() {
     }
 
     ublox.setDynamicModel(DYN_MODEL_AIRBORNE4g);
-	ublox.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA); //Set the I2C port to output both NMEA and UBX messages
-    // Set the measurment rate faster than one HZ if necessary
-    // ublox.setMeasurementRate(100);
-	ublox.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT); //Save (only) the communications port settings to flash and BBR
-
-	//This will pipe all NMEA sentences to the serial port so we can see them
+    ublox.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA);
+    ublox.setMeasurementRate(100);              // 10 Hz full nav
+    ublox.setAutoPVT(true);
 
     return ErrorCode::NoError;
 }
