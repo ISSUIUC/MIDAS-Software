@@ -96,9 +96,9 @@ inline std::array<float, 3> gps_to_ecef(float lat, float lon, float alt) {
 
 /**
  * @brief Converts the current ECEF (meters) to ENU (meters) based on a reference in both ECEF (meters) and GPS (degrees)
- * @return Vector of ENU coordinates {East, North, Up}
+ * @return std::array of ENU coordinates {East, North, Up}
  */
-inline std::vector<float> ecef_to_enu(std::vector<float> curr_ecef, std::vector<float> ref_ecef, std::vector<float> ref_gps) {
+inline std::array<float, 3> ecef_to_enu(std::array<float, 3> curr_ecef, std::array<float, 3> ref_ecef, std::array<float, 3> ref_gps) {
     float ref_lat = ref_gps[0] * pi / 180.0;
     float ref_lon = ref_gps[1] * pi / 180.0;
 

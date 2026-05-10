@@ -47,8 +47,8 @@ private:
     float Cn = 0;
     float Wind_alpha = 0.85f;
     float Cp = 0;
-    std::vector<float> starting_gps;    // latitude, longitude, altitude
-    std::vector<float> starting_ecef;   // x, y, z
+    std::array<float, 3> starting_gps;    // latitude, longitude, altitude
+    std::array<float, 3> starting_ecef;   // x, y, z
 
     // Eigen::Matrix<float,3,1> gravity = Eigen::Matrix<float,3,1>::Zero();
     KalmanState kalman_state;
