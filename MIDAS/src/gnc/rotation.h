@@ -78,9 +78,9 @@ void GlobalToBody(Angles &angles_rad, Eigen::Matrix<float, 3, 1> &global_vec)
 
 /**
  * @brief Converts GPS (degrees) to ECEF (meters)
- * @return Vector of ECEF coordinates {X, Y, Z}
+ * @return std::array of ECEF coordinates {X, Y, Z}
  */
-inline std::vector<float> gps_to_ecef(float lat, float lon, float alt) {
+inline std::array<float, 3> gps_to_ecef(float lat, float lon, float alt) {
     // Convert to radians
     lat *= pi / 180.0;
     lon *= pi / 180.0;

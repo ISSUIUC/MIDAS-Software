@@ -131,8 +131,8 @@ void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanDa
         float lon = gps.longitude / 1e7;
         float alt = gps.altitude;
         // Convert GPS to ECEF
-        std::vector<float> rocket_cords = gps_to_ecef(lat, lon, alt);
-        std::vector<float> reference_cord = gps_to_ecef(gps_latitude_original, gps_longitude_original, 0);
+        std::array<float, 3> rocket_cords = gps_to_ecef(lat, lon, alt);
+        std::array<float, 3> reference_cord = gps_to_ecef(gps_latitude_original, gps_longitude_original, 0);
         float gps_latitude_original_rad = gps_latitude_original * pi / 180;
         float gps_longitude_original_rad = gps_longitude_original * pi / 180;
         double dx = rocket_cords[0] - reference_cord[0];
