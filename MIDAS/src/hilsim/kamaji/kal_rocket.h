@@ -3,20 +3,20 @@
 #include "sensor_data.h"
 #include "rocket_state.h"
 
+
 struct KRocketData {
 public:
     KalmanData kalman;
-    IMU imu_data;
+    AngularKalmanData angular_kalman_data;
+    IMU imu;
+    IMU_SFLP sflp;
     Barometer barometer;
     PyroState pyro;
-    FSMState fsm_state;
+    FSMData fsm_state;
     GPS gps;
     Magnetometer magnetometer;
-    AngularKalmanData angular_kalman;
     Voltage voltage;
-    CommandFlags command_flags;
-    uint8_t camera_state = 127;
-
+    CameraData cam_data;
     Latency log_latency;
 };
 

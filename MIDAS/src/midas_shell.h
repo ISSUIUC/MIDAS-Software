@@ -116,3 +116,4 @@ class MShell {
 // Sets up the MIDAS shell
 void m_shell_setup();
 extern MShell m_shell_inst;
+void m_shell_init_commands(MShell* sh);

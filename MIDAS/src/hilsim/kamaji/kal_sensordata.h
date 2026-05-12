@@ -23,11 +23,14 @@ inline ReadingDiscriminant data_reports[MAX_DATA_REPORTS]; // Reports stack
 inline uint8_t data_report_top = 0; // data_reports top pointer
 
 inline void k_read_into_sensordata(uint8_t disc, uint8_t* data) {
+    if (disc == 0 || disc >= READING_DISC_COUNT) return;
     SensorMapping cur_map = MAP[disc - 1];
+    if (cur_map.struct_map == nullptr) return;
     memcpy(cur_map.struct_map, data, cur_map.struct_size);
 }
 
 inline size_t k_get_discriminant_size(uint8_t disc) {
+    if (disc == 0 || disc >= READING_DISC_COUNT) return 0;
     return MAP[disc-1].struct_size;
 }
 
@@ -37,6 +40,7 @@ inline void k_set_timestamp(uint32_t ts) {
 
 // Data reporting
 inline void k_enable_data_report(ReadingDiscriminant sens_id, uint32_t report_interval) {
+    if (sens_id == 0 || sens_id >= READING_DISC_COUNT) return;
     if(data_report_top >= MAX_DATA_REPORTS - 1) {
         k_REPORTOVERFLOW();
         return;
@@ -50,8 +54,10 @@ inline void k_tick_data_report() {
     unsigned long cur_t = millis();
     for(uint8_t i = 0; i < data_report_top; i++) {
         uint8_t disc_id = (uint8_t)data_reports[i];
+        if (disc_id == 0 || disc_id >= READING_DISC_COUNT) continue;
         ReadingDiscriminant disc = (ReadingDiscriminant) (disc_id-1);
         SensorMapping* s = &MAP[disc];
+        if (!s->struct_map) continue;
         if(s->report_interval) {
 
             if((cur_t - s->last_report_tick) > s->report_interval) {

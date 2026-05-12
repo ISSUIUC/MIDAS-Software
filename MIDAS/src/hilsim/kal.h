@@ -50,11 +50,13 @@ enum sys_instr_t {
     REPORT_EN = 1,
     VERIFY_CHECKSUM = 2,
     FSM_SET = 3,
+    SH_BEGIN = 4
 };
 
 struct sys_flags_t {
     FSMState fsm_target = FSMState::FSM_STATE_COUNT;
     uint8_t fsm_target_motor = 0;
+    bool sh_en = false;
 };
 
 
@@ -66,6 +68,7 @@ struct sys_flags_t {
 // - 0x01 --> REPORT_EN
 // - 0x02 --> VERIFY_CHECKSUM
 // - 0x03 --> FSM_SET
+// - 0x04 --> SH_BEGIN
 inline void k_handle_sys_msg(uint8_t* data, uint16_t crc, sys_flags_t* sflags) {
     sys_instr_t instr = (sys_instr_t) data[0];
 
@@ -93,6 +96,11 @@ inline void k_handle_sys_msg(uint8_t* data, uint16_t crc, sys_flags_t* sflags) {
             sflags->fsm_target = new_fsm;
             }
             break;
+        case (sys_instr_t::SH_BEGIN):
+            {
+                // The argument doesnt matter, once shell begins we don't care about ending it
+                sflags->sh_en = true;
+            }
         default:
             k_INVALIDINSTR();
             return;

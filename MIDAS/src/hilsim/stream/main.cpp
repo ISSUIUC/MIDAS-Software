@@ -23,8 +23,16 @@
 size_t struct_sizes[READING_DISC_COUNT];
 bool ignore_disc[READING_DISC_COUNT];
 
+// Per-disc overrides: non-zero means "read this many bytes from the log file"
+// instead of struct_sizes[disc].  Use when sizeof(mapped type) on the host
+// doesn't match what the ESP32 actually wrote (e.g. double alignment, struct changes).
+size_t file_size_override[READING_DISC_COUNT] = {0};
+
+// Discs that are read to keep byte-sync but never forwarded to the ESP32.
+bool always_skip[READING_DISC_COUNT] = {false};
 
 #define ASSOCIATE(ty, id) struct_sizes[id] = sizeof(ty)
+
 // #define DEBUG
 
 FILE* inptr;
@@ -68,9 +76,15 @@ void setup_ssizes() {
     ASSOCIATE(FSMState, ID_FSM);
     ASSOCIATE(pstate_t, ID_PYRO);
     ASSOCIATE(CameraData, ID_CAMERADATA);
+
+    // Skip stuff that has no business being force-set
+    always_skip[ID_FSM] = true;
+    always_skip[ID_PYRO] = true;
+
 }
 
 size_t get_size(uint8_t discriminant) {
+    if (file_size_override[discriminant]) return file_size_override[discriminant];
     return struct_sizes[discriminant];
 }
 
@@ -214,6 +228,18 @@ void send_data(serialib& s, entry_t& dat) {
     #endif
 }
 
+void drain_serial(serialib& s) {
+    int av = s.available();
+    if (av <= 0) return;
+    uint8_t buf[256];
+    int n = s.readBytes(buf, std::min(av, 255));
+    if (n > 0) {
+        buf[n] = '\0';
+        printf("%s", (char*)buf);
+        fflush(stdout);
+    }
+}
+
 int main(int argc, char** argv) {
     
     if(argc != 1) {
@@ -243,19 +269,8 @@ int main(int argc, char** argv) {
 
     while (true) {
 
-        // handle serial output
         if(Serial.isDeviceOpen()) {
-            // do something
-
-            int av = Serial.available();
-            if (av) {
-                uint8_t buf[256];
-                Serial.readBytes(buf, 255);
-                buf[255] = '\0';
-                printf("from thingy: %s", (char*)buf);
-            }
-
-            // TBD
+            drain_serial(Serial);
         }
         
         // Handle inputs from stdin
@@ -276,6 +291,7 @@ int main(int argc, char** argv) {
         // d <disc_id:int> - [DEBUG] get size of discrim
         // l <Filepath:str> - load file for streaming
         // n - [DEBUG] gets next line and prints
+        // a - "Advance" -- gets next line and sends
         // N <num_lines:int> - Skips num_lines from the input
         // s - Stream data as fast as possible
         // r - Stream data in realtime
@@ -286,6 +302,7 @@ int main(int argc, char** argv) {
         //    If unset / 0, then no entries are skipped
 
         // F <state_id:int> - Set FSM state directly.
+        // !                - Inits midas firmware (sends newline)
 
 
         switch(_inbuf[0]) {
@@ -304,7 +321,17 @@ int main(int argc, char** argv) {
                     printf(".FSM %i\n", fsm_int);
                     fflush(stdout);
                 }
+                break;
+            case '!':
+                    {
+                    if (!Serial.isDeviceOpen()) {
+                        std::cerr << "No serial open" << std::endl;
+                        fflush(stdout);
+                        break;
+                    }
 
+                    Serial.writeChar('\n');
+                }
                 break;
             case 'i':
                     {
@@ -427,9 +454,30 @@ int main(int argc, char** argv) {
                 // s(tream) -- stream all data to com port as fast as possible
                 while(read_entry(entry)) {
                     num_read++;
+                    if(Serial.isDeviceOpen()) drain_serial(Serial);
                     if(num_read % 10000 == 0) {
                         printf("[%u] {time: %u}: (d%u) <size: %uB> (CRC 0x%x)\n", num_read, entry.ts, entry.disc, entry._data_size, entry.crc);
                     }
+                }
+                break;
+            case 'a':
+                // a(dvance) -- send the next line
+
+                if (!Serial.isDeviceOpen()) {
+                    std::cerr << "No serial open" << std::endl;
+                    printf(".ERR no_ser\n");
+                    fflush(stdout);
+                    break;
+                }
+
+                if (inptr) {
+                    if(read_entry(entry)) {
+                        send_data(Serial, entry);
+                        printf("SEND ENTRY [%u]: (%u) <size: %uB> (CRC 0x%x)\n", entry.ts, entry.disc, entry._data_size, entry.crc);
+                        fflush(stdin);
+                    } 
+                } else {
+                    std::cerr << "No file specified" << std::endl;
                 }
                 break;
             case 'r':
@@ -476,6 +524,7 @@ int main(int argc, char** argv) {
                     auto start_epoch = std::chrono::high_resolution_clock::now();
 
                     while (true) {
+                        drain_serial(Serial);
 
                         auto time_since_stream_start_ = std::chrono::high_resolution_clock::now() - start_epoch;
                         long long time_since_stream_start = std::chrono::duration_cast<std::chrono::milliseconds>(time_since_stream_start_).count();
@@ -493,7 +542,7 @@ int main(int argc, char** argv) {
 
                                 auto latency = time_since_stream_start - time_elapsed_in_log;
 
-                                if(!ignore_disc[entry.disc]) {
+                                if(!ignore_disc[entry.disc] && !always_skip[entry.disc]) {
                                     float randm = static_cast<float>(rand())/static_cast<float>(RAND_MAX);
                                     int threshold_ms = (int)(skip_threshold * 1000);
 

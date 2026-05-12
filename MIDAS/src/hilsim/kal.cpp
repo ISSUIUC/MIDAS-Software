@@ -1,8 +1,9 @@
 // KAL - Kamaji Abstraction Layer
 #include "kal.h"
+#include "midas_shell.h"
 
 // ---- GLOBALS ----
-MultipleLogSink<> sink;
+SDSink sink;
 RocketSystems systems{.log_sink = sink};
 
 // ---- INIT SENSORS ----
@@ -11,14 +12,17 @@ void k_init_sensordata() {
 
     // This list should run parallel to the list defined in data_logging. This macro will perform the opposite task,
     // mapping disc IDs to their locations in the struct.
+    ASSOCIATE(arg->imu, ID_IMU);
+    ASSOCIATE(arg->sflp, ID_SFLP);
     ASSOCIATE(arg->barometer, ID_BAROMETER);
     ASSOCIATE(arg->voltage, ID_VOLTAGE);
     ASSOCIATE(arg->gps, ID_GPS);
     ASSOCIATE(arg->magnetometer, ID_MAGNETOMETER);
-    ASSOCIATE(arg->fsm_state, ID_FSM);
     ASSOCIATE(arg->kalman, ID_KALMAN);
+    ASSOCIATE(arg->angular_kalman_data, ID_ANGULARKALMAN);
+    ASSOCIATE(arg->fsm_state, ID_FSM);
     ASSOCIATE(arg->pyro, ID_PYRO);
-    ASSOCIATE(arg->camera_state, ID_CAMERADATA);
+    ASSOCIATE(arg->cam_data, ID_CAMERADATA);
 }
 
 // ---- Kamaji Thread ----
@@ -37,15 +41,23 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
         int delim;
         do {
             k_tick();
+            if (Serial.available() == 0) {
+                THREAD_SLEEP(1);
+            }
             delim = Serial.read();
-            THREAD_SLEEP(1);
 
             if (sflags.fsm_target != FSMState::FSM_STATE_COUNT) {
                 arg->rocket_data.fsm_state.update({sflags.fsm_target, sflags.fsm_target_motor});
                 sflags.fsm_target = FSMState::FSM_STATE_COUNT;
             }
 
-        } while(delim != '$' && delim != '#');
+        } while(delim != '$' && delim != '#' && delim != '&');
+
+        if(delim == '&') {
+            START_THREAD(shell, DATA_CORE, arg, 5);
+            vTaskDelete(NULL);
+            continue;
+        }
 
         if(delim == '#') {
           if (!k_read_exact(data_buf, 16, 10)) continue;
@@ -78,12 +90,28 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
 
 // Run the Kamaji process
 [[noreturn]] void k_start() {
-    // The IMU thread (and the lora's optional mutex) take spi_mutex; it normally gets
-    // created in begin_systems() but HILSIM bypasses that, so create it here.
+    // These mutexes normally get created in begin_systems() but HILSIM bypasses that.
     static StaticSemaphore_t kal_spi_mutex_buffer;
     spi_mutex = xSemaphoreCreateMutexStatic(&kal_spi_mutex_buffer);
+    static StaticSemaphore_t kal_i2c_mutex_buffer;
+    i2c_mutex = xSemaphoreCreateMutexStatic(&kal_i2c_mutex_buffer);
+
+    // logger thread is not started in HILSIM, but FSM transitions write to meta_logging.summary.
+    // Point it at a static dummy so those writes don't fault.
+    static MetalogSummary kal_meta_summary;
+    systems.meta_logging.summary = &kal_meta_summary;
 
     // real midas setup
+    INIT_SYSTEM(systems.eeprom);
+
+    // To init log sink fast, we'll set its filenumber before initing it.
+    systems.log_sink.current_file_no = systems.eeprom.data.sd_file_num_last;
+
+    INIT_SYSTEM(systems.log_sink);
+
+    // Then, after initing we will read back the filenumber to EEPROM.
+    systems.eeprom.data.sd_file_num_last = systems.log_sink.current_file_no;
+
     INIT_SYSTEM(systems.sensors.barometer);
     INIT_SYSTEM(systems.sensors.magnetometer);
     INIT_SYSTEM(systems.sensors.voltage);
@@ -93,10 +121,14 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
     INIT_SYSTEM(systems.b2b);
     INIT_SYSTEM(systems.tlm);
 
+    m_shell_setup();
+    systems.shell = &m_shell_inst;
+    m_shell_init_commands(systems.shell);
+
     Serial.println("Starting Systems...");
     RocketSystems* config = &systems;
 
-    // START_THREAD(logger, DATA_CORE, config, 15);
+    START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(imuthread, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
     START_THREAD(gps, SENSOR_CORE, config, 8);
@@ -108,7 +140,6 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(angularkalman, SENSOR_CORE, config, 7);
-    // START_THREAD(shell, DATA_CORE, config, 5);
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
     START_THREAD(hilsim, DATA_CORE, config, 1);
 
@@ -122,6 +153,8 @@ DECLARE_THREAD(hilsim, RocketSystems* arg) {
 
 // ---- ENTRY FUNCS ----
 void k_run() {
+    // Default 256-byte RX buffer overflows when SFLP FIFO bursts arrive back-to-back.
+    Serial.setRxBufferSize(4096);
     Serial.begin(921600);
     // while(!Serial);
 

@@ -7,7 +7,7 @@
 #include "buzzer.h"
 
 /**
- * @struct IMUSensor (HILSIM stub — calibration is a no-op).
+ * @struct IMUSensor (HILSIM stub).
  */
 struct IMUSensor {
     enum IMUCalibrationState {
@@ -36,7 +36,7 @@ struct IMUSensor {
 };
 
 /**
- * @struct MagnetometerSensor (HILSIM stub — calibration is a no-op).
+ * @struct MagnetometerSensor (HILSIM stub).
  */
 struct MagnetometerSensor {
     ErrorCode init();
@@ -88,9 +88,22 @@ struct PyroTickData {
 };
 
 /**
- * @struct Pyro (HILSIM stub).
+ * @struct Pyro interface
  */
 struct Pyro {
     ErrorCode init();
     PyroState tick(PyroTickData& data);
+
+    void set_pyro_safety(); // Sets pyro_start_firing_time and has_fired_pyros.
+    void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros. 
+    
+    private:
+    void disarm_all_channels(PyroState& prev_state);
+    
+    double safety_pyro_start_firing_time;    // Time when pyros have fired "this cycle" (pyro test) -- Used to only fire pyros for a time then transition to SAFE 
+    bool safety_has_fired_pyros_this_cycle;  // If pyros have fired "this cycle" (pyro test) -- Allows only firing 1 pyro per cycle.
+
+    double pyro_trigger_times[MIDAS_NUM_PYROS]; // Storage for the time at which in-flight pyro event checks were triggered for each pyro.
+    bool pyro_event_check[MIDAS_NUM_PYROS];     // Storage to indicate whether the pyro condition was checked (for pyro delay rule)
+    bool pyro_event_consumed[MIDAS_NUM_PYROS];  // Storage for whether the pyro has attempted to have been fired.
 };

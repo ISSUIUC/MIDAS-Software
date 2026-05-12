@@ -227,7 +227,6 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
         double time_since_launch = (current_time - launch_time);
         const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
-
         PyroTickData tick_data = {
             current_fsm,
             akf_data,
@@ -250,8 +249,8 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
         arg->rocket_data.pyro.update(new_pyro_state);
         arg->led.update();
-
         THREAD_SLEEP(10);
+        
     }
 }
 
@@ -374,10 +373,6 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
     
-    float max_descent_rate = 0;
-    bool has_logged = false;
-    double max_descent_rate_time = 0;
-    
     double last_time_err_flash = pdTICKS_TO_MS(xTaskGetTickCount());
     arg->rocket_data.fsm_state.update(FSMData{FSMState::STATE_SAFE, 0});
     while (true)
@@ -398,7 +393,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         FSMData next_state = fsm.tick_fsm(tick_data);
 
         arg->rocket_data.fsm_state.update(next_state);
-        
+
         if(current_state != next_state.state) {
             fsm_transitioned_to(next_state, current_state_data, arg, current_time);       
         }
@@ -454,40 +449,30 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         {
             // Swap camera feed to MUX 1 (Side-facing camera) at launch.
             arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             arg->b2b.camera.vmux_set(SIDE_CAMERA);
-
             arg->b2b.camera.camera_on(SIDE_CAMERA);
             arg->b2b.camera.camera_on(BULKHEAD_CAMERA);
+            xSemaphoreGive(i2c_mutex);
         }
 
         if (arg->rocket_data.command_flags.FSM_should_power_save)
         {
             arg->rocket_data.command_flags.FSM_should_power_save = false;
-
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             arg->b2b.camera.vtx_off();
+            xSemaphoreGive(i2c_mutex);
         }
 
         if (arg->rocket_data.command_flags.FSM_should_swap_camera_feed)
         {
             // Swap camera feed to MUX 2 (recovery bay camera)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             arg->b2b.camera.vmux_set(BULKHEAD_CAMERA);
-        }
-        //MAX DESCENT RATE METADATA LOGGING - incomplete
-        if(arg->rocket_data.fsm_state.getRecentUnsync().state >= FSMState::STATE_DROGUE && arg->rocket_data.fsm_state.getRecentUnsync().state < FSMState::STATE_LANDED) {
-            if(max_descent_rate < state_estimate.vertical_speed) {
-                max_descent_rate = state_estimate.vertical_speed;
-                max_descent_rate_time = pdTICKS_TO_MS(xTaskGetTickCount());
-            }
+            xSemaphoreGive(i2c_mutex);
         }
 
-        if(!has_logged) {
-            if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
-                arg->meta_logging.log_data(MetaDataCode::DATA_MAX_DESCENT_RATE, max_descent_rate);
-                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_DESCENT_RATE, max_descent_rate_time);
-                has_logged = true;
-            }
-        }
         THREAD_SLEEP(50);
     }
 }
@@ -728,7 +713,6 @@ DECLARE_THREAD(cam, RocketSystems *arg)
             arg->rocket_data.cam_data.update(new_cam_data);
             THREAD_SLEEP(1800);
         }
-        
 
         THREAD_SLEEP(200);
     }
@@ -967,7 +951,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     }
 }
 
-// void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
-//     Serial.println("OVERFLOW");
-//     Serial.println((char*)pcTaskName);
-// }
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
+    Serial.println("OVERFLOW");
+    Serial.println((char*)pcTaskName);
+}

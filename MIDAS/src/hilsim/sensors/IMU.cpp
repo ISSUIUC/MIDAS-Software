@@ -6,9 +6,9 @@ ErrorCode IMUSensor::init() {
 }
 
 IMU IMUSensor::read() {
-    return GLOBAL_DATA.imu_data;
+    return GLOBAL_DATA.imu;
 }
 
 IMU_SFLP IMUSensor::read_sflp() {
-    return IMU_SFLP{};
+    return GLOBAL_DATA.sflp;
 }
