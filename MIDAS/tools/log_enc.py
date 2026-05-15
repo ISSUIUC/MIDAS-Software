@@ -908,12 +908,4 @@ def main():
     write_autogen(entries, eeprom_entries, vtable, autogen_file)
     print(f"Successfully wrote log format to {str(autogen_file)}!")
 
-
-# Guard so other scripts (migrate_log.py) can import parse_file etc. without
-# triggering the full autogen pipeline. PlatformIO runs this as __main__.
-if __name__ == "__main__":
-    main()
-
-
-
-
+main()
