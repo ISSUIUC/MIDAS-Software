@@ -13,6 +13,7 @@ public:
 
     int16_t getRecentRssi();
     void setFrequency(float frequency);
+    void set_spi_mutex(SemaphoreHandle_t /*mtx*/) {}
 
     template<typename T>
     void send(const T& data) {

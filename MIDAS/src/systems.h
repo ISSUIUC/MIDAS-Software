@@ -18,7 +18,7 @@
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"
 #elif defined(HILSIM)
-#include "hilsim/sensors.h"
+#include "hilsim/sensors/sensors.h"
 #else
 #include "hardware/sensors.h"
 #endif
@@ -63,6 +63,21 @@ struct RocketSystems {
     MShell* shell;
 };
 
-[[noreturn]] void begin_systems(RocketSystems *config);
 
-void NewFunction();
+[[noreturn]] void begin_systems(RocketSystems* config);
+
+void logger_thread(RocketSystems* arg);
+void pyro_thread(RocketSystems* arg);
+void kalman_thread(RocketSystems* arg);
+void angularkalman_thread(RocketSystems* arg);
+void fsm_thread(RocketSystems* arg);
+void cam_thread(RocketSystems* arg);
+void telemetry_thread(RocketSystems* arg);
+void shell_thread(RocketSystems* arg);
+
+void imuthread_thread(RocketSystems* arg);
+void barometer_thread(RocketSystems* arg);
+void gps_thread(RocketSystems* arg);
+void voltage_thread(RocketSystems* arg);
+void magnetometer_thread(RocketSystems* arg);
+void buzzer_thread(RocketSystems* arg);

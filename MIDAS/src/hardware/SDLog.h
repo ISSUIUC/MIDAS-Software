@@ -3,7 +3,6 @@
 #include <FS.h>
 
 #include <SD.h>
-#include "sensors.h"
 #include "data_logging.h"
 
 /**

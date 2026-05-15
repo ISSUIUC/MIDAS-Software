@@ -89,8 +89,7 @@ class MShell {
         return m_command.fn(ctx);
     }
 
-    void print_help(HWCDC* out) {
-        // Prints command help to the provided HWCDC.
+    void print_help(Stream* out) {
         for(int i = 0; i < cmd_count_; i++) {
             out->print(commands_[i].cmd);
             out->print(": ");
@@ -117,3 +116,4 @@ class MShell {
 // Sets up the MIDAS shell
 void m_shell_setup();
 extern MShell m_shell_inst;
+void m_shell_init_commands(MShell* sh);

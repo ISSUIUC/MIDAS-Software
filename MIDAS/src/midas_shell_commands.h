@@ -42,7 +42,6 @@ static constexpr const char * state_names[] = {
     "ARMED",
     "BOOST",
     "COAST",
-    "APOGEE",
     "DROGUE",
     "MAIN",
     "LANDED",

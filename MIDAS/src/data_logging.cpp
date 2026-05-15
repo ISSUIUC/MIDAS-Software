@@ -3,6 +3,13 @@
 #include "log_checksum.h"
 
 /**
+ * @brief Forward decleration of the ID recieving function
+*/
+template<typename T>
+constexpr ReadingDiscriminant get_discriminant();
+
+
+/**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
  * 
  * @param sink the LogSink to write to

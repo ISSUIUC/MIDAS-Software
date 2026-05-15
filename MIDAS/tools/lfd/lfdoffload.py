@@ -7,6 +7,7 @@ Michael Karpov, 2026
 import serial
 import sys
 from enum import IntEnum
+import time
 
 p_s = sys.argv[1]
 
@@ -63,6 +64,14 @@ class MShellExecutor:
         out = MShellExecutor.get_response(port)
         print(f"<< {out.out}")
         return out
+
+# HILSIM ONLY!
+port.write("\n".encode())
+time.sleep(0.1)
+port.write("&".encode())
+time.sleep(2)
+
+e = port.read_all()
 
 
 MShellExecutor.run_single(MShellCommand("echo 0"), port)
