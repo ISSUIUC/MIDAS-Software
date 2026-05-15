@@ -27,7 +27,7 @@ static constexpr MapEntry threshold_map[] = {
 static constexpr MapEntry channel_map[] = {
     {"ENABLE", offsetof(FSMPyroAction, enable), DataType::BOOL, ""},
     {"FSM_TRIGGER", offsetof(FSMPyroAction, fsm_trigger), DataType::FSMSTATE, ""},
-    {"DELAY", offsetof(FSMPyroAction, delay), DataType::FLOAT, "ms"},
+    {"DELAY", offsetof(FSMPyroAction, delay), DataType::DOUBLE, "ms"},
     {"MAX_TILT", offsetof(FSMPyroAction, max_tilt), DataType::FLOAT, "degrees"},
     {"AFTER_MOTOR", offsetof(FSMPyroAction, after_motor), DataType::UINT8, ""},
     {"LAUNCH_T_GT", offsetof(FSMPyroAction, launch_t_gt), DataType::FLOAT, "ms"},
