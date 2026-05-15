@@ -717,14 +717,11 @@ class Preprocessor:
         for i, line in enumerate(text.splitlines()):
             stripped = line.strip()
 
-            # the grammar can't handle template specializations or the ASSOCIATE macro,
-            # so we pull them out here before they reach the parser
+            # Strip unsupported language features
             if "get_discriminant" in stripped or stripped == "template<typename T>":
                 processed += "\n"
                 continue
 
-            # the grammar doesn't support constexpr variables (or static_cast),
-            # and log_enc.py doesn't need them — strip them out
             if stripped.startswith("constexpr "):
                 processed += "\n"
                 continue
@@ -908,4 +905,5 @@ def main():
     write_autogen(entries, eeprom_entries, vtable, autogen_file)
     print(f"Successfully wrote log format to {str(autogen_file)}!")
 
+# Needs to be top level to run.. oh well
 main()
