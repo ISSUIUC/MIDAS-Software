@@ -789,5 +789,5 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("calibset", m_calibset, "\tcalibset <sensor> <axis> <value> - Sets a calibration value for a sensor's axis.\n\tcalibset help - Display calibset's possible options");
     
     //Identify
-    sh->register_command("IDENT", ident_midas, "\tIdentify MIDAS");
+    sh->register_command("ident", ident_midas, "\tIdentify MIDAS");
 }
