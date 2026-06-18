@@ -165,6 +165,7 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             // Only switch to STATE_ARMED if triggered wirelessly.
             if(commands.should_transition_armed) {
                 state = FSMState::STATE_ARMED;
+                current_motor = 0;
                 commands.should_transition_armed = false;
             }
 
