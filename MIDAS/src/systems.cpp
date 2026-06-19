@@ -689,10 +689,10 @@ DECLARE_THREAD(cam, RocketSystems *arg)
     {
 
         // Check the status of the B2B chip, if it's bad then we don't waste time with an I2C check.
-        if(digitalRead(B2B_READY) == LOW) {
-            THREAD_SLEEP(200);
-            continue;
-        }
+        // if(digitalRead(B2B_READY) == LOW) {
+        //     THREAD_SLEEP(200);
+        //     continue;
+        // }
 
         // Check if CAM specifically is on the I2C bus
         xSemaphoreTake(i2c_mutex, portMAX_DELAY);
