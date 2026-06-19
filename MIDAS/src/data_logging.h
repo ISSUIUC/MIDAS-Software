@@ -8,8 +8,10 @@
 #elif defined(HILSIM)
 #else
 //#include "hardware/SDLog.h"
-//#include "hardware/Emmc.h"
 #endif
+
+
+
 
 /**
  * @class LogSink
@@ -20,10 +22,16 @@ class LogSink {
 public:
     LogSink() = default;
 
+    bool failed_wr = false; // Failed a write
+    bool failed_mr = false; // Failed a meta write
+
     virtual ErrorCode init() = 0;
     virtual void write(const uint8_t* data, size_t size) = 0;
 
+    virtual void write_meta(const uint8_t* data, size_t size) = 0;
     uint16_t current_file_no = 0;
+    char active_bin_name[20] = {0};   // basename of currently-open .bin (no leading '/')
+    char active_meta_name[20] = {0};  // basename of currently-open .meta
 };
 
 void log_begin(LogSink& sink);
@@ -39,6 +47,8 @@ public:
     };
 
     void write(const uint8_t* data, size_t size) override {};
+
+    void write_meta(const uint8_t* data, size_t size) override {};
 };
 
 template<typename Sink, typename... Sinks>
@@ -55,6 +65,11 @@ public:
         return sinks.init();
     };
     void write(const uint8_t* data, size_t size) override {
+        sink.write(data, size);
+        sinks.write(data, size);
+    };
+
+    void write_meta(const uint8_t* data, size_t size) override {
         sink.write(data, size);
         sinks.write(data, size);
     };

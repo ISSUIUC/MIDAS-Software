@@ -4,7 +4,6 @@
 
 #include "systems.h"
 #include "hardware/pins.h"
-#include "hardware/Emmc.h"
 #include "hardware/SDLog.h"
 #include "sensor_data.h"
 #include "pins.h"
@@ -13,8 +12,6 @@
  * Sets the config file and then starts all the threads using the config.
  */
 
-// #ifdef IS_SUSTAINER
-// MultipleLogSink<EMMCSink> sinks;
 SDSink sink;
 // #else
 // MultipleLogSink<> sinks;
@@ -27,7 +24,7 @@ RocketSystems systems{.log_sink = sink};
 void setup()
 {
     // begin serial port
-    Serial.begin(9600);
+    Serial.begin(115200);
 
     delay(200);
 
@@ -36,7 +33,7 @@ void setup()
     digitalWrite(BUZZER_PIN, LOW);
     ledcAttachPin(BUZZER_PIN, BUZZER_CHANNEL);
 
-    #ifdef IS_SUSTAINER
+    // Startup beeps
     ledcWriteTone(BUZZER_CHANNEL, 3200);
     delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
@@ -44,21 +41,6 @@ void setup()
     ledcWriteTone(BUZZER_CHANNEL, 3200);
     delay(250);
     ledcWriteTone(BUZZER_CHANNEL, 0);
-    #endif
-
-    #ifdef IS_BOOSTER
-    ledcWriteTone(BUZZER_CHANNEL, 2600);
-    delay(150);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    delay(75);
-    ledcWriteTone(BUZZER_CHANNEL, 2600);
-    delay(150);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    delay(75);
-    ledcWriteTone(BUZZER_CHANNEL, 2600);
-    delay(150);
-    ledcWriteTone(BUZZER_CHANNEL, 0);
-    #endif
 
 
     // begin sensor SPI bus
@@ -97,18 +79,20 @@ void setup()
     pinMode(LED_ORANGE, OUTPUT);
     pinMode(LED_RED, OUTPUT);
 
-    gpioPinMode(PYROA_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYROB_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYROC_FIRE_PIN, OUTPUT);
-    gpioPinMode(PYROD_FIRE_PIN, OUTPUT);
+    for (int i = 0; i < MIDAS_NUM_PYROS; i++) {
+        gpioPinMode(PYRO_PINS[i], OUTPUT);
+    }
     gpioPinMode(PYRO_GLOBAL_ARM_PIN, OUTPUT);
 
     delay(200);
 
     // init and start threads
     begin_systems(&systems);
+
+    loop();
 }
 
 void loop()
 {
+    printf("\nHI!");
 }

@@ -8,7 +8,6 @@
 #include "esp_eeprom.h"
 #include "buzzer.h"
 
-
 /**
  * @struct IMUSensor
  */
@@ -109,20 +108,33 @@ struct GPSSensor {
     bool is_leap = false;
 };
 
+struct PyroTickData {
+    const FSMData& fsm;
+    const AngularKalmanData& akf;
+    const KalmanData& ekf;
+    const FSMConfiguration& fsm_configuration;
+    CommandFlags& commands;
+    double current_time;
+    double time_since_launch;
+};
+
 /**
  * @struct Pyro interface
  */
 struct Pyro {
     ErrorCode init();
-    PyroState tick(FSMState fsm_state, AngularKalmanData angular_kalman_data, CommandFlags& telem_commands);
+    PyroState tick(PyroTickData& data);
 
     void set_pyro_safety(); // Sets pyro_start_firing_time and has_fired_pyros.
     void reset_pyro_safety(); // Resets pyro_start_firing_time and has_fired_pyros. 
     
     private:
     void disarm_all_channels(PyroState& prev_state);
-    void fire_pyro(int channel_idx, GpioAddress arm_pin, GpioAddress fire_pin);
-
+    
     double safety_pyro_start_firing_time;    // Time when pyros have fired "this cycle" (pyro test) -- Used to only fire pyros for a time then transition to SAFE 
     bool safety_has_fired_pyros_this_cycle;  // If pyros have fired "this cycle" (pyro test) -- Allows only firing 1 pyro per cycle.
+
+    double pyro_trigger_times[MIDAS_NUM_PYROS]; // Storage for the time at which in-flight pyro event checks were triggered for each pyro.
+    bool pyro_event_check[MIDAS_NUM_PYROS];     // Storage to indicate whether the pyro condition was checked (for pyro delay rule)
+    bool pyro_event_consumed[MIDAS_NUM_PYROS];  // Storage for whether the pyro has attempted to have been fired.
 };

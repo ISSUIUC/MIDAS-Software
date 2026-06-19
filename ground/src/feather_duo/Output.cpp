@@ -38,7 +38,7 @@ void printJSONField(const char* name, const char* val, bool comma = true) {
 void printPacketJson(FullTelemetryData const& packet) {
     bool is_heartbeat = packet.FSM_State == static_cast<uint8_t>(-1);
     char buff[1024]{};
-    int len = sprintf(buff, R"({"type": "data", "value": {"barometer_altitude": %f, "latitude": %f, "longitude": %f, "altitude": %i, "highG_ax": %f, "highG_ay": %f, "highG_az": %f, "battery_voltage": %f, "cam_battery_voltage": %f, "FSM_State": %i, "tilt_angle": %f, "frequency": %f, "RSSI": %f, "sat_count": %i, "kf_velocity": %f, "kf_positionX": %f, "kf_positionY": %f, "kf_positionZ": %f, "is_sustainer": %i, "roll_rate": %f, "c_valid": %u, "c_on": %u, "c_rec": %u, "vtx_on": %u, "vmux_stat": %u, "cam_ack": %u, "cmd_ack": %i, "gps_fixtype": %i, "pyro_a": %f, "pyro_b": %f, "pyro_c": %f, "pyro_d": %f}})",
+    int len = sprintf(buff, R"({"type": "data", "value": {"barometer_altitude": %f, "latitude": %f, "longitude": %f, "altitude": %i, "highG_ax": %f, "highG_ay": %f, "highG_az": %f, "battery_voltage": %f, "cam_battery_voltage": %f, "FSM_State": %i, "tilt_angle": %f, "frequency": %f, "RSSI": %f, "sat_count": %i, "kf_velocity": %f, "kf_positionX": %f, "kf_positionY": %f, "kf_positionZ": %f, "serial": %u, "roll_rate": %f, "c_valid": %u, "c_on": %u, "c_rec": %u, "vtx_on": %u, "vmux_stat": %u, "cam_ack": %u, "cmd_ack": %i, "gps_fixtype": %i, "pyro_a": %f, "pyro_b": %f, "pyro_c": %f, "pyro_d": %f, "err_flags": %u}})",
     
     // Barometer
     packet.barometer_altitude,
@@ -65,7 +65,7 @@ void printPacketJson(FullTelemetryData const& packet) {
     packet.kf_px,
     packet.kf_py,
     packet.kf_pz,
-    packet.is_sustainer,
+    packet.serial_no,
     packet.roll_rate_hz,
 
     
@@ -81,7 +81,8 @@ void printPacketJson(FullTelemetryData const& packet) {
     packet.pyros[0],
     packet.pyros[1],
     packet.pyros[2],
-    packet.pyros[3]
+    packet.pyros[3],
+    packet.midas_errs.encode()
     
     );
     Serial.println(buff);

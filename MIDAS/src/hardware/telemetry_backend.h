@@ -4,7 +4,7 @@
 #include "hal.h"
 #include "pins.h"
 
-#include "E22.h"
+#include <E22.h>
 
 /**
  * @class TelemetryBackend
@@ -18,6 +18,7 @@ public:
 
     int16_t getRecentRssi();
     ErrorCode setFrequency(float frequency);
+    void set_spi_mutex(SemaphoreHandle_t mtx) { lora.set_spi_mutex(mtx); }
 
     /**
      * @brief This function transmits data from the struct provided as

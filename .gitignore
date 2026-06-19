@@ -2,3 +2,4 @@
 .vscode/
 outputs/*
 ground/outputs/*
+buzzer/midi-files/*

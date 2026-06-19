@@ -68,7 +68,7 @@ void loop() {
     }
 
     if (message == "ls") {
-        size_t tot_size = 0;
+        uint64_t tot_size = 0;
         File root = SD_MMC.open("/");
         if (!root){
             Serial.println("Failed to open directory");

@@ -3,17 +3,28 @@
 #include "hal.h"
 #include "gnc/ekf.h"
 #include "gnc/mqekf.h"
+#include "log_format_AUTOGEN.h"
+#include "midas_shell_commands.h"
 
 static StaticSemaphore_t spi_mutex_buffer;
+static StaticSemaphore_t i2c_mutex_buffer;
 SemaphoreHandle_t spi_mutex;
-
-#if defined(IS_SUSTAINER) && defined(IS_BOOSTER)
-#error "Only one of IS_SUSTAINER and IS_BOOSTER may be defined at the same time."
-#elif !defined(IS_SUSTAINER) && !defined(IS_BOOSTER)
-#error "At least one of IS_SUSTAINER and IS_BOOSTER must be defined."
-#endif
+SemaphoreHandle_t i2c_mutex;
 
 #define ENABLE_TELEM
+
+#define METALOG_TEST
+
+void log_parse_tree(LogSink& log, size_t node_size, size_t node_count, uint8_t* data) {
+    // To recreate log formats, we need data to reconstruct the parse tree for log format
+    // This means knowing the size of each node and the pre-order traversal.
+    // We will store first the size of the node (each entry type), then a byte array of the pre order traversal.
+    // This lets us recreate the tree by converting the byte array into an array of nodes, then recreating the preorder traversal.
+    // For degenerate trees (lists), we will do the same thing, but they will be decoded as a list instead.
+    log.write_meta((uint8_t*)&node_size, sizeof(size_t)); // Store the node size
+    log.write_meta((uint8_t*)&node_count, sizeof(size_t)); // Store number of nodes
+    log.write_meta(data, node_size * node_count); // Store raw parse tree data
+}
 
 /**
  * @brief These are all the functions that will run in each task
@@ -24,18 +35,54 @@ SemaphoreHandle_t spi_mutex;
 DECLARE_THREAD(logger, RocketSystems *arg)
 {
     log_begin(arg->log_sink);
-    while (true)
-    {
+    int meta_delay_ctr = 0; //  Will cause meta logs to write slower intentionally
+
+    MetalogSummary s;
+    arg->meta_logging.summary = &s;
+    
+    constexpr size_t meta_logging_header_size = (sizeof(size_t)*8) + EEPROM_SIZE + sizeof(LogFormatMetaEntry)*(LOG_META_ENTRY_COUNT+EEPROM_META_ENTRY_COUNT) + sizeof(LogDiscMapEntry)*LOG_DISCMAP_COUNT;
+
+    // Write header size
+    arg->log_sink.write_meta((uint8_t*)&meta_logging_header_size, sizeof(size_t));
+
+    // Write meta log data + EEPROM
+    // We first write the EEPROM data, prefixed by the EEPROM size.
+    arg->log_sink.write_meta((uint8_t*)&EEPROM_SIZE, sizeof(size_t));
+    arg->log_sink.write_meta((uint8_t*)&arg->eeprom.data, EEPROM_SIZE);
+
+    // Log the formats themselves
+    log_parse_tree(arg->log_sink, sizeof(LogFormatMetaEntry), LOG_META_ENTRY_COUNT, (uint8_t*)LOG_META_ENTRIES);
+    log_parse_tree(arg->log_sink, sizeof(LogDiscMapEntry), LOG_DISCMAP_COUNT, (uint8_t*)LOG_DISCMAP_TABLE);
+    log_parse_tree(arg->log_sink, sizeof(LogFormatMetaEntry), EEPROM_META_ENTRY_COUNT, (uint8_t*)EEPROM_META_ENTRIES);
+
+    while (true) {
         log_data(arg->log_sink, arg->rocket_data);
 
         arg->rocket_data.log_latency.tick();
+        meta_delay_ctr++;
+
+        MetaLogging::MetaLogEntry entry;
+
+        if (meta_delay_ctr >= 100) {
+            if(arg->meta_logging.get_queued(&entry)) {
+                uint8_t buf[72];
+                size_t total_size = sizeof(MetaDataCode) + entry.size;
+                memcpy(buf, &entry.log_type, sizeof(MetaDataCode));
+                memcpy(buf + sizeof(MetaDataCode), &entry.data, entry.size);
+                arg->log_sink.write_meta(buf, total_size);
+            }
+        }
+
+        arg->rocket_data.err_flags.log_wr_err = arg->log_sink.failed_wr;
+        arg->rocket_data.err_flags.log_mr_err = arg->log_sink.failed_mr;
 
         THREAD_SLEEP(1);
     }
 }
 
-DECLARE_THREAD(barometer, RocketSystems *arg)
-{
+
+
+DECLARE_THREAD(barometer, RocketSystems* arg) {
     // Reject single rogue barometer readings that are very different from the immediately prior reading
     // Will only reject a certain number of readings in a row
     Barometer prev_reading;
@@ -70,6 +117,9 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
 { // This needs edits
 
     arg->sensors.imu.restore_calibration(arg->eeprom);
+    float max_accel = 0;
+    bool has_logged = false;
+    double max_accel_time = 0;
 
     while (true)
     {
@@ -91,9 +141,28 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
         // Sensor biases
         Acceleration bias = arg->sensors.imu.calibration_sensor_bias;
 
+        float prev_accel = arg->rocket_data.imu.getRecentUnsync().highg_acceleration.ax;
+        
+
         imudata.highg_acceleration.ax = imudata.highg_acceleration.ax + bias.ax;
         imudata.highg_acceleration.ay = imudata.highg_acceleration.ay + bias.ay;
         imudata.highg_acceleration.az = imudata.highg_acceleration.az + bias.az;
+
+        if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_BOOST) { // max accel can be during second boost, 
+            // but once the new fsm is implemented this will be changed to just "boost" and work (i think) - mihir
+            if(prev_accel < imudata.highg_acceleration.ax) {
+                max_accel = imudata.highg_acceleration.ax;
+                max_accel_time = pdTICKS_TO_MS(xTaskGetTickCount());
+            }
+        }
+
+        if(!has_logged) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
+                arg->meta_logging.log_data(MetaDataCode::DATA_MAX_ACCEL, max_accel);
+                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_accel_time);
+                has_logged = true;
+            }
+        }
 
         arg->rocket_data.imu.update(imudata);
         arg->rocket_data.sflp.update(sflp);
@@ -133,29 +202,55 @@ DECLARE_THREAD(gps, RocketSystems *arg)
 {
     while (true)
     {
+        // GPS's internal operations have a xSemaphoreTake.
         if (arg->sensors.gps.valid())
         {
             GPS reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
         }
         // GPS waits internally
-        THREAD_SLEEP(1);
+        THREAD_SLEEP(25);
     }
 }
 
 DECLARE_THREAD(pyro, RocketSystems *arg)
 {
+
     while (true)
     {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMData current_fsm = arg->rocket_data.fsm_state.getRecentUnsync();
+        AngularKalmanData akf_data = arg->rocket_data.angular_kalman_data.getRecentUnsync();
+        KalmanData ekf_data = arg->rocket_data.kalman.getRecentUnsync();
         CommandFlags &command_flags = arg->rocket_data.command_flags;
+        double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+        double launch_time = arg->fsm.get_launch_time();
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(current_state, arg->rocket_data.angular_kalman_data.getRecentUnsync(), command_flags);
+        double time_since_launch = (current_time - launch_time);
+        const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
+        PyroTickData tick_data = {
+            current_fsm,
+            akf_data,
+            ekf_data,
+            fsm_cfg,
+            command_flags,
+            current_time,
+            time_since_launch
+        };
+
+        PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data);
+
+        // Actually update the pyro state!
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+        gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW);
+        for(int i = 0; i < MIDAS_NUM_PYROS; i++) {
+            gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW);
+        }
+        xSemaphoreGive(i2c_mutex);
+
         arg->rocket_data.pyro.update(new_pyro_state);
-
         arg->led.update();
-
         THREAD_SLEEP(10);
+        
     }
 }
 
@@ -163,30 +258,164 @@ DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
         Voltage reading2 = arg->sensors.voltage.read();
         arg->rocket_data.voltage.update(reading2);
-
         THREAD_SLEEP(100);
+    }
+}
+
+//run threads
+
+void fsm_transitioned_to(FSMData& new_state, FSMData& old_state, RocketSystems* sys, double current_time) {
+    // Do something, NO delays allowed!
+
+    switch (new_state.state) {
+        case FSMState::STATE_BOOST:
+        //first stage specific logging
+            if(new_state.current_motor == 0){
+                sys->meta_logging.summary->event_tlaunch.update(current_time);
+                
+                sys->meta_logging.summary->data_launchsite_baro.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
+                
+                sys->meta_logging.summary->data_launchsite_gps_alt.update(sys->rocket_data.gps.getRecentUnsync().altitude);
+                sys->meta_logging.summary->data_launchsite_gps_lat.update(sys->rocket_data.gps.getRecentUnsync().latitude);
+                sys->meta_logging.summary->data_launchsite_gps_long.update(sys->rocket_data.gps.getRecentUnsync().longitude);
+                
+                sys->meta_logging.summary->data_launch_initial_tilt.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
+            }
+        //all other stages logging
+            else{
+                sys->meta_logging.summary->event_tignition.update(current_time);
+                sys->meta_logging.summary->data_tilt_at_ignition.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
+                sys->meta_logging.summary->data_baro_at_ignition.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
+
+            }
+
+            break;
+
+        case FSMState::STATE_COAST:
+            sys->meta_logging.summary->event_tburnout.update(current_time);
+            sys->meta_logging.summary->data_tilt_at_burnout.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
+            sys->meta_logging.summary->data_alt_at_burnout.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
+
+            break;
+
+        case FSMState::STATE_DROGUE:
+            sys->meta_logging.summary->event_tapogee.update(current_time);
+
+            break;
+        case FSMState::STATE_MAIN:
+            sys->meta_logging.summary->event_tmain.update(current_time);
+            break;
+        default:
+            break;
+    }
+}
+
+void fsm_state_commit(FSMData& current_state, RocketSystems* sys) {
+    // Do something, NO delays allowed!
+
+    switch (current_state.state) {
+        case FSMState::STATE_BOOST:
+        //first stage specific logging
+            if(current_state.current_motor == 0){
+                sys->meta_logging.summary->event_tlaunch.commit(sys->meta_logging);
+                
+                sys->meta_logging.summary->data_launchsite_baro.commit(sys->meta_logging);
+                
+                sys->meta_logging.summary->data_launchsite_gps_alt.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_launchsite_gps_lat.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_launchsite_gps_long.commit(sys->meta_logging);
+                
+                sys->meta_logging.summary->data_launch_initial_tilt.commit(sys->meta_logging);
+            }
+        //all other stages logging
+            else{
+                sys->meta_logging.summary->event_tignition.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_tilt_at_ignition.commit(sys->meta_logging);
+                sys->meta_logging.summary->data_baro_at_ignition.commit(sys->meta_logging);
+
+            }
+
+            break;
+
+        case FSMState::STATE_COAST:
+            sys->meta_logging.summary->event_tburnout.commit(sys->meta_logging);
+            sys->meta_logging.summary->data_tilt_at_burnout.commit(sys->meta_logging);
+            sys->meta_logging.summary->data_alt_at_burnout.commit(sys->meta_logging);
+
+            break;
+
+        case FSMState::STATE_DROGUE:
+            sys->meta_logging.summary->event_tapogee.commit(sys->meta_logging);
+
+            break;
+        case FSMState::STATE_MAIN:
+            sys->meta_logging.summary->event_tmain.commit(sys->meta_logging);
+            break;
+        default:
+            break;
     }
 }
 
 // This thread has a bit of extra logic since it needs to play a tune exactly once the sustainer ignites
 DECLARE_THREAD(fsm, RocketSystems *arg)
 {
-    FSM fsm{};
+    FSM& fsm = arg->fsm;
+
+    // Read in data from EEPROM
+    FSMConfiguration cfg = arg->eeprom.data.fsm_config;
+    if(!fsm.set_cfg(cfg)) {
+        fsm.set_crc_fail();
+        arg->rocket_data.err_flags.fsm_crc_err = true;
+    }
+
+    m_shell_load_fsm_config(cfg);
+
     bool already_played_freebird = false;
     double last_time_led_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+    
+    double last_time_err_flash = pdTICKS_TO_MS(xTaskGetTickCount());
+    arg->rocket_data.fsm_state.update(FSMData{FSMState::STATE_SAFE, 0});
     while (true)
     {
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMData current_state_data = arg->rocket_data.fsm_state.getRecentUnsync();
         StateEstimate state_estimate(arg->rocket_data);
         CommandFlags &telemetry_commands = arg->rocket_data.command_flags;
+        KalmanData kfd = arg->rocket_data.kalman.getRecentUnsync();
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
+        const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
 
-        FSMState next_state = fsm.tick_fsm(current_state, state_estimate, telemetry_commands);
+        FSMState current_state = current_state_data.state;
+
+        bool last_lockin_state = fsm.get_cur_state_lockin();
+
+        FSMTickData tick_data = {current_state_data, telemetry_commands, state_estimate, kfd, fsm_cfg, current_time};
+        
+        FSMData next_state = fsm.tick_fsm(tick_data);
 
         arg->rocket_data.fsm_state.update(next_state);
 
+        if(current_state != next_state.state) {
+            fsm_transitioned_to(next_state, current_state_data, arg, current_time);       
+        }
+        else {
+            if (last_lockin_state != fsm.get_cur_state_lockin() ) {
+                fsm_state_commit(current_state_data, arg);
+            }
+
+        }
+
+        if(arg->rocket_data.err_flags.encode() != 0) {
+            if ((current_time - last_time_err_flash) > 100)
+            {
+                // Fast flash red LED if any midas err, including crc err!
+                last_time_err_flash = current_time;
+                arg->led.toggle(LED::RED);
+            }
+        }
+
         if (current_state == FSMState::STATE_SAFE)
         {
+
             if ((current_time - last_time_led_flash) > 250)
             {
                 // Flashes green LED at 4Hz while in SAFE mode.
@@ -199,7 +428,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             arg->led.set(LED::GREEN, LOW);
         }
 
-        if ((current_state == FSMState::STATE_PYRO_TEST || current_state == FSMState::STATE_IDLE) && !arg->buzzer.is_playing())
+        if ((current_state == FSMState::STATE_PYRO_TEST) && !arg->buzzer.is_playing())
         {
             arg->buzzer.play_tune(warn_tone, WARN_TONE_LENGTH);
         }
@@ -209,7 +438,7 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
             arg->buzzer.play_tune(land_tone, LAND_TONE_LENGTH);
         }
 
-        if (current_state == FSMState::STATE_SUSTAINER_IGNITION && !already_played_freebird)
+        if (current_state == FSMState::STATE_BOOST && next_state.current_motor == 2 && !already_played_freebird)
         {
             arg->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
             already_played_freebird = true;
@@ -220,24 +449,28 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
         {
             // Swap camera feed to MUX 1 (Side-facing camera) at launch.
             arg->rocket_data.command_flags.FSM_should_set_cam_feed_cam1 = false;
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             arg->b2b.camera.vmux_set(SIDE_CAMERA);
-
             arg->b2b.camera.camera_on(SIDE_CAMERA);
             arg->b2b.camera.camera_on(BULKHEAD_CAMERA);
+            xSemaphoreGive(i2c_mutex);
         }
 
         if (arg->rocket_data.command_flags.FSM_should_power_save)
         {
             arg->rocket_data.command_flags.FSM_should_power_save = false;
-
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             arg->b2b.camera.vtx_off();
+            xSemaphoreGive(i2c_mutex);
         }
 
         if (arg->rocket_data.command_flags.FSM_should_swap_camera_feed)
         {
             // Swap camera feed to MUX 2 (recovery bay camera)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = false;
+            xSemaphoreTake(i2c_mutex, portMAX_DELAY);
             arg->b2b.camera.vmux_set(BULKHEAD_CAMERA);
+            xSemaphoreGive(i2c_mutex);
         }
 
         THREAD_SLEEP(50);
@@ -246,10 +479,25 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
 
 DECLARE_THREAD(buzzer, RocketSystems *arg)
 {
+    double last_beep_beep = pdMS_TO_TICKS(xTaskGetTickCount());
     while (true)
     {
-        arg->buzzer.tick();
+        double cur_time = pdMS_TO_TICKS(xTaskGetTickCount());
+        if(cur_time - last_beep_beep > 8000 && arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_ARMED) {
+            // Get cont and fsm failure data
+            bool cont[4] = {false, false, false, false};
+            bool fsm_fail = arg->fsm.get_cfg().crc32 == FSM_CRC_FAIL_STATE;
 
+            Voltage v = arg->rocket_data.voltage.getRecentUnsync();
+            for (int i = 0; i < 4; i++) {
+                cont[i] = v.continuity[i] > 3.0;
+            }
+
+            arg->buzzer.report_beeps(cont, fsm_fail);
+            last_beep_beep = cur_time;
+        }
+
+        arg->buzzer.tick();
         THREAD_SLEEP(10);
     }
 }
@@ -263,7 +511,7 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
 
     while (true)
     {
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent().state;
 
         if (arg->rocket_data.command_flags.should_reset_kf)
         {
@@ -307,6 +555,12 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
     // Serial.println("Initialized ekf :(");
     TickType_t last = xTaskGetTickCount();
 
+    
+    float max_vel = 0;
+    bool has_logged = false;
+    double max_vel_time = 0;
+
+
     while (true)
     {
         if (arg->rocket_data.command_flags.should_reset_kf)
@@ -324,7 +578,7 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         AngularKalmanData current_angular_kalman = arg->rocket_data.angular_kalman_data.getRecent();
 
-        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent();
+        FSMState FSM_state = arg->rocket_data.fsm_state.getRecent().state;
         GPS current_gps = arg->rocket_data.gps.getRecent();
 
         Acceleration current_accelerations = {
@@ -344,6 +598,21 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
         last = xTaskGetTickCount();
 
+        //float prev_vel = current_state.velocity.vx;
+        if(arg->rocket_data.fsm_state.getRecentUnsync().state >= FSMState::STATE_BOOST && arg->rocket_data.fsm_state.getRecentUnsync().state < FSMState::STATE_MAIN) {
+            if(max_vel < current_state.velocity.vx) {
+                max_vel = current_state.velocity.vx;
+                max_vel_time = pdTICKS_TO_MS(xTaskGetTickCount());
+            }
+        }
+
+        if(!has_logged) {
+            if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
+                arg->meta_logging.log_data(MetaDataCode::DATA_MAX_VEL, max_vel);
+                arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_vel_time);
+                has_logged = true;
+            }
+        }
         THREAD_SLEEP(50);
     }
 }
@@ -363,8 +632,8 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
         arg->rocket_data.command_flags.should_transition_pyro_test = true;
         Serial.println("Changing to pyro test");
         break;
-    case CommandType::SWITCH_TO_IDLE:
-        arg->rocket_data.command_flags.should_transition_idle = true;
+    case CommandType::SWITCH_TO_ARMED:
+        arg->rocket_data.command_flags.should_transition_armed = true;
         break;
     case CommandType::FIRE_PYRO_A:
         if (current_state == FSMState::STATE_PYRO_TEST)
@@ -419,23 +688,27 @@ DECLARE_THREAD(cam, RocketSystems *arg)
     while (true)
     {
 
+        // I2C BUFFER BYPASSED FOR CASSIOPEIA LAUNCH
         // Check the status of the B2B chip, if it's bad then we don't waste time with an I2C check.
-        if(digitalRead(B2B_READY) == LOW) {
-            THREAD_SLEEP(200);
-            continue;
-        }
+        // if(digitalRead(B2B_READY) == LOW) {
+        //     THREAD_SLEEP(200);
+        //     continue;
+        // }
 
         // Check if CAM specifically is on the I2C bus
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
         Wire.beginTransmission(0x69);
         byte error = Wire.endTransmission();
 
         if (error == 0)
         {
             arg->rocket_data.cam_data.update(arg->b2b.camera.read());
+            xSemaphoreGive(i2c_mutex);
         }
         else
         {
             // If failed:
+            xSemaphoreGive(i2c_mutex);
             CameraData new_cam_data = arg->rocket_data.cam_data.getRecent();
             new_cam_data.camera_state = 255; // all 1s, invalid state
             arg->rocket_data.cam_data.update(new_cam_data);
@@ -446,22 +719,103 @@ DECLARE_THREAD(cam, RocketSystems *arg)
     }
 }
 
+DECLARE_THREAD(shell, RocketSystems *arg)
+{
+    char line_buf[MShell::max_line_len];
+    char tmp_buf[MShell::max_line_len];
+    uint8_t d_read = 0;
+
+    while(true) {
+        // Wait for STATE_SAFE before activating shell
+        while(arg->rocket_data.fsm_state.getRecentUnsync().state != FSMState::STATE_SAFE) {
+            THREAD_SLEEP(1000);
+        }
+
+        if(arg->shell->settings.echo) {
+            Serial.print("> ");
+            Serial.flush();
+        }
+
+        while (arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_SAFE)
+        {
+            int num_bytes_avail = Serial.available();
+
+            if(num_bytes_avail > 0) {
+                Serial.read(tmp_buf, num_bytes_avail);
+                for(int i = 0; i < num_bytes_avail; i++) {
+
+                    if(tmp_buf[i] == '\r') {
+                        continue;
+                    }
+
+                    if(tmp_buf[i] == '\b' || tmp_buf[i] == 0x7F) {
+                        if(d_read > 0) {
+                            d_read--;
+                            if(arg->shell->settings.echo) {
+                                Serial.print("\b \b"); // erase character on terminal
+                            }
+                        }
+                        continue;
+                    }
+
+                    if(arg->shell->settings.echo) {
+                        Serial.print(tmp_buf[i]);
+                    }
+
+                    if(tmp_buf[i] == '\n') {
+                        // Process the line instead of adding it!
+                        line_buf[d_read] = '\0'; // Null terminate command
+                        d_read = 0;
+
+                        MCommandExecutionResult c_res = arg->shell->execute_line(line_buf, arg);
+                        Serial.print("<done> ");
+                        Serial.println(static_cast<int>(c_res));
+
+                        if(arg->shell->settings.echo) {
+                            Serial.print("> ");
+                            Serial.flush();
+                        }
+
+                        continue;
+                    }
+
+                    if(d_read >= MShell::max_line_len - 1) {
+                        continue;
+                    }
+
+                    // Otherwise add to the buf
+                    line_buf[d_read++] = tmp_buf[i];
+                }
+                Serial.flush();
+            }
+
+            // do stuff here
+
+            THREAD_SLEEP(10);
+        }
+    }
+}
+
 DECLARE_THREAD(telemetry, RocketSystems *arg)
 {
     double launch_time = 0;
     bool has_triggered_vmux_fallback = false;
 
-    arg->rocket_data.fsm_state.update(FSMState::STATE_SAFE);
+    arg->tlm.set_spi_mutex(spi_mutex);
+
+    // Restore frequency from EEPROM
+    // maybe have a check to make sure frequency value is in the 420-450 MHz range?
+    arg->tlm.setFrequency(arg->eeprom.data.frequency);
     while (true)
     {
 
-        arg->tlm.transmit(arg->rocket_data, arg->led);
+        arg->tlm.transmit(arg->rocket_data, arg->eeprom.data, arg->led);
 
-        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync();
+        FSMState current_state = arg->rocket_data.fsm_state.getRecentUnsync().state;
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
 
-        // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_IDLE.
-        if (current_state <= FSMState::STATE_IDLE)
+        // This applies to STATE_SAFE, STATE_PYRO_TEST, and STATE_ARMED.
+        if (current_state <= FSMState::STATE_ARMED)
         {
             launch_time = current_time;
             has_triggered_vmux_fallback = false;
@@ -476,12 +830,12 @@ DECLARE_THREAD(telemetry, RocketSystems *arg)
             arg->rocket_data.command_flags.FSM_should_swap_camera_feed = true;
         }
 
-        if (current_state == FSMState(STATE_IDLE) || current_state == FSMState(STATE_SAFE) || current_state == FSMState(STATE_PYRO_TEST) || (current_time - launch_time) > 1800000)
+        if (current_state == FSMState::STATE_ARMED || current_state == FSMState::STATE_SAFE || current_state == FSMState::STATE_PYRO_TEST || (current_time - launch_time) > 1800000)
         {
             TelemetryCommand command;
             if (arg->tlm.receive(&command, 200))
             {
-                if (command.valid())
+                if (command.valid() && command.serial == arg->eeprom.data.serial)
                 {
                     arg->tlm.acknowledgeReceived();
                     handle_tlm_command(command, arg, current_state);
@@ -533,6 +887,11 @@ ErrorCode init_systems(RocketSystems& systems) {
 
     // Update eeprom
     systems.eeprom.commit();
+
+    m_shell_setup(); // Set up the MIDAS shell
+    systems.shell = &m_shell_inst;
+    m_shell_init_commands(systems.shell);
+
     digitalWrite(LED_ORANGE, LOW);
     return NoError;
 }
@@ -546,6 +905,8 @@ ErrorCode init_systems(RocketSystems& systems) {
 {
     Serial.println("Starting Systems...");
     spi_mutex = xSemaphoreCreateMutexStatic(&spi_mutex_buffer);
+    i2c_mutex = xSemaphoreCreateMutexStatic(&i2c_mutex_buffer);
+
 
     ErrorCode init_error_code = init_systems(*config);
     if (init_error_code != NoError)
@@ -568,16 +929,22 @@ ErrorCode init_systems(RocketSystems& systems) {
     START_THREAD(voltage, SENSOR_CORE, config, 9);
     START_THREAD(pyro, SENSOR_CORE, config, 14);
     START_THREAD(magnetometer, SENSOR_CORE, config, 11);
-    START_THREAD(cam, SENSOR_CORE, config, 16);
+    START_THREAD(cam, SENSOR_CORE, config, 5);
     START_THREAD(kalman, SENSOR_CORE, config, 7);
     START_THREAD(fsm, SENSOR_CORE, config, 8);
     START_THREAD(buzzer, SENSOR_CORE, config, 6);
     START_THREAD(angularkalman, SENSOR_CORE, config, 7);
+    START_THREAD(shell, DATA_CORE, config, 4);
+
     #ifdef ENABLE_TELEM
     START_THREAD(telemetry, SENSOR_CORE, config, 15);
 #endif
-
-    config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    // play James Bond theme for MIDAS 007
+    if (config->eeprom.data.serial == 007) {
+        config->buzzer.play_tune(james_bond, JAMES_BOND_LENGTH);
+    } else {
+        config->buzzer.play_tune(free_bird, FREE_BIRD_LENGTH);
+    }
 
     while (true)
     {
@@ -585,7 +952,7 @@ ErrorCode init_systems(RocketSystems& systems) {
     }
 }
 
-// void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
-//     Serial.println("OVERFLOW");
-//     Serial.println((char*)pcTaskName);
-// }
+void vApplicationStackOverflowHook(TaskHandle_t xTask, signed char* pcTaskName){
+    Serial.println("OVERFLOW");
+    Serial.println((char*)pcTaskName);
+}

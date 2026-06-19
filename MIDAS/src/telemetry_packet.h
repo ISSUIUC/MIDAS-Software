@@ -2,6 +2,7 @@
 
 #include <array>
 #include <cstdint>
+#include "rocket_state.h"
 
 #define MAX_TELEM_VOLTAGE_V 6.0f
 #define MAX_TELEM_CONT_I 0.2f
@@ -37,13 +38,17 @@ struct TelemetryPacket {
     // If callsign bit (highest bit of fsm_callsign_satcount) is not set, the callsign is KD9ZPM
     
 
-    uint8_t callsign_gpsfix_satcount; //3 bits gpsfix, 4 bits sat count, 1 bit is_sustainer_callsign
+    uint8_t gpsfix_satcount; // 3 bits gpsfix, 5 bits sat count
+    uint8_t serial; // MIDAS Serial no
     uint16_t kf_vx; // 16 bit meters/second
     uint16_t kf_px; // 16 bit meters
     uint16_t kf_py; // 16 bit meters
     uint16_t kf_pz; // 16 bit meters
 
     uint32_t pyro; // 8 bit continuity x 4 channels
+
+    // Global error flags
+    MErrorFlags error_flags; 
     
     uint8_t roll_rate;
     uint8_t camera_state;
@@ -52,8 +57,9 @@ struct TelemetryPacket {
 };
 
 
+
 // Commands transmitted from ground station to rocket
-enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_IDLE, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX, CALIB_ACCEL, CALIB_MAG };
+enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST, SWITCH_TO_ARMED, FIRE_PYRO_A, FIRE_PYRO_B, FIRE_PYRO_C, FIRE_PYRO_D, CAM_ON, CAM_OFF, TOGGLE_CAM_VMUX, CALIB_ACCEL, CALIB_MAG };
 
 /**
  * @struct TelemetryCommand
@@ -62,13 +68,10 @@ enum class CommandType: uint8_t { RESET_KF, SWITCH_TO_SAFE, SWITCH_TO_PYRO_TEST,
 */
 struct TelemetryCommand {
     CommandType command;
-    std::array<char, 3> verify;
+    uint8_t serial;
+    uint8_t serial_check;
 
     bool valid() {
-        #ifdef IS_SUSTAINER
-        return verify == std::array<char, 3>{{'B','R','K'}};
-        #elif IS_BOOSTER
-        return verify == std::array<char, 3>{{'A','R','K'}};
-        #endif
+        return serial == (serial_check ^ 0xF2);
     }
 };

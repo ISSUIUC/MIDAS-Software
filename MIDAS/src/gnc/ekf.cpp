@@ -83,7 +83,7 @@ void EKF::priori(float dt, AngularKalmanData &orientation, FSMState fsm, Acceler
     // euler_t angles_rad = orientation.getEuler();
     // BodyToGlobal(angles_rad, sensor_accel_global_g);
     // Do not apply acceleration if on pad
-    float g_ms2 = (fsm > FSMState::STATE_IDLE) ? gravity_ms2 : 0.0f;
+    float g_ms2 = (fsm > FSMState::STATE_ARMED) ? gravity_ms2 : 0.0f;
     u_control(0, 0) = sensor_accel_global_g(0, 0) * g_ms2;
     u_control(1, 0) = sensor_accel_global_g(1, 0) * g_ms2;
     u_control(2, 0) = sensor_accel_global_g(2, 0) * g_ms2;
@@ -102,7 +102,7 @@ void EKF::priori(float dt, AngularKalmanData &orientation, FSMState fsm, Acceler
 void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanData orientation, FSMState FSM_state, GPS &gps)
 {
     // if on pad take last 10 barometer measurements for init state
-    if (FSM_state == FSMState::STATE_IDLE)
+    if (FSM_state == FSMState::STATE_ARMED)
     {
         float sum = 0;
         float data[10];
@@ -131,8 +131,8 @@ void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanDa
         float lon = gps.longitude / 1e7;
         float alt = gps.altitude;
         // Convert GPS to ECEF
-        std::vector<float> rocket_cords = gps_to_ecef(lat, lon, alt);
-        std::vector<float> reference_cord = gps_to_ecef(gps_latitude_original, gps_longitude_original, 0);
+        std::array<float, 3> rocket_cords = gps_to_ecef(lat, lon, alt);
+        std::array<float, 3> reference_cord = gps_to_ecef(gps_latitude_original, gps_longitude_original, 0);
         float gps_latitude_original_rad = gps_latitude_original * pi / 180;
         float gps_longitude_original_rad = gps_longitude_original * pi / 180;
         double dx = rocket_cords[0] - reference_cord[0];
@@ -228,7 +228,7 @@ void EKF::update(Barometer barometer, Acceleration acceleration, AngularKalmanDa
 void EKF::tick(float dt, float sd, Barometer &barometer, Acceleration acceleration, AngularKalmanData &orientation, FSMState FSM_state, GPS &gps)
 {
 
-    if (FSM_state >= FSMState::STATE_IDLE) //
+    if (FSM_state >= FSMState::STATE_ARMED) //
     {
         if (FSM_state != last_fsm)
         {
@@ -344,7 +344,7 @@ void EKF::reference_GPS(GPS &gps, FSMState fsm)
         return; // No GPS fix skip reference update
     }
 
-    if (fsm == FSMState::STATE_IDLE)
+    if (fsm == FSMState::STATE_ARMED)
     {
         gps_latitude_original = gps.latitude / 1e7;
         gps_longitude_original = gps.longitude / 1e7;

@@ -20,11 +20,7 @@
 #include "hardware/pins.h"
 
 // Change to 434.0 or other frequency, must match RX's freq!
-#ifdef IS_BOOSTER
-#define TX_FREQ 425.15
-#else
 #define TX_FREQ 421.15
-#endif
 
 #define TX_OUTPUT_POWER 22		// dBm
 #define LORA_BANDWIDTH 0		// [0: 125 kHz, 1: 250 kHz, 2: 500 kHz, 3: Reserved]
@@ -70,7 +66,7 @@ int16_t TelemetryBackend::getRecentRssi() {
 /**
  * @brief Sets new frequency for the LoRa module
  *
- * @param freq New frequency to set the LoRa module to
+ * @param freq New frequency to set the LoRa module to (MHz)
 */
 ErrorCode TelemetryBackend::setFrequency(float freq) {
     if(lora.set_frequency((uint32_t) (freq * 1e6)) != SX1268Error::NoError) {

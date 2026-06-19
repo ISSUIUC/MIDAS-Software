@@ -1,4 +1,6 @@
 #include <Wire.h>
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 
 #include <SparkFun_u-blox_GNSS_v3.h>
 
@@ -6,7 +8,27 @@
 #include "sensors.h"
 #include "sensor_data.h"
 
-SFE_UBLOX_GNSS ublox;
+// see systems.cpp
+extern SemaphoreHandle_t i2c_mutex;
+
+// override ublox for using the i2c mutex
+class MIDASUbloxGNSS : public SFE_UBLOX_GNSS {
+protected:
+    bool createLock(void) override {
+        return true;
+    }
+    bool lock(void) override {
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+        return true;
+    }
+    void unlock(void) override {
+        xSemaphoreGive(i2c_mutex);
+    }
+    void deleteLock(void) override {
+    }
+};
+
+MIDASUbloxGNSS ublox;
 
 /**
  * @brief Initializes GPS, returns NoError
@@ -19,12 +41,9 @@ ErrorCode GPSSensor::init() {
     }
 
     ublox.setDynamicModel(DYN_MODEL_AIRBORNE4g);
-	ublox.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA); //Set the I2C port to output both NMEA and UBX messages
-    // Set the measurment rate faster than one HZ if necessary
-    // ublox.setMeasurementRate(100);
-	ublox.saveConfigSelective(VAL_CFG_SUBSEC_IOPORT); //Save (only) the communications port settings to flash and BBR
-
-	//This will pipe all NMEA sentences to the serial port so we can see them
+    ublox.setI2COutput(COM_TYPE_UBX | COM_TYPE_NMEA);
+    ublox.setMeasurementRate(100);              // 10 Hz full nav
+    ublox.setAutoPVT(true);
 
     return ErrorCode::NoError;
 }

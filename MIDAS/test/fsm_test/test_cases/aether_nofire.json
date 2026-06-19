@@ -1,0 +1,15 @@
+{
+  "name": "Aether No fire (SAFE)",
+  "description": "Checks that pyros don't fire in SAFE ever, 2 stage data",
+  "input_csv": "../data/aetherii_telemega_s.csv",
+  "cfg": [
+    "initial_state=0",
+    "main_alt=800",
+    "cruise_lockout_en=false",
+    "pyro_fire_t=200",
+    "pyro_0=enable=true,fsm_trigger=5,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100",
+    "pyro_1=enable=true,fsm_trigger=6,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100"
+  ],
+  "transitions": [],
+  "pyro_fires": []
+}

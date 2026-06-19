@@ -3,6 +3,7 @@
 #include <SD_MMC.h>
 
 #include "SDLog.h"
+#include "hardware/pins.h"
 
 /**
  * @brief Initializes the SD card logger
@@ -13,7 +14,7 @@
 */
 ErrorCode SDSink::init() {
     Serial.println("[SD] Connecting to SD...");
-    if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0)) {
+    if (!SD_MMC.setPins(FLASH_CLK, FLASH_CMD, FLASH_DAT0, FLASH_DAT1, FLASH_DAT2, FLASH_DAT3)) {
         return ErrorCode::SDBeginFailed;
     }
     if (!SD_MMC.begin("/sd", true, false, SDMMC_FREQ_52M, 5)) {
@@ -23,7 +24,7 @@ ErrorCode SDSink::init() {
     Serial.println("[SD] Startup OK");
 
     char file_name[16] = "data";
-    char ext[] = ".launch";
+    char ext[] = ".bin";
     Serial.println("[SD] Determining output file");
     Serial.println(current_file_no);
 
@@ -34,7 +35,6 @@ ErrorCode SDSink::init() {
     int filenumber = -1;
     sdFileNamer(file_name, ext, SD_MMC, current_file_no, &filenumber);
     
-    
     if(filenumber != -1) {
         Serial.print("[SD] Beginning log: "); Serial.println(current_file_no);
     } else {
@@ -42,8 +42,16 @@ ErrorCode SDSink::init() {
         return ErrorCode::SDBeginFailed;
     }
 
+    char meta_name[255] = {0};
+    strcpy(meta_name, file_name);
+    char* extpos = strrchr(meta_name, '.');
+    if (extpos) {
+        strcpy(extpos, ".meta");
+    }
+
     file = SD_MMC.open(file_name, FILE_WRITE, true);
-    if (!file) {
+    meta = SD_MMC.open(meta_name, FILE_WRITE, true);
+    if (!file || !meta) {
         failed = true;
         return ErrorCode::SDCouldNotOpenFile;
     }
@@ -62,15 +70,28 @@ ErrorCode SDSink::init() {
  * @param size size of buffer 
 */
 void SDSink::write(const uint8_t* data, size_t size) {
-    if (failed) {
-
-    } else {
-        file.write(data, size);
-        unflushed_bytes += size;
-        if(unflushed_bytes > 32768){
-//        Serial.println("Flushed");
-            file.flush();
-            unflushed_bytes = 0;
-        }
+    size_t bytes_written = file.write(data, size);
+    unflushed_bytes += size;
+    if(unflushed_bytes > 32768){
+        file.flush();
+        unflushed_bytes = 0;
     }
+
+    if(bytes_written != size) {
+        failed_wr = true;
+    }
+}
+
+void SDSink::write_meta(const uint8_t* data, size_t size) {
+    if (failed) { return; }
+
+    size_t bytes_written = meta.write(data, size);
+    meta.write('\n');
+    meta.flush(); // Meta writes are infrequent, so flushing is OK.
+
+    if(bytes_written != size) {
+        failed_mr = true;
+    }
+
+    return;
 }

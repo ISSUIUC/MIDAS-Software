@@ -17,12 +17,13 @@ public:
 
 /**
  * @struct BuzzerController
- * 
+ *
  * @brief wraps the buzzer functionality
 */
 struct BuzzerController {
 private:
-    Sound* current_tune_ = nullptr;
+    static constexpr uint32_t MAX_TUNE_LENGTH = 32;
+    Sound tune_buffer_[MAX_TUNE_LENGTH];
     uint32_t index_ = 0;
     uint32_t length_ = 0;
 
@@ -36,11 +37,13 @@ public:
 
     ErrorCode init();
     void tick();
-    void play_tune(Sound* tune, uint32_t length);
+    void report_beeps(bool* cont, bool fsm_fail); // Beeps that report system status
+    void play_tune(const Sound* tune, uint32_t length);
     bool is_playing();
 };
 
-#define FREE_BIRD_LENGTH 11
+#define FREE_BIRD_LENGTH 48
+#define JAMES_BOND_LENGTH 27
 #define WARN_TONE_LENGTH 1
 #define LAND_TONE_LENGTH 11
 
@@ -48,6 +51,7 @@ public:
 #define C_MG_LENGTH 5
 
 extern Sound free_bird[FREE_BIRD_LENGTH];
+extern Sound james_bond[JAMES_BOND_LENGTH];
 extern Sound warn_tone[WARN_TONE_LENGTH];
 extern Sound land_tone[LAND_TONE_LENGTH];
 

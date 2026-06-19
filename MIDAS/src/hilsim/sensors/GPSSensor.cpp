@@ -1,10 +1,14 @@
 #include "sensors.h"
-#include "../global_packet.h"
+#include "../kamaji/kal_rocket.h"
 
 ErrorCode GPSSensor::init() {
     return ErrorCode::NoError;
 }
 
+bool GPSSensor::valid() {
+    return true;
+}
+
 GPS GPSSensor::read() {
-    return GPS{0, 0, 0.f, 0.f, 0, 0};
+    return GLOBAL_DATA.gps;
 }

@@ -1,10 +1,10 @@
 #include "sensors.h"
-#include "../global_packet.h"
+#include "../kamaji/kal_rocket.h"
 
 ErrorCode MagnetometerSensor::init() {
     return ErrorCode::NoError;
 }
 
 Magnetometer MagnetometerSensor::read() {
-    return Magnetometer{global_packet.mag_x,global_packet.mag_y,global_packet.mag_z};
+    return GLOBAL_DATA.magnetometer;
 }

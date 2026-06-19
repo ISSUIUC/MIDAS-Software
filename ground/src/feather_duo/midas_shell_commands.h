@@ -1,0 +1,238 @@
+#include "duo.h"
+#include <string>
+
+void print_serial(uint8_t serial){
+    uint8_t str [3];
+    if (serial < 10){
+        Serial.print("00");
+        Serial.println(serial);
+        return;
+    }
+    if (serial < 100){
+        Serial.print("0");
+        Serial.println(serial);
+        return;
+    }
+    Serial.println(serial);
+}
+
+MCommandExecutionResult hi_feather(const MShellContext& ctx) {
+    Serial.print("hi ");
+    // if no second argument, return
+    if(ctx.argc != 2) { return MCommandExecutionResult::OK; }
+    Serial.println(ctx.argv[1]);
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult serial(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 (get) or 4 (set) arguments
+    if(ctx.argc < 3 || ctx.argc > 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+
+    // check for valid radio key
+    uint8_t key = atoi(ctx.argv[1]);
+    if(key != 0 && key != 1) { return MCommandExecutionResult::ERR_INVAL_ARGUMENT; } 
+
+    if(!strcmp(ctx.argv[2], "set")){
+        if(ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+        uint8_t serial = atoi(ctx.argv[3]);
+        arg->eeprom.data.serial[key] = serial;
+        arg->eeprom.commit();
+        Serial.print("New Serial Number: ");
+        print_serial(arg->eeprom.data.serial[key]);
+        return MCommandExecutionResult::OK;
+    }
+    else if(!strcmp(ctx.argv[2], "get")){
+        print_serial(arg->eeprom.data.serial[key]);
+        return MCommandExecutionResult::OK;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+    }
+}
+
+MCommandExecutionResult frequency(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 (get) or 4 (set) arguments
+    if(ctx.argc < 3 || ctx.argc > 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+
+    // check for valid radio key
+    uint8_t key = atoi(ctx.argv[1]);
+    if(key != 0 && key != 1) { return MCommandExecutionResult::ERR_INVAL_ARGUMENT; } 
+
+    if(!strcmp(ctx.argv[2], "set")){
+        if(ctx.argc != 4) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+        float freq_mhz = atoff(ctx.argv[3]);
+        uint32_t frequency = (uint32_t) (freq_mhz * 1e6);
+        // ensure that given frequency is within the 70cm band 
+        if (freq_mhz > 450.0 || freq_mhz < 420.0) { return MCommandExecutionResult::ERR_INVAL_ARG_RANGE; }
+        
+        // set eeprom frequency
+        arg->eeprom.data.frequency[key] = frequency;
+        arg->eeprom.commit();
+
+        // set telemetry frequency
+        arg->cfg[key].desired_frequency = frequency;
+
+        Serial.print("New Frequency: ");
+        Serial.print(arg->eeprom.data.frequency[key]/1e6);
+        Serial.println("MHz");
+        return MCommandExecutionResult::OK;
+    }
+    else if(!strcmp(ctx.argv[2], "get")){
+        Serial.print(arg->eeprom.data.frequency[key]/1e6);
+        Serial.println(" MHz");
+        return MCommandExecutionResult::OK;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
+    }
+}
+
+
+int8_t checkSerial(DuoSystems* sys, uint8_t serial){
+    if (serial == sys->eeprom.data.serial[0]){
+        return 0;
+    }
+    else if (serial == sys->eeprom.data.serial[1]){
+        return 1;
+    }
+    return -1;
+}
+
+
+MCommandExecutionResult fire(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
+
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "A")){
+        command.command = CommandType::FIRE_PYRO_A;
+    }
+    else if (!strcmp(ctx.argv[2], "B")){
+        command.command = CommandType::FIRE_PYRO_B;
+    }
+    else if (!strcmp(ctx.argv[2], "C")){
+        command.command = CommandType::FIRE_PYRO_C;
+    }
+    else if (!strcmp(ctx.argv[2], "D")){
+        command.command = CommandType::FIRE_PYRO_D;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult basicCommand(const MShellContext& ctx, CommandType cmdtype){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 2 arguments
+    if(ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
+
+    TelemetryCommand command{};
+    command.command = cmdtype;
+    arg->cfg[key].cmd_queue->send(command);
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult safe(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::SWITCH_TO_SAFE);
+}
+
+MCommandExecutionResult pt(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::SWITCH_TO_PYRO_TEST);
+}
+
+MCommandExecutionResult arm(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::SWITCH_TO_ARMED);
+}
+
+
+MCommandExecutionResult cam(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
+
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "on")){
+        command.command = CommandType::CAM_ON;
+    }
+    else if (!strcmp(ctx.argv[2], "off")){
+        command.command = CommandType::CAM_OFF;
+    }
+    else if (!strcmp(ctx.argv[2], "toggle")){
+        command.command = CommandType::TOGGLE_CAM_VMUX;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult calib(const MShellContext& ctx){
+    DuoSystems* arg = (DuoSystems*) ctx.sysarg;
+    // expecting 3 arguments
+    if(ctx.argc != 3) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
+    uint8_t serial = atoi(ctx.argv[1]);
+    int8_t key = checkSerial(arg, serial);
+    if (key < 0) { return MCommandExecutionResult::ERR_INVAL_SERIAL; }
+
+    TelemetryCommand command{};
+
+    if (!strcmp(ctx.argv[2], "xl") || !strcmp(ctx.argv[2], "accel") || !strcmp(ctx.argv[2], "accelerometer")){
+        command.command = CommandType::CALIB_ACCEL;
+    }
+    else if (!strcmp(ctx.argv[2], "mag") || !strcmp(ctx.argv[2], "magnetometer")){
+        command.command = CommandType::CALIB_MAG;
+    }
+    else{
+        return MCommandExecutionResult::ERR_INVALID_CMD;
+    }
+
+    arg->cfg[key].cmd_queue->send(command);
+
+    return MCommandExecutionResult::OK;
+}
+
+MCommandExecutionResult kfr(const MShellContext& ctx){
+    return basicCommand(ctx, CommandType::RESET_KF);
+}
+
+MCommandExecutionResult identify(const MShellContext& ctx){
+    Serial.println("IDENT_RESPONSE:FEATHER_DUO");
+    return MCommandExecutionResult::OK;
+}
+
+
+void m_shell_init_commands(MShell* sh) {
+    sh->register_command("hi", hi_feather, "\t\thi <string> - Prints hi <string>");
+    sh->register_command("serial", serial, "\tserial (X) get - Get MIDAS serial number associated with radio X\n\t\tserial (X) set <serialnumber:int> - Set MIDAS serial number associated with radio X");
+    sh->register_command("frequency", frequency, "\tfrequency (X) get - Get radio X frequency (in MHz)\n\t\tfrequency (X) set <freq:float> - Set radio X frequency (in MHz)");
+    sh->register_command("fire", fire, "\tfire (serial) [A|B|C|D] - Fire pyro channel if in pyro test state");
+    sh->register_command("safe", safe, "\tsafe (serial) - Set MIDAS into safe state");
+    sh->register_command("pt", pt, "\tsafe (serial) - Set MIDAS into pyro test state");
+    sh->register_command("arm", arm, "\tarm (serial) - Set MIDAS into armed state");
+    sh->register_command("cam", cam, "\tcam (serial) [on|off|toggle] - Send commands to CAM via MIDAS");
+    sh->register_command("calib", calib, "\tcalib (serial) [mag|magnetometer|xl|accel|accelerometer] - Calibrate MIDAS sensors");
+    sh->register_command("kfr", kfr, "\tkfr (serial) - Reset MIDAS Kalman Filter");
+    sh->register_command("ident", identify, "\tident - identify device over serial as a Feather Duo");
+}

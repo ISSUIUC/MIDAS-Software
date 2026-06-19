@@ -8,24 +8,6 @@
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
 
-/**
- * @brief macro to associate a certain sensor with a specific number ID
-*/
-#define ASSOCIATE(ty, id) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
-
-
-ASSOCIATE(IMU, ID_IMU)
-ASSOCIATE(Barometer, ID_BAROMETER)
-ASSOCIATE(Voltage, ID_VOLTAGE)
-ASSOCIATE(GPS, ID_GPS)
-ASSOCIATE(Magnetometer, ID_MAGNETOMETER)
-ASSOCIATE(KalmanData, ID_KALMAN)
-ASSOCIATE(FSMState, ID_FSM)
-ASSOCIATE(PyroState, ID_PYRO)
-ASSOCIATE(CameraData, ID_CAMERADATA)
-ASSOCIATE(AngularKalmanData, ID_ANGULARKALMAN)
-ASSOCIATE(IMU_SFLP, ID_SFLP)
-
 
 /**
  * @brief writes a reading, with its ID, timestamp, and data to a specific sink
@@ -89,6 +71,8 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.pyro);
     log_from_sensor_data(sink, data.cam_data);
 }
+
+
 
 #ifndef SILSIM
 #define MAX_FILES 999
