@@ -88,10 +88,6 @@ void Shell_Thread(void *arg)
     uint8_t d_read = 0;
 
     while(true) {
-        // if(shell->settings.echo) {
-        //     Serial.print("> ");
-        //     Serial.flush();
-        // }
         int num_bytes_avail = Serial.available();
 
         if(num_bytes_avail > 0) {

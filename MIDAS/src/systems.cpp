@@ -688,6 +688,7 @@ DECLARE_THREAD(cam, RocketSystems *arg)
     while (true)
     {
 
+        // I2C BUFFER BYPASSED FOR CASSIOPEIA LAUNCH
         // Check the status of the B2B chip, if it's bad then we don't waste time with an I2C check.
         // if(digitalRead(B2B_READY) == LOW) {
         //     THREAD_SLEEP(200);
