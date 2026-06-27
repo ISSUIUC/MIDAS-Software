@@ -155,7 +155,7 @@ public:
     }
 };
 
-#include "util/command_flags.h"
+#include "finite-state-machines/command_flags.h"
 
 /**
  * @struct RocketData

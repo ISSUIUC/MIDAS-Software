@@ -10,10 +10,10 @@
 
 #include "csv.hpp"
 #include "config_parser.h"
-#include "fsm.h"
-#include "pyro_eval.h"
+#include "finite-state-machines/fsm.h"
+#include "finite-state-machines/pyro_eval.h"
 #include "flight-systems/sensor_data.h"
-#include "command_flags.h"
+#include "finite-state-machines/command_flags.h"
 
 static void print_usage(const char* prog) {
     fprintf(stderr,

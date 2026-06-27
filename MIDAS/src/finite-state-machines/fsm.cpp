@@ -72,7 +72,7 @@ static_assert(sizeof(FSMConfiguration) <= 256);
 
 #ifdef FSM_SIMULATOR
 #include "flight-systems/sensor_data.h"
-#include "util/command_flags.h"
+#include "command_flags.h"
 #else
 #include "flight-systems/rocket_state.h"
 
