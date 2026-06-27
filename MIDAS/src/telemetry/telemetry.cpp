@@ -2,6 +2,13 @@
 
 #include "telemetry/telemetry.h"
 
+/**
+ * @brief Maps an integer value linearly from one range to another range.
+ * * @param x input value
+ * @param in_min, in_max lower and upper bounds of the input range
+ * @param out_min, out_max lower and upper bounds of the output range
+ * @return long The scaled value in the target output range.
+ */
 inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
@@ -11,7 +18,7 @@ inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
  * @brief This function maps an input value onto within a particular range into a fixed point value of a certin binary
  * size
  *
- * @param val: number to map into target range, values outside of the range will be clamped
+ * @param val: number to map into target range, values outside the range will be clamped
  *
  * @param range: range to map number into. For unsigned output, [0, range). For signed output [-range/2, range)
  *
@@ -19,18 +26,19 @@ inline long map(long x, long in_min, long in_max, long out_min, long out_max) {
  */
 template <typename T>
 T inv_convert_range(float val, float range) {
+    // Determine the full dynamic range of the target integral type
     size_t numeric_range = (int64_t)std::numeric_limits<T>::max() - (int64_t)std::numeric_limits<T>::min() + 1;
+    // Perform scaling operation relative to the expected maximum physical range
     float converted = val * (float)numeric_range / range;
+    // Clamp the final result to prevent out-of-bounds overflow before casting
     return std::max(std::min((float)std::numeric_limits<T>::max(), converted), (float)std::numeric_limits<T>::min());
 }
 
 /**
  * @brief packs highg and tilt infomation into 3, 2 byte integers
- * 
- * @param highg highg data to store
- * @param tilt tilt information to store
- * 
- * @return tuple with packed data
+ * * @param highg data to store
+ * @param tilt information to store
+ * * @return tuple with packed data
 */
 // std::tuple<uint16_t, uint16_t, uint16_t, uint16_t> pack_highg_tilt(HighGData const& highg, uint16_t tilt) { //update parameter and function
     
@@ -53,31 +61,45 @@ Telemetry::Telemetry(TelemetryBackend&& backend) : backend(std::move(backend)) {
 
 /**
  * @brief transmit telemetry data through LoRa
- * 
- * @param rocket_data rocket_data to transmit
+ * * @param rocket_data rocket_data to transmit
  * @param led led state to transmit
 */
 void Telemetry::transmit(RocketData& rocket_data, const MIDASEEPROM& eeprom, LEDController& led) {
     // static_assert(sizeof(TelemetryPacket) == 20);
 
+    // Build the packed structured data frame
     TelemetryPacket packet = makePacket(rocket_data, eeprom);
+    // Provide visual indication of data frame transmission
     led.toggle(LED::BLUE);
 
+    // Hand over the payload to the specific RF transceiver driver
     backend.send(packet);
 }
 
+/**
+ * @brief Checks for and receives incoming telemetry commands within a specified timeout.
+ * * @param command Pointer to the command structure where received data will be stored.
+ * @param wait_milliseconds The maximum time to block waiting for a packet, in milliseconds.
+ * @return true If a command was successfully received.
+ * @return false If the timeout expired or an error occurred.
+ */
 bool Telemetry::receive(TelemetryCommand* command, int wait_milliseconds) {
+    // Query backend receiver and return structural status
     return backend.read(command, wait_milliseconds);
 }
 
+/**
+ * @brief Sends an acknowledgment packet back to the ground station for a received command.
+ */
 void Telemetry::acknowledgeReceived() {
+    // Increment tracking counter for total commands acknowledged 
     received_count ++;
 }
 
 /**
  * @brief Sets new frequency for the LoRa module
  *
- * @param freq New frequency to set the LoRa module to (MHz)
+ * @param freq New frequency in MHz
 */
 ErrorCode Telemetry::setFrequency(float freq){
     return backend.setFrequency(freq);
@@ -85,12 +107,12 @@ ErrorCode Telemetry::setFrequency(float freq){
 
 /**
  * @brief creates the packet to send through the telemetry system
- * 
- * @param data the data to serialize into a packet
-*/
+ * * @param data the data to serialize into a packet
+ */
 TelemetryPacket Telemetry::makePacket(RocketData& data, const MIDASEEPROM& eeprom) {
 
     TelemetryPacket packet { };
+    // Retrieve un-synchronized snapshots of all sub-system data variables safely
     IMU imu = data.imu.getRecentUnsync();
     IMU_SFLP sflp_data = data.sflp.getRecentUnsync();
     GPS gps = data.gps.getRecentUnsync();
@@ -102,6 +124,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data, const MIDASEEPROM& eepro
     AngularKalmanData angular_kalman = data.angular_kalman_data.getRecentUnsync();
     CameraData cam_data = data.cam_data.getRecentUnsync();
 
+    // Map positional data coordinates directly to packet fields
     packet.lat = gps.latitude;
     packet.lon = gps.longitude;
 
@@ -158,6 +181,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data, const MIDASEEPROM& eepro
     packet.gpsfix_satcount |= (gps.fix_type & 0x07);
     packet.gpsfix_satcount |= (gps.sats_in_view & 0x1F) << 3;
 
+    // Assign uniquely identifying hardware information from non-volatile storage
     packet.serial = eeprom.serial;
 
 
@@ -169,8 +193,7 @@ TelemetryPacket Telemetry::makePacket(RocketData& data, const MIDASEEPROM& eepro
 
 /**
  * @brief initializes the Telemetry system
- * 
- * @return Error Code
+ * * @return Error Code
 */
 ErrorCode __attribute__((warn_unused_result)) Telemetry::init() {
     return backend.init();
