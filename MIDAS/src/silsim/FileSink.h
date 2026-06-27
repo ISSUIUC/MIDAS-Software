@@ -1,9 +1,9 @@
 #pragma once
 
-#include "errors.h"
+#include <util/errors.h>
 #include <fstream>
 #include <cstdint>
-#include "data_logging.h"
+#include "logging/data_logging.h"
 
 struct SDSink : public LogSink {
     explicit SDSink(const char* file_name);

@@ -1,10 +1,10 @@
-#include "systems.h"
-#include "sensor_data.h"
-#include "hal.h"
+#include "flight-systems/systems.h"
+#include "flight-systems/sensor_data.h"
+#include "util/hal.h"
 #include "gnc/ekf.h"
 #include "gnc/mqekf.h"
-#include "log_format_AUTOGEN.h"
-#include "midas_shell_commands.h"
+#include "logging/log_format_AUTOGEN.h"
+#include "shell/midas_shell_commands.h"
 
 static StaticSemaphore_t spi_mutex_buffer;
 static StaticSemaphore_t i2c_mutex_buffer;

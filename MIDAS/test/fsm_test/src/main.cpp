@@ -12,7 +12,7 @@
 #include "config_parser.h"
 #include "fsm.h"
 #include "pyro_eval.h"
-#include "sensor_data.h"
+#include "flight-systems/sensor_data.h"
 #include "command_flags.h"
 
 static void print_usage(const char* prog) {

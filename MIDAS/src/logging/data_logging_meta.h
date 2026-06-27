@@ -2,7 +2,7 @@
 #include <Queue.h>
 #include <algorithm>
 #include <limits>
-#include <sensor_data.h>
+#include <flight-systems/sensor_data.h>
 
 #define META_LOGGING_MAX_SIZE 64
 

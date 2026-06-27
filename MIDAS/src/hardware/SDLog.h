@@ -3,7 +3,7 @@
 #include <FS.h>
 
 #include <SD.h>
-#include "data_logging.h"
+#include "logging/data_logging.h"
 
 /**
  * @class SDSink

@@ -1,6 +1,6 @@
 // KAL - Kamaji Abstraction Layer
 #pragma once
-#include "systems.h"
+#include "flight-systems/systems.h"
 #include "kamaji/kal_rocket.h"
 #include "kamaji/kal_error.h"
 #include "kamaji/kal_events.h"

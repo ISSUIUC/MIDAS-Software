@@ -2,18 +2,18 @@
 
 #include <array>
 
-#include "sensor_data.h"
-#include "hal.h"
-#include "Buffer.h"
-#include "data_logging.h"
-#include "buzzer.h"
-#include "led.h"
-#include "telemetry.h"
+#include "flight-systems/sensor_data.h"
+#include "util/hal.h"
+#include "util/Buffer.h"
+#include "logging/data_logging.h"
+#include "util/buzzer.h"
+#include "util/led.h"
+#include "telemetry/telemetry.h"
 #include "finite-state-machines/fsm.h"
-#include "b2b_interface.h"
-#include "esp_eeprom.h"
+#include "util/b2b_interface.h"
+#include "logging/esp_eeprom.h"
 #include "hardware/SDLog.h"
-#include "midas_shell.h"
+#include "shell/midas_shell.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_sensors.h"

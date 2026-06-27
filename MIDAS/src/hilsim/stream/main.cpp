@@ -12,7 +12,7 @@
 #include <condition_variable>
 #include <string>
 
-#include "sensor_data.h"
+#include "flight-systems/sensor_data.h"
 #include "log_format.h"
 #include "crc.h"
 

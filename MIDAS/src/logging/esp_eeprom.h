@@ -3,7 +3,7 @@
 // Handler for ESP32's eeprom read/writes for MIDAS FSW.
 #include "esp_eeprom_format.h"
 #include "esp_eeprom_checksum.h"
-#include "errors.h"
+#include <util/errors.h>
 #include <Arduino.h>
 #include <EEPROM.h>
 

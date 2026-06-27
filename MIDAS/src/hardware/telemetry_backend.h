@@ -1,7 +1,7 @@
 #pragma once
 
-#include "errors.h"
-#include "hal.h"
+#include <util/errors.h>
+#include "util/hal.h"
 #include "pins.h"
 
 #include <E22.h>

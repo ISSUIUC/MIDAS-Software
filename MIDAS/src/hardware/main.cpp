@@ -2,10 +2,9 @@
 #include <SPI.h>
 #include "TCAL9538.h"
 
-#include "systems.h"
-#include "hardware/pins.h"
-#include "hardware/SDLog.h"
-#include "sensor_data.h"
+#include "flight-systems/systems.h"
+#include "SDLog.h"
+#include "flight-systems/sensor_data.h"
 #include "pins.h"
 
 /**

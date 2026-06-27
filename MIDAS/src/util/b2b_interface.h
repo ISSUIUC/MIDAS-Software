@@ -3,8 +3,8 @@
 #include <Wire.h>
 #include "errors.h"
 #include "hal.h"
-#include "sensor_data.h"
-#include "rocket_state.h"
+#include "flight-systems/sensor_data.h"
+#include "flight-systems/rocket_state.h"
 
 // Which b2b communication we should use
 #define B2B_I2C

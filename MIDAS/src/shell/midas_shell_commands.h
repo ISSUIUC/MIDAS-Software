@@ -1,9 +1,9 @@
-#include <systems.h>
+#include <flight-systems/systems.h>
 #include <string>
 #include <SD_MMC.h>
-#include <log_format.h>
-#include "log_checksum.h"
-#include "esp_eeprom_checksum.h"
+#include <logging/log_format.h>
+#include "logging/log_checksum.h"
+#include "logging/esp_eeprom_checksum.h"
 
 FSMConfiguration shell_cfg;
 

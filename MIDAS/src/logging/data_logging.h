@@ -1,7 +1,7 @@
 #pragma once
 
-#include "rocket_state.h"
-#include "errors.h"
+#include "flight-systems/rocket_state.h"
+#include <util/errors.h>
 
 #if defined(SILSIM)
 //#include "silsim/FileSink.h"

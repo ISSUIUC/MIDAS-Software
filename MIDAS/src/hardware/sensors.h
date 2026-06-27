@@ -1,12 +1,12 @@
 #pragma once
 
-#include "errors.h"
-#include "sensor_data.h"
+#include <util/errors.h>
+#include "flight-systems/sensor_data.h"
 #include "hardware/pins.h"
 #include "TCAL9538.h"
-#include "rocket_state.h"
-#include "esp_eeprom.h"
-#include "buzzer.h"
+#include "flight-systems/rocket_state.h"
+#include "logging/esp_eeprom.h"
+#include "util/buzzer.h"
 
 /**
  * @struct IMUSensor

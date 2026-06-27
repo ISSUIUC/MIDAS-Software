@@ -7,7 +7,7 @@
 
 #include <cmath>
 #include "fsm.h"
-#include "sensor_data.h"
+#include "flight-systems/sensor_data.h"
 
 struct PyroEvalState {
     double trigger_times[MIDAS_NUM_PYROS] = {};

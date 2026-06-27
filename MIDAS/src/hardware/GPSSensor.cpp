@@ -6,7 +6,7 @@
 
 #include "pins.h"
 #include "sensors.h"
-#include "sensor_data.h"
+#include "flight-systems/sensor_data.h"
 
 // see systems.cpp
 extern SemaphoreHandle_t i2c_mutex;

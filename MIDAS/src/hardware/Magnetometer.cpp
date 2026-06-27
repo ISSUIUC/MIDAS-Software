@@ -1,7 +1,7 @@
 #include <SparkFun_MMC5983MA_Arduino_Library.h>
 
 #include "sensors.h"
-#include "hal.h"
+#include "util/hal.h"
 
 SFE_MMC5983MA MMC5983;           // global static instance of the sensor
 

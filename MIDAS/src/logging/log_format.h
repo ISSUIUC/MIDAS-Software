@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sensor_data.h"
+#include "flight-systems/sensor_data.h"
 #define LOG_FMT_VERSION 1
 
 /**

@@ -1,6 +1,6 @@
 #include "lsm6dsv320x.h"
 
-#include "errors.h"
+#include "util/errors.h"
 #include "sensors.h" 
 
 #define NUM_DIRECTIONS 3
@@ -50,22 +50,20 @@ IMU_SFLP IMUSensor::read_sflp() {
 
     uint16_t val[4];
 
-	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get(val);//4 elements
+	LSM6DSV.lsm6dsv320x_sflp_quaternion_raw_get(val);
 
-    reading.quaternion.w = LSM6DSV.sflp_quaternion_raw_to_float(val[0]);//Will have to find a half to single precision conversion function somewhere
+    reading.quaternion.w = LSM6DSV.sflp_quaternion_raw_to_float(val[0]);
     reading.quaternion.x = LSM6DSV.sflp_quaternion_raw_to_float(val[1]);
     reading.quaternion.y = LSM6DSV.sflp_quaternion_raw_to_float(val[2]);
     reading.quaternion.z = LSM6DSV.sflp_quaternion_raw_to_float(val[3]);
 
-    //(Feature) UPDATE TO USE FIFO -> If the readings are currently okay, this wont be a priority. Circular Buffer FIFO will be a feature
     LSM6DSV.sflp_gbias_raw_get((int16_t*)&val);//3 elements
 
     reading.gyro_bias.vx = LSM6DSV.sflp_gbias_raw_to_mdps(val[0]) / 1000.0;
     reading.gyro_bias.vy = LSM6DSV.sflp_gbias_raw_to_mdps(val[1]) / 1000.0;
     reading.gyro_bias.vz = LSM6DSV.sflp_gbias_raw_to_mdps(val[2]) / 1000.0;
 
-    //UPDATE TO USE FIFO -> If the readings are currently okay, Circular Buffer FIFO will be a feature
-    LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);//3 elements
+    LSM6DSV.sflp_gravity_raw_get((int16_t*)&val);
     
     reading.gravity.ax = LSM6DSV.sflp_gravity_raw_to_mg(val[0]) / 1000.0;
     reading.gravity.ay = LSM6DSV.sflp_gravity_raw_to_mg(val[1]) / 1000.0;
@@ -73,39 +71,6 @@ IMU_SFLP IMUSensor::read_sflp() {
     
     return reading;
 }
-
-//dont need this anymore
-
-// AngularKalmanData IMUSensor::read_Kalman_Angular() {
-//     sh2_SensorValue_t event;
-//     Vec3 euler;
-//     Vec3 filtered_euler = {0, 0, 0};
-//     const float alpha = 0.98; // Higher values dampen out current measurements --> reduce peaks
-//     unsigned long currentTime = millis();
-//     deltaTime = (currentTime - lastTime) / 1000.0;
-//     lastTime = currentTime;
-//     if (imu.getSensorEvent(&event)) {
-//         AngularKalmanData sensor_reading;
-//         sensor_reading.has_data = true;
-//         if (event.sensorId == SH2_ARVR_STABILIZED_RV) {
-//             euler = quaternionToEulerRV(&event.un.arvrStabilizedRV, true);
-//             sensor_reading.reading_type = OrientationReadingType::FULL_READING;
-//             sensor_reading.quaternion.w = event.un.arvrStabilizedRV.real;
-//             sensor_reading.quaternion.x = event.un.arvrStabilizedRV.i;
-//             sensor_reading.quaternion.y = event.un.arvrStabilizedRV.j;
-//             sensor_reading.quaternion.z = event.un.arvrStabilizedRV.k;
-//             break;
-//         }
-//         sensor_reading.yaw = -euler.y;
-//         sensor_reading.pitch = euler.x;
-//         sensor_reading.roll = euler.z;
-//         if (initial_flag == 0)
-//         {
-//             initial_orientation = sensor_reading;
-//             initial_flag = 1;
-//         }
-//     }
-// }
 
 #define XLC_TONE_PITCH Sound{3000, 65}
 #define XLC_TONE_PITCH_LONG Sound{3000, 250}

@@ -1,10 +1,10 @@
 #pragma once
 
 #include "telemetry_packet.h"
-#include "rocket_state.h"
-#include "errors.h"
-#include "led.h"
-#include "esp_eeprom.h"
+#include "flight-systems/rocket_state.h"
+#include <util/errors.h>
+#include "util/led.h"
+#include "logging/esp_eeprom.h"
 
 #if defined(SILSIM)
 #include "silsim/emulated_telemetry.h"

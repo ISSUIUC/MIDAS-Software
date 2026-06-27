@@ -4,7 +4,7 @@
 
 #include "fsm_config.h"
 #include "thresholds.h"
-#include "Buffer.h"
+#include "util/Buffer.h"
 
 struct RocketData;
 struct CommandFlags;

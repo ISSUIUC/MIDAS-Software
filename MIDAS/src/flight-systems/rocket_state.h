@@ -2,10 +2,10 @@
 
 #include <array>
 
-#include "sensor_data.h"
-#include "hal.h"
-#include "Buffer.h"
-#include "data_logging_meta.h"
+#include "flight-systems/sensor_data.h"
+#include "util/hal.h"
+#include "util/Buffer.h"
+#include "logging/data_logging_meta.h"
 #include "finite-state-machines/fsm.h"
 
 /** 
@@ -155,7 +155,7 @@ public:
     }
 };
 
-#include "command_flags.h"
+#include "util/command_flags.h"
 
 /**
  * @struct RocketData

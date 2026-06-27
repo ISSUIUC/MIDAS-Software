@@ -4,7 +4,7 @@
 #include "pins.h"
 
 #include "TCAL9538.h"
-#include <rocket_state.h>
+#include <flight-systems/rocket_state.h>
 #include "finite-state-machines/pyro_eval.h"
 
 

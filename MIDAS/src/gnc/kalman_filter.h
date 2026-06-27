@@ -6,8 +6,8 @@
 #undef B1
 
 #include <Eigen/Eigen>
-#include "sensor_data.h"
-#include "systems.h"
+#include "flight-systems/sensor_data.h"
+#include "flight-systems/systems.h"
 
 struct KalmanState
 {

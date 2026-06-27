@@ -2,7 +2,7 @@
 
 #include <array>
 #include <cstdint>
-#include "rocket_state.h"
+#include "flight-systems/rocket_state.h"
 
 #define MAX_TELEM_VOLTAGE_V 6.0f
 #define MAX_TELEM_CONT_I 0.2f

@@ -40,10 +40,10 @@ uint32_t FSMConfiguration::calculate_crc(const FSMConfiguration& cfg) {
 static_assert(sizeof(FSMConfiguration) <= 256);
 
 #ifdef FSM_SIMULATOR
-#include "sensor_data.h"
-#include "command_flags.h"
+#include "flight-systems/sensor_data.h"
+#include "util/command_flags.h"
 #else
-#include "rocket_state.h"
+#include "flight-systems/rocket_state.h"
 
 /**
  * @brief Helper to calculate the average value of a buffered sensor data
