@@ -1,6 +1,6 @@
 #pragma once
 #include "logging/data_logging.h"
-#include "log_format.h"
+#include "logging/log_format.h"
 #include "kal_error.h"
 #include "kal_events.h"
 

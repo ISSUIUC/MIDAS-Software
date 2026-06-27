@@ -2,6 +2,7 @@
 
 Flight software for the **MIDAS** avionics board. This repository contains the firmware, simulation environments, hardware drivers, telemetry, logging, and testing infrastructure used throughout development.
 
+Author: Muhammad Ali (2026)
 ---
 
 # Table of Contents

@@ -13,7 +13,7 @@
 #include <string>
 
 #include "flight-systems/sensor_data.h"
-#include "log_format.h"
+#include "logging/log_format.h"
 #include "crc.h"
 
 #define STR2(x) #x
