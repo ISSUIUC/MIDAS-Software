@@ -5,25 +5,45 @@
 #include "logging/log_checksum.h"
 #include "logging/esp_eeprom_checksum.h"
 
+/**
+ * @brief Global shell configuration structure holding the staged/queued 
+ * Finite State Machine (FSM) configuration parameters.
+ */
 FSMConfiguration shell_cfg;
 
+/**
+ * @brief Supported data types for flight software parameters mapped in the command shell.
+ */
 enum class DataType {
-    FLOAT, DOUBLE, BOOL, UINT8, FSMSTATE
+    FLOAT,      /**< 32-bit floating point value */
+    DOUBLE,     /**< 64-bit floating point value */
+    BOOL,       /**< Boolean flag (true/false) */
+    UINT8,      /**< 8-bit unsigned integer */
+    FSMSTATE    /**< Enumerated Finite State Machine state */
 };
 
+/**
+ * @brief Entry format for mapping string identifiers to internal structure fields via memory offsets.
+ */
 struct MapEntry {
-    const char* name;
-    size_t offset;
-    DataType type;
-    const char* unit;
+    const char* name;   /**< String command identifier passed via the shell */
+    size_t offset;      /**< Memory offset of the field within its parent structure */
+    DataType type;      /**< Underlying data type of the target field */
+    const char* unit;   /**< Human-readable unit symbol (e.g., "ms", "m", "degrees") */
 };
 
+/**
+ * @brief Lookup map linking global FSM system thresholds to their memory offsets and data types.
+ */
 static constexpr MapEntry threshold_map[] = {
     {"PYRO_FIRE_T", offsetof(FSMUserThresholds, pyro_fire_t), DataType::FLOAT, "ms"},
     {"MAIN_ALT", offsetof(FSMUserThresholds, main_alt), DataType::FLOAT, "m"},
     {"CRUISE_LOCKOUT_EN", offsetof(FSMUserThresholds, cruise_lockout_en), DataType::BOOL, ""},
 };
 
+/**
+ * @brief Lookup map linking pyrotechnic channel configuration fields to their memory offsets and data types.
+ */
 static constexpr MapEntry channel_map[] = {
     {"ENABLE", offsetof(FSMPyroAction, enable), DataType::BOOL, ""},
     {"FSM_TRIGGER", offsetof(FSMPyroAction, fsm_trigger), DataType::FSMSTATE, ""},
@@ -36,6 +56,9 @@ static constexpr MapEntry channel_map[] = {
     {"VX_MAX", offsetof(FSMPyroAction, vx_max), DataType::FLOAT, "m/s"},
 };
 
+/**
+ * @brief String representations of the flight FSM states for telemetry reporting and shell outputs.
+ */
 static constexpr const char * state_names[] = {
     "SAFE",
     "PYRO_TEST",
@@ -47,10 +70,17 @@ static constexpr const char * state_names[] = {
     "LANDED",
 };
 
+/**
+ * @brief Valid flight states authorized to safely trigger pyrotechnic deployment events.
+ */
 static constexpr FSMState allowed_trigger_states[] = {
     FSMState::STATE_COAST, FSMState::STATE_DROGUE, FSMState::STATE_MAIN
 };
 
+/**
+ * @brief Helper utility to print an 8-bit board serial identifier with zero-padded 3-digit formatting over Serial.
+ * @param serial The raw 8-bit unsigned integer serial number to format and output.
+ */
 void print_serial(uint8_t serial){
     uint8_t str [3];
     if (serial < 10){
@@ -66,6 +96,13 @@ void print_serial(uint8_t serial){
     Serial.println(serial);
 }
 
+/**
+ * @brief Manual override command to force alter the active flight state machine execution profile.
+ * @param ctx The current shell context parsed containing arguments.
+ * argv[1]: target state integer ID
+ * argv[2] (Optional): specific target motor index
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult set_fsm(const MShellContext& ctx) {
     // fix this command cause it's stupid
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -83,6 +120,11 @@ MCommandExecutionResult set_fsm(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Simple handshake shell command to echo an input string for debugging communication lines.
+ * @param ctx Shell context containing potential arguments to echo back.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult hi_midas(const MShellContext& ctx) {
     Serial.print("hi ");
     // if no second argument, return
@@ -91,6 +133,11 @@ MCommandExecutionResult hi_midas(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Shell command interface to retrieve or rewrite the system serial identifier in non-volatile storage.
+ * @param ctx Shell context. Usage: `serial get` or `serial set <value>`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult serial(const MShellContext& ctx){
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
     // expecting 2 (get) or 3 (set) arguments
@@ -114,6 +161,12 @@ MCommandExecutionResult serial(const MShellContext& ctx){
     }
 }
 
+/**
+ * @brief Shell command interface to fetch or modify the active 70cm radio telemetry band center frequency.
+ * @details Limits operational input to local safety brackets (420.0 MHz - 450.0 MHz) prior to updating hardware.
+ * @param ctx Shell context. Usage: `frequency get` or `frequency set <value>`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult frequency(const MShellContext& ctx){
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
     // expecting 2 (get) or 3 (set) arguments
@@ -147,6 +200,11 @@ MCommandExecutionResult frequency(const MShellContext& ctx){
     }
 }
 
+/**
+ * @brief Shell command to examine active configuration variants or stage a new software version baseline.
+ * @param ctx Shell context. Usage: `fsm version` or `fsm version <new_version>`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm_version(const MShellContext& ctx){
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
     // expecting 2 (get) or 3 (set) arguments
@@ -164,6 +222,11 @@ MCommandExecutionResult fsm_version(const MShellContext& ctx){
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+/**
+ * @brief Computes a validation checksum validation hash over the queued temporary shell configuration buffer.
+ * @param ctx Shell context. Usage: `fsm calculate`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm_calculate(const MShellContext& ctx){
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
     // Expecting just "fsm calculate"
@@ -173,6 +236,11 @@ MCommandExecutionResult fsm_calculate(const MShellContext& ctx){
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Handles reading and writing individual parameters located inside the global flight safety limits block.
+ * @param ctx Shell context containing arguments for reading/writing global bounds structures.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm_threshold(const MShellContext& ctx){
     if (ctx.argc>4 || ctx.argc<3) { return MCommandExecutionResult::ERR_INVAL_ARGC;}
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -253,6 +321,12 @@ MCommandExecutionResult fsm_threshold(const MShellContext& ctx){
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+/**
+ * @brief Modifies or queries operational profiles assigned to individual physical output pyro switches.
+ * @param ctx Shell context containing programmatic configuration elements.
+ * @param ch  The targeted hardware pyro index identifier (0=A, 1=B, 2=C, 3=D).
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
     if (ctx.argc>4 || ctx.argc<3) { return MCommandExecutionResult::ERR_INVAL_ARGC;}
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -381,6 +455,12 @@ MCommandExecutionResult fsm_channel(const MShellContext& ctx, uint8_t ch){
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+/**
+ * @brief Validates, flushes, and commits the staged configuration data into non-volatile EEPROM storage.
+ * @details Resets internal FSM health condition structures and status indicator lights on successful verification.
+ * @param ctx Shell context containing target integrity CRC hashes for security validation.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm_commit(const MShellContext& ctx){
     if (ctx.argc != 3) {return MCommandExecutionResult::ERR_INVAL_ARGC;}
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -401,6 +481,10 @@ MCommandExecutionResult fsm_commit(const MShellContext& ctx){
     return MCommandExecutionResult::ERR_INVAL_FSM;
 }
 
+/**
+ * @brief Outputs structural descriptions and syntax examples for all FSM terminal commands over Serial.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm_help(){
     Serial.println("FSM Configuration Help:\n");
 
@@ -429,6 +513,11 @@ MCommandExecutionResult fsm_help(){
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Router terminal handle processing sub-demands targeted toward flight profiling rules.
+ * @param ctx Shell context containing arguments.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult fsm(const MShellContext& ctx){
     if (ctx.argc<2) {return MCommandExecutionResult::ERR_INVAL_ARGC;}
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -466,10 +555,19 @@ MCommandExecutionResult fsm(const MShellContext& ctx){
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+/**
+ * @brief Initializes the localized working shell buffer configuration image from runtime configurations.
+ * @param fsm_cfg Reference source configuration containing initialization state values.
+ */
 void m_shell_load_fsm_config(const FSMConfiguration& fsm_cfg) {
     shell_cfg = fsm_cfg;
 }
 
+/**
+ * @brief Shell command to query and structure file catalog details currently visible within storage card partitions.
+ * @param ctx Shell context. Usage: `ls`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult cmd_ls(const MShellContext& ctx) {
     if(ctx.argc != 1) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     File root = SD_MMC.open("/");
@@ -504,6 +602,11 @@ MCommandExecutionResult cmd_ls(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Streaming reader outputting full raw contents of an explicit file asset target directly to serial.
+ * @param ctx Shell context containing targeted local string file paths. Usage: `read <filename>`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult cmd_read(const MShellContext& ctx) {
     if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
 
@@ -522,8 +625,12 @@ MCommandExecutionResult cmd_read(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
-// Returns true if the path refers to an active logfile. Compares basenames so
-// any number of leading slashes is tolerated.
+/**
+ * @brief Helper evaluation block verifying if a given directory file targets the live logging output metrics stream.
+ * @param arg Active flight vehicle operational class instances.
+ * @param path Extracted folder file lookup strings under comparative processing checks.
+ * @return true If the file matches active logs; false otherwise.
+ */
 static bool is_active_log(RocketSystems* arg, const char* path) {
     const char* basename = strrchr(path, '/');
     basename = basename ? basename + 1 : path;
@@ -535,6 +642,12 @@ static bool is_active_log(RocketSystems* arg, const char* path) {
     return !strcmp(basename, bin) || !strcmp(basename, meta);
 }
 
+/**
+ * @brief Safety sweep utility targeting deletion tasks spanning passive log file fragments across media partitions.
+ * @details Retains and isolates the currently running data structure files to guard active recording sessions.
+ * @param arg Hardware telemetry core coordination state machine structures.
+ * @return true On clean execution sweeps; false if hardware blockades disrupt operations.
+ */
 bool delete_all_flash(RocketSystems* arg) {
     File root = SD_MMC.open("/");
     while (true) {
@@ -561,6 +674,12 @@ bool delete_all_flash(RocketSystems* arg) {
     return true;
 }
 
+/**
+ * @brief Packages and streams unified high-fidelity launch session artifacts down telemetry pipelines.
+ * @details Interleaves structure elements, system metadata tracking logs, and direct checksum validation.
+ * @param ctx Shell context container parameters. Usage: `lfd <data_prefix>` (e.g., `lfd data17`)
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
     // Launch File Dump: Outputs a .launch file as binary data over serial
 
@@ -645,11 +764,21 @@ MCommandExecutionResult cmd_lfd(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Responds with the flight computer platform identifier signature over active standard serial out.
+ * @param ctx Shell context. Usage: `ident`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult ident_midas(const MShellContext& ctx) {
     Serial.println("IDENT_RESPONSE:MIDAS_MINI");
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Shell command executing removal routines handling isolated singular files or widespread safety flash wipes.
+ * @param ctx Shell context. Usage: `rm <filename>` or `rm *`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult cmd_rm(const MShellContext& ctx) {
     if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -676,6 +805,11 @@ MCommandExecutionResult cmd_rm(const MShellContext& ctx) {
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Enters an automated runtime state loop to update sensor internal zero points.
+ * @param ctx Shell context designating specific hardware channels. Usage: `calibrate [xl/mag]`
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult m_calibration(const MShellContext& ctx) {
     if (ctx.argc != 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
@@ -692,6 +826,10 @@ MCommandExecutionResult m_calibration(const MShellContext& ctx) {
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+/**
+ * @brief Prints documentation tracking direct programmatic hardware component correction offsets.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult calibset_help(){
     Serial.println("CalibSet Help:\n");
 
@@ -710,6 +848,12 @@ MCommandExecutionResult calibset_help(){
     return MCommandExecutionResult::OK;
 }
 
+/**
+ * @brief Command handler interface allowing manual software injection of calculated sensor bias matrices.
+ * @details Commits modified hard-iron, soft-iron, or high-G baseline bias vectors safely into EEPROM memory structures.
+ * @param ctx Shell context containing programmatic configuration elements.
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult m_calibset(const MShellContext& ctx) {
 
     if (ctx.argc < 2) { return MCommandExecutionResult::ERR_INVAL_ARGC; }
@@ -754,6 +898,12 @@ MCommandExecutionResult m_calibset(const MShellContext& ctx) {
     return MCommandExecutionResult::ERR_INVAL_ARGUMENT;
 }
 
+/**
+ * @brief Shell interface wrapper to fetch or adjust the rolling log prefix counter tracker.
+ * @details Prevents log name collisions during power cycle resets by tracking historical file numbers.
+ * @param ctx Shell context. Usage: `sdfn` (get) or `sdfn <file_num>` (set)
+ * @return MCommandExecutionResult Execution status code.
+ */
 MCommandExecutionResult m_sdfn(const MShellContext& ctx) {
     RocketSystems* arg = (RocketSystems*) ctx.sysarg;
     if(ctx.argc == 1) {
@@ -770,6 +920,10 @@ MCommandExecutionResult m_sdfn(const MShellContext& ctx) {
     return MCommandExecutionResult::ERR_INVAL_ARGC;
 }
 
+/**
+ * @brief Main execution command registry mapping terminal text command tokens to software execution handles.
+ * @param sh Target shell processing structure passing operational registers.
+ */
 void m_shell_init_commands(MShell* sh) {
     // sh->register_command("setfsm", set_fsm, "\tsetfsm <state:int> - Sets the FSM state to state <state>");
     sh->register_command("hi", hi_midas, "\t\thi <string> - Prints hi <string>");
