@@ -4,6 +4,7 @@
 #include <log_format.h>
 #include "log_checksum.h"
 #include "esp_eeprom_checksum.h"
+#include "msc.h"
 
 FSMConfiguration shell_cfg;
 
@@ -770,6 +771,16 @@ MCommandExecutionResult m_sdfn(const MShellContext& ctx) {
     return MCommandExecutionResult::ERR_INVAL_ARGC;
 }
 
+MCommandExecutionResult cmd_mount(const MShellContext& ctx)
+{
+    return msc_begin() ? MCommandExecutionResult::OK : MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+}
+
+MCommandExecutionResult cmd_unmount(const MShellContext& ctx)
+{
+    return msc_end() ? MCommandExecutionResult::OK : MCommandExecutionResult::ERR_FS_FAIL_OPEN;
+}
+
 void m_shell_init_commands(MShell* sh) {
     // sh->register_command("setfsm", set_fsm, "\tsetfsm <state:int> - Sets the FSM state to state <state>");
     sh->register_command("hi", hi_midas, "\t\thi <string> - Prints hi <string>");
@@ -783,6 +794,10 @@ void m_shell_init_commands(MShell* sh) {
     sh->register_command("read", cmd_read, "\tread <file> - Reads a file from the mounted LogSink");
     sh->register_command("lfd", cmd_lfd, "\tlfd <dataf> - Given a data file string (i.e. 'data17'), does a 'launch file dump', outputting a .launch file");
     sh->register_command("rm", cmd_rm, "\trm <file> - Deletes a file from the mounted LogSink");
+
+    // Filesystem mount
+    sh->register_command("mount", cmd_mount, "\t\tmount - mounts MIDAS as an MSC device");
+    sh->register_command("unmount", cmd_unmount, "\t\tunmount - unmounts MIDAS as an MSC device");
 
     // sensor calibration
     sh->register_command("calibrate", m_calibration, "\tcalibrate <sensor> - Inits calibration for a sensor, accepts sensor shorthand, i.e. 'xl' or 'mag'");

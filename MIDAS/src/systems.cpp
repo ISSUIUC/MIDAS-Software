@@ -922,7 +922,7 @@ ErrorCode init_systems(RocketSystems& systems) {
         }
     }
 
-    START_THREAD(logger, DATA_CORE, config, 15);
+    // START_THREAD(logger, DATA_CORE, config, 15);
     START_THREAD(imuthread, SENSOR_CORE, config, 13);
     START_THREAD(barometer, SENSOR_CORE, config, 12);
     START_THREAD(gps, SENSOR_CORE, config, 8);
