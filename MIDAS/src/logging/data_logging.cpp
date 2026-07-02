@@ -3,18 +3,30 @@
 #include "log_checksum.h"
 
 /**
- * @brief Forward decleration of the ID recieving function
-*/
+ * @brief Forward declaration for retrieving the log discriminant associated
+ *        with a specific reading type.
+ *
+ * Each supported sensor or subsystem type has a unique ReadingDiscriminant
+ * value used to identify serialized log packets during parsing.
+ */
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
 
-
 /**
- * @brief writes a reading, with its ID, timestamp, and data to a specific sink
- * 
- * @param sink the LogSink to write to
- * @param reading the data to read
-*/
+ * @brief Writes a single sensor reading to the specified logging sink.
+ *
+ * Each logged reading is serialized in the following order:
+ * 1. Reading type identifier (ReadingDiscriminant)
+ * 2. Timestamp in milliseconds
+ * 3. Raw reading data
+ *
+ * This standardized format allows log parsers to identify packet types while
+ * replaying or analyzing flight logs.
+ *
+ * @tparam T Sensor data type contained in the reading.
+ * @param sink Destination logging backend.
+ * @param reading Timestamped sensor reading to serialize.
+ */
 template<typename T>
 void log_reading(LogSink& sink, Reading<T>& reading) {
     ReadingDiscriminant discriminant = get_discriminant<T>();
@@ -24,40 +36,53 @@ void log_reading(LogSink& sink, Reading<T>& reading) {
 }
 
 /**
- * @brief writes a SensorData's entire queue reading to a sink
- * 
- * @param sink the LogSink to write to
- * @param sensor_data the sensor data, with queue, to write from
- * 
- * @return the number of packets written to the LogSink
-*/
+ * @brief Flushes queued sensor readings to the logging sink.
+ *
+ * Reads queued samples from a SensorData object and writes each one using
+ * log_reading(). To prevent logging from monopolizing execution time, the
+ * function writes at most 20 readings per invocation.
+ *
+ * @tparam T Sensor data type stored by the SensorData queue.
+ * @param sink Destination logging backend.
+ * @param sensor_data Sensor queue containing pending readings.
+ *
+ * @return Number of readings successfully written.
+ */
 template<typename T>
 uint32_t log_from_sensor_data(LogSink& sink, SensorData<T>& sensor_data) {
     Reading<T> reading;
     uint32_t read = 0;
+
     while (read < 20 && sensor_data.getQueued(&reading)) {
         log_reading(sink, reading);
         read++;
     }
+
     return read;
 }
 
 /**
- * @brief Initializes a specific LogSink
- * 
- * @param sink the LogSink to initialize
-*/
+ * @brief Begins a new flight log.
+ *
+ * Writes a fixed checksum header to the beginning of the log file so that
+ * parsing tools can verify the file format before processing logged data.
+ *
+ * @param sink Logging backend to initialize.
+ */
 void log_begin(LogSink& sink) {
     uint32_t checksum = LOG_CHECKSUM;
     sink.write((uint8_t*) &checksum, 4);
 }
 
 /**
- * @brief logs all sensor data from the rocket
- * 
- * @param sink the LogSink to write data to
- * @param data the rocket which holds all the sensor data to write
-*/
+ * @brief Logs all available queued flight data.
+ *
+ * Flushes pending readings from every major subsystem queue, including sensor
+ * measurements, state estimation, FSM state, pyro status, and camera data.
+ *
+ * @param sink Destination logging backend.
+ * @param data Rocket data structure containing all logging queues.
+ */
 void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.imu);
     log_from_sensor_data(sink, data.sflp);
@@ -72,20 +97,28 @@ void log_data(LogSink& sink, RocketData& data) {
     log_from_sensor_data(sink, data.cam_data);
 }
 
-
-
 #ifndef SILSIM
 #define MAX_FILES 999
 
 /**
- * @brief names a new file for a log sink depending on the files currently on said LogSink
- * 
- * @param fileName buffer to write the file name to
- * @param fileExtensionParam the file extension required for the file
- * @param fs the FileSystem to check files off of
- * 
- * @return buffer contianing string of file name
-*/
+ * @brief Generates a unique filename for a new flight log.
+ *
+ * Searches the filesystem for existing files using the supplied base name and
+ * extension. If a matching filename already exists, an incrementing numeric
+ * suffix is appended until an unused filename is found or the maximum file
+ * number is reached.
+ *
+ * The selected filename is written back into the supplied buffer.
+ *
+ * @param fileName Buffer containing the base filename. On return, contains the
+ *        generated filename including path and numeric suffix.
+ * @param fileExtensionParam Desired file extension (e.g. ".bin").
+ * @param fs Filesystem used to check for existing files.
+ * @param file_num Starting file number, typically recovered from EEPROM.
+ * @param fileno_out Pointer that receives the next file number.
+ *
+ * @return Pointer to the updated filename buffer.
+ */
 char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t file_num, int* fileno_out) {
     char fileExtension[strlen(fileExtensionParam) + 1];
     strcpy(fileExtension, fileExtensionParam);
@@ -95,18 +128,19 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t fil
     strcat(inputName, fileName);
     strcat(inputName, fileExtension);
 
-    // checks to see if file already exists and adds 1 to filename if it does.
+    // Check whether the base filename already exists.
     bool exists = fs.exists(inputName);
 
     if (exists) {
         bool fileExists = false;
-        // We will start at file_num, which is default 0 if eeprom is erased
+
+        // Start searching from the recovered file number.
         int i = file_num;
+
         while (!fileExists) {
             if (i > MAX_FILES) {
-                // max number of files reached. Don't want to overflow
-                // fileName[]. Will write new data to already existing
-                // data999.csv
+                // Maximum file number reached. Reuse the final filename to avoid
+                // overflowing the filename buffer.
                 strcpy(inputName, "/");
                 strcat(inputName, fileName);
                 strcat(inputName, "999");
@@ -115,16 +149,17 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t fil
                 break;
             }
 
-            // converts int i to char[]
+            // Convert the current file number into a string.
             char iStr[16] = {0};
             itoa(i, iStr, 10);
 
-            // writes "(sensor)_data(number).csv to fileNameTemp"
+            // Construct "/data<number>.ext".
             strcpy(inputName, "/");
             strcat(inputName, fileName);
             strcat(inputName, iStr);
             strcat(inputName, fileExtension);
 
+            // Stop once an unused filename is found.
             if (!fs.exists(inputName)) {
                 fileExists = true;
                 *fileno_out = i + 1;
@@ -133,6 +168,7 @@ char* sdFileNamer(char* fileName, char* fileExtensionParam, FS& fs, uint16_t fil
             i++;
         }
     } else {
+        // Base filename is unused.
         *fileno_out = 0;
     }
 

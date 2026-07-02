@@ -1,12 +1,22 @@
 #pragma once
 
 #include "flight-systems/sensor_data.h"
+
 #define LOG_FMT_VERSION 1
 
 /**
  * @enum ReadingDiscriminant
  *
- * @brief ID for each sensor, 0 is not used to make it easier to spot bugs
+ * @brief Unique identifier assigned to each logged sensor or subsystem.
+ *
+ * These discriminants are written before every logged reading so the log parser
+ * can determine which data structure follows in the binary log. The value `0`
+ * is intentionally left unused to make invalid or corrupted records easier to
+ * detect during parsing.
+ *
+ * @note
+ * `COUNT` is not a valid discriminant. It represents the number of defined
+ * discriminants and is primarily used for iteration and HIL simulation.
  */
 enum ReadingDiscriminant {
     ID_IMU = 1,
@@ -20,26 +30,53 @@ enum ReadingDiscriminant {
     ID_CAMERADATA = 11,
     ID_ANGULARKALMAN = 12,
     ID_SFLP = 13,
-    COUNT = 14, // Last element must be COUNT for HIL
+    COUNT = 14,
 };
 
+/**
+ * @brief Total number of valid reading discriminants.
+ *
+ * This compile-time constant is primarily used by HIL simulation and other
+ * code that needs to iterate through every supported log record type. DO NOT BREAK THIS UP INTO 2 LINES
+ */
 constexpr uint8_t READING_DISC_COUNT = static_cast<uint8_t>(ReadingDiscriminant::COUNT);
 
 /**
- * @struct LoggerReading
+ * @struct LoggedReading
  *
- * @brief representation of data that will be logged
+ * @brief Logical representation of a single binary log entry.
+ *
+ * A logged reading consists of:
+ *  - A sensor/subsystem identifier (`ReadingDiscriminant`)
+ *  - A timestamp in milliseconds
+ *  - The associated sensor data
+ *
+ * This structure is provided primarily as documentation of the log format and
+ * for compile-time type information.
  *
  * @note
- * This struct isn't actually logged as-is, because if we did we'd waste extra space since
- * unions are the size of their largest member. This is just a reference struct.
+ * The logger does **not** write this structure directly to storage. Instead it
+ * serializes each component individually:
+ *   1. Discriminant
+ *   2. Timestamp
+ *   3. Raw sensor data
  *
- * Instead, we use 4 bytes for the discriminant, 4 bytes for the timestamp, and then write the
- * actual data. No padding between inside these items or between readings.
+ * Writing fields separately avoids the padding that would otherwise be present
+ * due to the union, resulting in a compact binary log format.
  */
 struct LoggedReading {
+    /// Identifies the type of sensor data stored in this entry.
     ReadingDiscriminant discriminant;
+
+    /// Timestamp of the reading in milliseconds.
     uint32_t timestamp_ms;
+
+    /**
+     * @brief Sensor data payload.
+     *
+     * Only one member is valid for any given log entry, as determined by
+     * the corresponding value in `discriminant`.
+     */
     union {
         IMU imu;
         IMU_SFLP sflp;
@@ -56,16 +93,33 @@ struct LoggedReading {
 };
 
 /**
- * Associates a sensor type with its discriminant ID.
- * Used by data_logging.cpp for compile-time lookup, and parsed by log_enc.py
- * to build the discriminant-to-union-variant mapping for log metadata.
+ * @brief Returns the log discriminant associated with a sensor data type.
  *
- * Args: (type_name, discriminant_id, union_field_name)
+ * Template specializations provide a compile-time mapping between each sensor
+ * structure and its corresponding `ReadingDiscriminant`. This allows the logger
+ * to determine the correct record identifier without runtime lookups.
+ *
+ * The associations are also parsed by the metadata generation script
+ * (`log_enc.py`) to build the binary log schema used by log analysis tools.
+ *
+ * @tparam T Sensor or subsystem data type.
+ *
+ * @return Compile-time `ReadingDiscriminant` corresponding to `T`.
  */
 template<typename T>
 constexpr ReadingDiscriminant get_discriminant();
 
-#define ASSOCIATE(ty, id, field) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id; }
+/**
+ * @brief Defines a compile-time association between a data type and its
+ *        corresponding log discriminant.
+ *
+ * Expands into a template specialization of `get_discriminant<T>()`.
+ *
+ * @param ty Data type being associated.
+ * @param id ReadingDiscriminant value.
+ * @param field Corresponding union member name (used by metadata generation).
+ */
+#define ASSOCIATE(ty, id, field) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id;}
 
 ASSOCIATE(IMU, ID_IMU, imu)
 ASSOCIATE(IMU_SFLP, ID_SFLP, sflp)

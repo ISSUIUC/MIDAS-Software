@@ -2,7 +2,10 @@
 
 Flight software for the **MIDAS** avionics board. This repository contains the firmware, simulation environments, hardware drivers, telemetry, logging, and testing infrastructure used throughout development.
 
-Author: Muhammad Ali (2026)
+Documentation: 
+- Muhammad Ali (2026)
+- Melody Parker (2026)
+- Jennifer Luo (2026)
 ---
 
 # Table of Contents
@@ -98,7 +101,6 @@ cd MIDAS
 More setup instructions will be added for:
 
 * VSCode
-* CLion
 * PlatformIO installation
 
 ---
