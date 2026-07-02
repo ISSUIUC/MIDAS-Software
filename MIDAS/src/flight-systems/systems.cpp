@@ -15,6 +15,14 @@ SemaphoreHandle_t i2c_mutex;
 
 #define METALOG_TEST
 
+/**
+ * @brief writes data to log provided, with metalogging
+ * 
+ * @param log the log to log to
+ * @param node_size the size (in bytes) of each node in the tree 
+ * @param node_count the number of nodes in the tree
+ * @param data the actual data to log
+ */
 void log_parse_tree(LogSink& log, size_t node_size, size_t node_count, uint8_t* data) {
     // To recreate log formats, we need data to reconstruct the parse tree for log format
     // This means knowing the size of each node and the pre-order traversal.
@@ -55,25 +63,27 @@ DECLARE_THREAD(logger, RocketSystems *arg)
     log_parse_tree(arg->log_sink, sizeof(LogDiscMapEntry), LOG_DISCMAP_COUNT, (uint8_t*)LOG_DISCMAP_TABLE);
     log_parse_tree(arg->log_sink, sizeof(LogFormatMetaEntry), EEPROM_META_ENTRY_COUNT, (uint8_t*)EEPROM_META_ENTRIES);
 
+    // Thread loop
     while (true) {
-        log_data(arg->log_sink, arg->rocket_data);
+        log_data(arg->log_sink, arg->rocket_data); // Actually log the data
 
         arg->rocket_data.log_latency.tick();
         meta_delay_ctr++;
 
         MetaLogging::MetaLogEntry entry;
 
-        if (meta_delay_ctr >= 100) {
+        if (meta_delay_ctr >= 100) { // rate limit the metalogging
+            // meta_delay_ctr = 0; // uncomment to actually rate limit the metalogging
             if(arg->meta_logging.get_queued(&entry)) {
                 uint8_t buf[72];
                 size_t total_size = sizeof(MetaDataCode) + entry.size;
-                memcpy(buf, &entry.log_type, sizeof(MetaDataCode));
-                memcpy(buf + sizeof(MetaDataCode), &entry.data, entry.size);
-                arg->log_sink.write_meta(buf, total_size);
+                memcpy(buf, &entry.log_type, sizeof(MetaDataCode)); // add the log_type metadata into the buffer
+                memcpy(buf + sizeof(MetaDataCode), &entry.data, entry.size); // copy the data into the buffer
+                arg->log_sink.write_meta(buf, total_size); // actually metalog
             }
         }
 
-        arg->rocket_data.err_flags.log_wr_err = arg->log_sink.failed_wr;
+        arg->rocket_data.err_flags.log_wr_err = arg->log_sink.failed_wr; // mark errors on rocket_data struct
         arg->rocket_data.err_flags.log_mr_err = arg->log_sink.failed_mr;
 
         THREAD_SLEEP(1);
@@ -156,14 +166,14 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
             }
         }
 
-        if(!has_logged) {
+        if(!has_logged) { // once rocket has landed, log the max accel and when it happened, but only log this once
             if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_ACCEL, max_accel);
                 arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_accel_time);
                 has_logged = true;
             }
         }
-
+        // update rocket_data struct
         arg->rocket_data.imu.update(imudata);
         arg->rocket_data.sflp.update(sflp);
         
@@ -188,7 +198,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         // Sensor biases
         Magnetometer b = arg->sensors.magnetometer.calibration_bias_hardiron; // "Hard iron" / origin offset.
         Magnetometer s = arg->sensors.magnetometer.calibration_bias_softiron; // "Soft iron" / scale offset.
-        reading.mx = (reading.mx - b.mx) / s.mx;
+        reading.mx = (reading.mx - b.mx) / s.mx; // adjusts the sensor data according to the calibration
         reading.my = (reading.my - b.my) / s.my;
         reading.mz = (reading.mz - b.mz) / s.mz;
 
@@ -205,6 +215,7 @@ DECLARE_THREAD(gps, RocketSystems *arg)
         // GPS's internal operations have a xSemaphoreTake.
         if (arg->sensors.gps.valid())
         {
+            // read and update the GPS data
             GPS reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
         }
