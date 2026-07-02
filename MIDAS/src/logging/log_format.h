@@ -37,10 +37,9 @@ enum ReadingDiscriminant {
  * @brief Total number of valid reading discriminants.
  *
  * This compile-time constant is primarily used by HIL simulation and other
- * code that needs to iterate through every supported log record type.
+ * code that needs to iterate through every supported log record type. DO NOT BREAK THIS UP INTO 2 LINES
  */
-constexpr uint8_t READING_DISC_COUNT =
-    static_cast<uint8_t>(ReadingDiscriminant::COUNT);
+constexpr uint8_t READING_DISC_COUNT = static_cast<uint8_t>(ReadingDiscriminant::COUNT);
 
 /**
  * @struct LoggedReading
@@ -120,10 +119,7 @@ constexpr ReadingDiscriminant get_discriminant();
  * @param id ReadingDiscriminant value.
  * @param field Corresponding union member name (used by metadata generation).
  */
-#define ASSOCIATE(ty, id, field) \
-template<> constexpr ReadingDiscriminant get_discriminant<ty>() { \
-    return ReadingDiscriminant::id; \
-}
+#define ASSOCIATE(ty, id, field) template<> constexpr ReadingDiscriminant get_discriminant<ty>() { return ReadingDiscriminant::id;}
 
 ASSOCIATE(IMU, ID_IMU, imu)
 ASSOCIATE(IMU_SFLP, ID_SFLP, sflp)

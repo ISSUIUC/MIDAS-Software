@@ -180,6 +180,7 @@ private:
 };
 
 #ifndef SILSIM
+#include <FS.h>
 /**
  * @brief Determines the next available log filename.
  *

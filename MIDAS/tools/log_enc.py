@@ -19,6 +19,7 @@ from lark import Lark
 from lark.visitors import Interpreter, v_args
 from pathlib import Path
 import struct
+from lark.exceptions import UnexpectedCharacters, UnexpectedToken
 
 __all__ = ['parse_file', 'Context', 'Type', 'Struct', 'Enum', 'Float', 'Union', 'Integer']
 
@@ -778,8 +779,14 @@ def parse_file(file: Path) -> tuple[Context, dict[str, str]]:
     parser = Lark(grammar, parser="earley")
     try:
         tree = parser.parse(text)
-    except Exception as e:
-        raise Exception(f"Could not parse {file}") from e
+    except UnexpectedCharacters as e:
+        print(f"{file}:{e.line}:{e.column}")
+        print(e.get_context(text))
+        raise
+    except UnexpectedToken as e:
+        print(f"{file}:{e.line}:{e.column}")
+        print(e.get_context(text))
+        raise
     ctxt = BASE_CTXT.clone()
     ctxt.names.update(preprocessor.defines)
     Calculate(ctxt).visit(tree)
