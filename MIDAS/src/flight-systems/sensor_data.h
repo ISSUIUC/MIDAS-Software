@@ -9,7 +9,7 @@
 
 /**
  * @brief
- * This header provides all the implementation for the data that comes from all of the sensors/
+ * This header provides all the implementation for the data that comes from all of the sensors.
  * These structs will be individual packets of data passed between the sensor and the 
  * rocket_state struct, and each will be tagged with a timestamp.
 */
@@ -22,29 +22,51 @@ struct Vec3 {
     float y = 0;
     float z = 0;
 };
-
+/**
+ * @struct Position
+ * 
+ * @brief stores a position vector with px, py, pz coordinates
+ */
 struct Position {
     float px = 0;
     float py = 0;
     float pz = 0;
 };
 
+/**
+ * @struct Velocity
+ * 
+ * @brief stores a velocity vector with vx, vy, vz coordinates
+ */
 struct Velocity {
     float vx = 0;
     float vy = 0;
     float vz = 0;
 
+    /**
+     * @brief calculates and returns the absolute Euclidean speed
+     * 
+     * @return the absolute Euclidean speed of the Velocity vector
+     */
     float get_speed() {
         return sqrt(vx * vx + vy * vy + vz * vz);
     }
 };
 
+/**
+ * @struct Acceleration
+ * @brief stores an acceleration vector with ax, ay, az coordinates
+ */
 struct Acceleration {
     float ax = 0;
     float ay = 0;
     float az = 0;
 
-    // Get G-Force applied on the rocket
+    /**
+     * @brief calculates and returns absolute Euclidean acceleration (G-force)
+     * 
+     * @return absolute Euclidean acceleration (G-force) of the acceleration vector
+     */
     float get_magnitude() {
         return sqrt(ax * ax + ay * ay + az * az);
     }
@@ -106,7 +128,7 @@ struct GPS {
     // Unix timestamp since 1970
     // This isn't included in the telem packet because this is
     // solely for the SD logger. We do not need to know what time it is
-    // when we are recieving telem packets.
+    // when we are receiving telem packets.
     uint32_t time;
 };
 
@@ -124,6 +146,12 @@ struct Magnetometer {
 struct Quaternion { //long term, remove or rename this struct, it will conflict with libraries where Quaternion is well defined. 
     float w, x, y, z;
 
+    /**
+     * @brief calculates the quaternion dot product between the two parameters
+     * 
+     * @param q1 first Quaternion
+     * @param q2 second Quaternion
+     */
     static float dot(const Quaternion& q1, const Quaternion& q2) {
         return q1.w * q2.w + q1.x * q2.x + q1.y * q2.y + q1.z * q2.z;
     }
@@ -131,7 +159,8 @@ struct Quaternion { //long term, remove or rename this struct, it will conflict 
 };
 
 /**
- * @enum Orientation reading type
+ * @enum OrientationReadingType
+ * @brief represents the two possible types of orientation readings
  */
 enum class OrientationReadingType {
     FULL_READING = 0,
@@ -139,7 +168,7 @@ enum class OrientationReadingType {
 };
 
 /**
- * @struct SFLP
+ * @struct IMU_SFLP
  * 
  * @brief Data from the LSM6DSV320X Sensor Fusion Low Power module
  * 
@@ -155,7 +184,7 @@ struct IMU_SFLP {
  * 
  * @struct IMU
  * 
- * @brief IMU that stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP
+ * @brief stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP data from IMU
  * 
  */
 struct IMU { 
@@ -257,7 +286,7 @@ struct KalmanData {
 };
 
 /**
- * @struct KalmanData
+ * @struct AngularKalmanData
  * 
  * @brief data from the MQEKF thread
 */
@@ -272,6 +301,9 @@ struct AngularKalmanData {
     float pitch = 0;
     float roll = 0;
     // For yessir.cpp
+    /**
+     * @brief returns the euler representation of the current Kalman rotation vector
+     */
     euler_t getEuler() const {
         euler_t euler;
         euler.yaw = this->yaw;
@@ -301,7 +333,11 @@ struct PyroState {
      */
 };
 
-
+/**
+ * @struct CameraData
+ * 
+ * @brief stores data about the state of the camera
+ */
 struct CameraData {
     uint8_t camera_state = 255;
     float camera_voltage = 0;

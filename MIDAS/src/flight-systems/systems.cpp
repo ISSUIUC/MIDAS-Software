@@ -15,6 +15,14 @@ SemaphoreHandle_t i2c_mutex;
 
 #define METALOG_TEST
 
+/**
+ * @brief writes data to log provided, with metalogging
+ * 
+ * @param log the log to log to
+ * @param node_size the size (in bytes) of each node in the tree 
+ * @param node_count the number of nodes in the tree
+ * @param data the actual data to log
+ */
 void log_parse_tree(LogSink& log, size_t node_size, size_t node_count, uint8_t* data) {
     // To recreate log formats, we need data to reconstruct the parse tree for log format
     // This means knowing the size of each node and the pre-order traversal.
@@ -55,25 +63,27 @@ DECLARE_THREAD(logger, RocketSystems *arg)
     log_parse_tree(arg->log_sink, sizeof(LogDiscMapEntry), LOG_DISCMAP_COUNT, (uint8_t*)LOG_DISCMAP_TABLE);
     log_parse_tree(arg->log_sink, sizeof(LogFormatMetaEntry), EEPROM_META_ENTRY_COUNT, (uint8_t*)EEPROM_META_ENTRIES);
 
+    // Thread loop
     while (true) {
-        log_data(arg->log_sink, arg->rocket_data);
+        log_data(arg->log_sink, arg->rocket_data); // Actually log the data
 
         arg->rocket_data.log_latency.tick();
         meta_delay_ctr++;
 
         MetaLogging::MetaLogEntry entry;
 
-        if (meta_delay_ctr >= 100) {
+        if (meta_delay_ctr >= 100) { // rate limit the metalogging
+            // meta_delay_ctr = 0; // uncomment to actually rate limit the metalogging
             if(arg->meta_logging.get_queued(&entry)) {
                 uint8_t buf[72];
                 size_t total_size = sizeof(MetaDataCode) + entry.size;
-                memcpy(buf, &entry.log_type, sizeof(MetaDataCode));
-                memcpy(buf + sizeof(MetaDataCode), &entry.data, entry.size);
-                arg->log_sink.write_meta(buf, total_size);
+                memcpy(buf, &entry.log_type, sizeof(MetaDataCode)); // add the log_type metadata into the buffer
+                memcpy(buf + sizeof(MetaDataCode), &entry.data, entry.size); // copy the data into the buffer
+                arg->log_sink.write_meta(buf, total_size); // actually metalog
             }
         }
 
-        arg->rocket_data.err_flags.log_wr_err = arg->log_sink.failed_wr;
+        arg->rocket_data.err_flags.log_wr_err = arg->log_sink.failed_wr; // mark errors on rocket_data struct
         arg->rocket_data.err_flags.log_mr_err = arg->log_sink.failed_mr;
 
         THREAD_SLEEP(1);
@@ -156,14 +166,14 @@ DECLARE_THREAD(imuthread, RocketSystems *arg)
             }
         }
 
-        if(!has_logged) {
+        if(!has_logged) { // once rocket has landed, log the max accel and when it happened, but only log this once
             if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_ACCEL, max_accel);
                 arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_accel_time);
                 has_logged = true;
             }
         }
-
+        // update rocket_data struct
         arg->rocket_data.imu.update(imudata);
         arg->rocket_data.sflp.update(sflp);
         
@@ -188,7 +198,7 @@ DECLARE_THREAD(magnetometer, RocketSystems* arg) {
         // Sensor biases
         Magnetometer b = arg->sensors.magnetometer.calibration_bias_hardiron; // "Hard iron" / origin offset.
         Magnetometer s = arg->sensors.magnetometer.calibration_bias_softiron; // "Soft iron" / scale offset.
-        reading.mx = (reading.mx - b.mx) / s.mx;
+        reading.mx = (reading.mx - b.mx) / s.mx; // adjusts the sensor data according to the calibration
         reading.my = (reading.my - b.my) / s.my;
         reading.mz = (reading.mz - b.mz) / s.mz;
 
@@ -205,6 +215,7 @@ DECLARE_THREAD(gps, RocketSystems *arg)
         // GPS's internal operations have a xSemaphoreTake.
         if (arg->sensors.gps.valid())
         {
+            // read and update the GPS data
             GPS reading = arg->sensors.gps.read();
             arg->rocket_data.gps.update(reading);
         }
@@ -218,14 +229,18 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
     while (true)
     {
-        FSMData current_fsm = arg->rocket_data.fsm_state.getRecentUnsync();
+        // get all the relevant values for FSM updating
+        FSMData current_fsm = arg->rocket_data.fsm_state.getRecentUnsync(); 
         AngularKalmanData akf_data = arg->rocket_data.angular_kalman_data.getRecentUnsync();
         KalmanData ekf_data = arg->rocket_data.kalman.getRecentUnsync();
         CommandFlags &command_flags = arg->rocket_data.command_flags;
+
+        // get relevant times
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
         double launch_time = arg->fsm.get_launch_time();
 
-        double time_since_launch = (current_time - launch_time);
+
+        double time_since_launch = (current_time - launch_time); // for the launch timer
         const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
         PyroTickData tick_data = {
             current_fsm,
@@ -237,15 +252,15 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
             time_since_launch
         };
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data);
+        PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data); // find out what the new pyro state should be
 
         // Actually update the pyro state!
-        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
-        gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW);
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY); // thread safety
+        gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW); // either arms or disarms pyro globally
         for(int i = 0; i < MIDAS_NUM_PYROS; i++) {
-            gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW);
+            gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW); // fires any relevant pyros
         }
-        xSemaphoreGive(i2c_mutex);
+        xSemaphoreGive(i2c_mutex); // give back semaphore, since we're done with it
 
         arg->rocket_data.pyro.update(new_pyro_state);
         arg->led.update();
@@ -256,21 +271,27 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        Voltage reading2 = arg->sensors.voltage.read();
-        arg->rocket_data.voltage.update(reading2);
+        Voltage reading2 = arg->sensors.voltage.read(); // read voltage
+        arg->rocket_data.voltage.update(reading2); // update voltage in rocket_data
         THREAD_SLEEP(100);
     }
 }
 
 //run threads
-
+/**
+ * @brief is called to do all the logging for the new FSM state
+ * @param new_state the new state
+ * @param old_state the previous state
+ * @param sys the current system
+ * @param current_time the current time
+ */
 void fsm_transitioned_to(FSMData& new_state, FSMData& old_state, RocketSystems* sys, double current_time) {
     // Do something, NO delays allowed!
 
     switch (new_state.state) {
         case FSMState::STATE_BOOST:
         //first stage specific logging
-            if(new_state.current_motor == 0){
+            if(new_state.current_motor == 0) { // sets all the initial metalogging stuff
                 sys->meta_logging.summary->event_tlaunch.update(current_time);
                 
                 sys->meta_logging.summary->data_launchsite_baro.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
@@ -282,7 +303,7 @@ void fsm_transitioned_to(FSMData& new_state, FSMData& old_state, RocketSystems* 
                 sys->meta_logging.summary->data_launch_initial_tilt.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
             }
         //all other stages logging
-            else{
+            else {
                 sys->meta_logging.summary->event_tignition.update(current_time);
                 sys->meta_logging.summary->data_tilt_at_ignition.update(sys->rocket_data.angular_kalman_data.getRecentUnsync().mq_tilt);
                 sys->meta_logging.summary->data_baro_at_ignition.update(sys->rocket_data.barometer.getRecentUnsync().altitude);
@@ -309,7 +330,9 @@ void fsm_transitioned_to(FSMData& new_state, FSMData& old_state, RocketSystems* 
             break;
     }
 }
-
+/**
+ * @brief actually commits all the metalogs for the new fsm state transition
+ */
 void fsm_state_commit(FSMData& current_state, RocketSystems* sys) {
     // Do something, NO delays allowed!
 
@@ -377,29 +400,29 @@ DECLARE_THREAD(fsm, RocketSystems *arg)
     arg->rocket_data.fsm_state.update(FSMData{FSMState::STATE_SAFE, 0});
     while (true)
     {
-        FSMData current_state_data = arg->rocket_data.fsm_state.getRecentUnsync();
-        StateEstimate state_estimate(arg->rocket_data);
+        FSMData current_state_data = arg->rocket_data.fsm_state.getRecentUnsync(); // get state
+        StateEstimate state_estimate(arg->rocket_data); // estimate current state
         CommandFlags &telemetry_commands = arg->rocket_data.command_flags;
-        KalmanData kfd = arg->rocket_data.kalman.getRecentUnsync();
+        KalmanData kfd = arg->rocket_data.kalman.getRecentUnsync(); // ekf data
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
         const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
 
         FSMState current_state = current_state_data.state;
 
-        bool last_lockin_state = fsm.get_cur_state_lockin();
+        bool last_lockin_state = fsm.get_cur_state_lockin(); // has the current state been locked in yet?
 
         FSMTickData tick_data = {current_state_data, telemetry_commands, state_estimate, kfd, fsm_cfg, current_time};
         
-        FSMData next_state = fsm.tick_fsm(tick_data);
+        FSMData next_state = fsm.tick_fsm(tick_data); // get next fsm state
 
-        arg->rocket_data.fsm_state.update(next_state);
+        arg->rocket_data.fsm_state.update(next_state); // update fsm state
 
         if(current_state != next_state.state) {
-            fsm_transitioned_to(next_state, current_state_data, arg, current_time);       
+            fsm_transitioned_to(next_state, current_state_data, arg, current_time); // log the transition
         }
         else {
             if (last_lockin_state != fsm.get_cur_state_lockin() ) {
-                fsm_state_commit(current_state_data, arg);
+                fsm_state_commit(current_state_data, arg); // once the new state is locked in, commit it to the system
             }
 
         }
@@ -493,18 +516,18 @@ DECLARE_THREAD(buzzer, RocketSystems *arg)
                 cont[i] = v.continuity[i] > 3.0;
             }
 
-            arg->buzzer.report_beeps(cont, fsm_fail);
+            arg->buzzer.report_beeps(cont, fsm_fail); // play relevant beeps based on the current state
             last_beep_beep = cur_time;
         }
 
-        arg->buzzer.tick();
+        arg->buzzer.tick(); // let the buzzer keep doing its thing
         THREAD_SLEEP(10);
     }
 }
 
 // angularkalmandata needs updates
 DECLARE_THREAD(angularkalman, RocketSystems *arg)
-{ //
+{
     mqekf.initialize(arg);
     // Serial.println("Initialized mqekf :(");
     TickType_t last = xTaskGetTickCount();
@@ -513,13 +536,14 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
     {
         FSMState FSM_state = arg->rocket_data.fsm_state.getRecent().state;
 
-        if (arg->rocket_data.command_flags.should_reset_kf)
+        if (arg->rocket_data.command_flags.should_reset_kf) // checks if there was a command to reset the kf
         {
             mqekf.initialize(arg);
             TickType_t last = xTaskGetTickCount();
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
-        IMU_SFLP current_imu_sflp = arg->rocket_data.sflp.getRecent();
+        // get all the data
+        IMU_SFLP current_imu_sflp = arg->rocket_data.sflp.getRecent(); 
         IMU current_imu = arg->rocket_data.imu.getRecent();
         Acceleration current_high_g = current_imu.highg_acceleration;
         Acceleration current_low_g = current_imu.lowg_acceleration;
@@ -537,8 +561,8 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
 
         // Check with Divij
-        mqekf.tick(dt, current_mag, current_angular_velocity, current_accelerations, FSM_state, current_gyro_bias);
-        mqekf.calculate_tilt(current_imu_sflp);    
+        mqekf.tick(dt, current_mag, current_angular_velocity, current_accelerations, FSM_state, current_gyro_bias); // tick the EKF
+        mqekf.calculate_tilt(current_imu_sflp); 
         AngularKalmanData current_state = mqekf.getState();
 
         arg->rocket_data.angular_kalman_data.update(current_state);
@@ -552,7 +576,6 @@ DECLARE_THREAD(angularkalman, RocketSystems *arg)
 DECLARE_THREAD(kalman, RocketSystems *arg)
 {
     ekf.initialize(arg);
-    // Serial.println("Initialized ekf :(");
     TickType_t last = xTaskGetTickCount();
 
     
@@ -563,13 +586,13 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
 
     while (true)
     {
-        if (arg->rocket_data.command_flags.should_reset_kf)
+        if (arg->rocket_data.command_flags.should_reset_kf) // check for command
         {
             ekf.initialize(arg);
             TickType_t last = xTaskGetTickCount();
             arg->rocket_data.command_flags.should_reset_kf = false;
         }
-
+        // get all the relevant data to do the ekf stuff with
         Barometer current_barom_buf = arg->rocket_data.barometer.getRecent();
 
         IMU current_imu = arg->rocket_data.imu.getRecent();
@@ -584,12 +607,13 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
         Acceleration current_accelerations = {
             .ax = current_high_g.ax,
             .ay = current_high_g.ay,
-            .az = current_high_g.az}; //
+            .az = current_high_g.az};
 
         float dt = pdTICKS_TO_MS(xTaskGetTickCount() - last) / 1000.0f;
         float timestamp = pdTICKS_TO_MS(xTaskGetTickCount()) / 1000.0f;
 
         // Check with Divij
+        // 13.0 is the "spectral density", for anyone wondering about that magic number
         ekf.tick(dt, 13.0, current_barom_buf, current_accelerations, current_angular_kalman, FSM_state, current_gps);
 
         KalmanData current_state = ekf.getState();
@@ -599,14 +623,15 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
         last = xTaskGetTickCount();
 
         //float prev_vel = current_state.velocity.vx;
+        // if we're boosting, coasting, or drogue-ing
         if(arg->rocket_data.fsm_state.getRecentUnsync().state >= FSMState::STATE_BOOST && arg->rocket_data.fsm_state.getRecentUnsync().state < FSMState::STATE_MAIN) {
             if(max_vel < current_state.velocity.vx) {
                 max_vel = current_state.velocity.vx;
-                max_vel_time = pdTICKS_TO_MS(xTaskGetTickCount());
+                max_vel_time = pdTICKS_TO_MS(xTaskGetTickCount()); // update max velocity
             }
         }
 
-        if(!has_logged) {
+        if(!has_logged) { // log landing metadata if we haven't and we should
             if(arg->rocket_data.fsm_state.getRecentUnsync().state == FSMState::STATE_LANDED) {
                 arg->meta_logging.log_data(MetaDataCode::DATA_MAX_VEL, max_vel);
                 arg->meta_logging.log_data(MetaDataCode::EVENT_TMAX_ACCEL, max_vel_time);
@@ -617,10 +642,13 @@ DECLARE_THREAD(kalman, RocketSystems *arg)
     }
 }
 
+/**
+ * @brief processes telemetry commands from ground station
+ */
 void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState current_state)
 {
     // maybe we should move this somewhere else but it can stay here for now
-    switch (command.command)
+    switch (command.command) 
     {
     case CommandType::RESET_KF:
         arg->rocket_data.command_flags.should_reset_kf = true;
@@ -679,7 +707,7 @@ void handle_tlm_command(TelemetryCommand &command, RocketSystems *arg, FSMState 
         arg->sensors.magnetometer.begin_calibration(arg->buzzer);
         break;
     default:
-        break; // how
+        break; // this shouldn't be possible
     }
 }
 

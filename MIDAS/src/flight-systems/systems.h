@@ -29,7 +29,6 @@
  * @brief holds all interfaces for all sensors on MIDAS
 */
 
-//Remove the low_g sensor and high_g sensor, we will be using the imu sensor for the midas mini.
 
 //Barometer (Altitude from Barometer is bugged, need to fix)
 struct Sensors {
