@@ -229,14 +229,18 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
     while (true)
     {
-        FSMData current_fsm = arg->rocket_data.fsm_state.getRecentUnsync();
+        // get all the relevant values for FSM updating
+        FSMData current_fsm = arg->rocket_data.fsm_state.getRecentUnsync(); 
         AngularKalmanData akf_data = arg->rocket_data.angular_kalman_data.getRecentUnsync();
         KalmanData ekf_data = arg->rocket_data.kalman.getRecentUnsync();
         CommandFlags &command_flags = arg->rocket_data.command_flags;
+
+        // get relevant times
         double current_time = pdTICKS_TO_MS(xTaskGetTickCount());
         double launch_time = arg->fsm.get_launch_time();
 
-        double time_since_launch = (current_time - launch_time);
+
+        double time_since_launch = (current_time - launch_time); // for the launch timer
         const FSMConfiguration& fsm_cfg = arg->fsm.get_cfg();
         PyroTickData tick_data = {
             current_fsm,
@@ -248,15 +252,15 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
             time_since_launch
         };
 
-        PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data);
+        PyroState new_pyro_state = arg->sensors.pyro.tick(tick_data); // find out what the new pyro state should be
 
         // Actually update the pyro state!
-        xSemaphoreTake(i2c_mutex, portMAX_DELAY);
-        gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW);
+        xSemaphoreTake(i2c_mutex, portMAX_DELAY); // thread safety
+        gpioDigitalWrite(PYRO_GLOBAL_ARM_PIN, new_pyro_state.is_global_armed ? HIGH : LOW); // either arms or disarms pyro globally
         for(int i = 0; i < MIDAS_NUM_PYROS; i++) {
-            gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW);
+            gpioDigitalWrite(PYRO_PINS[i], new_pyro_state.channel_firing[i] ? HIGH : LOW); // fires any relevant pyros
         }
-        xSemaphoreGive(i2c_mutex);
+        xSemaphoreGive(i2c_mutex); // give back semaphore, since we're done with it
 
         arg->rocket_data.pyro.update(new_pyro_state);
         arg->led.update();
@@ -267,8 +271,8 @@ DECLARE_THREAD(pyro, RocketSystems *arg)
 
 DECLARE_THREAD(voltage, RocketSystems* arg) {
     while (true) {
-        Voltage reading2 = arg->sensors.voltage.read();
-        arg->rocket_data.voltage.update(reading2);
+        Voltage reading2 = arg->sensors.voltage.read(); // read voltage
+        arg->rocket_data.voltage.update(reading2); // update voltage in rocket_data
         THREAD_SLEEP(100);
     }
 }
