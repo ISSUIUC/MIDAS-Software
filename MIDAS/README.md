@@ -77,15 +77,6 @@ Before building the project, install:
 * Git
 * C++ compiler
 
-For **SILSIM**, a native compiler is also required.
-
-### Linux / macOS
-
-`gcc` is typically already installed.
-
-### Windows
-
-Install the latest version of **MinGW-w64** and add its `bin` directory to your system `PATH`.
 
 ---
 
@@ -131,17 +122,6 @@ Make sure the board is connected before uploading.
 
 ---
 
-# Running SILSIM
-
-To build and execute the Software-In-The-Loop simulator:
-
-```bash
-pio run -e mcu_silsim
-```
-
-SILSIM allows flight code to be tested without physical hardware.
-
-> More documentation describing simulation inputs, outputs, and workflows will be added later.
 
 ---
 
