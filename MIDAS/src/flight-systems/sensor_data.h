@@ -44,9 +44,9 @@ struct Velocity {
     float vz = 0;
 
     /**
-     * @brief calculates and returns the absolute Euclidean speed
+     * @brief calculates and returns the absolute speed
      * 
-     * @return the absolute Euclidean speed of the Velocity vector
+     * @return the absolute speed of the Velocity vector
      */
     float get_speed() {
         return sqrt(vx * vx + vy * vy + vz * vz);
@@ -63,9 +63,9 @@ struct Acceleration {
     float az = 0;
 
     /**
-     * @brief calculates and returns absolute Euclidean acceleration (G-force)
+     * @brief calculates and returns absolute acceleration (G-force)
      * 
-     * @return absolute Euclidean acceleration (G-force) of the acceleration vector
+     * @return absolute acceleration (G-force) of the acceleration vector
      */
     float get_magnitude() {
         return sqrt(ax * ax + ay * ay + az * az);
@@ -184,7 +184,7 @@ struct IMU_SFLP {
  * 
  * @struct IMU
  * 
- * @brief stores High/Low G Acceleration, Angular Velocity, and IMU_SFLP data from IMU
+ * @brief stores High/Low G Acceleration, Angular Velocity
  * 
  */
 struct IMU { 
