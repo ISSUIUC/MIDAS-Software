@@ -142,25 +142,21 @@ PyroState Pyro::tick(PyroTickData& data) {
             return new_pyro_state;
         }
 
-        // Fire channel A.
         if(data.commands.should_fire_pyro_a) {
             new_pyro_state.channel_firing[0] = true;
             set_pyro_safety();
         }
 
-        // Fire channel B.
         if(data.commands.should_fire_pyro_b) {
             new_pyro_state.channel_firing[1] = true;
             set_pyro_safety();
         }
 
-        // Fire channel C.
         if(data.commands.should_fire_pyro_c) {
             new_pyro_state.channel_firing[2] = true;
             set_pyro_safety();
         }
 
-        // Fire channel D.
         if(data.commands.should_fire_pyro_d) {
             new_pyro_state.channel_firing[3] = true;
             set_pyro_safety();
