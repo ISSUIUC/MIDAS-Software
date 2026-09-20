@@ -193,7 +193,7 @@ void MS5611::reset() {
     digitalWrite(_cspin, HIGH);  // pull CS line high
     SPI.endTransaction();        // end SPI transaction
 }
-#include"../../src/hal.h"
+#include"../../src/util/hal.h"
 void MS5611::convert(const uint8_t addr, uint8_t bits) {
     uint8_t del[5] = {1, 2, 3, 5,
                       10};  // array of MS5611 conversion time (in ms)

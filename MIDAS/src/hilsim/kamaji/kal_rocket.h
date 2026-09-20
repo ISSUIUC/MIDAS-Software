@@ -1,7 +1,7 @@
 #pragma once
 // A HILSIM version of the RocketData struct without any of the additional wrapping.
-#include "sensor_data.h"
-#include "rocket_state.h"
+#include "flight-systems/sensor_data.h"
+#include "flight-systems/rocket_state.h"
 
 
 struct KRocketData {

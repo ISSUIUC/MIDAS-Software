@@ -19,6 +19,7 @@ from lark import Lark
 from lark.visitors import Interpreter, v_args
 from pathlib import Path
 import struct
+from lark.exceptions import UnexpectedCharacters, UnexpectedToken
 
 __all__ = ['parse_file', 'Context', 'Type', 'Struct', 'Enum', 'Float', 'Union', 'Integer']
 
@@ -747,8 +748,13 @@ class Preprocessor:
                     raise Exception(f"Malformed line {i+1} of file {file_path}")
                 include_path = parts[1]
                 if include_path.startswith("\"") and include_path.endswith("\""):
-                    include_path = Path(file_path).absolute().parent / include_path[1:-1]
-                    processed += self.include_file(include_path)
+                    include_name = include_path[1:-1]
+                    candidate = Path(file_path).absolute().parent / include_name
+                    if not candidate.exists():
+                        candidate = Path("src") / include_name
+                    processed += self.include_file(candidate)
+
+                    
                 elif include_path in STD_HEADERS:
                     processed += self.preprocess(include_path[1:-1], STD_HEADERS[include_path])
                 else:
@@ -773,8 +779,14 @@ def parse_file(file: Path) -> tuple[Context, dict[str, str]]:
     parser = Lark(grammar, parser="earley")
     try:
         tree = parser.parse(text)
-    except Exception as e:
-        raise Exception(f"Could not parse {file}") from e
+    except UnexpectedCharacters as e:
+        print(f"{file}:{e.line}:{e.column}")
+        print(e.get_context(text))
+        raise
+    except UnexpectedToken as e:
+        print(f"{file}:{e.line}:{e.column}")
+        print(e.get_context(text))
+        raise
     ctxt = BASE_CTXT.clone()
     ctxt.names.update(preprocessor.defines)
     Calculate(ctxt).visit(tree)
@@ -889,8 +901,8 @@ const LogDiscMapEntry LOG_DISCMAP_TABLE[LOG_DISCMAP_COUNT] = {{
 
 
 def main():
-    ctxt, associations = parse_file(Path("src") / "log_format.h")
-    ctxt_eeprom, assoc_eeprom = parse_file(Path("src") / "esp_eeprom_format.h")
+    ctxt, associations = parse_file(Path("src") / "logging" / "log_format.h")
+    ctxt_eeprom, assoc_eeprom = parse_file(Path("src") / "logging" / "esp_eeprom_format.h")
 
     eeprom_format = ctxt_eeprom.types["MIDASEEPROM"]
     eeprom_entries = flatten("MIDASEEPROM", eeprom_format)
@@ -900,7 +912,7 @@ def main():
 
     entries = flatten("LoggedReading", logged_reading)
     vtable = build_variant_table(entries, associations, disc_enum)
-    autogen_file = Path("src") / "log_format_AUTOGEN.h"
+    autogen_file = Path("src") / "logging" / "log_format_AUTOGEN.h"
 
     write_autogen(entries, eeprom_entries, vtable, autogen_file)
     print(f"Successfully wrote log format to {str(autogen_file)}!")

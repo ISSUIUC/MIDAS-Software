@@ -1,10 +1,10 @@
 #pragma once
 
-#include "sensor_data.h" // for sim
-#include "Buffer.h"      // for sim
+#include "flight-systems/sensor_data.h" // for sim
+#include "util/Buffer.h"      // for sim
 #include "constants.h"
 #include <Eigen/Eigen>
-#include "systems.h"
+#include "flight-systems/systems.h"
 
 class QuaternionMEKF
 {

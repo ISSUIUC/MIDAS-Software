@@ -1,6 +1,6 @@
 // KAL - Kamaji Abstraction Layer
 #include "kal.h"
-#include "midas_shell.h"
+#include "shell/midas_shell.h"
 
 // ---- GLOBALS ----
 SDSink sink;

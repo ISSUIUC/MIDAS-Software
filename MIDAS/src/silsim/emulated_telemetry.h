@@ -2,8 +2,8 @@
 
 #include <fstream>
 
-#include "errors.h"
-#include "hal.h"
+#include <util/errors.h>
+#include "util/hal.h"
 
 
 class TelemetryBackend {

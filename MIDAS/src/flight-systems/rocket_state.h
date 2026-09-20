@@ -2,10 +2,10 @@
 
 #include <array>
 
-#include "sensor_data.h"
-#include "hal.h"
-#include "Buffer.h"
-#include "data_logging_meta.h"
+#include "flight-systems/sensor_data.h"
+#include "util/hal.h"
+#include "util/Buffer.h"
+#include "logging/data_logging_meta.h"
 #include "finite-state-machines/fsm.h"
 
 /** 
@@ -66,7 +66,7 @@ public:
     };
 
     /**
-     * @brief gets most recent data, will not acquire lock
+     * @brief gets most recent data without acquiring lock
      * 
      * @return the most recent data
     */
@@ -112,14 +112,23 @@ public:
         data_time.push(xTaskGetTickCount());
     };
 
-    // wrapper function to get easy access to buffer data
     template<size_t arr_count>
+    /**
+     * @brief wrapper function to get easy access to buffer data
+     * 
+     * @return recent buffer data
+     */
     std::array<S, arr_count> getBufferRecent() {
         std::array<S, arr_count> arr = buffer. template read_recent<arr_count>();
         return arr;
     };
 
     template<size_t arr_count>
+    /**
+     * @brief wrapper function to get easy access to data times
+     * 
+     * @return recent buffer times
+     */
     std::array<TickType_t, arr_count> getTimesRecent() {
         std::array<TickType_t, arr_count> arr = data_time. template read_recent<arr_count>();
         return arr;
@@ -146,16 +155,16 @@ public:
     }
 
     /**
-     * @brief gets the msot recent latency
+     * @brief gets the most recent latency
      * 
-     * @return most receent latency
+     * @return most recent latency
     */
     [[nodiscard]] uint32_t getLatency() const {
         return latency;
     }
 };
 
-#include "command_flags.h"
+#include "finite-state-machines/command_flags.h"
 
 /**
  * @struct RocketData
