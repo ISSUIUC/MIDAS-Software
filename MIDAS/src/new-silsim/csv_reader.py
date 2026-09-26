@@ -30,3 +30,36 @@ except FileNotFoundError:
     print(f"Error: Could not locate the telemetry file at {csv_path}")
 except KeyError as e:
     print(f"Error: Column mismatch or unexpected missing column: {e}")
+
+
+# loop through the headers and find all the sensors we care about
+with open(csv_path, mode="r", encoding="utf-8") as f:
+    csv_reader = csv.reader(f)
+
+    headers = next(csv_reader)
+    sensors = set()
+    for header in headers:
+        if "." not in header:
+            continue
+        sensor = header.split(".")[0]
+        sensors.add(sensor)
+    sensors = list(sensors)
+    print(sensors)
+
+# for each sensor, we need to generate a new csv file within data/outputs
+
+for sensor in sensors:
+    with open(csv_path, mode="r", encoding="utf-8") as f:
+        csv_reader = csv.reader(f)
+        headers = next(csv_reader)
+        relevant_cols = []
+        for i, header in enumerate(headers):
+            if header.startswith(sensor):
+                relevant_cols.append(i)
+        relevant_headers = [headers[0]] + [headers[i] for i in relevant_cols]
+
+        
+
+        line = next(csv_reader)
+
+
