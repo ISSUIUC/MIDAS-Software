@@ -1,8 +1,3 @@
 version https://git-lfs.github.com/spec/v1
-<<<<<<< HEAD
-oid sha256:061862cd826a8e86f59aa9a6b5f7927a7b928c355522dd82e24673c8c71d15b7
-size 1647590
-=======
-oid sha256:f02f66d577edd6b8fcfb2fab61c8d6774f7bc65e544765e981ee911041628601
-size 1677008
->>>>>>> remotes/origin/feature/silsim-python-script
+oid sha256:1427ea1a468ac66daa2d75c8cfb428fd982b573ec086910a4b1efab5d8422456
+size 294

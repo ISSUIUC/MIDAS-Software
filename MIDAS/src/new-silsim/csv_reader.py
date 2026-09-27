@@ -1,4 +1,4 @@
-import csv
+mport csv
 from pathlib import Path
 # import pandas as pd
 
@@ -61,10 +61,7 @@ for sensor in sensors:
         csv_data = []
         while line is not None:
             line = next(csv_reader)
-            filtered_line = []
+            filtered_line = line[*relevant_cols]
             for col in relevant_cols:
-                filtered_line.append()
         with open(csv_path / "sensors" / f"{sensor}.csv") as f2:
             csv_writer = csv.writer()
-
-
