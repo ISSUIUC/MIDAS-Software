@@ -2,6 +2,12 @@
 
 
 
+
+ErrorCode IMUCalibrationState
+
+
+
+
 Magnetometer MagnetometerSensor::read() {
     // read from aforementioned global instance of sensor
     uint32_t cx, cy, cz;

@@ -10,71 +10,11 @@
 #include <fstream>
 
 
-// timestamp_ms,sensor,imu.highg_acceleration.ax,imu.highg_acceleration.ay,
-// imu.highg_acceleration.az,imu.lowg_acceleration.ax,imu.lowg_acceleration.ay,
-// imu.lowg_acceleration.az,imu.angular_velocity.vx,imu.angular_velocity.vy,
-// imu.angular_velocity.vz,barometer.temperature,barometer.pressure,barometer.altitude,
-// voltage.continuity[0],voltage.continuity[1],voltage.continuity[2],voltage.continuity[3],
-// voltage.v_Bat,voltage.v_Pyro,gps.latitude,gps.longitude,gps.altitude,gps.speed,gps.fix_type,
-// gps.sats_in_view,gps.time,magnetometer.mx,magnetometer.my,magnetometer.mz,
-// kalman.position.px,kalman.position.py,kalman.position.pz,kalman.velocity.vx,
-// kalman.velocity.vy,kalman.velocity.vz,kalman.acceleration.ax,kalman.acceleration.ay,
-// kalman.acceleration.az,fsm.state,fsm.current_motor,pyro.is_global_armed,
-// pyro.channel_firing[0],pyro.channel_firing[1],pyro.channel_firing[2],pyro.channel_firing[3],
-// pyro.pyro_event_consumed[0],pyro.pyro_event_consumed[1],pyro.pyro_event_consumed[2],
-// pyro.pyro_event_consumed[3],cameradata.camera_state,cameradata.camera_voltage,
-// angular_kalman.quaternion.w,angular_kalman.quaternion.x,angular_kalman.quaternion.y,
-// angular_kalman.quaternion.z,angular_kalman.gyrobias[0],angular_kalman.gyrobias[1],
-// angular_kalman.gyrobias[2],angular_kalman.sflp_tilt,angular_kalman.mq_tilt,
-// angular_kalman.has_data,angular_kalman.yaw,angular_kalman.pitch,angular_kalman.roll,
-// sflp.quaternion.w,sflp.quaternion.x,sflp.quaternion.y,sflp.quaternion.z,sflp.gravity.ax,
-// sflp.gravity.ay,sflp.gravity.az,sflp.gyro_bias.vx,sflp.gyro_bias.vy,sflp.gyro_bias.vz
-
 struct SILData {
-
-    uint32_t timestamp;
-
-    // imu
-    float hg_ax, hg_ay, hg_az;
-    float lg_ax, lg_ay, lg_az;
-    float vx, vy, vz;
-
-
-    // barometer:
-    float temperature;
-    float pressure;
-    float altitude;
-
-    // volatage:
-    float pyro;
-    float battery;
-
-    // gps
-    int32_t lat;
-    int32_t lon;
-    float alt;
-    float speed;
-
-    // magnetometer
-    float mx;
-    float my;
-    float mz;
-
-    //pyro
-
-    //sflp
-    float quat_w, quat_
-
-};
-
-class SimulatedSensor {
-	private:
-        std::ifstream csv_stream;
-        virtual void update_data(int timestamp);
-        virtual int read_data();
-
-
+    RocketData data;
+    void update_data(dt);
 }
+
 
 /**
  * @struct IMUSensor

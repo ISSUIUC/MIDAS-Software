@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-
 #include "sensor_data.h"
 #include "hardware/sensors.h"
 #include "hal.h"
