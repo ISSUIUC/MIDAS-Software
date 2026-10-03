@@ -65,12 +65,13 @@ for sensor in sensors:
 
         line = next(csv_reader)
         csv_data = []
-        # c = 0
+        c = 0
+        init_time = -1 # the first timestamp in the csv for this sensor because we subtract it so it starts at zero.
         prev_relevant_values = []
         for line in csv_reader:
-            # c+= 1 # this is for sanity
-            # if c % 10000 == 0:
-            #     print(c)
+            c+= 1 # this is for sanity
+            if c % 10000 == 0:
+                print(c)
             relevant_values = []
             n : bool = False
             for i, col in enumerate(relevant_cols[1:]):
@@ -81,9 +82,10 @@ for sensor in sensors:
                         n = True
                 else:
                     n = True
-                    
+                    init_time = int(line[0])
+
             if (n): # adds to the csv_table with timestamp.
-                relevant_values_and_timestamp = [line[0]] # appending the timestamp to the front.
+                relevant_values_and_timestamp = [str(int(line[0])-init_time)] # appending the timestamp to the front.
                 relevant_values_and_timestamp.extend(relevant_values)
                 csv_table.append(relevant_values_and_timestamp)
                 prev_relevant_values = [val for val in relevant_values]
