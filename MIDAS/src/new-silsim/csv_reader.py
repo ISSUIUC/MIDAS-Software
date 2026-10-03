@@ -1,4 +1,4 @@
-mport csv
+import csv
 from pathlib import Path
 # import pandas as pd
 
@@ -39,7 +39,7 @@ with open(csv_path, mode="r", encoding="utf-8") as f:
     headers = next(csv_reader)
     sensors = set()
     for header in headers:
-        if "." not in header:
+        if "." not in header: # sensors have periods in their names.
             continue
         sensor = header.split(".")[0]
         sensors.add(sensor)
@@ -49,19 +49,48 @@ with open(csv_path, mode="r", encoding="utf-8") as f:
 # for each sensor, we need to generate a new csv file within data/outputs
 
 for sensor in sensors:
-    with open(csv_path, mode="r", encoding="utf-8") as f:
+    with open(csv_path, mode="r", encoding="utf-8") as f: # reopen file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)
         relevant_cols = []
+        relevant_cols.append(0)
         for i, header in enumerate(headers):
             if header.startswith(sensor):
                 relevant_cols.append(i)
-        relevant_headers = [headers[0]] + [headers[i] for i in relevant_cols]
+        relevant_headers = [headers[i] for i in relevant_cols]
+        csv_table = []
+
+
+        # with open(BASE_DIR / "data" / "sensors" / f"{sensor}.csv", mode="w",newline='', encoding='utf-8') as f2:
+        #     csv_writer = csv.writer(f2)
+        #     csv_writer.writerow(relevant_headers)
+        csv_table.append(relevant_headers)
+
         line = next(csv_reader)
         csv_data = []
-        while line is not None:
-            line = next(csv_reader)
-            filtered_line = line[*relevant_cols]
-            for col in relevant_cols:
-        with open(csv_path / "sensors" / f"{sensor}.csv") as f2:
-            csv_writer = csv.writer()
+        c = 0
+        prev_relevant_values = []
+        for line in csv_reader:
+            c+= 1
+            if c % 1000 == 0:
+                print(c)
+            # filtered_line = line[*relevant_cols]
+            relevant_values = []
+            n : bool = False
+            for i, col in enumerate(relevant_cols[1:]):
+                # filtered_line = line[col]
+                relevant_values.append(line[col])
+                if len(prev_relevant_values) > 0:
+                    if line[col] != prev_relevant_values[i-1]:
+                        n = True
+                        # print("Howdys")
+                else:
+                    n = True
+                    # print("Howdys2")
+                    
+            if (n):
+                csv_table.append(relevant_values)
+                prev_relevant_values = [val for val in relevant_values]
+        with open(BASE_DIR / "data" / "sensors" / f"{sensor}.csv", mode="w",newline='', encoding='utf-8') as f2:
+            csv_writer = csv.writer(f2)
+            csv_writer.writerows(csv_table)
