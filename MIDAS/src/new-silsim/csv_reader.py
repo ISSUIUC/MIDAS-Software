@@ -2,6 +2,7 @@ import csv
 from pathlib import Path
 # import pandas as pd
 
+# THIS CODE TAKES A LARGE CSV WITH LOTS OF SENSOR DATA AND SORTS INTO SEPARATE CSV's PER SENSOR
 BASE_DIR = Path(__file__).resolve().parent
 csv_path = BASE_DIR / "data" / "midas_sustainer_flight copy.csv"
 
@@ -44,7 +45,7 @@ with open(csv_path, mode="r", encoding="utf-8") as f:
         sensor = header.split(".")[0]
         sensors.add(sensor)
     sensors = list(sensors)
-    print(sensors)
+    # print(sensors)
 
 # for each sensor, we need to generate a new csv file within data/outputs
 
@@ -60,36 +61,31 @@ for sensor in sensors:
         relevant_headers = [headers[i] for i in relevant_cols]
         csv_table = []
 
-
-        # with open(BASE_DIR / "data" / "sensors" / f"{sensor}.csv", mode="w",newline='', encoding='utf-8') as f2:
-        #     csv_writer = csv.writer(f2)
-        #     csv_writer.writerow(relevant_headers)
         csv_table.append(relevant_headers)
 
         line = next(csv_reader)
         csv_data = []
-        c = 0
+        # c = 0
         prev_relevant_values = []
         for line in csv_reader:
-            c+= 1
-            if c % 1000 == 0:
-                print(c)
-            # filtered_line = line[*relevant_cols]
+            # c+= 1 # this is for sanity
+            # if c % 10000 == 0:
+            #     print(c)
             relevant_values = []
             n : bool = False
             for i, col in enumerate(relevant_cols[1:]):
-                # filtered_line = line[col]
+                # n denotes whether to actually add to csv and this only occurs if some value actually changed.
                 relevant_values.append(line[col])
                 if len(prev_relevant_values) > 0:
-                    if line[col] != prev_relevant_values[i-1]:
+                    if line[col] != prev_relevant_values[i]:
                         n = True
-                        # print("Howdys")
                 else:
                     n = True
-                    # print("Howdys2")
                     
-            if (n):
-                csv_table.append(relevant_values)
+            if (n): # adds to the csv_table with timestamp.
+                relevant_values_and_timestamp = [line[0]] # appending the timestamp to the front.
+                relevant_values_and_timestamp.extend(relevant_values)
+                csv_table.append(relevant_values_and_timestamp)
                 prev_relevant_values = [val for val in relevant_values]
         with open(BASE_DIR / "data" / "sensors" / f"{sensor}.csv", mode="w",newline='', encoding='utf-8') as f2:
             csv_writer = csv.writer(f2)
