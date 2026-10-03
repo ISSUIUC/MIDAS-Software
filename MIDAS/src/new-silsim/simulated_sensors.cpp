@@ -2,36 +2,44 @@
 
 
 
+// ErrorCode IMUCalibrationState
 
-ErrorCode IMUCalibrationState
+std::unordered_map<int, std::ifstream> sensor_file_objects;
+
+bool valid_sensor_name(std::string sensor_name) {
+    // check if its valid
+
+    return // validity
+}
+
+void silsim_init(std::string sensor_name) {
+    if !valid_sensor_name(sensor_name) throw std::rundtime_error("invalid sensor name in init"); 
+    std::ifstream sensor_file(std::filesystem::current_path() + "/data/sensors/" + sensor_name + ".csv");
+    !sensor_file.is_open() {
+        std::cerr << "file did not open well" << std::endl;
+        
+    }
+    sensor_file_objects[sensor_name] = sensor_file;
+}
 
 
+std::vector<double>* silsim_read(std::string sensor_name){
+    // assume sensor_name is appropriate to pull from an existing csv
+    // get current time_stamp
+    // use csv from corresponding sensor
+    // find the row for the corresponding time_stamp
+    // put the row in a vector<double>
+    // return the vector
+    if !valid_sensor_name(sensor_name) throw std::runtime_error("invalid sensor name in read"); 
+    sensor_file = sensor_file_objects[sensor_name];
 
-
-Magnetometer MagnetometerSensor::read() {
-    // read from aforementioned global instance of sensor
-    uint32_t cx, cy, cz;
-    double X, Y, Z;
+    int timestamp = pdTICKS_TO_MS(xTaskGetTickCount()); // get the current time
     
-    // PSEUDOCODE
-	/*
-		get timestamp is it time_stamp = pdTICKS_TO_MS(xTaskGetTickCount()); ??
-		get sensor data from csv at timestamp
-		put that in cx, cy, cz
-		happy
-		yay
-	*/
-    
-    // The magnetic field values are 18-bit unsigned. The _approximate_ zero (mid) point is 2^17
-    // Here we scale each field to +/- 1.0 to make it easier to convert to Gauss
-    // https://github.com/sparkfun/SparkFun_MMC5983MA_Magnetometer_Arduino_Library/tree/main/examples
-    double sf = (double)(1 << 17);
-    X = ((double)cx - sf)/sf;
-    Y = ((double)cy - sf)/sf;
-    Z = ((double)cz - sf)/sf;
-    
-    // We multiply by 8, which is the full scale of the mag.
-    // https://github.com/sparkfun/SparkFun_MMC5983MA_Magnetometer_Arduino_Library/blob/main/examples/Example4-SPI_Simple_measurement/Example4-SPI_Simple_measurement.ino
-    Magnetometer reading{Y*8, -X*8, -Z*8};
-    return reading;
+    std::string line;
+    while (std::getline(sensor_file, line)) {
+        // read and parse and do stuff
+        // check the time and whatnot
+        
+    }
+
 }
