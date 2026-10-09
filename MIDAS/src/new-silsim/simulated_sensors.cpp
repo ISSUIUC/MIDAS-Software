@@ -39,7 +39,5 @@ std::vector<double>* silsim_read(std::string sensor_name){
     while (std::getline(sensor_file, line)) {
         // read and parse and do stuff
         // check the time and whatnot
-        
     }
-
 }
