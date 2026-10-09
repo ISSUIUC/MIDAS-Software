@@ -1,5 +1,7 @@
 #include "simulated_sensors.h"
 
+using namespace std;
+
 
 
 // ErrorCode IMUCalibrationState
@@ -34,10 +36,27 @@ std::vector<double>* silsim_read(std::string sensor_name){
     sensor_file = sensor_file_objects[sensor_name];
 
     int timestamp = pdTICKS_TO_MS(xTaskGetTickCount()); // get the current time
-    
+
+    std::stringstream ss(sensor_file);
     std::string line;
     while (std::getline(sensor_file, line)) {
+        std::string csv_timestamp;
         // read and parse and do stuff
-        // check the time and whatnot
+        // check the time and whatnotf
+        std::getline(ss, csv_timestamp, ',');
+        if ((int)csv_timestamp <= timestamp) {
+            // do something
+            continue;
+        }else{
+            break;
+        }
     }
+    std::vector<double> out;
+
+    std::string csv_value
+    while(std::getline(ss, csv_value, ',')){
+        out->push_back((double)csv_value);
+    }
+
+    return &out;
 }
