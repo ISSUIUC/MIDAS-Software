@@ -4,7 +4,7 @@ from pathlib import Path
 
 # THIS CODE TAKES A LARGE CSV WITH LOTS OF SENSOR DATA AND SORTS INTO SEPARATE CSV's PER SENSOR
 BASE_DIR = Path(__file__).resolve().parent
-csv_path = BASE_DIR / "data" / "midas_sustainer_flight copy.csv"
+csv_path = (BASE_DIR / "data" / "midas_sustainer_flight.csv")
 
 # with open(csv_path, mode='r', encoding='utf-8') as file:
 #     csv_reader = csv.reader(file)
@@ -38,6 +38,7 @@ with open(csv_path, mode="r", encoding="utf-8") as f:
     csv_reader = csv.reader(f)
 
     headers = next(csv_reader)
+    flight_start_time = int(next(csv_reader)[0])
     sensors = set()
     for header in headers:
         if "." not in header: # sensors have periods in their names.
@@ -49,24 +50,25 @@ with open(csv_path, mode="r", encoding="utf-8") as f:
 
 # for each sensor, we need to generate a new csv file within data/outputs
 
-for sensor in sensors:
+(BASE_DIR / "data" / "sensors").mkdir(parents=True, exist_ok=True)
+for sensor in sensors: 
     with open(csv_path, mode="r", encoding="utf-8") as f: # reopen file
         csv_reader = csv.reader(f)
         headers = next(csv_reader)
         relevant_cols = []
         relevant_cols.append(0)
         for i, header in enumerate(headers):
-            if header.startswith(sensor):
+            if header.startswith(sensor + "."):
                 relevant_cols.append(i)
         relevant_headers = [headers[i] for i in relevant_cols]
         csv_table = []
 
         csv_table.append(relevant_headers)
 
-        line = next(csv_reader)
+        # line = next(csv_reader)
         csv_data = []
         c = 0
-        init_time = -1 # the first timestamp in the csv for this sensor because we subtract it so it starts at zero.
+        # init_time = int(line[0]) # the first timestamp in the csv for this sensor because we subtract it so it starts at zero.
         prev_relevant_values = []
         for line in csv_reader:
             c+= 1 # this is for sanity
@@ -85,10 +87,12 @@ for sensor in sensors:
                     init_time = int(line[0])
 
             if (n): # adds to the csv_table with timestamp.
-                relevant_values_and_timestamp = [str(int(line[0])-init_time)] # appending the timestamp to the front.
+                relevant_values_and_timestamp = [str(int(line[0]) - flight_start_time)] # appending the timestamp to the front.
                 relevant_values_and_timestamp.extend(relevant_values)
                 csv_table.append(relevant_values_and_timestamp)
                 prev_relevant_values = [val for val in relevant_values]
         with open(BASE_DIR / "data" / "sensors" / f"{sensor}.csv", mode="w",newline='', encoding='utf-8') as f2:
             csv_writer = csv.writer(f2)
             csv_writer.writerows(csv_table)
+
+print("done all sensor CSVs written")
