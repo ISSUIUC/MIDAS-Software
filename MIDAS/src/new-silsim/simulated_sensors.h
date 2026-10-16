@@ -12,6 +12,7 @@
 #include <filesystem>
 #include <iostream>
 #include <unordered_map>
+#include <map>
 
 
 
@@ -23,10 +24,10 @@ struct SILData {
 
 void silsim_init(std::string sensor_name);
 
-std::vector<double>* silsim_read(std::string sensor_name);
+std::vector<double> silsim_read(std::string sensor_name);
 
 
-//----------- IDK WHATS HAPPENIGN HERE THIS IS A FUTURE PROBLEM - PETER 10/3/2026
+//----------- IDK WHATS HAPPENING HERE THIS IS A FUTURE PROBLEM - PETER 10/3/2026
 
 /**
  * @struct IMUSensor

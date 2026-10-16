@@ -63,7 +63,9 @@ for sensor in sensors:
         relevant_headers = [headers[i] for i in relevant_cols]
         csv_table = []
 
-        csv_table.append(relevant_headers)
+        parsed_headers = [header[len(sensor) + 1:] if header.startswith(sensor) else header for header in relevant_headers]
+
+        csv_table.append(parsed_headers)
 
         # line = next(csv_reader)
         csv_data = []
