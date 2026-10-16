@@ -1,4 +1,3 @@
-#include <Wire.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
@@ -48,7 +47,7 @@ ErrorCode GPSSensor::init() {
 GPS GPSSensor::read() {
     std::map<double> data = silsim_read("GPS");
     // altitude and ground speed were divided by 1000 in HIL and I did not include it
-    return GPS{data["latitude"], data, (float) ublox.getAltitude() / 1000.f, (float) ublox.getGroundSpeed() / 1000.f, data["fix_type"], data["sats_in_view"], data["time"]};
+    return GPS{data["latitude"], data, data["altitude"], data["speed"], data["fix_type"], data["sats_in_view"], data["time"]};
 }
 
 bool GPSSensor::valid() {

@@ -30,7 +30,7 @@ void silsim_init(std::string sensor_name) {
     }
 }
 
-std::vector<double> silsim_read(std::string sensor_name) {
+std::map<double> silsim_read(std::string sensor_name) {
     // assume sensor_name is appropriate to pull from an existing csv
     // get current time_stamp
     // use csv from corresponding sensor

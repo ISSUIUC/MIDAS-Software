@@ -1,6 +1,6 @@
 #include "simulated_sensors.h"
 
-
+// TODO see if non init and non read functions need rewriting
 
 #define MGC_TONE_PITCH_H Sound{3000, 50}
 #define MGC_TONE_PITCH_L Sound{2200, 50}
