@@ -8,6 +8,6 @@ ErrorCode BarometerSensor::init() {
 }
 
 Barometer BarometerSensor::read() {
-	std::map<std::string, double> data = silsim_read("barometer")
-	return Barometer(data["temperature"], data["pressure"], data["altitude"])
+	std::map<std::string, double> data = silsim_read("barometer");
+	return Barometer(data["temperature"], data["pressure"], data["altitude"]);
 }

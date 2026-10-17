@@ -17,7 +17,7 @@ ErrorCode VoltageSensor::init() {
  * @return The scaled voltage given by the voltage sensor
 */
 Voltage VoltageSensor::read() {
-    std::map<double> data = silsim_read("voltage");
+    std::map<std::string, double> data = silsim_read("voltage");
     Voltage voltage;
     voltage.continuity[0] = data["continuity[0]"];
     voltage.continuity[1] = data["continuity[1]"];

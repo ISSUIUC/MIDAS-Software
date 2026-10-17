@@ -45,7 +45,7 @@ ErrorCode GPSSensor::init() {
  * @return GPS data packet
  */
 GPS GPSSensor::read() {
-    std::map<double> data = silsim_read("GPS");
+    std::map<std::string, double> data = silsim_read("GPS");
     // altitude and ground speed were divided by 1000 in HIL and I did not include it
     return GPS{data["latitude"], data, data["altitude"], data["speed"], data["fix_type"], data["sats_in_view"], data["time"]};
 }

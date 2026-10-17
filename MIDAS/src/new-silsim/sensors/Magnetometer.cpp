@@ -23,8 +23,8 @@ ErrorCode MagnetometerSensor::init() {
 }
 
 Magnetometer MagnetometerSensor::read() {
-	std::map<std::string, double> data = silsim_read("magnetometer")
-	Magnetometer reading{data["mX"], data["my"], data["mz"]}
+	std::map<std::string, double> data = silsim_read("magnetometer");
+	return Magnetometer reading{data["mX"], data["my"], data["mz"]};
 }
 
 
