@@ -25,6 +25,7 @@ struct FSMPyroAction {
 struct FSMUserThresholds {
     float pyro_fire_t;
     float main_alt;
+    float apog_launch_t_gt;
     bool cruise_lockout_en;
 };
 
