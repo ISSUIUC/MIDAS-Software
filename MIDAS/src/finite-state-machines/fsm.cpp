@@ -182,15 +182,17 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             }
 
             // Switch back to STATE_SAFE after a certain amount of time passes 
+            // + clear armed transition flag
             if((current_time - pyro_test_entry_time) > fsms_pt_disarm_t) {
                 commands.should_transition_pyro_test = false;
+                commands.should_transition_armed = false;
                 state = FSMState::STATE_SAFE;
             }
 
             break;
         case FSMState::STATE_ARMED:
 
-            // Force transtion to safe if requested + clear all transition flags.
+            // Force transition to safe if requested + clear all transition flags.
             if(commands.should_transition_safe) {
                 state = FSMState::STATE_SAFE;
                 commands.should_transition_pyro_test = false;
