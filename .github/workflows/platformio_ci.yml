@@ -87,45 +87,6 @@ jobs:
           name: firmware-feather_duo
           path: ground/.pio/build/feather_duo/firmware*.*
 
-  build_cam:
-    name: Build CamBoard:CamBoard
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: CamBoard
-    steps:
-      - uses: actions/checkout@v3
-      - name: Cache pip
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-      - name: Cache PlatformIO
-        uses: actions/cache@v3
-        with:
-          path: ~/.platformio
-          key: ${{ runner.os }}-pio-${{ hashFiles('**/platformio.ini') }}
-          restore-keys: |
-            ${{ runner.os }}-pio-
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
-      - name: Install PlatformIO
-        run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade platformio
-      - name: PlatformIO version
-        run: pio --version
-      - name: Build CamBoard
-        run: pio run -e CamBoard
-      - name: Upload Artifact for CamBoard
-        uses: actions/upload-artifact@v4
-        with:
-          name: firmware-cam_board
-          path: CamBoard/.pio/build/CamBoard/firmware*.*
 
   notify:
     name: Slack Notification Summary (main)
@@ -142,7 +103,6 @@ jobs:
             Build results:
             - *MIDAS:mcu_main*: ${{ needs.build_fsw.result }}
             - *ground:feather_duo*: ${{ needs.build_feather_duo.result }}
-            - *CamBoard:CamBoard*: ${{ needs.build_cam.result }}
 
             :information_source: CI Notifications only run on the `main` branch.
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK_URL }}
