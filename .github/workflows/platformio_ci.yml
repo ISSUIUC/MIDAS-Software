@@ -97,7 +97,7 @@ jobs:
       - name: Send Slack Summary
         uses: rtCamp/action-slack-notify@v2
         env:
-          SLACK_COLOR: ${{ (needs.build_fsw.result == 'success' && needs.build_feather_duo.result == 'success' && needs.build_cam.result == 'success') && 'good' || 'danger' }}
+          SLACK_COLOR: ${{ (needs.build_fsw.result == 'success' && needs.build_feather_duo.result == 'success') && 'good' || 'danger' }}
           SLACK_TITLE: "Firmware Build Summary"
           SLACK_MESSAGE: |
             Build results:
