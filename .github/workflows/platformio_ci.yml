@@ -90,7 +90,7 @@ jobs:
 
   notify:
     name: Slack Notification Summary (main)
-    needs: [build_fsw, build_feather_duo, build_cam]
+    needs: [build_fsw, build_feather_duo]
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/main'
     steps:
