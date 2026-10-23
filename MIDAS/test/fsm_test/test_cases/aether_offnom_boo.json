@@ -7,7 +7,7 @@
     "main_alt=1350",
     "cruise_lockout_en=true",
     "pyro_fire_t=200",
-    "apog_launch_t_gt=-1",
+    "apog_launch_t_gt=2000",
     "pyro_0=enable=true,fsm_trigger=5,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100",
     "pyro_1=enable=true,fsm_trigger=6,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=100",
     "pyro_3=enable=true,fsm_trigger=4,max_tilt=-1,after_motor=0,launch_t_gt=-1,launch_t_lt=-1,vx_min=-1,vx_max=-1,delay=500"
