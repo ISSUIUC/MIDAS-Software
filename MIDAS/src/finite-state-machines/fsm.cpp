@@ -270,10 +270,10 @@ FSMData FSM::tick_fsm(FSMTickData& fsm_data) {
             bool apog_detect_cruise_lockout = (!config.thresholds.cruise_lockout_en || kf_data.velocity.vx <= fsms_cruise_lockout_spd);
             // Note: This evaluates to TRUE (no lockout) if the lockout is disabled, OR if the condition is met
 
-            // Condition 3: Enough time has passed since launched
-            bool apog_detect_time_passed = ((current_time - launch_time) >= config.thresholds.apog_launch_t_gt);
+            // Condition 3: Enough time has passed since launch
+            bool apog_minimum_flight_time_met = ((current_time - launch_time) >= config.thresholds.apog_launch_t_gt);
 
-            if (apog_detect_low_speed && apog_detect_cruise_lockout && apog_detect_time_passed) {
+            if (apog_detect_low_speed && apog_detect_cruise_lockout && apog_minimum_flight_time_met) {
                 // Start the consecutive timer if not already running
                 if (apogee_detect_start == 0) {
                     apogee_detect_start = current_time;
