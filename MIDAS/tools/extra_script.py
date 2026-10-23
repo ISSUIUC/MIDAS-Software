@@ -7,9 +7,9 @@ assert sys.version_info >= (3, 5)
 
 Import("env")
 
-log_format_text = (Path("src") / "log_format.h").read_text()
-sensor_data_text = (Path("src") / "sensor_data.h").read_text(errors="replace")
-eeprom_format_text = (Path("src") / "esp_eeprom_format.h").read_text()
+log_format_text = (Path("src") / "logging" / "log_format.h").read_text()
+sensor_data_text = (Path("src") / "flight-systems" / "sensor_data.h").read_text(errors="replace")
+eeprom_format_text = (Path("src") / "logging" / "esp_eeprom_format.h").read_text()
 
 git_command = ["git", "log", "-n", "1", "--pretty=format:%H"]
 git_hash = subprocess.run(git_command, stdout=subprocess.PIPE).stdout.decode('utf-8')
@@ -28,8 +28,8 @@ file_eeprom = f"""\
 #define EEPROM_CHECKSUM (0x{checksum_eeprom:08x})
 """
 
-with Path("src/log_checksum.h").open("w") as checksum_file:
+with Path("src/logging/log_checksum.h").open("w") as checksum_file:
     checksum_file.write(file)
 
-with Path("src/esp_eeprom_checksum.h").open("w") as checksum_file_eeprom:
+with Path("src/logging/esp_eeprom_checksum.h").open("w") as checksum_file_eeprom:
     checksum_file_eeprom.write(file_eeprom)

@@ -12,8 +12,8 @@
 #include <condition_variable>
 #include <string>
 
-#include "sensor_data.h"
-#include "log_format.h"
+#include "flight-systems/sensor_data.h"
+#include "logging/log_format.h"
 #include "crc.h"
 
 #define STR2(x) #x

@@ -1,77 +1,127 @@
 #pragma once
 
-#include "errors.h"
-#include "hal.h"
+#include <util/errors.h>
+#include "util/hal.h"
 #include "pins.h"
 
 #include <E22.h>
 
 /**
  * @class TelemetryBackend
- * 
- * @brief Class that wraps the Telemetry functions
-*/
+ *
+ * @brief Interface for the onboard LoRa telemetry radio.
+ *
+ * Wraps the SX1268/E22 radio driver and provides functions for
+ * initialization, packet transmission, reception, frequency control,
+ * and SPI synchronization.
+ */
 class TelemetryBackend {
 public:
+    /**
+     * @brief Constructs the telemetry backend.
+     */
     TelemetryBackend();
+
+    /**
+     * @brief Initializes the LoRa radio.
+     *
+     * Configures the radio hardware and prepares it for packet
+     * transmission and reception.
+     *
+     * @return Error code indicating initialization status.
+     */
     [[nodiscard]] ErrorCode init();
 
+    /**
+     * @brief Returns the RSSI of the most recently received packet.
+     *
+     * @return Received Signal Strength Indicator (RSSI) in dBm.
+     */
     int16_t getRecentRssi();
+
+    /**
+     * @brief Changes the operating radio frequency.
+     *
+     * @param frequency Desired frequency in MHz.
+     *
+     * @return Error code indicating whether the operation succeeded.
+     */
     ErrorCode setFrequency(float frequency);
+
+    /**
+     * @brief Assigns the SPI mutex used by the radio driver.
+     *
+     * @param mtx FreeRTOS semaphore protecting the shared SPI bus.
+     */
     void set_spi_mutex(SemaphoreHandle_t mtx) { lora.set_spi_mutex(mtx); }
 
     /**
-     * @brief This function transmits data from the struct provided as
-     * the parameter (data collected from sensor suite) to the
-     * ground station. The function also switches to a new commanded
-     * frequency based on a previously received command and waits for
-     * a response from the ground station.
+     * @brief Transmits a packet over the LoRa radio.
      *
-     * @param sensor_data: struct of data from the sensor suite to be
-     *                     transmitted to the ground station.
+     * The packet type must fit within the SX1268 maximum payload size
+     * of 255 bytes. If transmission fails, the radio is automatically
+     * reinitialized.
      *
-     * @return void
+     * @tparam T Packet type to transmit.
+     *
+     * @param data Packet to send.
      */
     template<typename T>
     void send(const T& data) {
         static_assert(sizeof(T) <= 0xFF, "The data type to send is too large"); // Max payload is 255
 
         SX1268Error result = lora.send((uint8_t*) &data, sizeof(T));
+
         if(result != SX1268Error::NoError) {
             Serial.print("Lora TX error ");
             Serial.println((int)result);
-            // Re init the lora
+
+            // Attempt to recover from communication failure.
             (void)init();
         }
     }
 
     /**
-     * @brief Reads message from the LoRa
-     * 
-     * @param write The buffer to write the data to
-     * 
-     * @return bool indicating a successful read and write to buffer
-    */
+     * @brief Attempts to receive a packet from the LoRa radio.
+     *
+     * Waits up to the specified timeout for a packet of type T. Radio
+     * errors automatically trigger a reinitialization attempt.
+     *
+     * @tparam T Packet type expected.
+     *
+     * @param write Buffer where the received packet will be stored.
+     * @param wait_milliseconds Maximum receive timeout in milliseconds.
+     *
+     * @return true if a packet was successfully received.
+     * @return false if the receive timed out or an error occurred.
+     */
     template<typename T>
     bool read(T* write, int wait_milliseconds) {
         static_assert(sizeof(T) <= 0xFF, "The data type to receive is too large");
+
         uint8_t len = sizeof(T);
-        // set receive mode
+
+        // Receive a packet from the radio.
         SX1268Error result = lora.recv((uint8_t*) write, len, wait_milliseconds);
+
         if(result == SX1268Error::NoError) {
             return true;
-        } else if(result == SX1268Error::RxTimeout) {
+        }
+        else if(result == SX1268Error::RxTimeout) {
             return false;
-        } else {
+        }
+        else {
             Serial.print("Lora error on rx ");
             Serial.println((int)result);
 
-            //Re init the lora
+            // Attempt to recover from communication failure.
             (void)init();
+
             return false;
         }
     }
 
 private:
+    /// SX1268 LoRa transceiver driver.
     SX1268 lora;
 };

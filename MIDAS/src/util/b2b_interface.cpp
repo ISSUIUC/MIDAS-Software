@@ -1,6 +1,6 @@
 #include "b2b_interface.h"
-#include "sensor_data.h"
-#include "rocket_state.h"
+#include "flight-systems/sensor_data.h"
+#include "flight-systems/rocket_state.h"
 
 ErrorCode B2BInterface::init() {
     // No special init

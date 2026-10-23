@@ -1,5 +1,5 @@
 //#include "silsim/emulation.h"
-#include "systems.h"
+#include "flight-systems/systems.h"
 #include "FileSink.h"
 
 void rocket_main_thread(RocketSystems* systems) {

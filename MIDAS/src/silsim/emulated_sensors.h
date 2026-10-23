@@ -1,7 +1,7 @@
 #pragma once
 
-#include "errors.h"
-#include "sensor_data.h"
+#include <util/errors.h>
+#include "flight-systems/sensor_data.h"
 
 #include "silsim/simulation/simulation.h"
 

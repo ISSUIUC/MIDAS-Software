@@ -1,8 +1,8 @@
 #pragma once
 
 #include "kalman_filter.h"
-#include "sensor_data.h"
-#include "Buffer.h" 
+#include "flight-systems/sensor_data.h"
+#include "util/Buffer.h" 
 #include "constants.h"
 #include "aero_coeff.h"
 #include "rotation.h"

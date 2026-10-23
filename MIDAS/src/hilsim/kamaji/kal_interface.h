@@ -3,7 +3,7 @@
 #include <Wire.h>
 #include <SPI.h>
 #include "TCAL9538.h"
-#include <systems.h>
+#include <flight-systems/systems.h>
 // Handles MIDAS system setup and interfacing
 
 inline void k_midas_setup() {

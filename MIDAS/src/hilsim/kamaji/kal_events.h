@@ -1,7 +1,7 @@
 #pragma once
 #include <cstdint>
 #include "kal_error.h"
-#include "log_checksum.h"
+#include "logging/log_checksum.h"
 
 // ---- CONFIGURATION ----
 #define EVENT_STACK_SIZE 8
