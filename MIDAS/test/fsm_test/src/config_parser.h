@@ -82,6 +82,8 @@ inline SimConfig parse_config_lines(FILE* fp) {
             cfg.fsm_config.thresholds.cruise_lockout_en = (val == "true" || val == "1");
         } else if (key == "pyro_fire_t") {
             cfg.fsm_config.thresholds.pyro_fire_t = strtof(val.c_str(), nullptr);
+        } else if (key == "apog_launch_t_gt") {
+            cfg.fsm_config.thresholds.apog_launch_t_gt = strtof(val.c_str(), nullptr);
         } else if (key.size() == 6 && key.substr(0, 5) == "pyro_") {
             int idx = key[5] - '0';
             if (idx >= 0 && idx < MIDAS_NUM_PYROS) {

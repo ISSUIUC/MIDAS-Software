@@ -22,6 +22,7 @@ static constexpr MapEntry threshold_map[] = {
     {"PYRO_FIRE_T", offsetof(FSMUserThresholds, pyro_fire_t), DataType::FLOAT, "ms"},
     {"MAIN_ALT", offsetof(FSMUserThresholds, main_alt), DataType::FLOAT, "m"},
     {"CRUISE_LOCKOUT_EN", offsetof(FSMUserThresholds, cruise_lockout_en), DataType::BOOL, ""},
+    {"APOG_LAUNCH_T_GT", offsetof(FSMUserThresholds, apog_launch_t_gt), DataType::FLOAT, "ms"},
 };
 
 static constexpr MapEntry channel_map[] = {
