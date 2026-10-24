@@ -8,7 +8,7 @@ ErrorCode IMUSensor::init() {
 }
 
 IMU IMUSensor::read() {
-    std::map<std::string, double> values = silsim_read("imu");
+    std::map<std::string, double> values = silsim_read("imu", 0); // hardcoding 0 just for testing
 
     IMU reading{};
 
@@ -28,13 +28,13 @@ IMU IMUSensor::read() {
 }
 
 IMU_SFLP IMUSensor::read_sflp() {
-    std::map<std::string, double> values = silsim_read("sflp");
+    std::map<std::string, double> values = silsim_read("sflp", 0); // hardcoding 0 just for tseting
     IMU_SFLP reading{};
 
     reading.quaternion.w = values.at("quaternion.w");
     reading.quaternion.x = values.at("quaternion.x");
     reading.quaternion.y = values.at("quaternion.y");
-    readint.quaternion.z = values.at("quaternion.z");
+    reading.quaternion.z = values.at("quaternion.z");
 
     reading.gravity.ax = values.at("gravity.ax");
     reading.gravity.ay = values.at("gravity.ay");

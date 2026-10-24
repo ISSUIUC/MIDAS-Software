@@ -2,29 +2,34 @@
 
 #include "errors.h"
 #include "sensor_data.h"
-#include "hardware/pins.h"
-#include "TCAL9538.h"
-#include "rocket_state.h"
-#include "esp_eeprom.h"
-#include "buzzer.h"
+// #include "rocket_state.h"
+// #include "esp_eeprom.h"
+// #include "buzzer.h"
 #include <stdexcept>
 #include <fstream>
 #include <filesystem>
 #include <iostream>
 #include <unordered_map>
 #include <map>
+#include <string>
+#include <vector>
+#include <cstdint>
 
 
+class BuzzerController;
+class EEPROMController;
+struct CommandFlags;
 
-struct SILData {
-    RocketData data;
-    void update_data(int dt);
-};
+
+// struct SILData {
+//     RocketData data;
+//     void update_data(int dt);
+// };
 // 
 
 void silsim_init(std::string sensor_name);
 
-std::vector<double> silsim_read(std::string sensor_name);
+std::map<std::string, double> silsim_read(std::string sensor_name, std::uint64_t timestamp_ms);
 
 
 //----------- IDK WHATS HAPPENING HERE THIS IS A FUTURE PROBLEM - PETER 10/3/2026
@@ -50,7 +55,7 @@ struct IMUSensor {
     IMU_SFLP read_sflp();
     void begin_calibration(BuzzerController& buzzer);
     void calib_reading(Acceleration lowg_reading, Acceleration highg_reading, BuzzerController& buzzer_indicator, EEPROMController& eeprom);
-    unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+    unsigned long get_time_since_calibration_start();
     void restore_calibration(EEPROMController& eeprom);
     void abort_calibration(BuzzerController& buzzer, EEPROMController& eeprom);
     
@@ -84,7 +89,7 @@ struct MagnetometerSensor {
     Magnetometer calibration_bias_hardiron = {0.0, 0.0, 0.0}; // hard iron offset -- "recenters" data on origin (0,0,0).
     Magnetometer calibration_bias_softiron = {1.0, 1.0, 1.0}; // soft iron offset -- scales per-axis data (Should be 3x3, but we'll try 1x3 for now.)
 
-    unsigned long get_time_since_calibration_start() { return millis() - _calib_begin_timestamp; }
+    unsigned long get_time_since_calibration_start();
 
     private:
     void commit_calibration(EEPROMController& eeprom, BuzzerController& buzzer); // Calculate and commit the calibration to memory
