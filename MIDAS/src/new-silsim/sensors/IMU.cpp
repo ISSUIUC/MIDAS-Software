@@ -45,5 +45,5 @@ IMU_SFLP IMUSensor::read_sflp() {
     reading.gyro_bias.vz = values.at("gyro_bias.vz");
     
 
-    return readign;
+    return reading;
 }
